@@ -12,11 +12,12 @@ reached CMake using system 3.22.1, below the required 3.24, because that wrapper
 did not restore the build-tools PATH. These are recorded setup failures, not
 source compilation failures. They remain visible in `logs-expanded`.
 
-The current serial retry uses a new build root to preserve the verifier-only
-binary, loads the pinned existing oneAPI/ggml toolchains with the original
-bounded single-job setting and explicit compiler paths, and verifies the exact
-expanded source digests before configure. Its remote handle is in
-`backend-build-handle.json`. Verify the live process or terminal result and
-`sycl-build-clean.txt` before claiming an expanded SYCL pass. C++/SYCL builds
-are compilation evidence only; maestro1 cannot qualify Orin CUDA behavior or
-AMD/Intel GPU execution.
+The fresh-root retry completed all 123 Ninja steps and linked the expanded
+`strata` executable. The seven expanded source digests matched before
+configuration and were rechecked after the build. The build used one compile job
+and produced no compiler errors. The expanded executable digests are in
+`expanded-binary-sha256.txt`; the seven input source digests are in
+`expanded-source-sha256.txt`. The full clean-root compiler log is retained here
+as `sycl-build-clean.txt`; the remote handle and prior setup attempts are in
+`backend-build-handle.json`. C++/SYCL builds are compilation evidence only;
+maestro1 cannot qualify Orin CUDA behavior or AMD/Intel GPU execution.

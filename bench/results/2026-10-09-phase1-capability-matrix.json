@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "phase": 1,
+  "date": "2026-10-09",
+  "hardware": "Jetson AGX Orin Developer Kit, ARM64, SM87, CUDA 12.6.68, MAXN; dynamic clocks observed, not changed",
+  "model_cohort": {
+    "name": "Qwen3.8-Flash-Next Coder IQ1_M",
+    "shards": 2,
+    "mtp_source_tensors": 31,
+    "tokenizer_template": "verified tokenizer and chat template under ~/models/strata-orin-validation/pack/tokenizer",
+    "quantization_inventory": "GGUF header and tensor geometry inventory; inventory is not numerical qualification",
+    "evidence": [
+      "2026-10-09-integration-controls/README.md",
+      "2026-10-09-paired-api-controls/evidence/coder-tensor-inventory.json",
+      "2026-10-09-integration-controls/capabilities.json"
+    ]
+  },
+  "cells": [
+    {
+      "id": "native_control_and_branch_build",
+      "status": "pass",
+      "scope": "native ARM64 Release CUDA 12.6.68 builds; SM87 cubins inspected; source and executable identities retained",
+      "evidence": ["2026-10-09-integration-controls/README.md"]
+    },
+    {
+      "id": "artifact_identity",
+      "status": "pass",
+      "scope": "two IQ1_M shards and all 31 MTP source tensors independently rehashed against pinned digests; prepared pack identity only",
+      "evidence": ["2026-10-09-integration-controls/README.md", "2026-10-09-paired-api-controls/README.md"]
+    },
+    {
+      "id": "formatted_workload_shapes",
+      "status": "pass",
+      "scope": "exact actual prompt counts 512, 2048, 172, 557, 1069; generated counts 64, 128, 64, 64, 64",
+      "evidence": ["2026-10-09-paired-api-controls/README.md"]
+    },
+    {
+      "id": "same_day_paired_controls",
+      "status": "pass",
+      "scope": "four independent process pairs, 40 measured requests and 40 warmups, exact counts and zero reuse; screening only",
+      "evidence": ["2026-10-09-paired-api-controls/README.md", "2026-10-09-paired-api-controls/capabilities.json"]
+    },
+    {
+      "id": "seven_pair_confirmation",
+      "status": "not_run",
+      "scope": "four pairs are screening; seven independent pairs remain required for confirmation before promotion",
+      "evidence": ["2026-10-09-paired-api-controls/README.md"]
+    },
+    {
+      "id": "clock_profile",
+      "status": "pass",
+      "scope": "dynamic clocks and MAXN observed; clocks not changed; GPU/EMC observations complete for three of four pairs, pair zero missing",
+      "evidence": ["2026-10-09-paired-api-controls/README.md", "2026-10-09-paired-api-controls/evidence/paired-clocks.jsonl"]
+    },
+    {
+      "id": "physical_headroom",
+      "status": "pass",
+      "scope": "six GiB admission floor and separate 3072 MiB workspace reserve retained; paired-run sampled minimum 8.35 GiB",
+      "evidence": ["2026-10-09-paired-api-controls/capabilities.json"]
+    },
+    {
+      "id": "finite_cgroup_ceiling",
+      "status": "unsupported",
+      "scope": "no finite shared cgroup ancestor ceiling was exposed; physical-memory admission still enforced",
+      "evidence": ["2026-10-09-paired-api-controls/capabilities.json"]
+    },
+    {
+      "id": "setup_core_and_mock_api_baseline",
+      "status": "pass",
+      "scope": "15 setup tests, 312 selected mock API tests, pinned memory-budget test, six selected branch CPU/core tests; no skips in selected suites",
+      "evidence": ["2026-10-09-integration-controls/README.md"]
+    },
+    {
+      "id": "real_model_api_protocol_cancel_recovery",
+      "status": "pass",
+      "scope": "seven scenarios pass on both pinned and branch binaries, including OpenAI/Anthropic streaming, cancellation and recovery",
+      "evidence": ["2026-10-09-paired-api-controls/README.md"]
+    },
+    {
+      "id": "native_spec4_without_mtp_weights",
+      "status": "pass",
+      "scope": "one-token native smoke on both new builds; not a performance or parity comparison",
+      "evidence": ["2026-10-09-integration-controls/README.md"]
+    },
+    {
+      "id": "native_spec0",
+      "status": "unsupported",
+      "scope": "native IQ pack rejects explicit --spec 0; MTP-off translation uses supported native window without MTP weights",
+      "evidence": ["2026-10-09-integration-controls/README.md"]
+    },
+    {
+      "id": "streaming_kv_short_request_startup_recovery",
+      "status": "pass",
+      "scope": "context 32768, actual resident KV 20480; seven short-request checks pass; not boundary paging or long-context quality",
+      "evidence": ["2026-10-09-prefill-mtp-owner-trace/CAPABILITIES.json", "2026-10-09-prefill-mtp-owner-trace/README.md"]
+    },
+    {
+      "id": "streaming_kv_at_context4096_with_resident1024",
+      "status": "unsupported",
+      "scope": "engine clamps actual resident KV to zero and required-mode gate rejects before requests",
+      "evidence": ["2026-10-09-prefill-mtp-owner-trace/CAPABILITIES.json"]
+    },
+    {
+      "id": "residency_boundary_paging_and_long_context_quality",
+      "status": "not_run",
+      "scope": "paging across the resident boundary, retrieval/recall quality and 32K capacity remain untested",
+      "evidence": ["2026-10-09-prefill-mtp-owner-trace/README.md"]
+    },
+    {
+      "id": "whole_model_raw_logit_repeatability_and_reference_parity",
+      "status": "fail",
+      "scope": "raw multi-token controls vary; fresh four-token reference comparison has KL 1.302. Explicit CPU-sharing-disabled prefix comparison is narrow diagnostic evidence, not a whole-model pass",
+      "evidence": ["2026-10-09-paired-api-controls/README.md", "2026-10-09-prefill-mtp-owner-trace/CAPABILITIES.json"]
+    },
+    {
+      "id": "independent_weighted_rms_oracle",
+      "status": "pass",
+      "scope": "25 independent FP64 fixtures and eight invalid-argument checks on existing Strata CUDA operator; no NInfer kernel promotion",
+      "evidence": ["2026-10-09-paired-api-controls/README.md"]
+    },
+    {
+      "id": "q6_k_and_iq4_nl_codec_oracles",
+      "status": "pass",
+      "scope": "selected synthetic codec/conversion routes pass independent exact-bit oracles; not model quality, projection arithmetic, NInfer conversion or speed",
+      "evidence": ["2026-10-09-q6-k-codec-contract/README.md", "2026-10-09-iq4-nl-codec-contract/README.md"]
+    },
+    {
+      "id": "owner_and_workspace_accounting",
+      "status": "unsupported",
+      "scope": "partial requested-payload counters and graph instantiation counts exist; unique physical allocations, workspace peaks, graph-pool bytes and future reservations are not qualified",
+      "evidence": ["2026-10-09-prefill-mtp-owner-trace/CAPABILITIES.json", "2026-10-09-prefill-mtp-owner-trace/README.md"]
+    },
+    {
+      "id": "hip_sycl_shared_source_builds",
+      "status": "pass",
+      "scope": "verifier-only and expanded HIP/SYCL source compiled on maestro1; compilation only",
+      "evidence": ["2026-10-09-expanded-backend-build/README.md", "2026-10-09-expanded-backend-build/expanded-binary-sha256.txt"]
+    },
+    {
+      "id": "hip_sycl_gpu_runtime",
+      "status": "unsupported",
+      "scope": "maestro1 has no relevant GPU runtime qualification; no HIP/SYCL execution claim",
+      "evidence": ["2026-10-09-expanded-backend-build/README.md"]
+    },
+    {
+      "id": "ninfer_model_cohorts",
+      "status": "not_run",
+      "scope": "reference NInfer cohorts were not rebuilt or measured; inherited NInfer results remain separate cohorts",
+      "evidence": ["2026-10-08-maestro1-builds/README.md", "../../evidence/ninfer-orin/README.md"]
+    }
+  ],
+  "decision": "Phase 1 evidence and limitations are inventoried. This does not authorize optimization promotion; unresolved numerical parity, ownership, streaming-boundary and confirmation gates remain prerequisites for later claims."
+}

@@ -59,6 +59,6 @@ reservations. Phase 1 needs explicit counters and unsupported scopes; do not
 mistake a partial requested-byte trace for the later accounting gate.
 
 Shared owner edits require CUDA/HIP/SYCL builds, including migrated SYCL source
-copies where they exist. The native CUDA build passes; isolated maestro1 HIP
-and SYCL builds are pending for the expanded source. The earlier verifier-only
-HIP snapshot compiles; that does not validate the newer prefill/MTP edits. Compilation does not qualify either GPU runtime.
+copies where they exist. The native CUDA build and isolated maestro1 expanded HIP
+and SYCL builds pass for the newer prefill/MTP edits. Compilation does not qualify
+either GPU runtime.

@@ -92,14 +92,22 @@ The prepared cells are pp512+tg64, pp2048+tg128 and historical prompt lengths
 fail the control cell. CLI smoke tests are separate: CLI prefill counts exclude
 the final prompt token and cannot be labeled API workload results.
 
-## Gates still required
+## Closeout and carried limitations
 
-Owner-specific allocations, reservations and graph/workspace peak counters remain
-required. Same-day paired controls, streaming TTFT and the first independent
-operator tolerance/diagnostic are now recorded in the
+Phase 1 closes with its exercised, failed, unsupported and untested scopes in the
+[capability matrix](../../bench/results/2026-10-09-phase1-capability-matrix.json).
+Same-day paired controls, streaming TTFT and the first independent operator
+tolerance/diagnostics are recorded in the
 [paired report](../../bench/results/2026-10-09-paired-api-controls/README.md).
-The known raw-token logit discrepancy was freshly reproduced, not adopted as a
-pass. NInfer model cohorts have not been rebuilt or measured here.
+The known raw-token logit discrepancy was freshly reproduced and remains a
+failure; it was not adopted as a pass. NInfer model cohorts have not been rebuilt
+or measured here and remain separate from Strata's controls.
+
+Owner-specific allocations, unique reservations and graph/workspace peak counters
+remain incomplete. Their partial observations and exact unsupported scopes are
+recorded; they are required for Phase 3 accounting and any memory-path promotion.
+This closeout does not qualify persistent-state parity, long-context quality,
+capacity, sustained service or an optimization.
 
 The private diagnostic builds separately from production dispatch:
 

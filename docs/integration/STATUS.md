@@ -1,13 +1,14 @@
 # Integration status
 
-Updated: 2026-10-09. Phase 1 paired controls and correctness diagnostics have run;
-owner-specific observations are partial; expanded backend validation remains open. No NInfer execution component has been promoted into Strata.
+Updated: 2026-10-09. Phase 1 is complete with its supported, failed, unsupported
+and untested scopes recorded. Phase 2 contract work is active. No NInfer execution
+component has been promoted into Strata.
 
 | Phase | State | Evidence / next gate |
 | --- | --- | --- |
 | 0 — Repository and import | Complete | Pinned source/evidence manifest, source mapping, plan, offline planner checks |
-| 1 — Same-day controls | In progress | Four same-day paired API blocks; Verifier/prefill/MTP diagnostics added; capability qualification and expanded backend builds pending |
-| 2 — Operator/state contracts | Not started | Checked projection map, RMS and IQ4_NL oracles prepared; runtime adapters, other codecs and state ownership gates pending |
+| 1 — Same-day controls | Complete | Four same-day paired API blocks; exact workloads/artifacts; protocol and baseline checks; capability matrix records limits; expanded HIP/SYCL builds compile |
+| 2 — Operator/state contracts | In progress | Projection map and RMS/IQ4_NL/Q6_K oracles recorded; runtime adapters, broader format contracts and state ownership gates remain |
 | 3 — Memory and transfers | Not started | Unique allocation/reservation accounting and pressure/lifetime tests |
 | 4 — SM87/ARM kernels | Not started | Pinned request profile prepared; bottleneck attribution, qualified candidate and request confirmation pending |
 | 5 — Speculation and graphs | Not started | Accepted-prefix state, graph lifetime and drift qualification |
@@ -26,10 +27,11 @@ partial results, six GiB physical/cgroup admission, telemetry, explicit artifact
 and binary inventories, exact formatted workload preparation and an API screening
 adapter. The [integration notebook](PORTING_NOTES.md) records lessons for a future
 Strata + Splash integration. The first [opt-in owner diagnostic](INSTRUMENTATION.md)
-now records primary verifier arena events, window graph instantiations, prefill
-owned allocations/views and MTP state/scratch arenas with a separate payload counter.
-CUDA and trace-on/off real-model protocol checks pass; HIP/SYCL builds remain
-pending. Runtime policy and default dispatch are unchanged.
+records primary verifier arena events, window graph instantiations, prefill-owned
+allocations/views and MTP state/scratch arenas with a separate payload counter.
+CUDA and trace-on/off real-model protocol checks pass. Verifier-only and expanded
+HIP/SYCL builds pass. No HIP/SYCL GPU runtime execution is claimed. Runtime policy
+and default dispatch are unchanged.
 
 Fresh Orin checks: 46 integration harness tests, 15 Jetson setup tests, 312 selected
 mock API tests, the pinned shared-memory budget test and six selected branch
@@ -53,12 +55,18 @@ The [paired evidence report](../../bench/results/2026-10-09-paired-api-controls/
 retains raw requests, failures, telemetry, medians, paired uncertainty, plots,
 format inventory and the fresh four-token logit discrepancy (KL 1.302).
 Multi-token content also varies between identical runtime controls; numerical
-and persistent-state parity are not established. See [contracts](OPERATOR_CONTRACTS.md).
+and persistent-state parity are not established. The [Phase 1 capability
+matrix](../../bench/results/2026-10-09-phase1-capability-matrix.json) records
+the full supported/failed/unsupported/not-run inventory and closes Phase 1 with
+these exclusions visible. See [contracts](OPERATOR_CONTRACTS.md).
 
-Remaining Phase 1 gates: workspace/graph/MTP observations and capability
-qualification for their supported scopes. Unique physical ownership and future
-reservation semantics belong to Phase 3. Startup free-memory
-traces and buffer descriptions are coarse observations, not ownership accounting.
+Phase 1 controls used four pairs, which is screening evidence rather than the
+seven-pair confirmation required for promotion. HIP/SYCL shared-source builds
+pass; their runtime behavior is unqualified.
+Current workspace, graph, prefill and MTP observations are partial. Unique
+physical ownership and future reservation semantics belong to Phase 3. Startup
+free-memory traces and buffer descriptions are coarse observations, not ownership
+accounting.
 Native packs reject `--spec 0`; omit MTP weights while retaining a supported
 native window for MTP-off. No throughput improvement, combined-runtime
 qualification, sustained service or later-phase completion is claimed. NInfer
@@ -79,8 +87,8 @@ processes and the candidate, while CPU-reference KL remains 1.385. This is a
 narrow diagnostic, not default or whole-model parity. The requested 1024-token
 KV residency at a 4K context is clamped to a fully resident path and does not
 qualify streaming. The owned harness now saves actual initial capabilities and
-can require an observed streaming mode. Verifier-only HIP compilation passed;
-SYCL and expanded-source HIP/SYCL validation remain pending.
+can require an observed streaming mode. Verifier-only and expanded HIP/SYCL builds
+pass. No backend GPU runtime result is available from maestro1.
 
 Actual streaming startup/recovery now passes seven short-request checks with
 reported resident20480/context32768 and cache5215 slots/10155 MiB. Sampled
@@ -90,11 +98,11 @@ cell is explicitly rejected before requests and retained as unsupported. The
 [capability manifest](../../bench/results/2026-10-09-prefill-mtp-owner-trace/CAPABILITIES.json)
 keeps each qualification boundary explicit.
 
-Expanded backend validation is staged on maestro1: the wrapper waits for the
-verifier-only HIP/SYCL snapshot to finish, preserves its identities/logs, then
-applies the expanded source and forces recompilation. HIP and SYCL run serially
-with one compile job. This is a pending build handle, not completed evidence;
-revalidate the live process, terminal logs and exact source digests before review.
+Expanded backend validation passed on maestro1. Verifier-only and expanded
+HIP/SYCL builds completed; the fresh-root expanded SYCL build linked at 123/123
+steps. Source hashes matched before configuration and after build. Three prior
+setup failures are retained in the [backend report](../../bench/results/2026-10-09-expanded-backend-build/README.md).
+Compilation is not GPU runtime qualification.
 
 
 The fresh [IQ4_NL independent codec diagnostic](../../bench/results/2026-10-09-iq4-nl-codec-contract/README.md)
@@ -110,7 +118,8 @@ records all 48 layers / 108 selected source tensors as incompatible with direct
 reuse of the pinned NInfer two-parent GDN/attention profiles. Required-profile
 rejection preserves the evidence; no production converter/dispatch is added.
 Parent and head layout differences join the codec/hidden-width mismatches.
-This remains Phase 2 preparation until the Phase 1 backend gate closes.
+This is Phase 2 contract evidence; it does not itself qualify a runtime adapter
+or authorize a kernel change.
 
 
 The [first pinned request profile](../../bench/results/2026-10-09-request-profile/README.md)
@@ -131,10 +140,10 @@ GiB. This qualifies selected codec/conversion paths, not projection math,
 model quality, reuse or speed.
 
 
-Backend gate update: verifier-only HIP and SYCL builds pass; expanded HIP passes.
-Expanded SYCL is being rebuilt in a fresh isolated root after three retained
-setup/configuration failures (CMake compiler path/cache reset, then unset Intel
-environment handling, then system CMake below the required version). The current
-one-job retry verifies source hashes before compiling. See the [attempt log and
-live handle](../../bench/results/2026-10-09-expanded-backend-build/README.md).
+Backend gate update: verifier-only and expanded HIP/SYCL builds pass. The fresh-root
+SYCL retry used one compile job and verified source hashes before configuration
+and after build. Three retained setup/configuration failures (CMake compiler
+path/cache reset, unset Intel environment handling, and system CMake below the
+required version) preceded the successful retry. See the [attempt log and build
+identity](../../bench/results/2026-10-09-expanded-backend-build/README.md).
 No GPU execution is claimed from maestro1.
