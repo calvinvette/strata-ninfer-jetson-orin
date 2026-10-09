@@ -1,0 +1,111 @@
+{
+  "schema_version": 14,
+  "artifact_type": "ninfer_bench_report",
+  "tool": "ninfer_bench",
+  "command": "build/port-cuda126-sm87/bench/ninfer_bench --weights /home/calvin/models/qwen3_6_35b_a3b_v2/qwen3_6_35b_a3b.ninfer -pg 8192,1 -r 1 --warmup 0 --max-ctx 8193 --kv-dtype int8 --no-cuda-graph --no-prefix-reuse --output json --output-file profiles/bench/jetson_orin_35b_a3b/int8_pp8192_tg1_capacity.json",
+  "environment": {"gpu_name": "Orin", "cuda_runtime_version": "12.6", "cuda_driver_version": "12.6", "device_id": 0},
+  "artifact": {"path": "/home/calvin/models/qwen3_6_35b_a3b_v2/qwen3_6_35b_a3b.ninfer", "file_size_bytes": 22783246080},
+  "load": {
+    "target": "qwen3_6_35b_a3b",
+    "weights_id": "groupwise-int",
+    "load_seconds": 8.617681059,
+    "upload_seconds": 3.765399086,
+    "artifact_bytes_read": 21051306657,
+    "host_to_device_bytes": 21038461952,
+    "peak_staging_bytes": 268435456,
+    "tensor_count": 533,
+    "resource_count": 6
+  },
+  "memory": {
+    "device": 0,
+    "max_context": 8193,
+    "kv_capacity_mode": "explicit",
+    "kv_capacity": 8256,
+    "kv_capacity_page_groups": 129,
+    "kv_capacity_max_page_groups": 129,
+    "kv_cache": "int8-group64",
+    "weights": {"capacity_bytes": 21038469632, "used_bytes": 21038469632, "peak_used_bytes": 21038469632},
+    "sequence": {"capacity_bytes": 157764096, "used_bytes": 157764096, "peak_used_bytes": 157764096},
+    "workspace": {"capacity_bytes": 109453312, "used_bytes": 0, "peak_used_bytes": 0},
+    "vision_workspace": null,
+    "minimum_runtime_reservation_bytes": 267217408,
+    "kv_capacity_increment_bytes": 0,
+    "runtime_reservation_bytes": 267217408,
+    "available_after_weights_bytes": 9034391552,
+    "available_after_startup_bytes": 8936534016,
+    "kv_capacity_headroom_bytes": 0,
+    "planned_slack_bytes": 8767174144,
+    "cuda_graph_allowance_bytes": 0,
+    "kv_payload_bytes": 87183360
+  },
+  "config": {
+    "max_context": 8193,
+    "prefill_chunk": 1024,
+    "kv_cache": "int8-group64",
+    "mtp_draft_tokens": 0,
+    "proposal_head": "full",
+    "use_cuda_graph": false,
+    "use_context_cache": false,
+    "decode_path": "eager",
+    "decode_graph_prime": {"primed": false, "output_tokens": 0},
+    "repetitions": 1,
+    "warmup": 0,
+    "corpus_path": "bench/fixtures/bench_corpus.ids",
+    "corpus_tokens": 65536
+  },
+  "tests": [
+    {
+      "label": "pp8192+tg1",
+      "kind": "pp+tg",
+      "n_prompt": 8192,
+      "n_gen": 1,
+      "requested_output_tokens": 2,
+      "prefill_tok_s_mean": 1204.294643,
+      "prefill_tok_s_stddev": 0,
+      "decode_output_tok_s_mean": 32.03247837,
+      "decode_output_tok_s_stddev": 0,
+      "decode_engine_tok_s_mean": 32.03247837,
+      "decode_engine_tok_s_stddev": 0,
+      "prepare_seconds_mean": 4.4289e-05,
+      "prepare_seconds_stddev": 0,
+      "prefill_seconds_mean": 6.802322046,
+      "prefill_seconds_stddev": 0,
+      "decode_seconds_mean": 0.031218315,
+      "decode_seconds_stddev": 0,
+      "total_seconds_mean": 6.83393067,
+      "total_seconds_stddev": 0,
+      "workspace_peak_bytes": 109453312,
+      "workspace_allocator_peak_bytes": 109453312,
+      "speculative": {
+        "enabled": false,
+        "draft_window": 0,
+        "rounds": 0,
+        "drafted_tokens": 0,
+        "accepted_tokens": 0,
+        "fallback_steps": 0,
+        "acceptance_rate": null,
+        "acceptance_length": null,
+        "accepted_per_position": []
+      },
+      "reps": [
+        {
+          "generated_output_tokens": 2,
+          "decode_output_tokens": 1,
+          "decode_engine_tokens": 1,
+          "timings": {"prepare_seconds": 4.4289e-05, "vision_seconds": 0, "prefill_seconds": 6.802322046, "decode_seconds": 0.031218315, "total_seconds": 6.83393067},
+          "speculative": {
+            "enabled": false,
+            "draft_window": 0,
+            "rounds": 0,
+            "drafted_tokens": 0,
+            "accepted_tokens": 0,
+            "fallback_steps": 0,
+            "acceptance_rate": null,
+            "acceptance_length": null,
+            "accepted_per_position": []
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,13 +1,21 @@
-<h1 align="center">Strata Inference for Jetson Orin</h1>
+<h1 align="center">Strata + NInfer for Jetson Orin</h1>
 
 This repository is a derivative of **[Strata by Niko1221 and its contributors](https://github.com/Niko1221/Strata)**,
-maintained at [calvinvette/strata-inference-orin](https://github.com/calvinvette/strata-inference-orin).
-It adds ARM64 and shared physical RAM support for **NVIDIA Jetson AGX Orin 32 GB**, running
+developed at [calvinvette/strata-ninfer-jetson-orin](https://github.com/calvinvette/strata-ninfer-jetson-orin).
+It starts from [the Strata Orin port](https://github.com/calvinvette/strata-inference-orin) and brings in
+the source, tests, architecture and measured lessons from [the NInfer Orin port](https://github.com/calvinvette/ninfer-jetson-orin).
+The inherited runtime supports ARM64 and shared physical RAM on **NVIDIA Jetson AGX Orin 32 GB**, running
 **JetPack 6.2 with CUDA 12.6 (SM87)**. The original engine, server, web app and desktop features come from Strata.
-The project retains the original [MIT license and attribution](LICENSE).
+Strata retains its [MIT license](LICENSE); imported NInfer code retains its Apache-2.0 license and
+[source attribution](THIRD_PARTY_NOTICES.md).
 
-The Orin changes are on **`feat/jetson-orin-arm64`**. The translated READMEs below describe the original
-project and have not been updated for this port.
+Development is on **`main`**. The [integration guide](docs/integration/README.md) links the
+[multi-phase plan](docs/integration/PLAN.md), [architecture](docs/integration/ARCHITECTURE.md),
+[parametric/multivariate benchmark protocol](docs/integration/BENCHMARKS.md),
+[source import map](docs/integration/IMPORT_MAP.md) and [status](docs/integration/STATUS.md).
+The repository and reference import are complete; runtime integration and its measurements are pending.
+The results below are inherited Strata results, not measurements of a combined engine.
+The translated READMEs describe the original project and have not been updated for this integration.
 
 **English** · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Deutsch](README.de.md) · [Français](README.fr.md) · [Español](README.es.md) · [Português](README.pt-BR.md)
 
@@ -61,8 +69,8 @@ Use an NVMe SSD with room for the model downloads and prepared packs. This port 
 JetPack's installed CUDA 12.6 toolkit:
 
 ```bash
-git clone --branch feat/jetson-orin-arm64 https://github.com/calvinvette/strata-inference-orin.git
-cd strata-inference-orin
+git clone --branch main https://github.com/calvinvette/strata-ninfer-jetson-orin.git
+cd strata-ninfer-jetson-orin
 ./setup.sh --cuda 12
 ```
 
@@ -150,7 +158,7 @@ The full list: [docs/INSTALL.md](docs/INSTALL.md#what-you-need).
 Do you use an AI coding assistant (Claude Code, Cursor, Codex, GitHub Copilot, ...)? Paste this into it:
 
 ```text
-Set up Strata from https://github.com/calvinvette/strata-inference-orin, branch feat/jetson-orin-arm64.
+Set up Strata from https://github.com/calvinvette/strata-ninfer-jetson-orin, branch main.
 Follow docs/AI_SETUP.md and the Jetson section of README.md in that repository.
 ```
 
@@ -160,7 +168,7 @@ you how to connect your apps. AI tools can also install, start and stop Strata t
 
 ### Or do it yourself
 
-[Download this fork](https://github.com/calvinvette/strata-inference-orin/archive/refs/heads/feat/jetson-orin-arm64.zip) and unzip it (or `git clone` it).
+[Download this fork](https://github.com/calvinvette/strata-ninfer-jetson-orin/archive/refs/heads/main.zip) and unzip it (or `git clone` it).
 **Windows:** double-click **`START-HERE.bat`**. **Linux:** run **`./setup.sh`** in the Strata folder.
 
 The steps are the same for NVIDIA and AMD. The installer finds your card and sets up the right engine for it. It

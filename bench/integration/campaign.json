@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "purpose": "Offline experiment specification; capability and resource admission required before execution",
+  "seed": 870126,
+  "baseline_commit": "0be090c8997b24cf5d21557ced40a1b7e93e87d3",
+  "model_cohort": "strata-coder-iq1_m-pinned-artifacts-required",
+  "variants": ["baseline", "candidate"],
+  "screening_repetitions": 3,
+  "confirmation_repetitions": 7,
+  "warmup": 1,
+  "minimum_available_gib": 6,
+  "suites": [
+    {
+      "id": "mtp_kv_workload",
+      "phase": 5,
+      "scope": "request",
+      "required_capabilities": ["verified_mtp_weights", "qualified_kv_candidate", "matching_artifact_and_tokenizer"],
+      "blocks": [
+        {"workload": "short", "prompt_tokens": 512, "generate_tokens": 64, "context_tokens": 2048},
+        {"workload": "long", "prompt_tokens": 2048, "generate_tokens": 128, "context_tokens": 4096}
+      ],
+      "factors": {"mtp_window": [0, 2, 3, 4], "kv_profile": ["control", "qualified_candidate"]}
+    },
+    {
+      "id": "context_cache_chunk",
+      "phase": 3,
+      "scope": "request",
+      "required_capabilities": ["bounded_expert_cache_cap", "workspace_accounting", "physical_budget_preflight"],
+      "blocks": [{"workload": "short", "prompt_tokens": 512, "generate_tokens": 64}],
+      "factors": {"context_tokens": [8192, 32768, 65536], "safe_cache_fraction": [0.5, 0.75, 1.0], "prefill_chunk": [32, 64, 128]}
+    },
+    {
+      "id": "workers_transfer",
+      "phase": 4,
+      "scope": "request",
+      "required_capabilities": ["qualified_mapped_buffer", "arm_publication_contract", "physical_budget_preflight"],
+      "blocks": [{"workload": "long", "prompt_tokens": 2048, "generate_tokens": 128, "context_tokens": 4096}],
+      "factors": {"workers": [1, 2, 4, 8], "transfer_policy": ["device_copy", "mapped_read"]}
+    },
+    {
+      "id": "graph_mtp",
+      "phase": 5,
+      "scope": "request",
+      "required_capabilities": ["qualified_graph_lifetime", "verified_mtp_weights", "accepted_prefix_state_tests"],
+      "blocks": [
+        {"workload": "short", "prompt_tokens": 512, "generate_tokens": 64, "context_tokens": 2048},
+        {"workload": "long", "prompt_tokens": 2048, "generate_tokens": 128, "context_tokens": 4096}
+      ],
+      "factors": {"graph": [false, true], "mtp_window": [0, 2, 4]}
+    },
+    {
+      "id": "sm87_projection",
+      "phase": 4,
+      "scope": "operator",
+      "required_capabilities": ["matching_quantization_contract", "independent_oracle", "compiled_resource_admission", "cooperative_residency_if_used"],
+      "blocks": [{"operator": "qualified_attention_projection", "shape_source": "actual_strata_target_required"}],
+      "factors": {"tokens": [1, 8, 21, 128, 1024], "row_tile": [16, 32, 64], "column_tile": [64, 128], "stages": [2, 3, 4]}
+    },
+    {
+      "id": "capacity_ladder",
+      "phase": 7,
+      "scope": "capacity",
+      "repetitions": 1,
+      "ordered": true,
+      "required_capabilities": ["bounded_pressure_guard", "prior_capacity_point_passed", "post_request_recovery", "exact_prompt_token_count"],
+      "blocks": [
+        {"context_tokens": 1024, "prompt_tokens": 816, "generate_tokens": 64},
+        {"context_tokens": 2048, "prompt_tokens": 1840, "generate_tokens": 64},
+        {"context_tokens": 4096, "prompt_tokens": 3888, "generate_tokens": 64},
+        {"context_tokens": 8192, "prompt_tokens": 7984, "generate_tokens": 64},
+        {"context_tokens": 16384, "prompt_tokens": 16176, "generate_tokens": 64},
+        {"context_tokens": 32768, "prompt_tokens": 32560, "generate_tokens": 64},
+        {"context_tokens": 65536, "prompt_tokens": 65328, "generate_tokens": 64},
+        {"context_tokens": 131072, "prompt_tokens": 130864, "generate_tokens": 64},
+        {"context_tokens": 262144, "prompt_tokens": 261936, "generate_tokens": 64}
+      ],
+      "factors": {}
+    }
+  ]
+}

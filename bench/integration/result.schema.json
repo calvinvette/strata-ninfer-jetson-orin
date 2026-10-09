@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Strata NInfer integration per-repetition result",
+  "type": "object",
+  "required": ["schema_version", "cell_id", "pair_id", "variant", "status", "cohort", "provenance", "parameters", "metrics", "reason"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "cell_id": {"type": "string", "minLength": 1},
+    "pair_id": {"type": "string", "minLength": 1},
+    "variant": {"enum": ["baseline", "candidate"]},
+    "status": {"enum": ["pass", "fail", "unsupported", "pressure_abort", "not_run"]},
+    "reason": {"type": ["string", "null"]},
+    "cohort": {"type": "string", "minLength": 1},
+    "parameters": {"type": "object"},
+    "provenance": {
+      "type": "object",
+      "required": ["source_commit", "binary_sha256", "artifact_identity", "host", "toolchain", "clock_profile", "command_argv", "raw_reports"],
+      "properties": {
+        "source_commit": {"type": "string"},
+        "binary_sha256": {"type": ["string", "null"]},
+        "artifact_identity": {"type": "object"},
+        "host": {"type": "object"},
+        "toolchain": {"type": "object"},
+        "clock_profile": {"type": "object"},
+        "command_argv": {"type": "array", "items": {"type": "string"}},
+        "raw_reports": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "description": "Per-repetition observations only; null means unavailable. Define any extension's units and aggregation in the campaign.",
+      "properties": {
+        "prompt_tokens": {"type": ["integer", "null"], "minimum": 0},
+        "generated_tokens": {"type": ["integer", "null"], "minimum": 0},
+        "prefill_tokens_s": {"type": ["number", "null"], "minimum": 0},
+        "decode_tokens_s": {"type": ["number", "null"], "minimum": 0},
+        "ttft_ms": {"type": ["number", "null"], "minimum": 0},
+        "request_ms": {"type": ["number", "null"], "minimum": 0},
+        "operator_ms": {"type": ["number", "null"], "minimum": 0},
+        "min_available_bytes": {"type": ["integer", "null"], "minimum": 0},
+        "peak_swap_bytes": {"type": ["integer", "null"], "minimum": 0},
+        "disk_read_bytes": {"type": ["integer", "null"], "minimum": 0},
+        "drafted_tokens": {"type": ["integer", "null"], "minimum": 0},
+        "accepted_tokens": {"type": ["integer", "null"], "minimum": 0},
+        "energy_joules": {"type": ["number", "null"], "minimum": 0},
+        "energy_scope": {"type": ["string", "null"]},
+        "quality": {"type": ["object", "null"]}
+      }
+    }
+  }
+}

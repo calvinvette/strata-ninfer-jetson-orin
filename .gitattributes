@@ -7,3 +7,8 @@ bench/prompts/** -text
 
 # copies of real packs' native_experts.txt, parsed byte for byte by tests/core/expert_layout_test.cpp
 tests/data/native_experts/** -text
+
+# Preserve imported upstream bytes, including corpus whitespace and script endings.
+# The import manifest, not local formatting, verifies this reference snapshot.
+reference/ninfer/** -text -whitespace linguist-vendored
+evidence/ninfer-orin/** -text

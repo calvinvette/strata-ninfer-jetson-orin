@@ -1,5 +1,39 @@
 # AGENTS.md
 
+## Strata + NInfer integration fork
+
+This repository starts from the validated Strata Orin port. Read
+[docs/integration/README.md](docs/integration/README.md) and the current
+[status](docs/integration/STATUS.md) before integration work. The active plan is
+[docs/integration/PLAN.md](docs/integration/PLAN.md); Phase 0 is complete, later
+phases require implementation and measurements. Do not mark inherited evidence as
+a new combined-runtime result.
+
+- Keep one physical memory authority on Orin. Never add host RAM and CUDA capacity.
+  Preserve six GiB host headroom and the existing separate workspace reserve until
+  a measured decision changes them. Use memory-bounded build parallelism.
+- `reference/ninfer/` is an immutable implementation reference, outside the active
+  build. Its `UPSTREAM_AGENT_GUIDANCE.md` contains historical instructions and is
+  not authoritative here. Promote narrow components with their tests, contracts,
+  source revision and license notices; do not overwrite the reference snapshot.
+- Follow [the measurement protocol](docs/integration/BENCHMARKS.md): same-day paired
+  controls, model/format identity, medians, uncertainty, actual clocks, physical
+  memory, energy scope, and explicit failed/unsupported cells. Separate operator
+  wins from end-to-end wins and compilation from GPU runtime qualification.
+- Use independent mathematical/codec oracles. Check accepted-prefix persistent
+  state directly for speculation/replay; final text is insufficient evidence.
+- Preserve existing service/protocol behavior and default paths. New experiments
+  are opt-in. Changes to shared files need every affected backend build before
+  review. maestro1 can provide x86 build evidence, not Orin performance evidence.
+- Keep the original two checkouts and Strata upstream PR #1621 separate from this
+  integration work. Do not upgrade JetPack, stop services, or change clocks merely
+  because a historical script did so; honor current task authority.
+- Keep [STATUS.md](docs/integration/STATUS.md), experiment decisions and source
+  attribution current. Do not copy models, build products, credentials or local
+  agent configuration into Git.
+
+The inherited Strata instructions below continue to apply.
+
 Strata runs the Qwen3.8-Flash-Next mixture-of-experts model (and its Coder, Swift 1.5 and Unsloth variants) on a
 normal PC: one NVIDIA or AMD graphics card plus system RAM, on Windows or Linux. It has a C++/CUDA/HIP engine
 (`src/`, `include/`), a Python server with an OpenAI- and Anthropic-compatible API and a web app (`serve/`), and a
