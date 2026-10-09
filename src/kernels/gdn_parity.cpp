@@ -301,6 +301,56 @@ int main(int argc, char** argv) {
         cudaFree(d_cs); cudaFree(d_x); cudaFree(d_w); cudaFree(d_o);
     }
 
+    // ================= 2b. accepted-prefix convolution history =================
+    // After a verifier has computed T qkv rows, only the first n_keep rows may advance the three-row conv history.
+    // Check every retained prefix, including zero, against an independent host selection from [history | qkv].
+    {
+        const int C = 259;     // crosses the 256-channel CUDA block edge
+        const int max_t = strata::kernels::kVerifyMaxT;
+        std::vector<float> initial((size_t) C * 3), qkv((size_t) max_t * C);
+        for (size_t i = 0; i < initial.size(); ++i) initial[i] = (float) (i + 1) * 0.03125f - 9.0f;
+        for (size_t i = 0; i < qkv.size(); ++i) qkv[i] = (float) (i + 1) * -0.015625f + 3.0f;
+        float *d_history = nullptr, *d_qkv = nullptr;
+        int32_t* d_keep = nullptr;
+        check(cudaMalloc(&d_history, initial.size() * sizeof(float)), "conv commit history");
+        check(cudaMalloc(&d_qkv, qkv.size() * sizeof(float)), "conv commit qkv");
+        check(cudaMalloc(&d_keep, sizeof(int32_t)), "conv commit keep");
+        check(cudaMemcpy(d_qkv, qkv.data(), qkv.size() * sizeof(float), cudaMemcpyHostToDevice), "conv commit upload qkv");
+        int cases = 0, conv_bad = 0;
+        for (int T = 1; T <= max_t; ++T) {
+            for (int keep = 0; keep <= T; ++keep) {
+                std::vector<float> expected(initial.size()), got(initial.size());
+                for (int c = 0; c < C; ++c) {
+                    for (int j = 0; j < 3; ++j) {
+                        const int src = keep + j;
+                        expected[(size_t) c * 3 + j] = src < 3 ? initial[(size_t) c * 3 + src]
+                                                                  : qkv[(size_t) (src - 3) * C + c];
+                    }
+                }
+                const int32_t n_keep = keep;
+                check(cudaMemcpy(d_history, initial.data(), initial.size() * sizeof(float), cudaMemcpyHostToDevice),
+                      "conv commit reset history");
+                check(cudaMemcpy(d_keep, &n_keep, sizeof(n_keep), cudaMemcpyHostToDevice), "conv commit upload keep");
+                strata::kernels::gdn_conv_commit(d_history, d_qkv, C, d_keep, nullptr);
+                check(cudaMemcpy(got.data(), d_history, got.size() * sizeof(float), cudaMemcpyDeviceToHost),
+                      "conv commit download history");
+                ++cases;
+                if (std::memcmp(got.data(), expected.data(), got.size() * sizeof(float)) != 0) {
+                    std::printf("    *** gdn_conv_commit T=%d keep=%d differs from host prefix selection ***\n", T, keep);
+                    ++bad; ++conv_bad;
+                }
+            }
+        }
+        std::vector<float> qkv_after(qkv.size());
+        check(cudaMemcpy(qkv_after.data(), d_qkv, qkv_after.size() * sizeof(float), cudaMemcpyDeviceToHost),
+              "conv commit verify qkv");
+        const bool input_ok = std::memcmp(qkv.data(), qkv_after.data(), qkv.size() * sizeof(float)) == 0;
+        std::printf("  %-42s %s (%d prefixes; T=1..8, keep=0..T, C=259)\n", "gdn_conv_commit accepted prefixes",
+                    conv_bad == 0 && input_ok ? "bitwise" : "*** FAIL ***", cases);
+        if (!input_ok) { std::printf("    *** gdn_conv_commit modified its qkv input ***\n"); ++bad; }
+        cudaFree(d_history); cudaFree(d_qkv); cudaFree(d_keep);
+    }
+
     // ================= 3. l2_norm =================
     {
         const int rows = 16, cols = 128;
@@ -482,7 +532,10 @@ int main(int argc, char** argv) {
             struct Case { const char* name; int n_keep; int tb; };
             std::vector<Case> cases = {{"verify", -1, 0}, {"verify tb", -1, T > 1 ? T / 2 : 0}, {"commit", T, 0},
                                        {"commit tb", T, T / 2}, {"commit state only", T, T}};
-            if (T > 1) cases.push_back({"commit n-1", T - 1, T - 1});
+            // A verifier accepts a prefix, not just all tokens or the last token. Check every legal retained length,
+            // including zero, against a fresh single-token replay from identical state. This exercises the kernel's
+            // state result directly; API publication and KV/conv/PLE state still need the model-level transaction test.
+            for (int keep = 0; keep <= T; ++keep) cases.push_back({"commit prefix", keep, 0});
             for (const Case& c : cases) {
                 check(cudaMemcpy(d_st, st0.data(), st0.size() * 4, cudaMemcpyHostToDevice), "s0");
                 check(cudaMemset(d_y, 0, (size_t) T * vd * 4), "y0");

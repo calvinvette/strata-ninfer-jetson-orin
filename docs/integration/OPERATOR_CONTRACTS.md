@@ -97,9 +97,16 @@ state; simply accepting a rejected API call is insufficient.
 
 The existing `conversation_snapshot_test` freshly passes 3901 checks on native
 Orin CUDA. It uses independent byte patterns for snapshot save/restore, refusal
-preservation, several KV formats/modes and ring reconstruction. It exercises
-synthetic sessions, not model-window accepted-prefix commit or replay; those
-gates remain pending. [Raw result](../../bench/results/2026-10-09-verifier-owner-trace/conversation-snapshot-native/stdout.txt).
+preservation, several KV formats/modes and ring reconstruction. The GDN recurrence
+kernel parity test now checks every recurrence commit prefix 0..T for windows
+T=1..8 against fresh single-token replay (84 cases), plus all 44 convolution-history
+prefixes against independent host selection. The native run passes both suites
+bitwise, and the same test source compiles under the maestro1 HIP toolchain. These
+are kernel-level checks. A separate post-fix model-level spec1/spec4 comparison
+now verifies token and persistent-state parity for the observed output-clipping
+case; cancellation, recovery and other prefix cases remain untested.
+[Snapshot raw result](../../bench/results/2026-10-09-verifier-owner-trace/conversation-snapshot-native/stdout.txt);
+[GDN prefix evidence](../../bench/results/2026-10-09-gdn-prefix-kernel/).
 
 
 ## Accepted drafts, retained state and publication
@@ -112,12 +119,32 @@ advanced is the old anchor plus A drafts; the last output becomes the next
 pending anchor. Publication can retain M<=P after EOS/output-budget clipping.
 NInfer's replay transaction commits the retained prefix M.
 
-Strata's serve, pipeline and CLI loops call `commit(a+1)`. Zero accepted drafts
-therefore request commit(1), not commit(0). Audit clipping, pending anchors and
-persistent state at the publication boundary before adapting transaction tests.
-The open gate is direct state comparison for retained lengths, including zero,
-with rejected-suffix isolation; final text and a commit(0) rejection cannot prove
-it. No semantic bug or adapter equivalence is concluded from this source map.
+Strata's original serve, pipeline and CLI loops called `commit(a+1)`. Zero
+accepted drafts therefore request commit(1), not commit(0). Clipping, pending
+anchors and persistent state must be audited at the publication boundary before
+adapting transaction tests. The broader transaction gate includes direct state
+comparison for retained lengths, including zero, rejected-suffix isolation,
+cancellation/recovery and long chains; final text and a `commit(0)` rejection
+cannot prove those cases. They remain Phase 5 work. At the source-audit stage, no
+semantic bug or adapter equivalence was concluded from that map; the direct
+model check below later found a clipping mismatch.
+
+The first direct spec-1/spec-4 model check exposed a concrete clipping mismatch:
+both arms emitted identical 32-token IDs, while MTP accepted 23/27 drafts and
+the final persistent-state fingerprints differed (state length 1493 vs 1494;
+GDN, PLE, indexer, KV and PLE-history also differed). In the observed final
+window, the verifier match exceeded the request's remaining output budget, but
+the old service, CLI and pipeline paths committed `a+1` before publishing the
+shorter output. The worktree now commits only the published prefix in these
+paths and uses that prefix for consumed-token history and pipeline rollback.
+The shared host-side prefix selector has eleven no-GPU cases for zero accepted
+drafts (one retained correction output), intermediate and full accepted
+prefixes, output-budget clipping, EOS handling and empty boundaries. Its
+zero-output-budget case checks the selector result only; it does not exercise a
+zero-length `Verifier` transaction, which Strata rejects and the active decode
+loops do not issue. The supervised post-fix Orin rerun emitted identical token
+IDs and matched all nine captured persistent-state fields for this case. Raw
+data and its bounded scope are in the [state comparison report](../../bench/results/2026-10-09-accepted-prefix-publication/README.md).
 
 ## Independent IQ4_NL codec diagnostic contract
 

@@ -28,6 +28,7 @@
 #include "strata/core/coupled_draft.hpp"
 #include "strata/core/expert_source.hpp"
 #include "strata/core/foresight_swap.hpp"
+#include "strata/core/published_prefix.hpp"
 #include "strata/core/pinned.hpp"
 #include "strata/core/remote_experts.hpp"
 #include "strata/core/on_device.hpp"
@@ -10565,27 +10566,29 @@ int main(int argc, char** argv) {
                     chain_kind = 0;
                     int a = 0;
                     while (a < A.T - 1 && A.tok[a + 1] == outp[(size_t) a]) ++a;
-                    if (!V1(A).pl_commit_async(a + 1, err)) return die(err);
-                    for (int i = 0; i <= a; ++i) consumed.push_back(A.tok[i]);
+                    const auto retained = strata::core::published_prefix(outp.data(), a + 1, produced_n, max_new,
+                                                                          o.eos_ids.data(), o.eos_ids.size(), true);
+                    const int publish_n = retained.count;
+                    const bool eos = retained.eos;
+                    if (!V1(A).pl_commit_async(publish_n, err)) return die(err);
+                    for (int i = 0; i < publish_n; ++i) consumed.push_back(A.tok[i]);
                     draft_offered += A.T - 1;
                     draft_accepted += a;
                     ++rounds;
                     if (drive.d.fs) drive.d.fs->completed.fetch_add(1, std::memory_order_release);
                     ++dec_windows;
                     dec_T += A.T;
-                    bool eos = false;
-                    for (int i = 0; i <= a && produced_n < max_new && !eos; ++i) {
+                    for (int i = 0; i < publish_n; ++i) {
                         std::printf("T %d\n", (int) outp[(size_t) i]);
                         strata::core::progress_beat();
                         ++produced_n;
                         if (o.suffix_draft > 0) sfx.append(outp[(size_t) i]);
-                        eos = std::find(o.eos_ids.begin(), o.eos_ids.end(), (int64_t) outp[(size_t) i]) != o.eos_ids.end();
                     }
                     std::fflush(stdout);
                     if (eos) finish = "stop";
                     else if (stop_req.load()) finish = "cancel";
                     const bool last = eos || produced_n >= max_new || stop_req.load();
-                    const bool on = B.launched && a == A.T - 1 && B.tok[0] == outp[(size_t) A.T - 1];
+                    const bool on = !last && B.launched && a == A.T - 1 && B.tok[0] == outp[(size_t) A.T - 1];
                     if (B.made) {   // the gate's calibration: would B have been on the path, by its estimate p_on
                         const bool would = a == A.T - 1 && B.tok[0] == outp[(size_t) A.T - 1];
                         const int bin = std::min(9, std::max(0, (int) (B.p_on * 10.0f)));
@@ -10599,7 +10602,7 @@ int main(int argc, char** argv) {
                         if (A.sfx) { ++sfx_windows; sfx_drafts += A.T - 1; sfx_ok += a; }
                         if (A.seq > 0 && !last) policy.observe(A.sfx, A.T, a, A.sfx_match, now - last_verdict);
                         cls_ms[c] += now - last_verdict;
-                        cls_tok[c] += a + 1;
+                        cls_tok[c] += publish_n;
                         cls_n[c] += 1;
                         last_verdict = now;
                     }
@@ -10627,9 +10630,9 @@ int main(int argc, char** argv) {
                             doomed = true;
                             D = B;
                             undo_w = A;
-                            undo_keep = a + 1;
+                            undo_keep = publish_n;
                         } else if (!A.committed) {
-                            if (!V0(A).pl_commit_async(a + 1, err)) return die(err);
+                            if (!V0(A).pl_commit_async(publish_n, err)) return die(err);
                         }
                         // B is D now (or dropped): never pump it twice (whichever copy saw the window complete first
                         // would finish it, and the other would wait for it forever)
@@ -10814,24 +10817,26 @@ int main(int argc, char** argv) {
                 // (--adapt-async 1: the asynchronous tier above instead, ticked before the window)
                 if (!drive.d.usage.empty() && !ajob && ((rounds + 1) % o.adapt_every) == 0)
                     adapt_thr = std::thread([&] { adapt_ok = adapt(); });
-                if (!ver.commit(a + 1, err)) {
+                const auto retained = strata::core::published_prefix(outv.data(), a + 1, produced_n, max_new,
+                                                                      o.eos_ids.data(), o.eos_ids.size(), true);
+                const int publish_n = retained.count;
+                const bool eos = retained.eos;
+                if (!ver.commit(publish_n, err)) {
                     if (adapt_thr.joinable()) adapt_thr.join();
                     std::printf("ERR %s\n", err.c_str());
                     return 1;
                 }
-                // the window's first a + 1 tokens are in the session now (the last output is not: it is next x)
-                for (int i = 0; i <= a; ++i) consumed.push_back(window[(size_t) i]);
+                // Only inputs corresponding to outputs retained by the request are committed.
+                for (int i = 0; i < publish_n; ++i) consumed.push_back(window[(size_t) i]);
                 draft_offered += T - 1;
                 draft_accepted += a;
                 first_window = false;
-                bool eos = false;
-                for (int i = 0; i <= a && produced_n < max_new && !eos; ++i) {
+                for (int i = 0; i < publish_n; ++i) {
                     std::printf("T %d\n", (int) outv[(size_t) i]);
                     strata::core::progress_beat();
                     ++produced_n;
                     if (sfx_on) sfx.append(outv[(size_t) i]);
                     if (o.lookup_chain > 0) extra_sources_append(&outv[(size_t) i], 1);
-                    eos = std::find(o.eos_ids.begin(), o.eos_ids.end(), (int64_t) outv[(size_t) i]) != o.eos_ids.end();
                 }
                 std::fflush(stdout);
                 ++rounds;
@@ -11927,7 +11932,11 @@ int main(int argc, char** argv) {
             bool adapt_ok = true;
             if (!drive.d.usage.empty() && ((rounds + 1) % o.adapt_every) == 0)
                 adapt_thr = std::thread([&] { adapt_ok = adapt(); });
-            if (!ver.commit(a + 1, err)) {
+            const auto retained = strata::core::published_prefix(outv.data(), a + 1, (int64_t) produced.size(), max_new,
+                                                                  o.eos_ids.data(), o.eos_ids.size(), o.stop_eos);
+            const int publish_n = retained.count;
+            const bool eos = retained.eos;
+            if (!ver.commit(publish_n, err)) {
                 if (adapt_thr.joinable()) adapt_thr.join();
                 std::fprintf(stderr, "strata generate: %s\n", err.c_str());
                 return 1;
@@ -11938,12 +11947,10 @@ int main(int argc, char** argv) {
             ++accepted_hist[(size_t) a];
             if (from_sfx) { ++sfx_windows; sfx_drafts += T - 1; sfx_ok += a; }
             if (chain_n > 0) { ++chain_windows; chain_drafts += chain_n; chain_ok += std::max(0, a - (T_mtp - 1)); }
-            bool eos = false;
-            for (int i = 0; i <= a && (int64_t) produced.size() < max_new && !eos; ++i) {
+            for (int i = 0; i < publish_n; ++i) {
                 produced.push_back(outv[(size_t) i]);
                 if (sfx_on) sfx.append(outv[(size_t) i]);
                 if (o.lookup_chain > 0) extra_sources_append(&outv[(size_t) i], 1);
-                eos = o.stop_eos && std::find(o.eos_ids.begin(), o.eos_ids.end(), (int64_t) outv[(size_t) i]) != o.eos_ids.end();
                 if (!follow.empty()) { follow_differ += fdiff[(size_t) i]; ++follow_emitted; }
             }
             if (eos) {

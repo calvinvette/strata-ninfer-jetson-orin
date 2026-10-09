@@ -116,7 +116,9 @@ Extend the existing
 [Strata plotting script](../../bench/results/2026-10-08-jetson-orin/plot_context_comparison.py)
 and NInfer report tools after a result adapter exists. Export PNG/SVG plus CSV/JSON
 for each table; no interpolated values for missing cells and no invented baseline
-for an unmatched near-limit run. This bootstrap produces no new performance plots.
+for an unmatched near-limit run. Phase 1 produced paired control plots; those show
+same-source screening variability and are not optimization comparisons. Candidate
+performance plots require the later qualified, paired experiment cells.
 
 ## Running safely and reporting limits
 

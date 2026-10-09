@@ -1,0 +1,39 @@
+{
+  "status": "native ARM64/CUDA strata and published_prefix_test built successfully; one job",
+  "command": "CCACHE_DIR=/tmp/strata-integration-ccache CCACHE_TEMPDIR=/tmp cmake --build build/integration/candidate --target strata published_prefix_test --parallel 1",
+  "test": "build/integration/candidate/published_prefix_test: 11 checks, 0 failures",
+  "device_independent_checks": {
+    "harness_dry_run": "tools/integration/accepted_prefix_parity.py with baseline-paired-config.json: passed",
+    "cli_help": "build/integration/candidate/strata --help: exited 0",
+    "conversation_cache_parity": "12 tests passed",
+    "integration_harness": "46 tests run: 44 passed; 2 socket tests errored because sandbox denied socket creation"
+  },
+  "identities": {
+    "generate_source": {
+      "path": "src/program/generate.cpp",
+      "sha256": "006c3f08a064c13ff2d3d11ed8dbd79b3c866740ea6f10b3f5120f2bae403911"
+    },
+    "selector_header": {
+      "path": "include/strata/core/published_prefix.hpp",
+      "sha256": "acb7272187bbde1b582c0f68ccf49697b394731f5dff3b9a6e64ce88dd606a52"
+    },
+    "selector_test": {
+      "path": "src/core/published_prefix_test.cpp",
+      "sha256": "5254e1a9ff5f238fe925a066610b09561d201fb8a7526f35615fb2c759ede284"
+    },
+    "build_file": {
+      "path": "CMakeLists.txt",
+      "sha256": "1bd9e608612acc10bf045531c4272bfbb7e94879db1a3f2217b40d42c164a32a"
+    },
+    "engine_binary": {
+      "path": "build/integration/candidate/strata",
+      "sha256": "7c3b6e0a196db25d9d3546b7d23ccac90303f6d1967f736de6e30de047527da3"
+    },
+    "test_binary": {
+      "path": "build/integration/candidate/published_prefix_test",
+      "sha256": "c26db499c89e3ff8d1515389faaa3a9a7d30107b40c0950a35ec2eac97f4629a"
+    }
+  },
+  "runtime_qualification": "post-fix model-level accepted-prefix parity passed on local Orin; see post-fix-orin/README.md",
+  "backend_rebuilds": "HIP changed root generate.cpp compile + GDN test target rebuild; clean SYCL engine build passed (separate sycl/src/program/generate.cpp); see Phase 2 backend report"
+}

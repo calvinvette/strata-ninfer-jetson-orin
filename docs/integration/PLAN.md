@@ -188,6 +188,8 @@ local NInfer follow-on note is a proposal, not evidence that an upgrade supports
 this board. Verify vendor support before scheduling it. If undertaken, compare
 toolchains at identical clocks first, then a separate clock-profile experiment.
 
-The immediate implementation task after this bootstrap is Phase 1: build the new
-branch control and pin one fully instrumented same-day Coder campaign. Do not start
-by changing kernels, quantization, the model, toolchain and clocks simultaneously.
+Phases 1 and 2 are closed with their capability matrices, contracts and
+exclusions recorded. Continue with Phase 3's unique-allocation ownership and
+transfer experiments before promoting any execution path. Do not change kernels,
+quantization, model, toolchain and clocks simultaneously; select each candidate
+from measured bottlenecks and qualify its contract first.

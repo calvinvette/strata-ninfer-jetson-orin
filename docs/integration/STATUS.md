@@ -1,20 +1,46 @@
 # Integration status
 
-Updated: 2026-10-09. Phase 1 is complete with its supported, failed, unsupported
-and untested scopes recorded. Phase 2 contract work is active. No NInfer execution
-component has been promoted into Strata.
+Updated: 2026-10-09. Phases 1 and 2 are complete with their supported, failed,
+unsupported and untested scopes recorded. Phase 3 memory ownership and transfer
+work is next. No NInfer execution component has been promoted into Strata.
 
 | Phase | State | Evidence / next gate |
 | --- | --- | --- |
 | 0 — Repository and import | Complete | Pinned source/evidence manifest, source mapping, plan, offline planner checks |
 | 1 — Same-day controls | Complete | Four same-day paired API blocks; exact workloads/artifacts; protocol and baseline checks; capability matrix records limits; expanded HIP/SYCL builds compile |
-| 2 — Operator/state contracts | In progress | Projection map and RMS/IQ4_NL/Q6_K oracles recorded; runtime adapters, broader format contracts and state ownership gates remain |
+| 2 — Operator/state contracts | Complete | Ownership review, incompatible projection-profile rejection, independent RMS/IQ4_NL/Q6_K oracles, GDN prefix checks, default spec1 regression and post-fix spec1/spec4 token plus nine-field persistent-state parity recorded; native/HIP/SYCL build evidence and eleven selector tests pass; no NInfer execution component promoted |
 | 3 — Memory and transfers | Not started | Unique allocation/reservation accounting and pressure/lifetime tests |
 | 4 — SM87/ARM kernels | Not started | Pinned request profile prepared; bottleneck attribution, qualified candidate and request confirmation pending |
 | 5 — Speculation and graphs | Not started | Accepted-prefix state, graph lifetime and drift qualification |
 | 6 — Multivariate tuning | Not started | Randomized paired campaign, interactions, uncertainty, held-out confirmation |
 | 7 — Capacity and service | Not started | Quality, recovery, thermal equilibrium and sustained workload |
 | 8 — Release/upstream | Not started | Relevant backend builds, runtime matrix and reviewable changes |
+
+The [GDN prefix kernel check](../../bench/results/2026-10-09-gdn-prefix-kernel/README.md)
+adds direct recurrence and convolution-history prefix evidence in Phase 2. The
+model-level accepted-prefix check below now supplies the separate verifier and
+publication-boundary state evidence for the observed output-clipping case.
+
+The [runtime ownership review](OWNERSHIP_REVIEW.md) records existing owners for
+API ordering, engine execution, session state, verifier commits and device
+allocations. It adds no duplicate scheduler or allocation ledger. Unique physical
+backing and reservation semantics remain Phase 3 work.
+
+The [accepted-prefix publication check](../../bench/results/2026-10-09-accepted-prefix-publication/README.md)
+found identical 32-token output but differing persistent state between spec 1
+and spec 4 when the final verifier window exceeded the output budget. Service,
+CLI and pipeline use one shared selector for the published prefix; its eleven
+host cases pass. A supervised local Orin rerun now passes: spec 1 and spec 4
+emit identical 32 token IDs and match all nine recorded state fields, with 23
+of 27 drafts accepted. The six GiB physical-memory floor was maintained (minimum
+available 8.57 GiB). This closes only the observed final-output-clipping case;
+other prefix lengths, EOS, cancellation, long-chain drift and pipeline runtime
+remain Phase 5 work. maestro1's HIP rebuild compiles the changed
+`src/program/generate.cpp`; its fresh GDN parity build and the clean 123-step
+SYCL engine build are recorded in the [Phase 2 backend report](../../bench/results/2026-10-09-phase2-backend-build/README.md).
+SYCL uses its separate `sycl/src/program/generate.cpp`. The contract, oracle,
+ownership and unchanged-route checks close Phase 2; broader transaction and
+runtime cases remain explicit later-phase work.
 
 Inherited results live in [Strata's Orin report](../../bench/results/2026-10-08-jetson-orin/README.md),
 [maestro1's backend build report](../../bench/results/2026-10-08-maestro1-builds/README.md),
