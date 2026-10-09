@@ -1,6 +1,7 @@
 #include "strata/platform/mapped_memory.hpp"
 // src/core/verify.cpp - see include/strata/core/verify.hpp.
 #include "strata/core/verify.hpp"
+#include "strata/platform/integration_trace.hpp"
 #include "strata/core/remote_expert_opt.hpp"
 #include "strata/core/dma_batch.hpp"
 #include "strata/core/spec_prob.hpp"
@@ -403,7 +404,11 @@ Verifier::~Verifier() {
     if (df_fork_) cudaEventDestroy(df_fork_);
     for (cudaEvent_t e : df_join_)
         if (e) cudaEventDestroy(e);
-    if (arena_) cudaFree(arena_);
+    if (arena_) {
+        const auto freed = cudaFree(arena_);
+        if (freed == cudaSuccess)
+            strata::platform::integration_trace::event("verifier", "free", this, arena_, 0, device_);
+    }
     void* hosts[] = {h_tok_, h_step_, h_pos_, h_commit_, h_ple_, h_out_, h_x_, h_ids_, h_w_, h_seq_, h_flag_, h_ymiss_,
                      h_flagA_, h_plan_, h_flagB_, h_plan_err_};
     for (void* h : hosts)
@@ -561,6 +566,7 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
         err = "verify: the device arena (" + std::to_string(count.used >> 20) + " MiB) does not fit";
         return false;
     }
+    strata::platform::integration_trace::event("verifier", "allocate", this, arena_, count.used, device_);
     cudaMemset(arena_, 0, count.used);
     if (g_trace && trace_h_ == nullptr) {   // #649: the breadcrumbs, mapped so they read while the GPU hangs
         trace_n_ = (size_t) (g.n_layers + 1) * kProfPer * 2;
@@ -2524,6 +2530,8 @@ bool Verifier::instantiate_evicting(cudaGraphExec_t& ex, cudaGraph_t graph, cons
         err = std::string(what) + cudaGetErrorString(ie);
         return false;
     }
+    // Count successful instantiations; no graph-pool byte estimate is inferred.
+    strata::platform::integration_trace::event("verifier", "graph_instantiate", this, nullptr, 0, device_, 1);
     return true;
 }
 

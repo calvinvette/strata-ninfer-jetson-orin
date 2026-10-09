@@ -4,6 +4,7 @@
 #include <dpct/dpct.hpp>
 #include "strata/sycl_queue.hpp"
 #include "strata/prefill/prefill.hpp"
+#include "strata/platform/integration_trace.hpp"
 #include "strata/core/gguf_expert_source.hpp"
 #include "../../../src/prefill/mmq_resident_sort.hpp"
 #include "../../../src/prefill/wmma_gemm.h"
@@ -295,6 +296,18 @@ double ms_since(Clock::time_point t) { return std::chrono::duration<double, std:
 
 // Either cudaMalloc (owned, freed with the object) or a bump allocation from a borrowed region; with no base and
 // no region it only counts, which is how `bytes_needed` sizes the region.
+// Observe the existing owner's payloads; borrowed views do not allocate backing.
+void observe_prefill(const char* kind, const void* owner, const void* p, uint64_t bytes) {
+    if (!strata::platform::integration_trace::enabled()) return;
+    const int device = dpct::get_current_device_id();
+    strata::platform::integration_trace::event("prefill", kind, owner, p, bytes, device,
+                                              std::strcmp(kind, "view") == 0 ? 1 : 0);
+}
+void free_prefill(const void* owner, void* p, int device) {
+    if (DPCT_CHECK_ERROR(sycl::free(p, dpct::get_in_order_queue())) != 0) return;
+    strata::platform::integration_trace::event("prefill", "free", owner, p, 0, device);
+}
+
 struct Alloc {
     uint8_t* base = nullptr;
     uint64_t cap = 0, used = 0;
@@ -313,6 +326,7 @@ struct Alloc {
             if (used + bytes > cap) { ok = false; failed_bytes = bytes; return nullptr; }
             T* p = (T*) (base + used);
             used += bytes;
+            observe_prefill("view", owned, p, bytes);
             return p;
         }
         void* p = nullptr;
@@ -321,6 +335,7 @@ struct Alloc {
             ok = false; failed_bytes = bytes; return nullptr;
         }
         owned->push_back(p);
+        observe_prefill("allocate", owned, p, bytes);
         used += bytes;
         return (T*) p;
     }
@@ -591,8 +606,7 @@ struct PeerPrefill {
         dpct::select_device(dev);
         if (s) s->wait();
         ctx.reset();
-        for (void *p : owned)
-            DPCT_CHECK_ERROR(sycl::free(p, dpct::get_in_order_queue()));
+        for (void *p : owned) free_prefill(&owned, p, dev);
         if (ev_done) dpct::destroy_event(ev_done);
         if (s_out) s_out->wait();
         for (dpct::event_ptr e : ev_grp) if (e) dpct::destroy_event(e);
@@ -793,8 +807,7 @@ void Prefill::release() {
     if (impl_->kv_ready) dpct::destroy_event(impl_->kv_ready);
     if (impl_->grp_host)
         sycl::free(impl_->grp_host, dpct::get_in_order_queue());
-    for (void *p : impl_->owned)
-        DPCT_CHECK_ERROR(sycl::free(p, dpct::get_in_order_queue()));
+    for (void *p : impl_->owned) free_prefill(&impl_->owned, p, impl_->device);
 }
 
 namespace {
@@ -959,6 +972,7 @@ bool Prefill::init(const core::WeightTable &wt, const core::ModelGeometry &g,
             return false;
         }
         m.owned.push_back(m.tok_dev);
+        observe_prefill("allocate", &m.owned, m.tok_dev, (uint64_t) chunk * sizeof(int32_t));
         m.tok_host.resize((size_t) chunk);
     }
     /*
@@ -1075,8 +1089,10 @@ bool Prefill::init(const core::WeightTable &wt, const core::ModelGeometry &g,
             DPCT_CHECK_ERROR(dpct::get_in_order_queue().memcpy(
                 m.ident_table, ident.data(), ident.size() * 4).wait()) != 0)
             ok = false;
-        else
+        else {
             m.owned.push_back(m.ident_table);
+            observe_prefill("allocate", &m.owned, m.ident_table, ident.size() * 4);
+        }
     }
     if (!ok) { err = "prefill: host buffers or events for a chunk of " + std::to_string(chunk) + " tokens"; return false; }
     Alloc o;
@@ -1711,6 +1727,7 @@ bool Prefill::set_peer(core::PeerExperts *peer, int64_t cap_rows,
             ok = false; return nullptr;
         }
         pp->owned.push_back(p);
+        observe_prefill("allocate", &pp->owned, p, bytes);
         return p;
     }
     catch (sycl::exception const &exc) {

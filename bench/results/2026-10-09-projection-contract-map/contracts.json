@@ -1,0 +1,2473 @@
+{
+  "schema_version": 1,
+  "ninfer_revision": "b07248f2528125aeda7550055580204541f1714c",
+  "scope": "source-header contract map for pinned two-parent projections only; not runtime plane validation or conversion qualification",
+  "excluded": "single-parent NInfer specializations, other operators/codecs, state, numerical accuracy, performance",
+  "counts": {
+    "gdn": 36,
+    "attention": 12
+  },
+  "layers": [
+    {
+      "layer": 0,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.0.attn_qkv.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.0.attn_gate.weight",
+          "source_format": "Q4_K",
+          "source_ggml_type_id": 12,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q4_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 1,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.1.attn_qkv.weight",
+          "source_format": "Q5_K",
+          "source_ggml_type_id": 13,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.1.attn_gate.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q5_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 2,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.2.attn_qkv.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.2.attn_gate.weight",
+          "source_format": "IQ4_XS",
+          "source_ggml_type_id": 23,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF IQ4_XS is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 3,
+      "family": "attention",
+      "operator": "ninfer::ops::attn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.3.attn_q.weight",
+          "source_format": "IQ4_XS",
+          "source_ggml_type_id": 23,
+          "logical_rows_columns": [
+            12288,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.3.attn_k.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.3.attn_v.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_q.weight: input columns 2560, required 5120",
+        "attn_q.weight: source GGUF IQ4_XS is not a validated NInfer RowSplit parent",
+        "attn_k.weight: input columns 2560, required 5120",
+        "attn_k.weight: output rows 512, required 1024",
+        "attn_k.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_v.weight: input columns 2560, required 5120",
+        "attn_v.weight: output rows 512, required 1024",
+        "attn_v.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "contiguous query/key and gate/value parents; Strata q/gate rows interleave by head"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 4,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.4.attn_qkv.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.4.attn_gate.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 5,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.5.attn_qkv.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.5.attn_gate.weight",
+          "source_format": "Q4_K",
+          "source_ggml_type_id": 12,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q4_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 6,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.6.attn_qkv.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.6.attn_gate.weight",
+          "source_format": "IQ4_XS",
+          "source_ggml_type_id": 23,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF IQ4_XS is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 7,
+      "family": "attention",
+      "operator": "ninfer::ops::attn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.7.attn_q.weight",
+          "source_format": "IQ4_XS",
+          "source_ggml_type_id": 23,
+          "logical_rows_columns": [
+            12288,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.7.attn_k.weight",
+          "source_format": "IQ4_XS",
+          "source_ggml_type_id": 23,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.7.attn_v.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_q.weight: input columns 2560, required 5120",
+        "attn_q.weight: source GGUF IQ4_XS is not a validated NInfer RowSplit parent",
+        "attn_k.weight: input columns 2560, required 5120",
+        "attn_k.weight: output rows 512, required 1024",
+        "attn_k.weight: source GGUF IQ4_XS is not a validated NInfer RowSplit parent",
+        "attn_v.weight: input columns 2560, required 5120",
+        "attn_v.weight: output rows 512, required 1024",
+        "attn_v.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "contiguous query/key and gate/value parents; Strata q/gate rows interleave by head"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 8,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.8.attn_qkv.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.8.attn_gate.weight",
+          "source_format": "IQ4_XS",
+          "source_ggml_type_id": 23,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF IQ4_XS is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 9,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.9.attn_qkv.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.9.attn_gate.weight",
+          "source_format": "Q4_K",
+          "source_ggml_type_id": 12,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q4_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 10,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.10.attn_qkv.weight",
+          "source_format": "Q5_K",
+          "source_ggml_type_id": 13,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.10.attn_gate.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q5_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 11,
+      "family": "attention",
+      "operator": "ninfer::ops::attn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.11.attn_q.weight",
+          "source_format": "Q4_K",
+          "source_ggml_type_id": 12,
+          "logical_rows_columns": [
+            12288,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.11.attn_k.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.11.attn_v.weight",
+          "source_format": "Q5_K",
+          "source_ggml_type_id": 13,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_q.weight: input columns 2560, required 5120",
+        "attn_q.weight: source GGUF Q4_K is not a validated NInfer RowSplit parent",
+        "attn_k.weight: input columns 2560, required 5120",
+        "attn_k.weight: output rows 512, required 1024",
+        "attn_k.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_v.weight: input columns 2560, required 5120",
+        "attn_v.weight: output rows 512, required 1024",
+        "attn_v.weight: source GGUF Q5_K is not a validated NInfer RowSplit parent",
+        "contiguous query/key and gate/value parents; Strata q/gate rows interleave by head"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 12,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.12.attn_qkv.weight",
+          "source_format": "Q5_K",
+          "source_ggml_type_id": 13,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.12.attn_gate.weight",
+          "source_format": "IQ4_XS",
+          "source_ggml_type_id": 23,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q5_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF IQ4_XS is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 13,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.13.attn_qkv.weight",
+          "source_format": "Q4_K",
+          "source_ggml_type_id": 12,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.13.attn_gate.weight",
+          "source_format": "Q4_K",
+          "source_ggml_type_id": 12,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q4_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q4_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 14,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.14.attn_qkv.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.14.attn_gate.weight",
+          "source_format": "Q5_K",
+          "source_ggml_type_id": 13,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q5_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 15,
+      "family": "attention",
+      "operator": "ninfer::ops::attn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.15.attn_q.weight",
+          "source_format": "IQ4_XS",
+          "source_ggml_type_id": 23,
+          "logical_rows_columns": [
+            12288,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.15.attn_k.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.15.attn_v.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_q.weight: input columns 2560, required 5120",
+        "attn_q.weight: source GGUF IQ4_XS is not a validated NInfer RowSplit parent",
+        "attn_k.weight: input columns 2560, required 5120",
+        "attn_k.weight: output rows 512, required 1024",
+        "attn_k.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_v.weight: input columns 2560, required 5120",
+        "attn_v.weight: output rows 512, required 1024",
+        "attn_v.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "contiguous query/key and gate/value parents; Strata q/gate rows interleave by head"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 16,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.16.attn_qkv.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.16.attn_gate.weight",
+          "source_format": "IQ4_XS",
+          "source_ggml_type_id": 23,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF IQ4_XS is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 17,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.17.attn_qkv.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.17.attn_gate.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 18,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.18.attn_qkv.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.18.attn_gate.weight",
+          "source_format": "IQ4_XS",
+          "source_ggml_type_id": 23,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF IQ4_XS is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 19,
+      "family": "attention",
+      "operator": "ninfer::ops::attn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.19.attn_q.weight",
+          "source_format": "Q5_K",
+          "source_ggml_type_id": 13,
+          "logical_rows_columns": [
+            12288,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.19.attn_k.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.19.attn_v.weight",
+          "source_format": "Q5_K",
+          "source_ggml_type_id": 13,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_q.weight: input columns 2560, required 5120",
+        "attn_q.weight: source GGUF Q5_K is not a validated NInfer RowSplit parent",
+        "attn_k.weight: input columns 2560, required 5120",
+        "attn_k.weight: output rows 512, required 1024",
+        "attn_k.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_v.weight: input columns 2560, required 5120",
+        "attn_v.weight: output rows 512, required 1024",
+        "attn_v.weight: source GGUF Q5_K is not a validated NInfer RowSplit parent",
+        "contiguous query/key and gate/value parents; Strata q/gate rows interleave by head"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 20,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.20.attn_qkv.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.20.attn_gate.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 21,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.21.attn_qkv.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.21.attn_gate.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 22,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.22.attn_qkv.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.22.attn_gate.weight",
+          "source_format": "Q4_K",
+          "source_ggml_type_id": 12,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q4_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 23,
+      "family": "attention",
+      "operator": "ninfer::ops::attn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.23.attn_q.weight",
+          "source_format": "Q5_K",
+          "source_ggml_type_id": 13,
+          "logical_rows_columns": [
+            12288,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.23.attn_k.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.23.attn_v.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_q.weight: input columns 2560, required 5120",
+        "attn_q.weight: source GGUF Q5_K is not a validated NInfer RowSplit parent",
+        "attn_k.weight: input columns 2560, required 5120",
+        "attn_k.weight: output rows 512, required 1024",
+        "attn_k.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_v.weight: input columns 2560, required 5120",
+        "attn_v.weight: output rows 512, required 1024",
+        "attn_v.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "contiguous query/key and gate/value parents; Strata q/gate rows interleave by head"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 24,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.24.attn_qkv.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.24.attn_gate.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 25,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.25.attn_qkv.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.25.attn_gate.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 26,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.26.attn_qkv.weight",
+          "source_format": "Q5_K",
+          "source_ggml_type_id": 13,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.26.attn_gate.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q5_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 27,
+      "family": "attention",
+      "operator": "ninfer::ops::attn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.27.attn_q.weight",
+          "source_format": "Q5_K",
+          "source_ggml_type_id": 13,
+          "logical_rows_columns": [
+            12288,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.27.attn_k.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.27.attn_v.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_q.weight: input columns 2560, required 5120",
+        "attn_q.weight: source GGUF Q5_K is not a validated NInfer RowSplit parent",
+        "attn_k.weight: input columns 2560, required 5120",
+        "attn_k.weight: output rows 512, required 1024",
+        "attn_k.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_v.weight: input columns 2560, required 5120",
+        "attn_v.weight: output rows 512, required 1024",
+        "attn_v.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "contiguous query/key and gate/value parents; Strata q/gate rows interleave by head"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 28,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.28.attn_qkv.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.28.attn_gate.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 29,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.29.attn_qkv.weight",
+          "source_format": "Q5_K",
+          "source_ggml_type_id": 13,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.29.attn_gate.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q5_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 30,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.30.attn_qkv.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.30.attn_gate.weight",
+          "source_format": "Q4_K",
+          "source_ggml_type_id": 12,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q4_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 31,
+      "family": "attention",
+      "operator": "ninfer::ops::attn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.31.attn_q.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            12288,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.31.attn_k.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.31.attn_v.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_q.weight: input columns 2560, required 5120",
+        "attn_q.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_k.weight: input columns 2560, required 5120",
+        "attn_k.weight: output rows 512, required 1024",
+        "attn_k.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_v.weight: input columns 2560, required 5120",
+        "attn_v.weight: output rows 512, required 1024",
+        "attn_v.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "contiguous query/key and gate/value parents; Strata q/gate rows interleave by head"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 32,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.32.attn_qkv.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.32.attn_gate.weight",
+          "source_format": "Q5_K",
+          "source_ggml_type_id": 13,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q5_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 33,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.33.attn_qkv.weight",
+          "source_format": "IQ4_XS",
+          "source_ggml_type_id": 23,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.33.attn_gate.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF IQ4_XS is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 34,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.34.attn_qkv.weight",
+          "source_format": "Q5_K",
+          "source_ggml_type_id": 13,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.34.attn_gate.weight",
+          "source_format": "IQ4_XS",
+          "source_ggml_type_id": 23,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q5_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF IQ4_XS is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 35,
+      "family": "attention",
+      "operator": "ninfer::ops::attn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.35.attn_q.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            12288,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.35.attn_k.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.35.attn_v.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_q.weight: input columns 2560, required 5120",
+        "attn_q.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_k.weight: input columns 2560, required 5120",
+        "attn_k.weight: output rows 512, required 1024",
+        "attn_k.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_v.weight: input columns 2560, required 5120",
+        "attn_v.weight: output rows 512, required 1024",
+        "attn_v.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "contiguous query/key and gate/value parents; Strata q/gate rows interleave by head"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 36,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.36.attn_qkv.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.36.attn_gate.weight",
+          "source_format": "Q4_K",
+          "source_ggml_type_id": 12,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q4_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 37,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.37.attn_qkv.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.37.attn_gate.weight",
+          "source_format": "Q4_K",
+          "source_ggml_type_id": 12,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q4_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 38,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.38.attn_qkv.weight",
+          "source_format": "Q5_K",
+          "source_ggml_type_id": 13,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.38.attn_gate.weight",
+          "source_format": "Q5_K",
+          "source_ggml_type_id": 13,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q5_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q5_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 39,
+      "family": "attention",
+      "operator": "ninfer::ops::attn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.39.attn_q.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            12288,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.39.attn_k.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.39.attn_v.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_q.weight: input columns 2560, required 5120",
+        "attn_q.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_k.weight: input columns 2560, required 5120",
+        "attn_k.weight: output rows 512, required 1024",
+        "attn_k.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_v.weight: input columns 2560, required 5120",
+        "attn_v.weight: output rows 512, required 1024",
+        "attn_v.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "contiguous query/key and gate/value parents; Strata q/gate rows interleave by head"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 40,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.40.attn_qkv.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.40.attn_gate.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 41,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.41.attn_qkv.weight",
+          "source_format": "Q4_K",
+          "source_ggml_type_id": 12,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.41.attn_gate.weight",
+          "source_format": "Q4_K",
+          "source_ggml_type_id": 12,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q4_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q4_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 42,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.42.attn_qkv.weight",
+          "source_format": "Q5_K",
+          "source_ggml_type_id": 13,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.42.attn_gate.weight",
+          "source_format": "IQ4_XS",
+          "source_ggml_type_id": 23,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q5_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF IQ4_XS is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 43,
+      "family": "attention",
+      "operator": "ninfer::ops::attn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.43.attn_q.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            12288,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.43.attn_k.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.43.attn_v.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_q.weight: input columns 2560, required 5120",
+        "attn_q.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_k.weight: input columns 2560, required 5120",
+        "attn_k.weight: output rows 512, required 1024",
+        "attn_k.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_v.weight: input columns 2560, required 5120",
+        "attn_v.weight: output rows 512, required 1024",
+        "attn_v.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "contiguous query/key and gate/value parents; Strata q/gate rows interleave by head"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 44,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.44.attn_qkv.weight",
+          "source_format": "Q5_K",
+          "source_ggml_type_id": 13,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.44.attn_gate.weight",
+          "source_format": "Q4_K",
+          "source_ggml_type_id": 12,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q5_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q4_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 45,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.45.attn_qkv.weight",
+          "source_format": "IQ4_XS",
+          "source_ggml_type_id": 23,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.45.attn_gate.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF IQ4_XS is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 46,
+      "family": "gdn",
+      "operator": "ninfer::ops::gdn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.46.attn_qkv.weight",
+          "source_format": "Q5_K",
+          "source_ggml_type_id": 13,
+          "logical_rows_columns": [
+            10240,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.46.attn_gate.weight",
+          "source_format": "Q5_K",
+          "source_ggml_type_id": 13,
+          "logical_rows_columns": [
+            6144,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 4096,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 12288,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_qkv.weight: input columns 2560, required 5120",
+        "attn_qkv.weight: source GGUF Q5_K is not a validated NInfer RowSplit parent",
+        "attn_gate.weight: input columns 2560, required 5120",
+        "attn_gate.weight: source GGUF Q5_K is not a validated NInfer RowSplit parent",
+        "qk parent plus concatenated value/z parent; source QKV and gate parents differ"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    },
+    {
+      "layer": 47,
+      "family": "attention",
+      "operator": "ninfer::ops::attn_input_proj(two-parent)",
+      "decision": "incompatible_direct_reuse",
+      "source_weights": [
+        {
+          "symbol": "blk.47.attn_q.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            12288,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.47.attn_k.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        },
+        {
+          "symbol": "blk.47.attn_v.weight",
+          "source_format": "Q6_K",
+          "source_ggml_type_id": 14,
+          "logical_rows_columns": [
+            512,
+            2560
+          ]
+        }
+      ],
+      "required_parents": [
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q4G64_F16S",
+          "layout": "RowSplit"
+        },
+        {
+          "rows": 7168,
+          "columns": 5120,
+          "format": "Q5G64_F16S",
+          "layout": "RowSplit"
+        }
+      ],
+      "reasons": [
+        "attn_q.weight: input columns 2560, required 5120",
+        "attn_q.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_k.weight: input columns 2560, required 5120",
+        "attn_k.weight: output rows 512, required 1024",
+        "attn_k.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "attn_v.weight: input columns 2560, required 5120",
+        "attn_v.weight: output rows 512, required 1024",
+        "attn_v.weight: source GGUF Q6_K is not a validated NInfer RowSplit parent",
+        "contiguous query/key and gate/value parents; Strata q/gate rows interleave by head"
+      ],
+      "activation_contract": "NInfer requires contiguous BF16; source headers do not validate runtime activations"
+    }
+  ],
+  "inventory_sha256": "c29e530c429e011d2f57df86eb6154504a3a42e658cd11d12ea7ac6e565911f9"
+}

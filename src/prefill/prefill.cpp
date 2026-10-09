@@ -1,5 +1,6 @@
 // src/prefill/prefill.cpp - see include/strata/prefill/prefill.hpp.
 #include "strata/prefill/prefill.hpp"
+#include "strata/platform/integration_trace.hpp"
 #include "mmq_resident_sort.hpp"
 #include "wmma_gemm.h"
 #include "strata/core/mtp.hpp"
@@ -362,6 +363,19 @@ double ms_since(Clock::time_point t) { return std::chrono::duration<double, std:
 
 // Either cudaMalloc (owned, freed with the object) or a bump allocation from a borrowed region; with no base and
 // no region it only counts, which is how `bytes_needed` sizes the region.
+// Observe the existing owner's payloads; borrowed views do not allocate backing.
+void observe_prefill(const char* kind, const void* owner, const void* p, uint64_t bytes) {
+    if (!strata::platform::integration_trace::enabled()) return;
+    int device = -1;
+    if (cudaGetDevice(&device) != cudaSuccess) return;
+    strata::platform::integration_trace::event("prefill", kind, owner, p, bytes, device,
+                                              std::strcmp(kind, "view") == 0 ? 1 : 0);
+}
+void free_prefill(const void* owner, void* p, int device) {
+    if (cudaFree(p) != cudaSuccess) return;
+    strata::platform::integration_trace::event("prefill", "free", owner, p, 0, device);
+}
+
 struct Alloc {
     uint8_t* base = nullptr;
     uint64_t cap = 0, used = 0;
@@ -380,11 +394,13 @@ struct Alloc {
             if (used + bytes > cap) { ok = false; failed_bytes = bytes; return nullptr; }
             T* p = (T*) (base + used);
             used += bytes;
+            observe_prefill("view", owned, p, bytes);
             return p;
         }
         void* p = nullptr;
         if (cudaMalloc(&p, bytes) != cudaSuccess) { ok = false; failed_bytes = bytes; return nullptr; }
         owned->push_back(p);
+        observe_prefill("allocate", owned, p, bytes);
         used += bytes;
         return (T*) p;
     }
@@ -646,7 +662,7 @@ struct PeerPrefill {
         cudaSetDevice(dev);
         if (s) cudaStreamSynchronize(s);
         ctx.reset();
-        for (void* p : owned) cudaFree(p);
+        for (void* p : owned) free_prefill(&owned, p, dev);
         if (ev_done) cudaEventDestroy(ev_done);
         if (s_out) cudaStreamSynchronize(s_out);
         for (cudaEvent_t e : ev_grp) if (e) cudaEventDestroy(e);
@@ -874,7 +890,7 @@ void Prefill::release() {
         if (e) cudaEventDestroy(e);
     for (cudaEvent_t e : impl_->cpu_wall)
         if (e) cudaEventDestroy(e);
-    for (void* p : impl_->owned) cudaFree(p);
+    for (void* p : impl_->owned) free_prefill(&impl_->owned, p, impl_->device);
 }
 
 namespace {
@@ -1015,6 +1031,7 @@ bool Prefill::init(const core::WeightTable& wt, const core::ModelGeometry& g, co
             return false;
         }
         m.owned.push_back(m.tok_dev);
+        observe_prefill("allocate", &m.owned, m.tok_dev, (uint64_t) chunk * sizeof(int32_t));
         m.tok_host.resize((size_t) chunk);
     }
     if (cudaStreamCreateWithFlags(&m.copy, cudaStreamNonBlocking) != cudaSuccess) { err = "prefill: copy stream"; return false; }
@@ -1102,8 +1119,10 @@ bool Prefill::init(const core::WeightTable& wt, const core::ModelGeometry& g, co
         if (cudaMalloc((void**) &m.ident_table, ident.size() * 4) != cudaSuccess ||
             cudaMemcpy(m.ident_table, ident.data(), ident.size() * 4, cudaMemcpyHostToDevice) != cudaSuccess)
             ok = false;
-        else
+        else {
             m.owned.push_back(m.ident_table);
+            observe_prefill("allocate", &m.owned, m.ident_table, ident.size() * 4);
+        }
     }
     if (!ok) { err = "prefill: host buffers or events for a chunk of " + std::to_string(chunk) + " tokens"; return false; }
     Alloc o;
@@ -1611,6 +1630,7 @@ bool Prefill::set_peer(core::PeerExperts* peer, int64_t cap_rows, std::string& e
         void* p = nullptr;
         if (!ok || cudaMalloc(&p, bytes) != cudaSuccess) { ok = false; return nullptr; }
         pp->owned.push_back(p);
+        observe_prefill("allocate", &pp->owned, p, bytes);
         return p;
     };
     pp->mixed = (float*) take((size_t) m.T_max * N * 4);

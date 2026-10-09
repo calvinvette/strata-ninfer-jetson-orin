@@ -1,0 +1,614 @@
+[strata] 2026-10-09 05:40:49 engine started: /home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/control/strata --serve --pack /home/calvin/models/strata-orin-validation/pack --native /home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf --ple-gguf /home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf --expert-profile /home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin --expert-cache 5000 --prefill 64 --spec 4 --max-context 4096 --mmap-experts --mtp /home/calvin/models/strata-orin-validation/mtp/rt --prompt-cache 0 --vram-reserve-mib 3072 --pcie-frac 0.55
+strata generate: ARM CPU experts use ggml-cpu's native kernels
+strata generate: native pack: /home/calvin/models/strata-orin-validation/pack experts (largest blob 2.66 MB), token embedding IQ4_XS in mapped host memory (322 MiB, 0.3 s)
+strata generate: 1406 MiB of weights loaded from /home/calvin/models/strata-orin-validation/pack in 0.9 s (302 canonical tensors skipped: served natively)
+strata generate: 300 native projection matrices, 2018.88 MiB of weights, in 1.0 s
+strata generate: the SSD is kept awake while rows are read: one page of the table after 100 ms without a read, until 60 s after the last request (STRATA_SSD_KEEPALIVE=0 turns it off)
+strata generate: profile /home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin: 12288 ranked pairs, built for 12288 slots
+strata generate: PLE on, table 320001536 rows of /home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf
+strata mtp: draft layer loaded, 799 MiB of VRAM (experts 675, dense 111), files read in 0.67 s (1166 MiB/s)
+strata generate: experimental native Q5_K head, 521472000 bytes, in 0.4 s
+strata generate: integrated CUDA GPU: CPU and GPU share physical RAM; allocation headroom 6.00 GiB, managed concurrency 0
+strata generate: GPU 0: Orin, compute capability 8.7
+strata generate: experts via mmap (--mmap-experts; the A/B arm of R2.1)
+strata generate: CPU pool tasks/phase: 36 (automatic), participating threads: 12
+strata generate: 11 pool workers on logical processors 1,2,3,4,5,6,7,8,9,10,11, the host thread on 0 (draining too) (--host-core first)
+strata trace: 23074 MiB free after the weights, the session and the drafter
+strata generate: expert cache 6519 slots, 12.40 GiB of shared RAM allocated to the GPU; policy is
+strata trace: 10356 MiB free after opening the expert cache
+strata generate: the GPU computes the experts in the cache; it rounds differently from the CPU,
+                 so a reply can differ slightly from a run without the cache (same quality:
+                 bench/results/2026-09-27-cache-parity).
+                 PROFILE, ranked by routing frequency, no eviction.
+strata generate: the profile fill asks for 256 pairs ahead (STRATA_FILL_AHEAD)
+strata trace: 10322 MiB free after the profile fill
+strata generate: pre-filled 6519 of 6519 slots from the profile in 8.2 s (1628 MB/s); slot 0 verified
+strata trace: 10322 MiB free after the R4 hit path
+strata generate: R4 hit path ON - resident experts are computed on the GPU
+strata generate: 11 expert-pool workers + the host thread
+strata trace: 10322 MiB free after the expert cache and the graphs
+strata generate: session is up (engine 0.1.41)
+strata generate: token graph hit path: 6519 resident experts, decided on the device
+prefill: the CPU share is ON by default for prompt chunks below 1024 tokens (the idle CPU takes some of the experts the GPU would stream; answers can differ slightly from 0.1.40.3, mean KL ~0.004). STRATA_PREFILL_CPU_SHARE=0 turns it off.
+strata serve: the prompt path allocates its own buffers (too few cache slots to borrow)
+strata trace: 9117 MiB free after the head and the prompt path
+strata hc: CUDA0: the hyper-connection read runs as staged (the norm per token and stream, the down projection's activations staged ahead by cp.async); checked bit for bit against the plain read on this card (STRATA_HC_SPLIT=1 or 0 for the earlier ones)
+strata verify: window up to 6 tokens, 74.3 MiB of device buffers
+strata mtp: draft head over 106299 tokens (212.9 MiB)
+strata trace: 8835 MiB free after the verifier and the drafter's binding
+strata serve: 8836 MiB shared RAM available with everything loaded; 6144 MiB physical RAM headroom
+strata trace: request 557 0
+strata trace: prompt start 556 -1
+strata trace: lent 0 slots for 64 tokens in 0.0 ms
+strata trace: prompt chunk 0 of 556
+strata trace: prompt chunk 64 of 556
+strata trace: prompt chunk 128 of 556
+strata trace: prompt chunk 192 of 556
+strata trace: prompt chunk 256 of 556
+strata trace: prompt chunk 320 of 556
+strata trace: prompt chunk 384 of 556
+strata trace: prompt chunk 448 of 556
+strata trace: prompt chunk 512 of 556
+strata trace: read 556 tokens (batched) in 17200.4 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 556 1
+strata verify: capturing the 1-token window (8881 MiB of VRAM free)
+strata verify: captured the 1-token window (upload no error, sync no error)
+strata trace: window 557 4
+strata verify: capturing the 4-token window (8827 MiB of VRAM free)
+strata verify: captured the 4-token window (upload no error, sync no error)
+strata trace: window 559 4
+strata trace: window 561 4
+strata trace: window 564 4
+strata trace: window 565 4
+strata trace: window 568 4
+strata trace: window 571 4
+strata trace: window 573 4
+strata trace: window 577 4
+strata trace: window 579 4
+strata trace: window 581 4
+strata trace: window 585 4
+strata trace: window 586 4
+strata trace: window 588 4
+strata trace: window 592 4
+strata trace: window 593 4
+strata trace: window 595 4
+strata trace: window 599 4
+strata trace: window 600 4
+strata trace: window 603 4
+strata trace: window 605 4
+strata trace: window 607 4
+strata trace: window 609 4
+strata trace: window 611 4
+strata trace: window 614 4
+strata trace: window 618 4
+strata serve: prompt 557 tokens = 0 reused + 557 read in 17206 ms (32.4 tok/s), 64 generated in 4623 ms (13.8 tok/s), drafts accepted 37 of 78, 0 checkpoints
+strata serve: decode expert cache hit rate: 88.3% (44501 hits / 50400 lookups)
+strata serve: expert tiers: GPU 44501 hits this request; since the start RAM 0 blobs, files 0 blobs 52968.6 MB read
+strata trace: request 512 0
+strata trace: prompt start 511 -1
+strata trace: lent 0 slots for 64 tokens in 0.0 ms
+strata trace: prompt chunk 0 of 511
+strata trace: prompt chunk 64 of 511
+strata trace: prompt chunk 128 of 511
+strata trace: prompt chunk 192 of 511
+strata trace: prompt chunk 256 of 511
+strata trace: prompt chunk 320 of 511
+strata trace: prompt chunk 384 of 511
+strata trace: prompt chunk 448 of 511
+strata trace: read 511 tokens (batched) in 9972.8 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 511 1
+strata trace: window 512 4
+strata trace: window 514 4
+strata trace: window 516 4
+strata trace: window 518 4
+strata trace: window 522 4
+strata trace: window 526 4
+strata trace: window 529 4
+strata trace: window 533 4
+strata trace: window 537 4
+strata trace: window 539 4
+strata trace: window 540 4
+strata trace: window 541 4
+strata trace: window 542 4
+strata trace: window 544 4
+strata trace: window 548 4
+strata trace: window 549 4
+strata trace: window 550 4
+strata trace: window 551 4
+strata trace: window 555 4
+strata trace: window 556 4
+strata trace: window 557 4
+strata trace: window 559 4
+strata trace: window 561 4
+strata trace: window 563 4
+strata trace: window 565 4
+strata trace: window 566 4
+strata trace: window 567 4
+strata trace: window 570 4
+strata trace: window 574 4
+strata serve: prompt 512 tokens = 0 reused + 512 read in 9975 ms (51.3 tok/s), 64 generated in 3509 ms (18.2 tok/s), drafts accepted 34 of 87, 0 checkpoints
+strata serve: decode expert cache hit rate: 96.2% (54011 hits / 56160 lookups)
+strata serve: expert tiers: GPU 54011 hits this request; since the start RAM 0 blobs, files 0 blobs 86051.2 MB read
+strata trace: request 1069 0
+strata trace: prompt start 1068 -1
+strata trace: lent 0 slots for 64 tokens in 0.0 ms
+strata trace: prompt chunk 0 of 1068
+strata trace: prompt chunk 64 of 1068
+strata trace: prompt chunk 128 of 1068
+strata trace: prompt chunk 192 of 1068
+strata trace: prompt chunk 256 of 1068
+strata trace: prompt chunk 320 of 1068
+strata trace: prompt chunk 384 of 1068
+strata trace: prompt chunk 448 of 1068
+strata trace: prompt chunk 512 of 1068
+strata trace: prompt chunk 576 of 1068
+strata trace: prompt chunk 640 of 1068
+strata trace: prompt chunk 704 of 1068
+strata trace: prompt chunk 768 of 1068
+strata trace: prompt chunk 832 of 1068
+strata trace: prompt chunk 896 of 1068
+strata trace: prompt chunk 960 of 1068
+strata trace: prompt chunk 1024 of 1068
+strata trace: read 1068 tokens (batched) in 18526.1 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 1068 1
+strata trace: window 1069 4
+strata trace: window 1071 4
+strata trace: window 1075 4
+strata trace: window 1077 4
+strata trace: window 1078 4
+strata trace: window 1080 4
+strata trace: window 1083 4
+strata trace: window 1084 4
+strata trace: window 1085 4
+strata trace: window 1089 4
+strata trace: window 1093 4
+strata trace: window 1097 4
+strata trace: window 1098 4
+strata trace: window 1099 4
+strata trace: window 1101 4
+strata trace: window 1105 4
+strata trace: window 1106 4
+strata trace: window 1108 4
+strata trace: window 1112 4
+strata trace: window 1113 4
+strata trace: window 1114 4
+strata trace: window 1116 4
+strata trace: window 1118 4
+strata trace: window 1120 4
+strata trace: window 1122 4
+strata trace: window 1124 4
+strata trace: window 1127 4
+strata trace: window 1131 4
+strata serve: prompt 1069 tokens = 0 reused + 1069 read in 18528 ms (57.7 tok/s), 64 generated in 3310 ms (19.3 tok/s), drafts accepted 36 of 84, 0 checkpoints
+strata serve: decode expert cache hit rate: 98.0% (53146 hits / 54240 lookups)
+strata serve: expert tiers: GPU 53146 hits this request; since the start RAM 0 blobs, files 0 blobs 139145.5 MB read
+strata trace: request 172 0
+strata trace: prompt start 171 -1
+strata trace: lent 0 slots for 64 tokens in 0.0 ms
+strata trace: prompt chunk 0 of 171
+strata trace: prompt chunk 64 of 171
+strata trace: prompt chunk 128 of 171
+strata trace: read 171 tokens (batched) in 3199.8 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 171 1
+strata trace: window 172 4
+strata trace: window 174 4
+strata trace: window 176 4
+strata trace: window 179 4
+strata trace: window 180 4
+strata trace: window 183 4
+strata trace: window 186 4
+strata trace: window 188 4
+strata trace: window 192 4
+strata trace: window 194 4
+strata trace: window 196 4
+strata trace: window 200 4
+strata trace: window 201 4
+strata trace: window 203 4
+strata trace: window 207 4
+strata trace: window 208 4
+strata trace: window 210 4
+strata trace: window 214 4
+strata trace: window 215 4
+strata trace: window 216 4
+strata trace: window 218 4
+strata trace: window 220 4
+strata trace: window 222 4
+strata trace: window 224 4
+strata trace: window 225 4
+strata trace: window 226 4
+strata trace: window 230 4
+strata trace: window 234 4
+strata serve: prompt 172 tokens = 0 reused + 172 read in 3202 ms (53.7 tok/s), 64 generated in 3188 ms (20.1 tok/s), drafts accepted 35 of 84, 0 checkpoints
+strata serve: decode expert cache hit rate: 98.3% (53293 hits / 54240 lookups)
+strata serve: expert tiers: GPU 53293 hits this request; since the start RAM 0 blobs, files 0 blobs 151694.2 MB read
+strata trace: request 2048 0
+strata trace: prompt start 2047 -1
+strata trace: lent 0 slots for 64 tokens in 0.0 ms
+strata trace: prompt chunk 0 of 2047
+strata trace: prompt chunk 64 of 2047
+strata trace: prompt chunk 128 of 2047
+strata trace: prompt chunk 192 of 2047
+strata trace: prompt chunk 256 of 2047
+strata trace: prompt chunk 320 of 2047
+strata trace: prompt chunk 384 of 2047
+strata trace: prompt chunk 448 of 2047
+strata trace: prompt chunk 512 of 2047
+strata trace: prompt chunk 576 of 2047
+strata trace: prompt chunk 640 of 2047
+strata trace: prompt chunk 704 of 2047
+strata trace: prompt chunk 768 of 2047
+strata trace: prompt chunk 832 of 2047
+strata trace: prompt chunk 896 of 2047
+strata trace: prompt chunk 960 of 2047
+strata trace: prompt chunk 1024 of 2047
+strata trace: prompt chunk 1088 of 2047
+strata trace: prompt chunk 1152 of 2047
+strata trace: prompt chunk 1216 of 2047
+strata trace: prompt chunk 1280 of 2047
+strata trace: prompt chunk 1344 of 2047
+strata trace: prompt chunk 1408 of 2047
+strata trace: prompt chunk 1472 of 2047
+strata trace: prompt chunk 1536 of 2047
+strata trace: prompt chunk 1600 of 2047
+strata trace: prompt chunk 1664 of 2047
+strata trace: prompt chunk 1728 of 2047
+strata trace: prompt chunk 1792 of 2047
+strata trace: prompt chunk 1856 of 2047
+strata trace: prompt chunk 1920 of 2047
+strata trace: prompt chunk 1984 of 2047
+strata trace: read 2047 tokens (batched) in 31108.8 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 2047 1
+strata trace: window 2048 4
+strata trace: window 2050 4
+strata trace: window 2052 4
+strata trace: window 2054 4
+strata trace: window 2058 4
+strata trace: window 2062 4
+strata trace: window 2065 4
+strata trace: window 2069 4
+strata trace: window 2073 4
+strata trace: window 2075 4
+strata trace: window 2076 4
+strata trace: window 2077 4
+strata trace: window 2078 4
+strata trace: window 2080 4
+strata trace: window 2084 4
+strata trace: window 2085 4
+strata trace: window 2086 4
+strata trace: window 2087 4
+strata trace: window 2091 4
+strata trace: window 2092 4
+strata trace: window 2093 4
+strata trace: window 2095 4
+strata trace: window 2097 4
+strata trace: window 2099 4
+strata trace: window 2101 4
+strata trace: window 2102 4
+strata trace: window 2103 4
+strata trace: window 2106 4
+strata trace: window 2110 4
+strata trace: window 2111 4
+strata trace: window 2112 4
+strata trace: window 2114 4
+strata trace: window 2118 4
+strata trace: window 2122 4
+strata trace: window 2123 4
+strata trace: window 2124 4
+strata trace: window 2128 4
+strata trace: window 2132 4
+strata trace: window 2134 4
+strata trace: window 2135 4
+strata trace: window 2137 4
+strata trace: window 2139 4
+strata trace: window 2140 4
+strata trace: window 2141 4
+strata trace: window 2145 4
+strata trace: window 2149 4
+strata trace: window 2153 4
+strata trace: window 2155 4
+strata trace: window 2156 4
+strata trace: window 2157 4
+strata trace: window 2159 4
+strata trace: window 2160 4
+strata trace: window 2164 4
+strata trace: window 2167 4
+strata trace: window 2168 4
+strata trace: window 2169 4
+strata trace: window 2170 4
+strata trace: window 2172 4
+strata serve: prompt 2048 tokens = 0 reused + 2048 read in 31111 ms (65.8 tok/s), 128 generated in 7276 ms (17.6 tok/s), drafts accepted 70 of 174, 0 checkpoints
+strata serve: decode expert cache hit rate: 97.9% (109522 hits / 111840 lookups)
+strata serve: expert tiers: GPU 109522 hits this request; since the start RAM 0 blobs, files 0 blobs 251753.1 MB read
+strata trace: request 557 0
+strata trace: prompt start 556 -1
+strata trace: lent 0 slots for 64 tokens in 0.0 ms
+strata trace: prompt chunk 0 of 556
+strata trace: prompt chunk 64 of 556
+strata trace: prompt chunk 128 of 556
+strata trace: prompt chunk 192 of 556
+strata trace: prompt chunk 256 of 556
+strata trace: prompt chunk 320 of 556
+strata trace: prompt chunk 384 of 556
+strata trace: prompt chunk 448 of 556
+strata trace: prompt chunk 512 of 556
+strata trace: read 556 tokens (batched) in 9548.9 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 556 1
+strata trace: window 557 4
+strata trace: window 559 4
+strata trace: window 563 4
+strata trace: window 567 4
+strata trace: window 571 4
+strata trace: window 573 4
+strata trace: window 577 4
+strata trace: window 579 4
+strata trace: window 581 4
+strata trace: window 582 4
+strata trace: window 584 4
+strata trace: window 586 4
+strata trace: window 588 4
+strata trace: window 592 4
+strata trace: window 593 4
+strata trace: window 595 4
+strata trace: window 599 4
+strata trace: window 600 4
+strata trace: window 601 4
+strata trace: window 603 4
+strata trace: window 605 4
+strata trace: window 607 4
+strata trace: window 609 4
+strata trace: window 612 4
+strata trace: window 613 4
+strata trace: window 617 4
+strata trace: window 619 4
+strata serve: prompt 557 tokens = 0 reused + 557 read in 9551 ms (58.3 tok/s), 64 generated in 3028 ms (21.1 tok/s), drafts accepted 36 of 81, 0 checkpoints
+strata serve: decode expert cache hit rate: 98.8% (51674 hits / 52320 lookups)
+strata serve: expert tiers: GPU 51674 hits this request; since the start RAM 0 blobs, files 0 blobs 281032.8 MB read
+strata trace: request 512 0
+strata trace: prompt start 511 -1
+strata trace: lent 0 slots for 64 tokens in 0.0 ms
+strata trace: prompt chunk 0 of 511
+strata trace: prompt chunk 64 of 511
+strata trace: prompt chunk 128 of 511
+strata trace: prompt chunk 192 of 511
+strata trace: prompt chunk 256 of 511
+strata trace: prompt chunk 320 of 511
+strata trace: prompt chunk 384 of 511
+strata trace: prompt chunk 448 of 511
+strata trace: read 511 tokens (batched) in 7850.8 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 511 1
+strata trace: window 512 4
+strata trace: window 514 4
+strata trace: window 516 4
+strata trace: window 518 4
+strata trace: window 522 4
+strata trace: window 526 4
+strata trace: window 529 4
+strata trace: window 533 4
+strata trace: window 537 4
+strata trace: window 539 4
+strata trace: window 540 4
+strata trace: window 541 4
+strata trace: window 542 4
+strata trace: window 544 4
+strata trace: window 548 4
+strata trace: window 549 4
+strata trace: window 550 4
+strata trace: window 551 4
+strata trace: window 555 4
+strata trace: window 556 4
+strata trace: window 557 4
+strata trace: window 559 4
+strata trace: window 561 4
+strata trace: window 563 4
+strata trace: window 565 4
+strata trace: window 566 4
+strata trace: window 567 4
+strata trace: window 570 4
+strata trace: window 574 4
+strata serve: prompt 512 tokens = 0 reused + 512 read in 7853 ms (65.2 tok/s), 64 generated in 3121 ms (20.5 tok/s), drafts accepted 34 of 87, 0 checkpoints
+strata serve: decode expert cache hit rate: 99.0% (55587 hits / 56160 lookups)
+strata serve: expert tiers: GPU 55587 hits this request; since the start RAM 0 blobs, files 0 blobs 308735.7 MB read
+strata trace: request 1069 0
+strata trace: prompt start 1068 -1
+strata trace: lent 0 slots for 64 tokens in 0.0 ms
+strata trace: prompt chunk 0 of 1068
+strata trace: prompt chunk 64 of 1068
+strata trace: prompt chunk 128 of 1068
+strata trace: prompt chunk 192 of 1068
+strata trace: prompt chunk 256 of 1068
+strata trace: prompt chunk 320 of 1068
+strata trace: prompt chunk 384 of 1068
+strata trace: prompt chunk 448 of 1068
+strata trace: prompt chunk 512 of 1068
+strata trace: prompt chunk 576 of 1068
+strata trace: prompt chunk 640 of 1068
+strata trace: prompt chunk 704 of 1068
+strata trace: prompt chunk 768 of 1068
+strata trace: prompt chunk 832 of 1068
+strata trace: prompt chunk 896 of 1068
+strata trace: prompt chunk 960 of 1068
+strata trace: prompt chunk 1024 of 1068
+strata trace: read 1068 tokens (batched) in 16231.2 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 1068 1
+strata trace: window 1069 4
+strata trace: window 1071 4
+strata trace: window 1073 4
+strata trace: window 1075 4
+strata trace: window 1076 4
+strata trace: window 1078 4
+strata trace: window 1079 4
+strata trace: window 1080 4
+strata trace: window 1081 4
+strata trace: window 1085 4
+strata trace: window 1086 4
+strata trace: window 1090 4
+strata trace: window 1091 4
+strata trace: window 1093 4
+strata trace: window 1097 4
+strata trace: window 1100 4
+strata trace: window 1101 4
+strata trace: window 1103 4
+strata trace: window 1104 4
+strata trace: window 1107 4
+strata trace: window 1108 4
+strata trace: window 1109 4
+strata trace: window 1111 4
+strata trace: window 1113 4
+strata trace: window 1115 4
+strata trace: window 1116 4
+strata trace: window 1117 4
+strata trace: window 1118 4
+strata trace: window 1120 4
+strata trace: window 1122 4
+strata trace: window 1126 4
+strata trace: window 1128 4
+strata trace: window 1131 4
+strata serve: prompt 1069 tokens = 0 reused + 1069 read in 16233 ms (65.9 tok/s), 64 generated in 3884 ms (16.5 tok/s), drafts accepted 30 of 99, 0 checkpoints
+strata serve: decode expert cache hit rate: 97.9% (62495 hits / 63840 lookups)
+strata serve: expert tiers: GPU 62495 hits this request; since the start RAM 0 blobs, files 0 blobs 361079.8 MB read
+strata trace: request 172 0
+strata trace: prompt start 171 -1
+strata trace: lent 0 slots for 64 tokens in 0.0 ms
+strata trace: prompt chunk 0 of 171
+strata trace: prompt chunk 64 of 171
+strata trace: prompt chunk 128 of 171
+strata trace: read 171 tokens (batched) in 3117.4 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 171 1
+strata trace: window 172 4
+strata trace: window 174 4
+strata trace: window 176 4
+strata trace: window 179 4
+strata trace: window 180 4
+strata trace: window 183 4
+strata trace: window 186 4
+strata trace: window 188 4
+strata trace: window 192 4
+strata trace: window 194 4
+strata trace: window 196 4
+strata trace: window 200 4
+strata trace: window 201 4
+strata trace: window 203 4
+strata trace: window 207 4
+strata trace: window 208 4
+strata trace: window 210 4
+strata trace: window 214 4
+strata trace: window 215 4
+strata trace: window 216 4
+strata trace: window 218 4
+strata trace: window 220 4
+strata trace: window 222 4
+strata trace: window 224 4
+strata trace: window 227 4
+strata trace: window 228 4
+strata trace: window 232 4
+strata trace: window 234 4
+strata serve: prompt 172 tokens = 0 reused + 172 read in 3120 ms (55.1 tok/s), 64 generated in 3149 ms (20.3 tok/s), drafts accepted 35 of 84, 0 checkpoints
+strata serve: decode expert cache hit rate: 99.0% (53715 hits / 54240 lookups)
+strata serve: expert tiers: GPU 53715 hits this request; since the start RAM 0 blobs, files 0 blobs 372683.4 MB read
+strata trace: request 2048 0
+strata trace: prompt start 2047 -1
+strata trace: lent 0 slots for 64 tokens in 0.0 ms
+strata trace: prompt chunk 0 of 2047
+strata trace: prompt chunk 64 of 2047
+strata trace: prompt chunk 128 of 2047
+strata trace: prompt chunk 192 of 2047
+strata trace: prompt chunk 256 of 2047
+strata trace: prompt chunk 320 of 2047
+strata trace: prompt chunk 384 of 2047
+strata trace: prompt chunk 448 of 2047
+strata trace: prompt chunk 512 of 2047
+strata trace: prompt chunk 576 of 2047
+strata trace: prompt chunk 640 of 2047
+strata trace: prompt chunk 704 of 2047
+strata trace: prompt chunk 768 of 2047
+strata trace: prompt chunk 832 of 2047
+strata trace: prompt chunk 896 of 2047
+strata trace: prompt chunk 960 of 2047
+strata trace: prompt chunk 1024 of 2047
+strata trace: prompt chunk 1088 of 2047
+strata trace: prompt chunk 1152 of 2047
+strata trace: prompt chunk 1216 of 2047
+strata trace: prompt chunk 1280 of 2047
+strata trace: prompt chunk 1344 of 2047
+strata trace: prompt chunk 1408 of 2047
+strata trace: prompt chunk 1472 of 2047
+strata trace: prompt chunk 1536 of 2047
+strata trace: prompt chunk 1600 of 2047
+strata trace: prompt chunk 1664 of 2047
+strata trace: prompt chunk 1728 of 2047
+strata trace: prompt chunk 1792 of 2047
+strata trace: prompt chunk 1856 of 2047
+strata trace: prompt chunk 1920 of 2047
+strata trace: prompt chunk 1984 of 2047
+strata trace: read 2047 tokens (batched) in 29541.2 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 2047 1
+strata trace: window 2048 4
+strata trace: window 2050 4
+strata trace: window 2052 4
+strata trace: window 2055 4
+strata trace: window 2056 4
+strata trace: window 2060 4
+strata trace: window 2064 4
+strata trace: window 2068 4
+strata trace: window 2072 4
+strata trace: window 2074 4
+strata trace: window 2075 4
+strata trace: window 2076 4
+strata trace: window 2077 4
+strata trace: window 2079 4
+strata trace: window 2083 4
+strata trace: window 2084 4
+strata trace: window 2085 4
+strata trace: window 2086 4
+strata trace: window 2090 4
+strata trace: window 2091 4
+strata trace: window 2092 4
+strata trace: window 2094 4
+strata trace: window 2096 4
+strata trace: window 2098 4
+strata trace: window 2100 4
+strata trace: window 2103 4
+strata trace: window 2107 4
+strata trace: window 2110 4
+strata trace: window 2111 4
+strata trace: window 2112 4
+strata trace: window 2113 4
+strata trace: window 2117 4
+strata trace: window 2121 4
+strata trace: window 2122 4
+strata trace: window 2123 4
+strata trace: window 2127 4
+strata trace: window 2131 4
+strata trace: window 2133 4
+strata trace: window 2134 4
+strata trace: window 2136 4
+strata trace: window 2138 4
+strata trace: window 2139 4
+strata trace: window 2141 4
+strata trace: window 2144 4
+strata trace: window 2148 4
+strata trace: window 2152 4
+strata trace: window 2153 4
+strata trace: window 2157 4
+strata trace: window 2158 4
+strata trace: window 2159 4
+strata trace: window 2160 4
+strata trace: window 2161 4
+strata trace: window 2165 4
+strata trace: window 2166 4
+strata trace: window 2170 4
+strata trace: window 2171 4
+strata trace: window 2173 4
+strata serve: prompt 2048 tokens = 0 reused + 2048 read in 29543 ms (69.3 tok/s), 128 generated in 6855 ms (18.7 tok/s), drafts accepted 70 of 171, 0 checkpoints
+strata serve: decode expert cache hit rate: 98.4% (108120 hits / 109920 lookups)
+strata serve: expert tiers: GPU 108120 hits this request; since the start RAM 0 blobs, files 0 blobs 467783.7 MB read

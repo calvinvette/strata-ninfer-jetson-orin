@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "observed_hardware": "native ARM64 Orin, CUDA 12.6.68, embedded SM87",
+  "runtime_changes": "none; source src/include/CMake/vendored ggml matches pinned control",
+  "checks": {
+    "gguf_shard_identity": "pass: 2 independent rehashes against pinned digests",
+    "mtp_source_identity": "pass: 31 independent rehashes against pinned digests",
+    "prepared_packs": "identity-only; conversion arithmetic not requalified",
+    "exact_formatted_workloads": "pass: 512,2048,172,557,1069",
+    "native_no_mtp_smoke": "pass on both new builds; spec4 without --mtp",
+    "native_spec_zero": "unsupported: explicit native-pack rejection",
+    "clock_profile_display": "unsupported without root; power query MAXN; observed clocks in raw tegrastats",
+    "paired_api_controls": "not_run",
+    "first_token_timestamps": "not_run",
+    "owner_allocation_graph_workspace_counters": "not_run",
+    "independent_operator_tolerances": "not_run",
+    "ninfer_model_cohorts": "not_run",
+    "hip_sycl_rebuild": "not_run: no shared runtime files changed"
+  },
+  "qualification": "partial Phase 1 capabilities only; no optimization admission"
+}

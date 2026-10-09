@@ -4,6 +4,7 @@
 #include <dpct/dpct.hpp>
 #include "strata/sycl_queue.hpp"
 #include "strata/core/verify.hpp"
+#include "strata/platform/integration_trace.hpp"
 #include "strata/core/remote_expert_opt.hpp"
 #include "strata/core/dma_batch.hpp"
 #if defined(_WIN32)
@@ -384,7 +385,10 @@ Verifier::~Verifier() try {
     if (prof_pin_) sycl::free(prof_pin_, dpct::get_in_order_queue());
     if (ev_fork_) dpct::destroy_event(ev_fork_);
     if (ev_join_) dpct::destroy_event(ev_join_);
-    if (arena_) sycl::free(arena_, dpct::get_in_order_queue());
+    if (arena_) {
+        sycl::free(arena_, dpct::get_in_order_queue());
+        strata::platform::integration_trace::event("verifier", "free", this, arena_, 0, device_);
+    }
     void* hosts[] = {h_tok_, h_step_, h_pos_, h_commit_, h_ple_, h_out_, h_x_, h_ids_, h_w_, h_seq_, h_flag_, h_ymiss_,
                      h_flagA_, h_plan_, h_flagB_, h_plan_err_};
     for (void* h : hosts)
@@ -546,6 +550,7 @@ bool Verifier::init(const WeightTable &wt, const ModelGeometry &g,
         err = "verify: the device arena (" + std::to_string(count.used >> 20) + " MiB) does not fit";
         return false;
     }
+    strata::platform::integration_trace::event("verifier", "allocate", this, arena_, count.used, device_);
     strata::big_fill_zero(dpct::get_in_order_queue(), arena_, count.used);
     if (g_trace && trace_h_ == nullptr) {   // #649: the breadcrumbs, mapped so they read while the GPU hangs
         trace_n_ = (size_t) (g.n_layers + 1) * kProfPer * 2;
@@ -1688,6 +1693,7 @@ bool Verifier::capture(int T, std::string &err) try {
     /*
     DPCT1007: Migration of cudaGraphUpload is not supported.
     */
+    strata::platform::integration_trace::event("verifier", "graph_instantiate", this, nullptr, 0, device_, 1);
     const dpct::err0 ue = 0;   // no cudaGraphUpload on SYCL: a finalized command_graph is already resident
     const dpct::err0 us = DPCT_CHECK_ERROR(cs_->wait());
     std::fprintf(

@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "wall_time_s": 1791536453.5199518,
+  "revision": "0be090c8997b24cf5d21557ced40a1b7e93e87d3",
+  "source": "/home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/control-src",
+  "platform": {
+    "system": "Linux",
+    "node": "orin1",
+    "release": "5.15.148-tegra",
+    "version": "#1 SMP PREEMPT Mon Jun 16 08:24:48 PDT 2025",
+    "machine": "aarch64",
+    "processor": "aarch64"
+  },
+  "files": [
+    {
+      "path": "/home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/control/strata",
+      "size_bytes": 62295368,
+      "sha256": "edbc0a85fc706fd929f9ea5ad1041c3fed25a0cc107356bcc82e59c2431a5249"
+    },
+    {
+      "path": "/home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/control/CMakeCache.txt",
+      "size_bytes": 50523,
+      "sha256": "9c180692a65378535ed646df277beeee094f460a15b909f7739e1e5d5b14bd49"
+    },
+    {
+      "path": "/home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/evidence/artifacts.json",
+      "size_bytes": 1998,
+      "sha256": "e11d037820a79cb3c0b30bdacc29f4b225683be708e93929884e055d306265df"
+    },
+    {
+      "path": "/home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/workloads/workloads.json",
+      "size_bytes": 22444,
+      "sha256": "1c38b44a26fbe624e4bb81bd7ff07c320378bf22e4b6eafe38c28647ca7eedc0"
+    }
+  ],
+  "clocks": "dynamic; no clock changes by harness",
+  "qualification": "identity inventory only; no numerical/performance pass",
+  "checks": [
+    {
+      "command": [
+        "/usr/local/cuda/bin/nvcc",
+        "--version"
+      ],
+      "returncode": 0,
+      "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Wed_Aug_14_10:14:07_PDT_2024\nCuda compilation tools, release 12.6, V12.6.68\nBuild cuda_12.6.r12.6/compiler.34714021_0\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "c++",
+        "--version"
+      ],
+      "returncode": 0,
+      "stdout": "c++ (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "nvpmodel",
+        "-q"
+      ],
+      "returncode": 0,
+      "stdout": "NV Power Mode: MAXN\n0\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "jetson_clocks",
+        "--show"
+      ],
+      "returncode": 1,
+      "stdout": "SOC family:tegra234  Machine:NVIDIA Jetson AGX Orin Developer Kit\nError: Run this script(/usr/bin/jetson_clocks) as a root user\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "file",
+        "build/integration/control/strata"
+      ],
+      "returncode": 0,
+      "stdout": "build/integration/control/strata: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (GNU/Linux), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=5b90b3a0ecf3d9c42175673120c1bf24ce17c991, for GNU/Linux 3.7.0, not stripped\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/local/cuda/bin/cuobjdump",
+        "--list-elf",
+        "build/integration/control/strata"
+      ],
+      "returncode": 0,
+      "stdout": "ELF file    1: strata.1.sm_87.cubin\nELF file    2: strata.2.sm_87.cubin\nELF file    3: strata.3.sm_87.cubin\nELF file    4: strata.4.sm_87.cubin\nELF file    5: strata.5.sm_87.cubin\nELF file    6: strata.6.sm_87.cubin\nELF file    7: strata.7.sm_87.cubin\nELF file    8: strata.8.sm_87.cubin\nELF file    9: strata.9.sm_87.cubin\nELF file   10: strata.10.sm_87.cubin\nELF file   11: strata.11.sm_87.cubin\nELF file   12: strata.12.sm_87.cubin\nELF file   13: strata.13.sm_87.cubin\nELF file   14: strata.14.sm_87.cubin\nELF file   15: strata.15.sm_87.cubin\nELF file   16: strata.16.sm_87.cubin\nELF file   17: strata.17.sm_87.cubin\nELF file   18: strata.18.sm_87.cubin\nELF file   19: strata.19.sm_87.cubin\nELF file   20: strata.20.sm_87.cubin\nELF file   21: strata.21.sm_87.cubin\nELF file   22: strata.22.sm_87.cubin\nELF file   23: strata.23.sm_87.cubin\nELF file   24: strata.24.sm_87.cubin\nELF file   25: strata.25.sm_87.cubin\nELF file   26: strata.26.sm_87.cubin\nELF file   27: strata.27.sm_87.cubin\nELF file   28: strata.28.sm_87.cubin\nELF file   29: strata.29.sm_87.cubin\nELF file   30: strata.30.sm_87.cubin\nELF file   31: strata.31.sm_87.cubin\nELF file   32: strata.32.sm_87.cubin\nELF file   33: strata.33.sm_87.cubin\nELF file   34: strata.34.sm_87.cubin\nELF file   35: strata.35.sm_87.cubin\nELF file   36: strata.36.sm_87.cubin\nELF file   37: strata.37.sm_87.cubin\nELF file   38: strata.38.sm_87.cubin\nELF file   39: strata.39.sm_87.cubin\nELF file   40: strata.40.sm_87.cubin\nELF file   41: strata.41.sm_87.cubin\nELF file   42: strata.42.sm_87.cubin\nELF file   43: strata.43.sm_87.cubin\nELF file   44: strata.44.sm_87.cubin\nELF file   45: strata.45.sm_87.cubin\nELF file   46: strata.46.sm_87.cubin\nELF file   47: strata.47.sm_87.cubin\nELF file   48: strata.48.sm_87.cubin\nELF file   49: strata.49.sm_87.cubin\nELF file   50: strata.50.sm_87.cubin\nELF file   51: strata.51.sm_87.cubin\nELF file   52: strata.52.sm_87.cubin\nELF file   53: strata.53.sm_87.cubin\nELF file   54: strata.54.sm_87.cubin\nELF file   55: strata.55.sm_87.cubin\nELF file   56: strata.56.sm_87.cubin\nELF file   57: strata.57.sm_87.cubin\nELF file   58: strata.58.sm_87.cubin\n",
+      "stderr": ""
+    }
+  ],
+  "counter_gaps": [
+    "unique allocation/reservation bytes by owner",
+    "graph pool allocation",
+    "request-scoped energy",
+    "independent operator tolerance and persistent-state fixtures"
+  ]
+}

@@ -12,6 +12,8 @@
 | D008 | Keep CUDA 12.6/SM87 for the first campaign | Toolchain/clock upgrades are independent experiments, contingent on verified board support |
 | D009 | Single active request first; concurrency is conditional later work | Admission/state ownership and physical capacity must be proven before compact decode batching |
 | D010 | Independent GitHub repository with preserved Strata ancestry | Account already owns the Strata network fork; this keeps PR #1621 separate from integration research |
+| D012 | Fix the paired control expert budget and verify actual resources | Auto cache produced unmatched smoke allocations; budget5000 yields matching 6519 slots/12695 MiB in all completed pairs. No default change; revisit only with measured cache/context experiments |
+| D011 | Translate MTP-off separately from native `--spec` geometry | Fresh native-pack smoke rejects `--spec 0`; omit MTP weights while retaining a supported native window, then qualify actual counters before a sweep |
 
 For a change to these decisions, use the [decision template](templates/decision.md)
 and link its evidence from this table. No measured defaults change in the bootstrap.

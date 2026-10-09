@@ -1,0 +1,428 @@
+{
+  "scope": "one profiled process; kernel-duration sums include concurrent streams and spin waits, not critical-path fractions or speedups",
+  "alignment": "Nsight session UTC epoch plus median sampled wall/monotonic offset; no request NVTX marker; absolute alignment error not independently bounded",
+  "sensitivity": "plus/minus 50ms boundaries are a sensitivity check, not a confidence bound",
+  "sampled_wall_monotonic_offset_spread_ms": 0.001430511474609375,
+  "windows": [
+    {
+      "cell": "pp512+tg64",
+      "warmup": true,
+      "client_duration_ms": 24068.321024,
+      "profile_start_ns": 33025578143,
+      "profile_end_ns": 57093899167,
+      "nominal": {
+        "kernel_events": 131353,
+        "sum_kernel_duration_ms": 14263.607571,
+        "union_kernel_intervals_ms": 14184.786017,
+        "top_kernels": [
+          {
+            "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)14, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+            "events": 1024,
+            "duration_sum_ms": 3292.411136,
+            "fraction_of_kernel_duration_sum": 0.23082597579969552
+          },
+          {
+            "name": "strata::kernels::<unnamed>::wait_flag_ge_kernel(const volatile unsigned int *, unsigned int)",
+            "events": 4320,
+            "duration_sum_ms": 1815.113742,
+            "fraction_of_kernel_duration_sum": 0.12725488506080268
+          },
+          {
+            "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)13, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+            "events": 280,
+            "duration_sum_ms": 1040.251488,
+            "fraction_of_kernel_duration_sum": 0.07293046186400862
+          },
+          {
+            "name": "strata::prefill::mmq::<unnamed>::copy16_kernel(const uint4 *, long, const uint4 *, long, uint4 *, const uint4 *, long, uint4 *)",
+            "events": 23055,
+            "duration_sum_ms": 830.231648,
+            "fraction_of_kernel_duration_sum": 0.05820628784599924
+          },
+          {
+            "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)12, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+            "events": 376,
+            "duration_sum_ms": 726.831296,
+            "fraction_of_kernel_duration_sum": 0.05095704522029576
+          },
+          {
+            "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)23, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+            "events": 336,
+            "duration_sum_ms": 621.577024,
+            "fraction_of_kernel_duration_sum": 0.04357782706134996
+          },
+          {
+            "name": "void strata::kernels::<unnamed>::native_mmvq_il_kernel<strata::kernels::<unnamed>::IlQ6K, (int)4, (int)1>(const T1::F::Block *, const int *, const float *, float *, int, int)",
+            "events": 1218,
+            "duration_sum_ms": 390.620444,
+            "fraction_of_kernel_duration_sum": 0.027385809799912644
+          },
+          {
+            "name": "void strata::kernels::<unnamed>::gr_up_multi_kernel<(int)4, (bool)1>(strata::kernels::<unnamed>::GrMulti)",
+            "events": 2820,
+            "duration_sum_ms": 301.178423,
+            "fraction_of_kernel_duration_sum": 0.02111516469454332
+          },
+          {
+            "name": "void strata::kernels::<unnamed>::native_down_multi_kernel<(int)20, (bool)1>(const unsigned long long *, const int *, const int *, const int *, const block_q8_1 *, strata::kernels::NativeExpertLayout, float *)",
+            "events": 2340,
+            "duration_sum_ms": 244.069519,
+            "fraction_of_kernel_duration_sum": 0.017111345624526927
+          },
+          {
+            "name": "void strata::kernels::<unnamed>::native_mmvq_multi_kernel<strata::kernels::<unnamed>::Q6KTraits, (int)4, (int)4, (int)2, (bool)0, (bool)0>(const T1::Block *, const strata::kernels::<unnamed>::Q81Block *, float *, int, int, const T1::Block *, float *)",
+            "events": 2523,
+            "duration_sum_ms": 239.978839,
+            "fraction_of_kernel_duration_sum": 0.016824554223428868
+          }
+        ]
+      },
+      "boundary_sensitivity_50ms": {
+        "contracted": {
+          "kernel_events": 130222,
+          "sum_kernel_duration_ms": 14213.463329,
+          "union_kernel_intervals_ms": 14135.499774,
+          "top_kernels": [
+            {
+              "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)14, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+              "events": 1024,
+              "duration_sum_ms": 3292.411136,
+              "fraction_of_kernel_duration_sum": 0.23164031593077183
+            },
+            {
+              "name": "strata::kernels::<unnamed>::wait_flag_ge_kernel(const volatile unsigned int *, unsigned int)",
+              "events": 4258,
+              "duration_sum_ms": 1809.327363,
+              "fraction_of_kernel_duration_sum": 0.12729672713253462
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)13, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+              "events": 280,
+              "duration_sum_ms": 1040.251488,
+              "fraction_of_kernel_duration_sum": 0.07318775613805223
+            },
+            {
+              "name": "strata::prefill::mmq::<unnamed>::copy16_kernel(const uint4 *, long, const uint4 *, long, uint4 *, const uint4 *, long, uint4 *)",
+              "events": 23055,
+              "duration_sum_ms": 830.231648,
+              "fraction_of_kernel_duration_sum": 0.05841163612151182
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)12, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+              "events": 376,
+              "duration_sum_ms": 726.831296,
+              "fraction_of_kernel_duration_sum": 0.051136818604726145
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)23, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+              "events": 336,
+              "duration_sum_ms": 621.577024,
+              "fraction_of_kernel_duration_sum": 0.0437315670088503
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::native_mmvq_il_kernel<strata::kernels::<unnamed>::IlQ6K, (int)4, (int)1>(const T1::F::Block *, const int *, const float *, float *, int, int)",
+              "events": 1201,
+              "duration_sum_ms": 382.042732,
+              "fraction_of_kernel_duration_sum": 0.026878933244968588
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::gr_up_multi_kernel<(int)4, (bool)1>(strata::kernels::<unnamed>::GrMulti)",
+              "events": 2779,
+              "duration_sum_ms": 296.791519,
+              "fraction_of_kernel_duration_sum": 0.020881013453944795
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::native_down_multi_kernel<(int)20, (bool)1>(const unsigned long long *, const int *, const int *, const int *, const block_q8_1 *, strata::kernels::NativeExpertLayout, float *)",
+              "events": 2303,
+              "duration_sum_ms": 240.186113,
+              "fraction_of_kernel_duration_sum": 0.016898493170903934
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::native_mmvq_multi_kernel<strata::kernels::<unnamed>::Q6KTraits, (int)4, (int)4, (int)2, (bool)0, (bool)0>(const T1::Block *, const strata::kernels::<unnamed>::Q81Block *, float *, int, int, const T1::Block *, float *)",
+              "events": 2482,
+              "duration_sum_ms": 236.088586,
+              "fraction_of_kernel_duration_sum": 0.016610208260663954
+            }
+          ]
+        },
+        "expanded": {
+          "kernel_events": 131462,
+          "sum_kernel_duration_ms": 14279.161746,
+          "union_kernel_intervals_ms": 14200.340192,
+          "top_kernels": [
+            {
+              "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)14, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+              "events": 1026,
+              "duration_sum_ms": 3298.76368,
+              "fraction_of_kernel_duration_sum": 0.23101942107519566
+            },
+            {
+              "name": "strata::kernels::<unnamed>::wait_flag_ge_kernel(const volatile unsigned int *, unsigned int)",
+              "events": 4320,
+              "duration_sum_ms": 1815.113742,
+              "fraction_of_kernel_duration_sum": 0.12711626734730874
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)13, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+              "events": 280,
+              "duration_sum_ms": 1040.251488,
+              "fraction_of_kernel_duration_sum": 0.07285101930380501
+            },
+            {
+              "name": "strata::prefill::mmq::<unnamed>::copy16_kernel(const uint4 *, long, const uint4 *, long, uint4 *, const uint4 *, long, uint4 *)",
+              "events": 23096,
+              "duration_sum_ms": 831.44528,
+              "fraction_of_kernel_duration_sum": 0.058227877433555335
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)12, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+              "events": 378,
+              "duration_sum_ms": 729.474816,
+              "fraction_of_kernel_duration_sum": 0.05108666944012639
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)23, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+              "events": 337,
+              "duration_sum_ms": 621.8368,
+              "fraction_of_kernel_duration_sum": 0.04354855075258141
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::native_mmvq_il_kernel<strata::kernels::<unnamed>::IlQ6K, (int)4, (int)1>(const T1::F::Block *, const int *, const float *, float *, int, int)",
+              "events": 1218,
+              "duration_sum_ms": 390.620444,
+              "fraction_of_kernel_duration_sum": 0.027355978659561294
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::gr_up_multi_kernel<(int)4, (bool)1>(strata::kernels::<unnamed>::GrMulti)",
+              "events": 2820,
+              "duration_sum_ms": 301.178423,
+              "fraction_of_kernel_duration_sum": 0.021092164117012587
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::native_down_multi_kernel<(int)20, (bool)1>(const unsigned long long *, const int *, const int *, const int *, const block_q8_1 *, strata::kernels::NativeExpertLayout, float *)",
+              "events": 2340,
+              "duration_sum_ms": 244.069519,
+              "fraction_of_kernel_duration_sum": 0.0170927063746141
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::native_mmvq_multi_kernel<strata::kernels::<unnamed>::Q6KTraits, (int)4, (int)4, (int)2, (bool)0, (bool)0>(const T1::Block *, const strata::kernels::<unnamed>::Q81Block *, float *, int, int, const T1::Block *, float *)",
+              "events": 2523,
+              "duration_sum_ms": 239.978839,
+              "fraction_of_kernel_duration_sum": 0.01680622737306165
+            }
+          ]
+        }
+      }
+    },
+    {
+      "cell": "pp512+tg64",
+      "warmup": false,
+      "client_duration_ms": 14689.299456,
+      "profile_start_ns": 57105770655,
+      "profile_end_ns": 71795070111,
+      "nominal": {
+        "kernel_events": 128654,
+        "sum_kernel_duration_ms": 10172.476486,
+        "union_kernel_intervals_ms": 10080.816464,
+        "top_kernels": [
+          {
+            "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)14, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+            "events": 1024,
+            "duration_sum_ms": 2407.188896,
+            "fraction_of_kernel_duration_sum": 0.2366374500165151
+          },
+          {
+            "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)13, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+            "events": 280,
+            "duration_sum_ms": 747.736608,
+            "fraction_of_kernel_duration_sum": 0.07350585759810623
+          },
+          {
+            "name": "strata::prefill::mmq::<unnamed>::copy16_kernel(const uint4 *, long, const uint4 *, long, uint4 *, const uint4 *, long, uint4 *)",
+            "events": 20865,
+            "duration_sum_ms": 653.339936,
+            "fraction_of_kernel_duration_sum": 0.06422624194798261
+          },
+          {
+            "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)12, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+            "events": 376,
+            "duration_sum_ms": 509.434368,
+            "fraction_of_kernel_duration_sum": 0.050079680076047906
+          },
+          {
+            "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)23, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+            "events": 336,
+            "duration_sum_ms": 462.395328,
+            "fraction_of_kernel_duration_sum": 0.045455531761255726
+          },
+          {
+            "name": "void strata::kernels::<unnamed>::native_mmvq_il_kernel<strata::kernels::<unnamed>::IlQ6K, (int)4, (int)1>(const T1::F::Block *, const int *, const float *, float *, int, int)",
+            "events": 1218,
+            "duration_sum_ms": 389.048507,
+            "fraction_of_kernel_duration_sum": 0.03824521074444684
+          },
+          {
+            "name": "void strata::kernels::<unnamed>::gr_up_multi_kernel<(int)4, (bool)1>(strata::kernels::<unnamed>::GrMulti)",
+            "events": 2820,
+            "duration_sum_ms": 300.044474,
+            "fraction_of_kernel_duration_sum": 0.029495715661072307
+          },
+          {
+            "name": "void strata::kernels::<unnamed>::native_down_multi_kernel<(int)20, (bool)1>(const unsigned long long *, const int *, const int *, const int *, const block_q8_1 *, strata::kernels::NativeExpertLayout, float *)",
+            "events": 2340,
+            "duration_sum_ms": 261.035118,
+            "fraction_of_kernel_duration_sum": 0.025660921247569645
+          },
+          {
+            "name": "void strata::kernels::<unnamed>::native_mmvq_multi_kernel<strata::kernels::<unnamed>::Q6KTraits, (int)4, (int)4, (int)2, (bool)0, (bool)0>(const T1::Block *, const strata::kernels::<unnamed>::Q81Block *, float *, int, int, const T1::Block *, float *)",
+            "events": 2523,
+            "duration_sum_ms": 238.546328,
+            "fraction_of_kernel_duration_sum": 0.023450172465702173
+          },
+          {
+            "name": "void strata::kernels::<unnamed>::gr_down_staged_kernel<(int)4, (bool)1>(strata::kernels::<unnamed>::GrMulti)",
+            "events": 2820,
+            "duration_sum_ms": 198.702368,
+            "fraction_of_kernel_duration_sum": 0.019533332740898114
+          }
+        ]
+      },
+      "boundary_sensitivity_50ms": {
+        "contracted": {
+          "kernel_events": 127412,
+          "sum_kernel_duration_ms": 10102.676581,
+          "union_kernel_intervals_ms": 10011.848382,
+          "top_kernels": [
+            {
+              "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)14, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+              "events": 1020,
+              "duration_sum_ms": 2396.071264,
+              "fraction_of_kernel_duration_sum": 0.2371719261513594
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)13, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+              "events": 279,
+              "duration_sum_ms": 743.733024,
+              "fraction_of_kernel_duration_sum": 0.07361742386158644
+            },
+            {
+              "name": "strata::prefill::mmq::<unnamed>::copy16_kernel(const uint4 *, long, const uint4 *, long, uint4 *, const uint4 *, long, uint4 *)",
+              "events": 20824,
+              "duration_sum_ms": 652.126304,
+              "fraction_of_kernel_duration_sum": 0.06454985456294297
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)12, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+              "events": 373,
+              "duration_sum_ms": 506.539008,
+              "fraction_of_kernel_duration_sum": 0.05013908976880867
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)23, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+              "events": 334,
+              "duration_sum_ms": 461.872896,
+              "fraction_of_kernel_duration_sum": 0.045717874099685585
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::native_mmvq_il_kernel<strata::kernels::<unnamed>::IlQ6K, (int)4, (int)1>(const T1::F::Block *, const int *, const float *, float *, int, int)",
+              "events": 1203,
+              "duration_sum_ms": 380.837097,
+              "fraction_of_kernel_duration_sum": 0.037696653351868795
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::gr_up_multi_kernel<(int)4, (bool)1>(strata::kernels::<unnamed>::GrMulti)",
+              "events": 2781,
+              "duration_sum_ms": 295.880769,
+              "fraction_of_kernel_duration_sum": 0.029287364257157347
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::native_down_multi_kernel<(int)20, (bool)1>(const unsigned long long *, const int *, const int *, const int *, const block_q8_1 *, strata::kernels::NativeExpertLayout, float *)",
+              "events": 2305,
+              "duration_sum_ms": 257.218335,
+              "fraction_of_kernel_duration_sum": 0.02546041466711385
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::native_mmvq_multi_kernel<strata::kernels::<unnamed>::Q6KTraits, (int)4, (int)4, (int)2, (bool)0, (bool)0>(const T1::Block *, const strata::kernels::<unnamed>::Q81Block *, float *, int, int, const T1::Block *, float *)",
+              "events": 2485,
+              "duration_sum_ms": 234.887818,
+              "fraction_of_kernel_duration_sum": 0.02325005815208923
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::gr_down_staged_kernel<(int)4, (bool)1>(strata::kernels::<unnamed>::GrMulti)",
+              "events": 2781,
+              "duration_sum_ms": 195.974183,
+              "fraction_of_kernel_duration_sum": 0.019398243765277674
+            }
+          ]
+        },
+        "expanded": {
+          "kernel_events": 129556,
+          "sum_kernel_duration_ms": 10210.335011,
+          "union_kernel_intervals_ms": 10117.986032,
+          "top_kernels": [
+            {
+              "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)14, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+              "events": 1024,
+              "duration_sum_ms": 2407.188896,
+              "fraction_of_kernel_duration_sum": 0.23576003073421584
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)13, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+              "events": 280,
+              "duration_sum_ms": 747.736608,
+              "fraction_of_kernel_duration_sum": 0.07323330793695149
+            },
+            {
+              "name": "strata::prefill::mmq::<unnamed>::copy16_kernel(const uint4 *, long, const uint4 *, long, uint4 *, const uint4 *, long, uint4 *)",
+              "events": 20865,
+              "duration_sum_ms": 653.339936,
+              "fraction_of_kernel_duration_sum": 0.06398809983180091
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)12, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+              "events": 376,
+              "duration_sum_ms": 509.434368,
+              "fraction_of_kernel_duration_sum": 0.0498939914754184
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::dequant_kernel<(int)23, strata::kernels::<unnamed>::H16>(const unsigned char *, long, long, long, long, long, T2 *)",
+              "events": 336,
+              "duration_sum_ms": 462.395328,
+              "fraction_of_kernel_duration_sum": 0.04528698886979155
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::native_mmvq_il_kernel<strata::kernels::<unnamed>::IlQ6K, (int)4, (int)1>(const T1::F::Block *, const int *, const float *, float *, int, int)",
+              "events": 1229,
+              "duration_sum_ms": 396.408401,
+              "fraction_of_kernel_duration_sum": 0.0388242306029071
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::gr_up_multi_kernel<(int)4, (bool)1>(strata::kernels::<unnamed>::GrMulti)",
+              "events": 2852,
+              "duration_sum_ms": 303.460058,
+              "fraction_of_kernel_duration_sum": 0.029720871810089523
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::native_down_multi_kernel<(int)20, (bool)1>(const unsigned long long *, const int *, const int *, const int *, const block_q8_1 *, strata::kernels::NativeExpertLayout, float *)",
+              "events": 2370,
+              "duration_sum_ms": 264.241471,
+              "fraction_of_kernel_duration_sum": 0.02587980420968775
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::native_mmvq_multi_kernel<strata::kernels::<unnamed>::Q6KTraits, (int)4, (int)4, (int)2, (bool)0, (bool)0>(const T1::Block *, const strata::kernels::<unnamed>::Q81Block *, float *, int, int, const T1::Block *, float *)",
+              "events": 2555,
+              "duration_sum_ms": 241.469194,
+              "fraction_of_kernel_duration_sum": 0.023649487870853955
+            },
+            {
+              "name": "void strata::kernels::<unnamed>::gr_down_staged_kernel<(int)4, (bool)1>(strata::kernels::<unnamed>::GrMulti)",
+              "events": 2852,
+              "duration_sum_ms": 200.922625,
+              "fraction_of_kernel_duration_sum": 0.01967835774081243
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

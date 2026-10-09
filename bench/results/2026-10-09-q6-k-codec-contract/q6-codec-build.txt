@@ -1,0 +1,109 @@
+[ 20%] Building CUDA object CMakeFiles/integration_codec_kernels.dir/home/calvin/workspace/strata-ninfer-jetson-orin/src/kernels/cuda/iq_kernels.cu.o
+[ 40%] Building CUDA object CMakeFiles/integration_codec_kernels.dir/home/calvin/workspace/strata-ninfer-jetson-orin/src/kernels/cuda/dequant_bf16.cu.o
+/home/calvin/workspace/strata-ninfer-jetson-orin/src/kernels/cuda/iq_kernels.cu(2314): warning #20199-D: unrecognized #pragma in device code
+  #pragma clang fp contract(off)
+          ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+/home/calvin/workspace/strata-ninfer-jetson-orin/src/kernels/cuda/iq_kernels.cu(2186): warning #128-D: loop is not reachable
+          for (int q = 0; q < RPW; ++q)
+          ^
+          detected during:
+            instantiation of "void strata::kernels::<unnamed>::s26_gu_l_kernel<LT,LX,RPW,SL,TS>(const unsigned long long *, const int32_t *, const int32_t *, const int32_t *, const block_q8_1 *, strata::kernels::NativeExpertLayout, float *, float *) [with LT=true, LX=true, RPW=4, SL=true, TS=true]" at line 2337
+            instantiation of "void strata::kernels::<unnamed>::s26_launch_l<LT,LX,RG,RD,SL,FQ,TS,BD>(const strata::kernels::NativeExpertLayout &, int64_t, cudaStream_t, const unsigned long long *, const int32_t *, const int32_t *, const int32_t *, const int32_t *, const block_q8_1 *, float *, float *, float *, block_q8_1 *, float *, long long) [with LT=true, LX=true, RG=4, RD=4, SL=true, FQ=true, TS=true, BD=1]" at line 3465
+
+/home/calvin/workspace/strata-ninfer-jetson-orin/src/kernels/cuda/iq_kernels.cu(2297): warning #128-D: loop is not reachable
+          for (int q = 0; q < RPW; ++q)
+          ^
+          detected during:
+            instantiation of "void strata::kernels::<unnamed>::s26_down_l_kernel<LX,RPW,SL,TS,BAL>(const unsigned long long *, const int32_t *, const int32_t *, const int32_t *, const block_q8_1 *, strata::kernels::NativeExpertLayout, float *) [with LX=true, RPW=4, SL=true, TS=true, BAL=1]" at line 2345
+            instantiation of "void strata::kernels::<unnamed>::s26_launch_l<LT,LX,RG,RD,SL,FQ,TS,BD>(const strata::kernels::NativeExpertLayout &, int64_t, cudaStream_t, const unsigned long long *, const int32_t *, const int32_t *, const int32_t *, const int32_t *, const block_q8_1 *, float *, float *, float *, block_q8_1 *, float *, long long) [with LT=true, LX=true, RG=4, RD=4, SL=true, FQ=true, TS=true, BD=1]" at line 3465
+
+/home/calvin/workspace/strata-ninfer-jetson-orin/src/kernels/cuda/iq_kernels.cu(2553): warning #128-D: loop is not reachable
+          for (int q = 0; q < RPW; ++q)
+          ^
+          detected during:
+            instantiation of "void strata::kernels::<unnamed>::s27_gu_kernel<TG,LX,RPW,TS>(const unsigned long long *, const int32_t *, const int32_t *, const int32_t *, const block_q8_1 *, strata::kernels::NativeExpertLayout, float *, float *) [with TG=12, LX=true, RPW=4, TS=true]" at line 2651
+            instantiation of "void strata::kernels::<unnamed>::s27_launch<TG,TD,LX,RG,RD,TS>(const strata::kernels::NativeExpertLayout &, int64_t, cudaStream_t, const unsigned long long *, const int32_t *, const int32_t *, const int32_t *, const int32_t *, const block_q8_1 *, float *, float *, float *, block_q8_1 *, float *, long long) [with TG=12, TD=7, LX=true, RG=4, RD=4, TS=true]" at line 2661
+            instantiation of "void strata::kernels::<unnamed>::s27_launch_ts<TG,TD>(__nv_bool, const strata::kernels::NativeExpertLayout &, int64_t, cudaStream_t, const unsigned long long *, const int32_t *, const int32_t *, const int32_t *, const int32_t *, const block_q8_1 *, float *, float *, float *, block_q8_1 *, float *, long long) [with TG=12, TD=7]" at line 3479
+
+/home/calvin/workspace/strata-ninfer-jetson-orin/src/kernels/cuda/iq_kernels.cu(2634): warning #128-D: loop is not reachable
+          for (int q = 0; q < RPW; ++q)
+          ^
+          detected during:
+            instantiation of "void strata::kernels::<unnamed>::s27_down_kernel<TD,LX,RPW,TS>(const unsigned long long *, const int32_t *, const int32_t *, const int32_t *, const block_q8_1 *, strata::kernels::NativeExpertLayout, float *) [with TD=7, LX=true, RPW=4, TS=true]" at line 2654
+            instantiation of "void strata::kernels::<unnamed>::s27_launch<TG,TD,LX,RG,RD,TS>(const strata::kernels::NativeExpertLayout &, int64_t, cudaStream_t, const unsigned long long *, const int32_t *, const int32_t *, const int32_t *, const int32_t *, const block_q8_1 *, float *, float *, float *, block_q8_1 *, float *, long long) [with TG=12, TD=7, LX=true, RG=4, RD=4, TS=true]" at line 2661
+            instantiation of "void strata::kernels::<unnamed>::s27_launch_ts<TG,TD>(__nv_bool, const strata::kernels::NativeExpertLayout &, int64_t, cudaStream_t, const unsigned long long *, const int32_t *, const int32_t *, const int32_t *, const int32_t *, const block_q8_1 *, float *, float *, float *, block_q8_1 *, float *, long long) [with TG=12, TD=7]" at line 3479
+
+/home/calvin/workspace/strata-ninfer-jetson-orin/src/kernels/cuda/iq_kernels.cu(2634): warning #128-D: loop is not reachable
+          for (int q = 0; q < RPW; ++q)
+          ^
+          detected during:
+            instantiation of "void strata::kernels::<unnamed>::s27_down_kernel<TD,LX,RPW,TS>(const unsigned long long *, const int32_t *, const int32_t *, const int32_t *, const block_q8_1 *, strata::kernels::NativeExpertLayout, float *) [with TD=8, LX=true, RPW=4, TS=true]" at line 2654
+            instantiation of "void strata::kernels::<unnamed>::s27_launch<TG,TD,LX,RG,RD,TS>(const strata::kernels::NativeExpertLayout &, int64_t, cudaStream_t, const unsigned long long *, const int32_t *, const int32_t *, const int32_t *, const int32_t *, const block_q8_1 *, float *, float *, float *, block_q8_1 *, float *, long long) [with TG=12, TD=8, LX=true, RG=4, RD=4, TS=true]" at line 2661
+            instantiation of "void strata::kernels::<unnamed>::s27_launch_ts<TG,TD>(__nv_bool, const strata::kernels::NativeExpertLayout &, int64_t, cudaStream_t, const unsigned long long *, const int32_t *, const int32_t *, const int32_t *, const int32_t *, const block_q8_1 *, float *, float *, float *, block_q8_1 *, float *, long long) [with TG=12, TD=8]" at line 3480
+
+/home/calvin/workspace/strata-ninfer-jetson-orin/src/kernels/cuda/iq_kernels.cu(2553): warning #128-D: loop is not reachable
+          for (int q = 0; q < RPW; ++q)
+          ^
+          detected during:
+            instantiation of "void strata::kernels::<unnamed>::s27_gu_kernel<TG,LX,RPW,TS>(const unsigned long long *, const int32_t *, const int32_t *, const int32_t *, const block_q8_1 *, strata::kernels::NativeExpertLayout, float *, float *) [with TG=13, LX=true, RPW=4, TS=true]" at line 2651
+            instantiation of "void strata::kernels::<unnamed>::s27_launch<TG,TD,LX,RG,RD,TS>(const strata::kernels::NativeExpertLayout &, int64_t, cudaStream_t, const unsigned long long *, const int32_t *, const int32_t *, const int32_t *, const int32_t *, const block_q8_1 *, float *, float *, float *, block_q8_1 *, float *, long long) [with TG=13, TD=7, LX=true, RG=4, RD=4, TS=true]" at line 2661
+            instantiation of "void strata::kernels::<unnamed>::s27_launch_ts<TG,TD>(__nv_bool, const strata::kernels::NativeExpertLayout &, int64_t, cudaStream_t, const unsigned long long *, const int32_t *, const int32_t *, const int32_t *, const int32_t *, const block_q8_1 *, float *, float *, float *, block_q8_1 *, float *, long long) [with TG=13, TD=7]" at line 3481
+
+/home/calvin/workspace/strata-ninfer-jetson-orin/src/kernels/cuda/iq_kernels.cu(3229): warning #128-D: loop is not reachable
+              for (int j = 0; j < cn; ++j) {
+              ^
+          detected during instantiation of "void strata::kernels::native_gu_lds_kernel<TG,SG,TI>(const unsigned long long *, const int32_t *, const int32_t *, const int32_t *, const block_q8_1 *, strata::kernels::NativeExpertLayout, float *, float *) [with TG=16, SG=1, TI=true]" at line 3525
+
+/home/calvin/workspace/strata-ninfer-jetson-orin/src/kernels/cuda/iq_kernels.cu(3229): warning #128-D: loop is not reachable
+              for (int j = 0; j < cn; ++j) {
+              ^
+          detected during instantiation of "void strata::kernels::native_gu_lds_kernel<TG,SG,TI>(const unsigned long long *, const int32_t *, const int32_t *, const int32_t *, const block_q8_1 *, strata::kernels::NativeExpertLayout, float *, float *) [with TG=18, SG=1, TI=true]" at line 3526
+
+/home/calvin/workspace/strata-ninfer-jetson-orin/src/kernels/cuda/iq_kernels.cu(3229): warning #128-D: loop is not reachable
+              for (int j = 0; j < cn; ++j) {
+              ^
+          detected during instantiation of "void strata::kernels::native_gu_lds_kernel<TG,SG,TI>(const unsigned long long *, const int32_t *, const int32_t *, const int32_t *, const block_q8_1 *, strata::kernels::NativeExpertLayout, float *, float *) [with TG=21, SG=1, TI=true]" at line 3527
+
+/home/calvin/workspace/strata-ninfer-jetson-orin/src/kernels/cuda/iq_kernels.cu(3229): warning #128-D: loop is not reachable
+              for (int j = 0; j < cn; ++j) {
+              ^
+          detected during instantiation of "void strata::kernels::native_gu_lds_kernel<TG,SG,TI>(const unsigned long long *, const int32_t *, const int32_t *, const int32_t *, const block_q8_1 *, strata::kernels::NativeExpertLayout, float *, float *) [with TG=23, SG=1, TI=true]" at line 3528
+
+/home/calvin/workspace/strata-ninfer-jetson-orin/src/kernels/cuda/iq_kernels.cu(3229): warning #128-D: loop is not reachable
+              for (int j = 0; j < cn; ++j) {
+              ^
+          detected during instantiation of "void strata::kernels::native_gu_lds_kernel<TG,SG,TI>(const unsigned long long *, const int32_t *, const int32_t *, const int32_t *, const block_q8_1 *, strata::kernels::NativeExpertLayout, float *, float *) [with TG=22, SG=1, TI=true]" at line 3529
+
+/home/calvin/workspace/strata-ninfer-jetson-orin/src/kernels/cuda/iq_kernels.cu(2844): warning #20058-D: the #pragma unroll must precede a loop
+  #pragma unroll
+          ^
+          detected during instantiation of "void strata::kernels::native_gu_amd_kernel<TG,MODE>(const unsigned long long *, const int32_t *, const int32_t *, const int32_t *, const block_q8_1 *, strata::kernels::NativeExpertLayout, float *, float *) [with TG=16, MODE=1]" at line 3543
+
+/home/calvin/workspace/strata-ninfer-jetson-orin/src/kernels/cuda/iq_kernels.cu(596): warning #177-D: function "strata::kernels::<unnamed>::Fmt<14>::dot" was declared but never referenced
+                static float dot(const void* v, const block_q8_1* y, int kbx, int iqs) { return vec_dot_q6_K_q8_1(v, y, kbx, iqs); } };
+                             ^
+
+/home/calvin/workspace/strata-ninfer-jetson-orin/src/kernels/cuda/iq_kernels.cu(595): warning #177-D: member "strata::kernels::<unnamed>::Fmt<14>::qk" was declared but never referenced
+  template<> struct Fmt<14> { static constexpr int qk = 256, ipb = (256 / (4*2)) / VDR_Q6_K, step = VDR_Q6_K;
+                                                   ^
+
+/home/calvin/workspace/strata-ninfer-jetson-orin/src/kernels/cuda/iq_kernels.cu(595): warning #177-D: member "strata::kernels::<unnamed>::Fmt<14>::ipb" was declared but never referenced
+  template<> struct Fmt<14> { static constexpr int qk = 256, ipb = (256 / (4*2)) / VDR_Q6_K, step = VDR_Q6_K;
+                                                             ^
+
+/home/calvin/workspace/strata-ninfer-jetson-orin/src/kernels/cuda/iq_kernels.cu(595): warning #177-D: member "strata::kernels::<unnamed>::Fmt<14>::step" was declared but never referenced
+  template<> struct Fmt<14> { static constexpr int qk = 256, ipb = (256 / (4*2)) / VDR_Q6_K, step = VDR_Q6_K;
+                                                                                             ^
+
+[ 60%] Linking CUDA static library libintegration_codec_kernels.a
+[ 60%] Built target integration_codec_kernels
+[ 80%] Building CXX object CMakeFiles/iq4_nl_codec_contract.dir/iq4_nl_codec_contract.cpp.o
+[100%] Linking CXX executable iq4_nl_codec_contract
+[100%] Built target iq4_nl_codec_contract
+[ 60%] Built target integration_codec_kernels
+[ 80%] Building CXX object CMakeFiles/q6_k_codec_contract.dir/q6_k_codec_contract.cpp.o
+[100%] Linking CXX executable q6_k_codec_contract
+[100%] Built target q6_k_codec_contract

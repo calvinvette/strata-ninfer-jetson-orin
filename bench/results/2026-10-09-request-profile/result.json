@@ -1,0 +1,63 @@
+{
+  "command": [
+    "nsys",
+    "profile",
+    "--trace=cuda,nvtx,osrt",
+    "--sample=none",
+    "--cpuctxsw=none",
+    "--cuda-graph-trace=node",
+    "--cuda-memory-usage=true",
+    "--force-overwrite=false",
+    "--output=build/integration/nsys-pinned-pp512-tg64/profile",
+    "/home/calvin/workspace/strata/.venv/bin/python",
+    "tools/integration/api_control_block.py",
+    "--config",
+    "build/integration/baseline-paired-config.json",
+    "--workloads",
+    "build/integration/profile-workloads.json",
+    "--output",
+    "build/integration/nsys-pinned-pp512-tg64/requests.json",
+    "--variant",
+    "baseline",
+    "--rounds",
+    "1"
+  ],
+  "cwd": "/home/calvin/workspace/strata-ninfer-jetson-orin",
+  "status": "pass",
+  "floor_bytes": 6442450944,
+  "started_wall_s": 1791547014.6008852,
+  "energy_scope": "not measured; raw tegrastats rails only",
+  "counters": "engine stdout/stderr; unavailable counters are not inferred",
+  "initial_memory": {
+    "monotonic_s": 816184.17357907,
+    "wall_time_s": 1791547014.6021168,
+    "available_bytes": 26470064128,
+    "total_bytes": 32187883520,
+    "swap_used_bytes": 1097859072,
+    "cgroups": [
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/session-388.scope",
+        "current_bytes": 9570611200,
+        "max_bytes": null
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice",
+        "current_bytes": 9607610368,
+        "max_bytes": null
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice",
+        "current_bytes": 9608126464,
+        "max_bytes": null
+      }
+    ],
+    "cgroup_v2_observed": true,
+    "admission_available_bytes": 26470064128
+  },
+  "tegrastats": "started; inspect raw log for availability",
+  "reason": "command exit; numerical/workload qualification is separate",
+  "minimum_available_bytes": 8447049728,
+  "returncode": 0,
+  "elapsed_s": 94.39846820698585,
+  "finished_wall_s": 1791547109.0666895
+}

@@ -4,6 +4,7 @@
 #include <dpct/dpct.hpp>
 #include "strata/sycl_queue.hpp"
 #include "strata/core/mtp.hpp"
+#include "strata/platform/integration_trace.hpp"
 #include "strata/core/coupled_draft.hpp"
 #include "strata/core/on_device.hpp"
 
@@ -164,8 +165,14 @@ MtpDrafter::~MtpDrafter() {
     if (owns_weights_ && dense_) sycl::free(dense_, dpct::get_in_order_queue());
     if (owns_weights_ && experts_)
         sycl::free(experts_, dpct::get_in_order_queue());
-    if (state_arena_) sycl::free(state_arena_, dpct::get_in_order_queue());
-    if (arena_) sycl::free(arena_, dpct::get_in_order_queue());
+    if (state_arena_) {
+        sycl::free(state_arena_, dpct::get_in_order_queue());
+        strata::platform::integration_trace::event("mtp", "free", this, state_arena_, 0, device_);
+    }
+    if (arena_) {
+        sycl::free(arena_, dpct::get_in_order_queue());
+        strata::platform::integration_trace::event("mtp", "free", this, arena_, 0, device_);
+    }
     if (head_logits_) sycl::free(head_logits_, dpct::get_in_order_queue());
     if (owns_draft_head_ && dhead_) {
       strata::kernels::native_q6_k_unpack(dhead_);
@@ -394,6 +401,7 @@ bool MtpDrafter::load(const std::string &rt_dir, const ModelGeometry &g,
                              sb, dpct::get_in_order_queue())) != 0) {
         err = "mtp: the K/V state does not fit"; return false;
     }
+    strata::platform::integration_trace::event("mtp", "allocate", this, state_arena_, sb, device_);
     if (qsa_state_init(g, max_cells, state_arena_, st_, &ss.qsa_states[ss.qsa_primary()], ring) == 0) {
         if (st_.kv_mode == 0) { err = "mtp: state init failed"; return false; }
         std::fprintf(stderr, "strata mtp: no pinned RAM left for the draft layer's K/V copy; keeping it in VRAM\n");
@@ -402,6 +410,7 @@ bool MtpDrafter::load(const std::string &rt_dir, const ModelGeometry &g,
         functionality is redundant in SYCL.
         */
         sycl::free(state_arena_, dpct::get_in_order_queue());
+        strata::platform::integration_trace::event("mtp", "free", this, state_arena_, 0, device_);
         st_ = QsaState{};
         ring = -1;   // fully resident
         sb = qsa_state_bytes(g, max_cells, false, ring);
@@ -409,6 +418,7 @@ bool MtpDrafter::load(const std::string &rt_dir, const ModelGeometry &g,
                                  sb, dpct::get_in_order_queue())) != 0) {
             err = "mtp: the K/V state does not fit"; return false;
         }
+        strata::platform::integration_trace::event("mtp", "allocate", this, state_arena_, sb, device_);
         if (qsa_state_init(g, max_cells, state_arena_, st_, &ss.qsa_states[ss.qsa_primary()], ring) == 0) { err = "mtp: state init failed"; return false; }
     }
     qsa_set_kv_int8(kv_int8_was);
@@ -469,6 +479,7 @@ bool MtpDrafter::load(const std::string &rt_dir, const ModelGeometry &g,
                              count.used, dpct::get_in_order_queue())) != 0) {
         err = "mtp: buffers do not fit"; return false;
     }
+    strata::platform::integration_trace::event("mtp", "allocate", this, arena_, count.used, device_);
     strata::big_fill_zero(dpct::get_in_order_queue(), arena_, count.used);
     Bump real;
     real.base = (uint8_t*) arena_;
@@ -779,6 +790,9 @@ bool MtpDrafter::bind(const WeightTable &wt, const NativeHead *head,
         }
     }
     if (coupled_draft_env() && cparams_ == nullptr && !setup_coupled(err)) return false;
+    // The existing owner's payload counter includes weights/binding as well as
+    // arenas. It is separate from observed allocation events and physical bytes.
+    strata::platform::integration_trace::event("mtp", "payload_snapshot", this, nullptr, vram_, device_);
     return true;
 }
 catch (sycl::exception const &exc) {
