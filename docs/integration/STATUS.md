@@ -9,7 +9,7 @@ work is next. No NInfer execution component has been promoted into Strata.
 | 0 — Repository and import | Complete | Pinned source/evidence manifest, source mapping, plan, offline planner checks |
 | 1 — Same-day controls | Complete | Four same-day paired API blocks; exact workloads/artifacts; protocol and baseline checks; capability matrix records limits; expanded HIP/SYCL builds compile |
 | 2 — Operator/state contracts | Complete | Ownership review, incompatible projection-profile rejection, independent RMS/IQ4_NL/Q6_K oracles, GDN prefix checks, default spec1 regression and post-fix spec1/spec4 token plus nine-field persistent-state parity recorded; native/HIP/SYCL build evidence and eleven selector tests pass; no NInfer execution component promoted |
-| 3 — Memory and transfers | In progress | Opt-in trace covers ordinary ExpertCache, CUDA segmented-cache mapped VMM handles, shared CUDA VMM physical-chunk lifetimes, primary SessionState, verifier, prefill, MTP and separate pageable/pinned expert-stage host owners; Orin shrink/regrow lifecycle test preserved slot data and matched 41 allocate/free events; two randomized fixed-cache 4K staging screens matched tokens and nine state fields; the trace-corrected clocked repeat found +0.10% median prompt time and variable decode results with dynamic CPU/GPU clocks; minimum availability was 8.04 GiB; per-range VMM transitions, unique process-wide backing, pressure and other transfer experiments remain |
+| 3 — Memory and transfers | In progress | Opt-in trace covers ordinary ExpertCache, CUDA segmented-cache mapped VMM handles, shared CUDA VMM physical-chunk lifetimes, primary SessionState, verifier, prefill, MTP and separate pageable/pinned expert-stage host owners; Orin shrink/regrow lifecycle test preserved slot data and matched 41 allocate/free events; injected pinned-registration failures fell back to working pageable copies under the six-GiB supervisor; two randomized fixed-cache 4K staging screens matched tokens and nine state fields; the trace-corrected clocked repeat found +0.10% median prompt time and variable decode results with dynamic CPU/GPU clocks; minimum availability was 8.04 GiB; per-range VMM transitions, unique process-wide backing, real pressure and other transfer experiments remain |
 | 4 — SM87/ARM kernels | Not started | Pinned request profile prepared; bottleneck attribution, qualified candidate and request confirmation pending |
 | 5 — Speculation and graphs | Not started | Accepted-prefix state, graph lifetime and drift qualification |
 | 6 — Multivariate tuning | Not started | Randomized paired campaign, interactions, uncertainty, held-out confirmation |
@@ -36,6 +36,12 @@ establish a product benefit. Host staging is reported separately from device
 allocations. The [clocked repeat](../../bench/results/2026-10-09-stage-pin-transfer-clocked/README.md)
 records dynamic CPU/GPU frequencies and unsupported EMC sampling. These
 screens do not close Phase 3's broader pressure, unique-backing or transfer gates.
+
+The [pinned registration fallback check](../../bench/results/2026-10-09-pinned-fallback-pressure/README.md)
+forces `cudaHostRegister` failure in the existing arena test, confirms the
+registration error is cleared, and verifies a pageable copy round trip. This
+does not force `cudaHostAlloc` failure in the separate expert-stage pool and
+does not simulate memory pressure.
 
 Phase 3 has begun with opt-in reservation reporting at auto-cache sizing. The
 parser keeps planned cache holds outside allocation totals; the supervised
