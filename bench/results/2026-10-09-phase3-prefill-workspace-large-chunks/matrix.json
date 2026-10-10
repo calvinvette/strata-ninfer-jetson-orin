@@ -1,0 +1,93 @@
+{
+  "scope": "larger owned prefill chunks under the six-GiB admission floor; one short workload per process",
+  "run_order": [
+    "chunk1024-owned",
+    "chunk2048-owned"
+  ],
+  "cells": [
+    {
+      "name": "chunk1024-owned",
+      "prefill_chunk": 1024,
+      "workspace_mode": "owned",
+      "status": "pass",
+      "config": "chunk1024-owned/config.json",
+      "supervisor_returncode": 0,
+      "minimum_available_bytes": 8294174720,
+      "reason": "command exit; numerical/workload qualification is separate",
+      "actual_expert_slots": 6684,
+      "expert_cache_mib": 13016,
+      "vram_free_mib": 8045,
+      "reservation_events": [
+        {
+          "label": "expert-cache.mtp-bind",
+          "instance": 281473961847328,
+          "device": 0,
+          "bytes": 229612776
+        },
+        {
+          "label": "expert-cache.prefill-workspace",
+          "instance": 281473961847328,
+          "device": 0,
+          "bytes": 880803840
+        },
+        {
+          "label": "expert-cache.vram-slack",
+          "instance": 281473961847328,
+          "device": 0,
+          "bytes": 3221225472
+        }
+      ],
+      "request_summary": [
+        {
+          "cell": "repeat-172-tg8-capacity-diagnostic",
+          "passed_samples": 1,
+          "planned_samples": 1,
+          "median_prompt_per_second": 92.1,
+          "median_predicted_per_second": 19.4
+        }
+      ]
+    },
+    {
+      "name": "chunk2048-owned",
+      "prefill_chunk": 2048,
+      "workspace_mode": "owned",
+      "status": "pass",
+      "config": "chunk2048-owned/config.json",
+      "supervisor_returncode": 0,
+      "minimum_available_bytes": 8621314048,
+      "reason": "command exit; numerical/workload qualification is separate",
+      "actual_expert_slots": 6338,
+      "expert_cache_mib": 12339,
+      "vram_free_mib": 8151,
+      "reservation_events": [
+        {
+          "label": "expert-cache.mtp-bind",
+          "instance": 281474577579072,
+          "device": 0,
+          "bytes": 229612776
+        },
+        {
+          "label": "expert-cache.prefill-workspace",
+          "instance": 281474577579072,
+          "device": 0,
+          "bytes": 1593835520
+        },
+        {
+          "label": "expert-cache.vram-slack",
+          "instance": 281474577579072,
+          "device": 0,
+          "bytes": 3221225472
+        }
+      ],
+      "request_summary": [
+        {
+          "cell": "repeat-172-tg8-capacity-diagnostic",
+          "passed_samples": 1,
+          "planned_samples": 1,
+          "median_prompt_per_second": 97.9,
+          "median_predicted_per_second": 20.8
+        }
+      ]
+    }
+  ]
+}
