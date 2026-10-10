@@ -2,7 +2,9 @@
 
 Updated: 2026-10-09. Phases 1 and 2 are complete with their supported, failed,
 unsupported and untested scopes recorded. Phase 3 memory ownership and transfer
-work is next. No NInfer execution component has been promoted into Strata.
+work is active; its admission screens and focused owner tests are recorded below,
+with broader pressure and transfer gates still open. No NInfer execution
+component has been promoted into Strata.
 
 | Phase | State | Evidence / next gate |
 | --- | --- | --- |
