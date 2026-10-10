@@ -7,6 +7,10 @@ the existing IQ1_M Coder pack, the 8K `spec4`/MTP config, and the exact formatte
 Each randomized mapped/pread pair generated 64 tokens. Both arms explicitly used
 `--expert-cache 5000`; this selected the same 6,519 slots (12.40 GiB) in all six
 processes, with 49,629 expert-cache hits per request. Staging remained disabled.
+Full SHA256 and byte-size identities for the GGUF shards, packed tensors, MTP
+files, tokenizer, profile and candidate binary are in
+[`artifact-identities.json`](artifact-identities.json); model and pack files
+remain in `~/models/`.
 
 All three pairs matched all 64 token IDs and all nine persistent-state fields.
 The supervisor retained at least 8,701,550,592 bytes (8.10 GiB) of available
