@@ -1,0 +1,126 @@
+{
+  "measured_on": "orin1",
+  "date": "2026-10-10",
+  "source_revision": "9a1c1e447cac29c857743b0e5dfbb14333ac677c",
+  "engine": {
+    "path": "build/integration/candidate/strata",
+    "bytes": 62312640,
+    "sha256": "d3e8bcde3a430d7d5bb614fec8ba938398699b9abecd41965bb28fd6d465d721",
+    "build": "native ARM64 Release, CUDA 12.6.68, SM87"
+  },
+  "configuration": {
+    "path": "server-config.json",
+    "sha256": "7bfd0bcf686b679036d72c7becf64d69074d48d8e7852da113fb9ac917739611",
+    "actual_expert_slots": 6519,
+    "requested_expert_cache": 5000,
+    "prefill_chunk": 64,
+    "spec_flag": 4,
+    "max_context": 4096,
+    "KV": "fp16",
+    "MTP_max": 4,
+    "expert_io": "mmap"
+  },
+  "workload": {
+    "cell": "pp512+tg64",
+    "input_tokens": 512,
+    "generated_tokens": 64,
+    "prompt_file_sha256": "c463143cd6cc684c29cba41efe832274e4cc040335b2338cce196d67c47d3cbf",
+    "tokenizer": "IQ1_M control tokenizer under ~/models/strata-orin-validation/pack/tokenizer",
+    "prompt_file_sha256_source": "workloads.json: tokens_sha256",
+    "actual_verifier_window_tokens": 6,
+    "prompt_timing_scope": "API reports 512 prompt tokens; 64 generated tokens"
+  },
+  "artifacts_outside_git": [
+    {
+      "path": "~/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+      "bytes": 29608446496,
+      "sha256": "e11083ba855e7666b48ea3f2db6a9c3a20c18751a012cc24f948de91b7087fad",
+      "role": "main IQ1_M shard"
+    },
+    {
+      "path": "~/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+      "bytes": 28800138432,
+      "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113",
+      "role": "PLE shard"
+    },
+    {
+      "path": "~/models/strata-orin-validation/pack/experts.bin",
+      "bytes": 25146163200,
+      "sha256": "e72025811e52f0a7fa24a5e0ce4b8d5a8ca91865ae4b8389c6292de8338ca983",
+      "role": "packed expert tier"
+    },
+    {
+      "path": "~/models/strata-orin-validation/pack/dense.bin",
+      "bytes": 1475120640,
+      "sha256": "99853263806e25450074fc9945f1e955b175bea05aa171ceeb6b5837bf6a1d9d",
+      "role": "packed dense tensors"
+    },
+    {
+      "path": "~/models/strata-orin-validation/pack/index.txt",
+      "bytes": 93633,
+      "sha256": "2cb3352786bcae81ea4d933eee6b2d5db45774069320c924a6dea48eb65a3cd3",
+      "role": "pack index"
+    },
+    {
+      "path": "~/models/strata-orin-validation/pack/conversions.json",
+      "bytes": 306,
+      "sha256": "c82cdadb5cc2b0678d2cccad07430181e031fc05022c9cf31cec997a8cd35c3c",
+      "role": "pack conversion manifest"
+    },
+    {
+      "path": "~/models/strata-orin-validation/pack/native_experts.txt",
+      "bytes": 3269,
+      "sha256": "9ace1b92e1fe12595de469409e69dd52c8d5418c7981c405d9a51aa9d574dd3b",
+      "role": "native expert manifest"
+    },
+    {
+      "path": "~/models/strata-orin-validation/mtp/rt/experts.bin",
+      "bytes": 707788800,
+      "sha256": "09398406be61f1f54c93861f449e48b8df0bfccbc9ec9b2b7636775a6ea9244f",
+      "role": "MTP experts"
+    },
+    {
+      "path": "~/models/strata-orin-validation/mtp/rt/dense.bin",
+      "bytes": 116099072,
+      "sha256": "c724dc0b0822ada5d2977bf5bde821605feabaa64ea2e0045b67ca656329070a",
+      "role": "MTP dense tensors"
+    },
+    {
+      "path": "~/models/strata-orin-validation/mtp/rt/draft_vocab.bin",
+      "bytes": 425196,
+      "sha256": "b1e1d3a7a9e4bf862dcd5923ce661fb59bbd07907e594df5cf86a62ac235cb91",
+      "role": "MTP draft vocabulary"
+    },
+    {
+      "path": "~/workspace/strata/data/expert-profile-coder.bin",
+      "bytes": 98328,
+      "sha256": "a514661124d5305effe9c1bcecff7dc069af398b2b19ff9d11628a2cad0a8915",
+      "role": "ranked expert cache profile"
+    }
+  ],
+  "tokenizer_sha256": {
+    "tokenizer.json": "c0bd435efbc6c3b28964b47999afe16c4ad268c7c7c4e8cb3af410796a6f30bf",
+    "vocab.json": "4ba64f0332abcfb0b600b7df1537d1e836e68009d5fb7cdb77339738dc6365c4",
+    "merges.txt": "4ba698529766c7a2f5052083ea10cdf2485577f5237a332ee291054eb11e3332",
+    "token_type.json": "5088c8c298fc06af8382ddb3b76c888703ac2634e82263b97eedcc2ad202738b",
+    "chat_template.jinja": "12827f24b742ea4e80cdc12dbcf9622227056b9f797252a3149263d4f9aaadce"
+  },
+  "nsys": {
+    "version": "2024.5.4.34-245434855735v0",
+    "report": {
+      "build_path": "build/integration/nsys-candidate-pp512-tg64/supervised-profile.nsys-rep",
+      "bytes": 15274945,
+      "sha256": "f2991cc03c5ff743f6e0e20d47d922425a4ba26c0b6d30b613eb08430415cee2"
+    },
+    "sqlite": {
+      "build_path": "build/integration/nsys-candidate-pp512-tg64/supervised-profile.sqlite",
+      "bytes": 44306432,
+      "sha256": "60134702880b03276c022be1be893c8fcb270c78d56060ec5d3235a9072ec68d"
+    }
+  },
+  "analysis": {
+    "script": "bench/results/2026-10-09-request-profile/analyze_windows.py",
+    "sha256": "6a56cc169dd9225d9091a515ce1537f4db105a42850f54ad2c238afaf566ce99",
+    "window_alignment": "median sampled wall/monotonic offset; no request NVTX marker; absolute alignment error not independently bounded"
+  }
+}

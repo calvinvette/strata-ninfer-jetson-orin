@@ -12,7 +12,7 @@ component has been promoted into Strata.
 | 1 — Same-day controls | Complete | Four same-day paired API blocks; exact workloads/artifacts; protocol and baseline checks; capability matrix records limits; expanded HIP/SYCL builds compile |
 | 2 — Operator/state contracts | Complete | Ownership review, incompatible projection-profile rejection, independent RMS/IQ4_NL/Q6_K oracles, GDN prefix checks, default spec1 regression and post-fix spec1/spec4 token plus nine-field persistent-state parity recorded; native/HIP/SYCL build evidence and eleven selector tests pass; no NInfer execution component promoted |
 | 3 — Memory and transfers | In progress | Opt-in trace covers ordinary ExpertCache, CUDA segmented-cache mapped VMM handles, shared CUDA VMM physical-chunk lifetimes and per-range map/unmap transitions, primary SessionState, verifier, prefill, MTP and separate pageable/pinned expert-stage host owners; Orin shrink/regrow lifecycle test preserved slot data and matched 41 allocate/free events; injected pinned-registration failures fell back to working pageable copies under the six-GiB supervisor; one injected expert-stage `cudaHostAlloc` refusal produced an observed pageable owner allocation/free, while five sibling pinned buffers also balanced at teardown; the 10 instrumented allocation/free pairs in this request matched, with zero observed live bytes at teardown; the request and forced-pageable control generated one token above the memory floor (targeted test minimum 7.58 GiB); two randomized fixed-cache 4K staging screens matched tokens and nine state fields; the trace-corrected clocked repeat found +0.10% median prompt time and variable decode results with dynamic CPU/GPU clocks; minimum availability was 8.04 GiB; a randomized 2×2 requested-cache/context screen completed all cells above the six-GiB floor, with actual slots 3903/6519; a 2×2 prefill-chunk/borrowed-vs-owned screen observed separate 202/500 MiB workspace holds and remained above 7.47 GiB; owned chunk 1024/2048 follow-up reserved up to 1520 MiB and remained above 7.72 GiB; an exact 2048-token prompt completed against the 2048 owned chunk with 8.02 GiB minimum availability; the Oct 10 focused 10-test Phase 3 CTest set passed with 23.8 GB minimum availability during a separate bounded 4 GiB cgroup allocation; 12 and 16 GiB cgroup-limited IQ1_M runs reached prefill then were supervisor-aborted at the effective 6 GiB floor (host availability remained 22.2 and 15.6 GiB); the same request passed under 20/24 GiB caps with 9.58/8.84 GiB minimum effective availability and in a fresh uncapped process at 7.62 GiB; a simulated expert-cache allocation failure retried at 4,753 slots, then completed prefill and one generated token with 12.91 GiB minimum availability; the artifact-aware Q2_0 PLE oracle now passes all seven stages for the real layer-1 weights and real table rows (three-token block, synthetic hidden/history), reassembles the native key byte-identically, and matches the native Q2_0 projection to the independent decoded path; a separate 64-row real-table reader check is bit-identical; late-workspace pressure, in-process recovery after supervisor termination, and other transfer experiments remain |
-| 4 — SM87/ARM kernels | Not started | Pinned request profile prepared; bottleneck attribution, qualified candidate and request confirmation pending |
+| 4 — SM87/ARM kernels | In progress | Pinned and current-candidate request profiles both rank Q6_K→FP16 dequantization first by summed kernel duration; current profile is diagnostic and not a critical-path claim; next gate is operator contract/resource measurement and then held-out request confirmation |
 | 5 — Speculation and graphs | Not started | Accepted-prefix state, graph lifetime and drift qualification |
 | 6 — Multivariate tuning | Not started | Randomized paired campaign, interactions, uncertainty, held-out confirmation |
 | 7 — Capacity and service | Not started | Quality, recovery, thermal equilibrium and sustained workload |
@@ -393,6 +393,15 @@ by summed duration in both request windows (measured ~2.41 s / 23.7% of GPU
 kernel-duration sum). Overlap/spin waits, profiler overhead and unbounded absolute
 window alignment prevent a critical-path or speedup claim. This identifies a
 hypothesis for later qualified operator/memory work, not an active optimization.
+
+The [current candidate profile](../../bench/results/2026-10-10-phase4-candidate-request-profile/README.md)
+repeats the same pp512+tg64 request shape on the current candidate with the
+six-GiB supervisor. Q6_K→FP16 dequantization again ranks first in the measured
+window (2.557 s summed over 1,024 instances, 21.52% of summed kernel duration),
+followed by spin waits. Approximate request-window alignment, concurrent
+streams, profiler overhead and dynamic clocks still prevent critical-path or
+speedup conclusions. This begins Phase 4 attribution; it does not authorize a
+kernel or dispatch change.
 
 
 
