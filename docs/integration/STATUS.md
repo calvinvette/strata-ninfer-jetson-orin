@@ -107,7 +107,9 @@ same six persistent-state fields differed. This establishes run-to-run state
 instability independent of transfer mode; pause interpretation of new transfer
 timing/energy comparisons until that cause is identified. A per-block diagnostic
 matched the first of 36 GDN state blocks and differed in the remaining 35, which
-locates but does not explain divergence propagation. The earlier passing
+locates but does not explain divergence propagation. An identical mapped
+`spec2`/MTP-off repeat also had the same full-state mismatch with matching tokens
+and zero accepted drafts, so this is not confined to MTP. The earlier passing
 mapped/pread screen remains its own result.
 
 The traced [API cancellation and recovery run](../../bench/results/2026-10-10-phase3-cancel-recovery/README.md)

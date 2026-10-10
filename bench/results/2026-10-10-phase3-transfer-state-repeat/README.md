@@ -23,3 +23,6 @@ as equality evidence. The full request-level hashes and raw logs remain the
 correct parity gate; this narrows follow-up work to propagation after the first
 GDN state block. The refined raw run is retained in
 [`2026-10-10-phase3-transfer-state-repeat-gdn`](../2026-10-10-phase3-transfer-state-repeat-gdn/).
+The [MTP-off control](../2026-10-10-phase3-transfer-state-repeat-spec2/README.md)
+also differed in persistent state across identical mapped requests, so the issue
+is not limited to speculation or MTP.

@@ -286,6 +286,10 @@ reproduced differing persistent state in two identical mapped requests with the
 same tokens and MTP draft counts. For Splash, test repeated same-mode state
 stability before comparing alternative storage/transfer paths; paired output
 tokens alone do not establish equivalent internal execution.
+The same mismatch reproduced in mapped `spec2` without MTP, while the `spec4`
+case also diverged after the first GDN state block. This means Splash follow-up
+should first establish same-mode repeated-state stability with speculation both
+off and on before attributing differences to an I/O or memory adapter.
 
 The [async-pool transfer screen](../results/2026-10-10-phase3-async-pool/README.md)
 adds a 64 MiB transient CUDA pool allocation/copy/kernel/free path beside pinned
