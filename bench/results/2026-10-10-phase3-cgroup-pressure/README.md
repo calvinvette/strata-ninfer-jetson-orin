@@ -18,7 +18,7 @@ workspace pressure or service recovery under active cgroup pressure.
 ## Strata under an active cgroup cap
 
 The same candidate binary, IQ1_M pack/profile, flags and 512-token prompt ran
-inside 12, 16 and 24 GiB transient scopes, each with `run_control.py` enforcing
+inside 12, 16, 20 and 24 GiB transient scopes, each with `run_control.py` enforcing
 the normal 6 GiB effective-availability floor. The 12 GiB run started, chose
 file-backed experts, filled 1,410 expert-cache slots and was terminated during
 prefill when the next cgroup sample crossed the floor. Effective availability
@@ -29,10 +29,18 @@ availability while host `MemAvailable` remained 15.61 GiB; scope usage peaked
 at 10.54 of 16 GiB. Both are supervisor pressure aborts, not engine allocation
 failures or completed requests.
 
-The 24 GiB scope passed the same request. It completed the 511-token prompt and
-generated one token with 8.84 GiB minimum effective/host availability; scope
-usage peaked at 9.76 of 24 GiB. This is a single successful cell, not a general
-minimum cgroup size or a supported-capacity claim.
+| Scope cap | Outcome | Minimum effective availability | Minimum host availability | Peak scope current |
+| ---: | --- | ---: | ---: | ---: |
+| 12 GiB | Supervisor abort during prefill | 5.97 GiB | 20.69 GiB | 6.03 GiB |
+| 16 GiB | Supervisor abort during prefill | 5.46 GiB | 15.61 GiB | 10.54 GiB |
+| 20 GiB | Request completed | 9.58 GiB | 11.55 GiB | 10.42 GiB |
+| 24 GiB | Request completed | 8.84 GiB | 8.84 GiB | 9.76 GiB |
+
+The 20 and 24 GiB scopes passed the request. Both completed the 511-token
+prompt and generated one token. The smaller cap had 9.58 GiB minimum effective
+availability, and the 24 GiB cap had 8.84 GiB minimum effective/host
+availability. This is a small screen, not a universal minimum cgroup size or a
+supported-capacity claim.
 
 A fresh run with the same binary, pack, profile, flags and workload outside the
 12 GiB scope also passed, with 7.62 GiB minimum host availability. This shows
