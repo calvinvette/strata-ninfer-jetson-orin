@@ -198,6 +198,31 @@ should retain symbol-specific incompatibilities and explicit failed-profile
 cells before introducing rearrangement or conversion adapters.
 
 
+## Cache and workspace admission must use executed values
+
+The Orin cache/context screen requested 3000 and 5000 expert slots but the
+runtime selected 3903 and 6519; those request values are sizing lower bounds,
+not exact capacities. With automatic sizing, owned prompt buffers emitted
+separate workspace holds (202, 500, 840 and 1520 MiB for chunks 64, 512, 1024
+and 2048), while borrowed buffers emitted no such hold. The existing 3 GiB
+VRAM slack and MTP bind hold remained distinct. Report requested settings,
+actual capabilities, reservation metadata, observed owner allocations and
+physical `MemAvailable` separately. A reservation event is not an allocation,
+and GPU free-memory telemetry must not be added to host availability on a
+unified-memory device.
+
+For a future Strata + Splash integration, preserve this experimental shape but
+replace CUDA-specific observations with the actual Metal allocator and resource
+residency APIs Splash uses. Determine whether a configured prompt chunk owns
+buffers or borrows from a cache, query the executed cache capacity, and record
+any future workspace budget separately from committed allocations. Use one
+physical-memory authority for Apple unified memory, retain headroom, and sample
+the OS while supervising each process. A short prompt can verify startup and
+admission but cannot establish behavior at the configured chunk size; prepare a
+prompt that reaches the intended boundary before testing full-chunk workspace
+pressure.
+
+
 ## Measure materialization and preserve profiler scope
 
 The pinned pp512+tg64 trace ranks Q6_K→FP16 materialization above individual
