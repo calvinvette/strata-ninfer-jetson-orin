@@ -116,9 +116,15 @@ CUDA and trace-on/off real-model protocol checks pass. Verifier-only and expande
 HIP/SYCL builds pass. No HIP/SYCL GPU runtime execution is claimed. Runtime policy
 and default dispatch are unchanged.
 
-Fresh Orin checks: 46 integration harness tests, 15 Jetson setup tests, 312 selected
-mock API tests, the pinned shared-memory budget test and six selected branch
-CPU/core tests pass. The existing GPU conversation-snapshot test also freshly
+Fresh Orin checks: all 54 integration harness tests, 15 Jetson setup tests, 312
+selected mock API tests, the pinned shared-memory budget test and six selected
+branch CPU/core tests pass. The six targeted Phase 3 CTests (VMM transfer,
+segmented cache, pinned fallback/shared memory, shared budget and published
+prefix) pass. After a one-job build of missing targets, 108 of 112 CTests passed
+when excluding the unavailable-model PLE fixture; two tests were skipped and
+`expert_parity`/`pool_test` could not read their separate `pack/full/experts.bin`
+fixture. `ple_parity` was separately confirmed blocked because the pinned Q2_0
+model shard is absent from `~/models`. The existing GPU conversation-snapshot test also freshly
 passes 3901 synthetic state checks; this is not accepted-prefix commit parity. Both control binaries built as native ARM64 Release with
 CUDA 12.6.68 and embedded SM87 images. Both source GGUF shards and all 31 MTP
 source tensors were independently rehashed against pinned digests. Prepared
