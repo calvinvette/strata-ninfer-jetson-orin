@@ -224,6 +224,7 @@ private:
     int64_t live_slots_ = 0;            ///< #533: slots() - all of them unless shrunk
     int64_t seg_req_ = 0;               ///< #533: the segment size asked for (0: one cudaMalloc)
     int64_t seg_ = 0;                   ///< #533: the segment size used (a multiple of the driver's granularity)
+    int seg_device_ = -1;               ///< device owning segmented physical handles
     uint64_t reserved_ = 0;             ///< #533: the reserved address range's size
     std::vector<unsigned long long> segs_;   ///< #533: each segment's physical handle (0: unmapped)
     std::vector<int64_t> seg_size_;     ///< #533: each segment's size (the last one may be shorter)

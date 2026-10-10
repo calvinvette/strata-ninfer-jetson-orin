@@ -44,6 +44,24 @@ class OwnerObservationTests(unittest.TestCase):
                          {'expert-stage-pinned-host', 'expert-stage-pageable-host'})
         self.assertTrue(all(row['live_observed_requested_bytes'] == 0 for row in result['owners']))
 
+    def test_segmented_vmm_tracks_mapped_handles_across_shrink_and_regrow(self):
+        def vmm(kind, handle, size=0):
+            return PREFIX + json.dumps(dict(schema=1, owner='expert-cache-vmm-segment',
+                kind=kind, allocation=handle, requested_bytes=size, instance=11,
+                device=0, count=0))
+
+        rows = [vmm('allocate', 501, 8 << 20), vmm('allocate', 502, 8 << 20),
+                vmm('free', 502), vmm('allocate', 503, 8 << 20),
+                vmm('free', 501), vmm('free', 503)]
+        result = summarize(rows)
+        owner = result['owners'][0]
+        self.assertEqual(owner['owner'], 'expert-cache-vmm-segment')
+        self.assertEqual(owner['peak_observed_requested_bytes'], 16 << 20)
+        self.assertEqual(owner['live_observed_requested_bytes'], 0)
+        self.assertEqual(result['allocation_events'], 3)
+        self.assertEqual(result['free_events'], 3)
+        self.assertIn('CUDA segmented ExpertCache mapped VMM physical segments', result['coverage'])
+
     def test_alias_cannot_be_counted_as_another_allocation(self):
         with self.assertRaises(ValueError):
             summarize([event('allocate', size=10), event('allocate', size=10, instance=2)])

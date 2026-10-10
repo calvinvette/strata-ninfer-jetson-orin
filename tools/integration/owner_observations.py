@@ -58,7 +58,7 @@ def summarize(lines):
     owners = sorted(set(current) | set(graphs) | set(views) | set(payloads))
     return {
         'scope': 'observed sites only; requested payload bytes, not physical backing or total process ownership',
-        'coverage': 'instrumented CUDA/HIP ordinary ExpertCache single-block backing, pageable/pinned expert-stage host buffers, primary SessionState backing, verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; SYCL ExpertCache, VMM/segmented cache, stage/batch sessions and other sites excluded',
+        'coverage': 'instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA segmented ExpertCache mapped VMM physical segments, pageable/pinned expert-stage host buffers, primary SessionState backing, verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; shared KV VMM pools, SYCL ExpertCache, stage/batch sessions and other sites excluded',
         'graph_bytes': 'unsupported; counts do not measure driver or graph-pool bytes',
         'cleanup': 'live at log end is not a leak verdict; process termination may bypass destructors',
         'allocation_events': allocations, 'free_events': frees,

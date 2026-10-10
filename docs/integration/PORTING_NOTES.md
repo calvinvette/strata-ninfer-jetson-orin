@@ -225,6 +225,19 @@ does not establish a benefit, so pinning remains opt-in. Splash will need its
 own resource class and lifetime instrumentation; pinned CUDA semantics do not
 transfer to Metal.
 
+## Separate virtual address ranges from physical backing
+
+The segmented CUDA expert cache reserves one address range and maps physical
+segments into it. Trace the physical handle only after mapping succeeds, and
+close its observed lifetime only after unmap and release succeed; the reserved
+address range is not backing memory. The Orin test shrank and regrew both
+uniform and sized caches while checking retained slot bytes and matching each
+observed allocation with a free. A future Splash adapter should apply the same
+identity distinction to Metal heaps, sparse resources and aliases, while
+tracking Metal-specific residency and shared backing semantics. The current
+trace does not cover Strata's shared KV VMM chunk exchange, so it is not yet a
+complete unique-physical-backing ledger.
+
 
 
 ## Keep source quantization separate from materialized dtype

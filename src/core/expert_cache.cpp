@@ -307,6 +307,7 @@ bool ExpertCache::open_segmented(uint64_t want, std::string& err) {
         return false;
     }
     const uint64_t g = (uint64_t) gran;
+    seg_device_ = dev;
     const uint64_t total = (want + g - 1) / g * g;
     seg_ = (int64_t) (((uint64_t) seg_req_ + g - 1) / g * g);
     CUdeviceptr va = 0;
@@ -332,6 +333,10 @@ bool ExpertCache::open_segmented(uint64_t want, std::string& err) {
             return false;
         }
         mapped_segs_ = (int64_t) i + 1;
+        strata::platform::integration_trace::event(
+            "expert-cache-vmm-segment", "allocate", this,
+            reinterpret_cast<const void*>(static_cast<uintptr_t>(segs_[i])),
+            (uint64_t) seg_size_[i], dev);
     }
     return true;
 #endif
@@ -344,8 +349,13 @@ void ExpertCache::release_segmented() {
     const CUdeviceptr va = reinterpret_cast<CUdeviceptr>(base_);
     for (size_t i = 0; i < segs_.size(); ++i)
         if (segs_[i] != 0) {
-            v.unmap(va + (CUdeviceptr) ((uint64_t) i * (uint64_t) seg_), (size_t) seg_size_[i]);
-            v.release((CUmemGenericAllocationHandle) segs_[i]);
+            const CUresult unmapped = v.unmap(va + (CUdeviceptr) ((uint64_t) i * (uint64_t) seg_),
+                                              (size_t) seg_size_[i]);
+            const CUresult released = v.release((CUmemGenericAllocationHandle) segs_[i]);
+            if (unmapped == CUDA_SUCCESS && released == CUDA_SUCCESS)
+                strata::platform::integration_trace::event(
+                    "expert-cache-vmm-segment", "free", this,
+                    reinterpret_cast<const void*>(static_cast<uintptr_t>(segs_[i])), 0, seg_device_);
         }
     if (base_ != nullptr && reserved_ > 0) v.address_free(va, (size_t) reserved_);
 #endif
@@ -353,6 +363,7 @@ void ExpertCache::release_segmented() {
     seg_size_.clear();
     mapped_segs_ = 0;
     reserved_ = 0;
+    seg_device_ = -1;
     base_ = nullptr;
 }
 
@@ -397,6 +408,9 @@ bool ExpertCache::shrink(int64_t keep_bytes, std::string& err) {
             live_slots_ = slots_within(mapped_bytes());
             return false;
         }
+        strata::platform::integration_trace::event(
+            "expert-cache-vmm-segment", "free", this,
+            reinterpret_cast<const void*>(static_cast<uintptr_t>(segs_[(size_t) i])), 0, seg_device_);
         segs_[(size_t) i] = 0;
         mapped_segs_ = i;
     }
@@ -415,8 +429,7 @@ bool ExpertCache::grow(int64_t want_bytes, std::string& err) {
     return false;
 #else
     const Vmm& v = vmm();
-    int dev = 0;
-    cudaGetDevice(&dev);
+    const int dev = seg_device_;
     const CUdeviceptr va = reinterpret_cast<CUdeviceptr>(base_);
     int64_t at = mapped_bytes();
     while (mapped_segs_ < (int64_t) segs_.size() && at + seg_size_[(size_t) mapped_segs_] <= want_bytes) {
@@ -428,6 +441,10 @@ bool ExpertCache::grow(int64_t want_bytes, std::string& err) {
             live_slots_ = slots_within(mapped_bytes());
             return false;
         }
+        strata::platform::integration_trace::event(
+            "expert-cache-vmm-segment", "allocate", this,
+            reinterpret_cast<const void*>(static_cast<uintptr_t>(segs_[i])),
+            (uint64_t) seg_size_[i], dev);
         at += seg_size_[i];
         ++mapped_segs_;
     }

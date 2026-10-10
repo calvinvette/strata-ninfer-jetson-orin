@@ -1,0 +1,34 @@
+{
+  "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+  "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA segmented ExpertCache mapped VMM physical segments, pageable/pinned expert-stage host buffers, primary SessionState backing, verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; shared KV VMM pools, SYCL ExpertCache, stage/batch sessions and other sites excluded",
+  "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+  "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+  "allocation_events": 41,
+  "free_events": 41,
+  "planned_reservations": {
+    "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+    "events": []
+  },
+  "owners": [
+    {
+      "owner": "expert-cache",
+      "instance": 281474700755128,
+      "device": 0,
+      "peak_observed_requested_bytes": 8388608,
+      "live_observed_requested_bytes": 0,
+      "view_events": 0,
+      "last_owner_reported_payload_bytes": null,
+      "successful_graph_instantiations": 0
+    },
+    {
+      "owner": "expert-cache-vmm-segment",
+      "instance": 281474700755128,
+      "device": 0,
+      "peak_observed_requested_bytes": 100663296,
+      "live_observed_requested_bytes": 0,
+      "view_events": 0,
+      "last_owner_reported_payload_bytes": null,
+      "successful_graph_instantiations": 0
+    }
+  ]
+}

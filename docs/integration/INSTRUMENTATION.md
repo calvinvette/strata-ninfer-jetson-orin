@@ -15,10 +15,13 @@ The primary `SessionState` backing allocation is also observed as one owner
 allocation; its carved arrays are not added as separate backing. Layer-stage
 and batch-slot session allocations remain outside this trace.
 The CUDA/HIP ordinary single-block `ExpertCache` backing has matching
-allocation/free events. VMM and segmented-cache modes are excluded because their
-mapped backing can resize and needs per-segment identities to avoid counting
-reserved address space as physical allocation. SYCL has a separate cache source
-and does not emit these cache events. CUDA/HIP expert-stage buffers report separate
+allocation/free events. CUDA segmented-cache mode (`--vram-elastic`) reports
+one `expert-cache-vmm-segment` allocation per successfully mapped physical
+handle and a matching free after successful unmap/release. The reserved virtual
+address range is excluded. This supports cache shrink/grow observation without
+treating address reservation as device memory. Shared KV VMM chunks that move
+between cache and KV ownership are not covered yet. SYCL has a separate cache
+source and does not emit these cache events. CUDA/HIP expert-stage buffers report separate
 `expert-stage-pinned-host` and `expert-stage-pageable-host` owners with host device
 id `-1`; these events distinguish host backing and do not count as GPU memory.
 SYCL's migrated expert-source implementation is separate and does not emit these
@@ -40,7 +43,9 @@ python tools/integration/owner_observations.py \
 ```
 
 The parser rejects duplicate allocation identities, unmatched frees, conflicting
-owners and unsupported schema/kinds. It tracks only the observed requested
+owners and unsupported schema/kinds. VMM segment handles use the same lifetime
+checks, so a shrink followed by regrowth can reuse a released handle identity
+without overlapping its earlier lifetime. It tracks only the observed requested
 payloads. A live allocation at log end is reported explicitly; process termination
 may bypass destructors, so this is not automatically a leak. Absence of records
 fails rather than reporting zero usage. Requested bytes exclude allocator backing
@@ -92,15 +97,22 @@ bytes or physical memory. Device identities on frees come from the owning device
 The expanded [evidence report](../../bench/results/2026-10-09-prefill-mtp-owner-trace/README.md)
 compares owned and borrowed prefill, and trace-off protocol checks. Remaining
 sites include verifier mapped staging/auxiliary/batch buffers, MTP weight-load
-allocations, layer-stage and batch-slot session arenas, expert-cache backing/resizing and graph
-capture/destroy/pool observations. Phase 3 must distinguish unique physical backing, views and future
+allocations, layer-stage and batch-slot session arenas, shared KV VMM ownership
+exchange and graph capture/destroy/pool observations. Phase 3 must distinguish unique physical backing, views and future
 reservations. Phase 1 needs explicit counters and unsupported scopes; do not
 mistake a partial requested-byte trace for the later accounting gate.
 
+The local Orin [segmented VMM lifecycle check](../../bench/results/2026-10-09-vmm-segment-owner-trace/README.md)
+passes the existing shrink/regrow test for uniform and sized expert caches.
+Forty-one observed allocation events have matching frees, including the mapped
+physical segments. The short test had no model or imposed memory pressure; it
+qualifies trace lifecycle and cache data preservation only.
+
 Shared owner edits require CUDA/HIP/SYCL builds, including migrated SYCL source
 copies where they exist. The latest native build and targeted tests pass for the
-expert-stage host lifetime trace. The latest maestro1 HIP build covers its changed
-header/source; the migrated SYCL expert-source implementation is separate and
-does not consume these stage events. A separate maestro1 SYCL build of the cache
-header linked with its pinned oneMKL path. maestro1 has no AMD or SYCL device for
-runtime qualification. Compilation does not qualify either GPU runtime.
+expert-stage host lifetime trace and the CUDA segmented-cache owner events.
+Fresh one-job maestro1 HIP and SYCL builds include the updated cache header and
+pass; the HIP source also includes the VMM trace (compiled out on HIP). The
+migrated SYCL expert-source implementation is separate and does not consume the
+stage events. maestro1 has no AMD or SYCL device for runtime qualification.
+Compilation does not qualify either GPU runtime.
