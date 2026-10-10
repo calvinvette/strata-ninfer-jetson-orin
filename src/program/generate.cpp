@@ -1,5 +1,6 @@
 #include "strata/platform/cpu_arch.hpp"
 #include "strata/platform/shared_memory_budget.hpp"
+#include "strata/platform/integration_trace.hpp"
 // src/program/generate.cpp - P2.S6: `strata generate`.
 //
 // THE DRIVER, and the first program in this project that answers a question.  Everything below it is a
@@ -3855,7 +3856,8 @@ int main(int argc, char** argv) {
             strata::core::qsa_set_kv_elastic(on, iv != nullptr && std::atoll(iv) > 0 ? std::atoll(iv) : 16384);
             strata::core::ExpertCache::set_vmm(on);
         }
-        if (cudaMalloc(&sbuf, strata::core::session_bytes(g, o.max_context, K, 0, hi0)) != cudaSuccess) {
+        const uint64_t sbuf_bytes = strata::core::session_bytes(g, o.max_context, K, 0, hi0);
+        if (cudaMalloc(&sbuf, sbuf_bytes) != cudaSuccess) {
             std::fprintf(stderr, "strata generate: session state allocation failed\n");
             return 1;
         }
@@ -3863,6 +3865,7 @@ int main(int argc, char** argv) {
             std::fprintf(stderr, "strata generate: session_init failed\n");
             return 1;
         }
+        strata::platform::integration_trace::event("session", "allocate", &ss, sbuf, sbuf_bytes, 0);
         if (g.n_qsa_layers() > 0 && ss.qsa_states[ss.qsa_primary()].kv_mode == 1)
             std::fprintf(stderr, "strata generate: KV streaming: %lld of %lld cells per QSA layer in VRAM, the K/V in "
                                  "%.2f GiB of pinned RAM\n",
@@ -4424,6 +4427,18 @@ int main(int argc, char** argv) {
         for (const auto& d : slot_mtp)
             mtp_bind += (int64_t) d->bind_bytes(native_head.row_bytes(), n_vocab);
         const int64_t reserve = (((int64_t) o.vram_reserve_mib + prefill_mib) << 20) + mtp_bind + pipe_first;
+        if (strata::platform::integration_trace::enabled()) {
+            int reservation_device = 0;
+            (void) cudaGetDevice(&reservation_device);
+            strata::platform::integration_trace::reservation("expert-cache.vram-slack", &xcache,
+                (uint64_t) o.vram_reserve_mib << 20, reservation_device);
+            strata::platform::integration_trace::reservation("expert-cache.prefill-workspace", &xcache,
+                (uint64_t) prefill_mib << 20, reservation_device);
+            strata::platform::integration_trace::reservation("expert-cache.mtp-bind", &xcache,
+                (uint64_t) mtp_bind, reservation_device);
+            strata::platform::integration_trace::reservation("expert-cache.pipeline", &xcache,
+                (uint64_t) pipe_first, reservation_device);
+        }
         const int64_t blob = (int64_t) strata::kernels::cpu::expert_layout().max_blob;
         int64_t slots = ((int64_t) free_b - reserve) / blob;
         if (!profile.empty()) slots = std::min<int64_t>(slots, (int64_t) profile.size());
@@ -12248,7 +12263,8 @@ int main(int argc, char** argv) {
     cudaFree(d_logits);
     cudaFree(d_emb);
     cudaFree(d_parts);
-    cudaFree(sbuf);
+    if (cudaFree(sbuf) == cudaSuccess)
+        strata::platform::integration_trace::event("session", "free", &ss, sbuf, 0, 0);
     cudaFree(arena);
     return 0;
 }

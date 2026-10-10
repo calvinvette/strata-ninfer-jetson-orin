@@ -33,4 +33,19 @@ inline void event(const char* owner, const char* kind, const void* instance,
         (unsigned long long) bytes, device, (unsigned long long) count);
 }
 
+// A planned budget hold is metadata, not an allocation or physical-memory
+// observation. Keep it in a separate event kind so summaries never add it to
+// observed backing bytes.
+inline void reservation(const char* label, const void* instance, uint64_t bytes, int device) {
+    if (!enabled() || bytes == 0) return;
+    const double now = std::chrono::duration<double>(
+        std::chrono::steady_clock::now().time_since_epoch()).count();
+    std::fprintf(stderr,
+        "strata integration: {\"schema\":1,\"monotonic_s\":%.9f,\"owner\":\"%s\","
+        "\"kind\":\"reservation\",\"instance\":%llu,\"allocation\":0,\"requested_bytes\":%llu,"
+        "\"device\":%d,\"count\":0}\n", now, label,
+        (unsigned long long) reinterpret_cast<uintptr_t>(instance),
+        (unsigned long long) bytes, device);
+}
+
 }  // namespace strata::platform::integration_trace

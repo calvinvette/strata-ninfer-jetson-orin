@@ -7,7 +7,7 @@ PREFIX = 'strata integration: '
 
 
 def summarize(lines):
-    live, peaks, current, graphs, views, payloads = {}, {}, {}, {}, {}, {}
+    live, peaks, current, graphs, views, payloads, reservations = {}, {}, {}, {}, {}, {}, {}
     allocations = frees = 0
     for line in lines:
         if not line.startswith(PREFIX):
@@ -17,7 +17,14 @@ def summarize(lines):
             raise ValueError('unsupported owner event schema')
         owner = (row['owner'], row['instance'], row['device'])
         key = (row['device'], row['allocation'])
-        if row['kind'] == 'allocate':
+        if row['kind'] == 'reservation':
+            size = row['requested_bytes']
+            if not isinstance(size, int) or size <= 0 or row['allocation'] != 0 or row['count'] != 0:
+                raise ValueError('invalid planned reservation event')
+            if owner in reservations:
+                raise ValueError('duplicate planned reservation label for one instance/device')
+            reservations[owner] = size
+        elif row['kind'] == 'allocate':
             size = row['requested_bytes']
             if not isinstance(size, int) or size <= 0 or not key[1] or key in live:
                 raise ValueError('invalid or duplicate allocation event')
@@ -51,10 +58,14 @@ def summarize(lines):
     owners = sorted(set(current) | set(graphs) | set(views) | set(payloads))
     return {
         'scope': 'observed sites only; requested payload bytes, not physical backing or total process ownership',
-        'coverage': 'instrumented verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; other sites excluded',
+        'coverage': 'instrumented CUDA/HIP ordinary ExpertCache single-block backing, pageable/pinned expert-stage host buffers, primary SessionState backing, verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; SYCL ExpertCache, VMM/segmented cache, stage/batch sessions and other sites excluded',
         'graph_bytes': 'unsupported; counts do not measure driver or graph-pool bytes',
         'cleanup': 'live at log end is not a leak verdict; process termination may bypass destructors',
         'allocation_events': allocations, 'free_events': frees,
+        'planned_reservations': {
+            'scope': 'cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals',
+            'events': [{'label': o[0], 'instance': o[1], 'device': o[2], 'bytes': b}
+                       for o, b in sorted(reservations.items())]},
         'owners': [{'owner': o[0], 'instance': o[1], 'device': o[2],
                     'peak_observed_requested_bytes': peaks.get(o, 0),
                     'live_observed_requested_bytes': current.get(o, 0),

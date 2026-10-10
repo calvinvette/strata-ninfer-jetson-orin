@@ -63,7 +63,10 @@ GPU runtime result is claimed.
 This test exercises one naturally occurring accepted-prefix length (23 of 27)
 with a final output-budget clip. It does not qualify zero/intermediate/all
 acceptance across controlled windows, EOS clipping, cancellation, long-chain
-drift or pipelined runtime behavior. Those Phase 2/5 gates remain open.
+drift or pipelined runtime behavior. A separate supervised 8-token follow-up
+matched emitted IDs and most state fields but found a `pooled_full` spare-row
+mismatch; details are in the [short-prefix state report](../2026-10-09-short-prefix-state-followup/README.md).
+These transaction and runtime cases remain Phase 5 work.
 
 Raw pre-fix logs and results are retained beside this report. No model files,
 build products, credentials or local environment files are included.

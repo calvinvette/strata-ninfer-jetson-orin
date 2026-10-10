@@ -211,6 +211,21 @@ profiling needs its own trace-clock and request markers, not Linux timestamps
 assumed to transfer unchanged.
 
 
+## Pinned host staging is an owner-specific experiment
+
+`STRATA_STAGE_PIN=1` does not exercise the expert-stage pool by itself. On this
+file-backed route, `STRATA_IO_PREFETCH=1` with `STRATA_IO_PF_STAGE=1` selects the
+staged I/O path; the ordinary prefetch mode only fills the page cache. Trace
+pinned and pageable host buffers as separate owners, and emit a pinned free only
+after the runtime reports successful release. These bytes belong to host RAM,
+even when the CUDA API allocated them. Two three-pair 4K-prompt Orin screens
+matched tokens and committed state. The trace-corrected repeat showed a 0.10%
+median prompt regression and variable decode deltas from -9.24% to +3.94%; this
+does not establish a benefit, so pinning remains opt-in. Splash will need its
+own resource class and lifetime instrumentation; pinned CUDA semantics do not
+transfer to Metal.
+
+
 
 ## Keep source quantization separate from materialized dtype
 

@@ -2,6 +2,7 @@
 #include "strata/core/expert_cache.hpp"
 #include "strata/core/expert_source.hpp"
 #include "strata/platform/shared_memory_budget.hpp"
+#include "strata/platform/integration_trace.hpp"
 
 // #533's segmented cache uses CUDA's virtual memory management (cuMem*): not on HIP, neither the RDNA backend nor
 // the gfx906 compat build (PR #638), which compiles this file as HIP without STRATA_USE_HIP
@@ -527,6 +528,13 @@ bool ExpertCache::open(int64_t n_slots, int64_t n_layers, int64_t n_expert, int6
                       (double) want / 1073741824.0, cudaGetErrorString(cudaGetLastError()));
         err = buf;
         return false;
+    } else {
+        int device = 0;
+        if (cudaGetDevice(&device) == cudaSuccess) {
+            trace_allocation_bytes_ = want;
+            trace_device_ = device;
+            strata::platform::integration_trace::event("expert-cache", "allocate", this, base_, want, device);
+        }
     }
     // Zeroed so a slot read before it is filled is a DETERMINISTIC wrong answer rather than whatever the
     // allocator handed back.  A stale block of a previous process's memory would still sum to finite floats.
@@ -608,9 +616,14 @@ void ExpertCache::close() {
         vmm_.reset();   // unmaps and frees every chunk it still holds
         base_ = nullptr;
     } else if (base_ != nullptr) {
-        cudaFree(base_);
+        const uint8_t* allocation = base_;
+        const cudaError_t status = cudaFree(base_);
+        if (status == cudaSuccess && trace_allocation_bytes_ > 0)
+            strata::platform::integration_trace::event("expert-cache", "free", this, allocation, 0, trace_device_);
         base_ = nullptr;
     }
+    trace_allocation_bytes_ = 0;
+    trace_device_ = -1;
     residency_.clear();
     slots_ = 0;
     live_slots_ = 0;

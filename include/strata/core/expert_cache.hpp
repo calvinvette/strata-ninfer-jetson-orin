@@ -219,6 +219,8 @@ private:
     bool open_segmented(uint64_t want, std::string& err);
     void release_segmented();
     uint8_t* base_ = nullptr;
+    uint64_t trace_allocation_bytes_ = 0;  ///< ordinary single-block backing observed by integration tracing
+    int trace_device_ = -1;
     int64_t live_slots_ = 0;            ///< #533: slots() - all of them unless shrunk
     int64_t seg_req_ = 0;               ///< #533: the segment size asked for (0: one cudaMalloc)
     int64_t seg_ = 0;                   ///< #533: the segment size used (a multiple of the driver's granularity)

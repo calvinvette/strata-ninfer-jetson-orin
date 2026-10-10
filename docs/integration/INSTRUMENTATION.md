@@ -11,6 +11,18 @@ the same identity. CUDA/HIP records successful window graph instantiations throu
 `instantiate_evicting`; SYCL's migrated owner records the corresponding single
 window graph finalization. Their batch graph coverage is not equivalent yet.
 No graph-pool byte value is inferred from graph counts or free-memory deltas.
+The primary `SessionState` backing allocation is also observed as one owner
+allocation; its carved arrays are not added as separate backing. Layer-stage
+and batch-slot session allocations remain outside this trace.
+The CUDA/HIP ordinary single-block `ExpertCache` backing has matching
+allocation/free events. VMM and segmented-cache modes are excluded because their
+mapped backing can resize and needs per-segment identities to avoid counting
+reserved address space as physical allocation. SYCL has a separate cache source
+and does not emit these cache events. CUDA/HIP expert-stage buffers report separate
+`expert-stage-pinned-host` and `expert-stage-pageable-host` owners with host device
+id `-1`; these events distinguish host backing and do not count as GPU memory.
+SYCL's migrated expert-source implementation is separate and does not emit these
+stage events.
 
 Each record carries schema1, steady-clock seconds, owner label, instance,
 allocation identity, device, requested bytes and an event count. The steady
@@ -35,6 +47,33 @@ fails rather than reporting zero usage. Requested bytes exclude allocator backin
 granularity, other allocations by the same owner and driver/graph overhead. The
 parser is a research observation tool, not another physical-memory authority.
 
+Automatic expert-cache sizing also emits opt-in `reservation` events for its
+explicit VRAM slack and any priced MTP bind, owned-prefill workspace and pipeline
+workspace. The parser reports these in a separate `planned_reservations` list;
+they are cache-sizing inputs, not allocations or measured physical bytes and
+must never be added to observed allocations. Manual expert-cache sizing does
+not emit them because that path does not subtract these planned holds from an
+automatic cache calculation. A reservation's presence does not prove the later
+workspace allocation matched its estimate.
+
+The supervised auto-cache trace on 2026-10-09 records 3072 MiB of VRAM slack
+and roughly 215 MiB for MTP binding in each paired arm. Although the request
+used a 64-token prefill chunk, the sizing predicate expected it to borrow cache
+slots and emitted no separate prefill-workspace reservation. Both runtime logs
+instead report too few slots to borrow; the prompt path owns buffers with a
+measured 228,829,184-byte requested peak. The general 3072 MiB VRAM slack
+remained in the cache-sizing budget for later allocations, so this is not an
+admission failure or reserve-breach result. It shows a per-component forecast
+and owner-path difference; the free-memory margin and overlapping ownership
+still need measurement. No pipeline windows were requested.
+Thirty instrumented allocations were freed in each arm. The run also retained
+an 8-token accepted-prefix failure (`pooled_full` differed); it is reported
+separately and is not a memory-pressure abort. A later trace also observed the
+235,033,088-byte primary SessionState backing; it remained live at isolated
+subprocess termination. See the [Phase 3
+reservation observation](../../bench/results/2026-10-09-phase3-reservation-observations/README.md)
+and [short-prefix state follow-up](../../bench/results/2026-10-09-short-prefix-state-followup/README.md).
+
 Fresh CUDA evidence records one 77,960,704-byte primary arena allocation and its
 release, plus three successful window graph instantiations. Seven real-model
 protocol scenarios pass both with tracing enabled and disabled; disabled emits
@@ -53,12 +92,15 @@ bytes or physical memory. Device identities on frees come from the owning device
 The expanded [evidence report](../../bench/results/2026-10-09-prefill-mtp-owner-trace/README.md)
 compares owned and borrowed prefill, and trace-off protocol checks. Remaining
 sites include verifier mapped staging/auxiliary/batch buffers, MTP weight-load
-allocations, session arenas, expert-cache backing/resizing and graph
+allocations, layer-stage and batch-slot session arenas, expert-cache backing/resizing and graph
 capture/destroy/pool observations. Phase 3 must distinguish unique physical backing, views and future
 reservations. Phase 1 needs explicit counters and unsupported scopes; do not
 mistake a partial requested-byte trace for the later accounting gate.
 
 Shared owner edits require CUDA/HIP/SYCL builds, including migrated SYCL source
-copies where they exist. The native CUDA build and isolated maestro1 expanded HIP
-and SYCL builds pass for the newer prefill/MTP edits. Compilation does not qualify
-either GPU runtime.
+copies where they exist. The latest native build and targeted tests pass for the
+expert-stage host lifetime trace. The latest maestro1 HIP build covers its changed
+header/source; the migrated SYCL expert-source implementation is separate and
+does not consume these stage events. A separate maestro1 SYCL build of the cache
+header linked with its pinned oneMKL path. maestro1 has no AMD or SYCL device for
+runtime qualification. Compilation does not qualify either GPU runtime.

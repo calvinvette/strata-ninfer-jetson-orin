@@ -9,6 +9,7 @@
 
 #include "strata/core/pinned.hpp"
 #include "strata/platform/memory.hpp"
+#include "strata/platform/integration_trace.hpp"
 #include "strata/kernels/elementwise.hpp"
 #include "strata/kernels/quantize_act.hpp"
 #include "strata/kernels/s2_expert_grouped.hpp"
@@ -1156,8 +1157,14 @@ bool FileExpertSource::copy_from_files(int64_t layer, int64_t expert, uint8_t* d
 #define STAGE_PIN_DEFAULT 0
 constexpr uint64_t kStagePinFloor = 3ull << 30;   // RAM left available after a pinned stage buffer
 void FileExpertSource::StageBufFree::operator()(uint8_t* p) const noexcept {
-    if (pinned) (void) cudaFreeHost(p);
-    else delete[] p;
+    const char* owner = pinned ? "expert-stage-pinned-host" : "expert-stage-pageable-host";
+    if (pinned) {
+        if (cudaFreeHost(p) == cudaSuccess)
+            strata::platform::integration_trace::event(owner, "free", owner_instance, p, 0, -1);
+    } else {
+        delete[] p;
+        strata::platform::integration_trace::event(owner, "free", owner_instance, p, 0, -1);
+    }
 }
 
 // A blob assembled from the three role slices.  The buffer of a (layer, expert) is reused for another only once
@@ -1207,7 +1214,10 @@ bool FileExpertSource::claim_stage(int64_t key, size_t& v, bool& fill, bool ahea
         if (!pinned) (void) cudaGetLastError();   // the failed alloc's sticky error is ours, not the caller's
         uint8_t* raw = pinned ? (uint8_t*) p : new (std::nothrow) uint8_t[(size_t) stage_blob_];
         if (raw == nullptr) return false;
-        stage_buf_.emplace_back(raw, StageBufFree{pinned});
+        stage_buf_.emplace_back(raw, StageBufFree{pinned, this});
+        strata::platform::integration_trace::event(
+            pinned ? "expert-stage-pinned-host" : "expert-stage-pageable-host",
+            "allocate", this, raw, stage_blob_, -1);
         if (pinned && !stage_pin_said_) {
             stage_pin_said_ = true;
             std::fprintf(stderr, "FileExpertSource: the stage buffers are pinned (cudaHostAlloc)\n");

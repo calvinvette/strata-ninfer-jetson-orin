@@ -145,6 +145,10 @@ zero-length `Verifier` transaction, which Strata rejects and the active decode
 loops do not issue. The supervised post-fix Orin rerun emitted identical token
 IDs and matched all nine captured persistent-state fields for this case. Raw
 data and its bounded scope are in the [state comparison report](../../bench/results/2026-10-09-accepted-prefix-publication/README.md).
+An additional 8-token run matched IDs and state length but differed in
+`pooled_full`, the in-progress spare indexer row; automatic and fixed cache
+configurations reproduced it. This unresolved state case is tracked for Phase 5
+in the [short-prefix follow-up](../../bench/results/2026-10-09-short-prefix-state-followup/README.md).
 
 ## Independent IQ4_NL codec diagnostic contract
 

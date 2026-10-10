@@ -708,6 +708,7 @@ private:
     // header has no cuda_runtime.h).
     struct StageBufFree {
         bool pinned = false;
+        const void* owner_instance = nullptr;
         void operator()(uint8_t* p) const noexcept;
     };
     std::mutex stage_mu_;

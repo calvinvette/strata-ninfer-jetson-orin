@@ -9,7 +9,7 @@ work is next. No NInfer execution component has been promoted into Strata.
 | 0 — Repository and import | Complete | Pinned source/evidence manifest, source mapping, plan, offline planner checks |
 | 1 — Same-day controls | Complete | Four same-day paired API blocks; exact workloads/artifacts; protocol and baseline checks; capability matrix records limits; expanded HIP/SYCL builds compile |
 | 2 — Operator/state contracts | Complete | Ownership review, incompatible projection-profile rejection, independent RMS/IQ4_NL/Q6_K oracles, GDN prefix checks, default spec1 regression and post-fix spec1/spec4 token plus nine-field persistent-state parity recorded; native/HIP/SYCL build evidence and eleven selector tests pass; no NInfer execution component promoted |
-| 3 — Memory and transfers | Not started | Unique allocation/reservation accounting and pressure/lifetime tests |
+| 3 — Memory and transfers | In progress | Opt-in trace covers ordinary ExpertCache, primary SessionState, verifier, prefill, MTP and separate pageable/pinned expert-stage host owners; two randomized fixed-cache 4K staging screens matched tokens and nine state fields; the trace-corrected clocked repeat found +0.10% median prompt time and variable decode results with dynamic CPU/GPU clocks; minimum availability was 8.04 GiB; VMM/segmented cache, unique backing, pressure and other transfer experiments remain |
 | 4 — SM87/ARM kernels | Not started | Pinned request profile prepared; bottleneck attribution, qualified candidate and request confirmation pending |
 | 5 — Speculation and graphs | Not started | Accepted-prefix state, graph lifetime and drift qualification |
 | 6 — Multivariate tuning | Not started | Randomized paired campaign, interactions, uncertainty, held-out confirmation |
@@ -25,6 +25,26 @@ The [runtime ownership review](OWNERSHIP_REVIEW.md) records existing owners for
 API ordering, engine execution, session state, verifier commits and device
 allocations. It adds no duplicate scheduler or allocation ledger. Unique physical
 backing and reservation semantics remain Phase 3 work.
+
+The [pinned-stage transfer screens](../../bench/results/2026-10-09-stage-pin-transfer-fixed/README.md)
+tested pageable versus pinned file-tier staging on the local Orin under the six
+GiB floor. The selected staged path is opt-in and remains pageable by default.
+Both three-pair fixed-cache screens matched output and persistent state. The
+initial screen showed slower pinned medians; the trace-corrected clocked repeat
+showed a small prompt regression and variable decode results, so it does not
+establish a product benefit. Host staging is reported separately from device
+allocations. The [clocked repeat](../../bench/results/2026-10-09-stage-pin-transfer-clocked/README.md)
+records dynamic CPU/GPU frequencies and unsupported EMC sampling. These
+screens do not close Phase 3's broader pressure, unique-backing or transfer gates.
+
+Phase 3 has begun with opt-in reservation reporting at auto-cache sizing. The
+parser keeps planned cache holds outside allocation totals; the supervised
+[Orin observation](../../bench/results/2026-10-09-phase3-reservation-observations/README.md)
+records VRAM slack and MTP binding while preserving the six GiB floor. This is
+not complete physical ownership accounting. Its 8-token arm also exposed an
+unresolved `pooled_full` accepted-prefix mismatch, preserved in the [short-prefix
+follow-up](../../bench/results/2026-10-09-short-prefix-state-followup/README.md)
+for Phase 5 investigation.
 
 The [accepted-prefix publication check](../../bench/results/2026-10-09-accepted-prefix-publication/README.md)
 found identical 32-token output but differing persistent state between spec 1

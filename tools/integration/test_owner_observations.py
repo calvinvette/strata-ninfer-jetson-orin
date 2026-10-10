@@ -15,6 +15,11 @@ def event(kind, address=100, size=0, instance=1, device=0):
         device=device, count=1 if kind in ('graph_instantiate', 'view') else 0))
 
 
+def reservation(label, size, instance=1, device=0):
+    return PREFIX + json.dumps(dict(schema=1, owner=label, kind='reservation',
+        allocation=0, requested_bytes=size, instance=instance, device=device, count=0))
+
+
 class OwnerObservationTests(unittest.TestCase):
     def test_reused_address_and_concurrent_arena_peaks(self):
         result = summarize([event('allocate', size=10), event('allocate', 200, 20),
@@ -23,6 +28,21 @@ class OwnerObservationTests(unittest.TestCase):
         self.assertEqual(result['owners'][0]['peak_observed_requested_bytes'], 30)
         self.assertEqual(result['owners'][0]['live_observed_requested_bytes'], 0)
         self.assertEqual(result['owners'][0]['successful_graph_instantiations'], 1)
+
+    def test_pinned_and_pageable_expert_staging_are_separate_host_owners(self):
+        rows = []
+        for owner, address, size in [('expert-stage-pinned-host', 301, 4096),
+                                     ('expert-stage-pageable-host', 302, 8192)]:
+            rows.extend([PREFIX + json.dumps(dict(schema=1, owner=owner, kind='allocate',
+                allocation=address, requested_bytes=size, instance=9, device=-1, count=0)),
+                PREFIX + json.dumps(dict(schema=1, owner=owner, kind='free',
+                allocation=address, requested_bytes=0, instance=9, device=-1, count=0))])
+        result = summarize(rows)
+        self.assertEqual(result['allocation_events'], 2)
+        self.assertEqual(result['free_events'], 2)
+        self.assertEqual({row['owner'] for row in result['owners']},
+                         {'expert-stage-pinned-host', 'expert-stage-pageable-host'})
+        self.assertTrue(all(row['live_observed_requested_bytes'] == 0 for row in result['owners']))
 
     def test_alias_cannot_be_counted_as_another_allocation(self):
         with self.assertRaises(ValueError):
@@ -60,6 +80,20 @@ class OwnerObservationTests(unittest.TestCase):
         self.assertEqual(result['owners'][0]['peak_observed_requested_bytes'], 10)
         self.assertEqual(result['owners'][0]['last_owner_reported_payload_bytes'], 200)
 
+    def test_planned_workspace_reservations_stay_separate_from_allocations(self):
+        result = summarize([event('allocate', size=100),
+                            reservation('expert-cache.prefill-workspace', 40),
+                            reservation('expert-cache.mtp-bind', 20), event('free')])
+        self.assertEqual(result['allocation_events'], 1)
+        self.assertEqual(result['owners'][0]['peak_observed_requested_bytes'], 100)
+        self.assertEqual(sum(r['bytes'] for r in result['planned_reservations']['events']), 60)
+        self.assertIn('never added', result['planned_reservations']['scope'])
+
+    def test_duplicate_planned_reservation_label_is_rejected(self):
+        with self.assertRaises(ValueError):
+            summarize([event('allocate', size=1), reservation('cache.prefill', 2),
+                       reservation('cache.prefill', 3)])
+
     @unittest.skipUnless(shutil.which('c++'), 'C++ compiler unavailable')
     def test_cpp_opt_in_is_silent_by_default_and_emits_parseable_records(self):
         root = Path(__file__).resolve().parents[2]
@@ -68,6 +102,7 @@ int main() {
   int allocation;
   strata::platform::integration_trace::event("verifier", "allocate", &allocation, &allocation, 32, 0);
   strata::platform::integration_trace::event("verifier", "view", &allocation, &allocation, 16, 0, 1);
+  strata::platform::integration_trace::reservation("expert-cache.prefill-workspace", &allocation, 64, 0);
   strata::platform::integration_trace::event("verifier", "free", &allocation, &allocation, 0, 0);
 }'''
         with tempfile.TemporaryDirectory() as directory:
@@ -90,3 +125,4 @@ int main() {
             self.assertEqual(result['free_events'], 1)
             self.assertEqual(result['owners'][0]['live_observed_requested_bytes'], 0)
             self.assertEqual(result['owners'][0]['view_events'], 1)
+            self.assertEqual(result['planned_reservations']['events'][0]['bytes'], 64)
