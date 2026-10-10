@@ -272,6 +272,16 @@ device-level storage traffic, state whether worker time is summed or wall time,
 and establish counter baselines after loading/warmup. The full protocol and
 limits are recorded in the [transfer telemetry report](../results/2026-10-10-phase3-transfer-telemetry/README.md).
 
+An opt-in `tegrastats` sampler now integrates board rail power over each request
+and records available CPU/GPU/EMC clocks. On this Orin, CPU frequencies and rail
+power were available, while GPU/EMC frequencies were absent. Two transfer energy
+diagnostics failed persistent-state parity (one used the wrong `spec2`/no-MTP
+configuration; the corrected `spec4`/MTP run failed in two of three pairs), so
+their whole-board energy values are not path comparisons. For future Strata plus
+Splash work, retain energy scope and clock availability with raw samples, and
+establish repeated-process state determinism before interpreting an energy
+delta. See the [failed diagnostic report](../../bench/results/2026-10-10-phase3-transfer-energy/README.md).
+
 The [async-pool transfer screen](../results/2026-10-10-phase3-async-pool/README.md)
 adds a 64 MiB transient CUDA pool allocation/copy/kernel/free path beside pinned
 copy, mapped-host and sequential-managed controls. It checks exact checksums,

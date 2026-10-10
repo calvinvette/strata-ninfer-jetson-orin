@@ -95,6 +95,16 @@ IDs and nine state fields, but remains screening evidence: `/proc/self/io` bytes
 are unavailable, device counters are host-wide, and energy/copy/clock data are
 still missing.
 
+The [energy-instrumented transfer diagnostic](../../bench/results/2026-10-10-phase3-transfer-energy/README.md)
+adds per-request `tegrastats` rail integration and clock sampling. A first
+`spec2`/no-MTP attempt failed all three persistent-state comparisons. A corrected
+8K `spec4`/MTP repeat matched tokens in all three pairs but matched persistent
+state in only one; the other two differed across GDN, PLE, tail, pooled and KV
+fingerprints. Thus neither run qualifies a transfer or energy comparison, even
+though both stayed above the six-GiB floor. The earlier passing mapped/pread
+screen remains its own result; diagnose the repeated-run state instability before
+continuing this tradeoff.
+
 The traced [API cancellation and recovery run](../../bench/results/2026-10-10-phase3-cancel-recovery/README.md)
 passed all seven real-model protocol scenarios, including prefill and decode
 cancellation followed by successful requests through the same engine process.

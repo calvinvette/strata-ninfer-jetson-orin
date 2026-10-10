@@ -1,5 +1,6 @@
 """Compare mapped expert reads with the whole-blob pread path."""
 import argparse
+import atexit
 import hashlib
 import json
 import os
@@ -8,7 +9,9 @@ import random
 import re
 import sys
 import statistics
+import subprocess
 import threading
+import time
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT), str(ROOT / 'tools'), str(ROOT / 'tools/integration')]
@@ -19,6 +22,114 @@ from serve.frontend import ChatTemplate
 from serve.server import StrataEngine, child_env
 
 STATE_KEYS = ('L', 'gdn', 'ple', 'tail', 'dead', 'pooled', 'pooled_full', 'kv', 'ple_prev')
+
+
+class TegraSampler:
+    """Opt-in board-rail sampler; request energy is system-level, never process-attributed."""
+    _POWER = re.compile(r'([A-Z0-9_]+)\s+(\d+)mW(?:/(\d+)mW)?')
+    _CPU_FREQ = re.compile(r'\d+%@([0-9]+)')
+    _GPU = re.compile(r'GR3D_FREQ\s+(\d+)%?(?:@([0-9]+))?')
+    _EMC = re.compile(r'EMC_FREQ\s+(\d+)%?(?:@([0-9]+))?')
+
+    def __init__(self, path, interval_ms):
+        self.path = path
+        self.interval_ms = interval_ms
+        self.samples = []
+        self.lock = threading.Lock()
+        self.proc = None
+        self.thread = None
+        self.file = None
+
+    def start(self):
+        try:
+            self.proc = subprocess.Popen(['tegrastats', '--interval', str(self.interval_ms)],
+                                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                         text=True, bufsize=1)
+        except FileNotFoundError:
+            return False
+        self.file = self.path.open('w', encoding='utf-8')
+        self.thread = threading.Thread(target=self._read, daemon=True)
+        self.thread.start()
+        return True
+
+    def _read(self):
+        for raw in self.proc.stdout:
+            now = time.monotonic()
+            line = raw.rstrip('\n')
+            row = {'monotonic_s': now, 'raw': line, 'power_mw': {}}
+            for match in self._POWER.finditer(line):
+                row['power_mw'][match.group(1)] = int(match.group(2))
+            cpu = self._CPU_FREQ.findall(line)
+            row['cpu_clock_mhz'] = [int(x) for x in cpu]
+            gpu = self._GPU.search(line)
+            if gpu:
+                row['gr3d_utilization_percent'] = int(gpu.group(1))
+                row['gr3d_clock_mhz'] = int(gpu.group(2)) if gpu.group(2) else None
+            emc = self._EMC.search(line)
+            if emc:
+                row['emc_utilization_percent'] = int(emc.group(1))
+                row['emc_clock_mhz'] = int(emc.group(2)) if emc.group(2) else None
+            with self.lock:
+                self.samples.append(row)
+                self.file.write(json.dumps(row) + '\n')
+                self.file.flush()
+
+    def stop(self):
+        if self.proc is None:
+            return
+        proc = self.proc
+        self.proc = None
+        if proc.poll() is None:
+            proc.terminate()
+        try:
+            proc.wait(timeout=2)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            proc.wait()
+        if self.thread:
+            self.thread.join(timeout=2)
+        if self.file:
+            self.file.close()
+
+    def summarize(self, start_s, end_s):
+        with self.lock:
+            points = list(self.samples)
+        before = [x for x in points if x['monotonic_s'] <= start_s]
+        inside = [x for x in points if start_s < x['monotonic_s'] < end_s]
+        after = [x for x in points if x['monotonic_s'] >= end_s]
+        bounded = ([before[-1]] if before else []) + inside + ([after[0]] if after else [])
+        names = set.intersection(*(set(x['power_mw']) for x in bounded)) if len(bounded) >= 2 else set()
+        energy_j = {}
+        for name in names:
+            area = 0.0
+            for a, b in zip(bounded, bounded[1:]):
+                dt = b['monotonic_s'] - a['monotonic_s']
+                if dt <= 0:
+                    continue
+                left, right = max(start_s, a['monotonic_s']), min(end_s, b['monotonic_s'])
+                if right <= left:
+                    continue
+                y0, y1 = a['power_mw'][name], b['power_mw'][name]
+                yl = y0 + (y1 - y0) * (left - a['monotonic_s']) / dt
+                yr = y0 + (y1 - y0) * (right - a['monotonic_s']) / dt
+                area += (yl + yr) * 0.5 * (right - left) / 1000.0
+            energy_j[name] = area
+        window = [x for x in points if start_s <= x['monotonic_s'] <= end_s]
+        cpu_clocks = [n for x in window for n in x.get('cpu_clock_mhz', [])]
+        return {
+            'scope': 'whole-board rail energy sampled during request; includes unrelated system activity',
+            'duration_s': end_s - start_s,
+            'rail_energy_j_estimate': energy_j,
+            'energy_method': 'trapezoid integration of first mW value at tegrastats sample-arrival times',
+            'cpu_clock_mhz_samples': len(cpu_clocks),
+            'cpu_clock_mhz_min': min(cpu_clocks) if cpu_clocks else None,
+            'cpu_clock_mhz_median': statistics.median(cpu_clocks) if cpu_clocks else None,
+            'cpu_clock_mhz_max': max(cpu_clocks) if cpu_clocks else None,
+            'gr3d_clock_mhz_samples': sum(x.get('gr3d_clock_mhz') is not None for x in window),
+            'emc_clock_mhz_samples': sum(x.get('emc_clock_mhz') is not None for x in window),
+            'gr3d_clock_mhz_supported': any(x.get('gr3d_clock_mhz') is not None for x in window),
+            'emc_clock_mhz_supported': any(x.get('emc_clock_mhz') is not None for x in window),
+        }
 
 
 def process_counters(pid):
@@ -72,11 +183,16 @@ def main():
     parser.add_argument('--pairs', type=int, default=1)
     parser.add_argument('--seed', type=int, default=870126)
     parser.add_argument('--io-threads', type=int, default=8)
+    parser.add_argument('--tegrastats-energy', action='store_true',
+                        help='sample Orin rails and clocks around each request; board-level, not process-attributed')
+    parser.add_argument('--tegrastats-interval-ms', type=int, default=100)
     parser.add_argument('--resume', action='store_true', help='continue an incomplete output directory after a harness interruption')
     parser.add_argument('--run', action='store_true', help='otherwise print the planned exact prompt size only')
     args = parser.parse_args()
     if args.prompt_tokens < 512 or args.generated_tokens < 8 or args.pairs < 1:
         parser.error('require prompt >=512, generation >=8 and pairs >=1')
+    if args.tegrastats_interval_ms < 100:
+        parser.error('tegrastats interval must be at least 100 ms')
     if args.output.exists() != args.resume:
         parser.error('use a new output directory, or pass --resume for an existing one')
 
@@ -114,6 +230,13 @@ def main():
                   'generated_tokens': args.generated_tokens, 'planned_pairs': args.pairs,
                   'io_threads': args.io_threads,
                   'seed': args.seed, 'arms': [], 'pair_comparisons': []}
+    sampler = None
+    if args.tegrastats_energy:
+        sampler = TegraSampler(args.output / 'tegrastats-energy.jsonl', args.tegrastats_interval_ms)
+        result['tegrastats_energy'] = {
+            'enabled': sampler.start(), 'interval_ms': args.tegrastats_interval_ms,
+            'scope': 'whole-board rail and clock sampling; never process-attributed'}
+        atexit.register(sampler.stop)
     args_for = list(cfg['args'])
     pack_path = Path(args_for[args_for.index('--pack') + 1])
     disk_counter_path = pack_path / 'experts.bin'
@@ -158,8 +281,10 @@ def main():
             try:
                 before = process_counters(engine.proc.pid)
                 block_before = block_device_counters(disk_counter_path)
+                request_start = time.monotonic()
                 ids = [token for token in engine.generate(prompt, args.generated_tokens,
                        {'temperature': 0}, threading.Event()) if token is not None]
+                request_end = time.monotonic()
                 after = process_counters(engine.proc.pid)
                 block_after = block_device_counters(disk_counter_path)
                 arm.update(ids=ids, text=tokenizer.decode(ids), usage=dict(engine.last))
@@ -167,6 +292,8 @@ def main():
                 engine.close()
             arm['process_io_and_fault_deltas'] = {
                 key: after[key] - before[key] for key in before.keys() & after.keys()}
+            if sampler and result['tegrastats_energy']['enabled']:
+                arm['board_telemetry_during_request'] = sampler.summarize(request_start, request_end)
             arm['host_block_device_reads_during_request'] = {
                 'device': block_after['device'], 'major': block_after['major'],
                 'minor': block_after['minor'],
@@ -199,6 +326,10 @@ def main():
             'pread_ms': pread['usage'].get('prompt_ms', 0) + pread['usage'].get('decode_ms', 0)})
         result_path.write_text(json.dumps(result, indent=2) + '\n')
 
+    if sampler:
+        sampler.stop()
+        result['tegrastats_energy']['sample_count'] = len(sampler.samples)
+        result['tegrastats_energy']['raw_samples'] = 'tegrastats-energy.jsonl'
     failures = sorted({failure for pair in result['pair_comparisons'] for failure in pair['failures']})
     result['summary'] = {}
     for label in ('mapped', 'pread'):
