@@ -84,6 +84,17 @@ not isolated engine bytes. Request medians again favored mapped in total time;
 copy latency, energy and GPU/EMC clocks remain unmeasured, so the full transfer
 gate stays open.
 
+The [request-local transfer telemetry follow-up](../../bench/results/2026-10-10-phase3-transfer-telemetry/README.md)
+adds engine-side file-tier byte and summed pread-worker-time counters, seeded
+after startup so first-request deltas exclude cache population. On a three-pair
+512-token/64-output screen, both arms handed out 40,996.1 MB per request; pread
+read 2,216–2,298 MB in its workers, which spent a summed 2,516–2,723 ms. Mapped
+page-cache residency at handout was 33.4–33.7 GB. Pread cache-residency fields
+are omitted because that path does not sample them. The screen matched token
+IDs and nine state fields, but remains screening evidence: `/proc/self/io` bytes
+are unavailable, device counters are host-wide, and energy/copy/clock data are
+still missing.
+
 The traced [API cancellation and recovery run](../../bench/results/2026-10-10-phase3-cancel-recovery/README.md)
 passed all seven real-model protocol scenarios, including prefill and decode
 cancellation followed by successful requests through the same engine process.

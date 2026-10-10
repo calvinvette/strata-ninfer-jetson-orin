@@ -649,6 +649,7 @@ public:
     /// io_prefetch; otherwise opt in with STRATA_IO_STATS=1 (the check costs a few microseconds per blob).
     void set_io_stats(bool on) { io_stats_ = on || io_pf_; }
     bool io_stats() const { return io_stats_; }
+    bool io_fill_cache() const { return io_fill_; }
     struct IoCounters {
         uint64_t cached_bytes = 0, uncached_bytes = 0;       ///< file reads at hand-out, by page-cache residency
         uint64_t pread_bytes = 0, pread_us = 0, pread_n = 0; ///< bytes read with pread, thread time, calls

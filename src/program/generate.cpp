@@ -8747,6 +8747,11 @@ int main(int argc, char** argv) {
                 if (!pump(false)) return false;
             return true;
         };
+        // Counters gathered during model load/cache population are not request I/O. Seed the deltas only after
+        // startup work is complete, so the first served request is reported on the same basis as later requests.
+        strata::platform::ProcIo io_prev = strata::platform::proc_io_sample();
+        strata::core::FileExpertSource::IoCounters ic_prev = src.io_counters();
+        uint64_t fb_prev = src.file_read_bytes();
         for (;;) {
             if (batch_on() || (piped && pipe_inflight())) {
                 if (!try_next_line(line)) {
@@ -11155,25 +11160,26 @@ int main(int argc, char** argv) {
                              src.gguf_mode() ? " (the GGUF in place)" : "");
                 // what the OS did for this request (since the previous one): the drive's share of the file tier's reads
                 // against the page cache's, and what the I/O path did about it
-                static strata::platform::ProcIo io_prev;
-                static strata::core::FileExpertSource::IoCounters ic_prev;
-                static uint64_t fb_prev = 0;
                 const strata::platform::ProcIo io_now = strata::platform::proc_io_sample();
                 const strata::core::FileExpertSource::IoCounters ic = src.io_counters();
                 const uint64_t fb = src.file_read_bytes();
-                if (io_now.valid) {
-                    std::fprintf(stderr, "strata serve: file tier I/O this request: the OS read %.1f MB from storage (%llu major faults) for "
-                                         "%.1f MB of expert reads", (double) (io_now.read_bytes - io_prev.read_bytes) / 1e6,
-                                 (unsigned long long) (io_now.major_faults - io_prev.major_faults), (double) (fb - fb_prev) / 1e6);
-                    if (src.io_stats())
+                if (io_now.valid || src.io_stats() || src.io_prefetch()) {
+                    std::fprintf(stderr, "strata serve: file tier I/O this request:");
+                    if (io_now.valid)
+                        std::fprintf(stderr, " the OS read %.1f MB from storage (%llu major faults) for",
+                                     (double) (io_now.read_bytes - io_prev.read_bytes) / 1e6,
+                                     (unsigned long long) (io_now.major_faults - io_prev.major_faults));
+                    std::fprintf(stderr, " %.1f MB of expert reads", (double) (fb - fb_prev) / 1e6);
+                    if (src.io_stats() && !src.io_fill_cache())
                         std::fprintf(stderr, "; page cache held %.1f MB at the read, not %.1f MB",
                                      (double) (ic.cached_bytes - ic_prev.cached_bytes) / 1e6,
                                      (double) (ic.uncached_bytes - ic_prev.uncached_bytes) / 1e6);
                     if (src.io_prefetch())
-                        std::fprintf(stderr, "; io prefetch: %llu read ahead (%.1f MB by pread), %llu used, %llu unused, %llu skipped "
-                                             "(cached), %llu dropped; decode waited %.1f ms in %llu fetches",
+                        std::fprintf(stderr, "; io prefetch: %llu read ahead (%.1f MB by pread; %.1f ms summed worker time), "
+                                             "%llu used, %llu unused, %llu skipped (cached), %llu dropped; decode waited %.1f ms in %llu fetches",
                                      (unsigned long long) (ic.pf_read_blobs - ic_prev.pf_read_blobs),
                                      (double) (ic.pread_bytes - ic_prev.pread_bytes) / 1e6,
+                                     (double) (ic.pread_us - ic_prev.pread_us) / 1e3,
                                      (unsigned long long) (ic.pf_used - ic_prev.pf_used),
                                      (unsigned long long) (ic.pf_unused - ic_prev.pf_unused),
                                      (unsigned long long) (ic.pf_resident_skips - ic_prev.pf_resident_skips),
@@ -11181,7 +11187,7 @@ int main(int argc, char** argv) {
                                      (double) (ic.crit_us - ic_prev.crit_us) / 1e3,
                                      (unsigned long long) (ic.crit_n - ic_prev.crit_n));
                     std::fprintf(stderr, "\n");
-                    io_prev = io_now;
+                    if (io_now.valid) io_prev = io_now;
                     ic_prev = ic;
                     fb_prev = fb;
                 }

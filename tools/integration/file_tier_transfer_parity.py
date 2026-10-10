@@ -9,7 +9,6 @@ import re
 import sys
 import statistics
 import threading
-import queue as queue_module
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT), str(ROOT / 'tools'), str(ROOT / 'tools/integration')]
@@ -154,21 +153,8 @@ def main():
             arm = {'pair': pair, 'name': label, 'io_prefetch': io_prefetch,
                    'staging': 'disabled', 'args': args_for,
                    'engine_sha256': binary_hash}
-            captured_lines = []
-            base_queue = queue_module.Queue
-
-            class CapturingQueue(base_queue):
-                def put(self, item, *put_args, **put_kwargs):
-                    if isinstance(item, str):
-                        captured_lines.append(item.rstrip())
-                    return super().put(item, *put_args, **put_kwargs)
-
-            queue_module.Queue = CapturingQueue
-            try:
-                engine = StrataEngine(str(args.engine.resolve()), args_for, cwd=cfg.get('cwd'),
-                                      log=str(log), env=env)
-            finally:
-                queue_module.Queue = base_queue
+            engine = StrataEngine(str(args.engine.resolve()), args_for, cwd=cfg.get('cwd'),
+                                  log=str(log), env=env)
             try:
                 before = process_counters(engine.proc.pid)
                 block_before = block_device_counters(disk_counter_path)
@@ -190,8 +176,8 @@ def main():
             owners = summarize(log.read_text(encoding='utf-8').splitlines())
             arm['owner_observations'] = owners
             arm['observed_allocation_bytes_by_device'] = owners['observed_allocation_bytes_by_device']
-            arm['file_tier_summary_lines'] = [line for line in captured_lines
-                if 'io path' in line.lower() or 'expert tiers' in line.lower()]
+            arm['file_tier_summary_lines'] = [line for line in log.read_text(errors='replace').splitlines()
+                if 'strata serve: file tier I/O this request:' in line]
             result['arms'].append(arm)
             pair_rows.append(arm)
             result_path.write_text(json.dumps(result, indent=2) + '\n')

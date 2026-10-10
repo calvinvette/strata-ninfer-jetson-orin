@@ -259,6 +259,19 @@ screening evidence only. For Splash, preserve the measurement dimensions and
 state/checksum controls, then measure Metal-specific read, copy and residency
 counters rather than translating CUDA owner labels.
 
+The Oct 10 follow-up added request-local file-tier bytes and summed pread-worker
+time, with deltas seeded after model/cache startup. On three exact 512/64 pairs,
+mapped and pread outputs and persistent state matched; both handed out 40,996.1
+MB of expert reads per request, while pread workers read 2,216–2,298 MB and
+spent 2,516–2,723 ms cumulatively. The mapped path reported page-cache
+residency; the pread/fill-cache path does not sample it, so its log omits those
+fields instead of reporting false zeroes. `/proc/self/io` bytes are unavailable
+on this Orin kernel, and whole-device counters include unrelated reads and
+readahead. For Splash, keep request-local transfer counters distinct from
+device-level storage traffic, state whether worker time is summed or wall time,
+and establish counter baselines after loading/warmup. The full protocol and
+limits are recorded in the [transfer telemetry report](../results/2026-10-10-phase3-transfer-telemetry/README.md).
+
 ## Separate virtual address ranges from physical backing
 
 The segmented CUDA expert cache reserves one address range and maps physical
