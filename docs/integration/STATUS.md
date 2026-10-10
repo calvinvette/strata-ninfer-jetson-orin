@@ -95,22 +95,19 @@ IDs and nine state fields, but remains screening evidence: `/proc/self/io` bytes
 are unavailable, device counters are host-wide, and energy/copy/clock data are
 still missing.
 
-The [energy-instrumented transfer diagnostic](../../bench/results/2026-10-10-phase3-transfer-energy/README.md)
-adds per-request `tegrastats` rail integration and clock sampling. A first
-`spec2`/no-MTP attempt failed all three persistent-state comparisons. A corrected
-8K `spec4`/MTP repeat matched tokens in all three pairs but matched persistent
-state in only one; the other two differed across GDN, PLE, tail, pooled and KV
-fingerprints. Thus neither run qualifies a transfer or energy comparison, even
-though both stayed above the six-GiB floor. A separate [same-mode repeat](../../bench/results/2026-10-10-phase3-transfer-state-repeat/README.md)
-emitted identical tokens and MTP draft counts across two mapped runs, but the
-same six persistent-state fields differed. This establishes run-to-run state
-instability independent of transfer mode; pause interpretation of new transfer
-timing/energy comparisons until that cause is identified. A per-block diagnostic
-matched the first of 36 GDN state blocks and differed in the remaining 35, which
-locates but does not explain divergence propagation. An identical mapped
-`spec2`/MTP-off repeat also had the same full-state mismatch with matching tokens
-and zero accepted drafts, so this is not confined to MTP. The earlier passing
-mapped/pread screen remains its own result.
+The initial [energy-instrumented transfer diagnostics](../../bench/results/2026-10-10-phase3-transfer-energy/README.md)
+used automatic expert-cache sizing, which selected different resident capacities
+across processes and invalidated their state and timing comparisons. The
+three-pair [fixed-cache repeat](../../bench/results/2026-10-10-phase3-transfer-energy-fixed-cache/README.md)
+held the requested cache at 5,000 (6,519 actual slots) in all six arms. Tokens
+and all nine persistent-state fields matched in every pair; median mapped
+request time was 4.27% lower, and the `VIN_SYS_5V0` rail estimate was 4.73% lower
+as a descriptive paired median. This remains three-pair screening only: clocks
+were dynamic, GPU/EMC frequencies were unavailable, rail energy includes
+unrelated activity, and process read bytes were unavailable. No transfer path
+or default is promoted. A separate MTP-off one-token control also matched all
+state fields when it held 6,519 expert slots fixed, unlike its auto-sized repeat.
+For these comparisons, fixed expert residency is a required control.
 
 The traced [API cancellation and recovery run](../../bench/results/2026-10-10-phase3-cancel-recovery/README.md)
 passed all seven real-model protocol scenarios, including prefill and decode

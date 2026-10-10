@@ -117,10 +117,10 @@ class TegraSampler:
         window = [x for x in points if start_s <= x['monotonic_s'] <= end_s]
         cpu_clocks = [n for x in window for n in x.get('cpu_clock_mhz', [])]
         return {
-            'scope': 'whole-board rail energy sampled during request; includes unrelated system activity',
+            'scope': 'named tegrastats system rail sampled during request; includes unrelated system activity',
             'duration_s': end_s - start_s,
             'rail_energy_j_estimate': energy_j,
-            'energy_method': 'trapezoid integration of first mW value at tegrastats sample-arrival times',
+            'energy_method': 'trapezoid integration of each named rail first mW value at tegrastats sample-arrival times; rails are not additive',
             'cpu_clock_mhz_samples': len(cpu_clocks),
             'cpu_clock_mhz_min': min(cpu_clocks) if cpu_clocks else None,
             'cpu_clock_mhz_median': statistics.median(cpu_clocks) if cpu_clocks else None,
@@ -183,6 +183,8 @@ def main():
     parser.add_argument('--pairs', type=int, default=1)
     parser.add_argument('--seed', type=int, default=870126)
     parser.add_argument('--io-threads', type=int, default=8)
+    parser.add_argument('--expert-cache', type=str,
+                        help='override auto sizing to hold expert residency constant across paired arms')
     parser.add_argument('--tegrastats-energy', action='store_true',
                         help='sample Orin rails and clocks around each request; board-level, not process-attributed')
     parser.add_argument('--tegrastats-interval-ms', type=int, default=100)
@@ -221,6 +223,7 @@ def main():
         if (result.get('prompt_sha256') != prompt_hash or
                 result.get('generated_tokens') != args.generated_tokens or
                 result.get('planned_pairs') != args.pairs or result.get('seed') != args.seed or
+                result.get('expert_cache') != args.expert_cache or result.get('io_threads') != args.io_threads or
                 any(row.get('engine_sha256') != binary_hash for row in result.get('arms', []))):
             parser.error('resume inputs differ from the retained incomplete run')
     else:
@@ -228,14 +231,14 @@ def main():
         result = {'scope': 'exact real-model prompt, randomized mapped-versus-pread file-tier transfer screen; screening only',
                   'prompt_tokens': len(prompt), 'prompt_sha256': prompt_hash,
                   'generated_tokens': args.generated_tokens, 'planned_pairs': args.pairs,
-                  'io_threads': args.io_threads,
+                  'io_threads': args.io_threads, 'expert_cache': args.expert_cache,
                   'seed': args.seed, 'arms': [], 'pair_comparisons': []}
     sampler = None
     if args.tegrastats_energy:
         sampler = TegraSampler(args.output / 'tegrastats-energy.jsonl', args.tegrastats_interval_ms)
         result['tegrastats_energy'] = {
             'enabled': sampler.start(), 'interval_ms': args.tegrastats_interval_ms,
-            'scope': 'whole-board rail and clock sampling; never process-attributed'}
+            'scope': 'system rail and clock sampling; never process-attributed; rail values are separate and not additive'}
         atexit.register(sampler.stop)
     args_for = list(cfg['args'])
     pack_path = Path(args_for[args_for.index('--pack') + 1])
@@ -248,6 +251,11 @@ def main():
             args_for[args_for.index(key) + 1] = value
         else:
             args_for.extend([key, value])
+    if args.expert_cache is not None:
+        if '--expert-cache' in args_for:
+            args_for[args_for.index('--expert-cache') + 1] = args.expert_cache
+        else:
+            args_for.extend(['--expert-cache', args.expert_cache])
     rng = random.Random(args.seed)
     modes = [('mapped', '0'), ('pread', '1')]
     orders = []

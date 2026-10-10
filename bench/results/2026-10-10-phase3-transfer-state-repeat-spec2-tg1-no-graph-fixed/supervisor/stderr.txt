@@ -1,0 +1,31 @@
+Traceback (most recent call last):
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/transfer_state_repeat.py", line 85, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/transfer_state_repeat.py", line 56, in main
+    engine = StrataEngine(str(args.engine.resolve()), engine_args, cwd=cfg.get('cwd'), log=str(log), env=env)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/serve/server.py", line 693, in __init__
+    raise RuntimeError(why + (f" (see {log})" if log else "") +
+RuntimeError: the engine exited before it was ready (see bench/results/2026-10-10-phase3-transfer-state-repeat-spec2-tg1-no-graph-fixed/experiment/mapped-0.log)
+the engine log's last lines:
+  strata integration: {"schema":1,"monotonic_s":943166.676643658,"owner":"prefill","kind":"free","instance":187650930883664,"allocation":11352047616,"requested_bytes":0,"device":0,"count":0}
+  strata integration: {"schema":1,"monotonic_s":943166.676842760,"owner":"prefill","kind":"free","instance":187650930883664,"allocation":29158711296,"requested_bytes":0,"device":0,"count":0}
+  strata integration: {"schema":1,"monotonic_s":943166.676873544,"owner":"prefill","kind":"free","instance":187650930883664,"allocation":11021454336,"requested_bytes":0,"device":0,"count":0}
+  strata integration: {"schema":1,"monotonic_s":943166.676892808,"owner":"prefill","kind":"free","instance":187650930883664,"allocation":10794820096,"requested_bytes":0,"device":0,"count":0}
+  strata integration: {"schema":1,"monotonic_s":943166.676911400,"owner":"prefill","kind":"free","instance":187650930883664,"allocation":12686749696,"requested_bytes":0,"device":0,"count":0}
+  strata integration: {"schema":1,"monotonic_s":943166.676926759,"owner":"prefill","kind":"free","instance":187650930883664,"allocation":10835624448,"requested_bytes":0,"device":0,"count":0}
+  strata integration: {"schema":1,"monotonic_s":943166.676947495,"owner":"prefill","kind":"free","instance":187650930883664,"allocation":11021455872,"requested_bytes":0,"device":0,"count":0}
+  strata integration: {"schema":1,"monotonic_s":943166.678448248,"owner":"prefill","kind":"free","instance":187650930883664,"allocation":29161336832,"requested_bytes":0,"device":0,"count":0}
+  strata integration: {"schema":1,"monotonic_s":943166.678793076,"owner":"prefill","kind":"free","instance":187650930883664,"allocation":29197631488,"requested_bytes":0,"device":0,"count":0}
+  strata integration: {"schema":1,"monotonic_s":943166.679020754,"owner":"prefill","kind":"free","instance":187650930883664,"allocation":29204189184,"requested_bytes":0,"device":0,"count":0}
+  strata integration: {"schema":1,"monotonic_s":943166.679341294,"owner":"prefill","kind":"free","instance":187650930883664,"allocation":29207470080,"requested_bytes":0,"device":0,"count":0}
+  strata integration: {"schema":1,"monotonic_s":943166.679554220,"owner":"prefill","kind":"free","instance":187650930883664,"allocation":29214027776,"requested_bytes":0,"device":0,"count":0}
+  strata integration: {"schema":1,"monotonic_s":943166.679586988,"owner":"prefill","kind":"free","instance":187650930883664,"allocation":11352089088,"requested_bytes":0,"device":0,"count":0}
+  strata integration: {"schema":1,"monotonic_s":943166.679611467,"owner":"prefill","kind":"free","instance":187650930883664,"allocation":11352092160,"requested_bytes":0,"device":0,"count":0}
+  strata integration: {"schema":1,"monotonic_s":943166.680734720,"owner":"prefill","kind":"free","instance":187650930883664,"allocation":29217308672,"requested_bytes":0,"device":0,"count":0}
+  strata integration: {"schema":1,"monotonic_s":943166.681416601,"owner":"prefill","kind":"free","instance":187650930883664,"allocation":29245169664,"requested_bytes":0,"device":0,"count":0}
+  strata integration: {"schema":1,"monotonic_s":943166.682354799,"owner":"prefill","kind":"free","instance":187650930883664,"allocation":29259923456,"requested_bytes":0,"device":0,"count":0}
+  strata integration: {"schema":1,"monotonic_s":943166.682387055,"owner":"prefill","kind":"free","instance":187650930883664,"allocation":11055497728,"requested_bytes":0,"device":0,"count":0}
+  strata integration: {"schema":1,"monotonic_s":943166.682416078,"owner":"prefill","kind":"free","instance":187650930883664,"allocation":11588673536,"requested_bytes":0,"device":0,"count":0}
+  strata integration: {"schema":1,"monotonic_s":943167.280500201,"owner":"expert-cache","kind":"free","instance":281474808243152,"allocation":13555879936,"requested_bytes":0,"device":0,"count":0}

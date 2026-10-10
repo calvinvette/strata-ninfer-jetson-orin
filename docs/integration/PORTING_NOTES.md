@@ -270,28 +270,22 @@ on this Orin kernel, and whole-device counters include unrelated reads and
 readahead. For Splash, keep request-local transfer counters distinct from
 device-level storage traffic, state whether worker time is summed or wall time,
 and establish counter baselines after loading/warmup. The full protocol and
-limits are recorded in the [transfer telemetry report](../results/2026-10-10-phase3-transfer-telemetry/README.md).
+limits are recorded in the [transfer telemetry report](../../bench/results/2026-10-10-phase3-transfer-telemetry/README.md).
 
-An opt-in `tegrastats` sampler now integrates board rail power over each request
+An opt-in `tegrastats` sampler integrates each named system rail over a request
 and records available CPU/GPU/EMC clocks. On this Orin, CPU frequencies and rail
-power were available, while GPU/EMC frequencies were absent. Two transfer energy
-diagnostics failed persistent-state parity (one used the wrong `spec2`/no-MTP
-configuration; the corrected `spec4`/MTP run failed in two of three pairs), so
-their whole-board energy values are not path comparisons. For future Strata plus
-Splash work, retain energy scope and clock availability with raw samples, and
-establish repeated-process state determinism before interpreting an energy
-delta. See the [failed diagnostic report](../../bench/results/2026-10-10-phase3-transfer-energy/README.md).
-The follow-up [same-mode repeat](../../bench/results/2026-10-10-phase3-transfer-state-repeat/README.md)
-reproduced differing persistent state in two identical mapped requests with the
-same tokens and MTP draft counts. For Splash, test repeated same-mode state
-stability before comparing alternative storage/transfer paths; paired output
-tokens alone do not establish equivalent internal execution.
-The same mismatch reproduced in mapped `spec2` without MTP, while the `spec4`
-case also diverged after the first GDN state block. This means Splash follow-up
-should first establish same-mode repeated-state stability with speculation both
-off and on before attributing differences to an I/O or memory adapter.
+power were available, while GPU/EMC frequencies were absent. Auto-cache
+diagnostics selected different expert capacities between processes and showed
+state mismatches; fixed `--expert-cache 5000` restored exact token/state parity
+for both an MTP-off one-token repeat and all three `spec4` mapped/pread pairs.
+For Splash, keep cache residency fixed within every pair and retain the actual
+capacity and hits alongside state hashes. Rail values include unrelated system
+activity and are not additive or process-attributed. The [failed auto-cache
+diagnostics](../../bench/results/2026-10-10-phase3-transfer-energy/README.md)
+and [fixed-cache transfer screen](../../bench/results/2026-10-10-phase3-transfer-energy-fixed-cache/README.md)
+preserve the comparison and its limits.
 
-The [async-pool transfer screen](../results/2026-10-10-phase3-async-pool/README.md)
+The [async-pool transfer screen](../../bench/results/2026-10-10-phase3-async-pool/README.md)
 adds a 64 MiB transient CUDA pool allocation/copy/kernel/free path beside pinned
 copy, mapped-host and sequential-managed controls. It checks exact checksums,
 records the 64 MiB pool high-water and verifies zero live pool bytes afterward.

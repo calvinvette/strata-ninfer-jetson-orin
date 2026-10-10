@@ -1,0 +1,31 @@
+Traceback (most recent call last):
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/transfer_state_repeat.py", line 85, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/transfer_state_repeat.py", line 56, in main
+    engine = StrataEngine(str(args.engine.resolve()), engine_args, cwd=cfg.get('cwd'), log=str(log), env=env)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/serve/server.py", line 693, in __init__
+    raise RuntimeError(why + (f" (see {log})" if log else "") +
+RuntimeError: the engine exited before it was ready (see bench/results/2026-10-10-phase3-transfer-state-repeat-spec2-tg1-no-graph/experiment/mapped-0.log)
+the engine log's last lines:
+  strata integration: {"schema":1,"monotonic_s":942952.001349915,"owner":"expert-cache.vram-slack","kind":"reservation","instance":281474067606112,"allocation":0,"requested_bytes":3221225472,"device":0,"count":0}
+  strata generate: expert cache auto: 17.42 GiB free, 3072 MiB reserved (+0 MiB for the draft head) -> 5813 slots
+  strata integration: {"schema":1,"monotonic_s":942955.451926286,"owner":"expert-cache","kind":"allocate","instance":281474067606112,"allocation":13555879936,"requested_bytes":15474406400,"device":0,"count":0}
+  strata generate: only 2996 MiB free once the slots are written (reserve 3072 MiB); shrinking the expert cache
+  strata integration: {"schema":1,"monotonic_s":942956.271755499,"owner":"expert-cache","kind":"free","instance":281474067606112,"allocation":13555879936,"requested_bytes":0,"device":0,"count":0}
+  strata generate: ExpertCache: 14.28 GiB requested, but the shared RAM allocation budget is 13.62 GiB after physical RAM headroom. Lower --expert-cache.; trying a smaller expert cache: 5631 slots
+  strata integration: {"schema":1,"monotonic_s":942958.555555653,"owner":"expert-cache","kind":"allocate","instance":281474067606112,"allocation":13555879936,"requested_bytes":11494425600,"device":0,"count":0}
+  strata generate: expert cache: 5631 slots (10.71 GiB) after 1 smaller tries - free shared RAM determines the cache size
+  strata generate: expert cache 5631 slots, 10.71 GiB of shared RAM allocated to the GPU; policy is
+  strata generate: the GPU computes the experts in the cache; it rounds differently from the CPU,
+                   so a reply can differ slightly from a run without the cache (same quality:
+                   bench/results/2026-09-27-cache-parity).
+                   PROFILE, ranked by routing frequency, no eviction.
+  strata generate: the profile fill asks for 256 pairs ahead (STRATA_FILL_AHEAD)
+  strata generate: pre-filled 5631 of 5631 slots from the profile in 6.0 s (1913 MB/s); slot 0 verified
+  strata generate: R4 hit path ON - resident experts are computed on the GPU
+  strata generate: 11 expert-pool workers + the host thread
+  strata generate: session is up (engine 0.1.41)
+  strata serve: needs --spec T and --prefill CHUNK (and a fillable --expert-cache; the graphed hit path additionally needs --expert-profile P)
+  strata integration: {"schema":1,"monotonic_s":942965.375230824,"owner":"expert-cache","kind":"free","instance":281474067606112,"allocation":13555879936,"requested_bytes":0,"device":0,"count":0}
