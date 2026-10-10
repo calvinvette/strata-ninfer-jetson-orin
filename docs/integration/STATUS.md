@@ -72,6 +72,14 @@ availability. Mapped decode median was 22.7% lower, while prompt median was
 were collected, but disk-byte, copy-latency, energy and GPU/EMC clock counters
 were unavailable, so the full transfer tradeoff gate remains open.
 
+The traced [API cancellation and recovery run](../../bench/results/2026-10-10-phase3-cancel-recovery/README.md)
+passed all seven real-model protocol scenarios, including prefill and decode
+cancellation followed by successful requests through the same engine process.
+Instrumented expert-cache, prefill, MTP and verifier allocations balanced; the
+resident session owner stayed live by design. Minimum physical availability was
+7.65 GiB. Graph-pool bytes remain unpriced, and this does not test persistent
+state parity or injected late-workspace recovery.
+
 The candidate [vision-enabled image request](../../bench/results/2026-10-10-phase3-vision-allocation/README.md)
 now passes with the optional CUDA encoder built locally. Its 56×56 image request
 completed at the six-GiB floor (minimum 7.22 GiB); startup reported 7.43 GiB
