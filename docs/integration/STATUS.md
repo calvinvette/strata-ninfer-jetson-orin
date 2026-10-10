@@ -271,9 +271,11 @@ runtime packs have new identity hashes, not new numerical qualification.
 A separate [Q2_0 runtime admission smoke](../../bench/results/2026-10-10-phase3-q2-runtime-smoke/README.md)
 did not reach prefill: the available 48×256 expert profile is incompatible
 with Q2_0's 48×512 layout, and the generic MTP converter rejects this artifact's
-GGML type-42 tensor. All attempts stayed above the six-GiB floor. The PLE block
-oracle therefore remains block-level evidence; Q2_0 model execution is not yet
-qualified.
+GGML type-42 tensor. A separate no-MTP one-token native Q2_0 CLI smoke then
+completed at a fixed 5,000 expert slots, with 15.71 GiB minimum physical
+availability. Its full expert ranking is deterministic fill order, not
+routing-derived. This is admission evidence only; quality, MTP/speculative
+behavior, service behavior and performance on Q2_0 remain unqualified.
 
 Fresh paired controls cover all five exact workloads in four independent process
 pairs (40 measured requests plus 40 warmups). Actual cache/KV/MTP resources match.

@@ -18,11 +18,35 @@ the local `~/models/strata-orin-validation/pack-venv`; that reader rejects
 GGML tensor type 42 in this artifact. No repository dependency or source was
 changed, and generated models/runtime files remain under `~/models`.
 
-All three supervised attempts stayed well above the six-GiB floor; their
-minimum available memory readings were 28.23 GiB, 25.28 GiB and 24.64 GiB.
+The three initial supervised attempts stayed well above the six-GiB floor;
+their minimum available memory readings were 28.23 GiB, 25.28 GiB and 24.64 GiB.
 The first unsupported configuration and both artifact-compatibility failures
 are retained under `run/supervisor*` and `mtp-convert/`. The failure is a useful
 integration boundary: Q2_0 PLE block compatibility is established, while the
 model's expert profile and MTP runtime conversion need matching Q2_0 support
-before a model request can be qualified. No timing or correctness conclusions
-are drawn from these setup failures.
+before speculative requests can be qualified.
+
+## Narrow one-token result
+
+To isolate runtime admission from those unsupported pieces, a shape-correct
+full 48×512 expert ranking was generated with `tools/make_profile.py --no-base`
+and stored at `~/models/strata-orin-validation/q2-expert-profile.bin`. The
+ranking uses the tool's deterministic fill order; it is not based on Q2_0
+routing measurements and is not a performance profile. With a fixed 5,000-slot
+cache, MTP omitted and `--max-new 1`, the real native Q2_0 model completed the
+provided 512-token prompt and emitted token ID 32. The log records 5,000 actual
+resident slots, Q2_0 PLE enabled, and a captured one-token verifier window.
+Minimum physical `MemAvailable` was 16,870,502,400 bytes (15.71 GiB), above the
+six-GiB floor. The provided CLI prompt is processed as 511 prefill tokens plus
+the final prompt token in the decode path, consistent with the control
+convention.
+
+This is one successful allocation/admission smoke, not a quality check, paired
+comparison, cache-ranking result, MTP/speculation test, service test, or
+performance claim. The build SHA256 is
+`d3e8bcde3a430d7d5bb614fec8ba938398699b9abecd41965bb28fd6d465d721`; the exact
+token file SHA256 is
+`c463143cd6cc684c29cba41efe832274e4cc040335b2338cce196d67c47d3cbf`; and the
+generated admission profile SHA256 is
+`b3e62120218cd96d175a0547530158869177dd2164b22b40f32bea7d7e85fb8c`. The
+supervised raw run is `run/supervisor-spec2-no-mtp/`.
