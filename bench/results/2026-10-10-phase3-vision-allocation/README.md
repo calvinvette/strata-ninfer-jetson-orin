@@ -35,3 +35,30 @@ tegrastats and owner-accounting summary. `run_vision_smoke.py` reproduces the
 bounded API request; it uses the paths passed on the command line and writes
 all runtime artifacts beneath its output directory. Model artifacts and the
 CUDA encoder build remain outside Git.
+
+## Separate-process CUDA allocation probe
+
+A test-only `LD_PRELOAD` probe wrapped successful CUDA runtime `cudaMalloc`,
+`cudaMallocManaged` and `cudaFree` calls and tagged each record with PID. The
+corrected supervised image request passed HTTP 200, returned 41 prompt tokens
+and 48 output tokens, and completed in 10.34 seconds. Minimum host
+`MemAvailable` was 7,740,080,128 bytes (7.21 GiB).
+
+The `strata-vision` PID peaked at 913,686,144 bytes (871.4 MiB) in tracked
+runtime allocations during model load/warmup; its tracked current bytes returned
+to zero on process exit. The separate main-engine PID reached a tracked
+19,027,389,968-byte (17.72 GiB) high-water mark. Do not add these numbers to
+each other or to host RAM: they are concurrent API allocation ledgers on one
+unified-memory device, while the supervisor's host availability is the physical
+memory authority. The passing supervised run is the admission evidence.
+
+This probe is a lower bound: it does not interpose CUDA driver allocation APIs,
+stream-ordered pools, graph executable resources or all vendor-library internal
+allocations, and it does not identify which process caused the full system
+physical-memory peak. The original vision smoke report's owner trace also omits
+those scopes. Treat these PID-tagged CUDA calls as attribution evidence, not a
+complete memory total. Source, build command/hash, probe output, and the
+supervisor's full telemetry are retained under `alloc-probe/`. Its first
+invocation failed before making an image request because it named a fixture
+path that does not exist in this checkout; that failed run is retained in
+`alloc-probe/supervisor/` and the corrected run is in `alloc-probe/supervisor2/`.

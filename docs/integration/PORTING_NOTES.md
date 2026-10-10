@@ -295,6 +295,13 @@ on Orin above the six-GiB floor, but the engine owner trace did not include the
 encoder process or graph-pool bytes. A Splash port should record image decode,
 Metal encoder allocations, embedding lifetime and model-side image buffers as
 separate owners, then validate the total with system memory-pressure telemetry.
+An Oct 10 process-tagged CUDA runtime probe attributed 871.4 MiB of tracked
+allocation high-water to the encoder PID and 17.72 GiB to the separate engine
+PID during a passing image request. These API ledgers are lower bounds and must
+not be added to each other or host RAM; driver/internal and graph-executable
+allocations are not fully observed. For Splash, tag allocations by process and
+resource lifetime while using unified physical pressure as the admission
+authority.
 
 CUDA's graph memory attributes report the asynchronous graph allocator; a
 calibration with graph allocation nodes confirmed those values, while Strata's

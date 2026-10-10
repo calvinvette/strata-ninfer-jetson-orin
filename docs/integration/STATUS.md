@@ -107,8 +107,12 @@ The candidate [vision-enabled image request](../../bench/results/2026-10-10-phas
 now passes with the optional CUDA encoder built locally. Its 56×56 image request
 completed at the six-GiB floor (minimum 7.22 GiB); startup reported 7.43 GiB
 available after cache, verifier and MTP setup. This is one small-image smoke
-point. The separate vision process and CUDA graph-pool bytes remain outside the
-owner trace, so this does not complete transient or graph peak accounting.
+point. A process-tagged CUDA runtime probe measured 871.4 MiB peak in
+`strata-vision` and a separate 17.72 GiB engine runtime-allocation high-water
+mark; both are attribution ledgers, not a physical-memory total. Host
+`MemAvailable` remained the authority (7.21 GiB minimum). The probe misses
+driver/internal and graph-executable memory, so transient and graph peak
+accounting remains incomplete.
 
 The [CUDA graph allocator probe](../../bench/results/2026-10-10-phase3-graph-memory-probe/README.md)
 observed 10 graph instantiations, 1,900 memory snapshots, and zero graph async-
