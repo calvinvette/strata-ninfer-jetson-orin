@@ -15,6 +15,27 @@ captured (the transient scope was not present at the sampler's selected path),
 and this did not run Strata inside the pressure scope. It does not close late
 workspace pressure or service recovery under active cgroup pressure.
 
+## Strata under an active cgroup cap
+
+The candidate engine then ran the existing IQ1_M native path inside a transient
+12 GiB scope, with `run_control.py` enforcing the normal 6 GiB effective
+availability floor. Startup completed, chose file-backed experts, sized the
+expert cache to 1,410 slots under the cap and completed profile fill. During
+the 512-token prefill the supervisor observed cgroup availability reach
+6,409,375,744 bytes, then terminated the command as its next sample crossed
+the floor. At that point host `MemAvailable` remained 22,215,254,016 bytes;
+the cgroup scope reached 6,475,526,144 bytes current of 12 GiB. This is a
+supervisor pressure abort, not an engine allocation failure or a completed
+request.
+
+A fresh run with the same binary, pack, profile, flags and workload outside the
+12 GiB scope passed, completed the 511-token prompt and generated one token.
+Its minimum host availability was 8,180,158,464 bytes (7.62 GiB). This shows
+fresh-process recovery after the supervisor ends a cgroup-limited engine. It
+does not demonstrate in-process recovery, state parity, or that the bounded
+12 GiB scope supports this workload. Raw outputs and cgroup/host samples are in
+`../2026-10-10-phase3-cgroup-engine/`.
+
 ## PLE artifact rerun
 
 The current `ple_parity` CTest was rerun against the downloaded Q2_0 shard and
