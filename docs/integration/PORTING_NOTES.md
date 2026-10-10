@@ -281,6 +281,11 @@ their whole-board energy values are not path comparisons. For future Strata plus
 Splash work, retain energy scope and clock availability with raw samples, and
 establish repeated-process state determinism before interpreting an energy
 delta. See the [failed diagnostic report](../../bench/results/2026-10-10-phase3-transfer-energy/README.md).
+The follow-up [same-mode repeat](../../bench/results/2026-10-10-phase3-transfer-state-repeat/README.md)
+reproduced differing persistent state in two identical mapped requests with the
+same tokens and MTP draft counts. For Splash, test repeated same-mode state
+stability before comparing alternative storage/transfer paths; paired output
+tokens alone do not establish equivalent internal execution.
 
 The [async-pool transfer screen](../results/2026-10-10-phase3-async-pool/README.md)
 adds a 64 MiB transient CUDA pool allocation/copy/kernel/free path beside pinned

@@ -101,9 +101,12 @@ adds per-request `tegrastats` rail integration and clock sampling. A first
 8K `spec4`/MTP repeat matched tokens in all three pairs but matched persistent
 state in only one; the other two differed across GDN, PLE, tail, pooled and KV
 fingerprints. Thus neither run qualifies a transfer or energy comparison, even
-though both stayed above the six-GiB floor. The earlier passing mapped/pread
-screen remains its own result; diagnose the repeated-run state instability before
-continuing this tradeoff.
+though both stayed above the six-GiB floor. A separate [same-mode repeat](../../bench/results/2026-10-10-phase3-transfer-state-repeat/README.md)
+emitted identical tokens and MTP draft counts across two mapped runs, but the
+same six persistent-state fields differed. This establishes run-to-run state
+instability independent of transfer mode; pause interpretation of new transfer
+timing/energy comparisons until that cause is identified. The earlier passing
+mapped/pread screen remains its own result.
 
 The traced [API cancellation and recovery run](../../bench/results/2026-10-10-phase3-cancel-recovery/README.md)
 passed all seven real-model protocol scenarios, including prefill and decode

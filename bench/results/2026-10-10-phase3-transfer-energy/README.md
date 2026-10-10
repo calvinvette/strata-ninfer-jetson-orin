@@ -30,3 +30,6 @@ evidence, but do not treat it as confirmation of this failed repeat. Both runs,
 including failures, are retained. No model or build artifacts are included.
 The corrected run's complete raw records are in
 [`2026-10-10-phase3-transfer-energy-spec4`](../2026-10-10-phase3-transfer-energy-spec4/).
+The same-mode [mapped repeat control](../2026-10-10-phase3-transfer-state-repeat/README.md)
+also failed persistent-state parity, showing that the discrepancy is not
+isolated to switching between mapped reads and pread.
