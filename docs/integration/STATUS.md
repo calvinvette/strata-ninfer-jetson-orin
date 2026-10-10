@@ -268,6 +268,13 @@ CUDA 12.6.68 and embedded SM87 images. Both source GGUF shards and all 31 MTP
 source tensors were independently rehashed against pinned digests. Prepared
 runtime packs have new identity hashes, not new numerical qualification.
 
+A separate [Q2_0 runtime admission smoke](../../bench/results/2026-10-10-phase3-q2-runtime-smoke/README.md)
+did not reach prefill: the available 48×256 expert profile is incompatible
+with Q2_0's 48×512 layout, and the generic MTP converter rejects this artifact's
+GGML type-42 tensor. All attempts stayed above the six-GiB floor. The PLE block
+oracle therefore remains block-level evidence; Q2_0 model execution is not yet
+qualified.
+
 Fresh paired controls cover all five exact workloads in four independent process
 pairs (40 measured requests plus 40 warmups). Actual cache/KV/MTP resources match.
 Three pairs have GPU/EMC observations in every measured request window; the first
