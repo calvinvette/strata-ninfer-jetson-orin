@@ -1,0 +1,268 @@
+{
+  "scope": "prefill chunk \u00d7 cache-borrowed versus separately owned workspace; one short workload per process; admission diagnostics only",
+  "seed": 10092027,
+  "run_order": [
+    "chunk512-borrow",
+    "chunk512-owned",
+    "chunk64-owned",
+    "chunk64-borrow"
+  ],
+  "cells": [
+    {
+      "name": "chunk512-borrow",
+      "prefill_chunk": 512,
+      "workspace_mode": "borrowed",
+      "status": "pass",
+      "config": "chunk512-borrow/config.json",
+      "minimum_available_bytes": 8041996288,
+      "actual_expert_slots": 7088,
+      "expert_cache_mib": 13809,
+      "vram_free_mib": 8031,
+      "reservation_events": [
+        {
+          "label": "expert-cache.mtp-bind",
+          "instance": 281474835763568,
+          "device": 0,
+          "bytes": 229612776
+        },
+        {
+          "label": "expert-cache.vram-slack",
+          "instance": 281474835763568,
+          "device": 0,
+          "bytes": 3221225472
+        }
+      ],
+      "owners": [
+        {
+          "owner": "expert-cache",
+          "peak_bytes": 14480742400,
+          "live_end_bytes": 0
+        },
+        {
+          "owner": "mtp",
+          "peak_bytes": 14177744,
+          "live_end_bytes": 0
+        },
+        {
+          "owner": "prefill",
+          "peak_bytes": 2048,
+          "live_end_bytes": 0
+        },
+        {
+          "owner": "session",
+          "peak_bytes": 235033088,
+          "live_end_bytes": 235033088
+        },
+        {
+          "owner": "verifier",
+          "peak_bytes": 77960704,
+          "live_end_bytes": 0
+        }
+      ],
+      "request_summary": [
+        {
+          "cell": "repeat-172-tg8-capacity-diagnostic",
+          "passed_samples": 1,
+          "planned_samples": 1,
+          "median_prompt_per_second": 114.8,
+          "median_predicted_per_second": 20.8
+        }
+      ]
+    },
+    {
+      "name": "chunk512-owned",
+      "prefill_chunk": 512,
+      "workspace_mode": "owned",
+      "status": "pass",
+      "config": "chunk512-owned/config.json",
+      "minimum_available_bytes": 8288296960,
+      "actual_expert_slots": 6857,
+      "expert_cache_mib": 13353,
+      "vram_free_mib": 8082,
+      "reservation_events": [
+        {
+          "label": "expert-cache.mtp-bind",
+          "instance": 281474689884640,
+          "device": 0,
+          "bytes": 229612776
+        },
+        {
+          "label": "expert-cache.prefill-workspace",
+          "instance": 281474689884640,
+          "device": 0,
+          "bytes": 524288000
+        },
+        {
+          "label": "expert-cache.vram-slack",
+          "instance": 281474689884640,
+          "device": 0,
+          "bytes": 3221225472
+        }
+      ],
+      "owners": [
+        {
+          "owner": "expert-cache",
+          "peak_bytes": 14002406400,
+          "live_end_bytes": 0
+        },
+        {
+          "owner": "mtp",
+          "peak_bytes": 14177744,
+          "live_end_bytes": 0
+        },
+        {
+          "owner": "prefill",
+          "peak_bytes": 380273152,
+          "live_end_bytes": 0
+        },
+        {
+          "owner": "session",
+          "peak_bytes": 235033088,
+          "live_end_bytes": 235033088
+        },
+        {
+          "owner": "verifier",
+          "peak_bytes": 77960704,
+          "live_end_bytes": 0
+        }
+      ],
+      "request_summary": [
+        {
+          "cell": "repeat-172-tg8-capacity-diagnostic",
+          "passed_samples": 1,
+          "planned_samples": 1,
+          "median_prompt_per_second": 109.9,
+          "median_predicted_per_second": 19.3
+        }
+      ]
+    },
+    {
+      "name": "chunk64-owned",
+      "prefill_chunk": 64,
+      "workspace_mode": "owned",
+      "status": "pass",
+      "config": "chunk64-owned/config.json",
+      "minimum_available_bytes": 8255385600,
+      "actual_expert_slots": 7011,
+      "expert_cache_mib": 13655,
+      "vram_free_mib": 7844,
+      "reservation_events": [
+        {
+          "label": "expert-cache.mtp-bind",
+          "instance": 281474181363152,
+          "device": 0,
+          "bytes": 229612776
+        },
+        {
+          "label": "expert-cache.prefill-workspace",
+          "instance": 281474181363152,
+          "device": 0,
+          "bytes": 211812352
+        },
+        {
+          "label": "expert-cache.vram-slack",
+          "instance": 281474181363152,
+          "device": 0,
+          "bytes": 3221225472
+        }
+      ],
+      "owners": [
+        {
+          "owner": "expert-cache",
+          "peak_bytes": 14319334400,
+          "live_end_bytes": 0
+        },
+        {
+          "owner": "mtp",
+          "peak_bytes": 14177744,
+          "live_end_bytes": 0
+        },
+        {
+          "owner": "prefill",
+          "peak_bytes": 228829184,
+          "live_end_bytes": 0
+        },
+        {
+          "owner": "session",
+          "peak_bytes": 235033088,
+          "live_end_bytes": 235033088
+        },
+        {
+          "owner": "verifier",
+          "peak_bytes": 77960704,
+          "live_end_bytes": 0
+        }
+      ],
+      "request_summary": [
+        {
+          "cell": "repeat-172-tg8-capacity-diagnostic",
+          "passed_samples": 1,
+          "planned_samples": 1,
+          "median_prompt_per_second": 58.9,
+          "median_predicted_per_second": 17.0
+        }
+      ]
+    },
+    {
+      "name": "chunk64-borrow",
+      "prefill_chunk": 64,
+      "workspace_mode": "borrowed",
+      "status": "pass",
+      "config": "chunk64-borrow/config.json",
+      "minimum_available_bytes": 8018960384,
+      "actual_expert_slots": 7113,
+      "expert_cache_mib": 13859,
+      "vram_free_mib": 7820,
+      "reservation_events": [
+        {
+          "label": "expert-cache.mtp-bind",
+          "instance": 281474794819296,
+          "device": 0,
+          "bytes": 229612776
+        },
+        {
+          "label": "expert-cache.vram-slack",
+          "instance": 281474794819296,
+          "device": 0,
+          "bytes": 3221225472
+        }
+      ],
+      "owners": [
+        {
+          "owner": "expert-cache",
+          "peak_bytes": 14533145600,
+          "live_end_bytes": 0
+        },
+        {
+          "owner": "mtp",
+          "peak_bytes": 14177744,
+          "live_end_bytes": 0
+        },
+        {
+          "owner": "prefill",
+          "peak_bytes": 228829184,
+          "live_end_bytes": 0
+        },
+        {
+          "owner": "session",
+          "peak_bytes": 235033088,
+          "live_end_bytes": 235033088
+        },
+        {
+          "owner": "verifier",
+          "peak_bytes": 77960704,
+          "live_end_bytes": 0
+        }
+      ],
+      "request_summary": [
+        {
+          "cell": "repeat-172-tg8-capacity-diagnostic",
+          "passed_samples": 1,
+          "planned_samples": 1,
+          "median_prompt_per_second": 58.0,
+          "median_predicted_per_second": 17.7
+        }
+      ]
+    }
+  ]
+}
