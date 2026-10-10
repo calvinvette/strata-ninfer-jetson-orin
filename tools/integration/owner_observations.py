@@ -9,6 +9,7 @@ PREFIX = 'strata integration: '
 def summarize(lines):
     live, peaks, current, graphs, views, payloads, reservations, mapped = {}, {}, {}, {}, {}, {}, {}, {}
     range_maps = range_unmaps = 0
+    observed_current_by_device, observed_peak_by_device = {}, {}
     allocations = frees = 0
     for line in lines:
         if not line.startswith(PREFIX):
@@ -32,13 +33,18 @@ def summarize(lines):
             live[key] = (owner, size)
             current[owner] = current.get(owner, 0) + size
             peaks[owner] = max(peaks.get(owner, 0), current[owner])
+            observed_current_by_device[row['device']] = observed_current_by_device.get(row['device'], 0) + size
+            observed_peak_by_device[row['device']] = max(
+                observed_peak_by_device.get(row['device'], 0), observed_current_by_device[row['device']])
             allocations += 1
         elif row['kind'] == 'free':
             if key not in live or live[key][0] != owner:
                 raise ValueError('unmatched free or conflicting allocation owner')
             if key in mapped:
                 raise ValueError('physical VMM handle released while it is still mapped')
-            current[owner] -= live.pop(key)[1]
+            _, size = live.pop(key)
+            current[owner] -= size
+            observed_current_by_device[row['device']] -= size
             frees += 1
         elif row['kind'] == 'map':
             size = row['requested_bytes']
@@ -81,6 +87,10 @@ def summarize(lines):
         'graph_bytes': 'unsupported; counts do not measure driver or graph-pool bytes',
         'cleanup': 'live at log end is not a leak verdict; process termination may bypass destructors',
         'allocation_events': allocations, 'free_events': frees,
+        'observed_allocation_bytes_by_device': {
+            'scope': 'concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory',
+            'peak': {str(device): size for device, size in sorted(observed_peak_by_device.items())},
+            'live_at_log_end': {str(device): size for device, size in sorted(observed_current_by_device.items())}},
         'vmm_range_mappings': {
             'map_events': range_maps, 'unmap_events': range_unmaps,
             'still_mapped_at_log_end': [

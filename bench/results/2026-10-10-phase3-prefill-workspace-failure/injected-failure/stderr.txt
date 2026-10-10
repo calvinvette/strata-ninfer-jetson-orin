@@ -1,0 +1,49 @@
+strata generate: PCIe probe: 23.1 GB/s host->device (best of 9.2 23.1 23.1 23.1) -> pcie_frac 0.55 (default 0.55)
+strata generate: ARM CPU experts use ggml-cpu's native kernels
+strata generate: native pack: /home/calvin/models/strata-orin-validation/pack experts (largest blob 2.66 MB), token embedding IQ4_XS in mapped host memory (322 MiB, 0.3 s)
+strata generate: 1406 MiB of weights loaded from /home/calvin/models/strata-orin-validation/pack in 1.0 s (302 canonical tensors skipped: served natively)
+strata generate: 300 native projection matrices, 2018.88 MiB of weights, in 1.6 s
+strata generate: the SSD is kept awake while rows are read: one page of the table after 100 ms without a read, until 60 s after the last request (STRATA_SSD_KEEPALIVE=0 turns it off)
+strata generate: profile data/expert-profile-coder.bin: 12288 ranked pairs, built for 12288 slots
+strata integration: {"schema":1,"monotonic_s":933973.252216811,"owner":"session","kind":"allocate","instance":281474068245824,"allocation":12691300352,"requested_bytes":235033088,"device":0,"count":0}
+strata generate: PLE on, table 320001536 rows of /home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf
+strata generate: experimental native Q5_K head, 521472000 bytes, in 0.4 s
+strata generate: integrated CUDA GPU: CPU and GPU share physical RAM; allocation headroom 6.00 GiB, managed concurrency 0
+strata generate: the 23.42 GiB expert arena does not fit available shared RAM with headroom; using file-backed experts (--mmap-experts)
+strata generate: GPU 0: Orin, compute capability 8.7
+strata generate: experts via mmap (--mmap-experts; the A/B arm of R2.1)
+strata generate: CPU pool tasks/phase: 36 (automatic), participating threads: 12
+strata generate: 11 pool workers on logical processors 1,2,3,4,5,6,7,8,9,10,11, the host thread on 0 (draining too) (--host-core first)
+strata generate: shared RAM: automatic expert cache keeps 3072 MiB for late prompt, verification and CUDA workspaces, in addition to physical RAM headroom
+strata integration: {"schema":1,"monotonic_s":933973.708800568,"owner":"expert-cache.vram-slack","kind":"reservation","instance":281474068213136,"allocation":0,"requested_bytes":3221225472,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":933973.708812920,"owner":"expert-cache.prefill-workspace","kind":"reservation","instance":281474068213136,"allocation":0,"requested_bytes":524288000,"device":0,"count":0}
+strata generate: expert cache auto: 17.63 GiB free, 3072 MiB reserved (+0 MiB for the draft head) -> 5701 slots
+strata integration: {"schema":1,"monotonic_s":933977.084065480,"owner":"expert-cache","kind":"allocate","instance":281474068213136,"allocation":13447811072,"requested_bytes":15177113600,"device":0,"count":0}
+strata generate: expert cache 7428 slots, 14.13 GiB of shared RAM allocated to the GPU; policy is
+strata generate: the GPU computes the experts in the cache; it rounds differently from the CPU,
+                 so a reply can differ slightly from a run without the cache (same quality:
+                 bench/results/2026-09-27-cache-parity).
+                 PROFILE, ranked by routing frequency, no eviction.
+strata generate: the profile fill asks for 256 pairs ahead (STRATA_FILL_AHEAD)
+strata generate: pre-filled 7428 of 7428 slots from the profile in 9.1 s (1675 MB/s); slot 0 verified
+strata generate: R4 hit path ON - resident experts are computed on the GPU
+strata generate: 11 expert-pool workers + the host thread
+strata generate: session is up (engine 0.1.41)
+strata generate: sampling greedy
+strata generate: token graph hit path: 7428 resident experts, decided on the device
+prefill: the CPU share is ON by default for prompt chunks below 1024 tokens (the idle CPU takes some of the experts the GPU would stream; answers can differ slightly from 0.1.40.3, mean KL ~0.004). STRATA_PREFILL_CPU_SHARE=0 turns it off.
+strata generate: prompt path allocates its own buffers (no cache slots to borrow)
+strata integration: {"schema":1,"monotonic_s":933986.552632045,"owner":"prefill","kind":"allocate","instance":187650273999456,"allocation":11349996032,"requested_bytes":2048,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":933986.654940796,"owner":"prefill","kind":"allocate","instance":187650273999456,"allocation":28678008832,"requested_bytes":67109120,"device":0,"count":0}
+TEST_SHIM: refused one 33554688-byte CUDA GEMM workspace allocation
+/tmp/strata-fail-prefill-ws.so(cudaMalloc+0x124)[0xffff96de0a94]
+build/integration/candidate/strata(+0x15fc88)[0xaaaaab81fc88]
+build/integration/candidate/strata(+0x16c880)[0xaaaaab82c880]
+build/integration/candidate/strata(+0x322d4)[0xaaaaab6f22d4]
+/lib/aarch64-linux-gnu/libc.so.6(+0x273fc)[0xffff8f1673fc]
+/lib/aarch64-linux-gnu/libc.so.6(__libc_start_main+0x98)[0xffff8f1674cc]
+build/integration/candidate/strata(+0x658f0)[0xaaaaab7258f0]
+strata generate: prefill: GEMM scratch does not fit
+strata integration: {"schema":1,"monotonic_s":933986.691955975,"owner":"prefill","kind":"free","instance":187650273999456,"allocation":11349996032,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":933986.694140779,"owner":"prefill","kind":"free","instance":187650273999456,"allocation":28678008832,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":933987.270461740,"owner":"expert-cache","kind":"free","instance":281474068213136,"allocation":13447811072,"requested_bytes":0,"device":0,"count":0}

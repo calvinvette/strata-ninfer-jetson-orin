@@ -1,0 +1,63 @@
+{
+  "command": [
+    "build/integration/candidate/strata",
+    "--pack",
+    "/home/calvin/models/strata-orin-validation/pack",
+    "--native",
+    "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+    "--expert-profile",
+    "data/expert-profile-coder.bin",
+    "--spec",
+    "4",
+    "--prefill",
+    "512",
+    "--tokens-file",
+    "build/integration/workloads/pp512-tg64.tokens",
+    "--max-context",
+    "4096",
+    "--max-new",
+    "1",
+    "--expert-cache",
+    "auto",
+    "--ple-gguf",
+    "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf"
+  ],
+  "cwd": "/home/calvin/workspace/strata-ninfer-jetson-orin",
+  "status": "pass",
+  "floor_bytes": 6442450944,
+  "started_wall_s": 1791664320.2933123,
+  "energy_scope": "not measured; raw tegrastats rails only",
+  "counters": "engine stdout/stderr; unavailable counters are not inferred",
+  "initial_memory": {
+    "monotonic_s": 933489.866851964,
+    "wall_time_s": 1791664320.2953904,
+    "available_bytes": 26191581184,
+    "total_bytes": 32187883520,
+    "swap_used_bytes": 1145831424,
+    "cgroups": [
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/session-388.scope",
+        "current_bytes": 12544614400,
+        "max_bytes": null
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice",
+        "current_bytes": 12720623616,
+        "max_bytes": null
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice",
+        "current_bytes": 12721139712,
+        "max_bytes": null
+      }
+    ],
+    "cgroup_v2_observed": true,
+    "admission_available_bytes": 26191581184
+  },
+  "tegrastats": "started; inspect raw log for availability",
+  "reason": "command exit; numerical/workload qualification is separate",
+  "minimum_available_bytes": 9493749760,
+  "returncode": 0,
+  "elapsed_s": 32.66532369691413,
+  "finished_wall_s": 1791664353.0251908
+}

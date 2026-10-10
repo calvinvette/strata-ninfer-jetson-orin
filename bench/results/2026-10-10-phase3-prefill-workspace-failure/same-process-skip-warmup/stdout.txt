@@ -1,0 +1,58 @@
+{
+  "checks": [
+    {
+      "name": "injected_failure",
+      "http_status": 200,
+      "body": {
+        "id": "chatcmpl-65940736e4494295b3e49f2c",
+        "object": "chat.completion",
+        "created": 1791665305,
+        "model": "Qwen3.8-Flash-Next-Coder-IQ1_M-Orin-validation",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "re"
+            },
+            "finish_reason": "length"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 17,
+          "completion_tokens": 1,
+          "total_tokens": 18,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 17,
+          "prompt_ms": 1873.8,
+          "prompt_per_token_ms": 110.224,
+          "prompt_per_second": 9.1,
+          "predicted_n": 1,
+          "predicted_ms": 110.9,
+          "predicted_per_token_ms": 110.9,
+          "predicted_per_second": 9.0,
+          "draft_n": 0,
+          "draft_n_accepted": 0
+        }
+      }
+    }
+  ],
+  "server_pid": 2462086,
+  "port": 18123,
+  "health": {
+    "status": "ok",
+    "max_context": 4096,
+    "model": "Qwen3.8-Flash-Next-Coder-IQ1_M-Orin-validation",
+    "images": false,
+    "api_key": false,
+    "loaded": true,
+    "service": "strata"
+  },
+  "status": "fail",
+  "reason": "AssertionError: first request did not surface the injected prefill GEMM workspace failure"
+}

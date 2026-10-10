@@ -28,6 +28,26 @@ class OwnerObservationTests(unittest.TestCase):
         self.assertEqual(result['owners'][0]['peak_observed_requested_bytes'], 30)
         self.assertEqual(result['owners'][0]['live_observed_requested_bytes'], 0)
         self.assertEqual(result['owners'][0]['successful_graph_instantiations'], 1)
+        self.assertEqual(result['observed_allocation_bytes_by_device']['peak'], {'0': 30})
+        self.assertEqual(result['observed_allocation_bytes_by_device']['live_at_log_end'], {'0': 0})
+
+    def test_allocation_peaks_are_concurrent_across_owners_and_domains(self):
+        def row(owner, kind, address, size, device):
+            return PREFIX + json.dumps(dict(schema=1, owner=owner, kind=kind,
+                allocation=address, requested_bytes=size, instance=1,
+                device=device, count=0))
+
+        result = summarize([
+            row('session', 'allocate', 101, 100, 0),
+            row('expert-cache', 'allocate', 102, 200, 0),
+            row('expert-stage-pinned-host', 'allocate', 103, 50, -1),
+            row('session', 'free', 101, 0, 0),
+            row('expert-cache', 'free', 102, 0, 0),
+            row('expert-stage-pinned-host', 'free', 103, 0, -1),
+        ])
+        totals = result['observed_allocation_bytes_by_device']
+        self.assertEqual(totals['peak'], {'-1': 50, '0': 300})
+        self.assertEqual(totals['live_at_log_end'], {'-1': 0, '0': 0})
 
     def test_pinned_and_pageable_expert_staging_are_separate_host_owners(self):
         rows = []

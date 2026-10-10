@@ -11,7 +11,7 @@ component has been promoted into Strata.
 | 0 — Repository and import | Complete | Pinned source/evidence manifest, source mapping, plan, offline planner checks |
 | 1 — Same-day controls | Complete | Four same-day paired API blocks; exact workloads/artifacts; protocol and baseline checks; capability matrix records limits; expanded HIP/SYCL builds compile |
 | 2 — Operator/state contracts | Complete | Ownership review, incompatible projection-profile rejection, independent RMS/IQ4_NL/Q6_K oracles, GDN prefix checks, default spec1 regression and post-fix spec1/spec4 token plus nine-field persistent-state parity recorded; native/HIP/SYCL build evidence and eleven selector tests pass; no NInfer execution component promoted |
-| 3 — Memory and transfers | In progress | Opt-in trace covers ordinary ExpertCache, CUDA segmented-cache mapped VMM handles, shared CUDA VMM physical-chunk lifetimes and per-range map/unmap transitions, primary SessionState, verifier, prefill, MTP and separate pageable/pinned expert-stage host owners; Orin shrink/regrow lifecycle test preserved slot data and matched 41 allocate/free events; injected pinned-registration failures fell back to working pageable copies under the six-GiB supervisor; two randomized fixed-cache 4K staging screens matched tokens and nine state fields; the trace-corrected clocked repeat found +0.10% median prompt time and variable decode results with dynamic CPU/GPU clocks; minimum availability was 8.04 GiB; a randomized 2×2 requested-cache/context screen completed all cells above the six-GiB floor, with actual slots 3903/6519; a 2×2 prefill-chunk/borrowed-vs-owned screen observed separate 202/500 MiB workspace holds and remained above 7.47 GiB; owned chunk 1024/2048 follow-up reserved up to 1520 MiB and remained above 7.72 GiB; an exact 2048-token prompt completed against the 2048 owned chunk with 8.02 GiB minimum availability; the Oct 10 supervised 10-test Phase 3 CTest set passes with 27.94 GiB minimum availability; the fixture-free PLE block oracle cannot consume this Q2_0 pack's native key/BF16 value representation, so PLE parity remains unsupported pending an artifact-aware oracle; process-wide ownership, pressure failures and other transfer experiments remain |
+| 3 — Memory and transfers | In progress | Opt-in trace covers ordinary ExpertCache, CUDA segmented-cache mapped VMM handles, shared CUDA VMM physical-chunk lifetimes and per-range map/unmap transitions, primary SessionState, verifier, prefill, MTP and separate pageable/pinned expert-stage host owners; Orin shrink/regrow lifecycle test preserved slot data and matched 41 allocate/free events; injected pinned-registration failures fell back to working pageable copies under the six-GiB supervisor; one injected expert-stage `cudaHostAlloc` refusal produced an observed pageable owner allocation/free, while five sibling pinned buffers also balanced at teardown; the 10 instrumented allocation/free pairs in this request matched, with zero observed live bytes at teardown; the request and forced-pageable control generated one token above the memory floor (targeted test minimum 7.58 GiB); two randomized fixed-cache 4K staging screens matched tokens and nine state fields; the trace-corrected clocked repeat found +0.10% median prompt time and variable decode results with dynamic CPU/GPU clocks; minimum availability was 8.04 GiB; a randomized 2×2 requested-cache/context screen completed all cells above the six-GiB floor, with actual slots 3903/6519; a 2×2 prefill-chunk/borrowed-vs-owned screen observed separate 202/500 MiB workspace holds and remained above 7.47 GiB; owned chunk 1024/2048 follow-up reserved up to 1520 MiB and remained above 7.72 GiB; an exact 2048-token prompt completed against the 2048 owned chunk with 8.02 GiB minimum availability; the Oct 10 supervised 10-test Phase 3 CTest set passes with 27.94 GiB minimum availability; a simulated expert-cache allocation failure retried at 4,753 slots, then completed prefill and one generated token with 12.91 GiB minimum availability; the fixture-free PLE block oracle cannot consume this Q2_0 pack's native key/BF16 value representation, so PLE parity remains unsupported pending an artifact-aware oracle; broader real pressure and other transfer experiments remain |
 | 4 — SM87/ARM kernels | Not started | Pinned request profile prepared; bottleneck attribution, qualified candidate and request confirmation pending |
 | 5 — Speculation and graphs | Not started | Accepted-prefix state, graph lifetime and drift qualification |
 | 6 — Multivariate tuning | Not started | Randomized paired campaign, interactions, uncertainty, held-out confirmation |
@@ -42,8 +42,35 @@ screens do not close Phase 3's broader pressure, unique-backing or transfer gate
 The [pinned registration fallback check](../../bench/results/2026-10-09-pinned-fallback-pressure/README.md)
 forces `cudaHostRegister` failure in the existing arena test, confirms the
 registration error is cleared, and verifies a pageable copy round trip. This
-does not force `cudaHostAlloc` failure in the separate expert-stage pool and
-does not simulate memory pressure.
+is complemented by the [expert-stage `cudaHostAlloc` fallback check](../../bench/results/2026-10-10-phase3-stage-hostalloc-failure/README.md):
+one precisely targeted allocation failure produced a pageable expert-stage
+owner, the request completed, and the pageable plus pinned buffers all had
+matching teardown events. Neither test simulates actual memory pressure.
+
+The [expert-cache allocation retry](../../bench/results/2026-10-10-phase3-cache-failure-retry/README.md)
+injects one automatic-cache allocation failure in the real IQ1_M Orin path.
+The engine retries with a smaller cache, populates its profile and completes a
+511-token prompt plus one generated token. This qualifies that retry path under
+the six-GiB floor, not actual system pressure, `cudaHostAlloc` fallback, or a
+performance difference.
+
+The [late prefill-workspace failure check](../../bench/results/2026-10-10-phase3-prefill-workspace-failure/README.md)
+refuses the owned path's 32 MiB GEMM workspace after the FP16 scratch has been
+allocated. The CLI fails cleanly, traces frees for the partial prefill owner and
+cache, and stays above the six-GiB floor; its session owner remains live until
+process exit. A fresh no-fault process completes the same request. A same-server
+API probe showed the 32 MiB workspace is allocated during server warmup and
+reused by the first client request; allowing warmup therefore did not inject a
+request failure. That recovery check is inconclusive, and same-process recovery
+after a late workspace failure remains untested.
+
+An actual cgroup-v2 [admission check](../../bench/results/2026-10-10-phase3-cgroup-admission/README.md)
+placed the supervisor in a 1 GiB systemd user scope. It saw only 1.0 GiB of
+effective cgroup availability despite 24.6 GiB host availability and aborted
+before launching its child. This validates the cgroup-aware prelaunch guard,
+not behavior under active cgroup pressure. The owner summarizer also now reports
+concurrent observed allocation-request peaks across owners per device; it still
+excludes uninstrumented allocations and is not the physical memory authority.
 
 The [requested cache × context screen](../../bench/results/2026-10-09-phase3-cache-context-matrix/README.md)
 ran a randomized 2×2 configuration matrix on Orin with one short API workload

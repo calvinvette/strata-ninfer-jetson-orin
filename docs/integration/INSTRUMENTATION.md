@@ -57,6 +57,12 @@ may bypass destructors, so this is not automatically a leak. Absence of records
 fails rather than reporting zero usage. Requested bytes exclude allocator backing
 granularity, other allocations by the same owner and driver/graph overhead. The
 parser is a research observation tool, not another physical-memory authority.
+The summary now also reports concurrent allocation-request peaks by device
+across all observed owners. It counts each live `(device, allocation identity)`
+once; mapped range transfers, repeated/overlapping views, planned reservations
+and graph instantiations are excluded. Device-local totals must stay separate:
+they do not represent one physical pool on discrete-GPU systems, and untraced
+allocations remain outside the totals.
 
 Automatic expert-cache sizing also emits opt-in `reservation` events for its
 explicit VRAM slack and any priced MTP bind, owned-prefill workspace and pipeline
