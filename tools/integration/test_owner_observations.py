@@ -80,7 +80,7 @@ class OwnerObservationTests(unittest.TestCase):
         self.assertEqual(owner['live_observed_requested_bytes'], 0)
         self.assertEqual(result['allocation_events'], 3)
         self.assertEqual(result['free_events'], 3)
-        self.assertIn('CUDA segmented ExpertCache mapped VMM physical segments', result['coverage'])
+        self.assertIn('CUDA VMM address reservations and physical segments/chunks', result['coverage'])
 
     def test_shared_vmm_chunk_lifetime_is_independent_of_range_owner(self):
         def chunk(kind, handle, size=0):
@@ -181,6 +181,32 @@ class OwnerObservationTests(unittest.TestCase):
         self.assertEqual(sum(r['bytes'] for r in result['planned_reservations']['events']), 60)
         self.assertIn('never added', result['planned_reservations']['scope'])
 
+    def test_virtual_address_reservations_are_tracked_separately_from_backing(self):
+        def va(kind, address, size, instance=3):
+            return PREFIX + json.dumps(dict(schema=1, owner='cuda-vmm-address-range',
+                kind=kind, allocation=address, requested_bytes=size, instance=instance,
+                device=0, count=0))
+
+        result = summarize([event('allocate', 901, 32), va('address_reserve', 902, 1 << 30),
+            event('free', 901), va('address_release', 902, 1 << 30)])
+        self.assertEqual(result['allocation_events'], 1)
+        self.assertEqual(result['observed_allocation_bytes_by_device']['peak'], {'0': 32})
+        self.assertEqual(result['virtual_address_ranges']['reserve_events'], 1)
+        self.assertEqual(result['virtual_address_ranges']['release_events'], 1)
+        self.assertEqual(result['virtual_address_ranges']['peak_reserved_bytes_by_device'], {'0': 1 << 30})
+        self.assertEqual(result['virtual_address_ranges']['live_reserved_bytes_by_device'], {'0': 0})
+        self.assertIn('never added', result['virtual_address_ranges']['scope'])
+
+    def test_virtual_address_release_must_match_owner_address_and_size(self):
+        reserve = PREFIX + json.dumps(dict(schema=1, owner='cuda-vmm-address-range',
+            kind='address_reserve', allocation=903, requested_bytes=1 << 20,
+            instance=3, device=0, count=0))
+        release = PREFIX + json.dumps(dict(schema=1, owner='cuda-vmm-address-range',
+            kind='address_release', allocation=903, requested_bytes=2 << 20,
+            instance=3, device=0, count=0))
+        with self.assertRaises(ValueError):
+            summarize([event('allocate', size=1), reserve, release])
+
     def test_duplicate_planned_reservation_label_is_rejected(self):
         with self.assertRaises(ValueError):
             summarize([event('allocate', size=1), reservation('cache.prefill', 2),
@@ -196,6 +222,8 @@ int main() {
   strata::platform::integration_trace::event("verifier", "view", &allocation, &allocation, 16, 0, 1);
   strata::platform::integration_trace::reservation("expert-cache.prefill-workspace", &allocation, 64, 0);
   strata::platform::integration_trace::event("verifier", "free", &allocation, &allocation, 0, 0);
+  strata::platform::integration_trace::event("cuda-vmm-address-range", "address_reserve", &allocation, &allocation, 128, 0);
+  strata::platform::integration_trace::event("cuda-vmm-address-range", "address_release", &allocation, &allocation, 128, 0);
 }'''
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory)
@@ -218,3 +246,5 @@ int main() {
             self.assertEqual(result['owners'][0]['live_observed_requested_bytes'], 0)
             self.assertEqual(result['owners'][0]['view_events'], 1)
             self.assertEqual(result['planned_reservations']['events'][0]['bytes'], 64)
+            self.assertEqual(result['virtual_address_ranges']['reserve_events'], 1)
+            self.assertEqual(result['virtual_address_ranges']['release_events'], 1)

@@ -317,6 +317,9 @@ bool ExpertCache::open_segmented(uint64_t want, std::string& err) {
     }
     base_ = reinterpret_cast<uint8_t*>(va);
     reserved_ = total;
+    strata::platform::integration_trace::event(
+        "cuda-vmm-address-range", "address_reserve", this,
+        reinterpret_cast<const void*>(static_cast<uintptr_t>(va)), total, dev);
     for (uint64_t at = 0; at < total; at += (uint64_t) seg_) {
         segs_.push_back(0);
         seg_size_.push_back((int64_t) std::min<uint64_t>((uint64_t) seg_, total - at));
@@ -357,7 +360,11 @@ void ExpertCache::release_segmented() {
                     "expert-cache-vmm-segment", "free", this,
                     reinterpret_cast<const void*>(static_cast<uintptr_t>(segs_[i])), 0, seg_device_);
         }
-    if (base_ != nullptr && reserved_ > 0) v.address_free(va, (size_t) reserved_);
+    if (base_ != nullptr && reserved_ > 0 &&
+        v.address_free(va, (size_t) reserved_) == CUDA_SUCCESS)
+        strata::platform::integration_trace::event(
+            "cuda-vmm-address-range", "address_release", this,
+            reinterpret_cast<const void*>(static_cast<uintptr_t>(va)), reserved_, seg_device_);
 #endif
     segs_.clear();
     seg_size_.clear();

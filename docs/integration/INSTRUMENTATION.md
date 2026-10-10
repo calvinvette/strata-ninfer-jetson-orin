@@ -17,9 +17,10 @@ and batch-slot session allocations remain outside this trace.
 The CUDA/HIP ordinary single-block `ExpertCache` backing has matching
 allocation/free events. CUDA segmented-cache mode (`--vram-elastic`) reports
 one `expert-cache-vmm-segment` allocation per successfully mapped physical
-handle and a matching free after successful unmap/release. The reserved virtual
-address range is excluded. This supports cache shrink/grow observation without
-treating address reservation as device memory. Shared KV VMM chunks that move
+handle and a matching free after successful unmap/release. The virtual address
+range has separate `cuda-vmm-address-range` reserve/release events. This
+supports cache shrink/grow observation without treating address reservation as
+device memory. Shared KV VMM chunks that move
 between cache and KV ownership use a stable physical-chunk owner: allocation
 remains live across range transfers and ends only on successful handle release.
 `cuda-vmm-range` map/unmap events record those transfers without adding mapped
@@ -51,9 +52,13 @@ owners and unsupported schema/kinds. VMM segment handles use the same lifetime
 checks, so a shrink followed by regrowth can reuse a released handle identity
 without overlapping its earlier lifetime. Shared VMM map/unmap records keep a
 chunk's allocation lifetime intact while it changes range owners and reject a
-release while still mapped. It tracks only the observed requested
-payloads. A live allocation at log end is reported explicitly; process termination
-may bypass destructors, so this is not automatically a leak. Absence of records
+release while still mapped. Virtual-address events must match on owner, address,
+device and exact size; failed releases stay visible as live ranges at log end.
+Address-space bytes, physical handles, mapped ranges and budget reservations
+remain separate report dimensions. The physical allocation ledger still tracks
+only observed requested payloads. A live allocation at log end is reported
+explicitly; process termination may bypass destructors, so this is not
+automatically a leak. Absence of records
 fails rather than reporting zero usage. Requested bytes exclude allocator backing
 granularity, other allocations by the same owner and driver/graph overhead. The
 parser is a research observation tool, not another physical-memory authority.
@@ -109,9 +114,9 @@ bytes or physical memory. Device identities on frees come from the owning device
 The expanded [evidence report](../../bench/results/2026-10-09-prefill-mtp-owner-trace/README.md)
 compares owned and borrowed prefill, and trace-off protocol checks. Remaining
 sites include verifier mapped staging/auxiliary/batch buffers, MTP weight-load
-allocations, layer-stage and batch-slot session arenas, VMM virtual-address
-reservations and graph capture/destroy/pool observations. Phase 3 must distinguish unique physical backing, views and future
-reservations. Phase 1 needs explicit counters and unsupported scopes; do not
+allocations, layer-stage and batch-slot session arenas, and graph
+capture/destroy/pool observations. Phase 3 must distinguish unique physical
+backing, views and future reservations. Phase 1 needs explicit counters and unsupported scopes; do not
 mistake a partial requested-byte trace for the later accounting gate.
 
 The local Orin [segmented VMM lifecycle check](../../bench/results/2026-10-09-vmm-segment-owner-trace/README.md)
@@ -122,6 +127,10 @@ qualifies trace lifecycle and cache data preservation only.
 The shared-range [transfer check](../../bench/results/2026-10-09-vmm-segment-owner-trace/README.md)
 also records physical chunks once across ownership moves, with 11 matched
 map/unmap pairs and no mapping left live at teardown.
+The Oct 10 [virtual address reservation follow-up](../../bench/results/2026-10-10-phase3-vmm-va-reservation/README.md)
+records address ranges separately from mapped backing in both `vmm_test` and
+`expert_cache_segmented_test`; both tests balance reserve/release events and end
+with no range live.
 
 Shared owner edits require CUDA/HIP/SYCL builds, including migrated SYCL source
 copies where they exist. The latest native build and targeted tests pass for the

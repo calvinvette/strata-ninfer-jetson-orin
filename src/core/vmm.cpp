@@ -105,6 +105,9 @@ bool VmmRange::reserve(uint64_t bytes) {
     if (a.reserve(&p, (size_t) (n * a.gran), 0, 0, 0) != CUDA_SUCCESS) return false;
     base_ = (unsigned long long) p;
     h_.assign((size_t) n, 0);
+    strata::platform::integration_trace::event(
+        "cuda-vmm-address-range", "address_reserve", this,
+        reinterpret_cast<const void*>(static_cast<uintptr_t>(base_)), n * a.gran, a.dev);
     return true;
 }
 
@@ -112,7 +115,11 @@ void VmmRange::release() {
     if (base_ == 0) return;
     const Api& a = api();
     for (int64_t i = 0; i < chunks(); ++i) vmm_chunk_free(unmap(i));
-    a.free_va((CUdeviceptr) base_, (size_t) ((uint64_t) h_.size() * a.gran));
+    const uint64_t bytes = (uint64_t) h_.size() * a.gran;
+    if (a.free_va((CUdeviceptr) base_, (size_t) bytes) == CUDA_SUCCESS)
+        strata::platform::integration_trace::event(
+            "cuda-vmm-address-range", "address_release", this,
+            reinterpret_cast<const void*>(static_cast<uintptr_t>(base_)), bytes, a.dev);
     base_ = 0;
     h_.clear();
 }

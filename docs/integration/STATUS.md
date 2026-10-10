@@ -171,6 +171,14 @@ The `vmm_test` transfer moved two 2 MiB handles between ranges while preserving
 contents; the trace balanced nine chunk allocations with nine releases and
 reports map/unmap transitions separately from backing bytes.
 
+The [VMM address-range follow-up](../../bench/results/2026-10-10-phase3-vmm-va-reservation/README.md)
+now traces virtual address reserve/release separately from physical handles.
+The Orin `vmm_test` and segmented-cache lifecycle test passed with tracing on;
+both balanced two address-range lifetimes and ended with zero live address or
+physical bytes. In `vmm_test`, virtual-range peak was 27.3 MB while the unique
+physical-handle request peak was 18.9 MB; these are separate dimensions, not
+additive memory totals.
+
 Phase 3 has begun with opt-in reservation reporting at auto-cache sizing. The
 parser keeps planned cache holds outside allocation totals; the supervised
 [Orin observation](../../bench/results/2026-10-09-phase3-reservation-observations/README.md)

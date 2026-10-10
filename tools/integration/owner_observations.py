@@ -8,7 +8,9 @@ PREFIX = 'strata integration: '
 
 def summarize(lines):
     live, peaks, current, graphs, views, payloads, reservations, mapped = {}, {}, {}, {}, {}, {}, {}, {}
-    range_maps = range_unmaps = 0
+    address_ranges = {}
+    address_current_by_device, address_peak_by_device = {}, {}
+    range_maps = range_unmaps = address_reserves = address_releases = 0
     observed_current_by_device, observed_peak_by_device = {}, {}
     allocations = frees = 0
     for line in lines:
@@ -26,6 +28,22 @@ def summarize(lines):
             if owner in reservations:
                 raise ValueError('duplicate planned reservation label for one instance/device')
             reservations[owner] = size
+        elif row['kind'] == 'address_reserve':
+            size = row['requested_bytes']
+            if not isinstance(size, int) or size <= 0 or not key[1] or key in address_ranges:
+                raise ValueError('invalid or duplicate virtual address reservation')
+            address_ranges[key] = (owner, size)
+            address_current_by_device[row['device']] = address_current_by_device.get(row['device'], 0) + size
+            address_peak_by_device[row['device']] = max(
+                address_peak_by_device.get(row['device'], 0), address_current_by_device[row['device']])
+            address_reserves += 1
+        elif row['kind'] == 'address_release':
+            size = row['requested_bytes']
+            if not isinstance(size, int) or size <= 0 or address_ranges.get(key) != (owner, size):
+                raise ValueError('unmatched or conflicting virtual address release')
+            address_ranges.pop(key)
+            address_current_by_device[row['device']] -= size
+            address_releases += 1
         elif row['kind'] == 'allocate':
             size = row['requested_bytes']
             if not isinstance(size, int) or size <= 0 or not key[1] or key in live:
@@ -83,7 +101,7 @@ def summarize(lines):
     owners = sorted(set(current) | set(graphs) | set(views) | set(payloads))
     return {
         'scope': 'observed sites only; requested payload bytes, not physical backing or total process ownership',
-        'coverage': 'instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA segmented ExpertCache mapped VMM physical segments, CUDA VMM physical chunks across VmmRange ownership transfers, pageable/pinned expert-stage host buffers, primary SessionState backing, verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; SYCL ExpertCache, stage/batch sessions and other sites excluded',
+        'coverage': 'instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA VMM address reservations and physical segments/chunks across range ownership transfers, pageable/pinned expert-stage host buffers, primary SessionState backing, verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; SYCL ExpertCache, stage/batch sessions and other sites excluded',
         'graph_bytes': 'unsupported; counts do not measure driver or graph-pool bytes',
         'cleanup': 'live at log end is not a leak verdict; process termination may bypass destructors',
         'allocation_events': allocations, 'free_events': frees,
@@ -100,6 +118,18 @@ def summarize(lines):
             'scope': 'cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals',
             'events': [{'label': o[0], 'instance': o[1], 'device': o[2], 'bytes': b}
                        for o, b in sorted(reservations.items())]},
+        'virtual_address_ranges': {
+            'scope': 'reserved virtual address space only; no physical backing implied and never added to allocation totals',
+            'reserve_events': address_reserves,
+            'release_events': address_releases,
+            'peak_reserved_bytes_by_device': {
+                str(device): size for device, size in sorted(address_peak_by_device.items())},
+            'live_reserved_bytes_by_device': {
+                str(device): size for device, size in sorted(address_current_by_device.items())},
+            'live_ranges_at_log_end': [
+                {'owner': value[0][0], 'instance': value[0][1], 'device': key[0],
+                 'address': key[1], 'bytes': value[1]}
+                for key, value in sorted(address_ranges.items())]},
         'owners': [{'owner': o[0], 'instance': o[1], 'device': o[2],
                     'peak_observed_requested_bytes': peaks.get(o, 0),
                     'live_observed_requested_bytes': current.get(o, 0),
