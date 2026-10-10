@@ -1,4 +1,5 @@
 #include "strata/core/vmm.hpp"
+#include "strata/platform/integration_trace.hpp"
 
 #if !defined(STRATA_USE_HIP) && !defined(STRATA_HIP_GFX906)
 #include <cuda.h>
@@ -80,11 +81,19 @@ VmmChunk vmm_chunk_new() {
     prop.location.id = a.dev;
     CUmemGenericAllocationHandle h = 0;
     if (a.create(&h, (size_t) a.gran, &prop, 0) != CUDA_SUCCESS) return 0;
+    strata::platform::integration_trace::event(
+        "cuda-vmm-physical-chunk", "allocate", &a,
+        reinterpret_cast<const void*>(static_cast<uintptr_t>(h)), a.gran, a.dev);
     return (VmmChunk) h;
 }
 
 void vmm_chunk_free(VmmChunk h) {
-    if (h != 0 && api().ok) api().release((CUmemGenericAllocationHandle) h);
+    if (h == 0 || !api().ok) return;
+    const Api& a = api();
+    if (a.release((CUmemGenericAllocationHandle) h) == CUDA_SUCCESS)
+        strata::platform::integration_trace::event(
+            "cuda-vmm-physical-chunk", "free", &a,
+            reinterpret_cast<const void*>(static_cast<uintptr_t>(h)), 0, a.dev);
 }
 
 bool VmmRange::reserve(uint64_t bytes) {

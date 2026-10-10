@@ -20,7 +20,9 @@ one `expert-cache-vmm-segment` allocation per successfully mapped physical
 handle and a matching free after successful unmap/release. The reserved virtual
 address range is excluded. This supports cache shrink/grow observation without
 treating address reservation as device memory. Shared KV VMM chunks that move
-between cache and KV ownership are not covered yet. SYCL has a separate cache
+between cache and KV ownership use a stable physical-chunk owner: allocation
+remains live across range transfers and ends only on successful handle release.
+Per-range map/unmap transitions are not emitted yet. SYCL has a separate cache
 source and does not emit these cache events. CUDA/HIP expert-stage buffers report separate
 `expert-stage-pinned-host` and `expert-stage-pageable-host` owners with host device
 id `-1`; these events distinguish host backing and do not count as GPU memory.
@@ -97,8 +99,8 @@ bytes or physical memory. Device identities on frees come from the owning device
 The expanded [evidence report](../../bench/results/2026-10-09-prefill-mtp-owner-trace/README.md)
 compares owned and borrowed prefill, and trace-off protocol checks. Remaining
 sites include verifier mapped staging/auxiliary/batch buffers, MTP weight-load
-allocations, layer-stage and batch-slot session arenas, shared KV VMM ownership
-exchange and graph capture/destroy/pool observations. Phase 3 must distinguish unique physical backing, views and future
+allocations, layer-stage and batch-slot session arenas, per-range VMM map/unmap
+transitions and graph capture/destroy/pool observations. Phase 3 must distinguish unique physical backing, views and future
 reservations. Phase 1 needs explicit counters and unsupported scopes; do not
 mistake a partial requested-byte trace for the later accounting gate.
 

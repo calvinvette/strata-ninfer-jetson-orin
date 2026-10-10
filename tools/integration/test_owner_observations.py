@@ -62,6 +62,24 @@ class OwnerObservationTests(unittest.TestCase):
         self.assertEqual(result['free_events'], 3)
         self.assertIn('CUDA segmented ExpertCache mapped VMM physical segments', result['coverage'])
 
+    def test_shared_vmm_chunk_lifetime_is_independent_of_range_owner(self):
+        def chunk(kind, handle, size=0):
+            return PREFIX + json.dumps(dict(schema=1, owner='cuda-vmm-physical-chunk',
+                kind=kind, allocation=handle, requested_bytes=size, instance=7,
+                device=0, count=0))
+
+        # The same physical handle can be unmapped from one range and mapped in
+        # another without ending its allocation lifetime.
+        rows = [chunk('allocate', 700, 2 << 20), event('view', 700, 2 << 20, instance=8),
+                event('view', 700, 2 << 20, instance=9), chunk('free', 700)]
+        result = summarize(rows)
+        backing = next(o for o in result['owners'] if o['owner'] == 'cuda-vmm-physical-chunk')
+        self.assertEqual(backing['peak_observed_requested_bytes'], 2 << 20)
+        self.assertEqual(backing['live_observed_requested_bytes'], 0)
+        self.assertEqual(backing['view_events'], 0)
+        self.assertEqual(result['allocation_events'], 1)
+        self.assertEqual(result['free_events'], 1)
+
     def test_alias_cannot_be_counted_as_another_allocation(self):
         with self.assertRaises(ValueError):
             summarize([event('allocate', size=10), event('allocate', size=10, instance=2)])

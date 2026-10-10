@@ -234,9 +234,11 @@ address range is not backing memory. The Orin test shrank and regrew both
 uniform and sized caches while checking retained slot bytes and matching each
 observed allocation with a free. A future Splash adapter should apply the same
 identity distinction to Metal heaps, sparse resources and aliases, while
-tracking Metal-specific residency and shared backing semantics. The current
-trace does not cover Strata's shared KV VMM chunk exchange, so it is not yet a
-complete unique-physical-backing ledger.
+tracking Metal-specific residency and shared backing semantics. Shared CUDA
+VMM chunks now have a global physical-handle lifetime that remains live while a
+chunk moves between expert-cache and K/V ranges. Per-range map and transfer
+events remain untraced, so this is not yet a complete allocation and ownership
+ledger.
 
 
 

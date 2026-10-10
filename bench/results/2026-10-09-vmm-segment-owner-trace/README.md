@@ -18,6 +18,15 @@ allocation granularity. The virtual address reservation is not reported as
 device backing. These requested-byte events are scoped observations, not total
 Orin physical-memory accounting.
 
+A second supervised Orin check ran the existing `vmm_test`, which unmaps two
+chunks from one range, maps them into another and verifies that their contents
+survive. The global `cuda-vmm-physical-chunk` owner recorded 9 allocations and
+9 matching releases, peaking at 18,874,368 bytes (nine 2 MiB chunks) and ending
+at zero despite the intermediate range transfer. The supervisor's minimum
+available memory sample was 26,430,693,376 bytes; the run lasted 1.06 s, so this
+is a functional transfer/lifetime check rather than pressure evidence. Raw
+events and telemetry are under `shared-vmm-chunk-test/`.
+
 Raw engine events are in `stderr.txt`; supervisor telemetry is in
 `memory.jsonl`, `tegrastats.txt` and `result.json`. The summarized parser output
 is `owner-summary.json`. No model was loaded. Energy and clock sampling were not
@@ -28,7 +37,7 @@ segmented test binary SHA-256 is
 hashes are recorded in `source-hashes.txt`. Verify all retained files with
 `SHA256SUMS`.
 
-The changed cache header and source were then built on maestro1 with one job
+The changed cache and VMM sources were then built on maestro1 with one job
 for the HIP `strata` target. A separate one-job SYCL `strata` build also passed
 with the shared header updated; its migrated cache implementation remains
 separate and unchanged. The source hashes and executable identities are in
