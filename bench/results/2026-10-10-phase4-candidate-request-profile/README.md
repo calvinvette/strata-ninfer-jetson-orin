@@ -65,3 +65,38 @@ python3 bench/results/2026-10-09-request-profile/analyze_windows.py \
 Profiler overhead, concurrent kernel execution, approximate request-window
 alignment and unlocked clocks limit interpretation. Use unprofiled paired
 controls for performance confirmation.
+
+## Source-tensor and conversion contract follow-up
+
+The profiled symbol is `dequant_kernel<(int)14,H16>` in
+`src/kernels/cuda/dequant_bf16.cu`, reached through `Gemm::native`'s ordinary
+`dequant_f16` path. It is distinct from `iq_dequant_f16` and the native Q6_K
+matrix-vector kernel. Joining the GGUF shard headers to Nsight's launch grids
+shows that the observed grids correspond to these Q6_K tensor shapes (GGUF
+stores `[input, output]`; the matrix is `[output, input]`):
+
+| Grid X | Model matrix | Q6_K tensors in artifact | Calls across warmup + measured |
+| ---: | ---: | ---: | ---: |
+| 1920 | 6144 × 2560 | 40 | 864 |
+| 200 | 2560 × 640 | 26 | 416 |
+| 3200 | 2560 × 10240 | 22 | 352 |
+| 160 | 2560 × 512 | 21 | 336 |
+| 3840 | 2560 × 12288 | 5 | 80 |
+
+For this kernel, `gridX = rows * (cols / 32) / 256`; the table matches each
+launch geometry exactly. Each request window has half of the listed calls.
+CUDA kernel records do not carry source tensor addresses, so this establishes
+the set of compatible source shapes and observed launch counts, not a per-layer
+call assignment. `output.weight` is also Q6_K in this artifact but does not
+match these grids; its active head path is separate.
+
+On 2026-10-10, the current CUDA `dequant_bf16_test` binary was run against both
+IQ1_M shards. It passed all six supported quantization types found, comparing
+F32 and BF16 conversion against the independent CPU artifact decoder on the
+first four rows of a real tensor of each type. Q6_K's selected tensor was
+`output.weight` (4 × 2560 values in the tested row slice). This is real-payload
+format evidence, but not a test of the five profiled Q6_K tensor shapes or of
+the `H16` output path. The separate Q6_K codec report tests F16 conversion
+against synthetic blocks; a real-payload, profiled-shape F16 oracle remains
+open. The test binary SHA256 is
+`f1dc3a5819ee68d809f50aa9b5cadff4f17d2e664adce8d7b07c1839f3d0b7bf`.
