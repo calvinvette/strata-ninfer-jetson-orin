@@ -274,8 +274,11 @@ with Q2_0's 48×512 layout, and the generic MTP converter rejects this artifact'
 GGML type-42 tensor. A separate no-MTP one-token native Q2_0 CLI smoke then
 completed at a fixed 5,000 expert slots, with 15.71 GiB minimum physical
 availability. Its full expert ranking is deterministic fill order, not
-routing-derived. This is admission evidence only; quality, MTP/speculative
-behavior, service behavior and performance on Q2_0 remain unqualified.
+routing-derived. The existing Q2_0 MTP runtime also loaded and bound for a
+one-token request (977 MiB reported for MTP, 14.88 GiB minimum host
+availability), but the token limit left zero draft rounds. This is admission
+evidence only; draft execution/acceptance, quality, service behavior and
+performance on Q2_0 remain unqualified.
 With this exact one-token cell under cgroup limits, 20 GiB completed with
 7.98 GiB minimum effective availability; 16 GiB was safely aborted during
 prefill when sampled effective availability reached 5.45 GiB, while host

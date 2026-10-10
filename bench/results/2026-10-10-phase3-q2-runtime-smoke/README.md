@@ -2,29 +2,33 @@
 
 The artifact-aware Q2_0 PLE oracle and table reader pass are documented in the
 [PLE report](../2026-10-10-phase3-q2-ple-artifact-aware/README.md). This follow-up
-attempted a separate 512-token/one-output native-pack request under
-`run_control.py` with the six-GiB physical availability floor. It did not reach
-prefill and does not qualify Q2_0 model execution, service behavior or
-performance.
+captured initial setup failures and then a 512-token/one-output native-pack
+request under `run_control.py` with the six-GiB physical availability floor.
+Later sections distinguish the successful admission smoke from MTP binding,
+cgroup and configured-context screens. None qualifies model quality, sustained
+service behavior or performance.
 
 The first attempt was rejected by the CLI because a native pack requires
 `--native`, `--spec >= 2` and an explicit prefill chunk. The supported spec2
 retry loaded the Q2_0 pack and native projections, then rejected
 `data/expert-profile-coder.bin`: it has 48×256 entries while this model has
 48×512 experts. The no-profile retry loaded the pack and PLE table but failed
-before prefill because the supplied Q2_0 MTP GGUF had not been converted to
-runtime files. `tools/mtp_rt.py` was then tried with `gguf` 0.19.0 installed in
-the local `~/models/strata-orin-validation/pack-venv`; that reader rejects
-GGML tensor type 42 in this artifact. No repository dependency or source was
-changed, and generated models/runtime files remain under `~/models`.
+before prefill because it was passed the MTP `.gguf` file where the engine
+expects a runtime directory. `tools/mtp_rt.py` was then tried with `gguf`
+0.19.0 installed in the local `~/models/strata-orin-validation/pack-venv`; that
+reader rejects GGML tensor type 42 in this artifact. The existing Q2_0 runtime
+directory at `~/models/strata-orin-validation/mtp/rt` was subsequently used
+successfully. No repository dependency or source was changed, and generated
+models/runtime files remain under `~/models`.
 
 The three initial supervised attempts stayed well above the six-GiB floor;
 their minimum available memory readings were 28.23 GiB, 25.28 GiB and 24.64 GiB.
-The first unsupported configuration and both artifact-compatibility failures
-are retained under `run/supervisor*` and `mtp-convert/`. The failure is a useful
-integration boundary: Q2_0 PLE block compatibility is established, while the
-model's expert profile and MTP runtime conversion need matching Q2_0 support
-before speculative requests can be qualified.
+The unsupported configuration, expert-profile shape rejection, mistaken MTP
+file argument and generic-reader type-42 error are retained under
+`run/supervisor*` and `mtp-convert/`. They show that a profile must match the
+artifact's 48×512 expert geometry and that the generic MTP conversion reader
+cannot parse this type-42 GGUF. The existing runtime directory allowed a
+separate successful MTP load/bind check below; draft execution is still open.
 
 ## Narrow one-token result
 
@@ -63,8 +67,24 @@ one-token verifier window and output token ID 32 matched the 4K smoke. This
 supports admission at these settings for this artifact and request shape, not
 actual 8K/16K ingestion, retrieval quality or long-context serving.
 
+## Q2_0 MTP load and bind
+
+The same 4K/5,000-slot cell also passed with
+`--mtp ~/models/strata-orin-validation/mtp/rt`. The engine loaded the Q2_0
+draft layer (798 MiB: 675 MiB routed experts and 111 MiB dense tensors) and the
+178.4 MiB draft head, then bound MTP during prefill. The summary reports 977 MiB
+for MTP and 18.3 ms for MTP prompt binding. One output token (ID 32) was
+generated; because `--max-new 1` leaves zero draft rounds, this validates load,
+binding and memory admission only, not draft acceptance or speculative state.
+Minimum host availability was 14.88 GiB. Runtime artifact hashes are
+`experts.bin` `09398406be61f1f54c93861f449e48b8df0bfccbc9ec9b2b7636775a6ea9244f`,
+`dense.bin` `c724dc0b0822ada5d2977bf5bde821605feabaa64ea2e0045b67ca656329070a`,
+and `draft_vocab.bin`
+`b1e1d3a7a9e4bf862dcd5923ce661fb59bbd07907e594df5cf86a62ac235cb91`. Raw
+telemetry is in `run/mtp-bind/`.
+
 This is one successful allocation/admission smoke, not a quality check, paired
-comparison, cache-ranking result, MTP/speculation test, service test, or
+comparison, cache-ranking result, MTP draft/speculation test, service test, or
 performance claim. The build SHA256 is
 `d3e8bcde3a430d7d5bb614fec8ba938398699b9abecd41965bb28fd6d465d721`; the exact
 token file SHA256 is
