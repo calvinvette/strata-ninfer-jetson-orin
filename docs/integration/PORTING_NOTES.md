@@ -272,6 +272,15 @@ device-level storage traffic, state whether worker time is summed or wall time,
 and establish counter baselines after loading/warmup. The full protocol and
 limits are recorded in the [transfer telemetry report](../results/2026-10-10-phase3-transfer-telemetry/README.md).
 
+The [async-pool transfer screen](../results/2026-10-10-phase3-async-pool/README.md)
+adds a 64 MiB transient CUDA pool allocation/copy/kernel/free path beside pinned
+copy, mapped-host and sequential-managed controls. It checks exact checksums,
+records the 64 MiB pool high-water and verifies zero live pool bytes afterward.
+The transient async path's one-run median was slower than the persistent-copy
+control, so no path is promoted. For Splash, keep async allocation lifetime and
+reserved-versus-live bytes separate from Metal residency, and compare a
+transient path only with controls that share its allocation lifetime.
+
 The 3,522-token/256-output Orin recovery smoke then served a separate short
 request through the same engine. It passed above the six-GiB floor, while
 workspace and cache owners remained service-resident until orderly shutdown.
