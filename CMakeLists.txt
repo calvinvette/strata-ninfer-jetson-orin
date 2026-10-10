@@ -951,17 +951,17 @@ if(STRATA_ENABLE_CUDA OR STRATA_ENABLE_HIP)
   # `ngram.cpp` is host-only but lives in `strata_kernels` because `ple.cu` shares its geometry constants, and
   # splitting them across two libraries would only add a layer.
   #
-  # The pack, the original GGUF and the ggml capture are all REQUIRED inputs: this test's oracles are real
-  # artifacts, so the working directory is pinned to the source tree and a missing input is a hard error
-  # INSIDE the test.  A test that passes by finding nothing to compare is the failure mode this project keeps
-  # re-learning.
+  # The pack and original GGUF are required inputs. The block oracle is computed in double precision in the
+  # test from those real weights and fixed-seed synthetic state; it does not depend on unshipped capture files.
   add_executable(ple_parity src/kernels/ple_parity.cpp)
   target_include_directories(ple_parity PRIVATE ${_strata_gpu_include_directories})
   target_link_libraries(ple_parity PRIVATE strata_kernels ${_strata_gpu_runtime_target})
-  set(STRATA_PLE_FIXTURE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bench/micro" CACHE PATH
-      "Directory containing required ple_in.bin and ple_out.bin parity fixtures")
+  set(STRATA_PLE_PACK_DIR "${CMAKE_CURRENT_SOURCE_DIR}/pack/full" CACHE PATH
+      "Pack containing the real PLE tensors for ple_parity")
+  set(STRATA_PLE_GGUF "${CMAKE_CURRENT_SOURCE_DIR}/../../Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf"
+      CACHE FILEPATH "Q2_0 GGUF shard containing the PLE table for ple_parity")
   add_test(NAME ple_parity COMMAND ple_parity --selftest
-    --in "${STRATA_PLE_FIXTURE_DIR}/ple_in.bin" --out "${STRATA_PLE_FIXTURE_DIR}/ple_out.bin"
+    --pack "${STRATA_PLE_PACK_DIR}" --gguf "${STRATA_PLE_GGUF}"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
   # Plan v0.3 P7: INT8 KV storage vs a host reference and vs the FP16 path (GPU, synthetic, no model).

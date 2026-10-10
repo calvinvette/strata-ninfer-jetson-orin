@@ -1,6 +1,6 @@
 # Integration status
 
-Updated: 2026-10-09. Phases 1 and 2 are complete with their supported, failed,
+Updated: 2026-10-10. Phases 1 and 2 are complete with their supported, failed,
 unsupported and untested scopes recorded. Phase 3 memory ownership and transfer
 work is active; its admission screens and focused owner tests are recorded below,
 with broader pressure and transfer gates still open. No NInfer execution
@@ -11,7 +11,7 @@ component has been promoted into Strata.
 | 0 — Repository and import | Complete | Pinned source/evidence manifest, source mapping, plan, offline planner checks |
 | 1 — Same-day controls | Complete | Four same-day paired API blocks; exact workloads/artifacts; protocol and baseline checks; capability matrix records limits; expanded HIP/SYCL builds compile |
 | 2 — Operator/state contracts | Complete | Ownership review, incompatible projection-profile rejection, independent RMS/IQ4_NL/Q6_K oracles, GDN prefix checks, default spec1 regression and post-fix spec1/spec4 token plus nine-field persistent-state parity recorded; native/HIP/SYCL build evidence and eleven selector tests pass; no NInfer execution component promoted |
-| 3 — Memory and transfers | In progress | Opt-in trace covers ordinary ExpertCache, CUDA segmented-cache mapped VMM handles, shared CUDA VMM physical-chunk lifetimes and per-range map/unmap transitions, primary SessionState, verifier, prefill, MTP and separate pageable/pinned expert-stage host owners; Orin shrink/regrow lifecycle test preserved slot data and matched 41 allocate/free events; injected pinned-registration failures fell back to working pageable copies under the six-GiB supervisor; two randomized fixed-cache 4K staging screens matched tokens and nine state fields; the trace-corrected clocked repeat found +0.10% median prompt time and variable decode results with dynamic CPU/GPU clocks; minimum availability was 8.04 GiB; a randomized 2×2 requested-cache/context screen completed all cells above the six-GiB floor, with actual slots 3903/6519; a 2×2 prefill-chunk/borrowed-vs-owned screen observed separate 202/500 MiB workspace holds and remained above 7.47 GiB; owned chunk 1024/2048 follow-up reserved up to 1520 MiB and remained above 7.72 GiB; an exact 2048-token prompt completed against the 2048 owned chunk with 8.02 GiB minimum availability; process-wide ownership, pressure failures and other transfer experiments remain |
+| 3 — Memory and transfers | In progress | Opt-in trace covers ordinary ExpertCache, CUDA segmented-cache mapped VMM handles, shared CUDA VMM physical-chunk lifetimes and per-range map/unmap transitions, primary SessionState, verifier, prefill, MTP and separate pageable/pinned expert-stage host owners; Orin shrink/regrow lifecycle test preserved slot data and matched 41 allocate/free events; injected pinned-registration failures fell back to working pageable copies under the six-GiB supervisor; two randomized fixed-cache 4K staging screens matched tokens and nine state fields; the trace-corrected clocked repeat found +0.10% median prompt time and variable decode results with dynamic CPU/GPU clocks; minimum availability was 8.04 GiB; a randomized 2×2 requested-cache/context screen completed all cells above the six-GiB floor, with actual slots 3903/6519; a 2×2 prefill-chunk/borrowed-vs-owned screen observed separate 202/500 MiB workspace holds and remained above 7.47 GiB; owned chunk 1024/2048 follow-up reserved up to 1520 MiB and remained above 7.72 GiB; an exact 2048-token prompt completed against the 2048 owned chunk with 8.02 GiB minimum availability; the Oct 10 supervised 10-test Phase 3 CTest set passes with 27.94 GiB minimum availability; the fixture-free PLE block oracle cannot consume this Q2_0 pack's native key/BF16 value representation, so PLE parity remains unsupported pending an artifact-aware oracle; process-wide ownership, pressure failures and other transfer experiments remain |
 | 4 — SM87/ARM kernels | Not started | Pinned request profile prepared; bottleneck attribution, qualified candidate and request confirmation pending |
 | 5 — Speculation and graphs | Not started | Accepted-prefix state, graph lifetime and drift qualification |
 | 6 — Multivariate tuning | Not started | Randomized paired campaign, interactions, uncertainty, held-out confirmation |
@@ -120,13 +120,18 @@ and default dispatch are unchanged.
 
 Fresh Orin checks: all 54 integration harness tests, 15 Jetson setup tests, 312
 selected mock API tests, the pinned shared-memory budget test and six selected
-branch CPU/core tests pass. The six targeted Phase 3 CTests (VMM transfer,
+branch CPU/core tests pass. The six earlier targeted Phase 3 CTests (VMM transfer,
 segmented cache, pinned fallback/shared memory, shared budget and published
-prefix) pass. After a one-job build of missing targets, 108 of 112 CTests passed
+prefix) pass. On Oct 10, a fresh supervised run of 10 Phase 3 CTests, including
+memory refusal, platform memory, and the PLE table-reader selftest, passed with
+27.94 GiB minimum availability. After a one-job build of missing targets, 108 of 112 CTests passed
 when excluding the unavailable-model PLE fixture; two tests were skipped and
 `expert_parity`/`pool_test` could not read their separate `pack/full/experts.bin`
-fixture. `ple_parity` was separately confirmed blocked because the pinned Q2_0
-model shard is absent from `~/models`. The existing GPU conversation-snapshot test also freshly
+fixture. On Oct 10 the pinned Q2_0 shards were downloaded under `~/models`, and
+a standalone native pack was generated successfully. The fixture-free PLE block
+oracle then reached the pack but rejected its native Q2_0 key and BF16 PLE value
+layout; no PLE block result is claimed. See the [Q2_0 PLE attempt and Phase 3
+checks](../../bench/results/2026-10-10-phase3-q2-ple-test/README.md). The existing GPU conversation-snapshot test also freshly
 passes 3901 synthetic state checks; this is not accepted-prefix commit parity. Both control binaries built as native ARM64 Release with
 CUDA 12.6.68 and embedded SM87 images. Both source GGUF shards and all 31 MTP
 source tensors were independently rehashed against pinned digests. Prepared

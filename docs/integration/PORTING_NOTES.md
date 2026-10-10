@@ -277,3 +277,17 @@ weight encodings or shared source storage says nothing about model-quality
 interchangeability. Exhaustive storage conversion is not a substitute for a
 real-layer accuracy and state test. A future Splash/Metal port should preserve
 both format identity and output dtype at this seam.
+
+## Make parity readers artifact-aware at the PLE seam
+
+The fixture-free block oracle from Strata upstream PR #568 avoids captures
+that were never included in the repository, but its initial reader is tied to
+one pack representation: separated 2-bit key codes and FP16 group scales plus
+a 32-bit-expanded BF16 value tensor. The downloaded GSQ-RCO Q2_0 artifact keeps
+the key in native GGUF Q2_0 blocks and stores the value directly as BF16. The
+oracle correctly refuses the different byte spans before comparison. For a
+future Strata + Splash integration, derive test input adapters from the source
+artifact metadata and pack index, retain exact source-format identities, and
+compare both a source-format decode oracle and the backend's actual materialized
+weights. Do not fix a failed fixture lookup by substituting a tensor from a
+different model cohort; tensor shapes alone do not establish matching values.
