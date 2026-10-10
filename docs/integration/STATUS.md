@@ -289,7 +289,12 @@ peaks are not used to infer MTP's incremental RAM cost. Under 16 GiB, the same
 MTP-loaded cell reached the draft layer/head load and was supervisor-aborted
 during prefill at 5.72 GiB effective availability; host availability remained
 15.04 GiB. This is the effective-cgroup admission guard, not an engine/OOM
-failure.
+failure. An opt-in one-token owner trace on Q2_0 MTP balanced 262 allocation
+and free events and ended with zero observed live bytes; the tracked concurrent
+CUDA requested-byte peak was 7,205,736,400 bytes, with 353,894,400 bytes of
+pageable expert-stage host backing. MTP state/scratch requests peaked at
+12,977,872 bytes, distinct from its reported 1,024,377,180-byte payload.
+Graph/driver memory remains unpriced; see the linked runtime smoke report.
 At the same 5,000 cache slots, configured 8K and 16K contexts also admitted
 the one-token/512-input smoke with 15.65/15.70 GiB minimum host availability;
 these do not represent long-context ingestion or quality tests.

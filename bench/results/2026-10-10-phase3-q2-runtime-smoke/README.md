@@ -92,6 +92,19 @@ and `draft_vocab.bin`
 `b1e1d3a7a9e4bf862dcd5923ce661fb59bbd07907e594df5cf86a62ac235cb91`. Raw
 telemetry is in `run/mtp-bind/`.
 
+A separate one-token rerun enabled `STRATA_INTEGRATION_TRACE=1` and passed
+through `tools/integration/owner_observations.py`. It observed 262 allocations
+and 262 matching frees, with zero observed live bytes at process exit. The
+tracked concurrent requested-byte peak on CUDA device 0 was 7,205,736,400
+bytes; pageable expert-stage host backing peaked at 353,894,400 bytes. Within
+the MTP owner, its state/scratch arena peaked at 12,977,872 requested bytes,
+while the separately reported MTP payload snapshot was 1,024,377,180 bytes
+(about 977 MiB). The summary records one successful verifier graph
+instantiation, but graph/driver bytes remain unsupported. These owner totals
+are partial requested-allocation observations and must not be added to host
+availability or treated as complete physical ownership. The minimum host
+availability was 15.12 GiB. Raw events and summary are in `run/mtp-owner-trace/`.
+
 This is one successful allocation/admission smoke, not a quality check, paired
 comparison, cache-ranking result, MTP draft/speculation test, service test, or
 performance claim. The build SHA256 is
