@@ -41,6 +41,20 @@ six-GiB floor. The provided CLI prompt is processed as 511 prefill tokens plus
 the final prompt token in the decode path, consistent with the control
 convention.
 
+The same cell was repeated inside transient systemd cgroups:
+
+| MemoryMax | Outcome | Minimum effective availability | Minimum host availability | Peak scope current |
+| ---: | --- | ---: | ---: | ---: |
+| 20 GiB | Request completed; output token 32 | 7.98 GiB | 15.82 GiB | 12.01 GiB |
+| 16 GiB | Supervisor pressure abort during prefill | 5.45 GiB | 15.80 GiB | 10.55 GiB |
+
+The 16-GiB run crossed the six-GiB effective-availability stop threshold
+between sampler intervals; host availability stayed ample and the process was
+stopped by the supervisor, not by an OOM event. These cells show this exact
+workload completing at 20 GiB and being refused at 16 GiB. They do not define a
+general minimum cgroup size or a supported capacity profile. Raw telemetry and
+outputs are in `run/cgroup-20g/` and `run/cgroup-16g/`.
+
 This is one successful allocation/admission smoke, not a quality check, paired
 comparison, cache-ranking result, MTP/speculation test, service test, or
 performance claim. The build SHA256 is

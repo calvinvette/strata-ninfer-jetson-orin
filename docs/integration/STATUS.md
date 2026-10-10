@@ -276,6 +276,10 @@ completed at a fixed 5,000 expert slots, with 15.71 GiB minimum physical
 availability. Its full expert ranking is deterministic fill order, not
 routing-derived. This is admission evidence only; quality, MTP/speculative
 behavior, service behavior and performance on Q2_0 remain unqualified.
+With this exact one-token cell under cgroup limits, 20 GiB completed with
+7.98 GiB minimum effective availability; 16 GiB was safely aborted during
+prefill when sampled effective availability reached 5.45 GiB, while host
+availability remained 15.80 GiB. These are cell-specific admission bounds.
 
 Fresh paired controls cover all five exact workloads in four independent process
 pairs (40 measured requests plus 40 warmups). Actual cache/KV/MTP resources match.
