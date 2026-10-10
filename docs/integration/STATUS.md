@@ -72,6 +72,13 @@ availability. Mapped decode median was 22.7% lower, while prompt median was
 were collected, but disk-byte, copy-latency, energy and GPU/EMC clock counters
 were unavailable, so the full transfer tradeoff gate remains open.
 
+The candidate [vision-enabled image request](../../bench/results/2026-10-10-phase3-vision-allocation/README.md)
+now passes with the optional CUDA encoder built locally. Its 56×56 image request
+completed at the six-GiB floor (minimum 7.22 GiB); startup reported 7.43 GiB
+available after cache, verifier and MTP setup. This is one small-image smoke
+point. The separate vision process and CUDA graph-pool bytes remain outside the
+owner trace, so this does not complete transient or graph peak accounting.
+
 An actual cgroup-v2 [admission check](../../bench/results/2026-10-10-phase3-cgroup-admission/README.md)
 placed the supervisor in a 1 GiB systemd user scope. It saw only 1.0 GiB of
 effective cgroup availability despite 24.6 GiB host availability and aborted

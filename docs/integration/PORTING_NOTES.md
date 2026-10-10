@@ -275,6 +275,14 @@ against its range instance without adding the mapped view to backing totals.
 Range instance IDs still need semantic role labels for easier attribution, and
 other CUDA/driver allocations remain outside this partial owner ledger.
 
+The candidate's optional CUDA vision path also needs a separate process/memory
+scope: the Python service launches `strata-vision` with the projector, then
+forwards its embeddings to the model engine. A fresh 56×56 image request passed
+on Orin above the six-GiB floor, but the engine owner trace did not include the
+encoder process or graph-pool bytes. A Splash port should record image decode,
+Metal encoder allocations, embedding lifetime and model-side image buffers as
+separate owners, then validate the total with system memory-pressure telemetry.
+
 
 
 ## Keep source quantization separate from materialized dtype
