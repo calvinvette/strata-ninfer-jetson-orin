@@ -2,6 +2,7 @@
 import argparse
 import json
 from pathlib import Path
+import re
 import threading
 
 from file_tier_transfer_parity import (
@@ -44,6 +45,7 @@ def main():
         log = args.output / f'{args.mode}-{repeat}.log'
         env = child_env(cfg)
         env.update({'STRATA_STAGE_PIN': '0', 'STRATA_STATE_HASH': '1',
+                    'STRATA_STATE_HASH_GDN': '1',
                     'STRATA_MTP_BATCH': '1', 'STRATA_PREFILL_CPU_SHARE': '0',
                     'STRATA_INTEGRATION_TRACE': '1', 'STRATA_IO_PREFETCH': io_prefetch,
                     'STRATA_IO_PF_THREADS': '8', 'STRATA_IO_PF_STAGE': '0', 'STRATA_IO_STATS': '1'})
@@ -54,8 +56,12 @@ def main():
             usage = dict(engine.last)
         finally:
             engine.close()
+        gdn_line = next((line for line in log.read_text(errors='replace').splitlines()
+                         if 'STATE_HASH_GDN ' in line), '')
+        gdn_match = re.search(r'STATE_HASH_GDN\s+([0-9a-fA-F ]+)', gdn_line)
         rows.append({'repeat': repeat, 'token_ids': ids, 'usage': usage,
-                     'state': state_hashes(log)})
+                     'state': state_hashes(log),
+                     'gdn_layer_hashes16': gdn_match.group(1).split() if gdn_match else None})
     equal = rows[0]['token_ids'] == rows[1]['token_ids'] and rows[0]['state'] == rows[1]['state']
     result = {'mode': args.mode, 'prompt_tokens': len(prompt), 'generated_tokens': args.generated_tokens,
               'engine_args': engine_args, 'repeats': rows, 'token_ids_equal': rows[0]['token_ids'] == rows[1]['token_ids'],

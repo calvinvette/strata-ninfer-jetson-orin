@@ -105,7 +105,9 @@ though both stayed above the six-GiB floor. A separate [same-mode repeat](../../
 emitted identical tokens and MTP draft counts across two mapped runs, but the
 same six persistent-state fields differed. This establishes run-to-run state
 instability independent of transfer mode; pause interpretation of new transfer
-timing/energy comparisons until that cause is identified. The earlier passing
+timing/energy comparisons until that cause is identified. A per-block diagnostic
+matched the first of 36 GDN state blocks and differed in the remaining 35, which
+locates but does not explain divergence propagation. The earlier passing
 mapped/pread screen remains its own result.
 
 The traced [API cancellation and recovery run](../../bench/results/2026-10-10-phase3-cancel-recovery/README.md)

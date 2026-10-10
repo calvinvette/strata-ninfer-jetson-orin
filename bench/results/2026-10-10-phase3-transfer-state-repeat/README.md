@@ -15,3 +15,11 @@ state/token records are retained in `experiment/`.
 This is a diagnostic failure, not evidence of a transfer regression or a user
 visible output difference. The prompt/output token stream matched exactly. No
 models or build products are included.
+
+A second same-mode run enabled Strata's per-GDN-block diagnostic. Its first of
+36 block fingerprints matched and the remaining 35 differed. Those per-block
+fingerprints retain only 16 hash bits, so use them to locate the boundary, not
+as equality evidence. The full request-level hashes and raw logs remain the
+correct parity gate; this narrows follow-up work to propagation after the first
+GDN state block. The refined raw run is retained in
+[`2026-10-10-phase3-transfer-state-repeat-gdn`](../2026-10-10-phase3-transfer-state-repeat-gdn/).
