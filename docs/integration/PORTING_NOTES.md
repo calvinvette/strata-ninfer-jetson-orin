@@ -250,6 +250,15 @@ does not establish a benefit, so pinning remains opt-in. Splash will need its
 own resource class and lifetime instrumentation; pinned CUDA semantics do not
 transfer to Metal.
 
+An additional exact 512-token/64-output Orin screen paired mapped expert reads
+with whole-blob `pread`, with staging disabled in both arms. All three pairs
+matched tokens and persistent state. The mapped arm had a 22.7% lower decode
+median but a 1.7% higher prompt median; process major faults were lower for
+pread. Disk-byte and copy-latency counters were unavailable, so the result is
+screening evidence only. For Splash, preserve the measurement dimensions and
+state/checksum controls, then measure Metal-specific read, copy and residency
+counters rather than translating CUDA owner labels.
+
 ## Separate virtual address ranges from physical backing
 
 The segmented CUDA expert cache reserves one address range and maps physical

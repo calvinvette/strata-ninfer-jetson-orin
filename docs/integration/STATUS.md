@@ -64,6 +64,14 @@ reused by the first client request; allowing warmup therefore did not inject a
 request failure. That recovery check is inconclusive, and same-process recovery
 after a late workspace failure remains untested.
 
+The [mapped-versus-pread file-tier screen](../../bench/results/2026-10-10-phase3-mapped-pread-screen/README.md)
+ran three randomized pairs on an exact 512-token/64-output request. Tokens and
+nine persistent-state fields matched in all pairs, with 8.17 GiB minimum
+availability. Mapped decode median was 22.7% lower, while prompt median was
+1.7% higher; this small screen is not a promotion result. Process page faults
+were collected, but disk-byte, copy-latency, energy and GPU/EMC clock counters
+were unavailable, so the full transfer tradeoff gate remains open.
+
 An actual cgroup-v2 [admission check](../../bench/results/2026-10-10-phase3-cgroup-admission/README.md)
 placed the supervisor in a 1 GiB systemd user scope. It saw only 1.0 GiB of
 effective cgroup availability despite 24.6 GiB host availability and aborted
