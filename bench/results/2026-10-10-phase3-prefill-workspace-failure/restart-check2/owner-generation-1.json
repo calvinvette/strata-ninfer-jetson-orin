@@ -1,0 +1,97 @@
+{
+  "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+  "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA segmented ExpertCache mapped VMM physical segments, CUDA VMM physical chunks across VmmRange ownership transfers, pageable/pinned expert-stage host buffers, primary SessionState backing, verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; SYCL ExpertCache, stage/batch sessions and other sites excluded",
+  "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+  "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+  "allocation_events": 32,
+  "free_events": 0,
+  "observed_allocation_bytes_by_device": {
+    "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+    "peak": {
+      "0": 14694158288
+    },
+    "live_at_log_end": {
+      "0": 14694158288
+    }
+  },
+  "vmm_range_mappings": {
+    "map_events": 0,
+    "unmap_events": 0,
+    "still_mapped_at_log_end": []
+  },
+  "planned_reservations": {
+    "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+    "events": [
+      {
+        "label": "expert-cache.mtp-bind",
+        "instance": 281474338441312,
+        "device": 0,
+        "bytes": 229612776
+      },
+      {
+        "label": "expert-cache.prefill-workspace",
+        "instance": 281474338441312,
+        "device": 0,
+        "bytes": 524288000
+      },
+      {
+        "label": "expert-cache.vram-slack",
+        "instance": 281474338441312,
+        "device": 0,
+        "bytes": 3221225472
+      }
+    ]
+  },
+  "owners": [
+    {
+      "owner": "expert-cache",
+      "instance": 281474338441312,
+      "device": 0,
+      "peak_observed_requested_bytes": 13986713600,
+      "live_observed_requested_bytes": 13986713600,
+      "view_events": 0,
+      "last_owner_reported_payload_bytes": null,
+      "successful_graph_instantiations": 0
+    },
+    {
+      "owner": "mtp",
+      "instance": 281474338478128,
+      "device": 0,
+      "peak_observed_requested_bytes": 14177744,
+      "live_observed_requested_bytes": 14177744,
+      "view_events": 0,
+      "last_owner_reported_payload_bytes": 1061718712,
+      "successful_graph_instantiations": 0
+    },
+    {
+      "owner": "prefill",
+      "instance": 187651271330864,
+      "device": 0,
+      "peak_observed_requested_bytes": 380273152,
+      "live_observed_requested_bytes": 380273152,
+      "view_events": 34,
+      "last_owner_reported_payload_bytes": null,
+      "successful_graph_instantiations": 0
+    },
+    {
+      "owner": "session",
+      "instance": 281474338474000,
+      "device": 0,
+      "peak_observed_requested_bytes": 235033088,
+      "live_observed_requested_bytes": 235033088,
+      "view_events": 0,
+      "last_owner_reported_payload_bytes": null,
+      "successful_graph_instantiations": 0
+    },
+    {
+      "owner": "verifier",
+      "instance": 281474338482280,
+      "device": 0,
+      "peak_observed_requested_bytes": 77960704,
+      "live_observed_requested_bytes": 77960704,
+      "view_events": 0,
+      "last_owner_reported_payload_bytes": null,
+      "successful_graph_instantiations": 0
+    }
+  ]
+}

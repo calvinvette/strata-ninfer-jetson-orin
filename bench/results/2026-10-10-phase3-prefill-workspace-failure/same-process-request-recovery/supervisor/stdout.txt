@@ -1,0 +1,66 @@
+{
+  "checks": [
+    {
+      "name": "post_warmup_injected_request",
+      "http_status": 503,
+      "body_excerpt": "{\"error\": {\"type\": \"server_error\", \"message\": \"the engine stopped unexpectedly (exit code -6); the next request restarts it\"}}",
+      "injection_observed": true
+    },
+    {
+      "name": "same_process_recovery",
+      "http_status": 200,
+      "body": {
+        "id": "chatcmpl-53befca52ebd482d8e762fbd",
+        "object": "chat.completion",
+        "created": 1791667086,
+        "model": "Qwen3.8-Flash-Next-Coder-IQ1_M-Orin-validation",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "re"
+            },
+            "finish_reason": "length"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 17,
+          "completion_tokens": 1,
+          "total_tokens": 18,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 17,
+          "prompt_ms": 1857.6,
+          "prompt_per_token_ms": 109.271,
+          "prompt_per_second": 9.2,
+          "predicted_n": 1,
+          "predicted_ms": 118.0,
+          "predicted_per_token_ms": 118.0,
+          "predicted_per_second": 8.5,
+          "draft_n": 0,
+          "draft_n_accepted": 0
+        }
+      }
+    }
+  ],
+  "server_pid": 2467416,
+  "port": 18126,
+  "injection": "one cudaMalloc >=1MiB after readiness marker",
+  "health": {
+    "status": "ok",
+    "max_context": 4096,
+    "model": "Qwen3.8-Flash-Next-Coder-IQ1_M-Orin-validation",
+    "images": false,
+    "api_key": false,
+    "loaded": true,
+    "service": "strata"
+  },
+  "status": "pass",
+  "server_returncode_before_stop": null,
+  "server_returncode_after_stop": 0
+}

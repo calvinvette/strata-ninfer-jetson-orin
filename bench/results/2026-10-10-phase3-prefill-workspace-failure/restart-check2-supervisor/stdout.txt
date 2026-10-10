@@ -1,0 +1,68 @@
+{
+  "checks": [
+    {
+      "name": "post_warmup_injected_request",
+      "http_status": 503,
+      "body_excerpt": "{\"error\": {\"type\": \"server_error\", \"message\": \"the engine stopped unexpectedly (exit code -6); the next request restarts it\"}}",
+      "injection_observed": true
+    },
+    {
+      "name": "service_recovery_after_engine_restart",
+      "http_status": 200,
+      "body": {
+        "id": "chatcmpl-32536aad8c5d47d1ada108d7",
+        "object": "chat.completion",
+        "created": 1791667211,
+        "model": "Qwen3.8-Flash-Next-Coder-IQ1_M-Orin-validation",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "re"
+            },
+            "finish_reason": "length"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 17,
+          "completion_tokens": 1,
+          "total_tokens": 18,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 17,
+          "prompt_ms": 1879.0,
+          "prompt_per_token_ms": 110.529,
+          "prompt_per_second": 9.0,
+          "predicted_n": 1,
+          "predicted_ms": 113.7,
+          "predicted_per_token_ms": 113.7,
+          "predicted_per_second": 8.8,
+          "draft_n": 0,
+          "draft_n_accepted": 0
+        }
+      }
+    }
+  ],
+  "server_pid": 2467620,
+  "port": 18127,
+  "scope": "same Python service; engine process is expected to restart after abort",
+  "injection": "one cudaMalloc >=1MiB after readiness marker",
+  "health": {
+    "status": "ok",
+    "max_context": 4096,
+    "model": "Qwen3.8-Flash-Next-Coder-IQ1_M-Orin-validation",
+    "images": false,
+    "api_key": false,
+    "loaded": true,
+    "service": "strata"
+  },
+  "engine_restart_observed": 1,
+  "status": "pass",
+  "server_returncode_before_stop": null,
+  "server_returncode_after_stop": 0
+}

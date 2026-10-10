@@ -61,8 +61,15 @@ cache, and stays above the six-GiB floor; its session owner remains live until
 process exit. A fresh no-fault process completes the same request. A same-server
 API probe showed the 32 MiB workspace is allocated during server warmup and
 reused by the first client request; allowing warmup therefore did not inject a
-request failure. That recovery check is inconclusive, and same-process recovery
-after a late workspace failure remains untested.
+request failure. A marker-gated request-time CUDA allocation refusal now
+produced HTTP 503 and an engine abort during long prefill; the resident Python
+service restarted the engine and the next request succeeded. Separate
+per-generation traces record 32 allocations/no frees before abort (reclaimed at
+process exit), then 32 allocations/31 frees after restart, with the session
+arena still resident. Minimum physical availability was 7.80 GiB. This qualifies
+service restart recovery, not in-place engine recovery or graceful cleanup of
+the aborted engine; the refused 1 MiB request-path allocation is GEMM host
+buffer backing, not the 32 MiB cuBLAS workspace itself.
 
 The [mapped-versus-pread file-tier screen](../../bench/results/2026-10-10-phase3-mapped-pread-screen/README.md)
 ran three randomized pairs on an exact 512-token/64-output request. Tokens and

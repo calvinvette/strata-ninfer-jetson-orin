@@ -50,21 +50,52 @@ python tools/integration/run_control.py \
   --ple-gguf /home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf
 ```
 
-## Same-server recovery probe (inconclusive)
+## Post-warmup request fault and service recovery
 
-A follow-up started the API server under the memory supervisor with the same
-one-shot shim. The original shim refused the workspace during server startup
-warmup, before readiness; that run confirms the service reports startup failure
-and the engine cleans up the partial prefill owner and cache, but cannot test a
-subsequent request. A second attempt allowed the first matching allocation and
-waited for readiness. The API request then succeeded, and the shim did not
-refuse any allocation during that request: the 32 MiB workspace allocated at
-warmup was reused. This is not evidence of injected request failure or
-same-process recovery. Minimum available memory in the latter run was
-8,411,717,632 bytes (7.83 GiB).
+The first two API attempts are retained in `same-process/` and
+`same-process-skip-warmup/`. The first refused the known 32 MiB GEMM workspace
+during warmup; the second allowed warmup and then did not encounter another
+matching allocation. They did not establish request-time recovery.
 
-The captured attempts are in `same-process/` and
-`same-process-skip-warmup/`. The latter also retains the attempted driver
-script. A useful request-level injection needs a targeted hook after warmup or
-a different allocation that is created on the request path; this probe did not
-establish one.
+A marker-gated `cudaMalloc` shim now waits until after readiness, then refuses
+the next allocation of at least 1 MiB during a 1,552-token formatted prefill.
+Two supervised runs hit the injection at 1 MiB, returned HTTP 503 because the
+engine aborted with exit code -6, restarted the engine once inside the same
+Python API service, and completed a one-token recovery request. The follow-up
+run's minimum physical availability was 8,377,454,592 bytes (7.80 GiB). The
+service logs and per-generation owner summaries are in
+`restart-check2/`; the first successful capture is in
+`same-process-request-recovery/`. The first engine generation had 32 observed
+allocation events and no frees before abort; OS process teardown reclaims those
+allocations. The restarted generation had 32 allocations and 31 frees, with the
+235,033,088-byte session arena still live because the server remained resident.
+These are requested-byte observations, not complete physical ownership or graph
+pool accounting. The two generations are summarized separately so the crashed
+engine's allocations are not added to the restarted process peak.
+
+This qualifies service restart and request recovery after an injected request-
+path CUDA allocation failure. It does not show in-place engine recovery,
+graceful cleanup of the aborted engine, or failure specifically in the GEMM
+workspace allocation: the request-path shim refuses the first allocation of at
+least 1 MiB, which is currently a CUDA GEMM host-buffer allocation on the traced
+stack. The `restart-check-supervisor/` attempt failed before launch because its
+loopback port was still unavailable; it is retained as a harness setup failure.
+The successful re-run used port 18127.
+
+Reproduction builds the shim and then runs:
+
+```bash
+g++ -shared -fPIC -O2 \
+  -I/usr/local/cuda-12.6/targets/aarch64-linux/include \
+  bench/results/2026-10-10-phase3-prefill-workspace-failure/fail_malloc_after_marker.cpp \
+  -ldl -o /tmp/strata-fail-malloc-marker.so
+python tools/integration/run_control.py \
+  --output bench/results/2026-10-10-phase3-prefill-workspace-failure/restart-check2-supervisor \
+  --timeout 1200 \
+  /home/calvin/models/strata-orin-validation/pack-venv/bin/python \
+  bench/results/2026-10-10-phase3-prefill-workspace-failure/same_process_request_recovery.py \
+  --config build/integration/candidate-protocol/server-config.json \
+  --shim /tmp/strata-fail-malloc-marker.so \
+  --output-dir bench/results/2026-10-10-phase3-prefill-workspace-failure/restart-check2 \
+  --port 18127
+```
