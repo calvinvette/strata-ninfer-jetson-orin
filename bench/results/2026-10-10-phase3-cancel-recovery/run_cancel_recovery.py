@@ -13,6 +13,8 @@ def main():
     parser.add_argument('--config', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--port', type=int, default=18125)
+    parser.add_argument('--graph-preload', type=Path,
+                        help='optional test-only CUDA graph memory sampling interposer')
     args = parser.parse_args()
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
@@ -31,6 +33,8 @@ def main():
     cfg['log'] = str(out / 'engine.log')
     cfg['open_browser'] = False
     cfg['env'] = {**cfg.get('env', {}), 'STRATA_INTEGRATION_TRACE': '1'}
+    if args.graph_preload:
+        cfg['env']['LD_PRELOAD'] = str(args.graph_preload.resolve())
     config_path = out / 'server-config.json'
     config_path.write_text(json.dumps(cfg, indent=2) + '\n')
     base = f'http://127.0.0.1:{args.port}'

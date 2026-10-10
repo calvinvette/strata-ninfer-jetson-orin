@@ -99,6 +99,15 @@ available after cache, verifier and MTP setup. This is one small-image smoke
 point. The separate vision process and CUDA graph-pool bytes remain outside the
 owner trace, so this does not complete transient or graph peak accounting.
 
+The [CUDA graph allocator probe](../../bench/results/2026-10-10-phase3-graph-memory-probe/README.md)
+observed 10 graph instantiations, 1,900 memory snapshots, and zero graph async-
+allocator usage. A 4 MiB graph-allocation calibration correctly reported the
+driver's 32 MiB reservation after launch. Strata's captured graphs have no async
+allocation nodes, so these attributes do not account for their executable or
+driver memory. The largest free-memory drop across one instantiate call was
+116.8 MiB, a correlated global device delta rather than a graph allocation
+measurement; graph peak accounting remains open.
+
 An actual cgroup-v2 [admission check](../../bench/results/2026-10-10-phase3-cgroup-admission/README.md)
 placed the supervisor in a 1 GiB systemd user scope. It saw only 1.0 GiB of
 effective cgroup availability despite 24.6 GiB host availability and aborted

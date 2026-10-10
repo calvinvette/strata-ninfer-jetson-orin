@@ -283,6 +283,15 @@ encoder process or graph-pool bytes. A Splash port should record image decode,
 Metal encoder allocations, embedding lifetime and model-side image buffers as
 separate owners, then validate the total with system memory-pressure telemetry.
 
+CUDA's graph memory attributes report the asynchronous graph allocator; a
+calibration with graph allocation nodes confirmed those values, while Strata's
+captured kernel graphs used none of that pool. The API therefore cannot stand
+in for total graph executable residency. For Splash, track command-buffer
+lifetimes and Metal heap/resource residency at each capture/replay boundary,
+including driver-managed transient memory; report API-specific counters beside
+system-wide physical pressure rather than treating a zero pool reading as zero
+graph cost.
+
 
 
 ## Keep source quantization separate from materialized dtype
