@@ -47,17 +47,23 @@ convention.
 
 The same cell was repeated inside transient systemd cgroups:
 
-| MemoryMax | Outcome | Minimum effective availability | Minimum host availability | Peak scope current |
-| ---: | --- | ---: | ---: | ---: |
-| 20 GiB | Request completed; output token 32 | 7.98 GiB | 15.82 GiB | 12.01 GiB |
-| 16 GiB | Supervisor pressure abort during prefill | 5.45 GiB | 15.80 GiB | 10.55 GiB |
+| MemoryMax | Cell | Outcome | Minimum effective availability | Minimum host availability | Peak scope current |
+| ---: | --- | --- | ---: | ---: | ---: |
+| 20 GiB | No MTP | Completed; output token 32 | 7.98 GiB | 15.82 GiB | 12.01 GiB |
+| 20 GiB | MTP loaded/bound | Completed; output token 32 | 9.81 GiB | 15.00 GiB | 10.19 GiB |
+| 16 GiB | No MTP | Supervisor pressure abort during prefill | 5.45 GiB | 15.80 GiB | 10.55 GiB |
 
 The 16-GiB run crossed the six-GiB effective-availability stop threshold
 between sampler intervals; host availability stayed ample and the process was
 stopped by the supervisor, not by an OOM event. These cells show this exact
 workload completing at 20 GiB and being refused at 16 GiB. They do not define a
 general minimum cgroup size or a supported capacity profile. Raw telemetry and
-outputs are in `run/cgroup-20g/` and `run/cgroup-16g/`.
+outputs are in `run/cgroup-20g/`, `run/mtp-cgroup-20g/` and
+`run/cgroup-16g/`. The two 20-GiB peaks are separate runs under changing cache
+and host conditions; do not subtract them to estimate MTP's incremental
+physical cost. The MTP-loaded cell nevertheless passed the supervisor's
+effective-memory floor with over 9.8 GiB minimum measured effective
+availability.
 
 Finally, the same 5,000-slot, no-MTP, 512-token/one-output cell completed with
 `--max-context 8192` and `--max-context 16384`. Minimum host availability was

@@ -283,6 +283,9 @@ With this exact one-token cell under cgroup limits, 20 GiB completed with
 7.98 GiB minimum effective availability; 16 GiB was safely aborted during
 prefill when sampled effective availability reached 5.45 GiB, while host
 availability remained 15.80 GiB. These are cell-specific admission bounds.
+The MTP-loaded one-token cell also completed in a 20-GiB scope with 9.81 GiB
+minimum effective and 15.00 GiB minimum host availability; separate-run scope
+peaks are not used to infer MTP's incremental RAM cost.
 At the same 5,000 cache slots, configured 8K and 16K contexts also admitted
 the one-token/512-input smoke with 15.65/15.70 GiB minimum host availability;
 these do not represent long-context ingestion or quality tests.
