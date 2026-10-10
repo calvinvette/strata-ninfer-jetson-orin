@@ -272,6 +272,13 @@ device-level storage traffic, state whether worker time is summed or wall time,
 and establish counter baselines after loading/warmup. The full protocol and
 limits are recorded in the [transfer telemetry report](../results/2026-10-10-phase3-transfer-telemetry/README.md).
 
+The 3,522-token/256-output Orin recovery smoke then served a separate short
+request through the same engine. It passed above the six-GiB floor, while
+workspace and cache owners remained service-resident until orderly shutdown.
+For Splash, distinguish service-lifetime reservations from per-request scratch
+and prove recovery by serving the follow-up request; teardown balance alone
+does not prove a request released reusable workspace.
+
 ## Separate virtual address ranges from physical backing
 
 The segmented CUDA expert cache reserves one address range and maps physical

@@ -103,6 +103,15 @@ resident session owner stayed live by design. Minimum physical availability was
 7.65 GiB. Graph-pool bytes remain unpriced, and this does not test persistent
 state parity or injected late-workspace recovery.
 
+A separate [long-then-short service recovery smoke](../../bench/results/2026-10-10-phase3-long-request-recovery/README.md)
+completed a 3,522-token prompt and 256-token output, followed by a one-token
+request through the same engine. Both returned HTTP 200 and minimum availability
+was 7.81 GiB. The service started once. Prefill, expert-cache and MTP owner
+buffers were released at orderly shutdown; the trace does not show per-request
+workspace release or a unique transient peak. This closes only the basic
+post-long-request availability check, not recovery after allocation failure or
+state parity.
+
 The candidate [vision-enabled image request](../../bench/results/2026-10-10-phase3-vision-allocation/README.md)
 now passes with the optional CUDA encoder built locally. Its 56×56 image request
 completed at the six-GiB floor (minimum 7.22 GiB); startup reported 7.43 GiB
