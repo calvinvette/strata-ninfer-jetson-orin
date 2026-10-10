@@ -76,8 +76,13 @@ ran three randomized pairs on an exact 512-token/64-output request. Tokens and
 nine persistent-state fields matched in all pairs, with 8.17 GiB minimum
 availability. Mapped decode median was 22.7% lower, while prompt median was
 1.7% higher; this small screen is not a promotion result. Process page faults
-were collected, but disk-byte, copy-latency, energy and GPU/EMC clock counters
-were unavailable, so the full transfer tradeoff gate remains open.
+were collected, but process-level disk bytes were unavailable. A same-day
+randomized repeat now records NVMe partition read sectors: mapped median 7.52
+GiB, pread 8.23 GiB, with mapped-minus-pread paired deltas between -742 MB and
+-1.19 GB. These whole-device counters include unrelated reads and readahead,
+not isolated engine bytes. Request medians again favored mapped in total time;
+copy latency, energy and GPU/EMC clocks remain unmeasured, so the full transfer
+gate stays open.
 
 The traced [API cancellation and recovery run](../../bench/results/2026-10-10-phase3-cancel-recovery/README.md)
 passed all seven real-model protocol scenarios, including prefill and decode

@@ -2,6 +2,7 @@
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import random
 import re
@@ -36,6 +37,17 @@ def process_counters(pid):
         if key in ('rchar', 'read_bytes', 'syscr'):
             values[key] = int(value.strip())
     return values
+
+
+def block_device_counters(path):
+    """Read physical block reads for the filesystem holding one model artifact."""
+    st = path.stat()
+    major, minor = os.major(st.st_dev), os.minor(st.st_dev)
+    stat_path = (Path('/sys/dev/block') / f'{major}:{minor}' / 'stat').resolve()
+    fields = stat_path.read_text().split()
+    # Linux block-stat field 3 is sectors read; the kernel reports 512-byte sectors.
+    return {'device': stat_path.parent.name, 'major': major, 'minor': minor,
+            'read_sectors': int(fields[2]), 'read_bytes': int(fields[2]) * 512}
 
 
 def state_hashes(path):
@@ -104,6 +116,10 @@ def main():
                   'io_threads': args.io_threads,
                   'seed': args.seed, 'arms': [], 'pair_comparisons': []}
     args_for = list(cfg['args'])
+    pack_path = Path(args_for[args_for.index('--pack') + 1])
+    disk_counter_path = pack_path / 'experts.bin'
+    if not disk_counter_path.is_file():
+        raise FileNotFoundError(f'expected packed expert file for block telemetry: {disk_counter_path}')
     for key, value in (('--max-context', str(max(args.prompt_tokens + args.generated_tokens, 8192))),
                        ('--prompt-cache', '6')):
         if key in args_for:
@@ -155,14 +171,21 @@ def main():
                 queue_module.Queue = base_queue
             try:
                 before = process_counters(engine.proc.pid)
+                block_before = block_device_counters(disk_counter_path)
                 ids = [token for token in engine.generate(prompt, args.generated_tokens,
                        {'temperature': 0}, threading.Event()) if token is not None]
                 after = process_counters(engine.proc.pid)
+                block_after = block_device_counters(disk_counter_path)
                 arm.update(ids=ids, text=tokenizer.decode(ids), usage=dict(engine.last))
             finally:
                 engine.close()
             arm['process_io_and_fault_deltas'] = {
                 key: after[key] - before[key] for key in before.keys() & after.keys()}
+            arm['host_block_device_reads_during_request'] = {
+                'device': block_after['device'], 'major': block_after['major'],
+                'minor': block_after['minor'],
+                'read_bytes_delta': block_after['read_bytes'] - block_before['read_bytes'],
+                'scope': 'whole host block device; includes unrelated reads and kernel readahead'}
             arm['state'] = state_hashes(log)
             owners = summarize(log.read_text(encoding='utf-8').splitlines())
             arm['owner_observations'] = owners

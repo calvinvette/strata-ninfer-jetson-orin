@@ -30,10 +30,32 @@ The first harness attempt in `supervisor/` stopped after startup because
 `/proc/<engine-pid>/io` was absent on this Orin process. The harness now treats
 those counters as unavailable and retains process page-fault counts; the
 completed rerun is in `retry-supervisor/`. Its `median_process_read_bytes` is
-null (unavailable), not zero. No disk read bytes, copy counts or copy latency
-were observed. Energy was not measured. Raw tegrastats are retained; CPU clocks
-varied, while GPU and EMC clock rates were unavailable. These gaps prevent this
-screen from satisfying the full Phase 3 transfer tradeoff gate.
+null (unavailable), not zero. Energy was not measured. Raw tegrastats are
+retained; CPU clocks varied, while GPU and EMC clock rates were unavailable.
+These gaps prevent this screen from satisfying the full Phase 3 transfer
+tradeoff gate.
+
+## Repeat with host block-device counters
+
+A same-day randomized three-pair repeat is retained in `disk-counter-supervisor/`.
+The harness now samples the 512-byte read-sector counter for `nvme0n1p1`, the
+partition containing `experts.bin`, immediately before and after each request.
+All pairs again matched generated token IDs and nine persistent-state fields.
+The whole-device median was 7.52 GiB of reads for mapped and 8.23 GiB for pread;
+the paired mapped-minus-pread deltas were -1.19 GB, -742 MB and -813 MB. The
+counter includes all reads from that host partition, including unrelated
+processes and kernel readahead, so these numbers are contextual disk traffic,
+not per-engine bytes or an isolated causal estimate. Median request times in
+this repeat were 21,673.8 ms prompt / 4,584.5 ms decode for mapped and
+21,961.3 ms / 5,985.9 ms for pread. Minimum physical availability was
+8,895,905,792 bytes (8.29 GiB). This adds system-level disk-byte evidence; it
+does not measure copy latency, energy, or GPU/EMC clock rates and remains a
+three-pair screen.
+
+`file_tier_transfer_parity.py` samples this counter from the filesystem device
+holding the packed experts. Its result labels the scope explicitly. Per-process
+`/proc/<pid>/io` remained unavailable in this repeat; process major/minor fault
+counters were still captured.
 
 The serving harness and exact raw process fault deltas are retained alongside
 the pair results, memory samples and tegrastats. Model artifacts remain in
