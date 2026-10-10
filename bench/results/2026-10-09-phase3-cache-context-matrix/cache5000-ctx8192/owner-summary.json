@@ -1,0 +1,69 @@
+{
+  "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+  "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA segmented ExpertCache mapped VMM physical segments, CUDA VMM physical chunks across VmmRange ownership transfers, pageable/pinned expert-stage host buffers, primary SessionState backing, verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; SYCL ExpertCache, stage/batch sessions and other sites excluded",
+  "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+  "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+  "allocation_events": 32,
+  "free_events": 31,
+  "vmm_range_mappings": {
+    "map_events": 0,
+    "unmap_events": 0,
+    "still_mapped_at_log_end": []
+  },
+  "planned_reservations": {
+    "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+    "events": []
+  },
+  "owners": [
+    {
+      "owner": "expert-cache",
+      "instance": 281474842051584,
+      "device": 0,
+      "peak_observed_requested_bytes": 13311897600,
+      "live_observed_requested_bytes": 0,
+      "view_events": 0,
+      "last_owner_reported_payload_bytes": null,
+      "successful_graph_instantiations": 0
+    },
+    {
+      "owner": "mtp",
+      "instance": 281474842088400,
+      "device": 0,
+      "peak_observed_requested_bytes": 24778192,
+      "live_observed_requested_bytes": 0,
+      "view_events": 0,
+      "last_owner_reported_payload_bytes": 1072319160,
+      "successful_graph_instantiations": 0
+    },
+    {
+      "owner": "prefill",
+      "instance": 187650822855104,
+      "device": 0,
+      "peak_observed_requested_bytes": 229877760,
+      "live_observed_requested_bytes": 0,
+      "view_events": 34,
+      "last_owner_reported_payload_bytes": null,
+      "successful_graph_instantiations": 0
+    },
+    {
+      "owner": "session",
+      "instance": 281474842084272,
+      "device": 0,
+      "peak_observed_requested_bytes": 343101952,
+      "live_observed_requested_bytes": 343101952,
+      "view_events": 0,
+      "last_owner_reported_payload_bytes": null,
+      "successful_graph_instantiations": 0
+    },
+    {
+      "owner": "verifier",
+      "instance": 281474842092552,
+      "device": 0,
+      "peak_observed_requested_bytes": 77985280,
+      "live_observed_requested_bytes": 0,
+      "view_events": 0,
+      "last_owner_reported_payload_bytes": null,
+      "successful_graph_instantiations": 2
+    }
+  ]
+}
