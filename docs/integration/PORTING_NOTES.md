@@ -236,9 +236,10 @@ observed allocation with a free. A future Splash adapter should apply the same
 identity distinction to Metal heaps, sparse resources and aliases, while
 tracking Metal-specific residency and shared backing semantics. Shared CUDA
 VMM chunks now have a global physical-handle lifetime that remains live while a
-chunk moves between expert-cache and K/V ranges. Per-range map and transfer
-events remain untraced, so this is not yet a complete allocation and ownership
-ledger.
+chunk moves between expert-cache and K/V ranges. Each map/unmap is also recorded
+against its range instance without adding the mapped view to backing totals.
+Range instance IDs still need semantic role labels for easier attribution, and
+other CUDA/driver allocations remain outside this partial owner ledger.
 
 
 

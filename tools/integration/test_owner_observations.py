@@ -80,6 +80,42 @@ class OwnerObservationTests(unittest.TestCase):
         self.assertEqual(result['allocation_events'], 1)
         self.assertEqual(result['free_events'], 1)
 
+    def test_vmm_chunk_transfer_between_ranges_does_not_duplicate_backing(self):
+        def physical(kind):
+            return PREFIX + json.dumps(dict(schema=1, owner='cuda-vmm-physical-chunk',
+                kind=kind, allocation=701, requested_bytes=(2 << 20) if kind == 'allocate' else 0,
+                instance=7, device=0, count=0))
+
+        def mapping(kind, instance):
+            return PREFIX + json.dumps(dict(schema=1, owner='cuda-vmm-range',
+                kind=kind, allocation=701, requested_bytes=2 << 20, instance=instance,
+                device=0, count=0))
+
+        result = summarize([physical('allocate'), mapping('map', 8), mapping('unmap', 8),
+                            mapping('map', 9), mapping('unmap', 9), physical('free')])
+        self.assertEqual(result['allocation_events'], 1)
+        self.assertEqual(result['free_events'], 1)
+        self.assertEqual(result['vmm_range_mappings'], {
+            'map_events': 2, 'unmap_events': 2, 'still_mapped_at_log_end': []})
+        owner = next(o for o in result['owners'] if o['owner'] == 'cuda-vmm-physical-chunk')
+        self.assertEqual(owner['peak_observed_requested_bytes'], 2 << 20)
+
+    def test_vmm_map_requires_live_physical_handle(self):
+        mapping = PREFIX + json.dumps(dict(schema=1, owner='cuda-vmm-range', kind='map',
+            allocation=702, requested_bytes=2 << 20, instance=8, device=0, count=0))
+        with self.assertRaises(ValueError):
+            summarize([event('allocate', size=1), mapping])
+
+    def test_vmm_physical_handle_cannot_be_released_while_mapped(self):
+        allocation = PREFIX + json.dumps(dict(schema=1, owner='cuda-vmm-physical-chunk', kind='allocate',
+            allocation=703, requested_bytes=2 << 20, instance=7, device=0, count=0))
+        mapping = PREFIX + json.dumps(dict(schema=1, owner='cuda-vmm-range', kind='map',
+            allocation=703, requested_bytes=2 << 20, instance=8, device=0, count=0))
+        free = PREFIX + json.dumps(dict(schema=1, owner='cuda-vmm-physical-chunk', kind='free',
+            allocation=703, requested_bytes=0, instance=7, device=0, count=0))
+        with self.assertRaises(ValueError):
+            summarize([allocation, mapping, free])
+
     def test_alias_cannot_be_counted_as_another_allocation(self):
         with self.assertRaises(ValueError):
             summarize([event('allocate', size=10), event('allocate', size=10, instance=2)])

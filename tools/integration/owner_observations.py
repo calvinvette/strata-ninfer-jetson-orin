@@ -7,7 +7,8 @@ PREFIX = 'strata integration: '
 
 
 def summarize(lines):
-    live, peaks, current, graphs, views, payloads, reservations = {}, {}, {}, {}, {}, {}, {}
+    live, peaks, current, graphs, views, payloads, reservations, mapped = {}, {}, {}, {}, {}, {}, {}, {}
+    range_maps = range_unmaps = 0
     allocations = frees = 0
     for line in lines:
         if not line.startswith(PREFIX):
@@ -35,8 +36,26 @@ def summarize(lines):
         elif row['kind'] == 'free':
             if key not in live or live[key][0] != owner:
                 raise ValueError('unmatched free or conflicting allocation owner')
+            if key in mapped:
+                raise ValueError('physical VMM handle released while it is still mapped')
             current[owner] -= live.pop(key)[1]
             frees += 1
+        elif row['kind'] == 'map':
+            size = row['requested_bytes']
+            range_owner = (row['owner'], row['instance'], row['device'])
+            if (row['owner'] != 'cuda-vmm-range' or not isinstance(size, int) or size <= 0 or
+                    key not in live or live[key][0][0] != 'cuda-vmm-physical-chunk' or key in mapped):
+                raise ValueError('invalid or duplicate physical VMM range mapping')
+            mapped[key] = (range_owner, size)
+            range_maps += 1
+        elif row['kind'] == 'unmap':
+            size = row['requested_bytes']
+            range_owner = (row['owner'], row['instance'], row['device'])
+            if (row['owner'] != 'cuda-vmm-range' or not isinstance(size, int) or size <= 0 or
+                    key not in mapped or mapped[key] != (range_owner, size)):
+                raise ValueError('unmatched or conflicting physical VMM range unmap')
+            mapped.pop(key)
+            range_unmaps += 1
         elif row['kind'] == 'graph_instantiate':
             if row['count'] != 1 or row['requested_bytes']:
                 raise ValueError('invalid graph instantiation observation')
@@ -62,6 +81,11 @@ def summarize(lines):
         'graph_bytes': 'unsupported; counts do not measure driver or graph-pool bytes',
         'cleanup': 'live at log end is not a leak verdict; process termination may bypass destructors',
         'allocation_events': allocations, 'free_events': frees,
+        'vmm_range_mappings': {
+            'map_events': range_maps, 'unmap_events': range_unmaps,
+            'still_mapped_at_log_end': [
+                {'device': key[0], 'allocation': key[1], 'range_instance': value[0][1],
+                 'bytes': value[1]} for key, value in sorted(mapped.items())]},
         'planned_reservations': {
             'scope': 'cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals',
             'events': [{'label': o[0], 'instance': o[1], 'device': o[2], 'bytes': b}

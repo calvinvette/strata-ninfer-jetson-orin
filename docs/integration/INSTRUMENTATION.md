@@ -22,8 +22,10 @@ address range is excluded. This supports cache shrink/grow observation without
 treating address reservation as device memory. Shared KV VMM chunks that move
 between cache and KV ownership use a stable physical-chunk owner: allocation
 remains live across range transfers and ends only on successful handle release.
-Per-range map/unmap transitions are not emitted yet. SYCL has a separate cache
-source and does not emit these cache events. CUDA/HIP expert-stage buffers report separate
+`cuda-vmm-range` map/unmap events record those transfers without adding mapped
+views to physical-byte totals; the parser checks each mapping against a live
+physical handle and range instance. SYCL has a separate cache source and does
+not emit these cache events. CUDA/HIP expert-stage buffers report separate
 `expert-stage-pinned-host` and `expert-stage-pageable-host` owners with host device
 id `-1`; these events distinguish host backing and do not count as GPU memory.
 SYCL's migrated expert-source implementation is separate and does not emit these
@@ -47,7 +49,9 @@ python tools/integration/owner_observations.py \
 The parser rejects duplicate allocation identities, unmatched frees, conflicting
 owners and unsupported schema/kinds. VMM segment handles use the same lifetime
 checks, so a shrink followed by regrowth can reuse a released handle identity
-without overlapping its earlier lifetime. It tracks only the observed requested
+without overlapping its earlier lifetime. Shared VMM map/unmap records keep a
+chunk's allocation lifetime intact while it changes range owners and reject a
+release while still mapped. It tracks only the observed requested
 payloads. A live allocation at log end is reported explicitly; process termination
 may bypass destructors, so this is not automatically a leak. Absence of records
 fails rather than reporting zero usage. Requested bytes exclude allocator backing
@@ -99,8 +103,8 @@ bytes or physical memory. Device identities on frees come from the owning device
 The expanded [evidence report](../../bench/results/2026-10-09-prefill-mtp-owner-trace/README.md)
 compares owned and borrowed prefill, and trace-off protocol checks. Remaining
 sites include verifier mapped staging/auxiliary/batch buffers, MTP weight-load
-allocations, layer-stage and batch-slot session arenas, per-range VMM map/unmap
-transitions and graph capture/destroy/pool observations. Phase 3 must distinguish unique physical backing, views and future
+allocations, layer-stage and batch-slot session arenas, VMM virtual-address
+reservations and graph capture/destroy/pool observations. Phase 3 must distinguish unique physical backing, views and future
 reservations. Phase 1 needs explicit counters and unsupported scopes; do not
 mistake a partial requested-byte trace for the later accounting gate.
 
@@ -109,6 +113,9 @@ passes the existing shrink/regrow test for uniform and sized expert caches.
 Forty-one observed allocation events have matching frees, including the mapped
 physical segments. The short test had no model or imposed memory pressure; it
 qualifies trace lifecycle and cache data preservation only.
+The shared-range [transfer check](../../bench/results/2026-10-09-vmm-segment-owner-trace/README.md)
+also records physical chunks once across ownership moves, with 11 matched
+map/unmap pairs and no mapping left live at teardown.
 
 Shared owner edits require CUDA/HIP/SYCL builds, including migrated SYCL source
 copies where they exist. The latest native build and targeted tests pass for the

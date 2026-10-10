@@ -27,11 +27,19 @@ available memory sample was 26,430,693,376 bytes; the run lasted 1.06 s, so this
 is a functional transfer/lifetime check rather than pressure evidence. Raw
 events and telemetry are under `shared-vmm-chunk-test/`.
 
+A repeat after adding range events passed the same test under the supervisor.
+It recorded 9 physical allocations/releases and 11 `cuda-vmm-range` map/unmap
+pairs; no handle was still mapped at process exit. Peak physical-chunk payload
+remained 18,874,368 bytes, showing that remapping between ranges did not count
+as a second allocation. The minimum available-memory sample was
+26,419,552,256 bytes over 1.06 s. Raw events and the parsed transition summary
+are under `shared-vmm-chunk-maps-test/`.
+
 Raw engine events are in `stderr.txt`; supervisor telemetry is in
 `memory.jsonl`, `tegrastats.txt` and `result.json`. The summarized parser output
 is `owner-summary.json`. No model was loaded. Energy and clock sampling were not
 part of this short test. The native candidate binary SHA-256 is
-`0901645481ba3e9274e455c5ad688eebc303e85f3f9807901d88f5a5da9fcf55`; the
+`8da2ee4299832c1715b07c9dfa2287453c492b48e4e4d96929ff54c1438636df`; the
 segmented test binary SHA-256 is
 `4492c8436d0401632975b4926f7aa172cfd9fb081660e4278bff0affba89cf77`. Source
 hashes are recorded in `source-hashes.txt`. Verify all retained files with

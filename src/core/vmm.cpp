@@ -129,6 +129,9 @@ bool VmmRange::map_one(int64_t i, VmmChunk h) {
         CUDA_SUCCESS)
         return false;
     h_[(size_t) i] = h;
+    strata::platform::integration_trace::event(
+        "cuda-vmm-range", "map", this,
+        reinterpret_cast<const void*>(static_cast<uintptr_t>(h)), a.gran, a.dev);
     return true;
 }
 
@@ -154,6 +157,9 @@ VmmChunk VmmRange::unmap(int64_t i) {
     const Api& a = api();
     const VmmChunk h = h_[(size_t) i];
     if (a.unmap((CUdeviceptr) (base_ + (uint64_t) i * a.gran), (size_t) a.gran) != CUDA_SUCCESS) return 0;
+    strata::platform::integration_trace::event(
+        "cuda-vmm-range", "unmap", this,
+        reinterpret_cast<const void*>(static_cast<uintptr_t>(h)), a.gran, a.dev);
     h_[(size_t) i] = 0;
     return h;
 }
