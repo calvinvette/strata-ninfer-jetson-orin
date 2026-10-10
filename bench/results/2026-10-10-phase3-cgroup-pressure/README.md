@@ -17,23 +17,28 @@ workspace pressure or service recovery under active cgroup pressure.
 
 ## Strata under an active cgroup cap
 
-The candidate engine then ran the existing IQ1_M native path inside a transient
-12 GiB scope, with `run_control.py` enforcing the normal 6 GiB effective
-availability floor. Startup completed, chose file-backed experts, sized the
-expert cache to 1,410 slots under the cap and completed profile fill. During
-the 512-token prefill the supervisor observed cgroup availability reach
-6,409,375,744 bytes, then terminated the command as its next sample crossed
-the floor. At that point host `MemAvailable` remained 22,215,254,016 bytes;
-the cgroup scope reached 6,475,526,144 bytes current of 12 GiB. This is a
-supervisor pressure abort, not an engine allocation failure or a completed
-request.
+The same candidate binary, IQ1_M pack/profile, flags and 512-token prompt ran
+inside 12, 16 and 24 GiB transient scopes, each with `run_control.py` enforcing
+the normal 6 GiB effective-availability floor. The 12 GiB run started, chose
+file-backed experts, filled 1,410 expert-cache slots and was terminated during
+prefill when the next cgroup sample crossed the floor. Effective availability
+reached 6,409,375,744 bytes; host `MemAvailable` was still 22,215,254,016
+bytes. Scope usage peaked at 6,475,526,144 of 12 GiB. The 16 GiB run reached
+prefill with a larger cache, then was stopped at 5.46 GiB effective
+availability while host `MemAvailable` remained 15.61 GiB; scope usage peaked
+at 10.54 of 16 GiB. Both are supervisor pressure aborts, not engine allocation
+failures or completed requests.
+
+The 24 GiB scope passed the same request. It completed the 511-token prompt and
+generated one token with 8.84 GiB minimum effective/host availability; scope
+usage peaked at 9.76 of 24 GiB. This is a single successful cell, not a general
+minimum cgroup size or a supported-capacity claim.
 
 A fresh run with the same binary, pack, profile, flags and workload outside the
-12 GiB scope passed, completed the 511-token prompt and generated one token.
-Its minimum host availability was 8,180,158,464 bytes (7.62 GiB). This shows
+12 GiB scope also passed, with 7.62 GiB minimum host availability. This shows
 fresh-process recovery after the supervisor ends a cgroup-limited engine. It
-does not demonstrate in-process recovery, state parity, or that the bounded
-12 GiB scope supports this workload. Raw outputs and cgroup/host samples are in
+does not demonstrate in-process recovery or state parity. Raw outputs and
+cgroup/host samples for all cells are in
 `../2026-10-10-phase3-cgroup-engine/`.
 
 ## PLE artifact rerun
