@@ -38,12 +38,14 @@ does not demonstrate in-process recovery, state parity, or that the bounded
 
 ## PLE artifact rerun
 
-The current `ple_parity` CTest was rerun against the downloaded Q2_0 shard and
-generated Q2_0 pack. It exits 2 during preflight because the oracle requires a
+The first rerun of `ple_parity` against the downloaded Q2_0 shard and generated
+Q2_0 pack exits 2 during preflight because the old oracle requires a
 26,214,400-byte PLE value span while this pack indexes 13,107,200 bytes of BF16
-values. This is the known representation mismatch documented in the
-[Q2_0 PLE attempt](../2026-10-10-phase3-q2-ple-test/README.md), not a numerical
-parity failure and not a pass.
+values. The raw failure is retained below and in the original
+[Q2_0 PLE attempt](../2026-10-10-phase3-q2-ple-test/README.md). The reader was
+then adapted to the source key blocks and BF16 values; the resulting test
+passes all seven stages. See the [artifact-aware PLE
+report](../2026-10-10-phase3-q2-ple-artifact-aware/README.md).
 
 The real-table reader was separately run with 64 rows from that shard and
 reported bit-identical mmap/direct reads. The selected Phase 3 CTest set was

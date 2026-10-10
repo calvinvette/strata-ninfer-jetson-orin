@@ -20,6 +20,7 @@
 #include "strata/kernels/ngram.hpp"
 #include "strata/kernels/f16_bits.hpp"
 #include "strata/kernels/native_mmvq.hpp"
+#include "strata/artifact/gguf_reader.hpp"
 #include "ple_oracle_vectors.inc"
 
 #include <cuda_runtime.h>
@@ -153,6 +154,7 @@ constexpr double kStageTolerance = 1e-5;
 /// The six PLE tensors as the pack stores them, plus the views the kernel and the reference each want.
 struct PleHostWeights {
     std::vector<uint8_t> key_codes, raw_scales;   // ple_key: 2-bit codes, then the fp16 group scales as stored
+    std::vector<uint8_t> native_q2_key;           // exact Q2_0 GGUF blocks, when read from the source artifact
     std::vector<float> key_scales;                // the same scales widened to f32, which every S-form kernel takes
     std::vector<uint16_t> value_bf16;             // ple_value BF16 bits
     std::vector<uint16_t> conv1d_f16;             // ple_conv1d F16 bits, ggml order k + kern*c
@@ -178,10 +180,11 @@ bool pack_tensor_span(const std::string& pack, const std::string& name, uint64_t
     return false;
 }
 
-/// Reads the PLE tensors of layer 1 from `<pack>/dense.bin` at the spans the pack's index gives.  The spans of
-/// `ple_key` and `ple_value` are also required to equal the generated offsets, so those two cannot drift apart
-/// silently.  Returns false, with `err` set, when an entry is missing or its size is not the expected one.
-bool load_ple_weights(const std::string& pack, PleHostWeights& w, std::string& err) {
+/// Reads the PLE tensors of layer 1 from the pack. Older packs store separated key codes/scales and expanded
+/// BF16 values; the Q2_0 artifact stores its key as native GGUF blocks and its value as raw BF16. The latter
+/// source representation is validated and unpacked into the oracle's explicit code/scale view without using a
+/// production decoder.
+bool load_ple_weights(const std::string& pack, const std::string& gguf, PleHostWeights& w, std::string& err) {
     static_assert(o::kKeyScalesOffset == o::kKeyCodesOffset + o::kKeyCodesBytes,
                   "the fp16 key scales follow the key codes in the pack");
     const uint64_t hcd = (uint64_t) k::NG_HC_DIM;
@@ -196,9 +199,64 @@ bool load_ple_weights(const std::string& pack, PleHostWeights& w, std::string& e
         if (v.empty()) err = std::string("cannot read ") + name + " from " + pack + "/dense.bin";
         return v;
     };
-    const std::vector<uint8_t> key = tensor("blk.1.ple_key.weight", o::kKeyCodesBytes + o::kKeyScalesBytes,
-                                            o::kKeyCodesOffset);
-    const std::vector<uint8_t> value = tensor("blk.1.ple_value.weight", o::kValueBytes, o::kValueOffset);
+    std::vector<uint8_t> key = tensor("blk.1.ple_key.weight", o::kKeyCodesBytes + o::kKeyScalesBytes,
+                                     o::kKeyCodesOffset);
+    if (!err.empty()) {
+        err.clear();
+        try {
+            strata::GgufModel model = strata::GgufModel::open(gguf);
+            size_t shard = 0;
+            const strata::TensorInfo* t = model.find("blk.1.ple_key.weight", &shard);
+            if (!t || t->type != 42 || t->shape != std::vector<uint64_t>{2560, (uint64_t) hcd} ||
+                !model.in_bounds(*t, shard)) {
+                err = "GGUF PLE key is missing, not Q2_0, has the wrong shape, or is out of bounds";
+                return false;
+            }
+            const uint64_t payload = strata::tensor_payload_bytes(*t);
+            if (payload != o::kKeyCodesBytes + o::kKeyScalesBytes) {
+                err = "GGUF PLE Q2_0 key payload has an unexpected byte count";
+                return false;
+            }
+            const uint8_t* raw = model.shard(shard).tensor_data(*t);
+            key.resize((size_t) payload);
+            w.native_q2_key.assign(raw, raw + (size_t) payload);
+            const size_t blocks = (size_t) hcd * (size_t) k::NG_N_EMBD / 64;
+            for (size_t b = 0; b < blocks; ++b) {
+                std::memcpy(key.data() + b * 16, raw + b * 18 + 2, 16);
+                std::memcpy(key.data() + o::kKeyCodesBytes + b * 2, raw + b * 18, 2);
+            }
+        } catch (const std::exception& e) {
+            err = std::string("cannot read native Q2_0 PLE key from GGUF: ") + e.what();
+            return false;
+        }
+    }
+    uint64_t value_off = 0, value_bytes = 0;
+    std::vector<uint8_t> value;
+    if (pack_tensor_span(pack, "blk.1.ple_value.weight", value_off, value_bytes) &&
+        (value_bytes == o::kValueBytes || value_bytes == (uint64_t) k::NG_N_EMBD * k::NG_N_EMBD * 2) &&
+        (value_bytes != o::kValueBytes || value_off == o::kValueOffset)) {
+        value = read_at((pack + "/dense.bin").c_str(), (long long) value_off, (size_t) value_bytes);
+        if (value.empty()) err = "cannot read blk.1.ple_value.weight from pack dense.bin";
+    } else {
+        err = "the pack index has no supported BF16 blk.1.ple_value.weight span";
+    }
+    if (err.empty() && !w.native_q2_key.empty()) {
+        try {
+            strata::GgufModel model = strata::GgufModel::open(gguf);
+            size_t shard = 0;
+            const strata::TensorInfo* t = model.find("blk.1.ple_value.weight", &shard);
+            if (!t || t->type != 30 || t->shape != std::vector<uint64_t>{2560, 2560} ||
+                !model.in_bounds(*t, shard) || strata::tensor_payload_bytes(*t) != value.size() ||
+                std::memcmp(model.shard(shard).tensor_data(*t), value.data(), value.size()) != 0) {
+                err = "pack BF16 PLE value bytes do not match the source GGUF tensor";
+                return false;
+            }
+            std::puts("  Q2_0 PLE BF16 value source-pack check: byte-identical");
+        } catch (const std::exception& e) {
+            err = std::string("cannot verify the source BF16 PLE value tensor: ") + e.what();
+            return false;
+        }
+    }
     const std::vector<uint8_t> conv = tensor("blk.1.ple_conv1d.weight", (uint64_t) k::PLE_CONV_KERNEL * hcd * 2, 0);
     const std::vector<uint8_t> nk = tensor("blk.1.ple_norm_key.weight", hcd * 4, 0);
     const std::vector<uint8_t> nq = tensor("blk.1.ple_norm_query.weight", hcd * 4, 0);
@@ -215,11 +273,15 @@ bool load_ple_weights(const std::string& pack, PleHostWeights& w, std::string& e
         w.key_scales[i] = k::f32_from_f16(h);
     }
     // ple_value is BF16 promoted to 32 bits in the pack; take the high half, which is exact
-    w.value_bf16.resize(value.size() / 4);
-    for (size_t i = 0; i < w.value_bf16.size(); ++i) {
-        uint32_t u;
-        std::memcpy(&u, value.data() + i * 4, 4);
-        w.value_bf16[i] = (uint16_t) (u >> 16);
+    w.value_bf16.resize((size_t) k::NG_N_EMBD * k::NG_N_EMBD);
+    if (value.size() == w.value_bf16.size() * 2) {
+        std::memcpy(w.value_bf16.data(), value.data(), value.size());
+    } else {
+        for (size_t i = 0; i < w.value_bf16.size(); ++i) {
+            uint32_t u;
+            std::memcpy(&u, value.data() + i * 4, 4);
+            w.value_bf16[i] = (uint16_t) (u >> 16);
+        }
     }
     w.conv1d_f16.resize(conv.size() / 2);
     std::memcpy(w.conv1d_f16.data(), conv.data(), conv.size());
@@ -441,7 +503,7 @@ int main(int argc, char** argv) {
             std::fprintf(stderr, "ple_parity: required PLE table is missing or incompatible: %s (%s)\n", gguf.c_str(), err.c_str());
             return 2;
         }
-        if (!load_ple_weights(pack, weights, err)) {
+        if (!load_ple_weights(pack, gguf, weights, err)) {
             std::fprintf(stderr, "ple_parity: required PLE weights are missing or incompatible: %s\n", err.c_str());
             return 2;
         }
@@ -720,7 +782,7 @@ int main(int argc, char** argv) {
 
     // ============================ C. THE BLOCK ============================
     std::printf("\nC. the PLE block, against a host reference in double precision\n");
-    if (!preflight_done && !load_ple_weights(pack, weights, err)) {
+    if (!preflight_done && !load_ple_weights(pack, gguf, weights, err)) {
         std::printf("  cannot load the PLE weights: %s\n", err.c_str());
         std::printf("\nple_parity: %d failures, BLOCK SKIPPED; partial diagnostic only\n", bad);
         return selftest || bad ? 1 : 0;
@@ -992,6 +1054,12 @@ int main(int argc, char** argv) {
             for (size_t b = 0; b < blocks; ++b) {
                 std::memcpy(native_key.data() + b * 18, raw_scales.data() + b * 2, 2);
                 std::memcpy(native_key.data() + b * 18 + 2, key_codes.data() + b * 16, 16);
+            }
+            if (!weights.native_q2_key.empty()) {
+                const bool source_roundtrip = native_key == weights.native_q2_key;
+                std::printf("  Q2_0 PLE key source-block round trip: %s\n",
+                            source_roundtrip ? "byte-identical" : "FAIL");
+                if (!source_roundtrip) ++bad;
             }
             void *native_storage = nullptr, *q_storage = nullptr;
             float* raw_projection = nullptr;

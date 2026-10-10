@@ -338,9 +338,21 @@ that were never included in the repository, but its initial reader is tied to
 one pack representation: separated 2-bit key codes and FP16 group scales plus
 a 32-bit-expanded BF16 value tensor. The downloaded GSQ-RCO Q2_0 artifact keeps
 the key in native GGUF Q2_0 blocks and stores the value directly as BF16. The
-oracle correctly refuses the different byte spans before comparison. For a
-future Strata + Splash integration, derive test input adapters from the source
-artifact metadata and pack index, retain exact source-format identities, and
-compare both a source-format decode oracle and the backend's actual materialized
-weights. Do not fix a failed fixture lookup by substituting a tensor from a
-different model cohort; tensor shapes alone do not establish matching values.
+diagnostic now adapts this Q2_0 source directly: it validates the GGUF tensor
+name, shape, type, bounds and payload size, separates the 64-code Q2_0 blocks
+into the oracle's code/scale view without changing represented values, and
+accepts the pack's raw BF16 value bits and verifies they match the source GGUF
+value tensor byte for byte. It also reassembles the exact source Q2_0 blocks
+and requires byte identity before checking the native projection.
+The CPU reference applies the Q2_0 `(code - 1) * fp16_scale` equation and the
+kernel's Q8_0 key activation / BF16 value activation contracts. All seven PLE
+stages are checked against real gathered table rows and real layer-1 weights;
+the native Q2_0 key projection is compared against the independently decoded
+key path. This is a block-level oracle with synthetic hidden state and
+convolution history, not whole-model quality evidence.
+
+For a future Strata + Splash integration, retain source-format identities and
+build an adapter from the source metadata and pack index, then compare the
+source-format decode oracle against the backend's actual materialized weights.
+Do not fix a failed fixture lookup by substituting a tensor from a different
+model cohort; tensor shapes alone do not establish matching values.
