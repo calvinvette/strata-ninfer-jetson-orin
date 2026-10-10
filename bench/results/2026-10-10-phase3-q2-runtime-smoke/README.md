@@ -55,6 +55,14 @@ workload completing at 20 GiB and being refused at 16 GiB. They do not define a
 general minimum cgroup size or a supported capacity profile. Raw telemetry and
 outputs are in `run/cgroup-20g/` and `run/cgroup-16g/`.
 
+Finally, the same 5,000-slot, no-MTP, 512-token/one-output cell completed with
+`--max-context 8192` and `--max-context 16384`. Minimum host availability was
+15.65 GiB and 15.70 GiB, respectively. These are configured context
+reservations; the requests still processed only the short prompt. The captured
+one-token verifier window and output token ID 32 matched the 4K smoke. This
+supports admission at these settings for this artifact and request shape, not
+actual 8K/16K ingestion, retrieval quality or long-context serving.
+
 This is one successful allocation/admission smoke, not a quality check, paired
 comparison, cache-ranking result, MTP/speculation test, service test, or
 performance claim. The build SHA256 is
