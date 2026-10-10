@@ -283,6 +283,12 @@ availability remained 15.80 GiB. These are cell-specific admission bounds.
 At the same 5,000 cache slots, configured 8K and 16K contexts also admitted
 the one-token/512-input smoke with 15.65/15.70 GiB minimum host availability;
 these do not represent long-context ingestion or quality tests.
+The [Q2_0 PLE direct/mmap screen](../../bench/results/2026-10-10-phase3-q2-ple-io-screen/README.md)
+ran three balanced pairs with identical output token IDs and 15.96 GiB minimum
+host availability. The CLI prompt median favored mmap by 3.88%, but the order
+was not randomized, clocks were dynamic, no state hashes were collected, and
+the engine PLE counter was only 0.2–0.3 ms. This remains descriptive screening;
+neither table path is promoted.
 
 Fresh paired controls cover all five exact workloads in four independent process
 pairs (40 measured requests plus 40 warmups). Actual cache/KV/MTP resources match.

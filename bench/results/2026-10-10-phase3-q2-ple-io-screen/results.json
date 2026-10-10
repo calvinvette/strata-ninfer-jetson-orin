@@ -1,0 +1,111 @@
+{
+  "measured_on": "orin1",
+  "date": "2026-10-10",
+  "engine_sha256": "d3e8bcde3a430d7d5bb614fec8ba938398699b9abecd41965bb28fd6d465d721",
+  "workload": {
+    "prompt_tokens_file_sha256": "c463143cd6cc684c29cba41efe832274e4cc040335b2338cce196d67c47d3cbf",
+    "input_token_count": 512,
+    "generated_token_count": 1,
+    "requested_expert_cache": 5000,
+    "actual_expert_cache_each_run": 5000,
+    "max_context": 4096,
+    "mtp": "disabled",
+    "model": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0",
+    "ple_table": "Q2_0 shard 2"
+  },
+  "order": "pair1 mmap/direct; pair2 direct/mmap; pair3 mmap/direct (balanced predeclared order; not randomized algorithmically)",
+  "runs": [
+    {
+      "pair": "pair1",
+      "mode": "direct",
+      "status": "pass",
+      "output_token_id": 32,
+      "cli_prompt_ms": 15303.5,
+      "one_token_decode_ms": 399.2,
+      "engine_reported_ple_ms": 0.3,
+      "minimum_host_available_bytes": 17127288832
+    },
+    {
+      "pair": "pair1",
+      "mode": "mmap",
+      "status": "pass",
+      "output_token_id": 32,
+      "cli_prompt_ms": 14709.1,
+      "one_token_decode_ms": 414.7,
+      "engine_reported_ple_ms": 0.2,
+      "minimum_host_available_bytes": 17317642240
+    },
+    {
+      "pair": "pair2",
+      "mode": "direct",
+      "status": "pass",
+      "output_token_id": 32,
+      "cli_prompt_ms": 14967.9,
+      "one_token_decode_ms": 551.7,
+      "engine_reported_ple_ms": 0.2,
+      "minimum_host_available_bytes": 17263398912
+    },
+    {
+      "pair": "pair2",
+      "mode": "mmap",
+      "status": "pass",
+      "output_token_id": 32,
+      "cli_prompt_ms": 14225.2,
+      "one_token_decode_ms": 486.0,
+      "engine_reported_ple_ms": 0.3,
+      "minimum_host_available_bytes": 17349836800
+    },
+    {
+      "pair": "pair3",
+      "mode": "direct",
+      "status": "pass",
+      "output_token_id": 32,
+      "cli_prompt_ms": 14486.0,
+      "one_token_decode_ms": 516.2,
+      "engine_reported_ple_ms": 0.3,
+      "minimum_host_available_bytes": 17313501184
+    },
+    {
+      "pair": "pair3",
+      "mode": "mmap",
+      "status": "pass",
+      "output_token_id": 32,
+      "cli_prompt_ms": 14195.3,
+      "one_token_decode_ms": 428.9,
+      "engine_reported_ple_ms": 0.3,
+      "minimum_host_available_bytes": 17279791104
+    }
+  ],
+  "paired_prompt_deltas": [
+    {
+      "pair": "pair1",
+      "mmap_minus_direct_prompt_ms": -594.4,
+      "mmap_minus_direct_prompt_pct": -3.88
+    },
+    {
+      "pair": "pair2",
+      "mmap_minus_direct_prompt_ms": -742.7,
+      "mmap_minus_direct_prompt_pct": -4.96
+    },
+    {
+      "pair": "pair3",
+      "mmap_minus_direct_prompt_ms": -290.7,
+      "mmap_minus_direct_prompt_pct": -2.01
+    }
+  ],
+  "arm_medians": {
+    "cli_prompt_ms": {
+      "direct": 14967.9,
+      "mmap": 14225.2
+    },
+    "one_token_decode_ms": {
+      "direct": 516.2,
+      "mmap": 428.9
+    },
+    "engine_reported_ple_ms": {
+      "direct": 0.3,
+      "mmap": 0.3
+    }
+  },
+  "interpretation": "Screening only. CLI prompt includes all prompt work and is not attributable to PLE I/O; reported PLE stage is 0.2-0.3 ms. No state hashes, clock normalization, energy attribution, or quality test. No path is promoted."
+}
