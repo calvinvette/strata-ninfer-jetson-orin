@@ -1,0 +1,185 @@
+{
+  "command": [
+    "/home/calvin/models/strata-orin-validation/pack-venv/bin/python",
+    "tools/integration/file_tier_transfer_parity.py",
+    "--config",
+    "/home/calvin/models/strata-orin-validation/strata-orin-validation-8k.json",
+    "--engine",
+    "build/integration/candidate/strata",
+    "--output",
+    "bench/results/2026-10-11-phase3-transfer-stage-cgroupio-current7/experiment",
+    "--prompt-tokens",
+    "512",
+    "--generated-tokens",
+    "64",
+    "--pairs",
+    "7",
+    "--seed",
+    "2026101125",
+    "--run",
+    "--compare-prefetch-stage",
+    "--tegrastats-energy",
+    "--tegrastats-interval-ms",
+    "100",
+    "--expert-cache",
+    "5000"
+  ],
+  "cwd": "/home/calvin/workspace/strata-ninfer-jetson-orin",
+  "status": "pass",
+  "floor_bytes": 6442450944,
+  "started_wall_s": 1791753380.6131678,
+  "energy_scope": "not measured; raw tegrastats rails only",
+  "counters": "engine stdout/stderr; unavailable counters are not inferred",
+  "clock_sampling": "read-only CPU/GPU/EMC frequency observations; no clock controls",
+  "initial_memory": {
+    "monotonic_s": 1022550.186829722,
+    "wall_time_s": 1791753380.6153681,
+    "available_bytes": 26435985408,
+    "total_bytes": 32187883520,
+    "swap_used_bytes": 1305460736,
+    "cgroups": [
+      {
+        "path": "/sys/fs/cgroup/system.slice/run-rc015e985d22144d296ff86606796442d.scope",
+        "current_bytes": 7692288,
+        "max_bytes": null,
+        "memory_stat_bytes": {
+          "anon": 7135232,
+          "file": 282624,
+          "kernel_stack": 0,
+          "pagetables": 65536,
+          "percpu": 0,
+          "sock": 0,
+          "shmem": 0,
+          "file_mapped": 0,
+          "file_dirty": 0,
+          "file_writeback": 0,
+          "anon_thp": 0,
+          "file_thp": 0,
+          "shmem_thp": 0,
+          "inactive_anon": 7102464,
+          "active_anon": 4096,
+          "inactive_file": 122880,
+          "active_file": 118784,
+          "unevictable": 0,
+          "slab_reclaimable": 16808,
+          "slab_unreclaimable": 32568,
+          "slab": 49376
+        },
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      },
+      {
+        "path": "/sys/fs/cgroup/system.slice",
+        "current_bytes": 9022611456,
+        "max_bytes": null,
+        "memory_stat_bytes": {
+          "anon": 69459968,
+          "file": 8853520384,
+          "kernel_stack": 2211840,
+          "pagetables": 7790592,
+          "percpu": 2502480,
+          "sock": 49152,
+          "shmem": 4829184,
+          "file_mapped": 43552768,
+          "file_dirty": 57344,
+          "file_writeback": 0,
+          "anon_thp": 16777216,
+          "file_thp": 0,
+          "shmem_thp": 0,
+          "inactive_anon": 48844800,
+          "active_anon": 25669632,
+          "inactive_file": 4761767936,
+          "active_file": 4086882304,
+          "unevictable": 0,
+          "slab_reclaimable": 73459720,
+          "slab_unreclaimable": 10585752,
+          "slab": 84045472
+        },
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      }
+    ],
+    "cgroup_v2_observed": true,
+    "admission_available_bytes": 26435985408,
+    "clock_observations": {
+      "wall_time_s": 1791753380.6361766,
+      "monotonic_s": 1022550.207640269,
+      "cpu": {
+        "cpu11": {
+          "hz": 1574400000,
+          "path": "/sys/devices/system/cpu/cpu11/cpufreq/scaling_cur_freq"
+        },
+        "cpu9": {
+          "hz": 1574400000,
+          "path": "/sys/devices/system/cpu/cpu9/cpufreq/scaling_cur_freq"
+        },
+        "cpu7": {
+          "hz": 1344000000,
+          "path": "/sys/devices/system/cpu/cpu7/cpufreq/scaling_cur_freq"
+        },
+        "cpu5": {
+          "hz": 1344000000,
+          "path": "/sys/devices/system/cpu/cpu5/cpufreq/scaling_cur_freq"
+        },
+        "cpu3": {
+          "hz": 729600000,
+          "path": "/sys/devices/system/cpu/cpu3/cpufreq/scaling_cur_freq"
+        },
+        "cpu1": {
+          "hz": 729600000,
+          "path": "/sys/devices/system/cpu/cpu1/cpufreq/scaling_cur_freq"
+        },
+        "cpu10": {
+          "hz": 1574400000,
+          "path": "/sys/devices/system/cpu/cpu10/cpufreq/scaling_cur_freq"
+        },
+        "cpu8": {
+          "hz": 1574400000,
+          "path": "/sys/devices/system/cpu/cpu8/cpufreq/scaling_cur_freq"
+        },
+        "cpu6": {
+          "hz": 1344000000,
+          "path": "/sys/devices/system/cpu/cpu6/cpufreq/scaling_cur_freq"
+        },
+        "cpu4": {
+          "hz": 1344000000,
+          "path": "/sys/devices/system/cpu/cpu4/cpufreq/scaling_cur_freq"
+        },
+        "cpu2": {
+          "hz": 729600000,
+          "path": "/sys/devices/system/cpu/cpu2/cpufreq/scaling_cur_freq"
+        },
+        "cpu0": {
+          "hz": 729600000,
+          "path": "/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"
+        }
+      },
+      "gpu": {
+        "hz": 306000000,
+        "path": "/sys/class/devfreq/17000000.gpu/cur_freq"
+      },
+      "emc": {
+        "hz": 3199000000,
+        "path": "/sys/kernel/debug/bpmp/debug/clk/emc/rate",
+        "access": "read-only sudo -n cat"
+      },
+      "clock_control": "none; observed dynamic frequencies"
+    }
+  },
+  "tegrastats": "started; inspect raw log for availability",
+  "reason": "command exit; numerical/workload qualification is separate",
+  "minimum_available_bytes": 8758239232,
+  "returncode": 0,
+  "elapsed_s": 826.3808212380391,
+  "finished_wall_s": 1791754207.0734947
+}

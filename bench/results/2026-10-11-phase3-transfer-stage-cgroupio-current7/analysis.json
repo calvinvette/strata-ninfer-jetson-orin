@@ -1,0 +1,183 @@
+{
+  "source": "experiment/results.json",
+  "paired_repetitions": 7,
+  "bootstrap_draws": 200000,
+  "bootstrap_seed": 2026101125,
+  "bootstrap_method": "resample whole paired blocks with replacement; percentile indices floor(0.025*n), floor(0.975*n)",
+  "paired_stage_minus_fill_request_delta_percent": {
+    "median": -0.5263251480289499,
+    "range": [
+      -3.344853337038256,
+      2.113915168355085
+    ],
+    "bootstrap_95_percentile_interval": [
+      -0.8944372867437878,
+      1.6615507807286711
+    ]
+  },
+  "paired_stage_minus_fill_cgroup_read_delta_gb": {
+    "median": -0.06592512,
+    "range": [
+      -0.509702144,
+      0.374853632
+    ],
+    "bootstrap_95_percentile_interval": [
+      -0.177774592,
+      0.009166848
+    ]
+  },
+  "arms": {
+    "prefetch-fill": {
+      "samples": 7,
+      "median_prompt_ms": 22451.9,
+      "median_decode_ms": 5980.8,
+      "median_request_ms": 28359.7,
+      "median_cgroup_io_read_bytes": 8587726848,
+      "median_major_faults": 63576,
+      "median_minor_faults": 202709
+    },
+    "prefetch-stage": {
+      "samples": 7,
+      "median_prompt_ms": 22273.8,
+      "median_decode_ms": 6018.3,
+      "median_request_ms": 27999.699999999997,
+      "median_cgroup_io_read_bytes": 8527712256,
+      "median_major_faults": 56067,
+      "median_minor_faults": 219387
+    }
+  },
+  "minimum_available_bytes": 8758239232,
+  "minimum_available_gib": 8.156745910644531,
+  "stage_host_peak_requested_bytes_range": [
+    95846400,
+    141107200
+  ],
+  "pairs": [
+    {
+      "pair": 0,
+      "order": [
+        "prefetch-stage",
+        "prefetch-fill"
+      ],
+      "prefetch_fill_request_ms": 28790.5,
+      "prefetch_stage_request_ms": 27827.5,
+      "stage_request_delta_percent": -3.344853337038256,
+      "fill_cgroup_read_bytes": 8587726848,
+      "stage_cgroup_read_bytes": 8512487424,
+      "stage_minus_fill_cgroup_read_gb": -0.075239424,
+      "token_ids_equal": true,
+      "persistent_state_equal": true,
+      "actual_cache_slots_equal": true,
+      "stage_host_peak_requested_bytes": 114483200,
+      "stage_summary": "strata serve: file tier I/O this request: 41707.4 MB of expert reads; page cache held 10012.4 MB at the read, not 1941.7 MB; io prefetch: 573 read ahead (2216.5 MB by pread; 3395.4 ms summed worker time), 104 used, 450 unused, 4443 skipped (cached), 0 dropped; decode waited 1639.7 ms in 1174 fetches"
+    },
+    {
+      "pair": 1,
+      "order": [
+        "prefetch-stage",
+        "prefetch-fill"
+      ],
+      "prefetch_fill_request_ms": 28359.7,
+      "prefetch_stage_request_ms": 28959.2,
+      "stage_request_delta_percent": 2.113915168355085,
+      "fill_cgroup_read_bytes": 9037414400,
+      "stage_cgroup_read_bytes": 8527712256,
+      "stage_minus_fill_cgroup_read_gb": -0.509702144,
+      "token_ids_equal": true,
+      "persistent_state_equal": true,
+      "actual_cache_slots_equal": true,
+      "stage_host_peak_requested_bytes": 141107200,
+      "stage_summary": "strata serve: file tier I/O this request: 41702.8 MB of expert reads; page cache held 9852.7 MB at the read, not 2096.9 MB; io prefetch: 623 read ahead (2265.4 MB by pread; 3667.7 ms summed worker time), 132 used, 466 unused, 5064 skipped (cached), 0 dropped; decode waited 1676.0 ms in 1175 fetches"
+    },
+    {
+      "pair": 2,
+      "order": [
+        "prefetch-stage",
+        "prefetch-fill"
+      ],
+      "prefetch_fill_request_ms": 28435.9,
+      "prefetch_stage_request_ms": 28588.5,
+      "stage_request_delta_percent": 0.5366455783006652,
+      "fill_cgroup_read_bytes": 8905654272,
+      "stage_cgroup_read_bytes": 8839729152,
+      "stage_minus_fill_cgroup_read_gb": -0.06592512,
+      "token_ids_equal": true,
+      "persistent_state_equal": true,
+      "actual_cache_slots_equal": true,
+      "stage_host_peak_requested_bytes": 119808000,
+      "stage_summary": "strata serve: file tier I/O this request: 41615.5 MB of expert reads; page cache held 9847.9 MB at the read, not 2014.3 MB; io prefetch: 560 read ahead (2190.0 MB by pread; 3566.5 ms summed worker time), 119 used, 422 unused, 4704 skipped (cached), 0 dropped; decode waited 1584.6 ms in 1190 fetches"
+    },
+    {
+      "pair": 3,
+      "order": [
+        "prefetch-fill",
+        "prefetch-stage"
+      ],
+      "prefetch_fill_request_ms": 28119.5,
+      "prefetch_stage_request_ms": 27971.5,
+      "stage_request_delta_percent": -0.5263251480289499,
+      "fill_cgroup_read_bytes": 8508112896,
+      "stage_cgroup_read_bytes": 8330338304,
+      "stage_minus_fill_cgroup_read_gb": -0.177774592,
+      "token_ids_equal": true,
+      "persistent_state_equal": true,
+      "actual_cache_slots_equal": true,
+      "stage_host_peak_requested_bytes": 114483200,
+      "stage_summary": "strata serve: file tier I/O this request: 41687.2 MB of expert reads; page cache held 9915.0 MB at the read, not 2019.0 MB; io prefetch: 598 read ahead (2181.4 MB by pread; 3567.6 ms summed worker time), 133 used, 449 unused, 4926 skipped (cached), 0 dropped; decode waited 1631.3 ms in 1117 fetches"
+    },
+    {
+      "pair": 4,
+      "order": [
+        "prefetch-stage",
+        "prefetch-fill"
+      ],
+      "prefetch_fill_request_ms": 28067.6,
+      "prefetch_stage_request_ms": 27898.699999999997,
+      "stage_request_delta_percent": -0.6017614616141032,
+      "fill_cgroup_read_bytes": 8369598464,
+      "stage_cgroup_read_bytes": 8314114048,
+      "stage_minus_fill_cgroup_read_gb": -0.055484416,
+      "token_ids_equal": true,
+      "persistent_state_equal": true,
+      "actual_cache_slots_equal": true,
+      "stage_host_peak_requested_bytes": 130457600,
+      "stage_summary": "strata serve: file tier I/O this request: 41668.7 MB of expert reads; page cache held 9894.3 MB at the read, not 2021.1 MB; io prefetch: 590 read ahead (2161.9 MB by pread; 3755.1 ms summed worker time), 120 used, 448 unused, 4704 skipped (cached), 0 dropped; decode waited 1642.4 ms in 1130 fetches"
+    },
+    {
+      "pair": 5,
+      "order": [
+        "prefetch-fill",
+        "prefetch-stage"
+      ],
+      "prefetch_fill_request_ms": 28473.4,
+      "prefetch_stage_request_ms": 28946.5,
+      "stage_request_delta_percent": 1.6615507807286711,
+      "fill_cgroup_read_bytes": 8638726144,
+      "stage_cgroup_read_bytes": 9013579776,
+      "stage_minus_fill_cgroup_read_gb": 0.374853632,
+      "token_ids_equal": true,
+      "persistent_state_equal": true,
+      "actual_cache_slots_equal": true,
+      "stage_host_peak_requested_bytes": 95846400,
+      "stage_summary": "strata serve: file tier I/O this request: 41820.4 MB of expert reads; page cache held 10019.8 MB at the read, not 2047.3 MB; io prefetch: 617 read ahead (2282.3 MB by pread; 3273.5 ms summed worker time), 122 used, 471 unused, 4840 skipped (cached), 0 dropped; decode waited 1480.9 ms in 1129 fetches"
+    },
+    {
+      "pair": 6,
+      "order": [
+        "prefetch-stage",
+        "prefetch-fill"
+      ],
+      "prefetch_fill_request_ms": 28252.399999999998,
+      "prefetch_stage_request_ms": 27999.699999999997,
+      "stage_request_delta_percent": -0.8944372867437878,
+      "fill_cgroup_read_bytes": 8564080640,
+      "stage_cgroup_read_bytes": 8573247488,
+      "stage_minus_fill_cgroup_read_gb": 0.009166848,
+      "token_ids_equal": true,
+      "persistent_state_equal": true,
+      "actual_cache_slots_equal": true,
+      "stage_host_peak_requested_bytes": 122470400,
+      "stage_summary": "strata serve: file tier I/O this request: 41635.9 MB of expert reads; page cache held 9893.8 MB at the read, not 1988.8 MB; io prefetch: 564 read ahead (2219.5 MB by pread; 3408.6 ms summed worker time), 118 used, 424 unused, 4458 skipped (cached), 0 dropped; decode waited 1558.7 ms in 1199 fetches"
+    }
+  ]
+}

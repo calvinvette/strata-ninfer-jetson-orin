@@ -749,3 +749,12 @@ fill (`STRATA_IO_PF_STAGE=0`), with zero prefetched blobs consumed and zero
 decode waits, so it does not measure request-path pread service. Dynamic clocks
 and this arm limitation remain; no default changed. The reusable calibration
 helper's four focused tests and the full 103-test integration suite pass.
+
+A [seven-pair staged-prefetch confirmation](../../bench/results/2026-10-11-phase3-transfer-stage-cgroupio-current7/README.md)
+compared active host staging against page-cache fill at 6,519 slots, with
+scoped I/O counters calibrated on the same filesystem. All pairs matched
+tokens, persistent state and cache capacity; staging served 104–133 blobs per
+request and waited 1.48–1.68 seconds during decode. Its median request delta
+was −0.53% (95% bootstrap interval −0.89% to +1.66%), with a 91–135 MiB
+requested host-stage peak and 8.16 GiB minimum host availability. The scoped
+read interval spans zero, as does the timing interval; no path is promoted.
