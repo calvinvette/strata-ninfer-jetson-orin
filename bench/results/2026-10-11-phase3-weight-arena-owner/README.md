@@ -36,6 +36,10 @@ excluded. The explicit-cache path emitted no planned reservation events.
 - The artifact-aware `ple_parity` CTest passed 1/1 under the six-GiB supervisor
   in 3.16 seconds; minimum physical availability was 24.39 GiB. Its raw output
   and supervisor samples are in `ple-parity/`.
+- The serial Phase 3 owner/graph regression selection passed 19/19, including
+  PLE, VMM, cache, conversation transfer/snapshot/validation, platform-memory
+  and captured-graph ownership tests. Minimum physical availability was
+  26,210,340,864 bytes (24.41 GiB); raw output is in `owner-regression-19/`.
 - The changed shared `generate.cpp` compiled and linked in the existing maestro1
   HIP `strata` build (`gfx1100`). The resulting x86 HIP binary SHA-256 was
   `fddaea1c7c63738a79e93c664afebe101f94ffcfea0d8871646d8b99906a34e9`.
