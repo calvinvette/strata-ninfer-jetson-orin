@@ -653,3 +653,11 @@ engine owner trace, and state its blind spots: CUDA runtime calls do not cover
 driver, graph, or vendor-internal backing. Future Splash work should capture
 both process lifetimes and system-wide physical availability without summing
 those ledgers.
+
+A model-free Orin self-test confirms managed sequential ownership only when the
+CPU/GPU handoff is synchronized; it does not claim concurrent managed access.
+The same test separately validates mapped pinned-host publication with
+platform acquire/release operations and a 2-MiB CUDA VMM mapping cycle. For a
+future Strata + Splash port, keep these primitives separate from product
+buffer qualification: test the actual buffer's ownership transitions, lifetime,
+physical backing and end-to-end effect before selecting a transfer mode.
