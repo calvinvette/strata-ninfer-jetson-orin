@@ -12,6 +12,7 @@
 #include <cstdio>
 #include <cstring>
 #include <memory>
+#include <numeric>
 #include <random>
 #include <stdexcept>
 #include <string>
@@ -88,6 +89,35 @@ __global__ void q6k_to_h16_candidate(const uint8_t* __restrict__ input, int64_t 
     }
 }
 
+// Layout candidate: one lane produces one value and each warp owns one 32-value Q6_K group.
+// The existing candidate above assigns one thread to a group and serially writes all 32 values.
+// Keep this test-only until exact real-payload parity and repeated timing justify any production change.
+template <int THREADS>
+__global__ void q6k_to_h16_warp_candidate(const uint8_t* __restrict__ input, int64_t row_bytes, int rows, int cols,
+                                          uint16_t* __restrict__ output) {
+    const int64_t elem = (int64_t)blockIdx.x * THREADS + threadIdx.x;
+    if (elem >= (int64_t)rows * cols) return;
+    const int64_t r = elem / cols;
+    const int ci = (int)(elem % cols);
+    const int gi = ci / 32;
+    const int l = ci % 32;
+    const int gi_k = gi % 8;
+    const uint8_t* b = input + r * row_bytes + (size_t)(gi / 8) * 210;
+    const int half = gi_k / 4;
+    const int role = gi_k % 4;
+    const uint8_t* ql = b + 64 * half;
+    const uint8_t* qh = b + 128 + 32 * half;
+    const int8_t* sc = (const int8_t*)(b + 192) + 8 * half;
+    const float d = __half2float(*reinterpret_cast<const __half*>(b + 208));
+    int q;
+    if (role == 0) q = (ql[l] & 0x0f) | (((qh[l] >> 0) & 3) << 4);
+    else if (role == 1) q = (ql[l + 32] & 0x0f) | (((qh[l] >> 2) & 3) << 4);
+    else if (role == 2) q = (ql[l] >> 4) | (((qh[l] >> 4) & 3) << 4);
+    else q = (ql[l + 32] >> 4) | (((qh[l] >> 6) & 3) << 4);
+    const float value = d * (float)sc[l / 16 + 2 * role] * (float)(q - 32);
+    output[elem] = __half_as_ushort(__float2half_rn(value));
+}
+
 void launch_baseline(Sample& s, cudaStream_t stream) {
     strata::kernels::dequant_f16(14, s.input.p, 0, s.shape.rows, s.shape.cols, (uint16_t*)s.baseline.p, stream);
 }
@@ -99,6 +129,14 @@ void launch_candidate(Sample& s, cudaStream_t stream) {
         (const uint8_t*)s.input.p, s.row_bytes, s.shape.rows, s.shape.cols, (uint16_t*)s.candidate.p);
     check(cudaGetLastError(), "launch candidate");
 }
+template <int THREADS>
+void launch_warp_candidate(Sample& s, cudaStream_t stream) {
+    const int64_t elements = (int64_t)s.shape.rows * s.shape.cols;
+    const unsigned grid = (unsigned)((elements + THREADS - 1) / THREADS);
+    q6k_to_h16_warp_candidate<THREADS><<<grid, THREADS, 0, stream>>>(
+        (const uint8_t*)s.input.p, s.row_bytes, s.shape.rows, s.shape.cols, (uint16_t*)s.candidate.p);
+    check(cudaGetLastError(), "launch warp candidate");
+}
 
 using Launch = void (*)(Sample&, cudaStream_t);
 struct Arm { const char* name; Launch launch; };
@@ -106,7 +144,11 @@ void prod(Sample& s, cudaStream_t st) { launch_baseline(s, st); }
 void b128(Sample& s, cudaStream_t st) { launch_candidate<128>(s, st); }
 void b256(Sample& s, cudaStream_t st) { launch_candidate<256>(s, st); }
 void b512(Sample& s, cudaStream_t st) { launch_candidate<512>(s, st); }
-constexpr std::array<Arm, 4> arms{{{"prod256", prod}, {"candidate128", b128}, {"candidate256", b256}, {"candidate512", b512}}};
+void w128(Sample& s, cudaStream_t st) { launch_warp_candidate<128>(s, st); }
+void w256(Sample& s, cudaStream_t st) { launch_warp_candidate<256>(s, st); }
+void w512(Sample& s, cudaStream_t st) { launch_warp_candidate<512>(s, st); }
+constexpr std::array<Arm, 7> arms{{{"prod256", prod}, {"candidate128", b128}, {"candidate256", b256}, {"candidate512", b512},
+                                   {"warp128", w128}, {"warp256", w256}, {"warp512", w512}}};
 constexpr int warmups = 5;
 constexpr int launches_per_sample = 20;
 constexpr int blocks = 7;
@@ -173,7 +215,8 @@ int main(int argc, char** argv) {
             std::array<size_t, shapes.size()> shape_order{{0, 1, 2, 3, 4}};
             std::shuffle(shape_order.begin(), shape_order.end(), rng);
             for (size_t si : shape_order) {
-                std::array<size_t, arms.size()> arm_order{{0, 1, 2, 3}};
+                std::array<size_t, arms.size()> arm_order{};
+                std::iota(arm_order.begin(), arm_order.end(), size_t{0});
                 std::shuffle(arm_order.begin(), arm_order.end(), rng);
                 std::printf("order,%d,%s", b, samples[si]->shape.name);
                 for (size_t ai : arm_order) std::printf(",%s", arms[ai].name);

@@ -174,6 +174,41 @@ __global__ void dequant_kernel(const uint8_t* __restrict__ blocks, int64_t row_b
     group32<TYPE>(blocks + (row0 + r) * row_bytes, (int) gi, out + r * ld + gi * 32);
 }
 
+// Experimental layout for the profiled Q6_K -> FP16 dense materialization path. One warp writes a contiguous
+// 32-value group, avoiding the production kernel's per-thread serial 32-value loop. Opt-in only; the default
+// dispatch remains dequant_kernel and the Q6_K decode/rounding equation is unchanged.
+__global__ void q6k_h16_warp_kernel(const uint8_t* __restrict__ blocks, int64_t row_bytes, int64_t row0,
+                                    int64_t rows, int64_t cols, int64_t ld, H16* __restrict__ out) {
+    const int64_t elem = (int64_t) blockIdx.x * blockDim.x + threadIdx.x;
+    if (elem >= rows * cols) return;
+    const int64_t r = elem / cols;
+    const int ci = (int) (elem % cols);
+    const int gi = ci / 32;
+    const int l = ci % 32;
+    const int gi_k = gi % 8;
+    const uint8_t* b = blocks + (row0 + r) * row_bytes + (size_t) (gi / 8) * 210;
+    const int half = gi_k / 4;
+    const int role = gi_k % 4;
+    const uint8_t* ql = b + 64 * half;
+    const uint8_t* qh = b + 128 + 32 * half;
+    const int8_t* sc = reinterpret_cast<const int8_t*>(b + 192) + 8 * half;
+    const float d = h2f(b + 208);
+    int q;
+    if (role == 0) q = (ql[l] & 0x0f) | (((qh[l] >> 0) & 3) << 4);
+    else if (role == 1) q = (ql[l + 32] & 0x0f) | (((qh[l] >> 2) & 3) << 4);
+    else if (role == 2) q = (ql[l] >> 4) | (((qh[l] >> 4) & 3) << 4);
+    else q = (ql[l + 32] >> 4) | (((qh[l] >> 6) & 3) << 4);
+    put(out + r * ld + ci, 0, d * (float) sc[l / 16 + 2 * role] * (float) (q - 32));
+}
+
+bool q6k_warp_h16_enabled() {
+    static const bool enabled = [] {
+        const char* value = std::getenv("STRATA_Q6K_WARP_DEQUANT");
+        return value != nullptr && value[0] == '1' && value[1] == '\0';
+    }();
+    return enabled;
+}
+
 bool geometry(int type, int& block_elems, int& block_bytes) {
     switch (type) {
     case 2: block_elems = 32; block_bytes = 18; return true;
@@ -246,6 +281,21 @@ void dequant_f16(int ggml_type, const void* blocks, int64_t row0, int64_t rows, 
     if (iq_only(ggml_type)) {
         iq_dequant_f16(ggml_type, (const uint8_t*) blocks + (size_t) row0 * iq_row_bytes(ggml_type, cols), rows * cols,
                        out, stream);
+        return;
+    }
+    if (ggml_type == 14 && q6k_warp_h16_enabled()) {
+        int be = 0, bb = 0;
+        if (!geometry(ggml_type, be, bb) || cols % be != 0 || rows <= 0) {
+            std::fprintf(stderr, "dequant: unsupported type %d or shape %lld x %lld\n", ggml_type,
+                         (long long) rows, (long long) cols);
+            std::exit(1);
+        }
+        const int64_t row_bytes = cols / be * bb;
+        const unsigned grid = (unsigned) ((rows * cols + 127) / 128);
+        q6k_h16_warp_kernel<<<grid, 128, 0, (cudaStream_t) stream>>>(
+            (const uint8_t*) blocks, row_bytes, row0, rows, cols, cols, reinterpret_cast<H16*>(out));
+        const cudaError_t e = cudaGetLastError();
+        if (e != cudaSuccess) { std::fprintf(stderr, "Q6_K warp dequant launch: %s\n", cudaGetErrorString(e)); std::exit(1); }
         return;
     }
     launch<H16>(ggml_type, blocks, row0, rows, cols, reinterpret_cast<H16*>(out), stream);

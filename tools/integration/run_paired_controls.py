@@ -18,6 +18,10 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--blocks', type=int, default=3)
     parser.add_argument('--seed', type=int, default=870126)
+    parser.add_argument('--warmup-workloads', type=Path,
+                        help='distinct workload sent once before each measured block')
+    parser.add_argument('--no-trace', action='store_true',
+                        help='disable request-path tracing for timing-only comparisons')
     parser.add_argument('--prior-campaign', type=Path, help='completed compatible campaign to extend with additional independent pairs')
     args = parser.parse_args()
     first_block = 0
@@ -65,6 +69,10 @@ def main():
                    '--timeout', '1800', '--', sys.executable, str(directory / 'api_control_block.py'),
                    '--config', str(config.resolve()), '--workloads', row['workloads'],
                    '--output', str((run_dir / 'requests.json').resolve()), '--variant', row['variant']]
+        if args.warmup_workloads is not None:
+            command.extend(['--warmup-workloads', str(args.warmup_workloads.resolve())])
+        if args.no_trace:
+            command.append('--no-trace')
         row.update(command=command, reason='running; incomplete until supervisor terminal result')
         write_result(output, result)
         print('starting', name, flush=True)
