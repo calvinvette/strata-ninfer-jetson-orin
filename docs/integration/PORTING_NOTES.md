@@ -71,6 +71,14 @@ ignored `build/integration/`. Original Strata/NInfer checkouts are only read for
 local toolchain/dependency reuse. No service or clock changes are part of this
 checkpoint.
 
+The Oct 10 Phase 3 follow-up found that this runtime namespace omits
+`/proc/<pid>/io` and does not expose `io.stat` in the harness leaf cgroup.
+Ancestor cgroup and whole-device block counters include unrelated work, so they
+cannot be labeled as per-request storage bytes. A future Splash harness should
+inventory the platform's actual process-I/O and GPU-allocation telemetry before
+designing per-request accounting; Linux procfs/cgroup assumptions do not carry
+over to Apple platforms.
+
 ## Phase 1 continuation — Factor translation and process ownership
 
 The paired runner uses fresh owned server processes, randomizes variant order

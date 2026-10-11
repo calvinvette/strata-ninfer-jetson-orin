@@ -23,6 +23,14 @@ adds direct recurrence and convolution-history prefix evidence in Phase 2. The
 model-level accepted-prefix check below now supplies the separate verifier and
 publication-boundary state evidence for the observed output-clipping case.
 
+The fresh [Phase 3 follow-up test run](../../bench/results/2026-10-10-phase3-followup-tests/README.md)
+passed the artifact-aware Q2_0 PLE test and nine focused memory/VMM tests under
+the six-GiB supervisor, with 27.80 GiB minimum physical availability. In this
+runtime namespace, `/proc/<pid>/io` and leaf-cgroup `io.stat` are absent, so
+available ancestor and block-device counters cannot isolate process reads.
+CUDA graph driver/executable memory also remains unpriced. These gaps keep
+Phase 3 open; the test rerun does not add new product-path qualification.
+
 The [runtime ownership review](OWNERSHIP_REVIEW.md) records existing owners for
 API ordering, engine execution, session state, verifier commits and device
 allocations. It adds no duplicate scheduler or allocation ledger. Unique physical
