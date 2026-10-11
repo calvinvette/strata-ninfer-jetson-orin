@@ -4,7 +4,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT), str(ROOT / 'tools'), str(ROOT / 'tools/integration')]
-from stage_buffer_parity import paired_ratio_effect, stage_environment
+from stage_buffer_parity import paired_ratio_effect, stage_environment, stamp_arm_end, stamp_arm_start
 
 
 class StageBufferEnvironmentTests(unittest.TestCase):
@@ -37,6 +37,13 @@ class StageBufferEnvironmentTests(unittest.TestCase):
         for control, candidate in (([], []), ([1.0], []), ([0.0], [1.0])):
             with self.subTest(control=control, candidate=candidate), self.assertRaises(ValueError):
                 paired_ratio_effect(control, candidate, iterations=10)
+
+    def test_arm_window_has_ordered_wall_and_monotonic_timestamps(self):
+        arm = {}
+        stamp_arm_start(arm)
+        stamp_arm_end(arm)
+        self.assertLessEqual(arm['started_wall_s'], arm['finished_wall_s'])
+        self.assertLessEqual(arm['started_monotonic_s'], arm['finished_monotonic_s'])
 
 
 if __name__ == '__main__':

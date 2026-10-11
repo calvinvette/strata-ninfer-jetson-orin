@@ -8,6 +8,7 @@ import re
 import sys
 import statistics
 import threading
+import time
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT), str(ROOT / 'tools'), str(ROOT / 'tools/integration')]
@@ -54,6 +55,16 @@ def paired_ratio_effect(control, candidate, *, iterations=100000, seed=870126):
                                              boot[int((iterations - 1) * 0.975)]],
             'pairs': len(effects), 'bootstrap_iterations': iterations,
             'pair_deltas_pct': effects}
+
+
+def stamp_arm_start(arm):
+    arm['started_wall_s'] = time.time()
+    arm['started_monotonic_s'] = time.monotonic()
+
+
+def stamp_arm_end(arm):
+    arm['finished_wall_s'] = time.time()
+    arm['finished_monotonic_s'] = time.monotonic()
 
 
 def state_hashes(path):
@@ -153,6 +164,7 @@ def main():
             env = stage_environment(child_env(cfg), pin, args.timing_only)
             arm = {'pair': pair, 'name': label, 'stage_pin': pin, 'args': args_for,
                    'engine_sha256': binary_hash}
+            stamp_arm_start(arm)
             engine = StrataEngine(str(args.engine.resolve()), args_for, cwd=cfg.get('cwd'),
                                   log=str(log), env=env)
             try:
@@ -160,7 +172,10 @@ def main():
                        {'temperature': 0}, threading.Event()) if token is not None]
                 arm.update(ids=ids, text=tokenizer.decode(ids), usage=dict(engine.last))
             finally:
-                engine.close()
+                try:
+                    engine.close()
+                finally:
+                    stamp_arm_end(arm)
             if not args.timing_only:
                 arm['state'] = state_hashes(log)
                 owners = summarize(log.read_text(encoding='utf-8').splitlines())
