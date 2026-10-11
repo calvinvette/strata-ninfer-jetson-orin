@@ -1,0 +1,1532 @@
+{
+  "scope": "exact real-model prompt, randomized paired staging diagnostic; screening only",
+  "prompt_tokens": 512,
+  "prompt_sha256": "9c1407d465d3daa0d7f5512422144432e482886d33717db09678fc89dddb4f4d",
+  "generated_tokens": 8,
+  "planned_pairs": 3,
+  "seed": 20261011,
+  "arms": [
+    {
+      "pair": 0,
+      "name": "pageable",
+      "stage_pin": "0",
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "512",
+        "--spec",
+        "4",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55",
+        "--pool-workers",
+        "1"
+      ],
+      "engine_sha256": "3ed52e6e0f845415b8fb2f2c15577f4b90efe49be72e2866d0dc961dbb0c95b0",
+      "ids": [
+        32,
+        6165,
+        11036,
+        1928,
+        1472,
+        264,
+        25924,
+        11
+      ],
+      "text": "A computer processes information through a sophisticated,",
+      "usage": {
+        "generated": 8,
+        "prompt_tokens": 512,
+        "prompt_ms": 13964.5,
+        "decode_ms": 2362.3,
+        "finish": "length",
+        "drafts_accepted": 6,
+        "drafts_offered": 12,
+        "reused": 0,
+        "hits": 4723,
+        "lookups": 8160,
+        "ram_blobs": 0,
+        "file_blobs": 0,
+        "file_mb": 5437.4,
+        "prompt_read": 512,
+        "offloaded": 0
+      },
+      "state": {
+        "L": "519",
+        "gdn": "1c633333c2388cde",
+        "ple": "c659884dd8544533",
+        "tail": "9fc2f7523e09fb57",
+        "dead": "e330c1a0187ad6bd",
+        "pooled": "39cfc43ec616f353",
+        "pooled_full": "6fbc2556d9af363a",
+        "kv": "d73863ad885a7301",
+        "ple_prev": "264,25924"
+      },
+      "owner_observations": {
+        "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+        "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA VMM address reservations and physical segments/chunks across range ownership transfers, pageable/pinned expert-stage host buffers, primary, layer-stage and batch-slot SessionState backing, verifier primary and auxiliary device buffers, batch-window device arena, window graphs and mapped/pinned host staging, prefill-owned vector allocations/views, MTP base dense/expert weights, optional converted projections and draft-head subset copies, and MTP state/scratch arenas; SYCL ExpertCache and other sites excluded",
+        "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+        "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+        "allocation_events": 81,
+        "free_events": 81,
+        "observed_allocation_bytes_by_device": {
+          "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+          "peak": {
+            "-1": 147174976,
+            "0": 9479354040
+          },
+          "live_at_log_end": {
+            "-1": 0,
+            "0": 0
+          }
+        },
+        "vmm_range_mappings": {
+          "map_events": 0,
+          "unmap_events": 0,
+          "still_mapped_at_log_end": []
+        },
+        "planned_reservations": {
+          "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+          "events": []
+        },
+        "virtual_address_ranges": {
+          "scope": "reserved virtual address space only; no physical backing implied and never added to allocation totals",
+          "reserve_events": 0,
+          "release_events": 0,
+          "peak_reserved_bytes_by_device": {},
+          "live_reserved_bytes_by_device": {},
+          "live_ranges_at_log_end": []
+        },
+        "owners": [
+          {
+            "owner": "expert-cache",
+            "instance": 281474004937152,
+            "device": 0,
+            "peak_observed_requested_bytes": 7985945600,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "expert-stage-pageable-host",
+            "instance": 281474004970896,
+            "device": -1,
+            "peak_observed_requested_bytes": 146432000,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp",
+            "instance": 281474004973968,
+            "device": 0,
+            "peak_observed_requested_bytes": 24778192,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": 1072319160,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp-base-weights",
+            "instance": 281474004973968,
+            "device": 0,
+            "peak_observed_requested_bytes": 823887872,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp-prefill-device-graph",
+            "instance": 281474004973968,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 1
+          },
+          {
+            "owner": "mtp-round-graph",
+            "instance": 281474004973968,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 2
+          },
+          {
+            "owner": "mtp-step-graph",
+            "instance": 281474004973968,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 2
+          },
+          {
+            "owner": "mtp-weight-copy",
+            "instance": 281474004973968,
+            "device": 0,
+            "peak_observed_requested_bytes": 223653096,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "prefill",
+            "instance": 187651155838384,
+            "device": 0,
+            "peak_observed_requested_bytes": 2048,
+            "live_observed_requested_bytes": 0,
+            "view_events": 67,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "session",
+            "instance": 281474004969840,
+            "device": 0,
+            "peak_observed_requested_bytes": 343101952,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "verifier",
+            "instance": 281474004978152,
+            "device": 0,
+            "peak_observed_requested_bytes": 77985280,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 3
+          },
+          {
+            "owner": "verifier-commit-graph",
+            "instance": 281474004978152,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 1
+          },
+          {
+            "owner": "verifier-mapped-host",
+            "instance": 281474004978152,
+            "device": -1,
+            "peak_observed_requested_bytes": 742976,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          }
+        ]
+      },
+      "stage_requested_bytes": {
+        "expert-stage-pageable-host": 146432000
+      }
+    },
+    {
+      "pair": 0,
+      "name": "pinned",
+      "stage_pin": "1",
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "512",
+        "--spec",
+        "4",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55",
+        "--pool-workers",
+        "1"
+      ],
+      "engine_sha256": "3ed52e6e0f845415b8fb2f2c15577f4b90efe49be72e2866d0dc961dbb0c95b0",
+      "ids": [
+        32,
+        6165,
+        11036,
+        1928,
+        1472,
+        264,
+        25924,
+        11
+      ],
+      "text": "A computer processes information through a sophisticated,",
+      "usage": {
+        "generated": 8,
+        "prompt_tokens": 512,
+        "prompt_ms": 13230.0,
+        "decode_ms": 2402.9,
+        "finish": "length",
+        "drafts_accepted": 6,
+        "drafts_offered": 12,
+        "reused": 0,
+        "hits": 4723,
+        "lookups": 8160,
+        "ram_blobs": 0,
+        "file_blobs": 0,
+        "file_mb": 5405.9,
+        "prompt_read": 512,
+        "offloaded": 0
+      },
+      "state": {
+        "L": "519",
+        "gdn": "1c633333c2388cde",
+        "ple": "c659884dd8544533",
+        "tail": "9fc2f7523e09fb57",
+        "dead": "e330c1a0187ad6bd",
+        "pooled": "39cfc43ec616f353",
+        "pooled_full": "6fbc2556d9af363a",
+        "kv": "d73863ad885a7301",
+        "ple_prev": "264,25924"
+      },
+      "owner_observations": {
+        "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+        "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA VMM address reservations and physical segments/chunks across range ownership transfers, pageable/pinned expert-stage host buffers, primary, layer-stage and batch-slot SessionState backing, verifier primary and auxiliary device buffers, batch-window device arena, window graphs and mapped/pinned host staging, prefill-owned vector allocations/views, MTP base dense/expert weights, optional converted projections and draft-head subset copies, and MTP state/scratch arenas; SYCL ExpertCache and other sites excluded",
+        "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+        "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+        "allocation_events": 90,
+        "free_events": 90,
+        "observed_allocation_bytes_by_device": {
+          "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+          "peak": {
+            "-1": 171136576,
+            "0": 9479354040
+          },
+          "live_at_log_end": {
+            "-1": 0,
+            "0": 0
+          }
+        },
+        "vmm_range_mappings": {
+          "map_events": 0,
+          "unmap_events": 0,
+          "still_mapped_at_log_end": []
+        },
+        "planned_reservations": {
+          "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+          "events": []
+        },
+        "virtual_address_ranges": {
+          "scope": "reserved virtual address space only; no physical backing implied and never added to allocation totals",
+          "reserve_events": 0,
+          "release_events": 0,
+          "peak_reserved_bytes_by_device": {},
+          "live_reserved_bytes_by_device": {},
+          "live_ranges_at_log_end": []
+        },
+        "owners": [
+          {
+            "owner": "expert-cache",
+            "instance": 281474885368384,
+            "device": 0,
+            "peak_observed_requested_bytes": 7985945600,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "expert-stage-pinned-host",
+            "instance": 281474885402128,
+            "device": -1,
+            "peak_observed_requested_bytes": 170393600,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp",
+            "instance": 281474885405200,
+            "device": 0,
+            "peak_observed_requested_bytes": 24778192,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": 1072319160,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp-base-weights",
+            "instance": 281474885405200,
+            "device": 0,
+            "peak_observed_requested_bytes": 823887872,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp-prefill-device-graph",
+            "instance": 281474885405200,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 1
+          },
+          {
+            "owner": "mtp-round-graph",
+            "instance": 281474885405200,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 2
+          },
+          {
+            "owner": "mtp-step-graph",
+            "instance": 281474885405200,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 2
+          },
+          {
+            "owner": "mtp-weight-copy",
+            "instance": 281474885405200,
+            "device": 0,
+            "peak_observed_requested_bytes": 223653096,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "prefill",
+            "instance": 187651082513792,
+            "device": 0,
+            "peak_observed_requested_bytes": 2048,
+            "live_observed_requested_bytes": 0,
+            "view_events": 67,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "session",
+            "instance": 281474885401072,
+            "device": 0,
+            "peak_observed_requested_bytes": 343101952,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "verifier",
+            "instance": 281474885409384,
+            "device": 0,
+            "peak_observed_requested_bytes": 77985280,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 3
+          },
+          {
+            "owner": "verifier-commit-graph",
+            "instance": 281474885409384,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 1
+          },
+          {
+            "owner": "verifier-mapped-host",
+            "instance": 281474885409384,
+            "device": -1,
+            "peak_observed_requested_bytes": 742976,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          }
+        ]
+      },
+      "stage_requested_bytes": {
+        "expert-stage-pinned-host": 170393600
+      }
+    },
+    {
+      "pair": 1,
+      "name": "pageable",
+      "stage_pin": "0",
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "512",
+        "--spec",
+        "4",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55",
+        "--pool-workers",
+        "1"
+      ],
+      "engine_sha256": "3ed52e6e0f845415b8fb2f2c15577f4b90efe49be72e2866d0dc961dbb0c95b0",
+      "ids": [
+        32,
+        6165,
+        11036,
+        1928,
+        1472,
+        264,
+        25924,
+        11
+      ],
+      "text": "A computer processes information through a sophisticated,",
+      "usage": {
+        "generated": 8,
+        "prompt_tokens": 512,
+        "prompt_ms": 13328.7,
+        "decode_ms": 2374.8,
+        "finish": "length",
+        "drafts_accepted": 6,
+        "drafts_offered": 12,
+        "reused": 0,
+        "hits": 4723,
+        "lookups": 8160,
+        "ram_blobs": 0,
+        "file_blobs": 0,
+        "file_mb": 5443.2,
+        "prompt_read": 512,
+        "offloaded": 0
+      },
+      "state": {
+        "L": "519",
+        "gdn": "1c633333c2388cde",
+        "ple": "c659884dd8544533",
+        "tail": "9fc2f7523e09fb57",
+        "dead": "e330c1a0187ad6bd",
+        "pooled": "39cfc43ec616f353",
+        "pooled_full": "6fbc2556d9af363a",
+        "kv": "d73863ad885a7301",
+        "ple_prev": "264,25924"
+      },
+      "owner_observations": {
+        "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+        "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA VMM address reservations and physical segments/chunks across range ownership transfers, pageable/pinned expert-stage host buffers, primary, layer-stage and batch-slot SessionState backing, verifier primary and auxiliary device buffers, batch-window device arena, window graphs and mapped/pinned host staging, prefill-owned vector allocations/views, MTP base dense/expert weights, optional converted projections and draft-head subset copies, and MTP state/scratch arenas; SYCL ExpertCache and other sites excluded",
+        "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+        "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+        "allocation_events": 98,
+        "free_events": 98,
+        "observed_allocation_bytes_by_device": {
+          "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+          "peak": {
+            "-1": 192435776,
+            "0": 9479354040
+          },
+          "live_at_log_end": {
+            "-1": 0,
+            "0": 0
+          }
+        },
+        "vmm_range_mappings": {
+          "map_events": 0,
+          "unmap_events": 0,
+          "still_mapped_at_log_end": []
+        },
+        "planned_reservations": {
+          "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+          "events": []
+        },
+        "virtual_address_ranges": {
+          "scope": "reserved virtual address space only; no physical backing implied and never added to allocation totals",
+          "reserve_events": 0,
+          "release_events": 0,
+          "peak_reserved_bytes_by_device": {},
+          "live_reserved_bytes_by_device": {},
+          "live_ranges_at_log_end": []
+        },
+        "owners": [
+          {
+            "owner": "expert-cache",
+            "instance": 281473961586672,
+            "device": 0,
+            "peak_observed_requested_bytes": 7985945600,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "expert-stage-pageable-host",
+            "instance": 281473961620416,
+            "device": -1,
+            "peak_observed_requested_bytes": 191692800,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp",
+            "instance": 281473961623488,
+            "device": 0,
+            "peak_observed_requested_bytes": 24778192,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": 1072319160,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp-base-weights",
+            "instance": 281473961623488,
+            "device": 0,
+            "peak_observed_requested_bytes": 823887872,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp-prefill-device-graph",
+            "instance": 281473961623488,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 1
+          },
+          {
+            "owner": "mtp-round-graph",
+            "instance": 281473961623488,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 2
+          },
+          {
+            "owner": "mtp-step-graph",
+            "instance": 281473961623488,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 2
+          },
+          {
+            "owner": "mtp-weight-copy",
+            "instance": 281473961623488,
+            "device": 0,
+            "peak_observed_requested_bytes": 223653096,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "prefill",
+            "instance": 187651369141888,
+            "device": 0,
+            "peak_observed_requested_bytes": 2048,
+            "live_observed_requested_bytes": 0,
+            "view_events": 67,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "session",
+            "instance": 281473961619360,
+            "device": 0,
+            "peak_observed_requested_bytes": 343101952,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "verifier",
+            "instance": 281473961627672,
+            "device": 0,
+            "peak_observed_requested_bytes": 77985280,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 3
+          },
+          {
+            "owner": "verifier-commit-graph",
+            "instance": 281473961627672,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 1
+          },
+          {
+            "owner": "verifier-mapped-host",
+            "instance": 281473961627672,
+            "device": -1,
+            "peak_observed_requested_bytes": 742976,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          }
+        ]
+      },
+      "stage_requested_bytes": {
+        "expert-stage-pageable-host": 191692800
+      }
+    },
+    {
+      "pair": 1,
+      "name": "pinned",
+      "stage_pin": "1",
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "512",
+        "--spec",
+        "4",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55",
+        "--pool-workers",
+        "1"
+      ],
+      "engine_sha256": "3ed52e6e0f845415b8fb2f2c15577f4b90efe49be72e2866d0dc961dbb0c95b0",
+      "ids": [
+        32,
+        6165,
+        11036,
+        1928,
+        1472,
+        264,
+        25924,
+        11
+      ],
+      "text": "A computer processes information through a sophisticated,",
+      "usage": {
+        "generated": 8,
+        "prompt_tokens": 512,
+        "prompt_ms": 13405.8,
+        "decode_ms": 2422.0,
+        "finish": "length",
+        "drafts_accepted": 6,
+        "drafts_offered": 12,
+        "reused": 0,
+        "hits": 4723,
+        "lookups": 8160,
+        "ram_blobs": 0,
+        "file_blobs": 0,
+        "file_mb": 5385.1,
+        "prompt_read": 512,
+        "offloaded": 0
+      },
+      "state": {
+        "L": "519",
+        "gdn": "1c633333c2388cde",
+        "ple": "c659884dd8544533",
+        "tail": "9fc2f7523e09fb57",
+        "dead": "e330c1a0187ad6bd",
+        "pooled": "39cfc43ec616f353",
+        "pooled_full": "6fbc2556d9af363a",
+        "kv": "d73863ad885a7301",
+        "ple_prev": "264,25924"
+      },
+      "owner_observations": {
+        "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+        "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA VMM address reservations and physical segments/chunks across range ownership transfers, pageable/pinned expert-stage host buffers, primary, layer-stage and batch-slot SessionState backing, verifier primary and auxiliary device buffers, batch-window device arena, window graphs and mapped/pinned host staging, prefill-owned vector allocations/views, MTP base dense/expert weights, optional converted projections and draft-head subset copies, and MTP state/scratch arenas; SYCL ExpertCache and other sites excluded",
+        "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+        "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+        "allocation_events": 101,
+        "free_events": 101,
+        "observed_allocation_bytes_by_device": {
+          "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+          "peak": {
+            "-1": 200422976,
+            "0": 9479354040
+          },
+          "live_at_log_end": {
+            "-1": 0,
+            "0": 0
+          }
+        },
+        "vmm_range_mappings": {
+          "map_events": 0,
+          "unmap_events": 0,
+          "still_mapped_at_log_end": []
+        },
+        "planned_reservations": {
+          "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+          "events": []
+        },
+        "virtual_address_ranges": {
+          "scope": "reserved virtual address space only; no physical backing implied and never added to allocation totals",
+          "reserve_events": 0,
+          "release_events": 0,
+          "peak_reserved_bytes_by_device": {},
+          "live_reserved_bytes_by_device": {},
+          "live_ranges_at_log_end": []
+        },
+        "owners": [
+          {
+            "owner": "expert-cache",
+            "instance": 281473965011264,
+            "device": 0,
+            "peak_observed_requested_bytes": 7985945600,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "expert-stage-pinned-host",
+            "instance": 281473965045008,
+            "device": -1,
+            "peak_observed_requested_bytes": 199680000,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp",
+            "instance": 281473965048080,
+            "device": 0,
+            "peak_observed_requested_bytes": 24778192,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": 1072319160,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp-base-weights",
+            "instance": 281473965048080,
+            "device": 0,
+            "peak_observed_requested_bytes": 823887872,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp-prefill-device-graph",
+            "instance": 281473965048080,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 1
+          },
+          {
+            "owner": "mtp-round-graph",
+            "instance": 281473965048080,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 2
+          },
+          {
+            "owner": "mtp-step-graph",
+            "instance": 281473965048080,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 2
+          },
+          {
+            "owner": "mtp-weight-copy",
+            "instance": 281473965048080,
+            "device": 0,
+            "peak_observed_requested_bytes": 223653096,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "prefill",
+            "instance": 187651592136576,
+            "device": 0,
+            "peak_observed_requested_bytes": 2048,
+            "live_observed_requested_bytes": 0,
+            "view_events": 67,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "session",
+            "instance": 281473965043952,
+            "device": 0,
+            "peak_observed_requested_bytes": 343101952,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "verifier",
+            "instance": 281473965052264,
+            "device": 0,
+            "peak_observed_requested_bytes": 77985280,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 3
+          },
+          {
+            "owner": "verifier-commit-graph",
+            "instance": 281473965052264,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 1
+          },
+          {
+            "owner": "verifier-mapped-host",
+            "instance": 281473965052264,
+            "device": -1,
+            "peak_observed_requested_bytes": 742976,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          }
+        ]
+      },
+      "stage_requested_bytes": {
+        "expert-stage-pinned-host": 199680000
+      }
+    },
+    {
+      "pair": 2,
+      "name": "pageable",
+      "stage_pin": "0",
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "512",
+        "--spec",
+        "4",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55",
+        "--pool-workers",
+        "1"
+      ],
+      "engine_sha256": "3ed52e6e0f845415b8fb2f2c15577f4b90efe49be72e2866d0dc961dbb0c95b0",
+      "ids": [
+        32,
+        6165,
+        11036,
+        1928,
+        1472,
+        264,
+        25924,
+        11
+      ],
+      "text": "A computer processes information through a sophisticated,",
+      "usage": {
+        "generated": 8,
+        "prompt_tokens": 512,
+        "prompt_ms": 13578.3,
+        "decode_ms": 14366.6,
+        "finish": "length",
+        "drafts_accepted": 6,
+        "drafts_offered": 12,
+        "reused": 0,
+        "hits": 4723,
+        "lookups": 8160,
+        "ram_blobs": 0,
+        "file_blobs": 0,
+        "file_mb": 5452.6,
+        "prompt_read": 512,
+        "offloaded": 0
+      },
+      "state": {
+        "L": "519",
+        "gdn": "1c633333c2388cde",
+        "ple": "c659884dd8544533",
+        "tail": "9fc2f7523e09fb57",
+        "dead": "e330c1a0187ad6bd",
+        "pooled": "39cfc43ec616f353",
+        "pooled_full": "6fbc2556d9af363a",
+        "kv": "d73863ad885a7301",
+        "ple_prev": "264,25924"
+      },
+      "owner_observations": {
+        "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+        "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA VMM address reservations and physical segments/chunks across range ownership transfers, pageable/pinned expert-stage host buffers, primary, layer-stage and batch-slot SessionState backing, verifier primary and auxiliary device buffers, batch-window device arena, window graphs and mapped/pinned host staging, prefill-owned vector allocations/views, MTP base dense/expert weights, optional converted projections and draft-head subset copies, and MTP state/scratch arenas; SYCL ExpertCache and other sites excluded",
+        "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+        "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+        "allocation_events": 94,
+        "free_events": 94,
+        "observed_allocation_bytes_by_device": {
+          "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+          "peak": {
+            "-1": 181786176,
+            "0": 9479354040
+          },
+          "live_at_log_end": {
+            "-1": 0,
+            "0": 0
+          }
+        },
+        "vmm_range_mappings": {
+          "map_events": 0,
+          "unmap_events": 0,
+          "still_mapped_at_log_end": []
+        },
+        "planned_reservations": {
+          "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+          "events": []
+        },
+        "virtual_address_ranges": {
+          "scope": "reserved virtual address space only; no physical backing implied and never added to allocation totals",
+          "reserve_events": 0,
+          "release_events": 0,
+          "peak_reserved_bytes_by_device": {},
+          "live_reserved_bytes_by_device": {},
+          "live_ranges_at_log_end": []
+        },
+        "owners": [
+          {
+            "owner": "expert-cache",
+            "instance": 281474779654240,
+            "device": 0,
+            "peak_observed_requested_bytes": 7985945600,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "expert-stage-pageable-host",
+            "instance": 281474779687984,
+            "device": -1,
+            "peak_observed_requested_bytes": 181043200,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp",
+            "instance": 281474779691056,
+            "device": 0,
+            "peak_observed_requested_bytes": 24778192,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": 1072319160,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp-base-weights",
+            "instance": 281474779691056,
+            "device": 0,
+            "peak_observed_requested_bytes": 823887872,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp-prefill-device-graph",
+            "instance": 281474779691056,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 1
+          },
+          {
+            "owner": "mtp-round-graph",
+            "instance": 281474779691056,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 2
+          },
+          {
+            "owner": "mtp-step-graph",
+            "instance": 281474779691056,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 2
+          },
+          {
+            "owner": "mtp-weight-copy",
+            "instance": 281474779691056,
+            "device": 0,
+            "peak_observed_requested_bytes": 223653096,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "prefill",
+            "instance": 187651742205888,
+            "device": 0,
+            "peak_observed_requested_bytes": 2048,
+            "live_observed_requested_bytes": 0,
+            "view_events": 67,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "session",
+            "instance": 281474779686928,
+            "device": 0,
+            "peak_observed_requested_bytes": 343101952,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "verifier",
+            "instance": 281474779695240,
+            "device": 0,
+            "peak_observed_requested_bytes": 77985280,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 3
+          },
+          {
+            "owner": "verifier-commit-graph",
+            "instance": 281474779695240,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 1
+          },
+          {
+            "owner": "verifier-mapped-host",
+            "instance": 281474779695240,
+            "device": -1,
+            "peak_observed_requested_bytes": 742976,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          }
+        ]
+      },
+      "stage_requested_bytes": {
+        "expert-stage-pageable-host": 181043200
+      }
+    },
+    {
+      "pair": 2,
+      "name": "pinned",
+      "stage_pin": "1",
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "512",
+        "--spec",
+        "4",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55",
+        "--pool-workers",
+        "1"
+      ],
+      "engine_sha256": "3ed52e6e0f845415b8fb2f2c15577f4b90efe49be72e2866d0dc961dbb0c95b0",
+      "ids": [
+        32,
+        6165,
+        11036,
+        1928,
+        1472,
+        264,
+        25924,
+        11
+      ],
+      "text": "A computer processes information through a sophisticated,",
+      "usage": {
+        "generated": 8,
+        "prompt_tokens": 512,
+        "prompt_ms": 13411.1,
+        "decode_ms": 2414.4,
+        "finish": "length",
+        "drafts_accepted": 6,
+        "drafts_offered": 12,
+        "reused": 0,
+        "hits": 4723,
+        "lookups": 8160,
+        "ram_blobs": 0,
+        "file_blobs": 0,
+        "file_mb": 5514.2,
+        "prompt_read": 512,
+        "offloaded": 0
+      },
+      "state": {
+        "L": "519",
+        "gdn": "1c633333c2388cde",
+        "ple": "c659884dd8544533",
+        "tail": "9fc2f7523e09fb57",
+        "dead": "e330c1a0187ad6bd",
+        "pooled": "39cfc43ec616f353",
+        "pooled_full": "6fbc2556d9af363a",
+        "kv": "d73863ad885a7301",
+        "ple_prev": "264,25924"
+      },
+      "owner_observations": {
+        "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+        "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA VMM address reservations and physical segments/chunks across range ownership transfers, pageable/pinned expert-stage host buffers, primary, layer-stage and batch-slot SessionState backing, verifier primary and auxiliary device buffers, batch-window device arena, window graphs and mapped/pinned host staging, prefill-owned vector allocations/views, MTP base dense/expert weights, optional converted projections and draft-head subset copies, and MTP state/scratch arenas; SYCL ExpertCache and other sites excluded",
+        "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+        "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+        "allocation_events": 79,
+        "free_events": 79,
+        "observed_allocation_bytes_by_device": {
+          "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+          "peak": {
+            "-1": 141850176,
+            "0": 9479354040
+          },
+          "live_at_log_end": {
+            "-1": 0,
+            "0": 0
+          }
+        },
+        "vmm_range_mappings": {
+          "map_events": 0,
+          "unmap_events": 0,
+          "still_mapped_at_log_end": []
+        },
+        "planned_reservations": {
+          "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+          "events": []
+        },
+        "virtual_address_ranges": {
+          "scope": "reserved virtual address space only; no physical backing implied and never added to allocation totals",
+          "reserve_events": 0,
+          "release_events": 0,
+          "peak_reserved_bytes_by_device": {},
+          "live_reserved_bytes_by_device": {},
+          "live_ranges_at_log_end": []
+        },
+        "owners": [
+          {
+            "owner": "expert-cache",
+            "instance": 281474758850896,
+            "device": 0,
+            "peak_observed_requested_bytes": 7985945600,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "expert-stage-pinned-host",
+            "instance": 281474758884640,
+            "device": -1,
+            "peak_observed_requested_bytes": 141107200,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp",
+            "instance": 281474758887712,
+            "device": 0,
+            "peak_observed_requested_bytes": 24778192,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": 1072319160,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp-base-weights",
+            "instance": 281474758887712,
+            "device": 0,
+            "peak_observed_requested_bytes": 823887872,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp-prefill-device-graph",
+            "instance": 281474758887712,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 1
+          },
+          {
+            "owner": "mtp-round-graph",
+            "instance": 281474758887712,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 2
+          },
+          {
+            "owner": "mtp-step-graph",
+            "instance": 281474758887712,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 2
+          },
+          {
+            "owner": "mtp-weight-copy",
+            "instance": 281474758887712,
+            "device": 0,
+            "peak_observed_requested_bytes": 223653096,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "prefill",
+            "instance": 187651319933696,
+            "device": 0,
+            "peak_observed_requested_bytes": 2048,
+            "live_observed_requested_bytes": 0,
+            "view_events": 67,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "session",
+            "instance": 281474758883584,
+            "device": 0,
+            "peak_observed_requested_bytes": 343101952,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "verifier",
+            "instance": 281474758891896,
+            "device": 0,
+            "peak_observed_requested_bytes": 77985280,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 3
+          },
+          {
+            "owner": "verifier-commit-graph",
+            "instance": 281474758891896,
+            "device": 0,
+            "peak_observed_requested_bytes": 0,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 1
+          },
+          {
+            "owner": "verifier-mapped-host",
+            "instance": 281474758891896,
+            "device": -1,
+            "peak_observed_requested_bytes": 742976,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          }
+        ]
+      },
+      "stage_requested_bytes": {
+        "expert-stage-pinned-host": 141107200
+      }
+    }
+  ],
+  "pair_comparisons": [
+    {
+      "pair": 0,
+      "order": [
+        "pageable",
+        "pinned"
+      ],
+      "token_ids_equal": true,
+      "persistent_state_equal": true,
+      "differing_state_fields": [],
+      "failures": []
+    },
+    {
+      "pair": 1,
+      "order": [
+        "pageable",
+        "pinned"
+      ],
+      "token_ids_equal": true,
+      "persistent_state_equal": true,
+      "differing_state_fields": [],
+      "failures": []
+    },
+    {
+      "pair": 2,
+      "order": [
+        "pageable",
+        "pinned"
+      ],
+      "token_ids_equal": true,
+      "persistent_state_equal": true,
+      "differing_state_fields": [],
+      "failures": []
+    }
+  ],
+  "summary": {
+    "pageable": {
+      "median_prompt_ms": 13578.3,
+      "median_decode_ms": 2374.8,
+      "stage_requested_bytes": 181043200
+    },
+    "pinned": {
+      "median_prompt_ms": 13405.8,
+      "median_decode_ms": 2414.4,
+      "stage_requested_bytes": 170393600
+    }
+  },
+  "comparison": {
+    "all_pairs_passed": true,
+    "failures": []
+  },
+  "passed": true
+}
