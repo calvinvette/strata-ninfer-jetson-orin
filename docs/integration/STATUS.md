@@ -221,6 +221,13 @@ driver memory. The largest free-memory drop across one instantiate call was
 116.8 MiB, a correlated global device delta rather than a graph allocation
 measurement; graph peak accounting remains open.
 
+A follow-up [public CUDA Driver allocation probe](../../bench/results/2026-10-11-phase3-graph-driver-probe/README.md)
+passed all seven real-model protocol/cancellation cases and observed 10 graph
+instantiations, but zero interposable public Driver allocation calls during
+instantiation. Its direct 2 MiB Driver allocation/free calibration passed, so
+graph executable storage remains unpriced rather than measured as zero. This
+clarifies the instrumentation boundary and leaves Phase 3 open.
+
 An actual cgroup-v2 [admission check](../../bench/results/2026-10-10-phase3-cgroup-admission/README.md)
 placed the supervisor in a 1 GiB systemd user scope. It saw only 1.0 GiB of
 effective cgroup availability despite 24.6 GiB host availability and aborted
