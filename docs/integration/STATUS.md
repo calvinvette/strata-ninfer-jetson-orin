@@ -661,3 +661,13 @@ PLE oracle passed with its real tensor pack and GGUF table shard; ten selected
 PLE/memory/owner CTests and all 92 integration Python tests passed. This closes
 one MTP ledger gap, not graph-pool pricing or the remaining broad admission and
 transfer gates; Phase 3 remains in progress.
+
+A separate trace-free seven-pair [pageable/pinned timing screen](../../bench/results/2026-10-11-phase3-stage-pin-timing512/README.md)
+now follows the traced correctness check. All 14 arms emitted 64 tokens with
+matching IDs, fixed 3,903 actual cache slots and 13.17 GiB minimum host
+availability. Paired prompt-stage delta was +0.48% (bootstrap 95% interval
+−3.64% to +10.45%); decode was −2.13% (−46.18% to +134.52%), and the prompt+
+decode stage sum was +12.10% (−24.00% to +58.19%). Wide paired uncertainty,
+dynamic clocks and one prompt/cache cell leave the candidate unpromoted. The
+traced three-pair state check remains separate; this timing run did not collect
+state hashes or owner events.

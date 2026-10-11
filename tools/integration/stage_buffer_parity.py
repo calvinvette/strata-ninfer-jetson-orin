@@ -18,6 +18,42 @@ from serve.frontend import ChatTemplate
 from serve.server import StrataEngine, child_env
 
 STATE_KEYS = ('L', 'gdn', 'ple', 'tail', 'dead', 'pooled', 'pooled_full', 'kv', 'ple_prev')
+TRACE_ENV_KEYS = ('STRATA_TRACE', 'STRATA_STATE_HASH', 'STRATA_INTEGRATION_TRACE',
+                  'STRATA_STATE_HASH_GDN')
+
+
+def stage_environment(env, pin, timing_only=False):
+    """Configure one arm while keeping timed runs free of instrumentation."""
+    env = dict(env)
+    env['STRATA_STAGE_PIN'] = pin
+    env['STRATA_MTP_BATCH'] = '1'
+    env['STRATA_PREFILL_CPU_SHARE'] = '0'
+    env['STRATA_IO_PREFETCH'] = '1'
+    env['STRATA_IO_PF_STAGE'] = '1'
+    if timing_only:
+        for key in TRACE_ENV_KEYS:
+            env.pop(key, None)
+    else:
+        env.update({'STRATA_TRACE': '1', 'STRATA_STATE_HASH': '1',
+                    'STRATA_INTEGRATION_TRACE': '1', 'STRATA_STATE_HASH_GDN': '1'})
+    return env
+
+
+def paired_ratio_effect(control, candidate, *, iterations=100000, seed=870126):
+    """Median paired candidate/control latency delta and percentile bootstrap interval."""
+    if len(control) != len(candidate) or not control or iterations < 1:
+        raise ValueError('paired effects require equally sized nonempty samples and positive iterations')
+    if any(value <= 0 for value in control + candidate):
+        raise ValueError('paired latency values must be positive')
+    effects = [(new / old - 1.0) * 100.0 for old, new in zip(control, candidate)]
+    rng = random.Random(seed)
+    boot = sorted(statistics.median(effects[rng.randrange(len(effects))] for _ in effects)
+                  for _ in range(iterations))
+    return {'paired_median_delta_pct': statistics.median(effects),
+            'bootstrap_95pct_interval_pct': [boot[int((iterations - 1) * 0.025)],
+                                             boot[int((iterations - 1) * 0.975)]],
+            'pairs': len(effects), 'bootstrap_iterations': iterations,
+            'pair_deltas_pct': effects}
 
 
 def state_hashes(path):
@@ -43,6 +79,8 @@ def main():
     parser.add_argument('--pairs', type=int, default=1)
     parser.add_argument('--seed', type=int, default=870126)
     parser.add_argument('--resume', action='store_true', help='continue an incomplete output directory after a harness interruption')
+    parser.add_argument('--timing-only', action='store_true',
+                        help='disable state/owner tracing; compare output IDs but do not claim state parity')
     parser.add_argument('--run', action='store_true', help='otherwise print the planned exact prompt size only')
     args = parser.parse_args()
     if args.prompt_tokens < 512 or args.generated_tokens < 8 or args.pairs < 1:
@@ -75,11 +113,14 @@ def main():
         if (result.get('prompt_sha256') != prompt_hash or
                 result.get('generated_tokens') != args.generated_tokens or
                 result.get('planned_pairs') != args.pairs or result.get('seed') != args.seed or
+                result.get('mode') != ('timing_only' if args.timing_only else 'traced_correctness_and_timing') or
                 any(row.get('engine_sha256') != binary_hash for row in result.get('arms', []))):
             parser.error('resume inputs differ from the retained incomplete run')
+        result['pair_comparisons'] = []
     else:
         args.output.mkdir(mode=0o700, parents=False, exist_ok=False)
         result = {'scope': 'exact real-model prompt, randomized paired staging diagnostic; screening only',
+                  'mode': 'timing_only' if args.timing_only else 'traced_correctness_and_timing',
                   'prompt_tokens': len(prompt), 'prompt_sha256': prompt_hash,
                   'generated_tokens': args.generated_tokens, 'planned_pairs': args.pairs,
                   'seed': args.seed, 'arms': [], 'pair_comparisons': []}
@@ -109,11 +150,7 @@ def main():
             log = args.output / f'pair-{pair}-{label}.log'
             if log.exists():
                 parser.error(f'incomplete arm log exists without a terminal result: {log}')
-            env = child_env(cfg)
-            env.update({'STRATA_STAGE_PIN': pin, 'STRATA_STATE_HASH': '1',
-                        'STRATA_MTP_BATCH': '1', 'STRATA_PREFILL_CPU_SHARE': '0',
-                        'STRATA_INTEGRATION_TRACE': '1', 'STRATA_IO_PREFETCH': '1',
-                        'STRATA_IO_PF_STAGE': '1'})
+            env = stage_environment(child_env(cfg), pin, args.timing_only)
             arm = {'pair': pair, 'name': label, 'stage_pin': pin, 'args': args_for,
                    'engine_sha256': binary_hash}
             engine = StrataEngine(str(args.engine.resolve()), args_for, cwd=cfg.get('cwd'),
@@ -124,12 +161,13 @@ def main():
                 arm.update(ids=ids, text=tokenizer.decode(ids), usage=dict(engine.last))
             finally:
                 engine.close()
-            arm['state'] = state_hashes(log)
-            owners = summarize(log.read_text(encoding='utf-8').splitlines())
-            arm['owner_observations'] = owners
-            arm['stage_requested_bytes'] = {
-                row['owner']: row['peak_observed_requested_bytes'] for row in owners['owners']
-                if row['owner'] in ('expert-stage-pageable-host', 'expert-stage-pinned-host')}
+            if not args.timing_only:
+                arm['state'] = state_hashes(log)
+                owners = summarize(log.read_text(encoding='utf-8').splitlines())
+                arm['owner_observations'] = owners
+                arm['stage_requested_bytes'] = {
+                    row['owner']: row['peak_observed_requested_bytes'] for row in owners['owners']
+                    if row['owner'] in ('expert-stage-pageable-host', 'expert-stage-pinned-host')}
             result['arms'].append(arm)
             pair_rows.append(arm)
             result_path.write_text(json.dumps(result, indent=2) + '\n')
@@ -139,17 +177,19 @@ def main():
         failures = []
         if pageable['ids'] != pinned['ids']:
             failures.append('generated token IDs differ')
-        state_differences = [key for key in STATE_KEYS if pageable['state'][key] != pinned['state'][key]]
-        if state_differences:
-            failures.append('persistent main-model state differs')
-        if pageable['stage_requested_bytes'].get('expert-stage-pageable-host', 0) <= 0:
-            failures.append('pageable stage backing was not observed')
-        if pinned['stage_requested_bytes'].get('expert-stage-pinned-host', 0) <= 0:
-            failures.append('pinned stage backing was not observed')
+        state_differences = []
+        if not args.timing_only:
+            state_differences = [key for key in STATE_KEYS if pageable['state'][key] != pinned['state'][key]]
+            if state_differences:
+                failures.append('persistent main-model state differs')
+            if pageable['stage_requested_bytes'].get('expert-stage-pageable-host', 0) <= 0:
+                failures.append('pageable stage backing was not observed')
+            if pinned['stage_requested_bytes'].get('expert-stage-pinned-host', 0) <= 0:
+                failures.append('pinned stage backing was not observed')
         result['pair_comparisons'].append({
             'pair': pair, 'order': [label for label, _ in order],
             'token_ids_equal': pageable['ids'] == pinned['ids'],
-            'persistent_state_equal': not state_differences,
+            'persistent_state_equal': None if args.timing_only else not state_differences,
             'differing_state_fields': state_differences, 'failures': failures})
         result_path.write_text(json.dumps(result, indent=2) + '\n')
 
@@ -161,15 +201,36 @@ def main():
         for key in ('prompt_ms', 'decode_ms'):
             result['summary'][label]['median_' + key] = statistics.median(
                 row['usage'][key] for row in arms)
-        result['summary'][label]['stage_requested_bytes'] = statistics.median(
-            row['stage_requested_bytes'].get('expert-stage-' + ('pageable' if label == 'pageable' else 'pinned') + '-host', 0)
-            for row in arms)
+        if not args.timing_only:
+            result['summary'][label]['stage_requested_bytes'] = statistics.median(
+                row['stage_requested_bytes'].get('expert-stage-' + ('pageable' if label == 'pageable' else 'pinned') + '-host', 0)
+                for row in arms)
     result['comparison'] = {'all_pairs_passed': not failures, 'failures': failures}
+    pair_rows = {row['pair']: row for row in result['pair_comparisons']}
+    metrics = {'prompt_ms': lambda arm: arm['usage']['prompt_ms'],
+               'decode_ms': lambda arm: arm['usage']['decode_ms'],
+               'request_ms': lambda arm: arm['usage']['prompt_ms'] + arm['usage']['decode_ms']}
+    arms_by_pair = {}
+    for arm in result['arms']:
+        arms_by_pair.setdefault(arm['pair'], {})[arm['name']] = arm
+    result['paired_effects'] = {}
+    for metric, value_for in metrics.items():
+        pairs = [arms_by_pair[index] for index in sorted(arms_by_pair)]
+        effect = paired_ratio_effect([value_for(pair['pageable']) for pair in pairs],
+                                     [value_for(pair['pinned']) for pair in pairs],
+                                     seed=args.seed + sum(map(ord, metric)))
+        result['paired_effects'][metric] = effect
+        for row, delta in zip((pair_rows[index] for index in sorted(pair_rows)),
+                              effect['pair_deltas_pct']):
+            row.setdefault('paired_pinned_minus_pageable_pct', {})[metric] = delta
     result['passed'] = not failures
     (args.output / 'results.json').write_text(json.dumps(result, indent=2) + '\n')
     if failures:
         raise AssertionError('; '.join(failures))
-    print('PASS: token IDs and persistent state match; both stage backing modes observed')
+    if args.timing_only:
+        print('PASS: token IDs match; state and owner tracing were disabled for timing')
+    else:
+        print('PASS: token IDs and persistent state match; both stage backing modes observed')
     return 0
 
 

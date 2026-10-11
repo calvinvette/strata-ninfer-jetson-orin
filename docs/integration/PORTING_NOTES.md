@@ -610,3 +610,15 @@ availability. Keep the existing payload snapshot separate because it overlaps
 observed backing. For Splash, inventory temporary logits and sampling buffers as
 well as persistent weights and state, and do not sum payload snapshots with
 unique live allocations.
+
+## Separate transfer correctness traces from transfer timing
+
+On Orin, the pageable/pinned stage trace matched output IDs and persistent state,
+but its tracing overhead made timing descriptive. A separate seven-pair
+trace-free screen retained equal output IDs and fixed actual cache capacity,
+then measured prompt/decode stages with pair-level bootstrap intervals. Its
+uncertainty was wide and did not support a pinned-stage benefit. For a future
+Strata + Splash comparison, first qualify output/state and owner lifetimes in a
+traced diagnostic, then collect timing with all instrumentation disabled and
+report its own per-arm buffer/copy counters separately. Do not combine the two
+runs or use request text alone as a state-parity check.
