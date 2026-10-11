@@ -555,3 +555,14 @@ conversation CTests (24.51 GiB minimum). See the
 This reconfirms those selected contracts on the modified tree; broader cgroup
 pressure, graph-memory attribution and remaining transfer/admission gates keep
 Phase 3 in progress.
+
+A fresh [post-fix Q2_0 service and graph-owner run](../../bench/results/2026-10-11-phase3-post-fix-q2-graph/README.md)
+passed all seven protocol/recovery scenarios. Three verifier window graphs and
+the commit graph were all observed (4/4), and the verifier arena, mapped host
+buffers, pageable expert staging, session and expert-cache owners balanced at
+teardown. The calibrated NVMap counter rose 72,425,472 bytes from the stable
+pre-graph sample through the fourth successful graph call, identical to the
+earlier Q2_0 repeats; this interval still includes adjacent synchronous device
+allocations. Minimum host availability was 21.15 GiB. This confirms one model
+and graph configuration after the new verifier code, not general graph pricing
+or pressure qualification.
