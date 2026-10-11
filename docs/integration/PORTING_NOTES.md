@@ -493,3 +493,5 @@ three-pair follow-up had opposite paired directions and a 0.49% median prompt
 difference. It does not justify a PLE I/O policy change. Splash should expose
 the corresponding Metal operator/copy counter before interpreting end-to-end
 timing, and retain an explicitly unsupported result if that counter is absent.
+
+A follow-up Q2_0 request at the same 8 GiB cgroup cap but with only 256 expert-cache slots requested still admitted zero slots and failed at the native speculative residency-table check, while retaining 6.78 GiB effective and 22.11 GiB host availability. Since the 10 GiB cap passed with 296 actual slots even when requesting 3,000, cap and cache-budget behavior is not monotonic in these isolated cells. For a future Strata + Splash port, log requested budget, actual resident slots, admission reason and workload together; do not extrapolate a support threshold from cap size alone.
