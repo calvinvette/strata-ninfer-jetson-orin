@@ -48,9 +48,12 @@ def main():
                     ['c++', '--version'], ['nvpmodel', '-q'],
                     ['jetson_clocks', '--show'], ['file', str(args.binary)],
                     ['/usr/local/cuda/bin/cuobjdump', '--list-elf', str(args.binary)]]],
-                'counter_gaps': ['unique allocation/reservation bytes by owner',
-                                 'graph pool allocation', 'request-scoped energy',
-                                 'independent operator tolerance and persistent-state fixtures']}
+                'counter_gaps': [
+                    'reconciled physical host/device backing across unique allocations, aliases, VMM mappings, reservations, graph pools and uninstrumented libraries; owner traces report requested bytes only',
+                    'complete graph-pool bytes; selected NVMap capture intervals are not isolated executable sizes',
+                    'request-scoped process I/O and energy attribution; available block and rail counters may include unrelated system activity',
+                    'whole-model quality thresholds and persistent-state parity across cache, context, transfer and prefill profiles',
+                    'runtime coverage for legacy graph owners and SYCL ExpertCache']}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(manifest, indent=2) + '\n')
 
