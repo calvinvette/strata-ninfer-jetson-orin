@@ -7,7 +7,9 @@ header is original integration code; no NInfer implementation is copied.
 
 The verifier diagnostic observes `Verifier`. Successful primary arena allocation
 records its requested bytes and allocation identity; a successful free records
-the same identity. CUDA/HIP records successful window graph instantiations through
+the same identity. Mapped verifier staging and profiler host buffers are reported
+as host owners (`device=-1`); their CUDA/HIP device aliases are views and are not
+added as separate physical allocations. CUDA/HIP records successful window graph instantiations through
 `instantiate_evicting`; SYCL's migrated owner records the corresponding single
 window graph finalization. Their batch graph coverage is not equivalent yet.
 No graph-pool byte value is inferred from graph counts or free-memory deltas.
@@ -118,7 +120,7 @@ from the owning device.
 
 The expanded [evidence report](../../bench/results/2026-10-09-prefill-mtp-owner-trace/README.md)
 compares owned and borrowed prefill, and trace-off protocol checks. Remaining
-sites include verifier mapped staging/auxiliary/batch buffers, layer-stage and
+sites include verifier auxiliary/device batch buffers, layer-stage and
 batch-slot session arenas, and graph
 capture/destroy/pool observations. Phase 3 must distinguish unique physical
 backing, views and future reservations. Phase 1 needs explicit counters and unsupported scopes; do not

@@ -337,6 +337,12 @@ draft-head subset: it emits the same token ID 32, and 266 allocations and frees
 balance. The observed base weights
 total 785.7 MiB and the subset head/vocabulary copies add 178.8 MiB of CUDA
 requested payload; shared drafters emit no duplicate base-weight allocations.
+The [verifier mapped-host follow-up](../../bench/results/2026-10-10-phase3-verifier-mapped-owner/README.md)
+adds host staging registrations/frees to the same Q2_0 load/bind check; all 282
+owner allocations and frees balance, including a 495,480-byte mapped-host peak.
+With the optional [verifier trace ring](../../bench/results/2026-10-10-phase3-verifier-trace-owner/README.md)
+enabled, 283 pairs balance; adding its mapped buffer to verifier teardown closes
+the diagnostic-buffer lifetime too. Both runs end with zero observed live bytes.
 At the same 5,000 cache slots, configured 8K and 16K contexts also admitted
 the one-token/512-input smoke with 15.65/15.70 GiB minimum host availability;
 these do not represent long-context ingestion or quality tests.

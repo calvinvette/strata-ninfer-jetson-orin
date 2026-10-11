@@ -184,17 +184,19 @@ bool one_token_self_commit() {
 #endif
 }
 
-bool mapped(size_t bytes, void** h, void** d) {
+bool mapped(const void* owner, size_t bytes, void** h, void** d) {
 #if defined(STRATA_USE_HIP)
     if (g_coherent) {
         if (hipHostMalloc(h, bytes, hipHostMallocMapped | hipHostMallocCoherent |
                                         (peer_portable() ? hipHostMallocPortable : 0)) != hipSuccess)
             return false;
+        strata::platform::integration_trace::event("verifier-mapped-host", "allocate", owner, *h, bytes, -1);
         std::memset(*h, 0, bytes);
         return cudaHostGetDevicePointer(d, *h, 0) == cudaSuccess;
     }
 #endif
     if (cudaHostAlloc(h, bytes, cudaHostAllocMapped | (peer_portable() ? cudaHostAllocPortable : 0)) != cudaSuccess) return false;   // multi-GPU: portable only with a peer - the peer card writes its rows into them
+    strata::platform::integration_trace::event("verifier-mapped-host", "allocate", owner, *h, bytes, -1);
     std::memset(*h, 0, bytes);
     return cudaHostGetDevicePointer(d, *h, 0) == cudaSuccess;
 }
@@ -387,7 +389,8 @@ Verifier::~Verifier() {
     for (auto& kv : commit_bm_)
         if (kv.second) cudaGraphExecDestroy(kv.second);
     if (arena_b_) cudaFree(arena_b_);
-    if (h_commitb_) cudaFreeHost(h_commitb_);
+    if (h_commitb_ && cudaFreeHost(h_commitb_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-mapped-host", "free", this, h_commitb_, 0, -1);
     if (qcnt_) cudaFree(qcnt_);
     if (d_spec_) cudaFree(d_spec_);
     if (cs_ && cs_ != ext_stream_) cudaStreamDestroy(cs_);   // set_stream: the stage's stream, shared, not ours
@@ -396,7 +399,8 @@ Verifier::~Verifier() {
     if (commit_done_) cudaEventDestroy(commit_done_);
     if (ev_done_) cudaEventDestroy(ev_done_);
     if (ev_commit_) cudaEventDestroy(ev_commit_);
-    if (prof_pin_) cudaFreeHost(prof_pin_);
+    if (prof_pin_ && cudaFreeHost(prof_pin_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-pinned-host", "free", this, prof_pin_, 0, -1);
     if (ev_fork_) cudaEventDestroy(ev_fork_);
     if (ev_join_) cudaEventDestroy(ev_join_);
     for (cudaStream_t s : df_side_)
@@ -410,9 +414,10 @@ Verifier::~Verifier() {
             strata::platform::integration_trace::event("verifier", "free", this, arena_, 0, device_);
     }
     void* hosts[] = {h_tok_, h_step_, h_pos_, h_commit_, h_ple_, h_out_, h_x_, h_ids_, h_w_, h_seq_, h_flag_, h_ymiss_,
-                     h_flagA_, h_plan_, h_flagB_, h_plan_err_};
+                     h_flagA_, h_plan_, h_flagB_, h_plan_err_, trace_h_};
     for (void* h : hosts)
-        if (h) cudaFreeHost(h);
+        if (h && cudaFreeHost(h) == cudaSuccess)
+            strata::platform::integration_trace::event("verifier-mapped-host", "free", this, h, 0, -1);
 }
 
 bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState& ss, const VerifyHits& hits,
@@ -481,21 +486,21 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
     const int max_in = (int) std::max<uint64_t>(std::max<uint64_t>(N, ZV), NH * HD);
 
     // ---- mapped staging
-    bool ok = mapped(T * 4, (void**) &h_tok_, (void**) &m_tok_) &&
-              mapped(T * strata::kernels::kStepCount * 4, (void**) &h_step_, (void**) &m_step_) &&
-              mapped(T * (NH + NKV + IQ) * 4, (void**) &h_pos_, (void**) &m_pos_) &&
-              mapped((2 + T) * 4 + 16, (void**) &h_commit_, (void**) &m_commit_) &&
-              mapped(T * N * 4, (void**) &h_ple_, (void**) &m_ple_) &&
-              mapped(T * 4 + 16, (void**) &h_out_, (void**) &m_out_) &&
-              mapped(T * N * 4, (void**) &h_x_, (void**) &m_x_) &&
-              mapped(T * K * 4, (void**) &h_ids_, (void**) &m_ids_) &&
-              mapped(T * K * 4, (void**) &h_w_, (void**) &m_w_) &&
-              mapped(64, (void**) &h_seq_, (void**) &m_seq_) &&
-              mapped(64, (void**) &h_flag_, (void**) &m_flag_) &&
-              mapped(64, (void**) &h_flagA_, (void**) &m_flagA_) &&
-              mapped(64, (void**) &h_flagB_, (void**) &m_flagB_) &&
-              mapped(64, (void**) &h_plan_err_, (void**) &m_plan_err_) &&
-              mapped(T * K * N * 4, (void**) &h_ymiss_, (void**) &m_ymiss_);
+    bool ok = mapped(this, T * 4, (void**) &h_tok_, (void**) &m_tok_) &&
+              mapped(this, T * strata::kernels::kStepCount * 4, (void**) &h_step_, (void**) &m_step_) &&
+              mapped(this, T * (NH + NKV + IQ) * 4, (void**) &h_pos_, (void**) &m_pos_) &&
+              mapped(this, (2 + T) * 4 + 16, (void**) &h_commit_, (void**) &m_commit_) &&
+              mapped(this, T * N * 4, (void**) &h_ple_, (void**) &m_ple_) &&
+              mapped(this, T * 4 + 16, (void**) &h_out_, (void**) &m_out_) &&
+              mapped(this, T * N * 4, (void**) &h_x_, (void**) &m_x_) &&
+              mapped(this, T * K * 4, (void**) &h_ids_, (void**) &m_ids_) &&
+              mapped(this, T * K * 4, (void**) &h_w_, (void**) &m_w_) &&
+              mapped(this, 64, (void**) &h_seq_, (void**) &m_seq_) &&
+              mapped(this, 64, (void**) &h_flag_, (void**) &m_flag_) &&
+              mapped(this, 64, (void**) &h_flagA_, (void**) &m_flagA_) &&
+              mapped(this, 64, (void**) &h_flagB_, (void**) &m_flagB_) &&
+              mapped(this, 64, (void**) &h_plan_err_, (void**) &m_plan_err_) &&
+              mapped(this, T * K * N * 4, (void**) &h_ymiss_, (void**) &m_ymiss_);
     if (!ok) { err = "verify: mapped staging allocation failed"; return false; }
     // the GPU plan: counts(4) | start(cap+1) | dst(cap) | tok(cap) | pad | ptr(cap u64) | ptr2(cap u64) | start2(cap+1)
     {
@@ -503,7 +508,7 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
         const int64_t i32 = 4 + (cap + 1) + cap + cap;
         const int64_t ptr_off = (i32 + 1) & ~1ll;
         plan_i32_ = ptr_off + 4 * cap + (cap + 1) + 1;
-        if (!mapped((size_t) plan_i32_ * 4 * 2 + 64, (void**) &h_plan_, (void**) &m_plan_)) {
+        if (!mapped(this, (size_t) plan_i32_ * 4 * 2 + 64, (void**) &h_plan_, (void**) &m_plan_)) {
             err = "verify: mapped plan allocation failed";
             return false;
         }
@@ -570,7 +575,7 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
     cudaMemset(arena_, 0, count.used);
     if (g_trace && trace_h_ == nullptr) {   // #649: the breadcrumbs, mapped so they read while the GPU hangs
         trace_n_ = (size_t) (g.n_layers + 1) * kProfPer * 2;
-        if (!mapped(trace_n_ * 8, (void**) &trace_h_, (void**) &trace_m_)) {
+        if (!mapped(this, trace_n_ * 8, (void**) &trace_h_, (void**) &trace_m_)) {
             (void) cudaGetLastError();
             trace_h_ = trace_m_ = nullptr;
             trace_n_ = 0;
@@ -2337,7 +2342,7 @@ bool Verifier::init_slots(const std::vector<SessionState*>& slots, std::string& 
     const int64_t S = (int64_t) slots.size(), CB = 2 + max_t_;
     const int64_t TS = (s.idx_block - 1) * g_->idx_key_dim, nQ = g_->n_qsa_layers();
     void* d = nullptr;
-    if (!mapped((size_t) (S * CB * 4 + 16), (void**) &h_commitb_, (void**) &m_commitb_)) {
+    if (!mapped(this, (size_t) (S * CB * 4 + 16), (void**) &h_commitb_, (void**) &m_commitb_)) {
         err = "verify: the batch commit staging failed";
         return false;
     }
@@ -2940,10 +2945,14 @@ bool Verifier::capture_all(std::string& err) {
         err = "verify: event create failed";
         return false;
     }
-    if (prof_on_ && prof_pin_ == nullptr &&
-        cudaHostAlloc((void**) &prof_pin_, prof_h_.size() * 8, cudaHostAllocDefault) != cudaSuccess) {
-        prof_pin_ = nullptr;   // the pipelined windows go unprofiled
-        cudaGetLastError();
+    if (prof_on_ && prof_pin_ == nullptr) {
+        if (cudaHostAlloc((void**) &prof_pin_, prof_h_.size() * 8, cudaHostAllocDefault) != cudaSuccess) {
+            prof_pin_ = nullptr;   // the pipelined windows go unprofiled
+            cudaGetLastError();
+        } else {
+            strata::platform::integration_trace::event("verifier-pinned-host", "allocate", this, prof_pin_,
+                                                        prof_h_.size() * 8, -1);
+        }
     }
     pl_ple_rows_.assign((size_t) strata::kernels::kVerifyMaxT * strata::kernels::PLE_N_HEADS, 0u);
     return true;
