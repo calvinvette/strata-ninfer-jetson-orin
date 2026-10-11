@@ -671,3 +671,13 @@ decode stage sum was +12.10% (−24.00% to +58.19%). Wide paired uncertainty,
 dynamic clocks and one prompt/cache cell leave the candidate unpromoted. The
 traced three-pair state check remains separate; this timing run did not collect
 state hashes or owner events.
+
+The [Q2_0 32K-configured/spec4 graph check](../../bench/results/2026-10-11-phase3-q2-graph-context32k-spec4/README.md)
+adds the missing context/speculation interaction point. A 31-token prompt and
+24-token generation passed with 20.96 GiB minimum physical availability; three
+successful Driver graph instantiations matched three owner events, and the
+302/302 allocation/free pairs balanced. Stable NVMap backing increased by
+48,709,632 bytes across capture/instantiate plus adjacent allocations. This is
+not a 32K ingestion test or isolated graph executable size. The 32K/spec2 run
+had four graph calls and a different 72,425,472-byte interval, so no per-graph
+cost is inferred; legacy session graphs and non-NVMap bytes remain open.

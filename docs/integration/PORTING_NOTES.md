@@ -622,3 +622,11 @@ Strata + Splash comparison, first qualify output/state and owner lifetimes in a
 traced diagnostic, then collect timing with all instrumentation disabled and
 report its own per-arm buffer/copy counters separately. Do not combine the two
 runs or use request text alone as a state-parity check.
+
+The configured-context × speculation graph screen now has Q2_0 observations at
+32K for spec2 and spec4. At spec4, three Driver instantiate calls matched three
+owner events, with a 48.71 MB stable NVMap interval; spec2 had four calls and a
+72.43 MB interval. These are configuration-specific capture intervals, not
+per-graph executable costs. For Splash, vary context and graph/speculation shape
+as separate factors, calibrate the platform counter, and retain actual request
+length so a configured reservation is not presented as long-context execution.
