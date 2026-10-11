@@ -1373,15 +1373,6 @@ uint64_t fnv1a(const void* data, size_t n, uint64_t h = 1469598103934665603ull) 
 
 using ConvStateSizes = strata::core::ConversationStateSizes;
 
-ConvStateSizes conv_state_sizes(const strata::core::ModelGeometry& g, const strata::core::SessionState& ss) {
-    ConvStateSizes z;
-    std::string error;
-    // a split stage's session owns only its layer range's state (see SessionState's carve note); the geometry
-    // and the carve have already passed engine validation
-    strata::core::conversation_session_sizes(g, ss, z, error);
-    return z;
-}
-
 /// Copies the running state out (this session's carve only).  The caller has synchronized the device.
 bool checkpoint_save(ConvCheckpoint& c, const strata::core::SessionState& ss, const strata::core::ModelGeometry& g) {
     std::string error;
@@ -10989,7 +10980,20 @@ int main(int argc, char** argv) {
                         }
                     return h;
                 };
-                const ConvStateSizes z = conv_state_sizes(g, ss);
+                ConvStateSizes z;
+                std::string state_size_error;
+                if (!strata::core::conversation_session_sizes(g, ss, z, state_size_error)) {
+                    std::fprintf(stderr, "strata serve: state fingerprint sizes: %s\n", state_size_error.c_str());
+                    return 1;
+                }
+                if (ss.gdn_alloc > 0 &&
+                    (ss.gdn_state == nullptr || z.gdn / (size_t) ss.gdn_alloc == 0 ||
+                     z.gdn % (size_t) ss.gdn_alloc != 0)) {
+                    std::fprintf(stderr,
+                                 "strata serve: state fingerprint: invalid GDN range (%zu bytes for %lld owned layers)\n",
+                                 z.gdn, (long long) ss.gdn_alloc);
+                    return 1;
+                }
                 uint64_t h_gdn = hash_dev(ss.gdn_state, z.gdn, 1469598103934665603ull);
                 if (std::getenv("STRATA_STATE_HASH_GDN") != nullptr && ss.gdn_alloc > 0) {   // per GDN layer: which one differs first
                     const size_t per = z.gdn / (size_t) ss.gdn_alloc;

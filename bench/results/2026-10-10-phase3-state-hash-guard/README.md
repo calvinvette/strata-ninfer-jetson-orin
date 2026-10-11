@@ -1,0 +1,9 @@
+# Persistent-state fingerprint range validation — 2026-10-10
+
+The `STRATA_STATE_HASH` diagnostic previously ignored the return value from `conversation_session_sizes`. It could silently hash an empty or malformed GDN range if the session carve was invalid. The diagnostic now checks the sizing result and rejects an absent GDN pointer, an empty per-layer range, or a byte count that cannot be evenly divided among the owned GDN layers.
+
+The updated generator built successfully as native CUDA on Orin and as HIP on maestro1. The HIP source SHA256 matched the local file (`2edf14c0ecca1ca6a91f42ab84e6bc45d7b8238b01102d6a80224a3c3fa85b92`); the HIP `strata` binary SHA256 is `bac9f0385398e340d8b037ca2a60d37c356bdabfc40f79234318763851ce2eb3`. The CLI help check passed with the ROCm runtime library paths set. maestro1 supplies compile/help evidence only. The SYCL project has a separate generator and does not compile this CUDA/HIP source.
+
+A fresh Q2_0 QFUSE serial/batch smoke with the guarded diagnostic passed under the six-GiB supervisor; minimum availability was 16,598,405,120 bytes (15.46 GiB). The new guard did not reject the session carve. Its full GDN hash remained `2d2b4c71fb470383` for both prompts, while the default-route comparison produced distinct hashes. Token outputs and the other captured state fields matched. QFUSE GDN parity remains unresolved; this diagnostic fix prevents empty or invalid ranges from being mistaken for a valid full state fingerprint but does not explain the observed difference.
+
+The native CUDA `strata` binary SHA256 is `0d42ff8a7c42b09a7e7ac1f01b6985d8d8bd5a41e2191b190fc32874e8da59ea`; the updated source SHA256 is `2edf14c0ecca1ca6a91f42ab84e6bc45d7b8238b01102d6a80224a3c3fa85b92`. The supervised run's raw output is in [the guard run](../2026-10-10-phase3-qfuse-fingerprint-guard2/). The QFUSE comparison and limitation are recorded in the [owner smoke report](../2026-10-10-phase3-qfuse-smoke/README.md).
