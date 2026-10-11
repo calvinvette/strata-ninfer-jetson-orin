@@ -33,3 +33,23 @@ Reproduce from the repository root with the exact command stored in
 `supervisor/result.json`; the run used `tools/integration/run_control.py` with
 its default six-GiB floor. No model artifacts or build products are stored in
 Git.
+
+## PID-tagged CUDA runtime allocation repeat
+
+A second identical 1,024-cap run used the existing test-only CUDA runtime
+interposer, inherited by both `strata-vision` and the main engine. It again
+returned HTTP 200 with 1,049 prompt tokens. The supervisor passed with minimum
+host availability of 9,241,104,384 bytes (8.606 GiB); this is a separate run
+with different cache state, not a paired memory comparison.
+
+The encoder process made six observed `cudaMalloc`/`cudaFree` events, peaked at
+1,037,613,696 bytes (989.5 MiB), and returned its tracked current bytes to
+zero at exit. The engine process peaked at 17,371,062,992 bytes (16.18 GiB) in
+tracked CUDA runtime requests and had 1,476,945,656 bytes (1.375 GiB) still
+tracked at shutdown. The engine's peak includes model/service allocations and
+the image request; it is not an isolated vision increment. These ledgers are
+per-process request totals and must not be added to each other or treated as
+physical backing. They omit CUDA driver/internal, graph-executable, pool and
+vendor-library allocations. PID/event counts and byte values are in
+`alloc-experiment/allocation-summary.json`; raw logs and the supervised
+telemetry are retained alongside it.

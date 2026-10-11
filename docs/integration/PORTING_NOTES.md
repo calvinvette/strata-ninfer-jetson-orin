@@ -644,10 +644,12 @@ length so a configured reservation is not presented as long-context execution.
 The 16-token vision smoke only qualifies a low-token image request. On Orin,
 add explicit min/max token limits to the reproducible smoke harness and run a
 large fixture under the ordinary six-GiB physical-memory supervisor. A 2,048²
-synthetic fixture at a 1,024-token cap completed here at 7.005 GiB minimum host
-availability; treat that as one point with little headroom margin, not a general
-vision admission guarantee. Keep `strata-vision`'s process-specific allocation
-probe separate from the engine owner trace, and state its blind spots: CUDA
-runtime calls do not cover driver, graph, or vendor-internal backing. Future
-Splash work should capture both process lifetimes and system-wide physical
-availability without summing those ledgers.
+synthetic fixture at a 1,024-token cap completed at 7.005 GiB minimum host
+availability; an interposed repeat separately observed a 989.5 MiB vision
+process CUDA runtime peak and 8.606 GiB minimum availability. Treat these as
+bounded points with limited evidence, not a general vision admission guarantee.
+Keep `strata-vision`'s process-specific allocation probe separate from the
+engine owner trace, and state its blind spots: CUDA runtime calls do not cover
+driver, graph, or vendor-internal backing. Future Splash work should capture
+both process lifetimes and system-wide physical availability without summing
+those ledgers.
