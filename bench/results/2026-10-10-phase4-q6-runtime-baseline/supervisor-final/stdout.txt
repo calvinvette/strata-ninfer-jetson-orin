@@ -1,0 +1,19 @@
+block_order,0,blk.31.attn_q.weight,blk.0.attn_qkv.weight,blk.1.attn_gate.weight,blk.3.attn_k.weight,blk.2.ffn_up_shexp.weight
+block_order,1,blk.1.attn_gate.weight,blk.0.attn_qkv.weight,blk.31.attn_q.weight,blk.3.attn_k.weight,blk.2.ffn_up_shexp.weight
+block_order,2,blk.2.ffn_up_shexp.weight,blk.1.attn_gate.weight,blk.31.attn_q.weight,blk.3.attn_k.weight,blk.0.attn_qkv.weight
+block_order,3,blk.1.attn_gate.weight,blk.3.attn_k.weight,blk.0.attn_qkv.weight,blk.31.attn_q.weight,blk.2.ffn_up_shexp.weight
+block_order,4,blk.1.attn_gate.weight,blk.0.attn_qkv.weight,blk.31.attn_q.weight,blk.2.ffn_up_shexp.weight,blk.3.attn_k.weight
+block_order,5,blk.2.ffn_up_shexp.weight,blk.3.attn_k.weight,blk.31.attn_q.weight,blk.0.attn_qkv.weight,blk.1.attn_gate.weight
+block_order,6,blk.2.ffn_up_shexp.weight,blk.31.attn_q.weight,blk.3.attn_k.weight,blk.1.attn_gate.weight,blk.0.attn_qkv.weight
+scope=isolated warmed full-matrix Q6_K->FP16; batch=20 launches; blocks=7; order_seed=20261010
+tensor,matrix_rows,matrix_cols,input_MiB,output_MiB,median_ms_per_launch,min_ms,max_ms,effective_GB_s
+blk.1.attn_gate.weight,6144,2560,12.305,30.000,2.389398,2.382458,2.398365,18.565
+raw_block_means_ms,blk.1.attn_gate.weight,2.385000,2.390056,2.389398,2.394608,2.382458,2.386509,2.398365
+blk.2.ffn_up_shexp.weight,640,2560,1.282,3.125,0.250606,0.250203,0.251194,18.438
+raw_block_means_ms,blk.2.ffn_up_shexp.weight,0.250622,0.250203,0.250363,0.251194,0.250885,0.250272,0.250606
+blk.0.attn_qkv.weight,10240,2560,20.508,50.000,3.955130,3.939170,3.969424,18.693
+raw_block_means_ms,blk.0.attn_qkv.weight,3.946736,3.964288,3.939170,3.965568,3.955130,3.969424,3.950843
+blk.3.attn_k.weight,512,2560,1.025,2.500,0.197917,0.197528,0.198938,18.678
+raw_block_means_ms,blk.3.attn_k.weight,0.197917,0.198270,0.197661,0.198414,0.197528,0.197621,0.198938
+blk.31.attn_q.weight,12288,2560,24.609,60.000,4.759488,4.745070,4.820704,18.641
+raw_block_means_ms,blk.31.attn_q.weight,4.791261,4.745070,4.820704,4.758602,4.768088,4.757936,4.759488

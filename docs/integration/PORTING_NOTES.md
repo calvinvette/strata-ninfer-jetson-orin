@@ -366,6 +366,17 @@ interchangeability. Exhaustive storage conversion is not a substitute for a
 real-layer accuracy and state test. A future Splash/Metal port should preserve
 both format identity and output dtype at this seam.
 
+For the profiled Q6_K materializer, qualify the exact runtime entry point on
+real payloads and the observed full matrix shapes before testing alternate
+schedules. The Orin diagnostic first checked output bits on real rows, then
+timed full device-resident matrices in shuffled shape-order blocks, reporting
+source-plus-destination traffic as nominal effective GB/s. Its timing excludes
+model loading and the initial copy and uses warmed repeated inputs; this makes
+it an operator baseline, not a production transfer or end-to-end result. For
+Splash, preserve these boundaries while measuring Metal resource residency,
+actual clocks and system-wide physical pressure with the backend-specific
+profiling permission model documented.
+
 ## Make parity readers artifact-aware at the PLE seam
 
 The fixture-free block oracle from Strata upstream PR #568 avoids captures
