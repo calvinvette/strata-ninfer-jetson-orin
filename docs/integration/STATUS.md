@@ -707,8 +707,11 @@ completed a real 32,768-token prompt plus one output token under both 256- and
 3,000-slot caches with a 32,800-token reservation. All four runs passed above
 the six-GiB floor. Within-profile state fingerprints matched exactly, while
 GDN, KV, tail and pooled fingerprints differed repeatably across cache sizes
-(35/36 GDN layer fingerprints differed) despite identical output IDs; this unresolved correctness mismatch is retained
-as a failed cross-profile parity check. The owner trace observed the session,
+(35/36 GDN layer fingerprints differed) despite identical output IDs; prefill
+GDN fingerprints matched and the difference appeared after one decode token.
+Strata documents different CPU/GPU accumulation order for cache hits and misses,
+which is a plausible but unverified explanation. This remains an unresolved
+cross-profile state-parity result, not a quality conclusion. The owner trace observed the session,
 prefill, verifier and staging buffers release; the process-lifetime dense weight
 arena remained live at log end, and graph-pool bytes remain outside this ledger.
 Two earlier context-boundary validations were rejected before prefill. This is

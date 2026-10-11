@@ -58,8 +58,14 @@ fingerprints differed; 35 of 36 GDN layer fingerprints differed. PLE, MTP,
 stale, dead and PLE-previous fields matched. This repeatable cross-profile
 state mismatch is an unresolved correctness result, not state parity. It blocks
 any claim that the two cache settings are semantically interchangeable; no
-cause is assigned by this screen. Per-run fingerprints and their comparison
-are in `state-comparison.json`.
+cause is assigned by this screen. The per-layer GDN fingerprints at the end of
+prefill matched across all four runs; the differences appeared after the
+one-token decode. Strata's source documents that a resident GPU expert and a
+CPU-computed miss use different floating-point accumulation order
+([expert-cache path](../../../src/program/generate.cpp)); the observed hit
+counts also differed (2/480 versus 54/480). That is a plausible explanation,
+not a demonstrated cause or quality result. Per-run final and GDN fingerprints
+are compared in `state-comparison.json`.
 
 These runs establish admission for the tested 32K prompt and both cache
 profiles, not 32K quality, concurrency, performance, a supported capacity
