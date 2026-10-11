@@ -758,3 +758,13 @@ request and waited 1.48–1.68 seconds during decode. Its median request delta
 was −0.53% (95% bootstrap interval −0.89% to +1.66%), with a 91–135 MiB
 requested host-stage peak and 8.16 GiB minimum host availability. The scoped
 read interval spans zero, as does the timing interval; no path is promoted.
+
+The same-binary [3,903-slot staged-prefetch confirmation](../../bench/results/2026-10-11-phase3-transfer-stage-cgroupio-cache3000-current7/README.md)
+adds a lower-cache comparison. All pairs passed output/state/cache checks;
+staging served 278–312 blobs and its requested host peak reached 177.7 MiB.
+The median paired request delta was −1.27% (95% bootstrap interval −3.48% to
++0.08%), while the paired scoped-read delta was +0.168 GB (interval +0.018 to
++0.477 GB). Minimum availability was 12.85 GiB. Together with the 6,519-slot
+confirmation, this confirms staging activity at both capacities, but the cache
+strata ran sequentially and no cross-profile interaction or default is
+qualified.
