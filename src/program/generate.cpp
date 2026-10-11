@@ -5368,6 +5368,8 @@ int main(int argc, char** argv) {
             std::fprintf(stderr, "strata generate: cannot pin the layer-dump staging buffer\n");
             return 1;
         }
+        strata::platform::integration_trace::event("layer-dump-pinned-host", "allocate", &layer_stage,
+                                                   layer_stage, layer_floats * sizeof(float), -1);
     }
 
     // ---- prefill is the DECODE PATH ONE TOKEN AT A TIME, which `phase-2-correct-engine.md:12-13` says is
@@ -12093,7 +12095,11 @@ int main(int argc, char** argv) {
     }
     if (layer_dump != nullptr) {
         std::fclose(layer_dump);
-        cudaFreeHost(layer_stage);
+        if (layer_stage != nullptr) {
+            strata::platform::integration_trace::event("layer-dump-pinned-host", "free", &layer_stage,
+                                                       layer_stage, 0, -1);
+            cudaFreeHost(layer_stage);
+        }
         std::printf("%-24s %s (%lld layers + the input x %d streams x %lld per position)\n", "layers dumped",
                     o.dump_layers.c_str(), (long long) g.n_layers, (int) g.hc, (long long) g.n_embd);
     }

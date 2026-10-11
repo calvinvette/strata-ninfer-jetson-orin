@@ -14,8 +14,10 @@ added as separate physical allocations. CUDA/HIP records successful window graph
 window graph finalization. Their batch graph coverage is not equivalent yet.
 No graph-pool byte value is inferred from graph counts or free-memory deltas.
 The primary `SessionState` backing allocation is also observed as one owner
-allocation; its carved arrays are not added as separate backing. Layer-stage
-and batch-slot session allocations remain outside this trace.
+allocation; its carved arrays are not added as separate backing. Batch-slot session allocations remain outside this trace. The optional `--dump-layers`
+pinned host staging buffer reports its requested bytes as `layer-dump-pinned-host`;
+that debug-output owner is separate from serving buffers and is not allocated unless
+layer dumps are requested.
 The CUDA/HIP ordinary single-block `ExpertCache` backing has matching
 allocation/free events. CUDA segmented-cache mode (`--vram-elastic`) reports
 one `expert-cache-vmm-segment` allocation per successfully mapped physical
