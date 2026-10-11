@@ -43,6 +43,28 @@ rerun under the same six-GiB supervisor: CTest passed 1/1, including all
 42,565,632 FP32/BF16/FP16 conversion values and guards. Its raw CTest and
 supervisor output are retained in `codec-regression/`.
 
+## Resource and safety-tool results
+
+The actual linked SM87 diagnostic library was inspected with CUDA 12.6.68
+`cuobjdump --dump-resource-usage`. The `dequant_kernel<(int)14,H16>` entry uses
+22 registers per thread, zero stack, zero spills, zero static shared memory,
+and zero local memory. Its launch uses 256 threads per block. These are static
+compiler resource counts, not measured occupancy, achieved bandwidth or
+critical-path contribution. The library SHA256 is
+`3aae54ba664a49d6e5e933e1ebb9423c306ffa840e51d54ad6cb37490c88b916`.
+
+Runtime profiling did not yield hardware counters: Nsight Compute 2025.2.0
+reported insufficient privileges to launch an application for profiling; the
+supervisor records exit status 0 for the profiler process, but its stdout is
+only the warning and contains no profile. The raw attempt is retained in
+`ncu/supervisor/`. The
+Compute Sanitizer memcheck attempt ran all five numerical comparisons
+successfully, then reported `GPU debugging features are disabled` and exited
+with its requested error code 99. It is unsupported on this device/configuration,
+not a clean memory-safety result. Its command result, stdout/stderr and
+supervisor telemetry are retained in `compute-sanitizer/supervisor/`. Neither
+tool result is counted as a pass.
+
 Reproduce on the Orin with the pinned ggml source available at
 `/tmp/strata-orin-build/_deps/strata_llamacpp-src`:
 
@@ -57,4 +79,11 @@ python3 tools/integration/run_control.py \
   build/integration/operator-tests/q6_k_real_payload_contract \
   ~/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf \
   ~/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf
+```
+
+Resource report for the linked test library:
+
+```sh
+/usr/local/cuda-12/bin/cuobjdump --dump-resource-usage \
+  build/integration/operator-tests/libintegration_codec_kernels.a
 ```
