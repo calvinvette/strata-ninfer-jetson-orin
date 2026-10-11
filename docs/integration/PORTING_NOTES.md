@@ -518,3 +518,24 @@ should record exact source tensors, cache residency, CPU/GPU work assignment,
 accepted IDs and full committed recurrent/KV state under matched capacity before
 using output text or latency to judge a split policy. Re-run with an independent
 operator or task-level oracle to decide which policy is accurate.
+
+## Calibrate physical-memory counters before pricing GPU allocations
+
+An Orin visibility calibration successfully allocated and touched 512 MiB
+through CUDA, but `cuMemGetInfo`, host availability, the interactive cgroup
+counter and `tegrastats` did not show a commensurate change. This does not say
+the allocation lacked physical backing; it shows these counters do not provide
+an independent per-allocation physical-byte measure on this setup. For Splash,
+calibrate each Metal and OS memory counter against a known live allocation
+before using it to price graph, heap or residency costs, and retain an unpriced
+status when the calibration fails.
+
+The supervisor now records cgroup-v2 `memory.stat` byte counters and
+`memory.events` alongside `memory.current`. In a Q2_0 64-token retry at a
+20 GiB cap, one process safely aborted at the six-GiB cgroup headroom guard
+while host availability stayed above 21.9 GiB; two later processes completed
+with identical 64-token IDs. The passing detailed sample had 8.29 GB file cache
+and 1.63 GB anonymous charge, with no max/OOM events. For Splash, retain
+file-backed cache, anonymous use and system physical headroom separately; a
+cgroup success/failure pair should be treated as an observation of that scope
+and run history, not a device capacity threshold.

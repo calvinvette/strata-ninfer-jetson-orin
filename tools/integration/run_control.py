@@ -16,6 +16,39 @@ import time
 
 GIB = 1024 ** 3
 
+CGROUP_MEMORY_STAT_FIELDS = {
+    'anon', 'file', 'shmem', 'file_mapped', 'file_dirty', 'file_writeback',
+    'inactive_anon', 'active_anon', 'inactive_file', 'active_file',
+    'unevictable', 'slab_reclaimable', 'slab_unreclaimable', 'slab',
+    'kernel_stack', 'pagetables', 'sec_pagetables', 'percpu', 'sock',
+    'anon_thp', 'file_thp', 'shmem_thp', 'inactive_anon_thp', 'active_anon_thp',
+}
+CGROUP_MEMORY_EVENTS = {'low', 'high', 'max', 'oom', 'oom_kill', 'oom_group_kill'}
+
+
+def cgroup_memory_details(node):
+    """Return useful cgroup v2 byte counters without treating them as total RAM."""
+    details = {}
+    try:
+        fields = {}
+        for line in (node / 'memory.stat').read_text().splitlines():
+            key, value = line.split()
+            if key in CGROUP_MEMORY_STAT_FIELDS:
+                fields[key] = int(value)
+        details['memory_stat_bytes'] = fields
+    except FileNotFoundError:
+        pass
+    try:
+        events = {}
+        for line in (node / 'memory.events').read_text().splitlines():
+            key, value = line.split()
+            if key in CGROUP_MEMORY_EVENTS:
+                events[key] = int(value)
+        details['memory_events'] = events
+    except FileNotFoundError:
+        pass
+    return details
+
 
 def process_snapshot(group_id):
     processes = []
@@ -57,7 +90,8 @@ def memory_snapshot(proc_root=Path('/proc'), cgroup_root=Path('/sys/fs/cgroup'))
                     current = int((node / 'memory.current').read_text())
                     maximum = (node / 'memory.max').read_text().strip()
                     limits.append({'path': str(node), 'current_bytes': current,
-                                   'max_bytes': None if maximum == 'max' else int(maximum)})
+                                   'max_bytes': None if maximum == 'max' else int(maximum),
+                                   **cgroup_memory_details(node)})
                 except FileNotFoundError:
                     pass
                 if node == cgroup_root:

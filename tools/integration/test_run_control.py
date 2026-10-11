@@ -83,9 +83,14 @@ class SupervisorTests(unittest.TestCase):
                             (cgroup / 'parent/leaf', 'max')]:
             (node / 'memory.max').write_text(limit)
             (node / 'memory.current').write_text(str(2 * GIB))
+            (node / 'memory.stat').write_text('anon 100\nfile 200\ninactive_file 150\npgfault 99\n')
+            (node / 'memory.events').write_text('low 0\nhigh 2\nmax 3\noom 0\noom_kill 0\n')
         result = memory_snapshot(proc, cgroup)
         self.assertEqual(result['admission_available_bytes'], 5 * GIB)
         self.assertEqual(result['available_bytes'], 10 * GIB)
+        leaf = next(row for row in result['cgroups'] if row['path'].endswith('/parent/leaf'))
+        self.assertEqual(leaf['memory_stat_bytes'], {'anon': 100, 'file': 200, 'inactive_file': 150})
+        self.assertEqual(leaf['memory_events']['high'], 2)
 
     def test_floor_cannot_be_lowered(self):
         with self.assertRaises(ValueError):

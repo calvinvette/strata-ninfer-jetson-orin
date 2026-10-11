@@ -1,0 +1,82 @@
+{
+  "command": [
+    "build/integration/candidate/strata",
+    "--pack",
+    "/home/calvin/models/strata-orin-validation/q2-ple-pack",
+    "--native",
+    "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+    "--ple-gguf",
+    "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+    "--expert-profile",
+    "/home/calvin/models/strata-orin-validation/q2-expert-profile.bin",
+    "--expert-cache",
+    "256",
+    "--prefill",
+    "512",
+    "--spec",
+    "2",
+    "--max-context",
+    "4096",
+    "--mmap-experts",
+    "--prompt-cache",
+    "0",
+    "--vram-reserve-mib",
+    "3072",
+    "--pcie-frac",
+    "0.55",
+    "--tokens-file",
+    "build/integration/workloads/pp512-tg64.tokens",
+    "--max-new",
+    "64",
+    "--greedy",
+    "--ple-io",
+    "mmap"
+  ],
+  "cwd": "/home/calvin/workspace/strata-ninfer-jetson-orin",
+  "status": "pressure_abort",
+  "floor_bytes": 6442450944,
+  "started_wall_s": 1791708411.0979936,
+  "energy_scope": "not measured; raw tegrastats rails only",
+  "counters": "engine stdout/stderr; unavailable counters are not inferred",
+  "initial_memory": {
+    "monotonic_s": 977580.67131611,
+    "wall_time_s": 1791708411.0998542,
+    "available_bytes": 26463838208,
+    "total_bytes": 32187883520,
+    "swap_used_bytes": 1313497088,
+    "cgroups": [
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/run-ra5a2a2cec7504485bf4d6d4c1f0ee512.scope",
+        "current_bytes": 7098368,
+        "max_bytes": 21474836480
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice",
+        "current_bytes": 40456192,
+        "max_bytes": null
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service",
+        "current_bytes": 46608384,
+        "max_bytes": null
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice",
+        "current_bytes": 14814949376,
+        "max_bytes": null
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice",
+        "current_bytes": 14815449088,
+        "max_bytes": null
+      }
+    ],
+    "cgroup_v2_observed": true,
+    "admission_available_bytes": 21467738112
+  },
+  "tegrastats": "started; inspect raw log for availability",
+  "reason": "physical/cgroup headroom during execution",
+  "minimum_available_bytes": 23524900864,
+  "elapsed_s": 20.120434976997785,
+  "finished_wall_s": 1791708432.192642
+}
