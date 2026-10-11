@@ -29,6 +29,8 @@ the six-GiB supervisor, with 27.80 GiB minimum physical availability. The base
 user namespace lacks `/proc/<pid>/io` and leaf-cgroup `io.stat`, but a temporary
 systemd scope with `IOAccounting=yes` enabled scoped read accounting for the
 [seven-pair transfer confirmation](../../bench/results/2026-10-10-phase3-transfer-cgroupio-confirmation7/README.md).
+A later direct [Q2_0 PLE rerun](../../bench/results/2026-10-10-phase4-ple-rerun/README.md)
+also passed under the same six-GiB supervisor (24.53 GiB minimum availability).
 CUDA graph driver/executable memory remains unpriced, and the transfer evidence
 is scoped to one workload/cache point. Phase 3 remains open; no path or default
 was promoted.
