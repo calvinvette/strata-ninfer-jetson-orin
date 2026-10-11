@@ -547,3 +547,15 @@ and 1.63 GB anonymous charge, with no max/OOM events. For Splash, retain
 file-backed cache, anonymous use and system physical headroom separately; a
 cgroup success/failure pair should be treated as an observation of that scope
 and run history, not a device capacity threshold.
+
+The follow-up [IQ1_M MTP graph-owner trace](../../bench/results/2026-10-11-phase3-iq1-graph-owner-check-rerun/README.md)
+labels successful MTP device-prefill, round and step graph instantiations in
+both CUDA/HIP and SYCL code. In one spec4 service sequence, the ten runtime
+instantiation calls matched ten owner events (three verifier windows, one
+verifier commit, and six MTP graphs); the API/cancellation/recovery scenarios
+passed above the six-GiB host floor. This is graph-call attribution coverage,
+not graph-pool sizing or total memory ownership. A future Strata + Splash port
+should inventory each engine's graph creation sites, attach labels only after
+successful instantiation, and compare the count with an independent runtime
+probe. Keep the calibration and workload/configuration identity with any
+platform memory delta.

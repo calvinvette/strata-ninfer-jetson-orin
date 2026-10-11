@@ -1,0 +1,26 @@
+{
+  "orin_cuda": {
+    "target": "strata",
+    "status": "pass",
+    "command": "cmake --build build/integration/candidate --target strata --parallel 1",
+    "binary_sha256": "7e4fe9a1a31bdfe65a3598a1cecfa75cff7da62aaeee7625726eadfba7a37553"
+  },
+  "maestro1_hip": {
+    "target": "strata",
+    "status": "pass",
+    "command": "cmake --build build-hip --target strata --parallel 1",
+    "binary_sha256": "a16bf882d33fabfc6cede5fbe29586bba227f641a0f133aafb09174ad2c68ba6",
+    "evidence_scope": "x86 build only; not Orin runtime evidence"
+  },
+  "maestro1_sycl": {
+    "target": "strata_engine MTP translation unit",
+    "status": "compile_pass_full_link_not_run",
+    "command": "ninja -C build-sycl CMakeFiles/strata_engine.dir/src/core/mtp.cpp.o",
+    "object_sha256": "69173354d75f3ae10cb7e84a1bb059cc94ebf7b6cbd1124dd5ed10fd158b2c41",
+    "reason": "A full target triggered a clean 94-object rebuild on the memory-limited host; it was stopped to avoid a redundant full rebuild."
+  },
+  "remote_reference_restored": {
+    "cuda_source_sha256": "f7d43ed3b3082d02b13af5d7135b93dbbdfe30c3865c7397e687bed01bd26e05",
+    "sycl_source_sha256": "43a75119e3eb6422ffb9b74c947ba8119d17ec07b795f3ec1dd2b3b24164ac9b"
+  }
+}

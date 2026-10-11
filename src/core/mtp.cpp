@@ -1057,14 +1057,18 @@ bool MtpDrafter::capture_prefill(int T, std::string& err) {
     copy_i32_from_mapped(step_, m_step_, (int64_t) T * 4, cs_);
     copy_i32_from_mapped(pos_, m_pos_, (int64_t) T * g_->n_head, cs_);
     const bool ok = record_forward(T, -1, cs_, err);   // K/V only, rows [0, T)
-    return finish_capture(cs_, ok, prefill_exec_[T], "prefill", err);
+    if (!finish_capture(cs_, ok, prefill_exec_[T], "prefill", err)) return false;
+    strata::platform::integration_trace::event("mtp-prefill-graph", "graph_instantiate", this, nullptr, 0, device_, 1);
+    return true;
 }
 
 bool MtpDrafter::capture_prefill_dev(int T, std::string& err) {
     if (prefill_dev_exec_[T]) return true;
     if (cudaStreamBeginCapture(cs_, cudaStreamCaptureModeThreadLocal) != cudaSuccess) { err = "mtp: begin capture"; return false; }
     const bool ok = record_forward(T, -1, cs_, err);   // K/V only, rows [0, T); tok_/step_/pos_ filled before launch
-    return finish_capture(cs_, ok, prefill_dev_exec_[T], "prefill (device inputs)", err);
+    if (!finish_capture(cs_, ok, prefill_dev_exec_[T], "prefill (device inputs)", err)) return false;
+    strata::platform::integration_trace::event("mtp-prefill-device-graph", "graph_instantiate", this, nullptr, 0, device_, 1);
+    return true;
 }
 
 bool MtpDrafter::capture_round(int T, bool coupled, std::string& err) {
@@ -1108,7 +1112,9 @@ bool MtpDrafter::capture_round(int T, bool coupled, std::string& err) {
     }
     if (ok) mtp_select(R_, HCN, out_ids_, row_ + 1, Rin_, tok_, m_out_, 0, cs_, probs_, m_prob_);
     if (ok && force_on_ && !coupled) force_token(tok_, m_force_, 0, cs_);   // chain_launch: step 1's input
-    return finish_capture(cs_, ok, exec, coupled ? "round (coupled)" : "round", err);
+    if (!finish_capture(cs_, ok, exec, coupled ? "round (coupled)" : "round", err)) return false;
+    strata::platform::integration_trace::event(coupled ? "mtp-round-coupled-graph" : "mtp-round-graph", "graph_instantiate", this, nullptr, 0, device_, 1);
+    return true;
 }
 
 // Chain step j (1..max_t-2): one row at the cell staged in step row `max_t + j - 1`, from the previous step's
@@ -1134,7 +1140,9 @@ bool MtpDrafter::capture_step(int j, bool coupled, std::string& err) {
     coupled_rec_ = false;
     if (ok) mtp_select(R_, HCN, out_ids_, row_ + 1, Rin_, tok_, m_out_, j, cs_, probs_, m_prob_);
     if (ok && force_on_ && !coupled) force_token(tok_, m_force_, j, cs_);   // chain_launch: step j+1's input
-    return finish_capture(cs_, ok, exec, coupled ? "step (coupled)" : "step", err);
+    if (!finish_capture(cs_, ok, exec, coupled ? "step (coupled)" : "step", err)) return false;
+    strata::platform::integration_trace::event(coupled ? "mtp-step-coupled-graph" : "mtp-step-graph", "graph_instantiate", this, nullptr, 0, device_, 1);
+    return true;
 }
 
 void MtpDrafter::kv_restore(int64_t upto) {

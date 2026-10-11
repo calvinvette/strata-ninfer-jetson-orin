@@ -1216,7 +1216,9 @@ bool MtpDrafter::capture_prefill(int T, std::string &err) try {
     copy_i32_from_mapped(step_, m_step_, (int64_t) T * 4, cs_);
     copy_i32_from_mapped(pos_, m_pos_, (int64_t) T * g_->n_head, cs_);
     const bool ok = record_forward(T, -1, cs_, err);   // K/V only, rows [0, T)
-    return finish_capture(cs_, ok, prefill_exec_[T], "prefill", err);
+    if (!finish_capture(cs_, ok, prefill_exec_[T], "prefill", err)) return false;
+    strata::platform::integration_trace::event("mtp-prefill-graph", "graph_instantiate", this, nullptr, 0, device_, 1);
+    return true;
 }
 catch (sycl::exception const &exc) {
   std::cerr << exc.what() << "Exception caught at file:" << __FILE__
@@ -1230,7 +1232,9 @@ bool MtpDrafter::capture_prefill_dev(int T, std::string &err) try {
         err = "mtp: begin capture"; return false;
     }
     const bool ok = record_forward(T, -1, cs_, err);   // K/V only, rows [0, T); tok_/step_/pos_ filled before launch
-    return finish_capture(cs_, ok, prefill_dev_exec_[T], "prefill (device inputs)", err);
+    if (!finish_capture(cs_, ok, prefill_dev_exec_[T], "prefill (device inputs)", err)) return false;
+    strata::platform::integration_trace::event("mtp-prefill-device-graph", "graph_instantiate", this, nullptr, 0, device_, 1);
+    return true;
 }
 catch (sycl::exception const &exc) {
   std::cerr << exc.what() << "Exception caught at file:" << __FILE__
@@ -1281,7 +1285,9 @@ bool MtpDrafter::capture_round(int T, bool coupled, std::string &err) try {
     }
     if (ok) mtp_select(R_, HCN, out_ids_, row_ + 1, Rin_, tok_, m_out_, 0, cs_, probs_, m_prob_);
     if (ok && force_on_ && !coupled) force_token(tok_, m_force_, 0, cs_);   // chain_launch: step 1's input
-    return finish_capture(cs_, ok, exec, coupled ? "round (coupled)" : "round", err);
+    if (!finish_capture(cs_, ok, exec, coupled ? "round (coupled)" : "round", err)) return false;
+    strata::platform::integration_trace::event(coupled ? "mtp-round-coupled-graph" : "mtp-round-graph", "graph_instantiate", this, nullptr, 0, device_, 1);
+    return true;
 }
 catch (sycl::exception const &exc) {
   std::cerr << exc.what() << "Exception caught at file:" << __FILE__
@@ -1314,7 +1320,9 @@ bool MtpDrafter::capture_step(int j, bool coupled, std::string &err) try {
     coupled_rec_ = false;
     if (ok) mtp_select(R_, HCN, out_ids_, row_ + 1, Rin_, tok_, m_out_, j, cs_, probs_, m_prob_);
     if (ok && force_on_ && !coupled) force_token(tok_, m_force_, j, cs_);   // chain_launch: step j+1's input
-    return finish_capture(cs_, ok, exec, coupled ? "step (coupled)" : "step", err);
+    if (!finish_capture(cs_, ok, exec, coupled ? "step (coupled)" : "step", err)) return false;
+    strata::platform::integration_trace::event(coupled ? "mtp-step-coupled-graph" : "mtp-step-graph", "graph_instantiate", this, nullptr, 0, device_, 1);
+    return true;
 }
 catch (sycl::exception const &exc) {
   std::cerr << exc.what() << "Exception caught at file:" << __FILE__
