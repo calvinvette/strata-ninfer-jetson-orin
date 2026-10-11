@@ -701,3 +701,13 @@ successful Driver graph instantiations matched three owner events, and the
 not a 32K ingestion test or isolated graph executable size. The 32K/spec2 run
 had four graph calls and a different 72,425,472-byte interval, so no per-graph
 cost is inferred; legacy session graphs and non-NVMap bytes remain open.
+
+The [Q2_0 actual 32K prompt admission](../../bench/results/2026-10-11-phase3-q2-actual32k/README.md)
+completed a real 32,768-token prompt plus one output token with a fixed 256-slot
+cache and 32,800-token reservation. `prompt_read` matched all 32,768 tokens;
+minimum host availability was 19.85 GiB. The owner trace observed the session,
+prefill, verifier and staging buffers release; the process-lifetime dense weight
+arena remained live at log end, and graph-pool bytes remain outside this ledger.
+Two earlier context-boundary validations were rejected before prefill and are
+retained separately. This is a single Q2_0 admission point, not quality,
+capacity, concurrency or performance evidence; broad Phase 3 gates remain open.
