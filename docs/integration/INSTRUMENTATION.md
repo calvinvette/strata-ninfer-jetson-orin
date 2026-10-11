@@ -107,14 +107,19 @@ Prefill now records successful owned-vector allocations and frees, including
 peer buffers, token buffers and streaming identity tables. Base-backed allocator
 slices emit `view` events. Views can overlap, repeat or borrow backing from an
 external expert cache; their sizes are never added to observed allocations.
-MTP records state/scratch arenas and releases. Its `payload_snapshot` reports the
-existing logical weight/head/arena counter separately, never added to arena
-bytes or physical memory. Device identities on frees come from the owning device.
+MTP records its owned dense and routed-expert weight allocations, optional
+converted projection copies, draft-head subset/vocabulary copies, state/scratch
+arenas and releases. Shared Drafter instances borrow immutable base weights and
+do not emit duplicate allocation events. In-place draft-head conversion retains
+the original allocation size in the owner ledger. Its `payload_snapshot` reports
+the existing logical weight/head/arena counter separately, never added to
+observed allocation bytes or physical memory. Device identities on frees come
+from the owning device.
 
 The expanded [evidence report](../../bench/results/2026-10-09-prefill-mtp-owner-trace/README.md)
 compares owned and borrowed prefill, and trace-off protocol checks. Remaining
-sites include verifier mapped staging/auxiliary/batch buffers, MTP weight-load
-allocations, layer-stage and batch-slot session arenas, and graph
+sites include verifier mapped staging/auxiliary/batch buffers, layer-stage and
+batch-slot session arenas, and graph
 capture/destroy/pool observations. Phase 3 must distinguish unique physical
 backing, views and future reservations. Phase 1 needs explicit counters and unsupported scopes; do not
 mistake a partial requested-byte trace for the later accounting gate.

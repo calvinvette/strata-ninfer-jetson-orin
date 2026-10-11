@@ -331,6 +331,12 @@ CUDA requested-byte peak was 7,205,736,400 bytes, with 353,894,400 bytes of
 pageable expert-stage host backing. MTP state/scratch requests peaked at
 12,977,872 bytes, distinct from its reported 1,024,377,180-byte payload.
 Graph/driver memory remains unpriced; see the linked runtime smoke report.
+The [MTP weight-owner follow-up](../../bench/results/2026-10-10-phase3-mtp-weight-owners/README.md)
+repeats this Q2_0 cell with tracing for dense and routed-expert blobs plus the
+draft-head subset: it emits the same token ID 32, and 266 allocations and frees
+balance. The observed base weights
+total 785.7 MiB and the subset head/vocabulary copies add 178.8 MiB of CUDA
+requested payload; shared drafters emit no duplicate base-weight allocations.
 At the same 5,000 cache slots, configured 8K and 16K contexts also admitted
 the one-token/512-input smoke with 15.65/15.70 GiB minimum host availability;
 these do not represent long-context ingestion or quality tests.

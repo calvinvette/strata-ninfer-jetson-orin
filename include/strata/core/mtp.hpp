@@ -195,6 +195,7 @@ private:
     bool hnorm_stream_ = false;
     bool q4_ = false, q4_head_ = false;
     uint8_t* dense4_ = nullptr;              ///< --mtp-q4: Q4_0 copies of the Q8_0 tensors
+    uint64_t dense4_bytes_ = 0;
     std::vector<std::pair<std::string, uint64_t>> q4_off_;
     int dhead_type_ = -1;                    ///< the draft head subset's ggml type (the main head's, or Q4_0)
     std::string dvocab_path_;
@@ -248,6 +249,7 @@ private:
     uint8_t* dhead_ = nullptr;
     int32_t* dvocab_ = nullptr;
     int64_t n_dvocab_ = 0;
+    uint64_t draft_head_bytes_ = 0, draft_vocab_bytes_ = 0;
     std::string rt_dir_;
     int64_t window_ = 0;        // attention over the last window_ cells (0 = every cell)
     int64_t prompt_len_ = 0;

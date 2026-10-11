@@ -129,7 +129,8 @@ MtpDrafter::~MtpDrafter() {
     for (auto& e : prefill_exec_) if (e) cudaGraphExecDestroy(e);
     for (auto& e : prefill_dev_exec_) if (e) cudaGraphExecDestroy(e);
     if (pf_dev_) cudaFree(pf_dev_);
-    if (dense4_) cudaFree(dense4_);
+    if (dense4_ && cudaFree(dense4_) == cudaSuccess)
+        strata::platform::integration_trace::event("mtp-weight-copy", "free", this, dense4_, 0, device_);
     for (auto& e : round_exec_) if (e) cudaGraphExecDestroy(e);
     for (auto& e : step_exec_) if (e) cudaGraphExecDestroy(e);
     for (auto& e : round_exec_c_) if (e) cudaGraphExecDestroy(e);
@@ -145,8 +146,10 @@ MtpDrafter::~MtpDrafter() {
     if (side_) cudaStreamDestroy(side_);
     if (sh_fork_) cudaEventDestroy(sh_fork_);
     if (sh_join_) cudaEventDestroy(sh_join_);
-    if (owns_weights_ && dense_) cudaFree(dense_);
-    if (owns_weights_ && experts_) cudaFree(experts_);
+    if (owns_weights_ && dense_ && cudaFree(dense_) == cudaSuccess)
+        strata::platform::integration_trace::event("mtp-base-weights", "free", this, dense_, 0, device_);
+    if (owns_weights_ && experts_ && cudaFree(experts_) == cudaSuccess)
+        strata::platform::integration_trace::event("mtp-base-weights", "free", this, experts_, 0, device_);
     if (state_arena_) {
         if (cudaFree(state_arena_) == cudaSuccess)
             strata::platform::integration_trace::event("mtp", "free", this, state_arena_, 0, device_);
@@ -156,8 +159,13 @@ MtpDrafter::~MtpDrafter() {
             strata::platform::integration_trace::event("mtp", "free", this, arena_, 0, device_);
     }
     if (head_logits_) cudaFree(head_logits_);
-    if (owns_draft_head_ && dhead_) { strata::kernels::native_q6_k_unpack(dhead_); cudaFree(dhead_); }
-    if (owns_draft_head_ && dvocab_) cudaFree(dvocab_);
+    if (owns_draft_head_ && dhead_) {
+        strata::kernels::native_q6_k_unpack(dhead_);
+        if (cudaFree(dhead_) == cudaSuccess)
+            strata::platform::integration_trace::event("mtp-weight-copy", "free", this, dhead_, 0, device_);
+    }
+    if (owns_draft_head_ && dvocab_ && cudaFree(dvocab_) == cudaSuccess)
+        strata::platform::integration_trace::event("mtp-weight-copy", "free", this, dvocab_, 0, device_);
     if (ev_chain_) cudaEventDestroy(ev_chain_);
     for (cudaEvent_t e : ev_step_) if (e) cudaEventDestroy(e);
     void* hosts[] = {h_tok_, h_step_, h_pos_, h_row_, h_out_, h_prob_, h_force_};
@@ -208,6 +216,8 @@ bool MtpDrafter::make_q4_dense(const std::vector<uint8_t>& blob, std::string& er
         q4_off_.push_back({t->name, off});
     }
     if (cudaMalloc((void**) &dense4_, (size_t) total) != cudaSuccess) { err = "mtp: the Q4_0 projections do not fit"; return false; }
+    dense4_bytes_ = total;
+    strata::platform::integration_trace::event("mtp-weight-copy", "allocate", this, dense4_, dense4_bytes_, device_);
     cudaMemcpy(dense4_, host.data(), (size_t) total, cudaMemcpyHostToDevice);
     vram_ += total;
     std::fprintf(stderr, "strata mtp: --mtp-q4: %zu projections as Q4_0 (%.1f MiB)\n", plan.size(), (double) total / 1048576.0);
@@ -293,6 +303,7 @@ bool MtpDrafter::load(const std::string& rt_dir, const ModelGeometry& g, Session
                   (info == cudaSuccess ? std::to_string(free_bytes >> 20) + " MiB" : "unknown");
             return false;
         }
+        strata::platform::integration_trace::event("mtp-base-weights", "allocate", this, dense_, blob.size(), device_);
         cudaMemcpy(dense_, blob.data(), blob.size(), cudaMemcpyHostToDevice);
         vram_ += blob.size();
         if (q4_ && !make_q4_dense(blob, err)) return false;
@@ -309,6 +320,7 @@ bool MtpDrafter::load(const std::string& rt_dir, const ModelGeometry& g, Session
             ~Closer() { if (f != nullptr) std::fclose(f); }
         } closer{f};
         if (cudaMalloc((void**) &experts_, bytes) != cudaSuccess) { err = "mtp: the 512 experts do not fit in VRAM"; return false; }
+        strata::platform::integration_trace::event("mtp-base-weights", "allocate", this, experts_, bytes, device_);
 #if !defined(_WIN32)
         strata::platform::advise_willneed(fileno(f), 0, bytes);
 #endif
@@ -643,12 +655,20 @@ bool MtpDrafter::bind(const WeightTable& wt, const NativeHead* head, const float
         if (read_file(vocab_file(), raw) && raw.size() >= 4 && raw.size() % 4 == 0) {
             n_dvocab_ = (int64_t) (raw.size() / 4);
             const int64_t row_bytes = (int64_t) head->row_bytes();   // a vocabulary row of the native head
-            if (cudaMalloc((void**) &dvocab_, raw.size()) != cudaSuccess ||
-                cudaMalloc((void**) &dhead_, (size_t) (n_dvocab_ * row_bytes)) != cudaSuccess) {
+            if (cudaMalloc((void**) &dvocab_, raw.size()) != cudaSuccess) {
                 err = "mtp: the draft head does not fit";
                 draft_head_hint(n_dvocab_, row_bytes);
                 return false;
             }
+            draft_vocab_bytes_ = raw.size();
+            strata::platform::integration_trace::event("mtp-weight-copy", "allocate", this, dvocab_, draft_vocab_bytes_, device_);
+            if (cudaMalloc((void**) &dhead_, (size_t) (n_dvocab_ * row_bytes)) != cudaSuccess) {
+                err = "mtp: the draft head does not fit";
+                draft_head_hint(n_dvocab_, row_bytes);
+                return false;
+            }
+            draft_head_bytes_ = (uint64_t) n_dvocab_ * row_bytes;
+            strata::platform::integration_trace::event("mtp-weight-copy", "allocate", this, dhead_, draft_head_bytes_, device_);
             cudaMemcpy(dvocab_, raw.data(), raw.size(), cudaMemcpyHostToDevice);
             dvocab_host_.resize((size_t) n_dvocab_);
             std::memcpy(dvocab_host_.data(), raw.data(), raw.size());
