@@ -724,3 +724,17 @@ Two earlier context-boundary validations were rejected before prefill. This is
 admission evidence for the tested cells, not broad capacity or performance
 evidence. The current candidate's `ple_parity` and `ple_reader_selftest` passed
 2/2, and integration Python discovery passed 99/99. Phase 3 remains open.
+
+The [mapped/pread × cache-budget interaction screen](../../bench/results/2026-10-11-phase3-transfer-cache-interaction-screen/README.md)
+adds three randomized pairs at each 3,903- and 6,519-slot cache. All pairs
+matched tokens and persistent state within cache size; mapped request time was
+lower in all six pairs (median paired deltas −4.75% and −3.54%). Minimum host
+availability was 13.05 and 8.03 GiB. The cache groups ran sequentially, clocks
+were dynamic, and their state differed across cache size, so this is a screen
+of transfer effects within each profile, not a cache-size or quality result.
+No default changed; Phase 3 remains open.
+
+The same [Phase 3 transfer/cache screen](../../bench/results/2026-10-11-phase3-transfer-cache-interaction-screen/README.md)
+reran artifact-aware Q2_0 `ple_parity` and `ple_reader_selftest` on the current
+candidate under the six-GiB supervisor; both passed. Integration Python tests
+passed 99/99. Minimum host availability for the PLE CTests was 24.64 GiB.
