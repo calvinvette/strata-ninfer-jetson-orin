@@ -503,3 +503,18 @@ A second graph-memory probe wrapped both the CUDA runtime instantiate call and p
 
 
 The one-token Q2_0 cache-cap bracket does not predict longer-generation admission: at 256 slots, 64-token requests were aborted under 9.5, 10 and 12 GiB scopes before prefill, and at 16 GiB after prefill; 18 and 20 GiB cells completed. Effective cgroup availability, including file-cache charge, must be sampled during the request. Keep prompt/generation length and actual admitted cache slots in every support cell on a future Strata + Splash port.
+
+## Compare heterogeneous CPU/GPU prefill by committed state
+
+The automatic CPU/GPU prefill-sharing policy was not repeatable on Orin in a
+matched three-process test, even though all eight output tokens and accepted
+token IDs matched: full recurrent-state hashes differed at the first recorded
+verifier commit and every later boundary. Fixed 0.5 sharing and disabled sharing
+were each repeatable across three processes when actual expert-cache capacity
+was held at 3,903 slots, but the two policies produced different committed
+states. This points to a policy-dependent numerical path, not an accuracy result;
+tracing also synchronizes, so these runs do not qualify timing. A Splash port
+should record exact source tensors, cache residency, CPU/GPU work assignment,
+accepted IDs and full committed recurrent/KV state under matched capacity before
+using output text or latency to judge a split policy. Re-run with an independent
+operator or task-level oracle to decide which policy is accurate.
