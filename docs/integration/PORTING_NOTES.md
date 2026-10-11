@@ -187,6 +187,15 @@ This is narrow route evidence, not default-profile or whole-model parity. The
 independent CPU-reference distribution still differs (KL 1.385), so bit equality
 between these controls cannot close numerical qualification.
 
+On Orin's Flash-Next path, fixed CPU/GPU prefill sharing can preserve output
+tokens while changing persistent recurrence state materially: a matched 512-token
+case differed by 3.172% GDN relative L2 at the first accepted boundary, and the
+state fingerprints still differed after 64 generated tokens. A Splash port must
+compare accepted-prefix state and later outputs when splitting operators across
+CPU/GPU execution; matching short text alone does not validate recurrence
+compatibility. Keep state-dump capture aligned to the measured request, since a
+same-length warmup can consume a one-shot boundary hook.
+
 Requested settings do not establish executed paths. Strata clamps KV residency
 to at least 20,480 tokens: requesting 1024 with a 4096 context remains fully
 resident. Save actual engine capabilities before testing and fail unsupported
