@@ -476,11 +476,13 @@ artifacts, even when an IQ1_M screen already exists. On Orin, the Q2_0 3,000- an
 doubling context added 108,068,864 requested session bytes. Splash should run
 the same model-specific matrix against its Metal-backed owner and report host
 availability, device requests and virtual reservations as separate quantities.
-Orin also passed the Q2_0 512-token/one-output request under 12/20/24 GiB
-cgroup caps; the 12-GiB run retained 6.99 GiB effective availability and
-21.57 GiB host availability. A future port should test its actual constrained
-service scope while preserving the platform-level physical headroom guard; a
-cap-only success does not establish general model capacity.
+Orin also passed the Q2_0 512-token/one-output request under 10/12/20/24 GiB
+cgroup caps. With the same 3,000-slot request, the runtime admitted 296 and 805
+actual slots under 10/12 GiB, then 3,000 under 20/24 GiB; the tightest passing
+cell retained 6.99 GiB effective availability and 21.57 GiB host availability.
+A future port should test its actual constrained service scope while preserving
+the platform-level physical headroom guard; a cap-only success does not
+establish general model capacity.
 
 For transfer modes, compare the operator-specific counter with whole-request
 time and keep allocation tracing out of timing arms. The Q2_0 PLE mmap/direct
