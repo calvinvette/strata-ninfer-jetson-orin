@@ -22,6 +22,14 @@ exact cell; minimum effective availability was 6.78–8.45 GiB and host
 296 slots. This is not a general capacity threshold; see the [four-cell
 bracket](../../bench/results/2026-10-11-phase3-q2-cgroup256-bracket/README.md).
 
+For a 64-token Q2_0 request with the same 256-slot budget, the 9.5, 10
+and 12 GiB scopes were supervisor-aborted before prefill; the 16 GiB cell
+completed prefill but was aborted before request completion. The 18 and 20 GiB
+cells completed all 64 tokens. Host availability stayed above 21.5 GiB. These
+longer-request cells have larger scoped-memory demands than the one-token
+admission bracket and do not establish a general capacity threshold; see the
+[Q2_0 64-token cap sweep](../../bench/results/2026-10-11-phase3-q2-cgroup256-tg64/README.md).
+
 The artifact-aware Q2_0 PLE oracle was also rerun inside a 10 GiB cgroup
 scope and passed all seven stages for three tokens (worst relative L1
 `1.148e-7`); minimum effective availability was 9.97 GiB and host
