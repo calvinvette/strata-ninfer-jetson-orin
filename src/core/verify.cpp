@@ -388,11 +388,20 @@ Verifier::~Verifier() {
         if (kv.second) cudaGraphExecDestroy(kv.second);
     for (auto& kv : commit_bm_)
         if (kv.second) cudaGraphExecDestroy(kv.second);
-    if (arena_b_) cudaFree(arena_b_);
+    if (arena_b_ && cudaFree(arena_b_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-batch-device", "free", this, arena_b_, 0, device_);
     if (h_commitb_ && cudaFreeHost(h_commitb_) == cudaSuccess)
         strata::platform::integration_trace::event("verifier-mapped-host", "free", this, h_commitb_, 0, -1);
-    if (qcnt_) cudaFree(qcnt_);
-    if (d_spec_) cudaFree(d_spec_);
+    if (qcnt_ && cudaFree(qcnt_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-aux-device", "free", this, qcnt_, 0, device_);
+    if (skip_ && cudaFree(skip_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-aux-device", "free", this, skip_, 0, device_);
+    if (slot_off_d_ && cudaFree(slot_off_d_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-aux-device", "free", this, slot_off_d_, 0, device_);
+    if (d_spec_ && cudaFree(d_spec_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-aux-device", "free", this, d_spec_, 0, device_);
+    if (prof_ && cudaFree(prof_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-profile-device", "free", this, prof_, 0, device_);
     if (cs_ && cs_ != ext_stream_) cudaStreamDestroy(cs_);   // set_stream: the stage's stream, shared, not ours
     if (sh_cs_) cudaStreamDestroy(sh_cs_);
     if (copy_) { cudaStreamSynchronize(copy_); cudaStreamDestroy(copy_); }
@@ -594,7 +603,12 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
     if (prof_on_) {
         const size_t np = (size_t) g.n_layers * kProfPer + 4;
         if (cudaMalloc((void**) &prof_, np * 8) != cudaSuccess) { prof_on_ = false; prof_ = nullptr; cudaGetLastError(); }
-        else { cudaMemset(prof_, 0, np * 8); prof_h_.assign(np, 0); }
+        else {
+            strata::platform::integration_trace::event("verifier-profile-device", "allocate", this, prof_, np * 8,
+                                                        device_);
+            cudaMemset(prof_, 0, np * 8);
+            prof_h_.assign(np, 0);
+        }
     }
     Bump real;
     real.base = (uint8_t*) arena_;
@@ -669,21 +683,36 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
     }
     // (halo's STRATA_VERIFY_RESIDENT=1 is this window's all_resident_ graph above, which 0.1.39 has on by default)
     if (g_qfuse()) {   // S26: the HC read's q8_1 group counters, zeroed once (each launch leaves them zero)
-        if (cudaMalloc((void**) &qcnt_, sizeof(unsigned) * (size_t) (g.n_embd / 32)) != cudaSuccess ||
-            cudaMemset(qcnt_, 0, sizeof(unsigned) * (size_t) (g.n_embd / 32)) != cudaSuccess) {
+        const size_t qcnt_bytes = sizeof(unsigned) * (size_t) (g.n_embd / 32);
+        if (cudaMalloc((void**) &qcnt_, qcnt_bytes) == cudaSuccess) {
+            strata::platform::integration_trace::event("verifier-aux-device", "allocate", this, qcnt_, qcnt_bytes,
+                                                        device_);
+        }
+        if (qcnt_ == nullptr || cudaMemset(qcnt_, 0, qcnt_bytes) != cudaSuccess) {
             cudaGetLastError();
-            if (qcnt_) cudaFree(qcnt_);
+            if (qcnt_ && cudaFree(qcnt_) == cudaSuccess)
+                strata::platform::integration_trace::event("verifier-aux-device", "free", this, qcnt_, 0, device_);
             qcnt_ = nullptr;
         }
     }
     if (all_resident_ || device_plan_) {
         bool ok2 = true;
-        if (device_plan_)
-            ok2 = cudaMalloc((void**) &skip_, 64) == cudaSuccess && cudaMemset(skip_, 0, 64) == cudaSuccess;
+        if (device_plan_) {
+            ok2 = cudaMalloc((void**) &skip_, 64) == cudaSuccess;
+            if (ok2) {
+                strata::platform::integration_trace::event("verifier-aux-device", "allocate", this, skip_, 64,
+                                                            device_);
+                ok2 = cudaMemset(skip_, 0, 64) == cudaSuccess;
+            }
+        }
         if (ok2 && hits.slot_off != nullptr && hits.n_slots > 0) {
-            ok2 = cudaMalloc((void**) &slot_off_d_, (size_t) hits.n_slots * sizeof(unsigned long long)) == cudaSuccess &&
-                  cudaMemcpy(slot_off_d_, hits.slot_off, (size_t) hits.n_slots * sizeof(unsigned long long),
-                             cudaMemcpyHostToDevice) == cudaSuccess;
+            const size_t bytes = (size_t) hits.n_slots * sizeof(unsigned long long);
+            ok2 = cudaMalloc((void**) &slot_off_d_, bytes) == cudaSuccess;
+            if (ok2) {
+                strata::platform::integration_trace::event("verifier-aux-device", "allocate", this, slot_off_d_, bytes,
+                                                            device_);
+                ok2 = cudaMemcpy(slot_off_d_, hits.slot_off, bytes, cudaMemcpyHostToDevice) == cudaSuccess;
+            }
         }
         if (!ok2) { cudaGetLastError(); all_resident_ = false; device_plan_ = false; }
     }
@@ -2094,11 +2123,15 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
         // STRATA_SPEC_PROB: the drafter's q lists for this window, judged by rejection sampling (spec_prob.hpp)
         bool judged = false;
         if (sampled && spec_q_ != nullptr && spec_nq_ > 0 && T > 1 && T <= kVerifyMaxT) {
-            if (d_spec_ == nullptr &&
-                cudaMalloc((void**) &d_spec_, (size_t) kVerifyMaxT * (1 + strata::core::kSpecQStride) * sizeof(int32_t)) !=
-                    cudaSuccess) {
-                (void) cudaGetLastError();
-                d_spec_ = nullptr;
+            if (d_spec_ == nullptr) {
+                const size_t bytes = (size_t) kVerifyMaxT * (1 + strata::core::kSpecQStride) * sizeof(int32_t);
+                if (cudaMalloc((void**) &d_spec_, bytes) != cudaSuccess) {
+                    (void) cudaGetLastError();
+                    d_spec_ = nullptr;
+                } else {
+                    strata::platform::integration_trace::event("verifier-aux-device", "allocate", this, d_spec_,
+                                                                bytes, device_);
+                }
             }
             if (d_spec_ != nullptr) {
                 const int nq = std::min(spec_nq_, T - 1);
@@ -2352,6 +2385,8 @@ bool Verifier::init_slots(const std::vector<SessionState*>& slots, std::string& 
         return false;
     }
     arena_b_ = d;
+    strata::platform::integration_trace::event("verifier-batch-device", "allocate", this, arena_b_,
+        a + (uint64_t) S * std::max<int64_t>(nQ, 1) * TS * 4, device_);
     commitb_ = (int32_t*) d;
     tail_snap_b_ = (float*) ((uint8_t*) d + a);
     slots_ = slots;

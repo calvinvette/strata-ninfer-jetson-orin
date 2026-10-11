@@ -13,6 +13,12 @@ added as separate physical allocations. CUDA/HIP records successful window graph
 `instantiate_evicting`; SYCL's migrated owner records the corresponding single
 window graph finalization. Their batch graph coverage is not equivalent yet.
 No graph-pool byte value is inferred from graph counts or free-memory deltas.
+CUDA/HIP verifier profile stamps, Q8-fuse counters, device-plan scratch, slot
+offset copies, probabilistic-sampling scratch and batch-window arenas have
+separate device-owner events. Successful destructor frees are recorded; the
+same cleanup also releases the profile, plan and slot-offset buffers that were
+previously left to process teardown. These events still exclude driver and
+graph-executable backing.
 The primary `SessionState` backing allocation is also observed as one owner
 allocation; its carved arrays are not added as separate backing. Batch-slot session allocations remain outside this trace. The optional `--dump-layers`
 pinned host staging buffer reports its requested bytes as `layer-dump-pinned-host`;
@@ -121,9 +127,12 @@ observed allocation bytes or physical memory. Device identities on frees come
 from the owning device.
 
 The expanded [evidence report](../../bench/results/2026-10-09-prefill-mtp-owner-trace/README.md)
-compares owned and borrowed prefill, and trace-off protocol checks. Remaining
-sites include verifier auxiliary/device batch buffers, layer-stage and
-batch-slot session arenas, and graph
+compares owned and borrowed prefill, and trace-off protocol checks. The
+[verifier auxiliary follow-up](../../bench/results/2026-10-10-phase3-verifier-aux/README.md)
+adds profile, Q8-fuse, device-plan, slot-offset, probabilistic-sampling and
+batch-window device owners; the forced profile owner balances on Orin. The
+other optional verifier branches are build-checked but remain runtime-untested.
+Remaining sites include layer-stage and batch-slot session arenas, and graph
 capture/destroy/pool observations. Phase 3 must distinguish unique physical
 backing, views and future reservations. Phase 1 needs explicit counters and unsupported scopes; do not
 mistake a partial requested-byte trace for the later accounting gate.
