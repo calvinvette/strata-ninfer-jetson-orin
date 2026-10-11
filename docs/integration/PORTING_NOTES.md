@@ -79,6 +79,12 @@ inventory the platform's actual process-I/O and GPU-allocation telemetry before
 designing per-request accounting; Linux procfs/cgroup assumptions do not carry
 over to Apple platforms.
 
+The [pinned H2D copy screen](../../bench/results/2026-10-10-phase3-copy-latency/README.md)
+uses CUDA events around the transfer itself and retains all per-copy samples.
+Its seven process medians were tightly grouped, but rare event samples were
+over twice the median. A Splash transfer benchmark should preserve those tails
+and time the copy separately from checksum work, allocation and request stages.
+
 ## Phase 1 continuation — Factor translation and process ownership
 
 The paired runner uses fresh owned server processes, randomizes variant order

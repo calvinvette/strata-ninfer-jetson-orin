@@ -31,6 +31,12 @@ available ancestor and block-device counters cannot isolate process reads.
 CUDA graph driver/executable memory also remains unpriced. These gaps keep
 Phase 3 open; the test rerun does not add new product-path qualification.
 
+The separate [pinned-copy timing screen](../../bench/results/2026-10-10-phase3-copy-latency/README.md)
+measured 64 MiB H2D copies at a 2.909 ms median across seven supervised
+processes (23.067 decimal GB/s); individual samples include larger outliers.
+It isolates the copy operation but does not compare mapped reads or establish
+request-level transfer benefit.
+
 The [runtime ownership review](OWNERSHIP_REVIEW.md) records existing owners for
 API ordering, engine execution, session state, verifier commits and device
 allocations. It adds no duplicate scheduler or allocation ledger. Unique physical
