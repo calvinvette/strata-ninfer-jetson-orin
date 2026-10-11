@@ -199,8 +199,8 @@ passed all seven real-model protocol scenarios, including prefill and decode
 cancellation followed by successful requests through the same engine process.
 Instrumented expert-cache, prefill, MTP and verifier allocations balanced; the
 resident session owner stayed live by design. Minimum physical availability was
-7.65 GiB. Graph-pool bytes remain unpriced, and this does not test persistent
-state parity or injected late-workspace recovery.
+7.65 GiB. At that stage, graph-pool bytes had not been priced; the later calibrated
+NVMap startup interval is recorded in the [graph-memory follow-up](../../bench/results/2026-10-11-phase3-graph-nvmap-calibration/README.md). This run does not test persistent state parity or injected late-workspace recovery.
 
 A separate [long-then-short service recovery smoke](../../bench/results/2026-10-10-phase3-long-request-recovery/README.md)
 completed a 3,522-token prompt and 256-token output, followed by a one-token
