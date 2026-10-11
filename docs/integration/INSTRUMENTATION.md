@@ -19,8 +19,12 @@ separate device-owner events. Successful destructor frees are recorded; the
 same cleanup also releases the profile, plan and slot-offset buffers that were
 previously left to process teardown. These events still exclude driver and
 graph-executable backing.
-The primary `SessionState` backing allocation is also observed as one owner
-allocation; its carved arrays are not added as separate backing. Batch-slot session allocations remain outside this trace. The optional `--dump-layers`
+The primary `SessionState` backing allocation is observed once as `session`;
+split-stage and batch-slot backing use `session-stage` and `session-batch`.
+Their carved arrays are not added as separate backing. Stage and batch sessions
+are engine-lifetime allocations and currently appear live at process teardown;
+this is not automatically a leak, but their explicit release path is not yet
+instrumented. The optional `--dump-layers`
 pinned host staging buffer reports its requested bytes as `layer-dump-pinned-host`;
 that debug-output owner is separate from serving buffers and is not allocated unless
 layer dumps are requested.

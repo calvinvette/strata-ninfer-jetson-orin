@@ -1015,6 +1015,8 @@ struct GpuStage {
     strata::core::NativeDense dense;
     strata::core::NativeHead head;
     strata::core::SessionState ss;
+    void* session_buf = nullptr;                         ///< device backing for this stage's carved session
+    uint64_t session_buf_bytes = 0;
     cudaStream_t stream = nullptr;
     strata::core::ExpertCache cache;
     std::vector<std::pair<int32_t, int32_t>> profile;   ///< its layers' share of the profile, hottest first
@@ -3892,9 +3894,14 @@ int main(int argc, char** argv) {
     for (size_t i = 0; i < stages.size(); ++i) {
         GpuStage& st = *stages[i];
         const strata::core::OnDevice on(st.dev);
-        void* sbuf_s = nullptr;
-        if (cudaMalloc(&sbuf_s, strata::core::session_bytes(g, o.max_context, K, st.lb, st.le)) != cudaSuccess ||
-            strata::core::session_init(g, o.max_context, K, sbuf_s, st.ss, st.lb, st.le) == 0) {
+        st.session_buf_bytes = strata::core::session_bytes(g, o.max_context, K, st.lb, st.le);
+        if (cudaMalloc(&st.session_buf, st.session_buf_bytes) != cudaSuccess) {
+            std::fprintf(stderr, "strata generate: layer split, CUDA%d: the session state failed\n", st.dev);
+            return 1;
+        }
+        strata::platform::integration_trace::event("session-stage", "allocate", &st.ss, st.session_buf,
+                                                   st.session_buf_bytes, st.dev);
+        if (strata::core::session_init(g, o.max_context, K, st.session_buf, st.ss, st.lb, st.le) == 0) {
             std::fprintf(stderr, "strata generate: layer split, CUDA%d: the session state failed\n", st.dev);
             return 1;
         }
@@ -3979,9 +3986,22 @@ int main(int argc, char** argv) {
             for (int b = 0; b < fit; ++b) {
                 auto u = std::make_unique<strata::core::SessionState>();
                 void* buf = nullptr;
-                if (cudaMalloc(&buf, bytes) != cudaSuccess || strata::core::session_init(g, o.max_context, K, buf, *u, lo, hi) == 0) {
+                if (cudaMalloc(&buf, bytes) != cudaSuccess) {
                     cudaGetLastError();
-                    if (buf != nullptr) cudaFree(buf);
+                    size_t fb = 0, tb = 0;
+                    cudaMemGetInfo(&fb, &tb);
+                    std::fprintf(stderr, "strata generate: WARNING: --batch %d: slot %d's session does not fit on CUDA%d "
+                                         "(%.2f GiB each, %.2f GiB free); %d slot%s\n", o.batch, b, dev,
+                                 (double) bytes / 1073741824.0, (double) fb / 1073741824.0, b, b == 1 ? "" : "s");
+                    fit = b;
+                    break;
+                }
+                strata::platform::integration_trace::event("session-batch", "allocate", u.get(), buf, bytes, dev);
+                if (strata::core::session_init(g, o.max_context, K, buf, *u, lo, hi) == 0) {
+                    cudaGetLastError();
+                    strata::core::session_release(*u);
+                    if (cudaFree(buf) == cudaSuccess)
+                        strata::platform::integration_trace::event("session-batch", "free", u.get(), buf, 0, dev);
                     size_t fb = 0, tb = 0;
                     cudaMemGetInfo(&fb, &tb);
                     std::fprintf(stderr, "strata generate: WARNING: --batch %d: slot %d's session does not fit on CUDA%d "

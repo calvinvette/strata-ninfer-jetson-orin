@@ -56,6 +56,8 @@ The [Oct 10 owner/PLE follow-up](../../bench/results/2026-10-10-phase3-owner-tes
 
 The [verifier auxiliary owner follow-up](../../bench/results/2026-10-10-phase3-verifier-aux/README.md) now traces verifier profile, Q8-fuse, device-plan, slot-offset, probabilistic-sampling and batch-window device buffers. A traced one-token Q2_0 profile run balanced 282 allocation/free pairs, including a 12,704-byte profile buffer, with zero observed live bytes and 16.39 GiB minimum `MemAvailable`. The other optional branches are instrumented but were not exercised in that smoke.
 
+The [batch-session owner smoke](../../bench/results/2026-10-10-phase3-batch-session-owners/README.md) traces the primary and two batch-slot sessions plus the verifier batch arena. Two independent serial-versus-concurrent Q2_0 runs admitted both slots, matched outputs and matched all nine state hashes by prompt identity. Each batch session requested 235,034,112 bytes; the verifier batch arena requested 37,120 bytes and freed. Minimum `MemAvailable` was 15.30 GiB. The three session backings remained live at service teardown as engine-lifetime allocations; explicit release remains open. CUDA and maestro1 HIP builds passed.
+
 The [runtime ownership review](OWNERSHIP_REVIEW.md) records existing owners for
 API ordering, engine execution, session state, verifier commits and device
 allocations. It adds no duplicate scheduler or allocation ledger. Unique physical
