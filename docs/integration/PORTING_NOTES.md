@@ -19,6 +19,7 @@ reading and pinning that engine's actual source and license:
 | Separate observations from qualification | Successful command exit does not establish numerical parity or speedup | Metal compilation, operator execution, request behavior and sustained service need distinct gates |
 | Own process lifecycle in the harness | One cooperating campaign lock, child process groups, bounded TERM/KILL, partial JSON | Implement equivalent process cleanup and platform telemetry; Linux `/proc` is not portable |
 | Promote narrow seams | Existing Strata scheduler, physical owner and persistent state remain authoritative | Identify the existing Metal/CPU owner; avoid a duplicate scheduler or memory ledger |
+| Attribute weight arenas | Main CUDA `WeightTable` dense arena is one explicit allocation with an opt-in owner event; do not count its suballocated tensor views again | Inventory each dense/packed arena and its lifetime; distinguish backing allocations from tensor views and confirm successful free events |
 | Independent correctness before schedules | Codec/math oracle and accepted-prefix state gates remain pending | CPU FP64 or independent exact codec reference; directly inspect recurrent/KV state for speculation |
 
 `tools/integration/run_control.py` supervises explicit commands. It samples

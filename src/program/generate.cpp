@@ -2716,6 +2716,7 @@ int main(int argc, char** argv) {
     }
 #endif
     void* arena = nullptr;
+    int weight_arena_trace_device = -1;
     if (const cudaError_t ce = cudaMalloc(&arena, pool_bytes); ce != cudaSuccess) {
         // #486: the arena is the first large allocation and its size does not depend on the context, so what is
         // missing is held by something else: say how much was free
@@ -2745,6 +2746,12 @@ int main(int argc, char** argv) {
                      (unsigned long long) pool_bytes, cudaGetErrorString(ce), (unsigned long long) (free_b >> 20),
                      (unsigned long long) (total_b >> 20));
         return 1;
+    }
+    if (strata::platform::integration_trace::enabled()) {
+        weight_arena_trace_device = 0;
+        (void) cudaGetDevice(&weight_arena_trace_device);
+        strata::platform::integration_trace::event("weight-arena", "allocate", &arena, arena, pool_bytes,
+                                                    weight_arena_trace_device);
     }
     auto load_t0 = std::chrono::steady_clock::now();
     auto load_s = [&] {
@@ -12432,6 +12439,8 @@ int main(int argc, char** argv) {
     bslot_ss.clear();
     stages.clear();
     primary_session_backing.release();
-    cudaFree(arena);
+    if (cudaFree(arena) == cudaSuccess && weight_arena_trace_device >= 0)
+        strata::platform::integration_trace::event("weight-arena", "free", &arena, arena, 0,
+                                                    weight_arena_trace_device);
     return 0;
 }
