@@ -703,11 +703,14 @@ had four graph calls and a different 72,425,472-byte interval, so no per-graph
 cost is inferred; legacy session graphs and non-NVMap bytes remain open.
 
 The [Q2_0 actual 32K prompt admission](../../bench/results/2026-10-11-phase3-q2-actual32k/README.md)
-completed a real 32,768-token prompt plus one output token with a fixed 256-slot
-cache and 32,800-token reservation. `prompt_read` matched all 32,768 tokens;
-minimum host availability was 19.85 GiB. The owner trace observed the session,
+completed a real 32,768-token prompt plus one output token under both 256- and
+3,000-slot caches with a 32,800-token reservation. All four runs passed above
+the six-GiB floor. Within-profile state fingerprints matched exactly, while
+GDN, KV, tail and pooled fingerprints differed repeatably across cache sizes
+(35/36 GDN layer fingerprints differed) despite identical output IDs; this unresolved correctness mismatch is retained
+as a failed cross-profile parity check. The owner trace observed the session,
 prefill, verifier and staging buffers release; the process-lifetime dense weight
 arena remained live at log end, and graph-pool bytes remain outside this ledger.
-Two earlier context-boundary validations were rejected before prefill and are
-retained separately. This is a single Q2_0 admission point, not quality,
-capacity, concurrency or performance evidence; broad Phase 3 gates remain open.
+Two earlier context-boundary validations were rejected before prefill. This is
+admission evidence for the tested cells, not broad capacity or performance
+evidence; Phase 3 remains open.
