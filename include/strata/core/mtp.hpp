@@ -219,6 +219,7 @@ private:
     float chain_prob_[8] = {};
     int64_t n_vocab_ = 0;
     uint64_t vram_ = 0;
+    uint64_t head_logits_bytes_ = 0;
     cudaStream_t cs_ = nullptr;
     cudaGraphExec_t prefill_exec_[9] = {};
     cudaGraphExec_t prefill_dev_exec_[9] = {};

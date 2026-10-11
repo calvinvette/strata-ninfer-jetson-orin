@@ -651,3 +651,13 @@ However, the persistent-state fingerprints differed at both committed
 prefixes (`L=48` and `L=52`), so state parity failed and is not claimed. The
 Q2_0 fixture has no compatible MTP weights; this result does not describe Q2_0
 or close the Phase 5 transaction gate.
+
+The [MTP logits owner check](../../bench/results/2026-10-11-phase3-mtp-logits-owner/README.md)
+closes a missing owner event for the draft logits CUDA buffer: the rebuilt
+candidate emitted its exact allocate/free pair, and the seven-scenario IQ1_M/MTP
+API cancellation/recovery run balanced 53/53 instrumented allocations at zero
+live bytes. Minimum physical availability was 9.84 GiB. The independent Q2_0
+PLE oracle passed with its real tensor pack and GGUF table shard; ten selected
+PLE/memory/owner CTests and all 92 integration Python tests passed. This closes
+one MTP ledger gap, not graph-pool pricing or the remaining broad admission and
+transfer gates; Phase 3 remains in progress.

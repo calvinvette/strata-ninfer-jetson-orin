@@ -597,3 +597,16 @@ The [1,069-token follow-up](../../bench/results/2026-10-11-phase4-pool-workers-1
 The paired [accepted-prefix follow-up](../../bench/results/2026-10-11-phase4-pool-workers-1069-state/README.md) then confirmed all token commits and persistent state across those worker counts on the held-out prompt. Keep this state check separate from timing: the trace synchronizes execution. For Splash, compare committed state across scheduling choices on longer prompts before using output hash parity as a proxy.
 
 The [Q2_0 cancellation-under-pressure and owner cleanup checks](../../bench/results/2026-10-11-phase3-q2-cancel-recovery-22G/README.md) reinforce two reusable rules: report a cgroup pressure abort separately from host physical pressure, and make diagnostic-buffer cleanup scope-bound so errors after allocation still balance the owner trace. The 18 GiB cell crossed the six-GiB cgroup guard and was supervisor-aborted; at 22 GiB, cancellation after 512/2,048 prompt tokens and same-process recovery passed with all 302 allocation/free pairs balanced. A separate [layer-dump owner check](../../bench/results/2026-10-11-phase3-layer-dump-owner/README.md) confirmed that the 2,007,040-byte pinned debug buffer is released on the verifier's unsupported-configuration return, although successful dumping is not available on this native speculative route. For Splash, instrument any debug-only pinned or mapped buffers, test early errors as well as successful teardown, and keep platform-wide physical memory distinct from process or cgroup caps.
+
+## Trace every MTP backing allocation, including logits
+
+The MTP owner ledger initially covered state and scratch arenas plus copied
+weights, but omitted the draft logits buffer allocated during `bind()`. Add the
+owner event at the successful native allocation, retain the exact requested byte
+count, and emit release only after a successful free. Verify a traced model run
+through cancellation and orderly shutdown; the Oct 11 IQ1_M/MTP check balanced
+53 allocation/free events with zero live bytes and 9.84 GiB minimum host
+availability. Keep the existing payload snapshot separate because it overlaps
+observed backing. For Splash, inventory temporary logits and sampling buffers as
+well as persistent weights and state, and do not sum payload snapshots with
+unique live allocations.

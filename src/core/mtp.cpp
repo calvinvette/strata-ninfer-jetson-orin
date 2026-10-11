@@ -158,7 +158,8 @@ MtpDrafter::~MtpDrafter() {
         if (cudaFree(arena_) == cudaSuccess)
             strata::platform::integration_trace::event("mtp", "free", this, arena_, 0, device_);
     }
-    if (head_logits_) cudaFree(head_logits_);
+    if (head_logits_ && cudaFree(head_logits_) == cudaSuccess)
+        strata::platform::integration_trace::event("mtp", "free", this, head_logits_, 0, device_);
     if (owns_draft_head_ && dhead_) {
         strata::kernels::native_q6_k_unpack(dhead_);
         if (cudaFree(dhead_) == cudaSuccess)
@@ -632,10 +633,14 @@ bool MtpDrafter::bind(const WeightTable& wt, const NativeHead* head, const float
     if (!wo) { err = "mtp: output.weight is missing"; return false; }
     n_vocab_ = wo->ne1;
     if (head == nullptr || !head->loaded()) { err = "mtp: the draft layer needs the native head (--native)"; return false; }
-    if (head_logits_ == nullptr &&
-        cudaMalloc((void**) &head_logits_, (size_t) max_t_ * (size_t) n_vocab_ * sizeof(float)) != cudaSuccess) {
-        err = "mtp: the draft logits do not fit";
-        return false;
+    if (head_logits_ == nullptr) {
+        head_logits_bytes_ = (uint64_t) max_t_ * (uint64_t) n_vocab_ * sizeof(float);
+        if (cudaMalloc((void**) &head_logits_, (size_t) head_logits_bytes_) != cudaSuccess) {
+            head_logits_bytes_ = 0;
+            err = "mtp: the draft logits do not fit";
+            return false;
+        }
+        strata::platform::integration_trace::event("mtp", "allocate", this, head_logits_, head_logits_bytes_, device_);
     }
     if (shared != nullptr) {
         if (shared->head_ != head || shared->device_ != device_ ||
