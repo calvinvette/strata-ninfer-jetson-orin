@@ -36,6 +36,20 @@ class SupervisorTests(unittest.TestCase):
         self.assertIn('control', (self.root / 'run/stdout.txt').read_text())
         self.assertTrue((self.root / 'run/memory.jsonl').read_text())
 
+    def test_optional_clock_observations_are_recorded(self):
+        clock = lambda: {'gpu': {'hz': 306_000_000}, 'emc': {'hz': 3_199_000_000}}
+        result = self.execute('print("control")', clock_sample=clock)
+        self.assertEqual(result['status'], 'pass')
+        self.assertIn('clock_observations', result['initial_memory'])
+        rows = [json.loads(line) for line in (self.root / 'run/memory.jsonl').read_text().splitlines()]
+        self.assertTrue(rows)
+        self.assertEqual(rows[0]['clock_observations']['gpu']['hz'], 306_000_000)
+
+    def test_clock_sampler_error_does_not_fail_workload(self):
+        result = self.execute('print("control")', clock_sample=lambda: 1 / 0)
+        self.assertEqual(result['status'], 'pass')
+        self.assertEqual(result['initial_memory']['clock_observations']['status'], 'sample_error')
+
     def test_nonzero_exit(self):
         result = self.execute('raise SystemExit(7)')
         self.assertEqual((result['status'], result['returncode']), ('fail', 7))

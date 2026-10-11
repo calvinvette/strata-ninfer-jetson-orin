@@ -139,8 +139,18 @@ def write_result(path, result):
     temporary.replace(path)
 
 
+def observed_clocks(clock_sample):
+    """Return read-only clock observations without making telemetry fatal."""
+    if clock_sample is None:
+        return None
+    try:
+        return clock_sample()
+    except Exception as exc:
+        return {'status': 'sample_error', 'reason': f'{type(exc).__name__}: {exc}'}
+
+
 def run(command, output, *, floor_bytes=6 * GIB, interval_s=1, timeout_s=3600,
-        grace_s=3, sample=memory_snapshot, lock_path=None):
+        grace_s=3, sample=memory_snapshot, clock_sample=None, lock_path=None):
     if not command or floor_bytes < 6 * GIB or min(interval_s, timeout_s, grace_s) <= 0:
         raise ValueError('explicit command, >=6 GiB floor and positive timing limits required')
     output = Path(output)
@@ -149,6 +159,8 @@ def run(command, output, *, floor_bytes=6 * GIB, interval_s=1, timeout_s=3600,
               'floor_bytes': floor_bytes, 'started_wall_s': time.time(),
               'energy_scope': 'not measured; raw tegrastats rails only',
               'counters': 'engine stdout/stderr; unavailable counters are not inferred'}
+    if clock_sample is not None:
+        result['clock_sampling'] = 'read-only CPU/GPU/EMC frequency observations; no clock controls'
     child = telemetry = None
     caught = []
     previous = {}
@@ -157,6 +169,9 @@ def run(command, output, *, floor_bytes=6 * GIB, interval_s=1, timeout_s=3600,
         try:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
             initial = sample()
+            clocks = observed_clocks(clock_sample)
+            if clocks is not None:
+                initial['clock_observations'] = clocks
             result['initial_memory'] = initial
             if initial['admission_available_bytes'] < floor_bytes:
                 result.update(status='pressure_abort', reason='prelaunch physical/cgroup headroom')
@@ -175,6 +190,9 @@ def run(command, output, *, floor_bytes=6 * GIB, interval_s=1, timeout_s=3600,
                 start = time.monotonic()
                 while True:
                     row = sample()
+                    clocks = observed_clocks(clock_sample)
+                    if clocks is not None:
+                        row['clock_observations'] = clocks
                     row.update(process_snapshot(child.pid))
                     samples.write(json.dumps(row) + '\n')
                     samples.flush()
@@ -220,10 +238,19 @@ def main():
     parser.add_argument('--timeout', type=float, default=3600)
     parser.add_argument('--interval', type=float, default=1)
     parser.add_argument('--term-grace', type=float, default=3)
+    parser.add_argument('--sample-clocks', action='store_true',
+                        help='include read-only CPU/GPU/EMC frequency observations in memory.jsonl')
+    parser.add_argument('--privileged-emc', action='store_true',
+                        help='read protected EMC rate using noninteractive sudo; implies --sample-clocks')
     parser.add_argument('command', nargs=argparse.REMAINDER)
     args = parser.parse_args()
     command = args.command[1:] if args.command[:1] == ['--'] else args.command
-    result = run(command, args.output, interval_s=args.interval, timeout_s=args.timeout, grace_s=args.term_grace)
+    clock_sample = None
+    if args.sample_clocks or args.privileged_emc:
+        from sample_clocks import snapshot
+        clock_sample = lambda: snapshot(privileged_emc=args.privileged_emc)
+    result = run(command, args.output, interval_s=args.interval, timeout_s=args.timeout,
+                 grace_s=args.term_grace, clock_sample=clock_sample)
     print(json.dumps(result, indent=2))
     return 0 if result['status'] == 'pass' else 1
 

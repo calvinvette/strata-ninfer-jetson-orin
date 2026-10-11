@@ -33,6 +33,12 @@ Use explicit paths; no artifact selection by newest file or glob.
 | Correctness | Reference/output logits and state, exact codec/layout checks, finite values, API/recall/scoring results | Error norms, selected-token/logprob error and justified tolerance; pass/fail/skip by actual contract |
 | Capacity/service | Actual prompt+generation, allocation, pressure aborts, recovery, queue/wait times | Largest completed and recovered point; abort boundary separate; throughput and per-request fairness only for implemented concurrency |
 
+`run_control.py` can include read-only CPU/GPU/EMC clock observations in each
+memory sample with `--sample-clocks`; `--privileged-emc` reads the protected EMC
+rate through noninteractive `sudo` and implies clock sampling. These are
+observed dynamic rates, not clock controls. Raw tegrastats remains separately
+retained and does not establish process-attributed energy.
+
 Measure request stages with a monotonic clock and align telemetry to those windows.
 Decode rate excludes prefill; state the treatment of the first token. In operator
 timings use CUDA events and completion synchronization; distinguish kernel time
