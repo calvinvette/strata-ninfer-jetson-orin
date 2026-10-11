@@ -47,6 +47,8 @@ bootstrap of the median paired delta (seed 1011, resampling whole pairs) gave
 same direction and were close to, but generally above, the scope counters;
 those device values still include unrelated activity.
 
+The pread-side runtime counters also limit the interpretation: in all seven pread arms, prefetch issued about 1,600–1,750 reads but reported zero consumed prefetched blobs, zero dropped blobs, and zero decode wait fetches. Thus this cell did not exercise a measured request-path pread copy stall; the request-time and scoped-I/O differences are observations for this configuration, not evidence that pread serves the expert misses.
+
 The paired result is workload-specific, with dynamic clocks and two large
 request-time outliers (one pread and one mapped). CPU clock medians varied from
 729 to 1,267 MHz; tegrastats provided no GPU or EMC frequency samples during
