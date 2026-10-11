@@ -1,0 +1,270 @@
+{
+  "scope": "isolated 64 MiB transfer/checksum, not product-path performance",
+  "n_process_blocks": 7,
+  "rows": [
+    {
+      "rep": 1,
+      "order": [
+        "1",
+        "0",
+        "2",
+        "3"
+      ],
+      "timings_ms": {
+        "mapped_host": 5.375139,
+        "pinned_copy": 13.56439,
+        "managed_sequential": 5.738961,
+        "async_pool_copy": 14.928767
+      },
+      "minimum_available_bytes": 30149824512,
+      "gpu_mhz_range": [
+        306.0,
+        306.0
+      ],
+      "cpu_mhz_range": [
+        729.6,
+        2201.6
+      ]
+    },
+    {
+      "rep": 2,
+      "order": [
+        "0",
+        "2",
+        "1",
+        "3"
+      ],
+      "timings_ms": {
+        "pinned_copy": 13.909492,
+        "managed_sequential": 5.729985,
+        "mapped_host": 5.189876,
+        "async_pool_copy": 14.946735
+      },
+      "minimum_available_bytes": 30154919936,
+      "gpu_mhz_range": [
+        306.0,
+        306.0
+      ],
+      "cpu_mhz_range": [
+        729.6,
+        2201.6
+      ]
+    },
+    {
+      "rep": 3,
+      "order": [
+        "3",
+        "2",
+        "0",
+        "1"
+      ],
+      "timings_ms": {
+        "async_pool_copy": 14.956303,
+        "managed_sequential": 5.759393,
+        "pinned_copy": 13.677366,
+        "mapped_host": 5.193796
+      },
+      "minimum_available_bytes": 30079807488,
+      "gpu_mhz_range": [
+        306.0,
+        306.0
+      ],
+      "cpu_mhz_range": [
+        729.6,
+        2201.6
+      ]
+    },
+    {
+      "rep": 4,
+      "order": [
+        "1",
+        "3",
+        "0",
+        "2"
+      ],
+      "timings_ms": {
+        "mapped_host": 5.186644,
+        "async_pool_copy": 14.815281,
+        "pinned_copy": 13.564119,
+        "managed_sequential": 5.596402
+      },
+      "minimum_available_bytes": 30082105344,
+      "gpu_mhz_range": [
+        306.0,
+        1300.5
+      ],
+      "cpu_mhz_range": [
+        729.6,
+        2201.6
+      ]
+    },
+    {
+      "rep": 5,
+      "order": [
+        "0",
+        "3",
+        "2",
+        "1"
+      ],
+      "timings_ms": {
+        "pinned_copy": 13.742758,
+        "async_pool_copy": 14.9336,
+        "managed_sequential": 5.632978,
+        "mapped_host": 5.303651
+      },
+      "minimum_available_bytes": 30095798272,
+      "gpu_mhz_range": [
+        306.0,
+        1300.5
+      ],
+      "cpu_mhz_range": [
+        729.6,
+        2201.6
+      ]
+    },
+    {
+      "rep": 6,
+      "order": [
+        "1",
+        "3",
+        "2",
+        "0"
+      ],
+      "timings_ms": {
+        "mapped_host": 5.218212,
+        "async_pool_copy": 14.914656,
+        "managed_sequential": 5.567666,
+        "pinned_copy": 13.676215
+      },
+      "minimum_available_bytes": 30091509760,
+      "gpu_mhz_range": [
+        306.0,
+        1300.5
+      ],
+      "cpu_mhz_range": [
+        729.6,
+        2201.6
+      ]
+    },
+    {
+      "rep": 7,
+      "order": [
+        "3",
+        "2",
+        "1",
+        "0"
+      ],
+      "timings_ms": {
+        "async_pool_copy": 14.960705,
+        "managed_sequential": 5.633506,
+        "mapped_host": 5.239653,
+        "pinned_copy": 13.674583
+      },
+      "minimum_available_bytes": 30094864384,
+      "gpu_mhz_range": [
+        306.0,
+        306.0
+      ],
+      "cpu_mhz_range": [
+        729.6,
+        2201.6
+      ]
+    }
+  ],
+  "process_median_summary_ms": {
+    "pinned_copy": {
+      "median": 13.676215,
+      "minimum": 13.564119,
+      "maximum": 13.909492
+    },
+    "mapped_host": {
+      "median": 5.218212,
+      "minimum": 5.186644,
+      "maximum": 5.375139
+    },
+    "managed_sequential": {
+      "median": 5.633506,
+      "minimum": 5.567666,
+      "maximum": 5.759393
+    },
+    "async_pool_copy": {
+      "median": 14.9336,
+      "minimum": 14.815281,
+      "maximum": 14.960705
+    }
+  },
+  "comparisons": [
+    {
+      "candidate": "mapped_host",
+      "control": "pinned_copy",
+      "paired_median_delta_percent": -61.76202818627586,
+      "bootstrap_95_percentile_interval_percent": [
+        -62.026343376348926,
+        -61.407666496055604
+      ],
+      "paired_block_deltas_percent": [
+        -60.37316090144857,
+        -62.68824195736264,
+        -62.026343376348926,
+        -61.76202818627586,
+        -61.407666496055604,
+        -61.844618558570474,
+        -61.68327034177204
+      ]
+    },
+    {
+      "candidate": "managed_sequential",
+      "control": "pinned_copy",
+      "paired_median_delta_percent": -58.803087450637435,
+      "bootstrap_95_percentile_interval_percent": [
+        -59.011298896480604,
+        -57.891066159960914
+      ],
+      "paired_block_deltas_percent": [
+        -57.690976151526165,
+        -58.80521732928852,
+        -57.891066159960914,
+        -58.74113165772137,
+        -59.011298896480604,
+        -59.28942327975979,
+        -58.803087450637435
+      ]
+    },
+    {
+      "candidate": "async_pool_copy",
+      "control": "pinned_copy",
+      "paired_median_delta_percent": 9.224056497882405,
+      "bootstrap_95_percentile_interval_percent": [
+        8.665232990350269,
+        9.405200875229625
+      ],
+      "paired_block_deltas_percent": [
+        10.058520877090693,
+        7.457087577317711,
+        9.350755108841868,
+        9.224056497882405,
+        8.665232990350269,
+        9.05543675644176,
+        9.405200875229625
+      ]
+    },
+    {
+      "candidate": "mapped_host",
+      "control": "managed_sequential",
+      "paired_median_delta_percent": -6.991259084484868,
+      "bootstrap_95_percentile_interval_percent": [
+        -9.426010713815137,
+        -6.276490004967961
+      ],
+      "paired_block_deltas_percent": [
+        -6.339509886894157,
+        -9.426010713815137,
+        -9.820427256830722,
+        -7.32181140668594,
+        -5.846410193684393,
+        -6.276490004967961,
+        -6.991259084484868
+      ]
+    }
+  ]
+}
