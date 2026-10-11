@@ -435,3 +435,24 @@ build an adapter from the source metadata and pack index, then compare the
 source-format decode oracle against the backend's actual materialized weights.
 Do not fix a failed fixture lookup by substituting a tensor from a different
 model cohort; tensor shapes alone do not establish matching values.
+
+## Treat worker-count results as correctness-gated experiments
+
+Orin Nsight Systems CPU instruction sampling found many samples in the expert
+pool worker loop during a `pp512+tg64` API request. A randomized fixed-workload
+screen showed lower median times at eight workers than at eleven, but the
+screen's gate failed: one of three eleven-worker outputs differed, and exact
+persistent-state fingerprints differed across every worker configuration.
+Those timings are not a worker-count speedup result. Before repeating this on
+Strata or Splash, record token IDs and accepted-prefix state at verifier commit
+boundaries, then require correctness across worker settings before comparing
+latency. For Splash, also record which CPU or GPU owns each expert operation;
+worker count may change CPU/GPU contention for shared memory bandwidth even if
+the operator sequence is unchanged.
+
+The experiment harness accepts a separate warmup workload set so the measured
+prompt can remain a fresh prefill while still warming model and service state.
+Use distinct prompts with identical token counts and chat-template settings,
+and confirm `cache_n=0` on measured requests. Retain the failed initial setup
+where warmup repeated the measured prompt: that was a harness failure, not
+evidence about the runtime.

@@ -29,6 +29,8 @@ def main():
     parser.add_argument('--config', type=Path, required=True)
     parser.add_argument('--workloads', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--warmup-workloads', type=Path,
+                        help='optional distinct workload set used only for the warmup request')
     parser.add_argument('--variant', choices=['baseline', 'candidate'], required=True)
     parser.add_argument('--rounds', type=int, default=1)
     parser.add_argument('--validate-api-only', action='store_true')
@@ -73,6 +75,8 @@ def main():
                        '--base-url', base, '--workloads', str(args.workloads.resolve()),
                        '--output', str(args.output.resolve()), '--variant', args.variant,
                        '--rounds', str(args.rounds), '--single-block', '--stream']
+            if args.warmup_workloads is not None:
+                command.extend(['--warmup-workloads', str(args.warmup_workloads.resolve())])
         return subprocess.call(command)
     finally:
         server.terminate()

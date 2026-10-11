@@ -1,0 +1,65 @@
+{
+  "command": [
+    "nsys",
+    "profile",
+    "--trace=cuda,nvtx,osrt",
+    "--sample=process-tree",
+    "--cpuctxsw=process-tree",
+    "--backtrace=fp",
+    "--samples-per-backtrace=8",
+    "--cuda-graph-trace=node",
+    "--cuda-memory-usage=true",
+    "--force-overwrite=true",
+    "--output=build/integration/nsys-candidate-pp512-tg64/cpu-sampling-profile",
+    "/home/calvin/models/strata-orin-validation/pack-venv/bin/python",
+    "tools/integration/api_control_block.py",
+    "--config",
+    "build/integration/nsys-candidate-pp512-tg64/server-config.json",
+    "--workloads",
+    "build/integration/profile-workloads.json",
+    "--output",
+    "build/integration/nsys-candidate-pp512-tg64/cpu-sampling-requests.json",
+    "--variant",
+    "candidate",
+    "--rounds",
+    "1"
+  ],
+  "cwd": "/home/calvin/workspace/strata-ninfer-jetson-orin",
+  "status": "pass",
+  "floor_bytes": 6442450944,
+  "started_wall_s": 1791682974.0162852,
+  "energy_scope": "not measured; raw tegrastats rails only",
+  "counters": "engine stdout/stderr; unavailable counters are not inferred",
+  "initial_memory": {
+    "monotonic_s": 952143.588794858,
+    "wall_time_s": 1791682974.0173333,
+    "available_bytes": 26415939584,
+    "total_bytes": 32187883520,
+    "swap_used_bytes": 1280573440,
+    "cgroups": [
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/session-388.scope",
+        "current_bytes": 558043136,
+        "max_bytes": null
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice",
+        "current_bytes": 610902016,
+        "max_bytes": null
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice",
+        "current_bytes": 611418112,
+        "max_bytes": null
+      }
+    ],
+    "cgroup_v2_observed": true,
+    "admission_available_bytes": 26415939584
+  },
+  "tegrastats": "started; inspect raw log for availability",
+  "reason": "command exit; numerical/workload qualification is separate",
+  "minimum_available_bytes": 8669982720,
+  "returncode": 0,
+  "elapsed_s": 97.84111011994537,
+  "finished_wall_s": 1791683071.916025
+}

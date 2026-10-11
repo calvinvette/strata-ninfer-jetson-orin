@@ -78,6 +78,8 @@ def main():
     parser.add_argument('--base-url', default='http://127.0.0.1:18081')
     parser.add_argument('--workloads', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--warmup-workloads', type=Path,
+                        help='optional distinct workload set used only for the warmup request')
     parser.add_argument('--variant', choices=['baseline', 'candidate'], required=True)
     parser.add_argument('--rounds', type=int, default=3)
     parser.add_argument('--stream', action='store_true')
@@ -90,6 +92,10 @@ def main():
         parser.error('positive independent-block repetitions or >=3 screening repetitions, and a new output path required')
     health = request(args.base_url.rstrip('/'), '/health')
     workloads = json.loads(args.workloads.read_text())['workloads']
+    warmup_workloads = (json.loads(args.warmup_workloads.read_text())['workloads']
+                        if args.warmup_workloads else None)
+    if warmup_workloads is not None and len(warmup_workloads) != len(workloads):
+        parser.error('warmup and measured workload sets must have the same number of cells')
     rows = []
     result = {'variant': args.variant, 'health': health, 'checks': rows,
               'replication_scope': 'requests within one server process; screening only',
@@ -98,7 +104,8 @@ def main():
     args.output.parent.mkdir(parents=True, exist_ok=True)
     failed = False
     for round_index in range(-1, args.rounds):
-        for cell in workloads:
+        selected_workloads = warmup_workloads if round_index == -1 and warmup_workloads is not None else workloads
+        for cell in selected_workloads:
             row = {'cell': cell['cell'], 'round': round_index, 'warmup': round_index == -1,
                    'status': 'not_run', 'reason': 'request started', 'wall_time_s': time.time()}
             rows.append(row)
