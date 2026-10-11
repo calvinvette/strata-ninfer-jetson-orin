@@ -221,6 +221,8 @@ the native Q2_0 projection and exact source-block reconstruction. The reader
 also matches 64 sampled PLE table rows bitwise; see the [artifact-aware PLE
 report](../../bench/results/2026-10-10-phase3-q2-ple-artifact-aware/README.md).
 
+The repeated [cache-cap × context screen](../../bench/results/2026-10-11-phase3-cache-context-repeated-fixed/README.md) ran three measured requests per randomized cell after warmup. All four combinations completed above the six-GiB floor (minimum 8.34 GiB); increasing the cache from 3,903 to 6,519 actual slots requested another 4.96 GiB of device backing and reduced the minimum host availability by about 4.8 GiB. Doubling context raised the instrumented session payload by 108 MiB. Timing is descriptive only because each cell used one process, dynamic clocks and a short prompt. The reusable screen harness has three offline config tests.
+
 The [requested cache × context screen](../../bench/results/2026-10-09-phase3-cache-context-matrix/README.md)
 ran a randomized 2×2 configuration matrix on Orin with one short API workload
 per process. All cells passed workload completion and stayed above the six-GiB

@@ -1,0 +1,49 @@
+{
+  "seed": 20261011,
+  "cache_values": [
+    3000,
+    5000
+  ],
+  "context_values": [
+    4096,
+    8192
+  ],
+  "planned_cells": 4,
+  "rounds_per_cell": 3,
+  "scope": "randomized order; independent server process per cell; one warmup and three or more measured requests per process; admission and screening evidence only",
+  "started_wall_time_s": 1791695312.7059479,
+  "cells": [
+    {
+      "name": "cache3000-ctx4096",
+      "requested_cache_lower_bound": 3000,
+      "context_tokens": 4096,
+      "order": 0,
+      "status": "fail",
+      "command": [
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-11-phase3-cache-context-repeated/cache3000-ctx4096/supervisor",
+        "--timeout",
+        "1800",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-11-phase3-cache-context-repeated/cache3000-ctx4096/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-09-phase3-cache-context-matrix/workloads.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-11-phase3-cache-context-repeated/cache3000-ctx4096/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "3"
+      ],
+      "minimum_available_bytes": 26451443712,
+      "elapsed_s": 1.0497838999144733,
+      "reason": "command exit; numerical/workload qualification is separate",
+      "supervisor_returncode": 1
+    }
+  ]
+}

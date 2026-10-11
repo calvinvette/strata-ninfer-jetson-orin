@@ -1,0 +1,113 @@
+"""Run randomized cache-cap/context cells with three measured requests per process."""
+import argparse
+import json
+from pathlib import Path
+import random
+import subprocess
+import sys
+import time
+
+from run_control import write_result
+
+
+def replace_option(args, option, value):
+    """Replace exactly one existing two-token CLI option; reject ambiguous configs."""
+    positions = [i for i, item in enumerate(args) if item == option]
+    if len(positions) != 1 or positions[0] + 1 >= len(args):
+        raise ValueError(f'expected exactly one {option} option with a value')
+    result = list(args)
+    result[positions[0] + 1] = str(value)
+    return result
+
+
+def cell_configs(config, cache_values, context_values):
+    cells = []
+    for cache in cache_values:
+        for context in context_values:
+            cfg = dict(config)
+            args = replace_option(config['args'], '--expert-cache', cache)
+            cfg['args'] = replace_option(args, '--max-context', context)
+            cells.append({'name': f'cache{cache}-ctx{context}',
+                          'requested_cache_lower_bound': cache,
+                          'context_tokens': context, 'config': cfg})
+    return cells
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--config', type=Path, required=True)
+    parser.add_argument('--workloads', type=Path, required=True)
+    parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--cache-values', type=int, nargs='+', default=[3000, 5000])
+    parser.add_argument('--context-values', type=int, nargs='+', default=[4096, 8192])
+    parser.add_argument('--rounds', type=int, default=3)
+    parser.add_argument('--seed', type=int, default=20261011)
+    parser.add_argument('--timeout', type=int, default=1800)
+    parser.add_argument('--python', type=Path, default=Path(sys.executable),
+                        help='Python executable with the server dependencies installed')
+    args = parser.parse_args()
+    if args.rounds < 3 or args.timeout < 1:
+        parser.error('screening requires at least three measured rounds and a positive timeout')
+    if len(set(args.cache_values)) != len(args.cache_values) or len(set(args.context_values)) != len(args.context_values):
+        parser.error('cache and context values must be unique')
+    base = json.loads(args.config.read_text())
+    workloads = json.loads(args.workloads.read_text())
+    if not workloads.get('workloads'):
+        parser.error('workload file must contain at least one prepared workload')
+    cells = cell_configs(base, args.cache_values, args.context_values)
+    rng = random.Random(args.seed)
+    rng.shuffle(cells)
+    args.output.mkdir(parents=True, exist_ok=False)
+    campaign = {'seed': args.seed, 'cache_values': args.cache_values,
+                'context_values': args.context_values, 'planned_cells': len(cells),
+                'rounds_per_cell': args.rounds,
+                'scope': 'randomized order; independent server process per cell; one warmup and three or more measured requests per process; admission and screening evidence only',
+                'started_wall_time_s': time.time(), 'cells': []}
+    manifest = args.output / 'campaign.json'
+    write_result(manifest, campaign)
+    tools = Path(__file__).resolve().parent
+    for index, cell in enumerate(cells):
+        name = cell['name']
+        out = args.output / name
+        out.mkdir()
+        cfgpath = out / 'config.json'
+        cfgpath.write_text(json.dumps(cell.pop('config'), indent=2) + '\n')
+        request_path = out / 'requests.json'
+        runtime_python = str(args.python.resolve())
+        command = [runtime_python, str(tools / 'run_control.py'), '--output', str((out / 'supervisor').resolve()),
+                   '--timeout', str(args.timeout), '--', runtime_python, str(tools / 'api_control_block.py'),
+                   '--config', str(cfgpath.resolve()), '--workloads', str(args.workloads.resolve()),
+                   '--output', str(request_path.resolve()), '--variant', 'candidate', '--rounds', str(args.rounds)]
+        row = dict(cell, order=index, status='not_run', command=command)
+        campaign['cells'].append(row)
+        write_result(manifest, campaign)
+        print('starting', name, flush=True)
+        with (out / 'supervisor.txt').open('w') as log:
+            code = subprocess.call(command, stdout=log, stderr=subprocess.STDOUT)
+        terminal_path = out / 'supervisor' / 'result.json'
+        if terminal_path.exists():
+            terminal = json.loads(terminal_path.read_text())
+            row.update(status=terminal['status'], minimum_available_bytes=terminal.get('minimum_available_bytes'),
+                       elapsed_s=terminal.get('elapsed_s'), reason=terminal.get('reason'),
+                       supervisor_returncode=code)
+        else:
+            row.update(status='fail', reason='missing supervisor terminal record', supervisor_returncode=code)
+        if request_path.exists():
+            measured = json.loads(request_path.read_text())
+            row['request_summary'] = measured.get('summary')
+            row['measured_samples'] = sum(s.get('passed_samples', 0) for s in measured.get('summary', []))
+        write_result(manifest, campaign)
+        print('finished', name, row['status'], row.get('reason'), flush=True)
+        if row['status'] != 'pass':
+            for pending in campaign['cells'][index + 1:]:
+                pending['status'] = 'not_run'
+                pending['reason'] = 'not launched after failed/pressure-aborted cell'
+            write_result(manifest, campaign)
+            return 1
+    campaign['finished_wall_time_s'] = time.time()
+    write_result(manifest, campaign)
+    return 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())
