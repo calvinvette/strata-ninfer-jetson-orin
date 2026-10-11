@@ -468,3 +468,11 @@ values with 3.138% relative L2 despite matching output IDs. This establishes a
 state difference, not which state is more accurate. A future Strata + Splash
 effort should adapt the dump to the actual recurrent-state layout and use an
 independent mathematical or task-level oracle before judging either state.
+
+The actual Q2_0 native-model admission matrix adds a related portability lesson:
+cache budgets and context reservations need to be measured on the target model
+artifacts, even when an IQ1_M screen already exists. On Orin, the Q2_0 3,000- and
+5,000-slot cells reported 3.86 and 6.44 GiB of shared-RAM cache backing, while
+doubling context added 108,068,864 requested session bytes. Splash should run
+the same model-specific matrix against its Metal-backed owner and report host
+availability, device requests and virtual reservations as separate quantities.

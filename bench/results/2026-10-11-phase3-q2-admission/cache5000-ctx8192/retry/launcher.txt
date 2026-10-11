@@ -1,0 +1,73 @@
+{
+  "command": [
+    "env",
+    "STRATA_INTEGRATION_TRACE=1",
+    "/home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/candidate/strata",
+    "--pack",
+    "/home/calvin/models/strata-orin-validation/q2-ple-pack",
+    "--native",
+    "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+    "--ple-gguf",
+    "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+    "--expert-profile",
+    "/home/calvin/models/strata-orin-validation/q2-expert-profile.bin",
+    "--prefill",
+    "512",
+    "--spec",
+    "2",
+    "--mmap-experts",
+    "--prompt-cache",
+    "0",
+    "--vram-reserve-mib",
+    "3072",
+    "--pcie-frac",
+    "0.55",
+    "--tokens-file",
+    "/home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/workloads/pp512-tg64.tokens",
+    "--max-new",
+    "1",
+    "--greedy",
+    "--expert-cache",
+    "5000",
+    "--max-context",
+    "8192"
+  ],
+  "cwd": "/home/calvin/workspace/strata-ninfer-jetson-orin",
+  "status": "pass",
+  "floor_bytes": 6442450944,
+  "started_wall_s": 1791704785.0164568,
+  "energy_scope": "not measured; raw tegrastats rails only",
+  "counters": "engine stdout/stderr; unavailable counters are not inferred",
+  "initial_memory": {
+    "monotonic_s": 973954.589416961,
+    "wall_time_s": 1791704785.0179553,
+    "available_bytes": 26524143616,
+    "total_bytes": 32187883520,
+    "swap_used_bytes": 1341128704,
+    "cgroups": [
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/session-388.scope",
+        "current_bytes": 19989397504,
+        "max_bytes": null
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice",
+        "current_bytes": 20026388480,
+        "max_bytes": null
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice",
+        "current_bytes": 20026900480,
+        "max_bytes": null
+      }
+    ],
+    "cgroup_v2_observed": true,
+    "admission_available_bytes": 26524143616
+  },
+  "tegrastats": "started; inspect raw log for availability",
+  "reason": "command exit; numerical/workload qualification is separate",
+  "minimum_available_bytes": 17050230784,
+  "returncode": 0,
+  "elapsed_s": 33.59467262006365,
+  "finished_wall_s": 1791704818.6372042
+}
