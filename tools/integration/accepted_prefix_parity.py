@@ -28,7 +28,7 @@ def parse_hashes(path):
     return found
 
 
-def args_for(cfg, spec):
+def args_for(cfg, spec, kv_format=None):
     args = list(cfg['args'])
     for key, value in (('--prompt-cache', '6'), ('--adapt-swaps', '0'),
                        ('--suffix-draft', '0'), ('--spec-min-p', '0')):
@@ -51,6 +51,11 @@ def args_for(cfg, spec):
             args[args.index('--mtp-max-t') + 1] = str(spec)
         else:
             args += ['--mtp-max-t', str(spec)]
+    if kv_format is not None:
+        if '--kv' in args:
+            args[args.index('--kv') + 1] = kv_format
+        else:
+            args += ['--kv', kv_format]
     return args
 
 
@@ -61,6 +66,8 @@ def main():
     ap.add_argument('--output', type=Path, required=True, help='new output directory; existing paths refused')
     ap.add_argument('--tokens', type=int, default=32)
     ap.add_argument('--prompt-tokens', type=int, default=512)
+    ap.add_argument('--kv-format', choices=('fp16', 'int8', 'q4_0', 'k8v4'), default=None,
+                    help='override the configured KV format for every arm')
     ap.add_argument('--windows', type=int, nargs='+', default=[0, 4],
                     help='MTP windows to compare; include 0 for the no-MTP reference')
     ap.add_argument('--run', action='store_true')
@@ -70,7 +77,7 @@ def main():
     if len(a.windows) < 2 or len(set(a.windows)) != len(a.windows) or a.windows[0] != 0 or any(x < 0 for x in a.windows):
         ap.error('--windows must be unique nonnegative values, start with 0 (MTP off), and contain at least two arms')
     if not a.run:
-        print('Dry run: sequential private engines, MTP off versus MTP window 4, token and accepted-prefix state parity.')
+        print('Dry run: sequential private engines across MTP windows and one KV format; compare tokens and accepted-prefix state.')
         return
 
     cfg = json.loads(a.config.read_text(encoding='utf-8'))
@@ -90,12 +97,15 @@ def main():
     env['STRATA_INTEGRATION_TRACE'] = '1'
     env['STRATA_MTP_BATCH'] = '1'
     env['STRATA_PREFILL_CPU_SHARE'] = '0'
+    base_args = list(cfg['args'])
+    configured_kv = base_args[base_args.index('--kv') + 1] if '--kv' in base_args else 'fp16'
     results = {'prompt_sha256': hashlib.sha256(json.dumps(prompt).encode()).hexdigest(),
-               'max_new': a.tokens, 'state_fields': STATE_KEYS, 'arms': []}
+               'max_new': a.tokens, 'kv_format': a.kv_format or configured_kv,
+               'state_fields': STATE_KEYS, 'arms': []}
     for spec in a.windows:
         label = 'mtp-off' if spec == 0 else f'mtp-window{spec}'
         log = a.output / f'{label}.log'
-        command = args_for(cfg, spec)
+        command = args_for(cfg, spec, a.kv_format)
         engine = StrataEngine(str(a.engine.resolve()), command, cwd=cfg.get('cwd'), log=str(log), env=env)
         arm = {'name': label, 'spec': spec, 'args': command, 'info': dict(engine.info), 'records': []}
         with a.engine.open('rb') as binary:

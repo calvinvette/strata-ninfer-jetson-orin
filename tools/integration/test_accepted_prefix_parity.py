@@ -35,6 +35,14 @@ class AcceptedPrefixParityTests(unittest.TestCase):
         self.assertEqual(args[args.index('--spec') + 1], '3')
         self.assertEqual(args[args.index('--mtp-max-t') + 1], '3')
 
+    def test_kv_format_override_preserves_mtp_arms(self):
+        cfg = {'args': ['--native', 'model.gguf', '--mtp', 'mtp/rt', '--spec', '4', '--kv', 'fp16']}
+        for spec in (0, 2, 3, 4):
+            args = args_for(cfg, spec, 'int8')
+            self.assertEqual(args[args.index('--kv') + 1], 'int8')
+            self.assertEqual(args[args.index('--spec') + 1], str(max(2, spec)))
+            self.assertEqual('--mtp' in args, spec != 0)
+
 
 if __name__ == '__main__':
     unittest.main()
