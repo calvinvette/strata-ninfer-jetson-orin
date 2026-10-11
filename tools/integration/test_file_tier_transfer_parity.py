@@ -3,7 +3,17 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from file_tier_transfer_parity import actual_expert_cache_slots, cgroup_io_read_bytes
+from file_tier_transfer_parity import (actual_expert_cache_slots, cgroup_io_read_bytes,
+                                      transfer_modes)
+
+
+class TransferModeTests(unittest.TestCase):
+    def test_prefetch_stage_pair_holds_io_path_constant(self):
+        self.assertEqual(transfer_modes(True), [
+            ('prefetch-fill', '1', '0'), ('prefetch-stage', '1', '1')])
+
+    def test_original_mapped_and_pread_pair_is_unchanged(self):
+        self.assertEqual(transfer_modes(False), [('mapped', '0', '0'), ('pread', '1', '0')])
 
 
 class CgroupIoReadBytesTests(unittest.TestCase):

@@ -24,6 +24,12 @@ from serve.server import StrataEngine, child_env
 STATE_KEYS = ('L', 'gdn', 'ple', 'tail', 'dead', 'pooled', 'pooled_full', 'kv', 'ple_prev')
 
 
+def transfer_modes(compare_prefetch_stage):
+    if compare_prefetch_stage:
+        return [('prefetch-fill', '1', '0'), ('prefetch-stage', '1', '1')]
+    return [('mapped', '0', '0'), ('pread', '1', '0')]
+
+
 class TegraSampler:
     """Opt-in board-rail sampler; request energy is system-level, never process-attributed."""
     _POWER = re.compile(r'([A-Z0-9_]+)\s+(\d+)mW(?:/(\d+)mW)?')
@@ -210,6 +216,8 @@ def main():
     parser.add_argument('--pairs', type=int, default=1)
     parser.add_argument('--seed', type=int, default=870126)
     parser.add_argument('--io-threads', type=int, default=8)
+    parser.add_argument('--compare-prefetch-stage', action='store_true',
+                        help='compare prefetch page-cache fill (stage=0) with staging (stage=1)')
     parser.add_argument('--expert-cache', type=str,
                         help='override auto sizing to hold expert residency constant across paired arms')
     parser.add_argument('--tegrastats-energy', action='store_true',
@@ -251,15 +259,19 @@ def main():
                 result.get('generated_tokens') != args.generated_tokens or
                 result.get('planned_pairs') != args.pairs or result.get('seed') != args.seed or
                 result.get('expert_cache') != args.expert_cache or result.get('io_threads') != args.io_threads or
+                result.get('compare_prefetch_stage', False) != args.compare_prefetch_stage or
                 any(row.get('engine_sha256') != binary_hash for row in result.get('arms', []))):
             parser.error('resume inputs differ from the retained incomplete run')
     else:
         args.output.mkdir(mode=0o700, parents=False, exist_ok=False)
-        result = {'scope': 'exact real-model prompt, randomized mapped-versus-pread file-tier transfer screen; screening only',
+        result = {'scope': ('exact real-model prompt, randomized prefetch page-cache-fill versus staging screen; screening only'
+                            if args.compare_prefetch_stage else
+                            'exact real-model prompt, randomized mapped-versus-pread file-tier transfer screen; screening only'),
                   'prompt_tokens': len(prompt), 'prompt_sha256': prompt_hash,
                   'generated_tokens': args.generated_tokens, 'planned_pairs': args.pairs,
                   'io_threads': args.io_threads, 'expert_cache': args.expert_cache,
-                  'seed': args.seed, 'arms': [], 'pair_comparisons': []}
+                  'seed': args.seed, 'compare_prefetch_stage': args.compare_prefetch_stage,
+                  'arms': [], 'pair_comparisons': []}
     sampler = None
     if args.tegrastats_energy:
         sampler = TegraSampler(args.output / 'tegrastats-energy.jsonl', args.tegrastats_interval_ms)
@@ -284,7 +296,7 @@ def main():
         else:
             args_for.extend(['--expert-cache', args.expert_cache])
     rng = random.Random(args.seed)
-    modes = [('mapped', '0'), ('pread', '1')]
+    modes = transfer_modes(args.compare_prefetch_stage)
     orders = []
     for _ in range(args.pairs):
         order = list(modes)
@@ -293,7 +305,7 @@ def main():
     for pair in range(args.pairs):
         order = orders[pair]
         pair_rows = []
-        for label, io_prefetch in order:
+        for label, io_prefetch, io_stage in order:
             existing = next((row for row in result['arms']
                              if row.get('pair') == pair and row.get('name') == label), None)
             if existing is not None:
@@ -307,9 +319,9 @@ def main():
                         'STRATA_MTP_BATCH': '1', 'STRATA_PREFILL_CPU_SHARE': '0',
                         'STRATA_INTEGRATION_TRACE': '1', 'STRATA_IO_PREFETCH': io_prefetch,
                         'STRATA_IO_PF_THREADS': str(args.io_threads),
-                        'STRATA_IO_PF_STAGE': '0', 'STRATA_IO_STATS': '1'})
+                        'STRATA_IO_PF_STAGE': io_stage, 'STRATA_IO_STATS': '1'})
             arm = {'pair': pair, 'name': label, 'io_prefetch': io_prefetch,
-                   'staging': 'disabled', 'args': args_for,
+                   'staging': io_stage == '1', 'args': args_for,
                    'engine_sha256': binary_hash}
             engine = StrataEngine(str(args.engine.resolve()), args_for, cwd=cfg.get('cwd'),
                                   log=str(log), env=env)
@@ -347,25 +359,27 @@ def main():
             result_path.write_text(json.dumps(result, indent=2) + '\n')
 
         by_name = {row['name']: row for row in pair_rows}
-        mapped, pread = by_name['mapped'], by_name['pread']
+        left_label, right_label = modes[0][0], modes[1][0]
+        left, right = by_name[left_label], by_name[right_label]
         failures = []
-        if mapped['ids'] != pread['ids']:
+        if left['ids'] != right['ids']:
             failures.append('generated token IDs differ')
-        cache_slots_equal = (mapped.get('actual_expert_cache_slots') is not None and
-                             mapped['actual_expert_cache_slots'] == pread.get('actual_expert_cache_slots'))
+        cache_slots_equal = (left.get('actual_expert_cache_slots') is not None and
+                             left['actual_expert_cache_slots'] == right.get('actual_expert_cache_slots'))
         if not cache_slots_equal:
             failures.append('actual expert-cache slot counts differ or are unavailable')
-        state_differences = [key for key in STATE_KEYS if mapped['state'][key] != pread['state'][key]]
+        state_differences = [key for key in STATE_KEYS if left['state'][key] != right['state'][key]]
         if state_differences:
             failures.append('persistent main-model state differs')
         result['pair_comparisons'].append({
-            'pair': pair, 'order': [label for label, _ in order],
-            'token_ids_equal': mapped['ids'] == pread['ids'],
+            'pair': pair, 'order': [mode[0] for mode in order],
+            'arms': [left_label, right_label],
+            'token_ids_equal': left['ids'] == right['ids'],
             'actual_expert_cache_slots_equal': cache_slots_equal,
             'persistent_state_equal': not state_differences,
             'differing_state_fields': state_differences, 'failures': failures,
-            'mapped_ms': mapped['usage'].get('prompt_ms', 0) + mapped['usage'].get('decode_ms', 0),
-            'pread_ms': pread['usage'].get('prompt_ms', 0) + pread['usage'].get('decode_ms', 0)})
+            left_label + '_ms': left['usage'].get('prompt_ms', 0) + left['usage'].get('decode_ms', 0),
+            right_label + '_ms': right['usage'].get('prompt_ms', 0) + right['usage'].get('decode_ms', 0)})
         result_path.write_text(json.dumps(result, indent=2) + '\n')
 
     if sampler:
@@ -374,7 +388,7 @@ def main():
         result['tegrastats_energy']['raw_samples'] = 'tegrastats-energy.jsonl'
     failures = sorted({failure for pair in result['pair_comparisons'] for failure in pair['failures']})
     result['summary'] = {}
-    for label in ('mapped', 'pread'):
+    for label in (modes[0][0], modes[1][0]):
         arms = [row for row in result['arms'] if row['name'] == label]
         result['summary'][label] = {}
         for key in ('prompt_ms', 'decode_ms'):
