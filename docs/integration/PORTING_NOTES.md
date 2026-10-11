@@ -207,6 +207,23 @@ licensed outputs, output clipping and retained persistent state. Zero accepted
 drafts still consume an anchor; zero published/retained tokens is a different
 transaction. Map each engine's boundary before importing replay scenarios.
 
+The Oct 11 Strata accepted-prefix test exposed a QSA indexer transaction detail
+that also applies when integrating another speculative engine. Commit replay
+correctly rebuilt rows for the accepted prefix, but a rejected suffix could
+have completed the next four-token pooling block and overwritten the spare
+pooled row. Output IDs and completed pooled rows still matched, while the full
+pooled-state fingerprint differed at output clipping and could persist into a
+later request. Restore the constant dead key into row
+`(last_committed_position + 1) / idx_block` after replay, using the commit
+buffer's accepted positions inside the existing ordered commit graph. For
+Strata+Splash, map the spare/lookahead row and its invariant explicitly, then
+test windows that end both before and on a block boundary. Compare committed
+rows, spare rows, recurrence/KV state, output publication and a subsequent
+request; final text alone will miss this class of transaction error. The
+confirmed Strata fix matched every shared boundary in the 8-token MTP-off/2/3/4
+screen and 32-token MTP-off/window-4 chain. See the
+[raw report](../../bench/results/2026-10-11-phase5-spare-restore-long-chain/README.md).
+
 
 ## A codec oracle can be exact without mirroring conversion code
 

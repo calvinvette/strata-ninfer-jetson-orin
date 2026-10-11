@@ -49,4 +49,11 @@ void native_qsa_indexer_append_steps(const float* raw, const int32_t* relative_p
                                      const QsaIndexerBuffers& buffers, const QsaShapes& shapes,
                                      int64_t max_cells, const RopeScaling& scaling, void* stream);
 
+/// Restore the spare pooled row after a verifier commits an accepted prefix.
+/// A rejected suffix may have completed a later indexer block and overwritten
+/// this row. The committed sequence's spare row is always the constant `dead`
+/// key at index `(last_committed_position + 1) / idx_block`.
+void native_qsa_indexer_restore_spare(const int32_t* commit, float* dead, float* pooled,
+                                      const QsaShapes& shapes, int64_t max_cells, int max_tokens, void* stream);
+
 } // namespace strata::kernels

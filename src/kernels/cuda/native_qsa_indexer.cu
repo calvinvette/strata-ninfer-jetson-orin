@@ -220,6 +220,21 @@ __global__ void append_tail(const float* __restrict__ raw, int64_t n, int64_t p0
     if (cell < p0) return;
     tail[s * D + d] = __half2float(__float2half_rn(raw[(cell - p0) * D + d]));
 }
+// Verifier windows append speculative rows into the live indexer buffers. The
+// commit graph replays only the accepted prefix, but a rejected block may have
+// overwritten the spare pooled row beyond it. Reinstall the constant dead key
+// at the accepted sequence's current spare index.
+__global__ void restore_spare(const int32_t* __restrict__ commit, const float* __restrict__ dead,
+                              float* __restrict__ pooled, int max_cells, int max_tokens) {
+    const int d = threadIdx.x;
+    const int keep = commit[0];
+    if (d >= D || keep < 1 || keep > max_tokens) return;
+    const int last_pos = commit[keep + 1]; // [0]=count, [1]=count-1, [2..]=committed positions
+    const int64_t row = (int64_t(last_pos) + 1) / R;
+    if (last_pos < 0 || row > max_cells / R) return;
+    pooled[row * D + d] = dead[d];
+}
+
 struct Span { const void* p; std::size_t n; };
 void validate(Span s) {
     const auto p = reinterpret_cast<std::uintptr_t>(s.p);
@@ -302,6 +317,20 @@ void native_qsa_indexer_append_batch(const float* raw, int64_t n, int64_t p0, in
         append_blocks<false><<<(unsigned) (hi - first + 1), THREADS, 0, st>>>(raw, n, p0, pos_base, gamma, epsilon,
             b.tail, b.dead, b.pooled, b.block_pos, first, hi, theta_scale, fsf, cl, ch, ef, ms, mtab, rt);
     append_tail<<<R - 1, D, 0, st>>>(raw, n, p0, b.tail);
+    const auto error = cudaGetLastError();
+    if (error != cudaSuccess) throw std::runtime_error(cudaGetErrorString(error));
+}
+
+void native_qsa_indexer_restore_spare(const int32_t* commit, float* dead, float* pooled,
+                                      const QsaShapes& s, int64_t max_cells, int max_tokens, void* stream) {
+    if (!stream || !commit || !dead || !pooled || s.idx_dim != D || s.idx_block != R ||
+        max_cells < 1 || max_cells > INT32_MAX || max_tokens < 1)
+        throw std::invalid_argument("native QSA indexer spare restore requires fixed geometry, capacity and stream");
+    validate({commit, size_t(2 + max_tokens) * sizeof(int32_t)});
+    validate({dead, size_t(D) * sizeof(float)});
+    validate({pooled, size_t(max_cells / R + 1) * D * sizeof(float)});
+    restore_spare<<<1, THREADS, 0, static_cast<cudaStream_t>(stream)>>>(commit, dead, pooled,
+                                                                        (int) max_cells, max_tokens);
     const auto error = cudaGetLastError();
     if (error != cudaSuccess) throw std::runtime_error(cudaGetErrorString(error));
 }

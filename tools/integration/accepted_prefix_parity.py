@@ -8,10 +8,12 @@ import sys
 import threading
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path[:0] = [str(ROOT), str(ROOT / 'tools')]
+sys.path[:0] = [str(ROOT), str(ROOT / 'tools'), str(ROOT / 'tools/integration')]
 from conversation_cache_parity import load_tokenizer, require
+from prepare_controls import exact_prompt
 from serve.frontend import ChatTemplate
 from serve.server import StrataEngine, child_env
+from pool_worker_screen import read_accepted_prefix_trace
 
 STATE_KEYS = ('L', 'gdn', 'ple', 'tail', 'dead', 'pooled', 'pooled_full', 'kv', 'ple_prev')
 
@@ -19,7 +21,7 @@ STATE_KEYS = ('L', 'gdn', 'ple', 'tail', 'dead', 'pooled', 'pooled_full', 'kv', 
 def parse_hashes(path):
     found = []
     for line in path.read_text(encoding='utf-8').splitlines():
-        if 'STATE_HASH L=' in line:
+        if line.startswith('strata serve: STATE_HASH L='):
             fields = dict(re.findall(r'(\w+)=([0-9a-f,-]+)', line))
             require(set(STATE_KEYS) <= fields.keys(), 'incomplete persistent state fingerprint')
             found.append({key: fields[key] for key in STATE_KEYS})
@@ -28,13 +30,27 @@ def parse_hashes(path):
 
 def args_for(cfg, spec):
     args = list(cfg['args'])
-    for key, value in (('--prompt-cache', '6'), ('--adapt-swaps', '0'), ('--spec', str(max(2, spec))),
-                       ('--mtp-max-t', str(spec)), ('--suffix-draft', '0'), ('--spec-min-p', '0')):
+    for key, value in (('--prompt-cache', '6'), ('--adapt-swaps', '0'),
+                       ('--suffix-draft', '0'), ('--spec-min-p', '0')):
         if key in args:
-            index = args.index(key)
-            args[index + 1] = value
+            args[args.index(key) + 1] = value
         else:
             args += [key, value]
+    spec_value = max(2, spec)
+    if '--spec' in args:
+        args[args.index('--spec') + 1] = str(spec_value)
+    else:
+        args += ['--spec', str(spec_value)]
+    if spec <= 0:
+        if '--mtp' in args:
+            del args[args.index('--mtp'):args.index('--mtp') + 2]
+        if '--mtp-max-t' in args:
+            del args[args.index('--mtp-max-t'):args.index('--mtp-max-t') + 2]
+    else:
+        if '--mtp-max-t' in args:
+            args[args.index('--mtp-max-t') + 1] = str(spec)
+        else:
+            args += ['--mtp-max-t', str(spec)]
     return args
 
 
@@ -44,12 +60,17 @@ def main():
     ap.add_argument('--engine', type=Path, required=True)
     ap.add_argument('--output', type=Path, required=True, help='new output directory; existing paths refused')
     ap.add_argument('--tokens', type=int, default=32)
+    ap.add_argument('--prompt-tokens', type=int, default=512)
+    ap.add_argument('--windows', type=int, nargs='+', default=[0, 4],
+                    help='MTP windows to compare; include 0 for the no-MTP reference')
     ap.add_argument('--run', action='store_true')
     a = ap.parse_args()
     if a.tokens < 8:
         ap.error('--tokens must be at least 8 to exercise multiple verifier windows')
+    if len(a.windows) < 2 or len(set(a.windows)) != len(a.windows) or a.windows[0] != 0 or any(x < 0 for x in a.windows):
+        ap.error('--windows must be unique nonnegative values, start with 0 (MTP off), and contain at least two arms')
     if not a.run:
-        print('Dry run: sequential private engines, spec 1 versus spec 4, token and persistent-state parity.')
+        print('Dry run: sequential private engines, MTP off versus MTP window 4, token and accepted-prefix state parity.')
         return
 
     cfg = json.loads(a.config.read_text(encoding='utf-8'))
@@ -57,19 +78,22 @@ def main():
     tok = load_tokenizer(tok_path)
     template_path = tok_path / 'chat_template.jinja'
     template = ChatTemplate(template_path if template_path.exists() else ROOT / 'serve/chat_template.jinja')
-    prompt_text = ('Remember these facts for the next turn.\n' +
-                   '\n'.join(f'Record {i}: blue square, green triangle, red circle.' for i in range(96)) +
-                   '\nReply with a short summary of the colors and shapes.')
-    prompt = tok.encode(template.render([{'role': 'user', 'content': prompt_text}], enable_thinking=False),
-                        parse_special=True)
+    def encode(text):
+        rendered = template.render([{'role': 'user', 'content': text}], enable_thinking=False)
+        return tok.encode(rendered, parse_special=True)
+    prompt_text = exact_prompt(a.prompt_tokens, encode)
+    prompt = encode(prompt_text)
     a.output.mkdir(mode=0o700, parents=False, exist_ok=False)
     env = child_env(cfg)
     env['STRATA_STATE_HASH'] = '1'
+    env['STRATA_ACCEPTED_PREFIX_TRACE'] = '1'
+    env['STRATA_INTEGRATION_TRACE'] = '1'
     env['STRATA_MTP_BATCH'] = '1'
     env['STRATA_PREFILL_CPU_SHARE'] = '0'
     results = {'prompt_sha256': hashlib.sha256(json.dumps(prompt).encode()).hexdigest(),
                'max_new': a.tokens, 'state_fields': STATE_KEYS, 'arms': []}
-    for label, spec in (('reference-spec1', 1), ('candidate-spec4', 4)):
+    for spec in a.windows:
+        label = 'mtp-off' if spec == 0 else f'mtp-window{spec}'
         log = a.output / f'{label}.log'
         command = args_for(cfg, spec)
         engine = StrataEngine(str(a.engine.resolve()), command, cwd=cfg.get('cwd'), log=str(log), env=env)
@@ -85,40 +109,61 @@ def main():
         hashes = parse_hashes(log)
         require(len(hashes) == 1, f'{label}: expected one completed-request fingerprint')
         arm['records'][0]['state'] = hashes[0]
+        arm['records'][0]['accepted_prefix_trace'] = read_accepted_prefix_trace(log)
+        require(bool(arm['records'][0]['accepted_prefix_trace']), f'{label}: accepted-prefix trace missing')
+        trace_ids = [token for entry in arm['records'][0]['accepted_prefix_trace'] for token in entry['token_ids']]
+        require(trace_ids == ids, f'{label}: accepted-prefix tokens do not match published output')
         results['arms'].append(arm)
         (a.output / 'results.json').write_text(json.dumps(results, indent=2) + '\n')
 
-    reference, candidate = (arm['records'][0] for arm in results['arms'])
-    failures = []
-    if reference['finish'] not in ('length', 'stop') or candidate['finish'] not in ('length', 'stop'):
-        failures.append('request did not finish normally')
-    if reference['ids'] != candidate['ids']:
-        failures.append('generated token IDs differ')
-    if reference['state'] != candidate['state']:
-        failures.append('persistent main-model state differs')
-    if candidate.get('drafts_offered', 0) <= 0 or candidate.get('drafts_accepted', 0) <= 0:
-        failures.append('spec-4 run did not offer and accept MTP drafts')
-    if candidate.get('drafts_accepted', 0) > candidate.get('drafts_offered', 0):
-        failures.append('accepted MTP count exceeds offered count')
-    results['passed'] = True
-    results['accepted_prefix_observed'] = {
-        'drafts_offered': candidate['drafts_offered'], 'drafts_accepted': candidate['drafts_accepted'],
-        'generated_tokens': candidate['generated'], 'persistent_state_equal': True,
-    }
-    results['comparison'] = {
-        'token_ids_equal': reference['ids'] == candidate['ids'],
-        'persistent_state_equal': reference['state'] == candidate['state'],
-        'differing_state_fields': [key for key in STATE_KEYS if reference['state'].get(key) != candidate['state'].get(key)],
-        'reference_length': reference['state']['L'], 'candidate_length': candidate['state']['L'],
-        'failures': failures,
-    }
-    results['accepted_prefix_observed']['persistent_state_equal'] = results['comparison']['persistent_state_equal']
-    results['passed'] = not failures
+    reference = results['arms'][0]['records'][0]
+    comparisons = []
+    for arm in results['arms'][1:]:
+        candidate = arm['records'][0]
+        failures = []
+        if reference['finish'] not in ('length', 'stop') or candidate['finish'] not in ('length', 'stop'):
+            failures.append('request did not finish normally')
+        if reference['ids'] != candidate['ids']:
+            failures.append('generated token IDs differ')
+        differing_final = [key for key in STATE_KEYS if reference['state'].get(key) != candidate['state'].get(key)]
+        if differing_final:
+            failures.append('final persistent main-model state differs: ' + ', '.join(differing_final))
+        if candidate.get('drafts_offered', 0) <= 0 or candidate.get('drafts_accepted', 0) <= 0:
+            failures.append('MTP run did not offer and accept drafts')
+        if candidate.get('drafts_accepted', 0) > candidate.get('drafts_offered', 0):
+            failures.append('accepted MTP count exceeds offered count')
+        reference_by_prefix = {}
+        prefix_count = 0
+        for entry in reference['accepted_prefix_trace']:
+            prefix_count += entry['committed']
+            reference_by_prefix[prefix_count] = entry['state']
+        prefix_checks = []
+        prefix_count = 0
+        for entry in candidate['accepted_prefix_trace']:
+            prefix_count += entry['committed']
+            prior = reference_by_prefix.get(prefix_count)
+            if prior is not None:
+                differing = [key for key in STATE_KEYS if prior.get(key) != entry['state'].get(key)]
+                prefix_checks.append({'generated_prefix_tokens': prefix_count, 'equal': not differing,
+                                     'differing_state_fields': differing})
+                if differing:
+                    failures.append(f'persistent state differs at committed prefix {prefix_count}: ' + ', '.join(differing))
+        if not prefix_checks:
+            failures.append('no shared accepted-prefix boundary between reference and MTP run')
+        comparisons.append({
+            'candidate': arm['name'], 'token_ids_equal': reference['ids'] == candidate['ids'],
+            'final_state_equal': not differing_final, 'final_state_differing_fields': differing_final,
+            'drafts_offered': candidate.get('drafts_offered', 0),
+            'drafts_accepted': candidate.get('drafts_accepted', 0),
+            'matched_commit_boundaries': prefix_checks, 'failures': failures,
+        })
+    results['comparisons'] = comparisons
+    results['passed'] = not any(row['failures'] for row in comparisons)
     (a.output / 'results.json').write_text(json.dumps(results, indent=2) + '\n')
-    if failures:
-        raise AssertionError('; '.join(failures))
-    print('PASS: identical token IDs and persistent main-model state; MTP draft counters recorded')
-    print(json.dumps(results['accepted_prefix_observed'], sort_keys=True))
+    print(json.dumps({'passed': results['passed'], 'comparisons': comparisons}, sort_keys=True))
+    if not results['passed']:
+        raise AssertionError('; '.join(f"{row['candidate']}: {'; '.join(row['failures'])}" for row in comparisons if row['failures']))
+    print('PASS: identical token IDs and persistent main-model state at compared accepted prefixes; MTP draft counters recorded')
 
 
 if __name__ == '__main__':

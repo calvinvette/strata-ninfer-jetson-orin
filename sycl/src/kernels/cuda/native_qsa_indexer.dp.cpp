@@ -469,6 +469,28 @@ void native_qsa_indexer_append(const float* raw, const int32_t* relative_pos_dev
                                const QsaShapes& s, int64_t max_cells, const RopeScaling& scaling, void* stream) {
     native_qsa_indexer_append_steps(raw, relative_pos_device, 0, 1, pos_base, gamma, epsilon, b, s, max_cells, scaling, stream);
 }
+
+void native_qsa_indexer_restore_spare(const int32_t* commit, float* dead, float* pooled,
+                                      const QsaShapes& s, int64_t max_cells, int max_tokens, void* stream) {
+    if (!stream || !commit || !dead || !pooled || s.idx_dim != D || s.idx_block != R ||
+        max_cells < 1 || max_cells > INT32_MAX || max_tokens < 1)
+        throw std::invalid_argument("native QSA indexer spare restore requires fixed geometry, capacity and stream");
+    validate({commit, size_t(2 + max_tokens) * sizeof(int32_t)});
+    validate({dead, size_t(D) * sizeof(float)});
+    validate({pooled, size_t(max_cells / R + 1) * D * sizeof(float)});
+    const dpct::queue_ptr queue = strata::q_of(stream);
+    queue->parallel_for<class restore_spare_kernel>(
+        sycl::nd_range<1>(sycl::range<1>(D), sycl::range<1>(D)), [=](sycl::nd_item<1> item) {
+            const int d = (int) item.get_global_linear_id();
+            const int keep = commit[0];
+            if (keep < 1 || keep > max_tokens) return;
+            const int last_pos = commit[keep + 1];
+            const int64_t row = (int64_t(last_pos) + 1) / R;
+            if (last_pos < 0 || row > max_cells / R) return;
+            pooled[row * D + d] = dead[d];
+        });
+}
+
 void native_qsa_indexer_append_batch(const float* raw, int64_t n, int64_t p0, int32_t pos_base, const float* gamma,
                                      float epsilon, const QsaIndexerBuffers& b, const QsaShapes& s, int64_t max_cells,
                                      const RopeScaling& scaling, void* stream) {

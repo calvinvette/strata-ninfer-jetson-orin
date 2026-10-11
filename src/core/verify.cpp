@@ -1858,6 +1858,7 @@ bool Verifier::capture_commit(std::string& err) {
                                                   (const float*) wikn->data, EPS, ib, s, st.max_cells,
                                                   rope_scaling(), cs_);
                 }
+                native_qsa_indexer_restore_spare(commit_, st.idx_dead, st.idx_pooled, s, st.max_cells, (int) MT, cs_);
                 ++qsa_index;
             }
         }

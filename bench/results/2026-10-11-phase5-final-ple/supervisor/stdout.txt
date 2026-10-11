@@ -1,0 +1,66 @@
+  Q2_0 PLE BF16 value source-pack check: byte-identical
+  PLE history 12 captured steps, row-fastest state and guards: pass
+A. the n-gram hash, against ref/ngram.py with the artifact's own constants
+  head_offsets == the running sum of vocab_sizes yes (sum 320001446 <= 320001536 rows; 90 spare)
+  window direction                               matches (0 of 64 differ)
+  EOS one back cuts both                         matches (0 of 48 differ)
+  NULL reads as EOS                              matches (0 of 32 differ)
+  token id 0 is NOT missing                      matches (0 of 32 differ)
+  own EOS does not cut itself                    matches (0 of 48 differ)
+  real vocabulary ids                            matches (0 of 80 differ)
+  XOR vs SUM                                     yes (64 of 64 rows differ from the oracle)
+  % vs & (vocab sizes are not powers of two)     yes (64 of 64 rows differ from the oracle)
+  window read newest-first, not oldest-first     yes (64 of 64 rows differ from the oracle)
+  token id 0 treated as the NULL sentinel        yes (8 of 64 rows differ from the oracle)
+  cut propagates FORWARD vs only at the EOS position yes (8 of 48 rows differ)
+
+B. the IQ4_NL table, against numpy reading the original GGUF
+  rows                                           320001536 (expected 320001536)
+  data_start + rows*90 == file size              yes (28800138432 vs 28800138432; data_start 192)
+  row matches numpy's decode of the same bytes   yes (row 0: head 0.000e+00 tail 0.000e+00 sum d 2.351e-10, non-finite 0)
+    (same, another row)                          yes (row 12345: head 0.000e+00 tail 0.000e+00 sum d 1.843e-11, non-finite 0)
+    (same, another row)                          yes (row 320001535: head 0.000e+00 tail 0.000e+00 sum d 0.000e+00, non-finite 0)
+  split-half vs INTERLEAVED nibbles observable   yes (125.38% apart; generator says 1.2538)
+  data_start 192 vs file offset 0 observable     yes (1080543545.73% apart)
+  gather is head-slowest                         yes (head h occupies [h*160,(h+1)*160))
+  head-fastest would differ                      yes (2553 of 2560 elements differ)
+
+C. the PLE block, against a host reference in double precision
+  weights: ple_key, ple_value, the three norms and the conv kernel, from /home/calvin/models/strata-orin-validation/q2-ple-pack/dense.bin
+  Q8_0 / BF16 activation contract observable     yes (key 4.941e-04, value 1.647e-03)
+  PLE old caller output offsets rejected before launch: pass (7/7, scratch unchanged)
+  token 0 key        (grouped_norm of ple_key @ emb)     rel 1.058e-07   (mean |ref| 0.4887, non-finite 0)
+  token 0 value      (ple_value @ emb, BF16)             rel 2.132e-08   (mean |ref| 0.0046, non-finite 0)
+  token 0 gate       (signed sqrt, sigmoid)              rel 1.029e-07   (mean |ref| 0.3470, non-finite 0)
+  token 0 gated      (value broadcast * gate)            rel 1.088e-07   (mean |ref| 0.0016, non-finite 0)
+  token 0 normalized (grouped_norm(gated, ple_norm_conv)) rel 4.392e-08   (mean |ref| 0.5863, non-finite 0)
+  token 0 conv_out   (dilated conv, then SiLU)           rel 6.159e-08   (mean |ref| 0.0074, non-finite 0)
+  token 0 result     (hidden + gated + conv)             rel 2.669e-08   (mean |ref| 0.4997, non-finite 0)
+  native PLE value: pass (ref rel 7.235e-08, BF16 separation 3.891e-03)
+  native PLE captured selection: byte-identical
+  restored PLE default: byte-identical
+  Q2_0 PLE key source-block round trip: byte-identical
+  native PLE key prelaunch guards: pass (9/9, workspace unchanged)
+  native PLE key projection->existing norm input 0: pass (rel 0.000e+00)
+  native PLE key projection->existing norm input 1: pass (rel 0.000e+00)
+  native PLE key graph/repeat/buffer guards checked; restored default: byte-identical
+  PLE separate exports and in-place hidden result: byte-identical
+  token 1 key        (grouped_norm of ple_key @ emb)     rel 1.148e-07   (mean |ref| 0.5531, non-finite 0)
+  token 1 value      (ple_value @ emb, BF16)             rel 2.169e-08   (mean |ref| 0.0048, non-finite 0)
+  token 1 gate       (signed sqrt, sigmoid)              rel 3.599e-08   (mean |ref| 0.4717, non-finite 0)
+  token 1 gated      (value broadcast * gate)            rel 4.978e-08   (mean |ref| 0.0023, non-finite 0)
+  token 1 normalized (grouped_norm(gated, ple_norm_conv)) rel 5.574e-08   (mean |ref| 0.6171, non-finite 0)
+  token 1 conv_out   (dilated conv, then SiLU)           rel 6.489e-08   (mean |ref| 0.0087, non-finite 0)
+  token 1 result     (hidden + gated + conv)             rel 2.718e-08   (mean |ref| 0.4983, non-finite 0)
+  token 2 key        (grouped_norm of ple_key @ emb)     rel 1.117e-07   (mean |ref| 0.4831, non-finite 0)
+  token 2 value      (ple_value @ emb, BF16)             rel 2.152e-08   (mean |ref| 0.0048, non-finite 0)
+  token 2 gate       (signed sqrt, sigmoid)              rel 6.190e-08   (mean |ref| 0.3705, non-finite 0)
+  token 2 gated      (value broadcast * gate)            rel 6.369e-08   (mean |ref| 0.0018, non-finite 0)
+  token 2 normalized (grouped_norm(gated, ple_norm_conv)) rel 5.374e-08   (mean |ref| 0.5752, non-finite 0)
+  token 2 conv_out   (dilated conv, then SiLU)           rel 6.116e-08   (mean |ref| 0.0084, non-finite 0)
+  token 2 result     (hidden + gated + conv)             rel 2.706e-08   (mean |ref| 0.5002, non-finite 0)
+  normalized vs gated as the conv input is observable  yes (36945.67% apart)
+  reversed conv tap order is observable                yes (143.55% apart)
+
+ple_parity: 0 failures (worst stage rel 1.148e-07)
+ple_parity OK
