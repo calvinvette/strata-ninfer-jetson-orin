@@ -629,6 +629,16 @@ integration Python unittest discovery passed 92/92. These checks reconfirm
 selected contracts on the rebuilt candidate; Phase 3 remains open for broader
 graph-memory attribution and admission/transfer coverage.
 
+The [spec4 graph-owner probe](../../bench/results/2026-10-11-phase3-q2-graph-spec4/README.md)
+adds a six-token verifier window at the same Q2_0 4K/256-slot startup. Three
+successful graph instantiations (two verifier, one commit) matched owner
+events; stable NVMap growth was 48,709,632 bytes over that capture interval,
+with 21.43 GiB minimum physical availability. The earlier spec2 run observed
+four calls and a 72,425,472-byte interval. Those different call sequences do
+not isolate graph executable size or support a per-graph comparison. The
+legacy session-token graph route and non-NVMap graph allocations remain
+unpriced; no runtime default changed.
+
 The paired [20 GiB cgroup-cap control](../../bench/results/2026-10-11-phase3-q2-decode-cancel-20G/README.md)
 also passed cancellation and recovery with balanced owners, but peaked at only
 3.70 GiB scope usage (16.30 GiB effective availability), so it is not treated
