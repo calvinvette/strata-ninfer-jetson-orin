@@ -14,7 +14,7 @@ The first two launches were rejected by Strata's request context validator
 before prefill. Context reservations of 32,769 and 32,770 tokens were both too
 small for the internal boundary accounting; these are test-setup validation
 failures, not capacity or engine failures. Their logs and supervisor samples
-are retained under `attempt-1/` and `attempt-2/`. The 32,800-token attempt
+are retained under `attempt-1/` and `attempt-2/` (including `engine.txt`). The 32,800-token attempt
 passed validation and ingested all 32,768 tokens, as confirmed by both the
 prompt trace and `prompt_read`. It emitted token ID 32. No prompt tokens were
 reused. The configured reserve was sufficient for this one request.
