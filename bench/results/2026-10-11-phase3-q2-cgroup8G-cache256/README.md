@@ -18,7 +18,4 @@ The 8 GiB result therefore does not become viable simply by requesting a
 smaller cache. This single repeat does not identify a general minimum cap or
 rule out other engine configurations.
 
-The preceding 10 GiB cell with a 3,000-slot request admitted 296 slots and
-completed. A lower cap with a smaller cache request did not admit any slots;
-the reason for this non-monotonic request-size result is not established here.
-No serving behavior or default changed.
+The matched [10 GiB/256-slot follow-up](../2026-10-11-phase3-q2-cgroup10G-cache256/README.md) passed and admitted all 256 slots. Thus this configuration succeeds at 10 GiB and fails at 8 GiB; the 10 GiB/3,000-slot cell separately contracted to 296 slots. These are observed points, not a general capacity threshold. No serving behavior or default changed.
