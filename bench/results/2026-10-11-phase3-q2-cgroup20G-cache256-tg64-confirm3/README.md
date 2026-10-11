@@ -8,14 +8,17 @@ This follow-up repeats the same Q2_0 cell as the [initial cap sweep](../2026-10-
 | Repeat 0 | Supervisor pressure abort during prefill | 0 | 5.48 GiB | 21.91 GiB | 14.52 GiB |
 | Repeat 1 | Pass | 64 | 9.35 GiB | 21.67 GiB | 10.65 GiB |
 | Repeat 2 | Pass | 64 | 10.66 GiB | 21.65 GiB | 9.34 GiB |
+| Repeat 3 | Supervisor pressure abort during prefill | 0 | 5.55 GiB | 20.90 GiB | 14.45 GiB |
 
-The three completed runs (original plus the two passing repeats) emitted the
-same 64 token IDs. Repeat 0 did not reach request completion: the supervisor
-stopped it when cgroup remaining capacity fell below the six-GiB guard, while
-host availability stayed above 21.9 GiB. This is a clean pressure abort, not
-an engine OOM or successful request. The mixed result shows that a 20 GiB cap
-alone does not guarantee admission for this workload; report the observed
-effective cgroup headroom and outcome with every cell.
+The three completed runs (original plus two passing repeats) emitted the same
+64 token IDs. Repeats 0 and 3 were safely aborted during prefill when effective
+scope availability crossed the six-GiB guard; host availability stayed above
+21.9 GiB and 20.90 GiB, respectively. Repeat 3's cgroup
+`memory.events` high/max/OOM/OOM-kill counters stayed zero. Across the four
+repeats there are two completed passes and two supervisor aborts. This confirms
+a 20 GiB cap is history-sensitive and does not define a safe admission
+threshold. A supervisor pressure abort is not an engine OOM or a successful
+request; report effective cgroup headroom and outcome with each cell.
 
 The new cgroup `memory.stat` telemetry in Repeat 2 shows why `memory.current`
 is not a process-only allocation measure: at its peak sample, 8,291,590,144
@@ -24,8 +27,9 @@ bytes were file cache (`file`), including 6,655,135,744 inactive and
 reported zero `memory.events` high/max/OOM/OOM-kill events. These counters help
 explain cgroup charge composition but do not convert it into GPU-owner bytes.
 
-Raw supervisor logs and telemetry for each repetition are retained in
-`rep-00/`, `rep-01/` and `rep-02/`. Repeat 0 was run before the supervisor
-memory-stat enhancement, so it has current/max and host availability only;
-Repeat 2 includes the added `memory.stat` and `memory.events` fields. The
+Raw supervisor logs and telemetry are retained in `rep-00/` through `rep-03/`.
+Repeats 0 and 3 were run before the supervisor memory-stat enhancement; Repeat 0
+has current/max and host availability only, while Repeat 3 records all cgroup
+fields. Repeat 3 ran in a transient systemd scope with `MemoryMax=20G`. Repeat 2
+also includes the added `memory.stat` and `memory.events` fields. The
 supervisor parser's nine-test suite passes.
