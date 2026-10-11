@@ -6,9 +6,24 @@
   "workspace_reserve_mib": 3072,
   "physical_memory_authority": "MemAvailable; host memory is never added to device allocation/cgroup capacity",
   "supervisor_floor_bytes": 6442450944,
-  "all_passed": true,
+  "all_passed": false,
   "actual_cache_residency_varied_under_tight_scopes": true,
   "cells": [
+    {
+      "memory_max_gib": 8,
+      "requested_expert_cache_slots": 3000,
+      "actual_expert_cache_slots": 0,
+      "reported_cache_shared_ram_gib": 0.0,
+      "status": "fail",
+      "returncode": 2,
+      "failure": "prefill completed, but speculative decode rejected because zero device residency slots were admitted",
+      "peak_scope_memory_current_bytes": 1352376320,
+      "min_effective_available_bytes": 7237558272,
+      "min_host_memavailable_bytes": 23954104320,
+      "elapsed_seconds": 12.737205369980074,
+      "output_token_id": null,
+      "run_dir": "../2026-10-11-phase3-q2-cgroup8G/supervisor"
+    },
     {
       "memory_max_gib": 10,
       "requested_expert_cache_slots": 3000,
@@ -61,5 +76,13 @@
       "output_token_id": 32,
       "run_dir": "../2026-10-11-phase3-q2-cgroup24G/supervisor"
     }
-  ]
+  ],
+  "successful_request_caps_gib": [
+    10,
+    12,
+    20,
+    24
+  ],
+  "unsupported_cap_cell_gib": 8,
+  "scope": "Q2_0 native admission: 10/12/20/24 GiB requests passed with adaptive cache residency; 8 GiB cell failed cleanly after prefill with zero cache slots"
 }
