@@ -46,6 +46,52 @@ int main() {
     if (!ok) return 1;
     std::puts("managed sequential CPU/GPU ownership: PASS");
 
+    // CUDA's stream-ordered pool is an optional alternative for temporary
+    // device buffers. Keep the allocate/use/free sequence on one stream and
+    // trim the pool before checking that its backing can be returned.
+    int pools_supported = 0;
+    if (!ck(cudaDeviceGetAttribute(&pools_supported, cudaDevAttrMemoryPoolsSupported, 0),
+            "memory-pool capability")) return 1;
+    if (!pools_supported) {
+        std::puts("CUDA stream-ordered memory pools unsupported: fallback required");
+    } else {
+        cudaStream_t pool_stream = nullptr;
+        cudaMemPool_t pool = nullptr;
+        int* pool_buffer = nullptr;
+        int pool_result = -1;
+        uint64_t reserved_before = 0, reserved_after = 0;
+        bool pool_ok = ck(cudaDeviceGetDefaultMemPool(&pool, 0), "default memory pool") &&
+                       ck(cudaMemPoolGetAttribute(pool, cudaMemPoolAttrReservedMemCurrent, &reserved_before),
+                          "pool bytes before") &&
+                       ck(cudaStreamCreate(&pool_stream), "pool stream");
+        if (pool_ok) pool_ok = ck(cudaMallocAsync(&pool_buffer, 4096, pool_stream), "async allocation");
+        if (pool_ok) pool_ok = ck(cudaMemsetAsync(pool_buffer, 0, 4096, pool_stream), "async initialize");
+        if (pool_ok) {
+            increment<<<1, 1, 0, pool_stream>>>(pool_buffer);
+            pool_ok = ck(cudaGetLastError(), "async launch");
+        }
+        if (pool_ok) pool_ok = ck(cudaMemcpyAsync(&pool_result, pool_buffer, sizeof(pool_result),
+                                                  cudaMemcpyDeviceToHost, pool_stream), "async result copy");
+        if (pool_buffer) {
+            const cudaError_t free_status = cudaFreeAsync(pool_buffer, pool_stream);
+            pool_ok = ck(free_status, "async free") && pool_ok;
+            pool_buffer = nullptr;
+        }
+        if (pool_stream) {
+            pool_ok = ck(cudaStreamSynchronize(pool_stream), "pool stream sync") && pool_ok;
+            pool_ok = ck(cudaStreamDestroy(pool_stream), "pool stream destroy") && pool_ok;
+        }
+        if (pool_ok) pool_ok = pool_result == 1;
+        if (pool_ok) pool_ok = ck(cudaMemPoolTrimTo(pool, 0), "pool trim");
+        if (pool_ok) pool_ok = ck(cudaMemPoolGetAttribute(pool, cudaMemPoolAttrReservedMemCurrent, &reserved_after),
+                                  "pool bytes after") && reserved_after <= reserved_before;
+        if (!pool_ok) { std::fprintf(stderr, "CUDA stream-ordered memory pool test failed\n"); return 1; }
+        std::printf("CUDA stream-ordered allocation/use/free and pool trim: PASS "
+                    "(reserved before %llu, after %llu bytes)\n",
+                    static_cast<unsigned long long>(reserved_before),
+                    static_cast<unsigned long long>(reserved_after));
+    }
+
     // The large host expert arena uses registration, not managed memory.
     int* registered = (int*) std::aligned_alloc(4096, 4096);
     if (!registered) return 1;

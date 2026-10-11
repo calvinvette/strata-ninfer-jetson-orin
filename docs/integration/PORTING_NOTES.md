@@ -661,3 +661,10 @@ platform acquire/release operations and a 2-MiB CUDA VMM mapping cycle. For a
 future Strata + Splash port, keep these primitives separate from product
 buffer qualification: test the actual buffer's ownership transitions, lifetime,
 physical backing and end-to-end effect before selecting a transfer mode.
+
+The Orin memory self-test now also exercises `cudaMallocAsync`/`cudaFreeAsync`
+on one stream, verifies the GPU result, and trims the default pool back to its
+zero-byte baseline. This proves that the primitive is available and the tested
+allocation can be released. Before using stream-ordered pools for an engine
+buffer, measure allocator latency, pool retention under concurrency, RAM
+headroom, and request-level impact against the existing allocator.
