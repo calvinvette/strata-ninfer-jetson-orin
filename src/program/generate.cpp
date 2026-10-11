@@ -10190,6 +10190,47 @@ int main(int argc, char** argv) {
                                  z.gdn, (long long) ss.gdn_alloc);
                     return false;
                 }
+                // Opt-in numerical diagnostic for prefill chunk comparisons.  The file is a
+                // small header followed by the owned GDN state as float32; it is deliberately
+                // gated on an exact accepted-prefix length so warmup requests can be shorter.
+                const char* gdn_dump_path = std::getenv("STRATA_STATE_DUMP_GDN");
+                const char* gdn_dump_at_s = std::getenv("STRATA_STATE_DUMP_GDN_AT");
+                static bool gdn_state_dumped = false;
+                if (gdn_dump_path && gdn_dump_at_s && !gdn_state_dumped && ss.gdn_alloc > 0 &&
+                    std::strtoll(gdn_dump_at_s, nullptr, 10) == L) {
+                    FILE* dump = std::fopen(gdn_dump_path, "wb");
+                    if (!dump) {
+                        std::fprintf(stderr, "strata serve: cannot open GDN state dump %s\n", gdn_dump_path);
+                        return false;
+                    }
+                    struct GdnDumpHeader {
+                        char magic[8];
+                        uint64_t cells;
+                        uint64_t layers;
+                        uint64_t floats_per_layer;
+                    } header{{'S','T','G','D','N','0','1','\0'}, (uint64_t) L,
+                             (uint64_t) ss.gdn_alloc, (uint64_t) (z.gdn / (size_t) ss.gdn_alloc / sizeof(float))};
+                    bool dump_ok = std::fwrite(&header, sizeof(header), 1, dump) == 1;
+                    for (size_t offset = 0; dump_ok && offset < z.gdn;) {
+                        const size_t n = std::min(hash_buffer.size(), z.gdn - offset);
+                        if (cudaMemcpy(hash_buffer.data(), (const uint8_t*) ss.gdn_state + offset, n,
+                                       cudaMemcpyDefault) != cudaSuccess ||
+                            std::fwrite(hash_buffer.data(), 1, n, dump) != n) {
+                            dump_ok = false;
+                            break;
+                        }
+                        offset += n;
+                    }
+                    if (std::fclose(dump) != 0) dump_ok = false;
+                    if (!dump_ok) {
+                        std::fprintf(stderr, "strata serve: failed writing GDN state dump %s\n", gdn_dump_path);
+                        return false;
+                    }
+                    gdn_state_dumped = true;
+                    std::fprintf(stderr, "strata serve: STATE_DUMP_GDN path=%s cells=%lld layers=%lld floats_per_layer=%llu\n",
+                                 gdn_dump_path, (long long) L, (long long) ss.gdn_alloc,
+                                 (unsigned long long) header.floats_per_layer);
+                }
                 uint64_t h_gdn = hash_dev(ss.gdn_state, z.gdn, 1469598103934665603ull);
                 if (std::getenv("STRATA_STATE_HASH_GDN") != nullptr && ss.gdn_alloc > 0) {   // per GDN layer: which one differs first
                     const size_t per = z.gdn / (size_t) ss.gdn_alloc;

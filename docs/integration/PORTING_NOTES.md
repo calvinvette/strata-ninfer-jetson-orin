@@ -456,3 +456,15 @@ Use distinct prompts with identical token counts and chat-template settings,
 and confirm `cache_n=0` on measured requests. Retain the failed initial setup
 where warmup repeated the measured prompt: that was a harness failure, not
 evidence about the runtime.
+
+Accepted-prefix hashes locate recurrent-state differences but do not quantify
+their size. For a long-prompt prefill-chunk comparison, the Orin harness now
+supports an explicitly requested one-time float32 GDN dump at a selected
+accepted length (`STRATA_STATE_DUMP_GDN` plus `STRATA_STATE_DUMP_GDN_AT`). Use a
+distinct shorter warmup so the selected length identifies the measured request,
+retain the binary checksum and a compact numeric summary, and keep the large
+dump itself outside Git. At `L=1069`, chunk 32 versus 128 changed 98.37% of GDN
+values with 3.138% relative L2 despite matching output IDs. This establishes a
+state difference, not which state is more accurate. A future Strata + Splash
+effort should adapt the dump to the actual recurrent-state layout and use an
+independent mathematical or task-level oracle before judging either state.

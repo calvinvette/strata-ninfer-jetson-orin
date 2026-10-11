@@ -1,0 +1,13 @@
+Native Orin CUDA build:
+  command: cmake --build build/integration/candidate --target strata --parallel 2
+  result: pass
+  executable SHA256: 3e1e003c2097d58591db30b60412acbd8798e5ab39ce857f1e3e2c0ebd241a5b
+
+maestro1 HIP build:
+  source basis: updated src/program/generate.cpp SHA256 e75fdcd463dfd37ecfda4217afa6554570bfba4f63850969a24e024fbe9a1b2e
+  command: cmake --build build-hip --target strata --parallel 1 (in ~/workspace/strata-integration-validation)
+  result: pass; executable loaded with the recorded ROCm library paths and --help exited 0
+  executable SHA256: 9a8ad4fd2229183ce7c8a3f0da7ca9b3ec53b3ab268464ac76b9a6b673ad1fd4
+  runtime: not tested; maestro1 is build evidence only
+
+SYCL uses the separate sycl/src/program/generate.cpp and was not touched by this change.
