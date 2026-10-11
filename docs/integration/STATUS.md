@@ -575,3 +575,12 @@ expert staging allocations balanced at teardown. Stable NVMap growth was again
 72,425,472 bytes across capture/instantiation, equal to the 4K run. This adds a
 second context point for the same request/configuration, not a universal graph
 size or closure of the remaining Phase 3 gates.
+
+The [16K-context Q2_0 graph follow-up](../../bench/results/2026-10-11-phase3-q2-graph-context16k/README.md)
+also passed all seven protocol/recovery scenarios with 21.04 GiB minimum host
+availability. Session backing increased from 224.1 MiB at 4K to 327.1 MiB at
+8K and 533.1 MiB at 16K, adding 103.0 MiB per context doubling. The four
+successful graph calls and balanced owner events repeated, while the stable
+NVMap capture interval remained 72,425,472 bytes. This describes the tested
+Q2_0 startup configurations; broader memory attribution and transfer/admission
+gates still keep Phase 3 in progress.
