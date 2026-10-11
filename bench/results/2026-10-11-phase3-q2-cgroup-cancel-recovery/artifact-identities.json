@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "model_repo": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+  "revision": "5348543e0147355ac9cbcb031184a3546350988e",
+  "artifacts": [
+    {
+      "name": "Q2_0 shard 1",
+      "path": "~/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+      "size_bytes": 37623740192,
+      "sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720"
+    },
+    {
+      "name": "Q2_0 shard 2 / PLE table",
+      "path": "~/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+      "size_bytes": 28800138432,
+      "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+    },
+    {
+      "name": "Q2_0 dense pack",
+      "path": "~/models/strata-orin-validation/q2-ple-pack/dense.bin",
+      "size_bytes": 1485606400,
+      "sha256": "a43d7d0b69525335f4b000d5197a1d3aefcd3c0014fc3e12b3455e0a5d827ba2"
+    },
+    {
+      "name": "Q2_0 expert profile",
+      "path": "~/models/strata-orin-validation/q2-expert-profile.bin",
+      "size_bytes": 196632,
+      "sha256": "b3e62120218cd96d175a0547530158869177dd2164b22b40f32bea7d7e85fb8c"
+    },
+    {
+      "name": "Tokenizer JSON",
+      "path": "~/models/strata-orin-validation/pack/tokenizer/tokenizer.json",
+      "size_bytes": 541,
+      "sha256": "c0bd435efbc6c3b28964b47999afe16c4ad268c7c7c4e8cb3af410796a6f30bf"
+    }
+  ],
+  "model_files_remain_outside_git": true,
+  "interposer_sha256": "2f0b74c6f4094363c025c0142792aca4fa042a2d4ad4c410075550d2d7d1160f",
+  "nvmap_counter": "/sys/kernel/debug/nvmap/iovmm/clients, calibrated in 2026-10-11-phase3-graph-nvmap-calibration/known-allocation-summary.json",
+  "engine": {
+    "path": "build/integration/candidate/strata",
+    "sha256": "bdde041e60d8593dac593a846d471c117fee2c5397b01dfd99c9502253dd0f7d"
+  },
+  "workload": {
+    "configuration": "Qwen3.8-Flash-Next Q2_0, spec4, 256 requested cache slots, 512-token prefill setting, 32768 configured context",
+    "actual_request": "2048 formatted prompt tokens requested; client disconnect observed after 512-token first prefill chunk; five-token short recovery",
+    "model_config": "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-11-phase3-q2-cgroup-cancel-recovery/server-config.json"
+  },
+  "measurement_note": "The cancellation/recovery run is a single supervised Q2_0 request sequence under a 16 GiB cgroup cap, not a general capacity or quality qualification."
+}
