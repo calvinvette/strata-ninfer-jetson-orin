@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-11",
+  "cuda": {
+    "host": "orin1 Orin AGX aarch64",
+    "command": "cmake --build build/integration/candidate --target strata -j2",
+    "binary_sha256": "5de05658f9b91f1b5a416b49285bc21fbc441f0fb0747b45d9f2f840fbbccb47",
+    "result": "passed"
+  },
+  "hip": {
+    "host": "maestro1 x86_64",
+    "arch": "gfx1100",
+    "command": "cmake --build build-hip --parallel 1",
+    "session_cpp_sha256": "da8aeb12333565ec54247af82cf6da5a330b17572017b9e3899321391e65ae9f",
+    "strata_binary_sha256": "515df52503c59abf17b8ce051fc6f497159b1e8c4db227602698ff3d5d6a9b1a",
+    "result": "passed; compile only, no GPU runtime qualification"
+  },
+  "sycl": {
+    "result": "not rebuilt: this change touches src/core/session.cpp, while the SYCL CMake resolver selects sycl/src/core/session.cpp when present; no SYCL source was modified"
+  }
+}

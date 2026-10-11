@@ -424,24 +424,38 @@ bool session_replay_stage_prefixes(const ModelGeometry& g, int64_t pos, int32_t 
     const size_t r_floats = (size_t) g.hc * (size_t) g.n_embd;
 
     float* saved = nullptr;
-    if (cudaMalloc((void**) &saved, r_floats * sizeof(float)) != cudaSuccess) {
+    const size_t saved_bytes = r_floats * sizeof(float);
+    if (cudaMalloc((void**) &saved, saved_bytes) != cudaSuccess) {
         err = "session_replay_stage_prefixes: could not save the residual";
         return false;
     }
+    int saved_device = -1;
+    if (strata::platform::integration_trace::enabled()) (void) cudaGetDevice(&saved_device);
+    strata::platform::integration_trace::event("session-replay-prefix-scratch", "allocate", &gr,
+                                                saved, saved_bytes, saved_device);
     std::vector<cudaEvent_t> ev((size_t) (n * 6));
     bool ev_ok = true;
     for (auto& e : ev) if (cudaEventCreate(&e) != cudaSuccess) { ev_ok = false; break; }
     if (!ev_ok) {
         for (auto& e : ev) cudaEventDestroy(e);
-        cudaFree(saved);
+        if (cudaFree(saved) == cudaSuccess)
+            strata::platform::integration_trace::event("session-replay-prefix-scratch", "free", &gr,
+                                                        saved, 0, saved_device);
         err = "session_replay_stage_prefixes: event create";
         return false;
     }
     struct Cleanup {
         std::vector<cudaEvent_t>* v;
         float* p;
-        ~Cleanup() { for (auto& e : *v) cudaEventDestroy(e); cudaFree(p); }
-    } cleanup{&ev, saved};
+        SessionGraphs* graphs;
+        int device;
+        ~Cleanup() {
+            for (auto& e : *v) cudaEventDestroy(e);
+            if (cudaFree(p) == cudaSuccess)
+                strata::platform::integration_trace::event("session-replay-prefix-scratch", "free", graphs,
+                                                            p, 0, device);
+        }
+    } cleanup{&ev, saved, &gr, saved_device};
 
     double t[5] = {0, 0, 0, 0, 0};
     mixer_per_layer.assign((size_t) n, 0.0);
@@ -531,6 +545,8 @@ bool SessionLoopScratch::init(size_t parts_bytes_in, std::string& err) {
         err = "SessionLoopScratch: cudaHostAlloc for the pool's staging failed";
         return false;
     }
+    strata::platform::integration_trace::event("session-loop-scratch-host", "allocate", this, y_miss,
+                                                parts_bytes, -1);
     std::memset(y_miss, 0, parts_bytes);
     if (cudaEventCreate(&probe) != cudaSuccess) {
         err = "SessionLoopScratch: cudaEventCreate failed";
@@ -567,7 +583,13 @@ void SessionLoopScratch::free() {
         pinned_core = {};
     }
     if (probe != nullptr) { cudaEventDestroy(probe); probe = nullptr; }
-    if (y_miss != nullptr) { cudaFreeHost(y_miss); y_miss = nullptr; }
+    if (y_miss != nullptr) {
+        float* released = y_miss;
+        if (cudaFreeHost(y_miss) == cudaSuccess)
+            strata::platform::integration_trace::event("session-loop-scratch-host", "free", this,
+                                                        released, 0, -1);
+        y_miss = nullptr;
+    }
     parts_bytes = 0;
 }
 
