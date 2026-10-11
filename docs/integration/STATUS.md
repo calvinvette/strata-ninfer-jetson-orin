@@ -58,6 +58,8 @@ The [verifier auxiliary owner follow-up](../../bench/results/2026-10-10-phase3-v
 
 The [batch-session owner smoke](../../bench/results/2026-10-10-phase3-batch-session-owners/README.md) traces the primary and two batch-slot sessions plus the verifier batch arena. Two independent serial-versus-concurrent Q2_0 runs admitted both slots, matched outputs and matched all nine state hashes by prompt identity. Each batch session requested 235,034,112 bytes; the verifier batch arena requested 37,120 bytes and freed. Minimum `MemAvailable` was 15.30 GiB. The three session backings remained live at service teardown as engine-lifetime allocations; explicit release remains open. CUDA and maestro1 HIP builds passed.
 
+The [device-plan owner check](../../bench/results/2026-10-10-phase3-verifier-device-plan/README.md) forces `STRATA_VERIFY_DEVICE_PLAN=1` on the same Q2_0 two-slot workload. The 64-byte skip scratch and 40,000-byte slot-offset copy both allocated and freed; outputs and all nine state hashes matched the default route by prompt identity. Minimum `MemAvailable` was 15.30 GiB. Q8-fuse and probabilistic-sampling owner branches remain untested.
+
 The [runtime ownership review](OWNERSHIP_REVIEW.md) records existing owners for
 API ordering, engine execution, session state, verifier commits and device
 allocations. It adds no duplicate scheduler or allocation ledger. Unique physical

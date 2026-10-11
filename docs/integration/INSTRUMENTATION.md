@@ -135,10 +135,13 @@ compares owned and borrowed prefill, and trace-off protocol checks. The
 [verifier auxiliary follow-up](../../bench/results/2026-10-10-phase3-verifier-aux/README.md)
 adds profile, Q8-fuse, device-plan, slot-offset, probabilistic-sampling and
 batch-window device owners; the forced profile owner balances on Orin. The
-other optional verifier branches are build-checked but remain runtime-untested.
-Remaining sites include layer-stage and batch-slot session arenas, and graph
-capture/destroy/pool observations. Phase 3 must distinguish unique physical
-backing, views and future reservations. Phase 1 needs explicit counters and unsupported scopes; do not
+[device-plan follow-up](../../bench/results/2026-10-10-phase3-verifier-device-plan/README.md)
+exercises and balances its 64-byte scratch and 40,000-byte slot-offset copy.
+Q8-fuse and probabilistic-sampling buffers remain runtime-untested.
+Remaining gaps include runtime qualification of split-stage sessions, explicit
+release of stage and batch session backings, and graph capture/destroy/pool
+observations. Phase 3 must distinguish unique physical backing, views and future
+reservations. Phase 1 needs explicit counters and unsupported scopes; do not
 mistake a partial requested-byte trace for the later accounting gate.
 
 The local Orin [segmented VMM lifecycle check](../../bench/results/2026-10-09-vmm-segment-owner-trace/README.md)
