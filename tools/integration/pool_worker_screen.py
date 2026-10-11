@@ -79,6 +79,36 @@ def read_state_hashes(log_path):
     return result
 
 
+def read_accepted_prefix_trace(log_path):
+    """Read the final measured request's token IDs and state at each verifier commit."""
+    keys = ('L', 'gdn', 'ple', 'tail', 'dead', 'pooled', 'pooled_full', 'kv', 'mtp', 'stale', 'ple_prev')
+    groups, current = [], []
+    pattern = re.compile(r'ACCEPTED_PREFIX position=(\d+) window=(\d+) accepted_drafts=(\d+) '
+                         r'committed=(\d+) tokens=([0-9,]+) state=\{STATE_HASH (.+)\}')
+    for line in log_path.read_text(errors='replace').splitlines():
+        if 'ACCEPTED_PREFIX ' in line:
+            match = pattern.search(line)
+            if not match:
+                raise ValueError(f'malformed accepted-prefix trace in {log_path}: {line.strip()}')
+            position, window, accepted, committed = map(int, match.group(1, 2, 3, 4))
+            token_ids = [int(value) for value in match.group(5).split(',')]
+            state = dict(re.findall(r'(\w+)=([0-9a-f,-]+)', match.group(6)))
+            if not set(keys) <= state.keys() or committed != len(token_ids) or committed < 1:
+                raise ValueError(f'incomplete accepted-prefix trace in {log_path}: {line.strip()}')
+            current.append({'position': position, 'window': window, 'accepted_drafts': accepted,
+                            'committed': committed, 'token_ids': token_ids,
+                            'state': {key: state[key] for key in keys}})
+        elif 'strata serve: STATE_HASH L=' in line and current:
+            groups.append(current)
+            current = []
+    if current:
+        groups.append(current)
+    if not groups:
+        return []
+    # api_control_block always sends warmup first and the measured request last.
+    return groups[-1]
+
+
 def measured_request(path):
     data = json.loads(path.read_text())
     good = [row for row in data['checks'] if row['status'] == 'pass' and not row['warmup']]
@@ -166,7 +196,7 @@ def main():
             run_cfg['port'] = base_port + repetition * len(args.workers) + cell_index
             run_cfg['log'] = str((run_dir / 'engine.log').resolve())
             run_cfg['env'] = {**cfg.get('env', {}), 'STRATA_TRACE': '1',
-                              'STRATA_STATE_HASH': '1', 'STRATA_INTEGRATION_TRACE': '1'}
+                              'STRATA_STATE_HASH': '1', 'STRATA_INTEGRATION_TRACE': '1', 'STRATA_ACCEPTED_PREFIX_TRACE': '1'}
             config_path = run_dir / 'server-config.json'
             config_path.write_text(json.dumps(run_cfg, indent=2) + '\n')
             request_path = run_dir / 'requests.json'
@@ -189,8 +219,13 @@ def main():
                 slot_counts = {int(n) for n in re.findall(r'expert cache (\d+) slots', text)}
                 row['actual_expert_cache_slots'] = next(iter(slot_counts)) if len(slot_counts) == 1 else None
                 row['state_hashes'] = read_state_hashes(log_path)
+                row['accepted_prefix_trace'] = read_accepted_prefix_trace(log_path)
                 if not row['state_hashes']:
                     raise ValueError(f'missing state fingerprints in {log_path}')
+                if not row['accepted_prefix_trace']:
+                    raise ValueError(f'missing accepted-prefix trace in {log_path}')
+                if sum(len(trace['token_ids']) for trace in row['accepted_prefix_trace']) != row['generated_tokens']:
+                    raise ValueError(f'accepted-prefix trace does not cover every generated token in {log_path}')
                 if row['actual_expert_cache_slots'] is None:
                     raise ValueError(f'cache capacity missing or conflicting in {log_path}')
             except (OSError, KeyError, ValueError, RuntimeError) as exc:
@@ -209,6 +244,8 @@ def main():
         state = [row['state_hashes'][-1] for row in valid]
         result['measured_state_equal'] = len({json.dumps(row, sort_keys=True) for row in state}) == 1
         result['measured_output_equal'] = len({row['output_sha256'] for row in valid}) == 1
+        result['measured_accepted_prefix_equal'] = len({json.dumps(row['accepted_prefix_trace'], sort_keys=True)
+                                                        for row in valid}) == 1
         result['paired_request_time_delta_percent'] = paired_deltas(valid, args.baseline_workers)
         result['bootstrap_95pct_median_intervals_percent'] = {
             worker: bootstrap_median(values, args.seed + int(worker))
@@ -225,16 +262,19 @@ def main():
                 'output_hashes': sorted({row['output_sha256'] for row in selected}),
             }
         result['passed'] = (result['actual_cache_slots_equal'] and result['measured_state_equal'] and
-                            result['measured_output_equal'] and not result['failures'])
+                            result['measured_output_equal'] and result['measured_accepted_prefix_equal'] and
+                            not result['failures'])
         if not result['actual_cache_slots_equal']:
             result['failures'].append({'failure': 'actual expert-cache capacity differs across cells'})
         if not result['measured_state_equal']:
             result['failures'].append({'failure': 'measured persistent-state fingerprints differ across cells'})
         if not result['measured_output_equal']:
             result['failures'].append({'failure': 'measured output content differs across worker counts'})
+        if not result['measured_accepted_prefix_equal']:
+            result['failures'].append({'failure': 'accepted token IDs or committed state differ at a verifier boundary'})
     (args.output / 'results.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps({key: result.get(key) for key in
-          ('passed', 'failures', 'summary', 'paired_request_time_delta_percent',
+          ('passed', 'failures', 'summary', 'measured_accepted_prefix_equal', 'paired_request_time_delta_percent',
            'bootstrap_95pct_median_intervals_percent')}, indent=2))
     return 0 if result.get('passed') else 1
 

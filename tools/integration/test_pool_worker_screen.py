@@ -4,7 +4,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from pool_worker_screen import exact_warmup_prompt, paired_deltas, read_state_hashes, set_arg
+from pool_worker_screen import (exact_warmup_prompt, paired_deltas, read_accepted_prefix_trace,
+                                read_state_hashes, set_arg)
 
 
 class PoolWorkerScreenTests(unittest.TestCase):
@@ -31,6 +32,44 @@ class PoolWorkerScreenTests(unittest.TestCase):
             path.write_text('strata: STATE_HASH L=519 gdn=a\n')
             with self.assertRaises(ValueError):
                 read_state_hashes(path)
+
+    def test_accepted_prefix_trace_captures_token_ids_and_all_persistent_fields(self):
+        line = ('strata serve: ACCEPTED_PREFIX position=575 window=4 accepted_drafts=2 committed=3 '
+                'tokens=12,34,56 state={STATE_HASH L=578 gdn=01 ple=02 tail=03 pooled=04 '
+                'kv=05 mtp=06 stale=07 dead=08 pooled_full=09 ple_prev=10,11}\n')
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'engine.log'
+            path.write_text(line)
+            trace = read_accepted_prefix_trace(path)
+        self.assertEqual(len(trace), 1)
+        self.assertEqual(trace[0]['token_ids'], [12, 34, 56])
+        self.assertEqual(trace[0]['accepted_drafts'], 2)
+        self.assertEqual(trace[0]['committed'], 3)
+        self.assertEqual(trace[0]['state']['L'], '578')
+        self.assertEqual(trace[0]['state']['mtp'], '06')
+        self.assertEqual(trace[0]['state']['ple_prev'], '10,11')
+
+    def test_accepted_prefix_trace_selects_last_request_after_warmup(self):
+        state = ('STATE_HASH L=512 gdn=01 ple=02 tail=03 pooled=04 kv=05 mtp=06 stale=07 '
+                 'dead=08 pooled_full=09 ple_prev=10,11')
+        def commit(token):
+            return (f'strata serve: ACCEPTED_PREFIX position=511 window=1 accepted_drafts=0 '
+                    f'committed=1 tokens={token} state={{{state}}}\n')
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'engine.log'
+            path.write_text(commit(12) + f'strata serve: {state}\n' + commit(34) + f'strata serve: {state}\n')
+            trace = read_accepted_prefix_trace(path)
+        self.assertEqual(len(trace), 1)
+        self.assertEqual(trace[0]['token_ids'], [34])
+
+    def test_accepted_prefix_trace_rejects_missing_state_fields(self):
+        line = ('strata serve: ACCEPTED_PREFIX position=575 window=4 accepted_drafts=0 committed=1 '
+                'tokens=12 state={STATE_HASH L=576 gdn=01}\n')
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'engine.log'
+            path.write_text(line)
+            with self.assertRaises(ValueError):
+                read_accepted_prefix_trace(path)
 
     def test_paired_deltas_resample_independent_process_blocks(self):
         rows = [

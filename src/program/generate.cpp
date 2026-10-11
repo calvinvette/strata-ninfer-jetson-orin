@@ -10135,6 +10135,136 @@ int main(int argc, char** argv) {
             std::vector<int32_t> consumed;
             consumed.reserve((size_t) (n + max_new + S));
             for (int64_t i = 0; i < n - 1; ++i) consumed.push_back((int32_t) ids[(size_t) i]);
+            static const bool state_hash = std::getenv("STRATA_STATE_HASH") != nullptr;
+            static const bool accepted_prefix_trace = std::getenv("STRATA_ACCEPTED_PREFIX_TRACE") != nullptr;
+            auto hash_session_state = [&](int64_t state_cells, std::string& state_fingerprint) -> bool {
+                // DEBUG: a fingerprint of every part of the session over the positions it holds ([0, L)), and
+                // separately of what lies past them in the last KV page (stale cells, fine unless something reads them)
+                if (cudaDeviceSynchronize() != cudaSuccess) {
+                    std::fprintf(stderr, "strata serve: ERR synchronizing state fingerprint\n");
+                    return false;
+                }
+                const int64_t L = state_cells;
+                const strata::kernels::QsaShapes qs = [&] {
+                    strata::kernels::QsaShapes s = strata::kernels::qsa_real_shapes();
+                    s.n_head_kv = g.n_head_kv; s.head_dim = g.head_dim; s.idx_dim = g.idx_key_dim;
+                    return s;
+                }();
+                bool hash_ok = true;
+                std::array<uint8_t, 65536> hash_buffer;
+                auto hash_dev = [&](const void* p, size_t bytes, uint64_t h) {
+                    for (size_t offset = 0; hash_ok && offset < bytes;) {
+                        const size_t n = std::min(hash_buffer.size(), bytes - offset);
+                        // VRAM or a streamed host copy, with fixed diagnostic workspace.
+                        if (cudaMemcpy(hash_buffer.data(), static_cast<const uint8_t*>(p) + offset, n, cudaMemcpyDefault) != cudaSuccess) {
+                            hash_ok = false;
+                            break;
+                        }
+                        h = fnv1a(hash_buffer.data(), n, h);
+                        offset += n;
+                    }
+                    return h;
+                };
+                // the cells [c0, c1) of one int8 K or V pool ([page][kv_head][page_size][head_dim]), bytes per value `w`
+                auto hash_cells = [&](const void* pool, int64_t per_cell, int64_t c0, int64_t c1, uint64_t h) {
+                    const int64_t ps = qs.page_size;
+                    for (int64_t pg = c0 / ps; pg * ps < c1; ++pg)
+                        for (int64_t hd = 0; hd < qs.n_head_kv; ++hd) {
+                            const int64_t a = std::max(c0, pg * ps) - pg * ps, e = std::min(c1, (pg + 1) * ps) - pg * ps;
+                            const size_t off = (size_t) (((pg * qs.n_head_kv + hd) * ps + a) * per_cell);
+                            h = hash_dev((const uint8_t*) pool + off, (size_t) ((e - a) * per_cell), h);
+                        }
+                    return h;
+                };
+                ConvStateSizes z;
+                std::string state_size_error;
+                if (!strata::core::conversation_session_sizes(g, ss, z, state_size_error)) {
+                    std::fprintf(stderr, "strata serve: state fingerprint sizes: %s\n", state_size_error.c_str());
+                    return false;
+                }
+                if (ss.gdn_alloc > 0 &&
+                    (ss.gdn_state == nullptr || z.gdn / (size_t) ss.gdn_alloc == 0 ||
+                     z.gdn % (size_t) ss.gdn_alloc != 0)) {
+                    std::fprintf(stderr,
+                                 "strata serve: state fingerprint: invalid GDN range (%zu bytes for %lld owned layers)\n",
+                                 z.gdn, (long long) ss.gdn_alloc);
+                    return false;
+                }
+                uint64_t h_gdn = hash_dev(ss.gdn_state, z.gdn, 1469598103934665603ull);
+                if (std::getenv("STRATA_STATE_HASH_GDN") != nullptr && ss.gdn_alloc > 0) {   // per GDN layer: which one differs first
+                    const size_t per = z.gdn / (size_t) ss.gdn_alloc;
+                    std::string s;
+                    char b[8];
+                    for (int64_t i = 0; i < ss.gdn_alloc; ++i) {
+                        std::snprintf(b, sizeof(b), "%04llx ", (unsigned long long) (hash_dev((const uint8_t*) ss.gdn_state + i * per, per, 1469598103934665603ull) & 0xffff));
+                        s += b;
+                    }
+                    std::fprintf(stderr, "strata serve: STATE_HASH_GDN %s\n", s.c_str());
+                }
+                uint64_t h_ple = hash_dev(ss.ple_hist, ss.ple_hist ? z.ple : 0, 1469598103934665603ull);
+                uint64_t h_tail = 1469598103934665603ull, h_pool = h_tail, h_kv = h_tail, h_stale = h_tail;
+                // pooled= keeps its 0.1.29 meaning: the completed rows [0, L / idx_block) only.  pooled_full= adds the
+                // spare row at L / idx_block (the `dead` key the next block completion overwrites), which a
+                // conversation restore writes back; dead= is the spare key itself
+                uint64_t h_dead = h_tail, h_pool_full = h_tail;
+                const int64_t kvb = qs.head_dim, scb = (qs.head_dim / 64) * 2;
+                // a state's K/V arrays and their bytes per (cell, head) row: the host copy when it has one
+                auto kv_arrays = [&](const strata::core::QsaState& st) {
+                    const bool h = st.kv_mode != 0;
+                    std::vector<std::pair<const void*, int64_t>> a;
+                    if (st.kv_q4) {
+                        const int64_t q4b = (int64_t) strata::kernels::kv_q4_bytes_per_head((int) qs.head_dim);
+                        a = {{h ? st.host.k_q4 : st.k_q4, q4b}, {h ? st.host.v_q4 : st.v_q4, q4b}};
+                    } else if (st.kv_hybrid) {
+                        const int64_t q4b = (int64_t) strata::kernels::kv_q4_bytes_per_head((int) qs.head_dim);
+                        a = {{h ? st.host.k_q : st.k_q, kvb}, {h ? st.host.v_q4 : st.v_q4, q4b},
+                             {h ? st.host.k_scale : st.k_scale, scb}};
+                    } else if (st.kv_int8) {
+                        a = {{h ? st.host.k_q : st.k_q, kvb}, {h ? st.host.v_q : st.v_q, kvb},
+                             {h ? st.host.k_scale : st.k_scale, scb}, {h ? st.host.v_scale : st.v_scale, scb}};
+                    } else {
+                        a = {{h ? st.host.k_pool : st.k_pool, qs.head_dim * 2},
+                             {h ? st.host.v_pool : st.v_pool, qs.head_dim * 2}};
+                    }
+                    return a;
+                };
+                const int64_t end_cell = std::min<int64_t>(((L + qs.page_size - 1) / qs.page_size) * qs.page_size,
+                                                           ss.max_cells);   // = the primary state's max_cells
+                for (int64_t j = 0; j < ss.qsa_alloc; ++j) {   // this session's owned QSA ordinals only
+                    const strata::core::QsaState& st = ss.qsa_states[ss.qsa_ord0 + j];
+                    h_tail = hash_dev(st.idx_tail, z.tail, h_tail);
+                    h_dead = hash_dev(st.idx_dead, z.dead, h_dead);
+                    h_pool = hash_dev(st.idx_pooled, (size_t) (L / qs.idx_block) * qs.idx_dim * 4, h_pool);
+                    h_pool_full = hash_dev(st.idx_pooled, (size_t) (L > 0 ? L / qs.idx_block + 1 : 0) * qs.idx_dim * 4,
+                                           h_pool_full);
+                    // KV streaming: the host copy is the identity layout and holds every cell
+                    for (const auto& [pool, w] : kv_arrays(st)) {
+                        h_kv = hash_cells(pool, w, 0, L, h_kv);
+                        h_stale = hash_cells(pool, w, L, end_cell, h_stale);
+                    }
+                }
+                uint64_t h_mtp = 1469598103934665603ull;
+                if (use_mtp) {
+                    const strata::core::QsaState& ms = mtp.kv_state();
+                    const int64_t mL = std::min<int64_t>(L, ms.max_cells);
+                    for (const auto& [pool, w] : kv_arrays(ms))
+                        if (pool != nullptr) h_mtp = hash_cells(pool, w, 0, mL, h_mtp);
+                }
+                if (!hash_ok) {
+                    std::fprintf(stderr, "strata serve: ERR reading state fingerprint\n");
+                    return false;
+                }
+                char fingerprint[512];
+                std::snprintf(fingerprint, sizeof(fingerprint),
+                              "STATE_HASH L=%lld gdn=%016llx ple=%016llx tail=%016llx pooled=%016llx "
+                              "kv=%016llx mtp=%016llx stale=%016llx dead=%016llx pooled_full=%016llx ple_prev=%d,%d",
+                              (long long) L, (unsigned long long) h_gdn, (unsigned long long) h_ple,
+                              (unsigned long long) h_tail, (unsigned long long) h_pool, (unsigned long long) h_kv,
+                              (unsigned long long) h_mtp, (unsigned long long) h_stale, (unsigned long long) h_dead,
+                              (unsigned long long) h_pool_full, ss.ple_prev[0], ss.ple_prev[1]);
+                state_fingerprint = fingerprint;
+                return true;
+            };
             const char* finish = "length";
             const Clock::time_point d0 = Clock::now();
             // STRATA_DECODE_TIMING=1: where a request's decode time goes (one line per request)
@@ -10896,6 +11026,21 @@ int main(int argc, char** argv) {
                     std::printf("ERR %s\n", err.c_str());
                     return 1;
                 }
+                if (accepted_prefix_trace) {
+                    if (!ver.wait_commit(err)) {
+                        if (adapt_thr.joinable()) adapt_thr.join();
+                        std::fprintf(stderr, "strata serve: accepted-prefix commit wait: %s\n", err.c_str());
+                        return 1;
+                    }
+                    std::string fingerprint;
+                    if (!hash_session_state((int64_t) consumed.size() + publish_n, fingerprint)) return 1;
+                    std::fprintf(stderr, "strata serve: ACCEPTED_PREFIX position=%lld window=%d accepted_drafts=%d committed=%d tokens=",
+                                 (long long) p, T, a, publish_n);
+                    for (int i = 0; i < publish_n; ++i)
+                        std::fprintf(stderr, "%s%d", i ? "," : "", (int) outv[(size_t) i]);
+                    std::fprintf(stderr, " state={%s}\n", fingerprint.c_str());
+                    std::fflush(stderr);
+                }
                 // Only inputs corresponding to outputs retained by the request are committed.
                 for (int i = 0; i < publish_n; ++i) consumed.push_back(window[(size_t) i]);
                 draft_offered += T - 1;
@@ -10977,130 +11122,10 @@ int main(int argc, char** argv) {
                 live_imgs = imgs_below(req_imgs, (int64_t) live.size());
                 live_ok = o.prompt_cache > 0 && req_ckpt;   // ckpt=0: nothing to continue or park (#830)
             }
-            static const bool state_hash = std::getenv("STRATA_STATE_HASH") != nullptr;
-            if (state_hash && !cancelled && o.prompt_cache > 0) {   // every finished request, ckpt=0 too (parity gates)
-                // DEBUG: a fingerprint of every part of the session over the positions it holds ([0, L)), and
-                // separately of what lies past them in the last KV page (stale cells, fine unless something reads them)
-                if (cudaDeviceSynchronize() != cudaSuccess) {
-                    std::printf("ERR synchronizing state fingerprint\n");
-                    return 1;
-                }
-                const int64_t L = (int64_t) live.size();
-                const strata::kernels::QsaShapes qs = [&] {
-                    strata::kernels::QsaShapes s = strata::kernels::qsa_real_shapes();
-                    s.n_head_kv = g.n_head_kv; s.head_dim = g.head_dim; s.idx_dim = g.idx_key_dim;
-                    return s;
-                }();
-                bool hash_ok = true;
-                std::array<uint8_t, 65536> hash_buffer;
-                auto hash_dev = [&](const void* p, size_t bytes, uint64_t h) {
-                    for (size_t offset = 0; hash_ok && offset < bytes;) {
-                        const size_t n = std::min(hash_buffer.size(), bytes - offset);
-                        // VRAM or a streamed host copy, with fixed diagnostic workspace.
-                        if (cudaMemcpy(hash_buffer.data(), static_cast<const uint8_t*>(p) + offset, n, cudaMemcpyDefault) != cudaSuccess) {
-                            hash_ok = false;
-                            break;
-                        }
-                        h = fnv1a(hash_buffer.data(), n, h);
-                        offset += n;
-                    }
-                    return h;
-                };
-                // the cells [c0, c1) of one int8 K or V pool ([page][kv_head][page_size][head_dim]), bytes per value `w`
-                auto hash_cells = [&](const void* pool, int64_t per_cell, int64_t c0, int64_t c1, uint64_t h) {
-                    const int64_t ps = qs.page_size;
-                    for (int64_t pg = c0 / ps; pg * ps < c1; ++pg)
-                        for (int64_t hd = 0; hd < qs.n_head_kv; ++hd) {
-                            const int64_t a = std::max(c0, pg * ps) - pg * ps, e = std::min(c1, (pg + 1) * ps) - pg * ps;
-                            const size_t off = (size_t) (((pg * qs.n_head_kv + hd) * ps + a) * per_cell);
-                            h = hash_dev((const uint8_t*) pool + off, (size_t) ((e - a) * per_cell), h);
-                        }
-                    return h;
-                };
-                ConvStateSizes z;
-                std::string state_size_error;
-                if (!strata::core::conversation_session_sizes(g, ss, z, state_size_error)) {
-                    std::fprintf(stderr, "strata serve: state fingerprint sizes: %s\n", state_size_error.c_str());
-                    return 1;
-                }
-                if (ss.gdn_alloc > 0 &&
-                    (ss.gdn_state == nullptr || z.gdn / (size_t) ss.gdn_alloc == 0 ||
-                     z.gdn % (size_t) ss.gdn_alloc != 0)) {
-                    std::fprintf(stderr,
-                                 "strata serve: state fingerprint: invalid GDN range (%zu bytes for %lld owned layers)\n",
-                                 z.gdn, (long long) ss.gdn_alloc);
-                    return 1;
-                }
-                uint64_t h_gdn = hash_dev(ss.gdn_state, z.gdn, 1469598103934665603ull);
-                if (std::getenv("STRATA_STATE_HASH_GDN") != nullptr && ss.gdn_alloc > 0) {   // per GDN layer: which one differs first
-                    const size_t per = z.gdn / (size_t) ss.gdn_alloc;
-                    std::string s;
-                    char b[8];
-                    for (int64_t i = 0; i < ss.gdn_alloc; ++i) {
-                        std::snprintf(b, sizeof(b), "%04llx ", (unsigned long long) (hash_dev((const uint8_t*) ss.gdn_state + i * per, per, 1469598103934665603ull) & 0xffff));
-                        s += b;
-                    }
-                    std::fprintf(stderr, "strata serve: STATE_HASH_GDN %s\n", s.c_str());
-                }
-                uint64_t h_ple = hash_dev(ss.ple_hist, ss.ple_hist ? z.ple : 0, 1469598103934665603ull);
-                uint64_t h_tail = 1469598103934665603ull, h_pool = h_tail, h_kv = h_tail, h_stale = h_tail;
-                // pooled= keeps its 0.1.29 meaning: the completed rows [0, L / idx_block) only.  pooled_full= adds the
-                // spare row at L / idx_block (the `dead` key the next block completion overwrites), which a
-                // conversation restore writes back; dead= is the spare key itself
-                uint64_t h_dead = h_tail, h_pool_full = h_tail;
-                const int64_t kvb = qs.head_dim, scb = (qs.head_dim / 64) * 2;
-                // a state's K/V arrays and their bytes per (cell, head) row: the host copy when it has one
-                auto kv_arrays = [&](const strata::core::QsaState& st) {
-                    const bool h = st.kv_mode != 0;
-                    std::vector<std::pair<const void*, int64_t>> a;
-                    if (st.kv_q4) {
-                        const int64_t q4b = (int64_t) strata::kernels::kv_q4_bytes_per_head((int) qs.head_dim);
-                        a = {{h ? st.host.k_q4 : st.k_q4, q4b}, {h ? st.host.v_q4 : st.v_q4, q4b}};
-                    } else if (st.kv_hybrid) {
-                        const int64_t q4b = (int64_t) strata::kernels::kv_q4_bytes_per_head((int) qs.head_dim);
-                        a = {{h ? st.host.k_q : st.k_q, kvb}, {h ? st.host.v_q4 : st.v_q4, q4b},
-                             {h ? st.host.k_scale : st.k_scale, scb}};
-                    } else if (st.kv_int8) {
-                        a = {{h ? st.host.k_q : st.k_q, kvb}, {h ? st.host.v_q : st.v_q, kvb},
-                             {h ? st.host.k_scale : st.k_scale, scb}, {h ? st.host.v_scale : st.v_scale, scb}};
-                    } else {
-                        a = {{h ? st.host.k_pool : st.k_pool, qs.head_dim * 2},
-                             {h ? st.host.v_pool : st.v_pool, qs.head_dim * 2}};
-                    }
-                    return a;
-                };
-                const int64_t end_cell = std::min<int64_t>(((L + qs.page_size - 1) / qs.page_size) * qs.page_size,
-                                                           ss.max_cells);   // = the primary state's max_cells
-                for (int64_t j = 0; j < ss.qsa_alloc; ++j) {   // this session's owned QSA ordinals only
-                    const strata::core::QsaState& st = ss.qsa_states[ss.qsa_ord0 + j];
-                    h_tail = hash_dev(st.idx_tail, z.tail, h_tail);
-                    h_dead = hash_dev(st.idx_dead, z.dead, h_dead);
-                    h_pool = hash_dev(st.idx_pooled, (size_t) (L / qs.idx_block) * qs.idx_dim * 4, h_pool);
-                    h_pool_full = hash_dev(st.idx_pooled, (size_t) (L > 0 ? L / qs.idx_block + 1 : 0) * qs.idx_dim * 4,
-                                           h_pool_full);
-                    // KV streaming: the host copy is the identity layout and holds every cell
-                    for (const auto& [pool, w] : kv_arrays(st)) {
-                        h_kv = hash_cells(pool, w, 0, L, h_kv);
-                        h_stale = hash_cells(pool, w, L, end_cell, h_stale);
-                    }
-                }
-                uint64_t h_mtp = 1469598103934665603ull;
-                if (use_mtp) {
-                    const strata::core::QsaState& ms = mtp.kv_state();
-                    const int64_t mL = std::min<int64_t>(L, ms.max_cells);
-                    for (const auto& [pool, w] : kv_arrays(ms))
-                        if (pool != nullptr) h_mtp = hash_cells(pool, w, 0, mL, h_mtp);
-                }
-                if (!hash_ok) {
-                    std::printf("ERR reading state fingerprint\n");
-                    return 1;
-                }
-                std::fprintf(stderr, "strata serve: STATE_HASH L=%lld gdn=%016llx ple=%016llx tail=%016llx pooled=%016llx "
-                                     "kv=%016llx mtp=%016llx stale=%016llx dead=%016llx pooled_full=%016llx ple_prev=%d,%d\n", (long long) L,
-                             (unsigned long long) h_gdn, (unsigned long long) h_ple, (unsigned long long) h_tail,
-                             (unsigned long long) h_pool, (unsigned long long) h_kv, (unsigned long long) h_mtp,
-                             (unsigned long long) h_stale, (unsigned long long) h_dead,
-                             (unsigned long long) h_pool_full, ss.ple_prev[0], ss.ple_prev[1]);
+            if ((state_hash || accepted_prefix_trace) && !cancelled && o.prompt_cache > 0) {
+                std::string fingerprint;
+                if (!hash_session_state((int64_t) live.size(), fingerprint)) return 1;
+                std::fprintf(stderr, "strata serve: %s\n", fingerprint.c_str());
             }
             const int64_t req_hits = drive.d.cache_hits - decode_hits0;
             const int64_t req_look = (drive.d.cache_hits + drive.d.cache_admitted + drive.d.cache_refused) - decode_look0;
