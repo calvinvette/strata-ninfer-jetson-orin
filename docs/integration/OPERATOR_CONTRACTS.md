@@ -232,3 +232,11 @@ finite-scale exhaustion includes synthetic FP16 overflow. [Commands, per-case
 output and identities](../../bench/results/2026-10-09-q6-k-codec-contract/README.md)
 retain scope. This does not qualify real tensor payloads or mixed-precision
 model quality.
+
+The separate [real-payload FP16 check](../../bench/results/2026-10-10-phase4-q6-real-payload/README.md)
+then exercised the profiled `dequant_f16` path on four rows of real Q6_K tensors
+for all five observed matrix shapes. The 51,200 half outputs matched the CPU
+artifact decoder plus independent nearest-half oracle exactly, and device input
+bytes remained unchanged. This closes the real-payload materialization check
+for these shape/codec combinations only; it does not validate GEMM products or
+model quality.
