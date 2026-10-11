@@ -476,3 +476,11 @@ artifacts, even when an IQ1_M screen already exists. On Orin, the Q2_0 3,000- an
 doubling context added 108,068,864 requested session bytes. Splash should run
 the same model-specific matrix against its Metal-backed owner and report host
 availability, device requests and virtual reservations as separate quantities.
+
+For transfer modes, compare the operator-specific counter with whole-request
+time and keep allocation tracing out of timing arms. The Q2_0 PLE mmap/direct
+screen returned a 0.3 ms PLE counter inside roughly 14 s prompts; a tracing-off
+three-pair follow-up had opposite paired directions and a 0.49% median prompt
+difference. It does not justify a PLE I/O policy change. Splash should expose
+the corresponding Metal operator/copy counter before interpreting end-to-end
+timing, and retain an explicitly unsupported result if that counter is absent.
