@@ -1030,6 +1030,11 @@ if(STRATA_ENABLE_CUDA OR STRATA_ENABLE_HIP)
   add_test(NAME platform_memory_test COMMAND platform_memory_test)
 
   if(STRATA_ENABLE_CUDA AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    add_executable(captured_graph_trace_test tests/core/captured_graph_trace_test.cpp)
+    target_link_libraries(captured_graph_trace_test PRIVATE strata_engine ${_strata_gpu_runtime_target})
+    add_test(NAME captured_graph_trace_test COMMAND captured_graph_trace_test)
+    set_tests_properties(captured_graph_trace_test PROPERTIES ENVIRONMENT "STRATA_INTEGRATION_TRACE=1")
+
     add_executable(pinned_fallback_test src/core/pinned_fallback_test.cpp)
     target_link_libraries(pinned_fallback_test PRIVATE strata_core ${_strata_gpu_runtime_target})
     target_link_options(pinned_fallback_test PRIVATE "LINKER:--wrap=cudaHostRegister")
