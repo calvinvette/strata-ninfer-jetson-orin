@@ -786,3 +786,14 @@ The median paired request delta was −1.27% (95% bootstrap interval −3.48% to
 confirmation, this confirms staging activity at both capacities, but the cache
 strata ran sequentially and no cross-profile interaction or default is
 qualified.
+
+A three-pair [Q2_0 pageable/pinned stage screen](../../bench/results/2026-10-11-phase3-q2-stage-pin-screen/README.md)
+also matched generated IDs, all nine state fields, cache counters and expected
+stage-owner types in every pair. Both modes requested 353,894,400 bytes of
+stage buffers. The traced timing screen had one large prompt outlier; its
+request interval spans zero, and it supports no performance claim. The guarded
+28-GiB-capped campaign stayed above 12.61 GiB effective cgroup headroom. A
+separate 22-GiB attempt was safely stopped at 5.97 GiB sampled effective
+headroom and is retained as a pressure abort; no OOM occurred. This adds a
+Q2_0 transfer-correctness point but leaves the broader Phase 3 transfer gate
+open.
