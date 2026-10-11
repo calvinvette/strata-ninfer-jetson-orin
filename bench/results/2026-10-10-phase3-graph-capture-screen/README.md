@@ -15,6 +15,8 @@ deltas do not attribute memory exclusively to graph executables or capture
 transients. See the earlier [calibrated graph memory API probe](../2026-10-10-phase3-graph-memory-probe/README.md)
 for the probe's validation and limitations.
 
+The Orin process-attribution interfaces were also checked: `nvidia-smi --query-compute-apps=pid,used_memory` returns `[N/A]`; `tegrastats --readall` reports system RAM and utilization but no per-process allocation; `/sys/kernel/debug` exposes no NvMap/GPU client tables. Thus there is no independent process-exclusive device-memory counter available here to price graph executable/driver objects.
+
 The paired eager request is unsupported by this service path. The engine's
 `--no-capture` implementation enters `session_token`, which has no CPU expert
 pool hook; the engine correctly refuses the request unless `--no-pool` is
