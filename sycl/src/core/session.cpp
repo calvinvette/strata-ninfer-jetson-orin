@@ -4,6 +4,7 @@
 #include <dpct/dpct.hpp>
 #include "strata/sycl_queue.hpp"
 #include "strata/core/session.hpp"
+#include "strata/platform/integration_trace.hpp"
 #include "strata/kernels/mrope.hpp"
 #include "strata/core/progress.hpp"
 
@@ -293,6 +294,9 @@ bool session_capture(const WeightTable& tables, const ModelGeometry& g, SessionS
                 err = "session_capture: instantiate failed at layer " + std::to_string(l);
                 return false;
             }
+            const char* owner = post ? "session-post-graph"
+                                     : (half ? "session-stage-graph" : "session-pre-graph");
+            strata::platform::integration_trace::event(owner, "graph_instantiate", &gr, nullptr, 0, -1, 1);
             delete (graph);
             return true;
         }
@@ -1312,6 +1316,7 @@ bool session_capture_token(const WeightTable &tables, const ModelGeometry &g,
               dpct::get_error_string_dummy(ie);
         return false;
     }
+    strata::platform::integration_trace::event("session-token-graph", "graph_instantiate", &tg, nullptr, 0, -1, 1);
     tg.captured = true;
     tg.n_layers = g.n_layers;
     tg.y_src = y_miss_host;

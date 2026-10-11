@@ -558,4 +558,4 @@ not graph-pool sizing or total memory ownership. A future Strata + Splash port
 should inventory each engine's graph creation sites, attach labels only after
 successful instantiation, and compare the count with an independent runtime
 probe. Keep the calibration and workload/configuration identity with any
-platform memory delta.
+platform memory delta. A later [session-graph instrumentation follow-up](../../bench/results/2026-10-11-phase3-graph-session-owner-check/README.md) adds events at legacy per-layer session graphs, the session token graph, and the generic `CapturedGraph` registry in CUDA/HIP and SYCL. The validated native pack bypasses those legacy paths, so its seven-scenario Orin rerun only confirms the verifier/MTP sequence remains 10/10; session-graph runtime coverage remains untested. For Splash, include these graph families in the owner inventory but keep unexercised classes separate from runtime-qualified evidence.

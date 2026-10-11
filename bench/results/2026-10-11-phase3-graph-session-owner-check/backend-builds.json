@@ -1,0 +1,31 @@
+{
+  "orin_cuda": {
+    "target": "strata",
+    "status": "pass",
+    "command": "cmake --build build/integration/candidate --target strata --parallel 1",
+    "binary_sha256": "3ed52e6e0f845415b8fb2f2c15577f4b90efe49be72e2866d0dc961dbb0c95b0"
+  },
+  "maestro1_hip": {
+    "target": "strata",
+    "status": "pass",
+    "command": "cmake --build build-hip --target strata --parallel 1",
+    "binary_sha256": "0e088866d3f5fb20cbd5e7a7741977aa822b7a15f95b5de1c2d9d1c2e0341d93",
+    "evidence_scope": "x86 build only; not Orin performance evidence"
+  },
+  "maestro1_sycl": {
+    "target": "strata",
+    "status": "pass",
+    "command": "LIBRARY_PATH=<oneAPI MKL lib> cmake --build build-sycl-expanded --target strata --parallel 1",
+    "binary_sha256": "b2e5dfb1ee5104bfa8e1d5da3869c2161db4f234f8d21623f69e373cb3c4ce6b",
+    "evidence_scope": "x86 build only; not SYCL device runtime or Orin performance evidence",
+    "link_note": "Linker warned that transitive libsvml, libirng, libimf and libintlc dependencies of libOpenCL were not found; target linked successfully with the existing MKL library directory on LIBRARY_PATH."
+  },
+  "maestro1_snapshot_restored": {
+    "src/core/session.cpp": "55ae0925797cdb8ca06bd529ef7bc498e3ddc0c4b0978e5334d47d0119ac8a44",
+    "sycl/src/core/session.cpp": "0b3127b430156138fc251427bbc7ecf2c7a4ad1a1294879e2daf6eddefbb70fb",
+    "src/core/graph.cpp": "c248aaa1935fce340cd49320ec97ed5fc17d05a8923bf72bea468f8128241b1c",
+    "sycl/src/core/graph.cpp": "bd46e2868f713f14a02297a87d5486eca751445bcba65f2a941587f8923ac998",
+    "src/core/mtp.cpp": "f7d43ed3b3082d02b13af5d7135b93dbbdfe30c3865c7397e687bed01bd26e05",
+    "sycl/src/core/mtp.cpp": "43a75119e3eb6422ffb9b74c947ba8119d17ec07b795f3ec1dd2b3b24164ac9b"
+  }
+}

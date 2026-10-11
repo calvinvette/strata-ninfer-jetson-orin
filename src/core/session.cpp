@@ -3,6 +3,7 @@
 #include "strata/core/session.hpp"
 #include "strata/kernels/mrope.hpp"
 #include "strata/core/progress.hpp"
+#include "strata/platform/integration_trace.hpp"
 
 #include "strata/kernels/qsa.hpp"
 #include "strata/kernels/elementwise.hpp"
@@ -248,6 +249,9 @@ bool session_capture(const WeightTable& tables, const ModelGeometry& g, SessionS
                 err = "session_capture: instantiate failed at layer " + std::to_string(l);
                 return false;
             }
+            const char* owner = post ? "session-post-graph"
+                                     : (half ? "session-stage-graph" : "session-pre-graph");
+            strata::platform::integration_trace::event(owner, "graph_instantiate", &gr, nullptr, 0, -1, 1);
             cudaGraphDestroy(graph);
             return true;
         };
@@ -896,6 +900,7 @@ bool session_capture_token(const WeightTable& tables, const ModelGeometry& g, Se
         err = std::string("session_capture_token: instantiate: ") + cudaGetErrorString(ie);
         return false;
     }
+    strata::platform::integration_trace::event("session-token-graph", "graph_instantiate", &tg, nullptr, 0, -1, 1);
     tg.captured = true;
     tg.n_layers = g.n_layers;
     tg.y_src = y_miss_host;

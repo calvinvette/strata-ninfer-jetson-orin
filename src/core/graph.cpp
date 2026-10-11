@@ -2,6 +2,7 @@
 #include "strata/core/graph.hpp"
 
 #include "strata/platform/cpu_relax.hpp"
+#include "strata/platform/integration_trace.hpp"
 
 #include <chrono>
 #include <cstdio>
@@ -64,6 +65,7 @@ bool CapturedGraph::end(void* stream, std::string& err) {
 
     e = cudaGraphInstantiate(&exec_, graph_, nullptr, nullptr, 0);
     if (e != cudaSuccess) return fail(err, "cudaGraphInstantiate", e);
+    strata::platform::integration_trace::event("captured-graph", "graph_instantiate", this, nullptr, 0, -1, 1);
 
     // The completion event is recorded ONCE and reused: `launch` records it again after each replay, which is
     // what makes `wait_ms` a query rather than a sync.

@@ -3,6 +3,7 @@
 #include <dpct/dpct.hpp>
 #include "strata/sycl_queue.hpp"
 #include "strata/core/graph.hpp"
+#include "strata/platform/integration_trace.hpp"
 
 #include <immintrin.h>
 
@@ -110,6 +111,7 @@ bool CapturedGraph::end(void *stream, std::string &err) try {
     DPCT1000: Error handling if-stmt was detected but could not be rewritten.
     */
     if (e != 0) return fail(err, "cudaGraphInstantiate", e);
+    strata::platform::integration_trace::event("captured-graph", "graph_instantiate", this, nullptr, 0, -1, 1);
 
     // The completion event is recorded ONCE and reused: `launch` records it again after each replay, which is
     // what makes `wait_ms` a query rather than a sync.
