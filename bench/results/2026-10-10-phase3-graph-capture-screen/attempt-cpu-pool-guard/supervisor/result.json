@@ -1,0 +1,62 @@
+{
+  "command": [
+    "/home/calvin/models/strata-orin-validation/pack-venv/bin/python",
+    "tools/integration/graph_capture_memory_pair.py",
+    "--config",
+    "build/integration/candidate-protocol/server-config.json",
+    "--engine",
+    "build/integration/candidate/strata",
+    "--interposer",
+    "/tmp/strata-graph-mem-probe.so",
+    "--output",
+    "bench/results/2026-10-10-phase3-graph-capture-screen/rep1/experiment",
+    "--prompt-tokens",
+    "512",
+    "--generated-tokens",
+    "8",
+    "--expert-cache",
+    "3000",
+    "--context",
+    "8192",
+    "--seed",
+    "20261012"
+  ],
+  "cwd": "/home/calvin/workspace/strata-ninfer-jetson-orin",
+  "status": "fail",
+  "floor_bytes": 6442450944,
+  "started_wall_s": 1791680710.2276113,
+  "energy_scope": "not measured; raw tegrastats rails only",
+  "counters": "engine stdout/stderr; unavailable counters are not inferred",
+  "initial_memory": {
+    "monotonic_s": 949879.800502395,
+    "wall_time_s": 1791680710.2290404,
+    "available_bytes": 26450616320,
+    "total_bytes": 32187883520,
+    "swap_used_bytes": 1299709952,
+    "cgroups": [
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/session-388.scope",
+        "current_bytes": 9672781824,
+        "max_bytes": null
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice",
+        "current_bytes": 9721876480,
+        "max_bytes": null
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice",
+        "current_bytes": 9722392576,
+        "max_bytes": null
+      }
+    ],
+    "cgroup_v2_observed": true,
+    "admission_available_bytes": 26450616320
+  },
+  "tegrastats": "started; inspect raw log for availability",
+  "reason": "command exit; numerical/workload qualification is separate",
+  "minimum_available_bytes": 14237065216,
+  "returncode": 1,
+  "elapsed_s": 83.76039962808136,
+  "finished_wall_s": 1791680794.0483332
+}

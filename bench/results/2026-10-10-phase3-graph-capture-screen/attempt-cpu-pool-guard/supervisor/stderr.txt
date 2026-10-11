@@ -1,0 +1,31 @@
+Traceback (most recent call last):
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/graph_capture_memory_pair.py", line 210, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/graph_capture_memory_pair.py", line 165, in main
+    engine = StrataEngine(str(args.engine.resolve()), arm['args'], cwd=cfg.get('cwd'),
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/serve/server.py", line 693, in __init__
+    raise RuntimeError(why + (f" (see {log})" if log else "") +
+RuntimeError: the engine exited before it was ready (see bench/results/2026-10-10-phase3-graph-capture-screen/rep1/experiment/eager.engine.txt)
+the engine log's last lines:
+  strata generate: 11 pool workers on logical processors 1,2,3,4,5,6,7,8,9,10,11, the host thread on 0 (draining too) (--host-core first)
+  strata trace: 23091 MiB free after the weights, the session and the drafter
+  strata integration: {"schema":1,"monotonic_s":949955.778731139,"owner":"expert-cache","kind":"allocate","instance":281474510726960,"allocation":14404550656,"requested_bytes":7985945600,"device":0,"count":0}
+  strata generate: expert cache 3903 slots, 7.44 GiB of shared RAM allocated to the GPU; policy is
+  strata trace: 15461 MiB free after opening the expert cache
+  strata generate: the GPU computes the experts in the cache; it rounds differently from the CPU,
+                   so a reply can differ slightly from a run without the cache (same quality:
+                   bench/results/2026-09-27-cache-parity).
+                   PROFILE, ranked by routing frequency, no eviction.
+  strata generate: the profile fill asks for 256 pairs ahead (STRATA_FILL_AHEAD)
+  strata trace: 15430 MiB free after the profile fill
+  strata generate: pre-filled 3903 of 3903 slots from the profile in 4.9 s (1616 MB/s); slot 0 verified
+  strata trace: 15430 MiB free after the R4 hit path
+  strata generate: R4 hit path ON - resident experts are computed on the GPU
+  strata generate: 11 expert-pool workers + the host thread
+  strata generate: --no-capture runs `session_token`, which has NO CPU expert pool hook, so the routed experts would silently contribute nothing. Pass --no-pool as well if the GPU-only floor is what you want.
+  strata integration: {"schema":1,"monotonic_s":949961.331061805,"owner":"expert-cache","kind":"free","instance":281474510726960,"allocation":14404550656,"requested_bytes":0,"device":0,"count":0}
+  GRAPH_MEM_PROBE {"id":17,"phase":"after_stream_synchronize","device":0,"free_bytes":20728504320,"total_bytes":32187883520,"graph_used_current_bytes":0,"graph_used_high_bytes":0,"graph_reserved_current_bytes":0,"graph_reserved_high_bytes":0,"query_status":0,"operation_status":0}
+  strata integration: {"schema":1,"monotonic_s":949961.874102550,"owner":"mtp","kind":"free","instance":281474510763776,"allocation":13858295808,"requested_bytes":0,"device":0,"count":0}
+  strata integration: {"schema":1,"monotonic_s":949961.874580608,"owner":"mtp","kind":"free","instance":281474510763776,"allocation":13876133888,"requested_bytes":0,"device":0,"count":0}
