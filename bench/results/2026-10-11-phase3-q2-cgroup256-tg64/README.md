@@ -19,9 +19,11 @@ identified in `artifact-identities.json` and stay under `~/models/`.
 
 The 64-token request passed at 18 and 20 GiB, while the 16 GiB request was
 aborted after prefill. These are cell outcomes, not a supported-capacity
-threshold. Observed cgroup `memory.current` varied substantially between
-independent runs, consistent with cgroup file-cache charging; do not infer
-incremental engine allocation or compare these peaks as process-only RAM.
+threshold. The sequential run order was 9.5, 10, 12, 20, 16 and 18 GiB; it was not
+randomized. Observed cgroup `memory.current` varied substantially between
+runs, consistent with cgroup file-cache charging and the order in which pages
+were first faulted. Do not infer incremental engine allocation or compare
+these peaks as process-only RAM.
 Host `MemAvailable` remained above 21.5 GiB in every cell, so the aborts were
 from the effective cgroup guard, not physical host pressure. Cgroup and host
 memory measurements are distinct and are never added.
