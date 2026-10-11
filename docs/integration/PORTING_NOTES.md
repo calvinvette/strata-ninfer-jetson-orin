@@ -377,6 +377,16 @@ Splash, preserve these boundaries while measuring Metal resource residency,
 actual clocks and system-wide physical pressure with the backend-specific
 profiling permission model documented.
 
+The Q6_K test-only CTA-size screen compared 128/256/512 threads with the
+production 256-thread path over full real matrices and required bitwise output
+equality before timing. Its three process-level repeats found no consistent
+winner; profile-weighted changes were sub-percent, and the 256/512-thread
+effects crossed zero between processes. This is a rejected local schedule
+screen, not a reason to alter the default. For Splash, vary a threadgroup
+parameter only after the source decode and output contract is fixed, randomize
+schedule order, and repeat separate processes before deciding whether a
+candidate deserves service-level testing.
+
 ## Make parity readers artifact-aware at the PLE seam
 
 The fixture-free block oracle from Strata upstream PR #568 avoids captures
