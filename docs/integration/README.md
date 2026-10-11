@@ -2,10 +2,13 @@
 
 This project starts from Strata's validated ARM64 port and applies the architecture,
 correctness methods and measured SM87 lessons from the NInfer Orin port. The first
-deliverable is an integration plan and an auditable source/evidence import. The
-combined runtime is **not implemented or benchmarked yet**. Phase 1 control
-harness implementation is underway; see [control reproduction](PHASE1.md) and
-[porting notes for future engines](PORTING_NOTES.md).
+deliverable was an integration plan and an auditable source/evidence import.
+This remains an active integration and qualification effort, not a claim of
+combined-runtime speedup. Phases 1 and 2 are complete; Phases 3 and 4 are in
+progress. Current admission, transfer and profiling evidence is summarized in
+[status](STATUS.md). See [control reproduction](PHASE1.md) and
+[porting notes for future engines](PORTING_NOTES.md) for reproducible methods
+and lessons for a future Strata + Splash integration.
 
 Start with the [development plan](PLAN.md), [architecture](ARCHITECTURE.md),
 [benchmark protocol](BENCHMARKS.md), [import map](IMPORT_MAP.md), and

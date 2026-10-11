@@ -285,6 +285,19 @@ diagnostics](../../bench/results/2026-10-10-phase3-transfer-energy/README.md)
 and [fixed-cache transfer screen](../../bench/results/2026-10-10-phase3-transfer-energy-fixed-cache/README.md)
 preserve the comparison and its limits.
 
+A seven-pair randomized fixed-cache follow-up measured mapped request time
+4.14% lower at the median for the same 512+64 workload, with a bootstrap
+interval for the median paired delta of −5.57% to −4.02%. All outputs and nine
+state fingerprints matched, and the six-GiB headroom floor held. Prompt times
+were nearly equal while decode favored mapped reads. The estimated system rails
+and NVMe partition counters include unrelated work, so this remains one-device,
+one-workload evidence and does not justify changing a default. In a future
+Strata + Splash study, pair file/resource access paths with fixed residency,
+identical state and emission checks, and separate Metal resource residency from
+system-wide memory pressure. Keep device I/O and power counters labeled by scope;
+do not convert host-wide observations into process-level claims. See the
+[seven-pair report](../../bench/results/2026-10-10-phase3-transfer-confirmation7/README.md).
+
 The [async-pool transfer screen](../../bench/results/2026-10-10-phase3-async-pool/README.md)
 adds a 64 MiB transient CUDA pool allocation/copy/kernel/free path beside pinned
 copy, mapped-host and sequential-managed controls. It checks exact checksums,
