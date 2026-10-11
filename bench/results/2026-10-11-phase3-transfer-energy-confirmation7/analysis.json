@@ -1,0 +1,153 @@
+{
+  "n_pairs": 7,
+  "paired_pct_deltas_mapped_minus_pread": {
+    "request_ms": {
+      "values": [
+        -9.68848899990328,
+        -6.272449115338556,
+        -6.2630674495202685,
+        -4.237153029954121,
+        -49.86498053400337,
+        102.19506546717734,
+        -4.932025764687769
+      ],
+      "median": -6.2630674495202685,
+      "bootstrap_95pct_percentile": [
+        -9.68848899990328,
+        -4.237153029954121
+      ]
+    },
+    "VIN_SYS_5V0": {
+      "values": [
+        -8.193464052498452,
+        -5.386116736659273,
+        -0.8558673595062226,
+        -5.5557993617163755,
+        -38.36823716213028,
+        57.577568392142986,
+        -2.948229774450212
+      ],
+      "median": -5.386116736659273,
+      "bootstrap_95pct_percentile": [
+        -8.193464052498452,
+        -0.8558673595062226
+      ]
+    },
+    "VDD_GPU_SOC": {
+      "values": [
+        -6.061016537328197,
+        -3.2568019671585584,
+        -1.9878828462071427,
+        -4.670213163084104,
+        -39.283527150688855,
+        61.128026863695396,
+        -3.650270262006319
+      ],
+      "median": -3.650270262006319,
+      "bootstrap_95pct_percentile": [
+        -6.061016537328197,
+        -1.9878828462071427
+      ]
+    },
+    "VDD_CPU_CV": {
+      "values": [
+        -25.588875596486872,
+        -22.316182276755523,
+        -21.76190933207645,
+        -17.452838119125637,
+        -30.127597871254775,
+        31.998273756177692,
+        -21.87085771735786
+      ],
+      "median": -21.87085771735786,
+      "bootstrap_95pct_percentile": [
+        -25.588875596486872,
+        -17.452838119125637
+      ]
+    },
+    "block_reads": {
+      "values": [
+        -14.189979243019824,
+        -8.557504176887534,
+        -3.8056026114797756,
+        -6.5456673102802645,
+        -2.8871543666451625,
+        -8.625654037734854,
+        -4.568225300411992
+      ],
+      "median": -6.5456673102802645,
+      "bootstrap_95pct_percentile": [
+        -8.625654037734854,
+        -3.8056026114797756
+      ]
+    }
+  },
+  "arm_medians": {
+    "request_ms": {
+      "mapped": 27030.5,
+      "pread": 28226.5
+    },
+    "VIN_SYS_5V0": {
+      "mapped": 193.93561254789756,
+      "pread": 202.65287493314926
+    },
+    "VDD_GPU_SOC": {
+      "mapped": 306.17120428406827,
+      "pread": 318.9439524579558
+    },
+    "VDD_CPU_CV": {
+      "mapped": 87.80770061424802,
+      "pread": 112.38789784302567
+    },
+    "block_reads": {
+      "mapped": 8084525056,
+      "pread": 8736342016
+    }
+  },
+  "paired_metrics": {
+    "mapped": {
+      "prompt_ms_median": 22206.9,
+      "decode_ms_median": 4627.0,
+      "major_faults_median": 88955,
+      "minor_faults_median": 183854,
+      "cpu_clock_mhz_median_of_request_medians": 883.0,
+      "cpu_clock_mhz_range": [
+        729,
+        2201
+      ],
+      "vin_sys_5v0_energy_j_median": 193.93561254789756,
+      "vdd_gpu_soc_energy_j_median": 306.17120428406827,
+      "actual_cache_slots": [
+        6519
+      ],
+      "expert_cache_hits": [
+        49629
+      ]
+    },
+    "pread": {
+      "prompt_ms_median": 22280.0,
+      "decode_ms_median": 6023.3,
+      "major_faults_median": 61809,
+      "minor_faults_median": 210082,
+      "cpu_clock_mhz_median_of_request_medians": 1036.0,
+      "cpu_clock_mhz_range": [
+        729,
+        2201
+      ],
+      "vin_sys_5v0_energy_j_median": 202.65287493314926,
+      "vdd_gpu_soc_energy_j_median": 318.9439524579558,
+      "actual_cache_slots": [
+        6519
+      ],
+      "expert_cache_hits": [
+        49629
+      ]
+    }
+  },
+  "limitations": [
+    "The two largest request-time outliers are retained: pair 4 pread and pair 5 mapped; both request CPU median was 729 MHz.",
+    "tegrastats reported no GR3D or EMC clock samples; CPU clocks were dynamic.",
+    "Process read_bytes and leaf-cgroup io.stat were unavailable. NVMe read-byte deltas are whole-device counters and include unrelated I/O and readahead.",
+    "Rail energy integrates named whole-board rails and includes unrelated system activity; rail values are separate and non-additive."
+  ]
+}
