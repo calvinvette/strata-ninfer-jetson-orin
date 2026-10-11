@@ -1,0 +1,29 @@
+{
+  "scope": "Q2_0 decode stream cancellation and same-process recovery under 22 GiB cgroup MemoryMax",
+  "model": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-Orin-validation",
+  "checks": [
+    {
+      "check": "decode_disconnect",
+      "status": "pass",
+      "first_visible_text": "1",
+      "event_count": 2,
+      "close_after_s": 7.90684277692344
+    },
+    {
+      "check": "same_process_recovery",
+      "status": "pass",
+      "response_text": "Hello Orin!",
+      "server_alive": true
+    }
+  ],
+  "health": {
+    "status": "ok",
+    "max_context": 4096,
+    "model": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-Orin-validation",
+    "images": false,
+    "api_key": false,
+    "loaded": true,
+    "service": "strata"
+  },
+  "server_alive_after_recovery": true
+}

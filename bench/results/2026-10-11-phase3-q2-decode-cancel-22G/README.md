@@ -34,5 +34,17 @@ systemd-run --user --scope -p MemoryMax=22G \
 Two earlier harness starts in this directory are retained but excluded: one
 stopped before requests because `requests` was unavailable in the host Python;
 the next exposed a harness import-path mistake. Neither is an engine failure.
+
+Two additional independent successful starts (`rerun4/` and `rerun5/`) repeated
+the same decode disconnect and same-process recovery, bringing the successful
+total to three. Their minimum physical availability was 21.37 and 21.63 GiB;
+minimum headroom inside the 22 GiB cgroup was 9.50 and 14.64 GiB. No cgroup
+OOM events occurred. In each repeat, all 303 request/session owner allocations
+had matching frees; the separate 1,485,606,400-byte service-lifetime weight
+arena remained allocated until process exit. The first successful run recorded
+302 released pairs and no arena allocation event in the trace. See
+[`repeat-analysis.json`](repeat-analysis.json) and its checker
+[`summarize_repeats.py`](summarize_repeats.py) for the retained comparison.
+
 Phase 3 remains open for broader admission and graph-memory attribution beyond
 these exercised model/configuration points.
