@@ -738,3 +738,14 @@ The same [Phase 3 transfer/cache screen](../../bench/results/2026-10-11-phase3-t
 reran artifact-aware Q2_0 `ple_parity` and `ple_reader_selftest` on the current
 candidate under the six-GiB supervisor; both passed. Integration Python tests
 passed 99/99. Minimum host availability for the PLE CTests was 24.64 GiB.
+
+A fresh seven-pair [scoped-I/O transfer confirmation](../../bench/results/2026-10-11-phase3-transfer-cgroupio-current7/README.md)
+at 6,519 cache slots matched outputs, all nine persistent-state fields and
+cache capacity in every pair. The cgroup counter was calibrated with a 64 MiB
+`O_DIRECT` read and reported exact scope-level request bytes. The mapped arm had
+a −4.80% median paired request delta and −0.668 GB median paired read delta;
+minimum host availability was 8.30 GiB. The nominal pread arm was page-cache
+fill (`STRATA_IO_PF_STAGE=0`), with zero prefetched blobs consumed and zero
+decode waits, so it does not measure request-path pread service. Dynamic clocks
+and this arm limitation remain; no default changed. The reusable calibration
+helper's four focused tests and the full 103-test integration suite pass.
