@@ -588,3 +588,11 @@ and balanced owner events repeated at 32K; stable NVMap capture growth remained
 32K actual prompt length or capacity. This describes the tested Q2_0 startup
 configurations; broader memory attribution and transfer/admission gates still
 keep Phase 3 in progress.
+
+The fresh [Q2_0 PLE and Phase 3 ownership follow-up](../../bench/results/2026-10-11-phase3-ple-followup-current/README.md)
+passed all seven artifact-aware PLE stages (worst relative L1 `1.148e-7`),
+then all 15 selected accounting/owner CTests under the six-GiB supervisor.
+Integration Python unittest discovery passed 91/91. Minimum host availability
+was 24.60 GiB across the supervised checks. This reconfirms selected contracts
+on the current checkout; broad cgroup pressure, other graph paths, and held-out
+transfer/cache interactions remain open, so Phase 3 stays in progress.
