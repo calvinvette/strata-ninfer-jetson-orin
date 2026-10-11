@@ -1,0 +1,3752 @@
+{
+  "scope": "exact real-model prompt, randomized mapped-versus-pread file-tier transfer screen; screening only",
+  "prompt_tokens": 512,
+  "prompt_sha256": "9c1407d465d3daa0d7f5512422144432e482886d33717db09678fc89dddb4f4d",
+  "generated_tokens": 64,
+  "planned_pairs": 7,
+  "io_threads": 8,
+  "expert_cache": "3000",
+  "seed": 20261011,
+  "arms": [
+    {
+      "pair": 0,
+      "name": "mapped",
+      "io_prefetch": "0",
+      "staging": "disabled",
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "64",
+        "--spec",
+        "4",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55"
+      ],
+      "engine_sha256": "d3e8bcde3a430d7d5bb614fec8ba938398699b9abecd41965bb28fd6d465d721",
+      "ids": [
+        32,
+        6165,
+        11036,
+        1928,
+        1472,
+        264,
+        25924,
+        11,
+        7072,
+        48470,
+        14855,
+        421,
+        11690,
+        440,
+        279,
+        17128,
+        11,
+        1048,
+        3750,
+        430,
+        279,
+        13540,
+        13,
+        561,
+        17128,
+        369,
+        279,
+        8358,
+        4560,
+        314,
+        33303,
+        11,
+        8220,
+        364,
+        29234,
+        10895,
+        321,
+        15899,
+        33633,
+        321,
+        19214,
+        7289,
+        13,
+        1049,
+        25224,
+        539,
+        42764,
+        10895,
+        494,
+        4779,
+        11,
+        45543,
+        1070,
+        310,
+        7995,
+        279,
+        3050,
+        3274,
+        2483,
+        11,
+        321,
+        1179,
+        29234,
+        1782
+      ],
+      "text": "A computer processes information through a sophisticated, multi-stage pipeline that begins with the processor, also known as the CPU. The processor is the central engine of computation, responsible for executing instructions and performing arithmetic and logical operations. It operates by fetching instructions from memory, decoding them to determine the specific task required, and then executing those",
+      "usage": {
+        "generated": 64,
+        "prompt_tokens": 512,
+        "prompt_ms": 24828.5,
+        "decode_ms": 5490.3,
+        "finish": "length",
+        "drafts_accepted": 34,
+        "drafts_offered": 87,
+        "reused": 0,
+        "hits": 39629,
+        "lookups": 56160,
+        "ram_blobs": 0,
+        "file_blobs": 0,
+        "file_mb": 26953.1,
+        "prompt_read": 512,
+        "offloaded": 0
+      },
+      "process_io_and_fault_deltas": {
+        "minor_faults": 252587,
+        "cgroup_io_read_bytes": 8410734592,
+        "major_faults": 89857
+      },
+      "board_telemetry_during_request": {
+        "scope": "named tegrastats system rail sampled during request; includes unrelated system activity",
+        "duration_s": 30.673809870961122,
+        "rail_energy_j_estimate": {
+          "VIN_SYS_5V0": 217.26227145297105,
+          "VDD_GPU_SOC": 316.10078976144297,
+          "VDD_CPU_CV": 112.44090414825963
+        },
+        "energy_method": "trapezoid integration of each named rail first mW value at tegrastats sample-arrival times; rails are not additive",
+        "cpu_clock_mhz_samples": 3468,
+        "cpu_clock_mhz_min": 729,
+        "cpu_clock_mhz_median": 806.0,
+        "cpu_clock_mhz_max": 2201,
+        "gr3d_clock_mhz_samples": 0,
+        "emc_clock_mhz_samples": 0,
+        "gr3d_clock_mhz_supported": false,
+        "emc_clock_mhz_supported": false
+      },
+      "host_block_device_reads_during_request": {
+        "device": "nvme0n1p1",
+        "major": 259,
+        "minor": 1,
+        "read_bytes_delta": 8435236864,
+        "scope": "whole host block device; includes unrelated reads and kernel readahead"
+      },
+      "state": {
+        "L": "575",
+        "gdn": "44c9bf09e55d70ea",
+        "ple": "0e385f3fbb0ae980",
+        "tail": "ddbe04e57dfc3429",
+        "dead": "9e9ef4b497c72990",
+        "pooled": "22d078ff318e0c7a",
+        "pooled_full": "274656ae5676c84c",
+        "kv": "9647b61774d0c207",
+        "ple_prev": "1179,29234"
+      },
+      "actual_expert_cache_slots": 3903,
+      "owner_observations": {
+        "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+        "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA VMM address reservations and physical segments/chunks across range ownership transfers, pageable/pinned expert-stage host buffers, primary SessionState backing, verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; SYCL ExpertCache, stage/batch sessions and other sites excluded",
+        "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+        "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+        "allocation_events": 32,
+        "free_events": 31,
+        "observed_allocation_bytes_by_device": {
+          "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+          "peak": {
+            "0": 8661688784
+          },
+          "live_at_log_end": {
+            "0": 343101952
+          }
+        },
+        "vmm_range_mappings": {
+          "map_events": 0,
+          "unmap_events": 0,
+          "still_mapped_at_log_end": []
+        },
+        "planned_reservations": {
+          "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+          "events": []
+        },
+        "virtual_address_ranges": {
+          "scope": "reserved virtual address space only; no physical backing implied and never added to allocation totals",
+          "reserve_events": 0,
+          "release_events": 0,
+          "peak_reserved_bytes_by_device": {},
+          "live_reserved_bytes_by_device": {},
+          "live_ranges_at_log_end": []
+        },
+        "owners": [
+          {
+            "owner": "expert-cache",
+            "instance": 281474179683744,
+            "device": 0,
+            "peak_observed_requested_bytes": 7985945600,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp",
+            "instance": 281474179720560,
+            "device": 0,
+            "peak_observed_requested_bytes": 24778192,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": 1072319160,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "prefill",
+            "instance": 187651501698496,
+            "device": 0,
+            "peak_observed_requested_bytes": 229877760,
+            "live_observed_requested_bytes": 0,
+            "view_events": 34,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "session",
+            "instance": 281474179716432,
+            "device": 0,
+            "peak_observed_requested_bytes": 343101952,
+            "live_observed_requested_bytes": 343101952,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "verifier",
+            "instance": 281474179724712,
+            "device": 0,
+            "peak_observed_requested_bytes": 77985280,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 3
+          }
+        ]
+      },
+      "observed_allocation_bytes_by_device": {
+        "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+        "peak": {
+          "0": 8661688784
+        },
+        "live_at_log_end": {
+          "0": 343101952
+        }
+      },
+      "file_tier_summary_lines": [
+        "strata serve: file tier I/O this request: 69483.1 MB of expert reads; page cache held 61563.5 MB at the read, not 7919.7 MB"
+      ]
+    },
+    {
+      "pair": 0,
+      "name": "pread",
+      "io_prefetch": "1",
+      "staging": "disabled",
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "64",
+        "--spec",
+        "4",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55"
+      ],
+      "engine_sha256": "d3e8bcde3a430d7d5bb614fec8ba938398699b9abecd41965bb28fd6d465d721",
+      "ids": [
+        32,
+        6165,
+        11036,
+        1928,
+        1472,
+        264,
+        25924,
+        11,
+        7072,
+        48470,
+        14855,
+        421,
+        11690,
+        440,
+        279,
+        17128,
+        11,
+        1048,
+        3750,
+        430,
+        279,
+        13540,
+        13,
+        561,
+        17128,
+        369,
+        279,
+        8358,
+        4560,
+        314,
+        33303,
+        11,
+        8220,
+        364,
+        29234,
+        10895,
+        321,
+        15899,
+        33633,
+        321,
+        19214,
+        7289,
+        13,
+        1049,
+        25224,
+        539,
+        42764,
+        10895,
+        494,
+        4779,
+        11,
+        45543,
+        1070,
+        310,
+        7995,
+        279,
+        3050,
+        3274,
+        2483,
+        11,
+        321,
+        1179,
+        29234,
+        1782
+      ],
+      "text": "A computer processes information through a sophisticated, multi-stage pipeline that begins with the processor, also known as the CPU. The processor is the central engine of computation, responsible for executing instructions and performing arithmetic and logical operations. It operates by fetching instructions from memory, decoding them to determine the specific task required, and then executing those",
+      "usage": {
+        "generated": 64,
+        "prompt_tokens": 512,
+        "prompt_ms": 26269.3,
+        "decode_ms": 6753.0,
+        "finish": "length",
+        "drafts_accepted": 34,
+        "drafts_offered": 87,
+        "reused": 0,
+        "hits": 39629,
+        "lookups": 56160,
+        "ram_blobs": 0,
+        "file_blobs": 0,
+        "file_mb": 26953.1,
+        "prompt_read": 512,
+        "offloaded": 0
+      },
+      "process_io_and_fault_deltas": {
+        "minor_faults": 271239,
+        "cgroup_io_read_bytes": 10790129664,
+        "major_faults": 71406
+      },
+      "board_telemetry_during_request": {
+        "scope": "named tegrastats system rail sampled during request; includes unrelated system activity",
+        "duration_s": 33.37481946591288,
+        "rail_energy_j_estimate": {
+          "VIN_SYS_5V0": 231.19510142133527,
+          "VDD_GPU_SOC": 331.9990338026982,
+          "VDD_CPU_CV": 138.78906022589706
+        },
+        "energy_method": "trapezoid integration of each named rail first mW value at tegrastats sample-arrival times; rails are not additive",
+        "cpu_clock_mhz_samples": 3768,
+        "cpu_clock_mhz_min": 729,
+        "cpu_clock_mhz_median": 1036.0,
+        "cpu_clock_mhz_max": 2201,
+        "gr3d_clock_mhz_samples": 0,
+        "emc_clock_mhz_samples": 0,
+        "gr3d_clock_mhz_supported": false,
+        "emc_clock_mhz_supported": false
+      },
+      "host_block_device_reads_during_request": {
+        "device": "nvme0n1p1",
+        "major": 259,
+        "minor": 1,
+        "read_bytes_delta": 10805481472,
+        "scope": "whole host block device; includes unrelated reads and kernel readahead"
+      },
+      "state": {
+        "L": "575",
+        "gdn": "44c9bf09e55d70ea",
+        "ple": "0e385f3fbb0ae980",
+        "tail": "ddbe04e57dfc3429",
+        "dead": "9e9ef4b497c72990",
+        "pooled": "22d078ff318e0c7a",
+        "pooled_full": "274656ae5676c84c",
+        "kv": "9647b61774d0c207",
+        "ple_prev": "1179,29234"
+      },
+      "actual_expert_cache_slots": 3903,
+      "owner_observations": {
+        "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+        "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA VMM address reservations and physical segments/chunks across range ownership transfers, pageable/pinned expert-stage host buffers, primary SessionState backing, verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; SYCL ExpertCache, stage/batch sessions and other sites excluded",
+        "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+        "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+        "allocation_events": 32,
+        "free_events": 31,
+        "observed_allocation_bytes_by_device": {
+          "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+          "peak": {
+            "0": 8661688784
+          },
+          "live_at_log_end": {
+            "0": 343101952
+          }
+        },
+        "vmm_range_mappings": {
+          "map_events": 0,
+          "unmap_events": 0,
+          "still_mapped_at_log_end": []
+        },
+        "planned_reservations": {
+          "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+          "events": []
+        },
+        "virtual_address_ranges": {
+          "scope": "reserved virtual address space only; no physical backing implied and never added to allocation totals",
+          "reserve_events": 0,
+          "release_events": 0,
+          "peak_reserved_bytes_by_device": {},
+          "live_reserved_bytes_by_device": {},
+          "live_ranges_at_log_end": []
+        },
+        "owners": [
+          {
+            "owner": "expert-cache",
+            "instance": 281474505983056,
+            "device": 0,
+            "peak_observed_requested_bytes": 7985945600,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp",
+            "instance": 281474506019872,
+            "device": 0,
+            "peak_observed_requested_bytes": 24778192,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": 1072319160,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "prefill",
+            "instance": 187651005741392,
+            "device": 0,
+            "peak_observed_requested_bytes": 229877760,
+            "live_observed_requested_bytes": 0,
+            "view_events": 34,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "session",
+            "instance": 281474506015744,
+            "device": 0,
+            "peak_observed_requested_bytes": 343101952,
+            "live_observed_requested_bytes": 343101952,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "verifier",
+            "instance": 281474506024024,
+            "device": 0,
+            "peak_observed_requested_bytes": 77985280,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 3
+          }
+        ]
+      },
+      "observed_allocation_bytes_by_device": {
+        "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+        "peak": {
+          "0": 8661688784
+        },
+        "live_at_log_end": {
+          "0": 343101952
+        }
+      },
+      "file_tier_summary_lines": [
+        "strata serve: file tier I/O this request: 69483.1 MB of expert reads; io prefetch: 1621 read ahead (3205.7 MB by pread; 3911.5 ms summed worker time), 0 used, 0 unused, 11255 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches"
+      ]
+    },
+    {
+      "pair": 1,
+      "name": "mapped",
+      "io_prefetch": "0",
+      "staging": "disabled",
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "64",
+        "--spec",
+        "4",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55"
+      ],
+      "engine_sha256": "d3e8bcde3a430d7d5bb614fec8ba938398699b9abecd41965bb28fd6d465d721",
+      "ids": [
+        32,
+        6165,
+        11036,
+        1928,
+        1472,
+        264,
+        25924,
+        11,
+        7072,
+        48470,
+        14855,
+        421,
+        11690,
+        440,
+        279,
+        17128,
+        11,
+        1048,
+        3750,
+        430,
+        279,
+        13540,
+        13,
+        561,
+        17128,
+        369,
+        279,
+        8358,
+        4560,
+        314,
+        33303,
+        11,
+        8220,
+        364,
+        29234,
+        10895,
+        321,
+        15899,
+        33633,
+        321,
+        19214,
+        7289,
+        13,
+        1049,
+        25224,
+        539,
+        42764,
+        10895,
+        494,
+        4779,
+        11,
+        45543,
+        1070,
+        310,
+        7995,
+        279,
+        3050,
+        3274,
+        2483,
+        11,
+        321,
+        1179,
+        29234,
+        1782
+      ],
+      "text": "A computer processes information through a sophisticated, multi-stage pipeline that begins with the processor, also known as the CPU. The processor is the central engine of computation, responsible for executing instructions and performing arithmetic and logical operations. It operates by fetching instructions from memory, decoding them to determine the specific task required, and then executing those",
+      "usage": {
+        "generated": 64,
+        "prompt_tokens": 512,
+        "prompt_ms": 25226.5,
+        "decode_ms": 5653.4,
+        "finish": "length",
+        "drafts_accepted": 34,
+        "drafts_offered": 87,
+        "reused": 0,
+        "hits": 39629,
+        "lookups": 56160,
+        "ram_blobs": 0,
+        "file_blobs": 0,
+        "file_mb": 26953.1,
+        "prompt_read": 512,
+        "offloaded": 0
+      },
+      "process_io_and_fault_deltas": {
+        "minor_faults": 260227,
+        "cgroup_io_read_bytes": 8878268416,
+        "major_faults": 94849
+      },
+      "board_telemetry_during_request": {
+        "scope": "named tegrastats system rail sampled during request; includes unrelated system activity",
+        "duration_s": 31.234226875007153,
+        "rail_energy_j_estimate": {
+          "VIN_SYS_5V0": 212.52666160482767,
+          "VDD_GPU_SOC": 313.8597852033139,
+          "VDD_CPU_CV": 115.30449990257661
+        },
+        "energy_method": "trapezoid integration of each named rail first mW value at tegrastats sample-arrival times; rails are not additive",
+        "cpu_clock_mhz_samples": 3540,
+        "cpu_clock_mhz_min": 729,
+        "cpu_clock_mhz_median": 883.0,
+        "cpu_clock_mhz_max": 2201,
+        "gr3d_clock_mhz_samples": 0,
+        "emc_clock_mhz_samples": 0,
+        "gr3d_clock_mhz_supported": false,
+        "emc_clock_mhz_supported": false
+      },
+      "host_block_device_reads_during_request": {
+        "device": "nvme0n1p1",
+        "major": 259,
+        "minor": 1,
+        "read_bytes_delta": 8901599232,
+        "scope": "whole host block device; includes unrelated reads and kernel readahead"
+      },
+      "state": {
+        "L": "575",
+        "gdn": "44c9bf09e55d70ea",
+        "ple": "0e385f3fbb0ae980",
+        "tail": "ddbe04e57dfc3429",
+        "dead": "9e9ef4b497c72990",
+        "pooled": "22d078ff318e0c7a",
+        "pooled_full": "274656ae5676c84c",
+        "kv": "9647b61774d0c207",
+        "ple_prev": "1179,29234"
+      },
+      "actual_expert_cache_slots": 3903,
+      "owner_observations": {
+        "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+        "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA VMM address reservations and physical segments/chunks across range ownership transfers, pageable/pinned expert-stage host buffers, primary SessionState backing, verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; SYCL ExpertCache, stage/batch sessions and other sites excluded",
+        "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+        "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+        "allocation_events": 32,
+        "free_events": 31,
+        "observed_allocation_bytes_by_device": {
+          "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+          "peak": {
+            "0": 8661688784
+          },
+          "live_at_log_end": {
+            "0": 343101952
+          }
+        },
+        "vmm_range_mappings": {
+          "map_events": 0,
+          "unmap_events": 0,
+          "still_mapped_at_log_end": []
+        },
+        "planned_reservations": {
+          "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+          "events": []
+        },
+        "virtual_address_ranges": {
+          "scope": "reserved virtual address space only; no physical backing implied and never added to allocation totals",
+          "reserve_events": 0,
+          "release_events": 0,
+          "peak_reserved_bytes_by_device": {},
+          "live_reserved_bytes_by_device": {},
+          "live_ranges_at_log_end": []
+        },
+        "owners": [
+          {
+            "owner": "expert-cache",
+            "instance": 281474172273360,
+            "device": 0,
+            "peak_observed_requested_bytes": 7985945600,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp",
+            "instance": 281474172310176,
+            "device": 0,
+            "peak_observed_requested_bytes": 24778192,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": 1072319160,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "prefill",
+            "instance": 187651674198368,
+            "device": 0,
+            "peak_observed_requested_bytes": 229877760,
+            "live_observed_requested_bytes": 0,
+            "view_events": 34,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "session",
+            "instance": 281474172306048,
+            "device": 0,
+            "peak_observed_requested_bytes": 343101952,
+            "live_observed_requested_bytes": 343101952,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "verifier",
+            "instance": 281474172314328,
+            "device": 0,
+            "peak_observed_requested_bytes": 77985280,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 3
+          }
+        ]
+      },
+      "observed_allocation_bytes_by_device": {
+        "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+        "peak": {
+          "0": 8661688784
+        },
+        "live_at_log_end": {
+          "0": 343101952
+        }
+      },
+      "file_tier_summary_lines": [
+        "strata serve: file tier I/O this request: 69483.1 MB of expert reads; page cache held 61114.3 MB at the read, not 8368.9 MB"
+      ]
+    },
+    {
+      "pair": 1,
+      "name": "pread",
+      "io_prefetch": "1",
+      "staging": "disabled",
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "64",
+        "--spec",
+        "4",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55"
+      ],
+      "engine_sha256": "d3e8bcde3a430d7d5bb614fec8ba938398699b9abecd41965bb28fd6d465d721",
+      "ids": [
+        32,
+        6165,
+        11036,
+        1928,
+        1472,
+        264,
+        25924,
+        11,
+        7072,
+        48470,
+        14855,
+        421,
+        11690,
+        440,
+        279,
+        17128,
+        11,
+        1048,
+        3750,
+        430,
+        279,
+        13540,
+        13,
+        561,
+        17128,
+        369,
+        279,
+        8358,
+        4560,
+        314,
+        33303,
+        11,
+        8220,
+        364,
+        29234,
+        10895,
+        321,
+        15899,
+        33633,
+        321,
+        19214,
+        7289,
+        13,
+        1049,
+        25224,
+        539,
+        42764,
+        10895,
+        494,
+        4779,
+        11,
+        45543,
+        1070,
+        310,
+        7995,
+        279,
+        3050,
+        3274,
+        2483,
+        11,
+        321,
+        1179,
+        29234,
+        1782
+      ],
+      "text": "A computer processes information through a sophisticated, multi-stage pipeline that begins with the processor, also known as the CPU. The processor is the central engine of computation, responsible for executing instructions and performing arithmetic and logical operations. It operates by fetching instructions from memory, decoding them to determine the specific task required, and then executing those",
+      "usage": {
+        "generated": 64,
+        "prompt_tokens": 512,
+        "prompt_ms": 25692.7,
+        "decode_ms": 37914.5,
+        "finish": "length",
+        "drafts_accepted": 34,
+        "drafts_offered": 87,
+        "reused": 0,
+        "hits": 39629,
+        "lookups": 56160,
+        "ram_blobs": 0,
+        "file_blobs": 0,
+        "file_mb": 26953.1,
+        "prompt_read": 512,
+        "offloaded": 0
+      },
+      "process_io_and_fault_deltas": {
+        "minor_faults": 265491,
+        "cgroup_io_read_bytes": 10253852672,
+        "major_faults": 63632
+      },
+      "board_telemetry_during_request": {
+        "scope": "named tegrastats system rail sampled during request; includes unrelated system activity",
+        "duration_s": 63.95892069302499,
+        "rail_energy_j_estimate": {
+          "VIN_SYS_5V0": 363.8081518944252,
+          "VDD_GPU_SOC": 548.84811694342,
+          "VDD_CPU_CV": 209.1824750665182
+        },
+        "energy_method": "trapezoid integration of each named rail first mW value at tegrastats sample-arrival times; rails are not additive",
+        "cpu_clock_mhz_samples": 7260,
+        "cpu_clock_mhz_min": 729,
+        "cpu_clock_mhz_median": 729.0,
+        "cpu_clock_mhz_max": 2201,
+        "gr3d_clock_mhz_samples": 0,
+        "emc_clock_mhz_samples": 0,
+        "gr3d_clock_mhz_supported": false,
+        "emc_clock_mhz_supported": false
+      },
+      "host_block_device_reads_during_request": {
+        "device": "nvme0n1p1",
+        "major": 259,
+        "minor": 1,
+        "read_bytes_delta": 10335223808,
+        "scope": "whole host block device; includes unrelated reads and kernel readahead"
+      },
+      "state": {
+        "L": "575",
+        "gdn": "44c9bf09e55d70ea",
+        "ple": "0e385f3fbb0ae980",
+        "tail": "ddbe04e57dfc3429",
+        "dead": "9e9ef4b497c72990",
+        "pooled": "22d078ff318e0c7a",
+        "pooled_full": "274656ae5676c84c",
+        "kv": "9647b61774d0c207",
+        "ple_prev": "1179,29234"
+      },
+      "actual_expert_cache_slots": 3903,
+      "owner_observations": {
+        "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+        "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA VMM address reservations and physical segments/chunks across range ownership transfers, pageable/pinned expert-stage host buffers, primary SessionState backing, verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; SYCL ExpertCache, stage/batch sessions and other sites excluded",
+        "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+        "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+        "allocation_events": 32,
+        "free_events": 31,
+        "observed_allocation_bytes_by_device": {
+          "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+          "peak": {
+            "0": 8661688784
+          },
+          "live_at_log_end": {
+            "0": 343101952
+          }
+        },
+        "vmm_range_mappings": {
+          "map_events": 0,
+          "unmap_events": 0,
+          "still_mapped_at_log_end": []
+        },
+        "planned_reservations": {
+          "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+          "events": []
+        },
+        "virtual_address_ranges": {
+          "scope": "reserved virtual address space only; no physical backing implied and never added to allocation totals",
+          "reserve_events": 0,
+          "release_events": 0,
+          "peak_reserved_bytes_by_device": {},
+          "live_reserved_bytes_by_device": {},
+          "live_ranges_at_log_end": []
+        },
+        "owners": [
+          {
+            "owner": "expert-cache",
+            "instance": 281474311396000,
+            "device": 0,
+            "peak_observed_requested_bytes": 7985945600,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp",
+            "instance": 281474311432816,
+            "device": 0,
+            "peak_observed_requested_bytes": 24778192,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": 1072319160,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "prefill",
+            "instance": 187650778857744,
+            "device": 0,
+            "peak_observed_requested_bytes": 229877760,
+            "live_observed_requested_bytes": 0,
+            "view_events": 34,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "session",
+            "instance": 281474311428688,
+            "device": 0,
+            "peak_observed_requested_bytes": 343101952,
+            "live_observed_requested_bytes": 343101952,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "verifier",
+            "instance": 281474311436968,
+            "device": 0,
+            "peak_observed_requested_bytes": 77985280,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 3
+          }
+        ]
+      },
+      "observed_allocation_bytes_by_device": {
+        "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+        "peak": {
+          "0": 8661688784
+        },
+        "live_at_log_end": {
+          "0": 343101952
+        }
+      },
+      "file_tier_summary_lines": [
+        "strata serve: file tier I/O this request: 69483.1 MB of expert reads; io prefetch: 1740 read ahead (3445.5 MB by pread; 65270.1 ms summed worker time), 0 used, 0 unused, 11934 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches"
+      ]
+    },
+    {
+      "pair": 2,
+      "name": "mapped",
+      "io_prefetch": "0",
+      "staging": "disabled",
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "64",
+        "--spec",
+        "4",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55"
+      ],
+      "engine_sha256": "d3e8bcde3a430d7d5bb614fec8ba938398699b9abecd41965bb28fd6d465d721",
+      "ids": [
+        32,
+        6165,
+        11036,
+        1928,
+        1472,
+        264,
+        25924,
+        11,
+        7072,
+        48470,
+        14855,
+        421,
+        11690,
+        440,
+        279,
+        17128,
+        11,
+        1048,
+        3750,
+        430,
+        279,
+        13540,
+        13,
+        561,
+        17128,
+        369,
+        279,
+        8358,
+        4560,
+        314,
+        33303,
+        11,
+        8220,
+        364,
+        29234,
+        10895,
+        321,
+        15899,
+        33633,
+        321,
+        19214,
+        7289,
+        13,
+        1049,
+        25224,
+        539,
+        42764,
+        10895,
+        494,
+        4779,
+        11,
+        45543,
+        1070,
+        310,
+        7995,
+        279,
+        3050,
+        3274,
+        2483,
+        11,
+        321,
+        1179,
+        29234,
+        1782
+      ],
+      "text": "A computer processes information through a sophisticated, multi-stage pipeline that begins with the processor, also known as the CPU. The processor is the central engine of computation, responsible for executing instructions and performing arithmetic and logical operations. It operates by fetching instructions from memory, decoding them to determine the specific task required, and then executing those",
+      "usage": {
+        "generated": 64,
+        "prompt_tokens": 512,
+        "prompt_ms": 26345.8,
+        "decode_ms": 5639.0,
+        "finish": "length",
+        "drafts_accepted": 34,
+        "drafts_offered": 87,
+        "reused": 0,
+        "hits": 39629,
+        "lookups": 56160,
+        "ram_blobs": 0,
+        "file_blobs": 0,
+        "file_mb": 26953.1,
+        "prompt_read": 512,
+        "offloaded": 0
+      },
+      "process_io_and_fault_deltas": {
+        "minor_faults": 248771,
+        "cgroup_io_read_bytes": 9449467904,
+        "major_faults": 103407
+      },
+      "board_telemetry_during_request": {
+        "scope": "named tegrastats system rail sampled during request; includes unrelated system activity",
+        "duration_s": 32.338677800958976,
+        "rail_energy_j_estimate": {
+          "VIN_SYS_5V0": 218.47226582426873,
+          "VDD_GPU_SOC": 316.4960100365354,
+          "VDD_CPU_CV": 118.02101378964248
+        },
+        "energy_method": "trapezoid integration of each named rail first mW value at tegrastats sample-arrival times; rails are not additive",
+        "cpu_clock_mhz_samples": 3660,
+        "cpu_clock_mhz_min": 729,
+        "cpu_clock_mhz_median": 960.0,
+        "cpu_clock_mhz_max": 2201,
+        "gr3d_clock_mhz_samples": 0,
+        "emc_clock_mhz_samples": 0,
+        "gr3d_clock_mhz_supported": false,
+        "emc_clock_mhz_supported": false
+      },
+      "host_block_device_reads_during_request": {
+        "device": "nvme0n1p1",
+        "major": 259,
+        "minor": 1,
+        "read_bytes_delta": 9484427264,
+        "scope": "whole host block device; includes unrelated reads and kernel readahead"
+      },
+      "state": {
+        "L": "575",
+        "gdn": "44c9bf09e55d70ea",
+        "ple": "0e385f3fbb0ae980",
+        "tail": "ddbe04e57dfc3429",
+        "dead": "9e9ef4b497c72990",
+        "pooled": "22d078ff318e0c7a",
+        "pooled_full": "274656ae5676c84c",
+        "kv": "9647b61774d0c207",
+        "ple_prev": "1179,29234"
+      },
+      "actual_expert_cache_slots": 3903,
+      "owner_observations": {
+        "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+        "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA VMM address reservations and physical segments/chunks across range ownership transfers, pageable/pinned expert-stage host buffers, primary SessionState backing, verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; SYCL ExpertCache, stage/batch sessions and other sites excluded",
+        "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+        "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+        "allocation_events": 32,
+        "free_events": 31,
+        "observed_allocation_bytes_by_device": {
+          "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+          "peak": {
+            "0": 8661688784
+          },
+          "live_at_log_end": {
+            "0": 343101952
+          }
+        },
+        "vmm_range_mappings": {
+          "map_events": 0,
+          "unmap_events": 0,
+          "still_mapped_at_log_end": []
+        },
+        "planned_reservations": {
+          "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+          "events": []
+        },
+        "virtual_address_ranges": {
+          "scope": "reserved virtual address space only; no physical backing implied and never added to allocation totals",
+          "reserve_events": 0,
+          "release_events": 0,
+          "peak_reserved_bytes_by_device": {},
+          "live_reserved_bytes_by_device": {},
+          "live_ranges_at_log_end": []
+        },
+        "owners": [
+          {
+            "owner": "expert-cache",
+            "instance": 281474594367664,
+            "device": 0,
+            "peak_observed_requested_bytes": 7985945600,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp",
+            "instance": 281474594404480,
+            "device": 0,
+            "peak_observed_requested_bytes": 24778192,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": 1072319160,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "prefill",
+            "instance": 187651055060032,
+            "device": 0,
+            "peak_observed_requested_bytes": 229877760,
+            "live_observed_requested_bytes": 0,
+            "view_events": 34,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "session",
+            "instance": 281474594400352,
+            "device": 0,
+            "peak_observed_requested_bytes": 343101952,
+            "live_observed_requested_bytes": 343101952,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "verifier",
+            "instance": 281474594408632,
+            "device": 0,
+            "peak_observed_requested_bytes": 77985280,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 3
+          }
+        ]
+      },
+      "observed_allocation_bytes_by_device": {
+        "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+        "peak": {
+          "0": 8661688784
+        },
+        "live_at_log_end": {
+          "0": 343101952
+        }
+      },
+      "file_tier_summary_lines": [
+        "strata serve: file tier I/O this request: 69483.1 MB of expert reads; page cache held 60549.0 MB at the read, not 8934.2 MB"
+      ]
+    },
+    {
+      "pair": 2,
+      "name": "pread",
+      "io_prefetch": "1",
+      "staging": "disabled",
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "64",
+        "--spec",
+        "4",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55"
+      ],
+      "engine_sha256": "d3e8bcde3a430d7d5bb614fec8ba938398699b9abecd41965bb28fd6d465d721",
+      "ids": [
+        32,
+        6165,
+        11036,
+        1928,
+        1472,
+        264,
+        25924,
+        11,
+        7072,
+        48470,
+        14855,
+        421,
+        11690,
+        440,
+        279,
+        17128,
+        11,
+        1048,
+        3750,
+        430,
+        279,
+        13540,
+        13,
+        561,
+        17128,
+        369,
+        279,
+        8358,
+        4560,
+        314,
+        33303,
+        11,
+        8220,
+        364,
+        29234,
+        10895,
+        321,
+        15899,
+        33633,
+        321,
+        19214,
+        7289,
+        13,
+        1049,
+        25224,
+        539,
+        42764,
+        10895,
+        494,
+        4779,
+        11,
+        45543,
+        1070,
+        310,
+        7995,
+        279,
+        3050,
+        3274,
+        2483,
+        11,
+        321,
+        1179,
+        29234,
+        1782
+      ],
+      "text": "A computer processes information through a sophisticated, multi-stage pipeline that begins with the processor, also known as the CPU. The processor is the central engine of computation, responsible for executing instructions and performing arithmetic and logical operations. It operates by fetching instructions from memory, decoding them to determine the specific task required, and then executing those",
+      "usage": {
+        "generated": 64,
+        "prompt_tokens": 512,
+        "prompt_ms": 26077.7,
+        "decode_ms": 7395.2,
+        "finish": "length",
+        "drafts_accepted": 34,
+        "drafts_offered": 87,
+        "reused": 0,
+        "hits": 39629,
+        "lookups": 56160,
+        "ram_blobs": 0,
+        "file_blobs": 0,
+        "file_mb": 26953.1,
+        "prompt_read": 512,
+        "offloaded": 0
+      },
+      "process_io_and_fault_deltas": {
+        "minor_faults": 263011,
+        "cgroup_io_read_bytes": 10283466752,
+        "major_faults": 69032
+      },
+      "board_telemetry_during_request": {
+        "scope": "named tegrastats system rail sampled during request; includes unrelated system activity",
+        "duration_s": 33.82484107709024,
+        "rail_energy_j_estimate": {
+          "VIN_SYS_5V0": 225.72622614065222,
+          "VDD_GPU_SOC": 329.4606483916402,
+          "VDD_CPU_CV": 147.1299985464239
+        },
+        "energy_method": "trapezoid integration of each named rail first mW value at tegrastats sample-arrival times; rails are not additive",
+        "cpu_clock_mhz_samples": 3828,
+        "cpu_clock_mhz_min": 729,
+        "cpu_clock_mhz_median": 1267.0,
+        "cpu_clock_mhz_max": 2201,
+        "gr3d_clock_mhz_samples": 0,
+        "emc_clock_mhz_samples": 0,
+        "gr3d_clock_mhz_supported": false,
+        "emc_clock_mhz_supported": false
+      },
+      "host_block_device_reads_during_request": {
+        "device": "nvme0n1p1",
+        "major": 259,
+        "minor": 1,
+        "read_bytes_delta": 10317701120,
+        "scope": "whole host block device; includes unrelated reads and kernel readahead"
+      },
+      "state": {
+        "L": "575",
+        "gdn": "44c9bf09e55d70ea",
+        "ple": "0e385f3fbb0ae980",
+        "tail": "ddbe04e57dfc3429",
+        "dead": "9e9ef4b497c72990",
+        "pooled": "22d078ff318e0c7a",
+        "pooled_full": "274656ae5676c84c",
+        "kv": "9647b61774d0c207",
+        "ple_prev": "1179,29234"
+      },
+      "actual_expert_cache_slots": 3903,
+      "owner_observations": {
+        "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+        "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA VMM address reservations and physical segments/chunks across range ownership transfers, pageable/pinned expert-stage host buffers, primary SessionState backing, verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; SYCL ExpertCache, stage/batch sessions and other sites excluded",
+        "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+        "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+        "allocation_events": 32,
+        "free_events": 31,
+        "observed_allocation_bytes_by_device": {
+          "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+          "peak": {
+            "0": 8661688784
+          },
+          "live_at_log_end": {
+            "0": 343101952
+          }
+        },
+        "vmm_range_mappings": {
+          "map_events": 0,
+          "unmap_events": 0,
+          "still_mapped_at_log_end": []
+        },
+        "planned_reservations": {
+          "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+          "events": []
+        },
+        "virtual_address_ranges": {
+          "scope": "reserved virtual address space only; no physical backing implied and never added to allocation totals",
+          "reserve_events": 0,
+          "release_events": 0,
+          "peak_reserved_bytes_by_device": {},
+          "live_reserved_bytes_by_device": {},
+          "live_ranges_at_log_end": []
+        },
+        "owners": [
+          {
+            "owner": "expert-cache",
+            "instance": 281474389108160,
+            "device": 0,
+            "peak_observed_requested_bytes": 7985945600,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp",
+            "instance": 281474389144976,
+            "device": 0,
+            "peak_observed_requested_bytes": 24778192,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": 1072319160,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "prefill",
+            "instance": 187650621014576,
+            "device": 0,
+            "peak_observed_requested_bytes": 229877760,
+            "live_observed_requested_bytes": 0,
+            "view_events": 34,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "session",
+            "instance": 281474389140848,
+            "device": 0,
+            "peak_observed_requested_bytes": 343101952,
+            "live_observed_requested_bytes": 343101952,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "verifier",
+            "instance": 281474389149128,
+            "device": 0,
+            "peak_observed_requested_bytes": 77985280,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 3
+          }
+        ]
+      },
+      "observed_allocation_bytes_by_device": {
+        "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+        "peak": {
+          "0": 8661688784
+        },
+        "live_at_log_end": {
+          "0": 343101952
+        }
+      },
+      "file_tier_summary_lines": [
+        "strata serve: file tier I/O this request: 69483.1 MB of expert reads; io prefetch: 1750 read ahead (3484.5 MB by pread; 4220.4 ms summed worker time), 0 used, 0 unused, 11685 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches"
+      ]
+    },
+    {
+      "pair": 3,
+      "name": "mapped",
+      "io_prefetch": "0",
+      "staging": "disabled",
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "64",
+        "--spec",
+        "4",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55"
+      ],
+      "engine_sha256": "d3e8bcde3a430d7d5bb614fec8ba938398699b9abecd41965bb28fd6d465d721",
+      "ids": [
+        32,
+        6165,
+        11036,
+        1928,
+        1472,
+        264,
+        25924,
+        11,
+        7072,
+        48470,
+        14855,
+        421,
+        11690,
+        440,
+        279,
+        17128,
+        11,
+        1048,
+        3750,
+        430,
+        279,
+        13540,
+        13,
+        561,
+        17128,
+        369,
+        279,
+        8358,
+        4560,
+        314,
+        33303,
+        11,
+        8220,
+        364,
+        29234,
+        10895,
+        321,
+        15899,
+        33633,
+        321,
+        19214,
+        7289,
+        13,
+        1049,
+        25224,
+        539,
+        42764,
+        10895,
+        494,
+        4779,
+        11,
+        45543,
+        1070,
+        310,
+        7995,
+        279,
+        3050,
+        3274,
+        2483,
+        11,
+        321,
+        1179,
+        29234,
+        1782
+      ],
+      "text": "A computer processes information through a sophisticated, multi-stage pipeline that begins with the processor, also known as the CPU. The processor is the central engine of computation, responsible for executing instructions and performing arithmetic and logical operations. It operates by fetching instructions from memory, decoding them to determine the specific task required, and then executing those",
+      "usage": {
+        "generated": 64,
+        "prompt_tokens": 512,
+        "prompt_ms": 26194.2,
+        "decode_ms": 5532.9,
+        "finish": "length",
+        "drafts_accepted": 34,
+        "drafts_offered": 87,
+        "reused": 0,
+        "hits": 39629,
+        "lookups": 56160,
+        "ram_blobs": 0,
+        "file_blobs": 0,
+        "file_mb": 26953.1,
+        "prompt_read": 512,
+        "offloaded": 0
+      },
+      "process_io_and_fault_deltas": {
+        "minor_faults": 261024,
+        "cgroup_io_read_bytes": 9007091712,
+        "major_faults": 100339
+      },
+      "board_telemetry_during_request": {
+        "scope": "named tegrastats system rail sampled during request; includes unrelated system activity",
+        "duration_s": 32.081332740955986,
+        "rail_energy_j_estimate": {
+          "VIN_SYS_5V0": 216.98298517050648,
+          "VDD_GPU_SOC": 315.48971606323374,
+          "VDD_CPU_CV": 115.03203015651876
+        },
+        "energy_method": "trapezoid integration of each named rail first mW value at tegrastats sample-arrival times; rails are not additive",
+        "cpu_clock_mhz_samples": 3636,
+        "cpu_clock_mhz_min": 729,
+        "cpu_clock_mhz_median": 960.0,
+        "cpu_clock_mhz_max": 2201,
+        "gr3d_clock_mhz_samples": 0,
+        "emc_clock_mhz_samples": 0,
+        "gr3d_clock_mhz_supported": false,
+        "emc_clock_mhz_supported": false
+      },
+      "host_block_device_reads_during_request": {
+        "device": "nvme0n1p1",
+        "major": 259,
+        "minor": 1,
+        "read_bytes_delta": 9028280320,
+        "scope": "whole host block device; includes unrelated reads and kernel readahead"
+      },
+      "state": {
+        "L": "575",
+        "gdn": "44c9bf09e55d70ea",
+        "ple": "0e385f3fbb0ae980",
+        "tail": "ddbe04e57dfc3429",
+        "dead": "9e9ef4b497c72990",
+        "pooled": "22d078ff318e0c7a",
+        "pooled_full": "274656ae5676c84c",
+        "kv": "9647b61774d0c207",
+        "ple_prev": "1179,29234"
+      },
+      "actual_expert_cache_slots": 3903,
+      "owner_observations": {
+        "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+        "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA VMM address reservations and physical segments/chunks across range ownership transfers, pageable/pinned expert-stage host buffers, primary SessionState backing, verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; SYCL ExpertCache, stage/batch sessions and other sites excluded",
+        "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+        "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+        "allocation_events": 32,
+        "free_events": 31,
+        "observed_allocation_bytes_by_device": {
+          "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+          "peak": {
+            "0": 8661688784
+          },
+          "live_at_log_end": {
+            "0": 343101952
+          }
+        },
+        "vmm_range_mappings": {
+          "map_events": 0,
+          "unmap_events": 0,
+          "still_mapped_at_log_end": []
+        },
+        "planned_reservations": {
+          "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+          "events": []
+        },
+        "virtual_address_ranges": {
+          "scope": "reserved virtual address space only; no physical backing implied and never added to allocation totals",
+          "reserve_events": 0,
+          "release_events": 0,
+          "peak_reserved_bytes_by_device": {},
+          "live_reserved_bytes_by_device": {},
+          "live_ranges_at_log_end": []
+        },
+        "owners": [
+          {
+            "owner": "expert-cache",
+            "instance": 281474072969408,
+            "device": 0,
+            "peak_observed_requested_bytes": 7985945600,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp",
+            "instance": 281474073006224,
+            "device": 0,
+            "peak_observed_requested_bytes": 24778192,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": 1072319160,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "prefill",
+            "instance": 187650716037232,
+            "device": 0,
+            "peak_observed_requested_bytes": 229877760,
+            "live_observed_requested_bytes": 0,
+            "view_events": 34,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "session",
+            "instance": 281474073002096,
+            "device": 0,
+            "peak_observed_requested_bytes": 343101952,
+            "live_observed_requested_bytes": 343101952,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "verifier",
+            "instance": 281474073010376,
+            "device": 0,
+            "peak_observed_requested_bytes": 77985280,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 3
+          }
+        ]
+      },
+      "observed_allocation_bytes_by_device": {
+        "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+        "peak": {
+          "0": 8661688784
+        },
+        "live_at_log_end": {
+          "0": 343101952
+        }
+      },
+      "file_tier_summary_lines": [
+        "strata serve: file tier I/O this request: 69483.1 MB of expert reads; page cache held 60998.9 MB at the read, not 8484.3 MB"
+      ]
+    },
+    {
+      "pair": 3,
+      "name": "pread",
+      "io_prefetch": "1",
+      "staging": "disabled",
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "64",
+        "--spec",
+        "4",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55"
+      ],
+      "engine_sha256": "d3e8bcde3a430d7d5bb614fec8ba938398699b9abecd41965bb28fd6d465d721",
+      "ids": [
+        32,
+        6165,
+        11036,
+        1928,
+        1472,
+        264,
+        25924,
+        11,
+        7072,
+        48470,
+        14855,
+        421,
+        11690,
+        440,
+        279,
+        17128,
+        11,
+        1048,
+        3750,
+        430,
+        279,
+        13540,
+        13,
+        561,
+        17128,
+        369,
+        279,
+        8358,
+        4560,
+        314,
+        33303,
+        11,
+        8220,
+        364,
+        29234,
+        10895,
+        321,
+        15899,
+        33633,
+        321,
+        19214,
+        7289,
+        13,
+        1049,
+        25224,
+        539,
+        42764,
+        10895,
+        494,
+        4779,
+        11,
+        45543,
+        1070,
+        310,
+        7995,
+        279,
+        3050,
+        3274,
+        2483,
+        11,
+        321,
+        1179,
+        29234,
+        1782
+      ],
+      "text": "A computer processes information through a sophisticated, multi-stage pipeline that begins with the processor, also known as the CPU. The processor is the central engine of computation, responsible for executing instructions and performing arithmetic and logical operations. It operates by fetching instructions from memory, decoding them to determine the specific task required, and then executing those",
+      "usage": {
+        "generated": 64,
+        "prompt_tokens": 512,
+        "prompt_ms": 25878.1,
+        "decode_ms": 7001.2,
+        "finish": "length",
+        "drafts_accepted": 34,
+        "drafts_offered": 87,
+        "reused": 0,
+        "hits": 39629,
+        "lookups": 56160,
+        "ram_blobs": 0,
+        "file_blobs": 0,
+        "file_mb": 26953.1,
+        "prompt_read": 512,
+        "offloaded": 0
+      },
+      "process_io_and_fault_deltas": {
+        "minor_faults": 274374,
+        "cgroup_io_read_bytes": 10633560064,
+        "major_faults": 70721
+      },
+      "board_telemetry_during_request": {
+        "scope": "named tegrastats system rail sampled during request; includes unrelated system activity",
+        "duration_s": 33.2357140929671,
+        "rail_energy_j_estimate": {
+          "VIN_SYS_5V0": 234.71899727868316,
+          "VDD_GPU_SOC": 334.6847857202914,
+          "VDD_CPU_CV": 143.19983547771403
+        },
+        "energy_method": "trapezoid integration of each named rail first mW value at tegrastats sample-arrival times; rails are not additive",
+        "cpu_clock_mhz_samples": 3756,
+        "cpu_clock_mhz_min": 729,
+        "cpu_clock_mhz_median": 1036.0,
+        "cpu_clock_mhz_max": 2201,
+        "gr3d_clock_mhz_samples": 0,
+        "emc_clock_mhz_samples": 0,
+        "gr3d_clock_mhz_supported": false,
+        "emc_clock_mhz_supported": false
+      },
+      "host_block_device_reads_during_request": {
+        "device": "nvme0n1p1",
+        "major": 259,
+        "minor": 1,
+        "read_bytes_delta": 10677039104,
+        "scope": "whole host block device; includes unrelated reads and kernel readahead"
+      },
+      "state": {
+        "L": "575",
+        "gdn": "44c9bf09e55d70ea",
+        "ple": "0e385f3fbb0ae980",
+        "tail": "ddbe04e57dfc3429",
+        "dead": "9e9ef4b497c72990",
+        "pooled": "22d078ff318e0c7a",
+        "pooled_full": "274656ae5676c84c",
+        "kv": "9647b61774d0c207",
+        "ple_prev": "1179,29234"
+      },
+      "actual_expert_cache_slots": 3903,
+      "owner_observations": {
+        "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+        "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA VMM address reservations and physical segments/chunks across range ownership transfers, pageable/pinned expert-stage host buffers, primary SessionState backing, verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; SYCL ExpertCache, stage/batch sessions and other sites excluded",
+        "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+        "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+        "allocation_events": 32,
+        "free_events": 31,
+        "observed_allocation_bytes_by_device": {
+          "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+          "peak": {
+            "0": 8661688784
+          },
+          "live_at_log_end": {
+            "0": 343101952
+          }
+        },
+        "vmm_range_mappings": {
+          "map_events": 0,
+          "unmap_events": 0,
+          "still_mapped_at_log_end": []
+        },
+        "planned_reservations": {
+          "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+          "events": []
+        },
+        "virtual_address_ranges": {
+          "scope": "reserved virtual address space only; no physical backing implied and never added to allocation totals",
+          "reserve_events": 0,
+          "release_events": 0,
+          "peak_reserved_bytes_by_device": {},
+          "live_reserved_bytes_by_device": {},
+          "live_ranges_at_log_end": []
+        },
+        "owners": [
+          {
+            "owner": "expert-cache",
+            "instance": 281474125323552,
+            "device": 0,
+            "peak_observed_requested_bytes": 7985945600,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp",
+            "instance": 281474125360368,
+            "device": 0,
+            "peak_observed_requested_bytes": 24778192,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": 1072319160,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "prefill",
+            "instance": 187651313037904,
+            "device": 0,
+            "peak_observed_requested_bytes": 229877760,
+            "live_observed_requested_bytes": 0,
+            "view_events": 34,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "session",
+            "instance": 281474125356240,
+            "device": 0,
+            "peak_observed_requested_bytes": 343101952,
+            "live_observed_requested_bytes": 343101952,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "verifier",
+            "instance": 281474125364520,
+            "device": 0,
+            "peak_observed_requested_bytes": 77985280,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 3
+          }
+        ]
+      },
+      "observed_allocation_bytes_by_device": {
+        "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+        "peak": {
+          "0": 8661688784
+        },
+        "live_at_log_end": {
+          "0": 343101952
+        }
+      },
+      "file_tier_summary_lines": [
+        "strata serve: file tier I/O this request: 69483.1 MB of expert reads; io prefetch: 1686 read ahead (3339.1 MB by pread; 4049.8 ms summed worker time), 0 used, 0 unused, 11528 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches"
+      ]
+    },
+    {
+      "pair": 4,
+      "name": "mapped",
+      "io_prefetch": "0",
+      "staging": "disabled",
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "64",
+        "--spec",
+        "4",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55"
+      ],
+      "engine_sha256": "d3e8bcde3a430d7d5bb614fec8ba938398699b9abecd41965bb28fd6d465d721",
+      "ids": [
+        32,
+        6165,
+        11036,
+        1928,
+        1472,
+        264,
+        25924,
+        11,
+        7072,
+        48470,
+        14855,
+        421,
+        11690,
+        440,
+        279,
+        17128,
+        11,
+        1048,
+        3750,
+        430,
+        279,
+        13540,
+        13,
+        561,
+        17128,
+        369,
+        279,
+        8358,
+        4560,
+        314,
+        33303,
+        11,
+        8220,
+        364,
+        29234,
+        10895,
+        321,
+        15899,
+        33633,
+        321,
+        19214,
+        7289,
+        13,
+        1049,
+        25224,
+        539,
+        42764,
+        10895,
+        494,
+        4779,
+        11,
+        45543,
+        1070,
+        310,
+        7995,
+        279,
+        3050,
+        3274,
+        2483,
+        11,
+        321,
+        1179,
+        29234,
+        1782
+      ],
+      "text": "A computer processes information through a sophisticated, multi-stage pipeline that begins with the processor, also known as the CPU. The processor is the central engine of computation, responsible for executing instructions and performing arithmetic and logical operations. It operates by fetching instructions from memory, decoding them to determine the specific task required, and then executing those",
+      "usage": {
+        "generated": 64,
+        "prompt_tokens": 512,
+        "prompt_ms": 25987.5,
+        "decode_ms": 5734.7,
+        "finish": "length",
+        "drafts_accepted": 34,
+        "drafts_offered": 87,
+        "reused": 0,
+        "hits": 39629,
+        "lookups": 56160,
+        "ram_blobs": 0,
+        "file_blobs": 0,
+        "file_mb": 26953.1,
+        "prompt_read": 512,
+        "offloaded": 0
+      },
+      "process_io_and_fault_deltas": {
+        "minor_faults": 254558,
+        "cgroup_io_read_bytes": 9635770368,
+        "major_faults": 106361
+      },
+      "board_telemetry_during_request": {
+        "scope": "named tegrastats system rail sampled during request; includes unrelated system activity",
+        "duration_s": 32.07504369493108,
+        "rail_energy_j_estimate": {
+          "VIN_SYS_5V0": 215.13937170170934,
+          "VDD_GPU_SOC": 316.3423337013066,
+          "VDD_CPU_CV": 120.41711555708963
+        },
+        "energy_method": "trapezoid integration of each named rail first mW value at tegrastats sample-arrival times; rails are not additive",
+        "cpu_clock_mhz_samples": 3636,
+        "cpu_clock_mhz_min": 729,
+        "cpu_clock_mhz_median": 960.0,
+        "cpu_clock_mhz_max": 2201,
+        "gr3d_clock_mhz_samples": 0,
+        "emc_clock_mhz_samples": 0,
+        "gr3d_clock_mhz_supported": false,
+        "emc_clock_mhz_supported": false
+      },
+      "host_block_device_reads_during_request": {
+        "device": "nvme0n1p1",
+        "major": 259,
+        "minor": 1,
+        "read_bytes_delta": 9695977472,
+        "scope": "whole host block device; includes unrelated reads and kernel readahead"
+      },
+      "state": {
+        "L": "575",
+        "gdn": "44c9bf09e55d70ea",
+        "ple": "0e385f3fbb0ae980",
+        "tail": "ddbe04e57dfc3429",
+        "dead": "9e9ef4b497c72990",
+        "pooled": "22d078ff318e0c7a",
+        "pooled_full": "274656ae5676c84c",
+        "kv": "9647b61774d0c207",
+        "ple_prev": "1179,29234"
+      },
+      "actual_expert_cache_slots": 3903,
+      "owner_observations": {
+        "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+        "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA VMM address reservations and physical segments/chunks across range ownership transfers, pageable/pinned expert-stage host buffers, primary SessionState backing, verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; SYCL ExpertCache, stage/batch sessions and other sites excluded",
+        "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+        "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+        "allocation_events": 32,
+        "free_events": 31,
+        "observed_allocation_bytes_by_device": {
+          "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+          "peak": {
+            "0": 8661688784
+          },
+          "live_at_log_end": {
+            "0": 343101952
+          }
+        },
+        "vmm_range_mappings": {
+          "map_events": 0,
+          "unmap_events": 0,
+          "still_mapped_at_log_end": []
+        },
+        "planned_reservations": {
+          "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+          "events": []
+        },
+        "virtual_address_ranges": {
+          "scope": "reserved virtual address space only; no physical backing implied and never added to allocation totals",
+          "reserve_events": 0,
+          "release_events": 0,
+          "peak_reserved_bytes_by_device": {},
+          "live_reserved_bytes_by_device": {},
+          "live_ranges_at_log_end": []
+        },
+        "owners": [
+          {
+            "owner": "expert-cache",
+            "instance": 281474866390816,
+            "device": 0,
+            "peak_observed_requested_bytes": 7985945600,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp",
+            "instance": 281474866427632,
+            "device": 0,
+            "peak_observed_requested_bytes": 24778192,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": 1072319160,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "prefill",
+            "instance": 187650854236112,
+            "device": 0,
+            "peak_observed_requested_bytes": 229877760,
+            "live_observed_requested_bytes": 0,
+            "view_events": 34,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "session",
+            "instance": 281474866423504,
+            "device": 0,
+            "peak_observed_requested_bytes": 343101952,
+            "live_observed_requested_bytes": 343101952,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "verifier",
+            "instance": 281474866431784,
+            "device": 0,
+            "peak_observed_requested_bytes": 77985280,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 3
+          }
+        ]
+      },
+      "observed_allocation_bytes_by_device": {
+        "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+        "peak": {
+          "0": 8661688784
+        },
+        "live_at_log_end": {
+          "0": 343101952
+        }
+      },
+      "file_tier_summary_lines": [
+        "strata serve: file tier I/O this request: 69483.1 MB of expert reads; page cache held 60397.0 MB at the read, not 9086.1 MB"
+      ]
+    },
+    {
+      "pair": 4,
+      "name": "pread",
+      "io_prefetch": "1",
+      "staging": "disabled",
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "64",
+        "--spec",
+        "4",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55"
+      ],
+      "engine_sha256": "d3e8bcde3a430d7d5bb614fec8ba938398699b9abecd41965bb28fd6d465d721",
+      "ids": [
+        32,
+        6165,
+        11036,
+        1928,
+        1472,
+        264,
+        25924,
+        11,
+        7072,
+        48470,
+        14855,
+        421,
+        11690,
+        440,
+        279,
+        17128,
+        11,
+        1048,
+        3750,
+        430,
+        279,
+        13540,
+        13,
+        561,
+        17128,
+        369,
+        279,
+        8358,
+        4560,
+        314,
+        33303,
+        11,
+        8220,
+        364,
+        29234,
+        10895,
+        321,
+        15899,
+        33633,
+        321,
+        19214,
+        7289,
+        13,
+        1049,
+        25224,
+        539,
+        42764,
+        10895,
+        494,
+        4779,
+        11,
+        45543,
+        1070,
+        310,
+        7995,
+        279,
+        3050,
+        3274,
+        2483,
+        11,
+        321,
+        1179,
+        29234,
+        1782
+      ],
+      "text": "A computer processes information through a sophisticated, multi-stage pipeline that begins with the processor, also known as the CPU. The processor is the central engine of computation, responsible for executing instructions and performing arithmetic and logical operations. It operates by fetching instructions from memory, decoding them to determine the specific task required, and then executing those",
+      "usage": {
+        "generated": 64,
+        "prompt_tokens": 512,
+        "prompt_ms": 25951.7,
+        "decode_ms": 7627.3,
+        "finish": "length",
+        "drafts_accepted": 34,
+        "drafts_offered": 87,
+        "reused": 0,
+        "hits": 39629,
+        "lookups": 56160,
+        "ram_blobs": 0,
+        "file_blobs": 0,
+        "file_mb": 26953.1,
+        "prompt_read": 512,
+        "offloaded": 0
+      },
+      "process_io_and_fault_deltas": {
+        "minor_faults": 266604,
+        "cgroup_io_read_bytes": 10646167552,
+        "major_faults": 68350
+      },
+      "board_telemetry_during_request": {
+        "scope": "named tegrastats system rail sampled during request; includes unrelated system activity",
+        "duration_s": 33.936794577981345,
+        "rail_energy_j_estimate": {
+          "VIN_SYS_5V0": 230.73947003289328,
+          "VDD_GPU_SOC": 335.763987745466,
+          "VDD_CPU_CV": 146.7210042317153
+        },
+        "energy_method": "trapezoid integration of each named rail first mW value at tegrastats sample-arrival times; rails are not additive",
+        "cpu_clock_mhz_samples": 3840,
+        "cpu_clock_mhz_min": 729,
+        "cpu_clock_mhz_median": 960.0,
+        "cpu_clock_mhz_max": 2201,
+        "gr3d_clock_mhz_samples": 0,
+        "emc_clock_mhz_samples": 0,
+        "gr3d_clock_mhz_supported": false,
+        "emc_clock_mhz_supported": false
+      },
+      "host_block_device_reads_during_request": {
+        "device": "nvme0n1p1",
+        "major": 259,
+        "minor": 1,
+        "read_bytes_delta": 10669076480,
+        "scope": "whole host block device; includes unrelated reads and kernel readahead"
+      },
+      "state": {
+        "L": "575",
+        "gdn": "44c9bf09e55d70ea",
+        "ple": "0e385f3fbb0ae980",
+        "tail": "ddbe04e57dfc3429",
+        "dead": "9e9ef4b497c72990",
+        "pooled": "22d078ff318e0c7a",
+        "pooled_full": "274656ae5676c84c",
+        "kv": "9647b61774d0c207",
+        "ple_prev": "1179,29234"
+      },
+      "actual_expert_cache_slots": 3903,
+      "owner_observations": {
+        "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+        "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA VMM address reservations and physical segments/chunks across range ownership transfers, pageable/pinned expert-stage host buffers, primary SessionState backing, verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; SYCL ExpertCache, stage/batch sessions and other sites excluded",
+        "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+        "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+        "allocation_events": 32,
+        "free_events": 31,
+        "observed_allocation_bytes_by_device": {
+          "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+          "peak": {
+            "0": 8661688784
+          },
+          "live_at_log_end": {
+            "0": 343101952
+          }
+        },
+        "vmm_range_mappings": {
+          "map_events": 0,
+          "unmap_events": 0,
+          "still_mapped_at_log_end": []
+        },
+        "planned_reservations": {
+          "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+          "events": []
+        },
+        "virtual_address_ranges": {
+          "scope": "reserved virtual address space only; no physical backing implied and never added to allocation totals",
+          "reserve_events": 0,
+          "release_events": 0,
+          "peak_reserved_bytes_by_device": {},
+          "live_reserved_bytes_by_device": {},
+          "live_ranges_at_log_end": []
+        },
+        "owners": [
+          {
+            "owner": "expert-cache",
+            "instance": 281474384595408,
+            "device": 0,
+            "peak_observed_requested_bytes": 7985945600,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp",
+            "instance": 281474384632224,
+            "device": 0,
+            "peak_observed_requested_bytes": 24778192,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": 1072319160,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "prefill",
+            "instance": 187651570823984,
+            "device": 0,
+            "peak_observed_requested_bytes": 229877760,
+            "live_observed_requested_bytes": 0,
+            "view_events": 34,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "session",
+            "instance": 281474384628096,
+            "device": 0,
+            "peak_observed_requested_bytes": 343101952,
+            "live_observed_requested_bytes": 343101952,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "verifier",
+            "instance": 281474384636376,
+            "device": 0,
+            "peak_observed_requested_bytes": 77985280,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 3
+          }
+        ]
+      },
+      "observed_allocation_bytes_by_device": {
+        "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+        "peak": {
+          "0": 8661688784
+        },
+        "live_at_log_end": {
+          "0": 343101952
+        }
+      },
+      "file_tier_summary_lines": [
+        "strata serve: file tier I/O this request: 69483.1 MB of expert reads; io prefetch: 1703 read ahead (3381.9 MB by pread; 4324.2 ms summed worker time), 0 used, 0 unused, 11563 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches"
+      ]
+    },
+    {
+      "pair": 5,
+      "name": "pread",
+      "io_prefetch": "1",
+      "staging": "disabled",
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "64",
+        "--spec",
+        "4",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55"
+      ],
+      "engine_sha256": "d3e8bcde3a430d7d5bb614fec8ba938398699b9abecd41965bb28fd6d465d721",
+      "ids": [
+        32,
+        6165,
+        11036,
+        1928,
+        1472,
+        264,
+        25924,
+        11,
+        7072,
+        48470,
+        14855,
+        421,
+        11690,
+        440,
+        279,
+        17128,
+        11,
+        1048,
+        3750,
+        430,
+        279,
+        13540,
+        13,
+        561,
+        17128,
+        369,
+        279,
+        8358,
+        4560,
+        314,
+        33303,
+        11,
+        8220,
+        364,
+        29234,
+        10895,
+        321,
+        15899,
+        33633,
+        321,
+        19214,
+        7289,
+        13,
+        1049,
+        25224,
+        539,
+        42764,
+        10895,
+        494,
+        4779,
+        11,
+        45543,
+        1070,
+        310,
+        7995,
+        279,
+        3050,
+        3274,
+        2483,
+        11,
+        321,
+        1179,
+        29234,
+        1782
+      ],
+      "text": "A computer processes information through a sophisticated, multi-stage pipeline that begins with the processor, also known as the CPU. The processor is the central engine of computation, responsible for executing instructions and performing arithmetic and logical operations. It operates by fetching instructions from memory, decoding them to determine the specific task required, and then executing those",
+      "usage": {
+        "generated": 64,
+        "prompt_tokens": 512,
+        "prompt_ms": 26230.7,
+        "decode_ms": 7254.6,
+        "finish": "length",
+        "drafts_accepted": 34,
+        "drafts_offered": 87,
+        "reused": 0,
+        "hits": 39629,
+        "lookups": 56160,
+        "ram_blobs": 0,
+        "file_blobs": 0,
+        "file_mb": 26953.1,
+        "prompt_read": 512,
+        "offloaded": 0
+      },
+      "process_io_and_fault_deltas": {
+        "minor_faults": 268335,
+        "cgroup_io_read_bytes": 10368839680,
+        "major_faults": 72083
+      },
+      "board_telemetry_during_request": {
+        "scope": "named tegrastats system rail sampled during request; includes unrelated system activity",
+        "duration_s": 33.837624759064056,
+        "rail_energy_j_estimate": {
+          "VIN_SYS_5V0": 225.58987578246598,
+          "VDD_GPU_SOC": 330.268850252983,
+          "VDD_CPU_CV": 146.02893493265506
+        },
+        "energy_method": "trapezoid integration of each named rail first mW value at tegrastats sample-arrival times; rails are not additive",
+        "cpu_clock_mhz_samples": 3804,
+        "cpu_clock_mhz_min": 729,
+        "cpu_clock_mhz_median": 1190.0,
+        "cpu_clock_mhz_max": 2201,
+        "gr3d_clock_mhz_samples": 0,
+        "emc_clock_mhz_samples": 0,
+        "gr3d_clock_mhz_supported": false,
+        "emc_clock_mhz_supported": false
+      },
+      "host_block_device_reads_during_request": {
+        "device": "nvme0n1p1",
+        "major": 259,
+        "minor": 1,
+        "read_bytes_delta": 10445893632,
+        "scope": "whole host block device; includes unrelated reads and kernel readahead"
+      },
+      "state": {
+        "L": "575",
+        "gdn": "44c9bf09e55d70ea",
+        "ple": "0e385f3fbb0ae980",
+        "tail": "ddbe04e57dfc3429",
+        "dead": "9e9ef4b497c72990",
+        "pooled": "22d078ff318e0c7a",
+        "pooled_full": "274656ae5676c84c",
+        "kv": "9647b61774d0c207",
+        "ple_prev": "1179,29234"
+      },
+      "actual_expert_cache_slots": 3903,
+      "owner_observations": {
+        "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+        "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA VMM address reservations and physical segments/chunks across range ownership transfers, pageable/pinned expert-stage host buffers, primary SessionState backing, verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; SYCL ExpertCache, stage/batch sessions and other sites excluded",
+        "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+        "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+        "allocation_events": 32,
+        "free_events": 31,
+        "observed_allocation_bytes_by_device": {
+          "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+          "peak": {
+            "0": 8661688784
+          },
+          "live_at_log_end": {
+            "0": 343101952
+          }
+        },
+        "vmm_range_mappings": {
+          "map_events": 0,
+          "unmap_events": 0,
+          "still_mapped_at_log_end": []
+        },
+        "planned_reservations": {
+          "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+          "events": []
+        },
+        "virtual_address_ranges": {
+          "scope": "reserved virtual address space only; no physical backing implied and never added to allocation totals",
+          "reserve_events": 0,
+          "release_events": 0,
+          "peak_reserved_bytes_by_device": {},
+          "live_reserved_bytes_by_device": {},
+          "live_ranges_at_log_end": []
+        },
+        "owners": [
+          {
+            "owner": "expert-cache",
+            "instance": 281474390229200,
+            "device": 0,
+            "peak_observed_requested_bytes": 7985945600,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp",
+            "instance": 281474390266016,
+            "device": 0,
+            "peak_observed_requested_bytes": 24778192,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": 1072319160,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "prefill",
+            "instance": 187651510711888,
+            "device": 0,
+            "peak_observed_requested_bytes": 229877760,
+            "live_observed_requested_bytes": 0,
+            "view_events": 34,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "session",
+            "instance": 281474390261888,
+            "device": 0,
+            "peak_observed_requested_bytes": 343101952,
+            "live_observed_requested_bytes": 343101952,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "verifier",
+            "instance": 281474390270168,
+            "device": 0,
+            "peak_observed_requested_bytes": 77985280,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 3
+          }
+        ]
+      },
+      "observed_allocation_bytes_by_device": {
+        "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+        "peak": {
+          "0": 8661688784
+        },
+        "live_at_log_end": {
+          "0": 343101952
+        }
+      },
+      "file_tier_summary_lines": [
+        "strata serve: file tier I/O this request: 69483.1 MB of expert reads; io prefetch: 1683 read ahead (3322.2 MB by pread; 4157.3 ms summed worker time), 0 used, 0 unused, 11726 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches"
+      ]
+    },
+    {
+      "pair": 5,
+      "name": "mapped",
+      "io_prefetch": "0",
+      "staging": "disabled",
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "64",
+        "--spec",
+        "4",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55"
+      ],
+      "engine_sha256": "d3e8bcde3a430d7d5bb614fec8ba938398699b9abecd41965bb28fd6d465d721",
+      "ids": [
+        32,
+        6165,
+        11036,
+        1928,
+        1472,
+        264,
+        25924,
+        11,
+        7072,
+        48470,
+        14855,
+        421,
+        11690,
+        440,
+        279,
+        17128,
+        11,
+        1048,
+        3750,
+        430,
+        279,
+        13540,
+        13,
+        561,
+        17128,
+        369,
+        279,
+        8358,
+        4560,
+        314,
+        33303,
+        11,
+        8220,
+        364,
+        29234,
+        10895,
+        321,
+        15899,
+        33633,
+        321,
+        19214,
+        7289,
+        13,
+        1049,
+        25224,
+        539,
+        42764,
+        10895,
+        494,
+        4779,
+        11,
+        45543,
+        1070,
+        310,
+        7995,
+        279,
+        3050,
+        3274,
+        2483,
+        11,
+        321,
+        1179,
+        29234,
+        1782
+      ],
+      "text": "A computer processes information through a sophisticated, multi-stage pipeline that begins with the processor, also known as the CPU. The processor is the central engine of computation, responsible for executing instructions and performing arithmetic and logical operations. It operates by fetching instructions from memory, decoding them to determine the specific task required, and then executing those",
+      "usage": {
+        "generated": 64,
+        "prompt_tokens": 512,
+        "prompt_ms": 25994.0,
+        "decode_ms": 5790.9,
+        "finish": "length",
+        "drafts_accepted": 34,
+        "drafts_offered": 87,
+        "reused": 0,
+        "hits": 39629,
+        "lookups": 56160,
+        "ram_blobs": 0,
+        "file_blobs": 0,
+        "file_mb": 26953.1,
+        "prompt_read": 512,
+        "offloaded": 0
+      },
+      "process_io_and_fault_deltas": {
+        "minor_faults": 253278,
+        "cgroup_io_read_bytes": 9632403456,
+        "major_faults": 101739
+      },
+      "board_telemetry_during_request": {
+        "scope": "named tegrastats system rail sampled during request; includes unrelated system activity",
+        "duration_s": 32.139911735081114,
+        "rail_energy_j_estimate": {
+          "VIN_SYS_5V0": 215.34312495590984,
+          "VDD_GPU_SOC": 316.8325546091772,
+          "VDD_CPU_CV": 120.12629550976116
+        },
+        "energy_method": "trapezoid integration of each named rail first mW value at tegrastats sample-arrival times; rails are not additive",
+        "cpu_clock_mhz_samples": 3648,
+        "cpu_clock_mhz_min": 729,
+        "cpu_clock_mhz_median": 960.0,
+        "cpu_clock_mhz_max": 2201,
+        "gr3d_clock_mhz_samples": 0,
+        "emc_clock_mhz_samples": 0,
+        "gr3d_clock_mhz_supported": false,
+        "emc_clock_mhz_supported": false
+      },
+      "host_block_device_reads_during_request": {
+        "device": "nvme0n1p1",
+        "major": 259,
+        "minor": 1,
+        "read_bytes_delta": 9644044288,
+        "scope": "whole host block device; includes unrelated reads and kernel readahead"
+      },
+      "state": {
+        "L": "575",
+        "gdn": "44c9bf09e55d70ea",
+        "ple": "0e385f3fbb0ae980",
+        "tail": "ddbe04e57dfc3429",
+        "dead": "9e9ef4b497c72990",
+        "pooled": "22d078ff318e0c7a",
+        "pooled_full": "274656ae5676c84c",
+        "kv": "9647b61774d0c207",
+        "ple_prev": "1179,29234"
+      },
+      "actual_expert_cache_slots": 3903,
+      "owner_observations": {
+        "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+        "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA VMM address reservations and physical segments/chunks across range ownership transfers, pageable/pinned expert-stage host buffers, primary SessionState backing, verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; SYCL ExpertCache, stage/batch sessions and other sites excluded",
+        "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+        "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+        "allocation_events": 32,
+        "free_events": 31,
+        "observed_allocation_bytes_by_device": {
+          "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+          "peak": {
+            "0": 8661688784
+          },
+          "live_at_log_end": {
+            "0": 343101952
+          }
+        },
+        "vmm_range_mappings": {
+          "map_events": 0,
+          "unmap_events": 0,
+          "still_mapped_at_log_end": []
+        },
+        "planned_reservations": {
+          "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+          "events": []
+        },
+        "virtual_address_ranges": {
+          "scope": "reserved virtual address space only; no physical backing implied and never added to allocation totals",
+          "reserve_events": 0,
+          "release_events": 0,
+          "peak_reserved_bytes_by_device": {},
+          "live_reserved_bytes_by_device": {},
+          "live_ranges_at_log_end": []
+        },
+        "owners": [
+          {
+            "owner": "expert-cache",
+            "instance": 281474456434544,
+            "device": 0,
+            "peak_observed_requested_bytes": 7985945600,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp",
+            "instance": 281474456471360,
+            "device": 0,
+            "peak_observed_requested_bytes": 24778192,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": 1072319160,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "prefill",
+            "instance": 187650815406768,
+            "device": 0,
+            "peak_observed_requested_bytes": 229877760,
+            "live_observed_requested_bytes": 0,
+            "view_events": 34,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "session",
+            "instance": 281474456467232,
+            "device": 0,
+            "peak_observed_requested_bytes": 343101952,
+            "live_observed_requested_bytes": 343101952,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "verifier",
+            "instance": 281474456475512,
+            "device": 0,
+            "peak_observed_requested_bytes": 77985280,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 3
+          }
+        ]
+      },
+      "observed_allocation_bytes_by_device": {
+        "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+        "peak": {
+          "0": 8661688784
+        },
+        "live_at_log_end": {
+          "0": 343101952
+        }
+      },
+      "file_tier_summary_lines": [
+        "strata serve: file tier I/O this request: 69483.1 MB of expert reads; page cache held 60364.1 MB at the read, not 9119.1 MB"
+      ]
+    },
+    {
+      "pair": 6,
+      "name": "pread",
+      "io_prefetch": "1",
+      "staging": "disabled",
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "64",
+        "--spec",
+        "4",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55"
+      ],
+      "engine_sha256": "d3e8bcde3a430d7d5bb614fec8ba938398699b9abecd41965bb28fd6d465d721",
+      "ids": [
+        32,
+        6165,
+        11036,
+        1928,
+        1472,
+        264,
+        25924,
+        11,
+        7072,
+        48470,
+        14855,
+        421,
+        11690,
+        440,
+        279,
+        17128,
+        11,
+        1048,
+        3750,
+        430,
+        279,
+        13540,
+        13,
+        561,
+        17128,
+        369,
+        279,
+        8358,
+        4560,
+        314,
+        33303,
+        11,
+        8220,
+        364,
+        29234,
+        10895,
+        321,
+        15899,
+        33633,
+        321,
+        19214,
+        7289,
+        13,
+        1049,
+        25224,
+        539,
+        42764,
+        10895,
+        494,
+        4779,
+        11,
+        45543,
+        1070,
+        310,
+        7995,
+        279,
+        3050,
+        3274,
+        2483,
+        11,
+        321,
+        1179,
+        29234,
+        1782
+      ],
+      "text": "A computer processes information through a sophisticated, multi-stage pipeline that begins with the processor, also known as the CPU. The processor is the central engine of computation, responsible for executing instructions and performing arithmetic and logical operations. It operates by fetching instructions from memory, decoding them to determine the specific task required, and then executing those",
+      "usage": {
+        "generated": 64,
+        "prompt_tokens": 512,
+        "prompt_ms": 25842.7,
+        "decode_ms": 8514.5,
+        "finish": "length",
+        "drafts_accepted": 34,
+        "drafts_offered": 87,
+        "reused": 0,
+        "hits": 39629,
+        "lookups": 56160,
+        "ram_blobs": 0,
+        "file_blobs": 0,
+        "file_mb": 26953.1,
+        "prompt_read": 512,
+        "offloaded": 0
+      },
+      "process_io_and_fault_deltas": {
+        "minor_faults": 267051,
+        "cgroup_io_read_bytes": 10026479616,
+        "major_faults": 64527
+      },
+      "board_telemetry_during_request": {
+        "scope": "named tegrastats system rail sampled during request; includes unrelated system activity",
+        "duration_s": 34.70992999407463,
+        "rail_energy_j_estimate": {
+          "VIN_SYS_5V0": 239.776444054895,
+          "VDD_GPU_SOC": 343.354873556516,
+          "VDD_CPU_CV": 149.83575483670012
+        },
+        "energy_method": "trapezoid integration of each named rail first mW value at tegrastats sample-arrival times; rails are not additive",
+        "cpu_clock_mhz_samples": 3912,
+        "cpu_clock_mhz_min": 729,
+        "cpu_clock_mhz_median": 1151.5,
+        "cpu_clock_mhz_max": 2201,
+        "gr3d_clock_mhz_samples": 0,
+        "emc_clock_mhz_samples": 0,
+        "gr3d_clock_mhz_supported": false,
+        "emc_clock_mhz_supported": false
+      },
+      "host_block_device_reads_during_request": {
+        "device": "nvme0n1p1",
+        "major": 259,
+        "minor": 1,
+        "read_bytes_delta": 10069557248,
+        "scope": "whole host block device; includes unrelated reads and kernel readahead"
+      },
+      "state": {
+        "L": "575",
+        "gdn": "44c9bf09e55d70ea",
+        "ple": "0e385f3fbb0ae980",
+        "tail": "ddbe04e57dfc3429",
+        "dead": "9e9ef4b497c72990",
+        "pooled": "22d078ff318e0c7a",
+        "pooled_full": "274656ae5676c84c",
+        "kv": "9647b61774d0c207",
+        "ple_prev": "1179,29234"
+      },
+      "actual_expert_cache_slots": 3903,
+      "owner_observations": {
+        "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+        "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA VMM address reservations and physical segments/chunks across range ownership transfers, pageable/pinned expert-stage host buffers, primary SessionState backing, verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; SYCL ExpertCache, stage/batch sessions and other sites excluded",
+        "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+        "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+        "allocation_events": 32,
+        "free_events": 31,
+        "observed_allocation_bytes_by_device": {
+          "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+          "peak": {
+            "0": 8661688784
+          },
+          "live_at_log_end": {
+            "0": 343101952
+          }
+        },
+        "vmm_range_mappings": {
+          "map_events": 0,
+          "unmap_events": 0,
+          "still_mapped_at_log_end": []
+        },
+        "planned_reservations": {
+          "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+          "events": []
+        },
+        "virtual_address_ranges": {
+          "scope": "reserved virtual address space only; no physical backing implied and never added to allocation totals",
+          "reserve_events": 0,
+          "release_events": 0,
+          "peak_reserved_bytes_by_device": {},
+          "live_reserved_bytes_by_device": {},
+          "live_ranges_at_log_end": []
+        },
+        "owners": [
+          {
+            "owner": "expert-cache",
+            "instance": 281474691010112,
+            "device": 0,
+            "peak_observed_requested_bytes": 7985945600,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp",
+            "instance": 281474691046928,
+            "device": 0,
+            "peak_observed_requested_bytes": 24778192,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": 1072319160,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "prefill",
+            "instance": 187650417330688,
+            "device": 0,
+            "peak_observed_requested_bytes": 229877760,
+            "live_observed_requested_bytes": 0,
+            "view_events": 34,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "session",
+            "instance": 281474691042800,
+            "device": 0,
+            "peak_observed_requested_bytes": 343101952,
+            "live_observed_requested_bytes": 343101952,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "verifier",
+            "instance": 281474691051080,
+            "device": 0,
+            "peak_observed_requested_bytes": 77985280,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 3
+          }
+        ]
+      },
+      "observed_allocation_bytes_by_device": {
+        "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+        "peak": {
+          "0": 8661688784
+        },
+        "live_at_log_end": {
+          "0": 343101952
+        }
+      },
+      "file_tier_summary_lines": [
+        "strata serve: file tier I/O this request: 69483.1 MB of expert reads; io prefetch: 1609 read ahead (3190.1 MB by pread; 6049.8 ms summed worker time), 0 used, 0 unused, 11844 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches"
+      ]
+    },
+    {
+      "pair": 6,
+      "name": "mapped",
+      "io_prefetch": "0",
+      "staging": "disabled",
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "64",
+        "--spec",
+        "4",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55"
+      ],
+      "engine_sha256": "d3e8bcde3a430d7d5bb614fec8ba938398699b9abecd41965bb28fd6d465d721",
+      "ids": [
+        32,
+        6165,
+        11036,
+        1928,
+        1472,
+        264,
+        25924,
+        11,
+        7072,
+        48470,
+        14855,
+        421,
+        11690,
+        440,
+        279,
+        17128,
+        11,
+        1048,
+        3750,
+        430,
+        279,
+        13540,
+        13,
+        561,
+        17128,
+        369,
+        279,
+        8358,
+        4560,
+        314,
+        33303,
+        11,
+        8220,
+        364,
+        29234,
+        10895,
+        321,
+        15899,
+        33633,
+        321,
+        19214,
+        7289,
+        13,
+        1049,
+        25224,
+        539,
+        42764,
+        10895,
+        494,
+        4779,
+        11,
+        45543,
+        1070,
+        310,
+        7995,
+        279,
+        3050,
+        3274,
+        2483,
+        11,
+        321,
+        1179,
+        29234,
+        1782
+      ],
+      "text": "A computer processes information through a sophisticated, multi-stage pipeline that begins with the processor, also known as the CPU. The processor is the central engine of computation, responsible for executing instructions and performing arithmetic and logical operations. It operates by fetching instructions from memory, decoding them to determine the specific task required, and then executing those",
+      "usage": {
+        "generated": 64,
+        "prompt_tokens": 512,
+        "prompt_ms": 26004.9,
+        "decode_ms": 13364.8,
+        "finish": "length",
+        "drafts_accepted": 34,
+        "drafts_offered": 87,
+        "reused": 0,
+        "hits": 39629,
+        "lookups": 56160,
+        "ram_blobs": 0,
+        "file_blobs": 0,
+        "file_mb": 26953.1,
+        "prompt_read": 512,
+        "offloaded": 0
+      },
+      "process_io_and_fault_deltas": {
+        "minor_faults": 259058,
+        "cgroup_io_read_bytes": 9602457600,
+        "major_faults": 100683
+      },
+      "board_telemetry_during_request": {
+        "scope": "named tegrastats system rail sampled during request; includes unrelated system activity",
+        "duration_s": 39.7234162169043,
+        "rail_energy_j_estimate": {
+          "VIN_SYS_5V0": 250.38706008084372,
+          "VDD_GPU_SOC": 369.72660981652587,
+          "VDD_CPU_CV": 134.64038341961015
+        },
+        "energy_method": "trapezoid integration of each named rail first mW value at tegrastats sample-arrival times; rails are not additive",
+        "cpu_clock_mhz_samples": 4512,
+        "cpu_clock_mhz_min": 729,
+        "cpu_clock_mhz_median": 729.0,
+        "cpu_clock_mhz_max": 2201,
+        "gr3d_clock_mhz_samples": 0,
+        "emc_clock_mhz_samples": 0,
+        "gr3d_clock_mhz_supported": false,
+        "emc_clock_mhz_supported": false
+      },
+      "host_block_device_reads_during_request": {
+        "device": "nvme0n1p1",
+        "major": 259,
+        "minor": 1,
+        "read_bytes_delta": 9680781312,
+        "scope": "whole host block device; includes unrelated reads and kernel readahead"
+      },
+      "state": {
+        "L": "575",
+        "gdn": "44c9bf09e55d70ea",
+        "ple": "0e385f3fbb0ae980",
+        "tail": "ddbe04e57dfc3429",
+        "dead": "9e9ef4b497c72990",
+        "pooled": "22d078ff318e0c7a",
+        "pooled_full": "274656ae5676c84c",
+        "kv": "9647b61774d0c207",
+        "ple_prev": "1179,29234"
+      },
+      "actual_expert_cache_slots": 3903,
+      "owner_observations": {
+        "scope": "observed sites only; requested payload bytes, not physical backing or total process ownership",
+        "coverage": "instrumented CUDA/HIP ordinary ExpertCache single-block backing, CUDA VMM address reservations and physical segments/chunks across range ownership transfers, pageable/pinned expert-stage host buffers, primary SessionState backing, verifier primary arena/window graphs, prefill-owned vector allocations/views and MTP state/scratch arenas; SYCL ExpertCache, stage/batch sessions and other sites excluded",
+        "graph_bytes": "unsupported; counts do not measure driver or graph-pool bytes",
+        "cleanup": "live at log end is not a leak verdict; process termination may bypass destructors",
+        "allocation_events": 32,
+        "free_events": 31,
+        "observed_allocation_bytes_by_device": {
+          "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+          "peak": {
+            "0": 8661688784
+          },
+          "live_at_log_end": {
+            "0": 343101952
+          }
+        },
+        "vmm_range_mappings": {
+          "map_events": 0,
+          "unmap_events": 0,
+          "still_mapped_at_log_end": []
+        },
+        "planned_reservations": {
+          "scope": "cache-sizing budget holds only; metadata, not allocated/physical bytes and never added to allocation totals",
+          "events": []
+        },
+        "virtual_address_ranges": {
+          "scope": "reserved virtual address space only; no physical backing implied and never added to allocation totals",
+          "reserve_events": 0,
+          "release_events": 0,
+          "peak_reserved_bytes_by_device": {},
+          "live_reserved_bytes_by_device": {},
+          "live_ranges_at_log_end": []
+        },
+        "owners": [
+          {
+            "owner": "expert-cache",
+            "instance": 281474074601872,
+            "device": 0,
+            "peak_observed_requested_bytes": 7985945600,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "mtp",
+            "instance": 281474074638688,
+            "device": 0,
+            "peak_observed_requested_bytes": 24778192,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": 1072319160,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "prefill",
+            "instance": 187651713071968,
+            "device": 0,
+            "peak_observed_requested_bytes": 229877760,
+            "live_observed_requested_bytes": 0,
+            "view_events": 34,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "session",
+            "instance": 281474074634560,
+            "device": 0,
+            "peak_observed_requested_bytes": 343101952,
+            "live_observed_requested_bytes": 343101952,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 0
+          },
+          {
+            "owner": "verifier",
+            "instance": 281474074642840,
+            "device": 0,
+            "peak_observed_requested_bytes": 77985280,
+            "live_observed_requested_bytes": 0,
+            "view_events": 0,
+            "last_owner_reported_payload_bytes": null,
+            "successful_graph_instantiations": 3
+          }
+        ]
+      },
+      "observed_allocation_bytes_by_device": {
+        "scope": "concurrent requested bytes from unique live allocation identities; excludes views, mappings, reservations, graph pools and uninstrumented allocations; not total physical memory",
+        "peak": {
+          "0": 8661688784
+        },
+        "live_at_log_end": {
+          "0": 343101952
+        }
+      },
+      "file_tier_summary_lines": [
+        "strata serve: file tier I/O this request: 69483.1 MB of expert reads; page cache held 60410.5 MB at the read, not 9072.6 MB"
+      ]
+    }
+  ],
+  "pair_comparisons": [
+    {
+      "pair": 0,
+      "order": [
+        "mapped",
+        "pread"
+      ],
+      "token_ids_equal": true,
+      "actual_expert_cache_slots_equal": true,
+      "persistent_state_equal": true,
+      "differing_state_fields": [],
+      "failures": [],
+      "mapped_ms": 30318.8,
+      "pread_ms": 33022.3
+    },
+    {
+      "pair": 1,
+      "order": [
+        "mapped",
+        "pread"
+      ],
+      "token_ids_equal": true,
+      "actual_expert_cache_slots_equal": true,
+      "persistent_state_equal": true,
+      "differing_state_fields": [],
+      "failures": [],
+      "mapped_ms": 30879.9,
+      "pread_ms": 63607.2
+    },
+    {
+      "pair": 2,
+      "order": [
+        "mapped",
+        "pread"
+      ],
+      "token_ids_equal": true,
+      "actual_expert_cache_slots_equal": true,
+      "persistent_state_equal": true,
+      "differing_state_fields": [],
+      "failures": [],
+      "mapped_ms": 31984.8,
+      "pread_ms": 33472.9
+    },
+    {
+      "pair": 3,
+      "order": [
+        "mapped",
+        "pread"
+      ],
+      "token_ids_equal": true,
+      "actual_expert_cache_slots_equal": true,
+      "persistent_state_equal": true,
+      "differing_state_fields": [],
+      "failures": [],
+      "mapped_ms": 31727.1,
+      "pread_ms": 32879.299999999996
+    },
+    {
+      "pair": 4,
+      "order": [
+        "mapped",
+        "pread"
+      ],
+      "token_ids_equal": true,
+      "actual_expert_cache_slots_equal": true,
+      "persistent_state_equal": true,
+      "differing_state_fields": [],
+      "failures": [],
+      "mapped_ms": 31722.2,
+      "pread_ms": 33579.0
+    },
+    {
+      "pair": 5,
+      "order": [
+        "pread",
+        "mapped"
+      ],
+      "token_ids_equal": true,
+      "actual_expert_cache_slots_equal": true,
+      "persistent_state_equal": true,
+      "differing_state_fields": [],
+      "failures": [],
+      "mapped_ms": 31784.9,
+      "pread_ms": 33485.3
+    },
+    {
+      "pair": 6,
+      "order": [
+        "pread",
+        "mapped"
+      ],
+      "token_ids_equal": true,
+      "actual_expert_cache_slots_equal": true,
+      "persistent_state_equal": true,
+      "differing_state_fields": [],
+      "failures": [],
+      "mapped_ms": 39369.7,
+      "pread_ms": 34357.2
+    }
+  ],
+  "tegrastats_energy": {
+    "enabled": true,
+    "interval_ms": 100,
+    "scope": "system rail and clock sampling; never process-attributed; rail values are separate and not additive",
+    "sample_count": 7220,
+    "raw_samples": "tegrastats-energy.jsonl"
+  },
+  "summary": {
+    "mapped": {
+      "median_prompt_ms": 25994.0,
+      "median_decode_ms": 5653.4,
+      "median_process_read_bytes": null,
+      "median_major_faults": 100683,
+      "median_cgroup_scope_read_bytes": 9449467904
+    },
+    "pread": {
+      "median_prompt_ms": 25951.7,
+      "median_decode_ms": 7395.2,
+      "median_process_read_bytes": null,
+      "median_major_faults": 69032,
+      "median_cgroup_scope_read_bytes": 10368839680
+    }
+  },
+  "comparison": {
+    "all_pairs_passed": true,
+    "failures": []
+  },
+  "passed": true
+}

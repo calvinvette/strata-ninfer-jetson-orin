@@ -79,6 +79,15 @@ inventory the platform's actual process-I/O and GPU-allocation telemetry before
 designing per-request accounting; Linux procfs/cgroup assumptions do not carry
 over to Apple platforms.
 
+For Orin, a temporary systemd scope with `IOAccounting=yes` did expose leaf
+`io.stat`. A 64 MiB `O_DIRECT` read moved the scope's `rbytes` by exactly 64
+MiB. The seven-pair mapped/pread follow-up then matched outputs and all state
+fields while measuring scope reads around each request. Launching with
+`systemd-run --uid` alone dropped the needed GPU device groups; a root-created
+temporary scope plus `setpriv` preserved the normal user and supplementary
+groups. Treat this as a Linux/Jetson measurement adapter, not a portable engine
+dependency.
+
 The [pinned H2D copy screen](../../bench/results/2026-10-10-phase3-copy-latency/README.md)
 uses CUDA events around the transfer itself and retains all per-copy samples.
 Its seven process medians were tightly grouped, but rare event samples were

@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/file_tier_transfer_parity.py", line 386, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/file_tier_transfer_parity.py", line 308, in main
+    engine = StrataEngine(str(args.engine.resolve()), args_for, cwd=cfg.get('cwd'),
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/serve/server.py", line 693, in __init__
+    raise RuntimeError(why + (f" (see {log})" if log else "") +
+RuntimeError: the engine exited before it was ready (see /home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-10-phase3-cgroup-io-transfer-pair/experiment/pair-0-mapped.log)
+the engine log's last lines:
+  [strata] 2026-10-10 20:33:36 engine started: /home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/candidate/strata --serve --pack /home/calvin/models/strata-orin-validation/pack --native /home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf --ple-gguf /home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf --expert-profile /home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin --expert-cache 5000 --prefill 64 --spec 4 --max-context 8192 --mmap-experts --mtp /home/calvin/models/strata-orin-validation/mtp/rt --prompt-cache 6 --vram-reserve-mib 3072 --pcie-frac 0.55
+  NvRmMemInitNvmap failed with Permission denied
+  356: Memory Manager Not supported
+  ****NvRmMemMgrInit failed**** error type: 196626
+  strata generate: ARM CPU experts use ggml-cpu's native kernels
+  strata generate: native embedding: cannot pin 322 MiB: unknown error, nor place it in VRAM

@@ -24,14 +24,16 @@ in the [artifact-aware PLE report](../2026-10-10-phase3-q2-ple-artifact-aware/RE
 This rerun confirms the existing focused checks; it does not add a new runtime
 or product-path qualification.
 
-The current process namespace has no `/proc/self/io` or `/proc/1/io` entry.
-Its leaf cgroup also has no `io.stat`; the available ancestor counters aggregate
-unrelated workloads. Therefore process-scoped disk bytes remain unavailable
-here, and host block-device counters cannot replace them. CUDA graph async-pool
-attributes still report zero for Strata's graphs, while global free-memory
-deltas cannot attribute executable/driver memory; see the
+The base user process namespace has no `/proc/self/io` or `/proc/1/io` entry,
+and its leaf cgroup has no `io.stat`; ancestor counters aggregate unrelated
+workloads. A later [seven-pair transfer confirmation](../2026-10-10-phase3-transfer-cgroupio-confirmation7/README.md)
+used a temporary systemd scope with `IOAccounting=yes` and captured scoped
+request read bytes. CUDA graph async-pool attributes still report zero for
+Strata's graphs, while global free-memory deltas cannot attribute
+executable/driver memory; see the
 [graph-memory probe](../2026-10-10-phase3-graph-memory-probe/README.md).
-These are open Phase 3 accounting gates, not test failures.
+Graph/driver attribution remains an open Phase 3 accounting gate, not a test
+failure.
 
 The supervised command, output, and telemetry are retained in `supervisor/`.
 No model, build product, service state, or clock setting was changed.

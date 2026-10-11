@@ -132,6 +132,20 @@ class TegraSampler:
         }
 
 
+def cgroup_io_read_bytes(cgroup_text, cgroup_root=Path('/sys/fs/cgroup')):
+    """Return leaf-cgroup physical read bytes when the I/O controller is exposed."""
+    unified = next(line.split(':', 2)[2] for line in cgroup_text.splitlines()
+                   if line.startswith('0::'))
+    scope = Path(cgroup_root) / unified.lstrip('/')
+    io_stat = (scope / 'io.stat').read_text()
+    total = 0
+    for line in io_stat.splitlines():
+        fields = dict(field.split('=', 1) for field in line.split()[1:]
+                      if '=' in field)
+        total += int(fields.get('rbytes', '0'))
+    return total
+
+
 def process_counters(pid):
     """Read Linux process counters used for this one engine request."""
     root = Path('/proc') / str(pid)
@@ -146,6 +160,13 @@ def process_counters(pid):
         key, _, value = line.partition(':')
         if key in ('rchar', 'read_bytes', 'syscr'):
             values[key] = int(value.strip())
+    # Some Orin runtime namespaces omit /proc/<pid>/io. When a run is launched
+    # in a dedicated systemd scope with IOAccounting=yes, leaf-cgroup io.stat
+    # provides block-I/O counters for the scope and its descendants.
+    try:
+        values['cgroup_io_read_bytes'] = cgroup_io_read_bytes((root / 'cgroup').read_text())
+    except (OSError, StopIteration, ValueError, IndexError):
+        pass
     return values
 
 
@@ -171,6 +192,12 @@ def state_hashes(path):
     if len(found) != 1:
         raise ValueError(f'expected one completed-request state fingerprint, got {len(found)}')
     return found[0]
+
+
+def actual_expert_cache_slots(log_text):
+    """Read the effective resident slot count reported during engine startup."""
+    counts = {int(value) for value in re.findall(r'expert cache (\d+) slots', log_text)}
+    return next(iter(counts)) if len(counts) == 1 else None
 
 
 def main():
@@ -308,7 +335,9 @@ def main():
                 'read_bytes_delta': block_after['read_bytes'] - block_before['read_bytes'],
                 'scope': 'whole host block device; includes unrelated reads and kernel readahead'}
             arm['state'] = state_hashes(log)
-            owners = summarize(log.read_text(encoding='utf-8').splitlines())
+            log_text = log.read_text(encoding='utf-8')
+            arm['actual_expert_cache_slots'] = actual_expert_cache_slots(log_text)
+            owners = summarize(log_text.splitlines())
             arm['owner_observations'] = owners
             arm['observed_allocation_bytes_by_device'] = owners['observed_allocation_bytes_by_device']
             arm['file_tier_summary_lines'] = [line for line in log.read_text(errors='replace').splitlines()
@@ -322,12 +351,17 @@ def main():
         failures = []
         if mapped['ids'] != pread['ids']:
             failures.append('generated token IDs differ')
+        cache_slots_equal = (mapped.get('actual_expert_cache_slots') is not None and
+                             mapped['actual_expert_cache_slots'] == pread.get('actual_expert_cache_slots'))
+        if not cache_slots_equal:
+            failures.append('actual expert-cache slot counts differ or are unavailable')
         state_differences = [key for key in STATE_KEYS if mapped['state'][key] != pread['state'][key]]
         if state_differences:
             failures.append('persistent main-model state differs')
         result['pair_comparisons'].append({
             'pair': pair, 'order': [label for label, _ in order],
             'token_ids_equal': mapped['ids'] == pread['ids'],
+            'actual_expert_cache_slots_equal': cache_slots_equal,
             'persistent_state_equal': not state_differences,
             'differing_state_fields': state_differences, 'failures': failures,
             'mapped_ms': mapped['usage'].get('prompt_ms', 0) + mapped['usage'].get('decode_ms', 0),
@@ -350,6 +384,11 @@ def main():
                       if 'read_bytes' in row['process_io_and_fault_deltas']]
         result['summary'][label]['median_process_read_bytes'] = (
             statistics.median(io_samples) if len(io_samples) == len(arms) else None)
+        cgroup_io_samples = [row['process_io_and_fault_deltas']['cgroup_io_read_bytes']
+                             for row in arms
+                             if 'cgroup_io_read_bytes' in row['process_io_and_fault_deltas']]
+        result['summary'][label]['median_cgroup_scope_read_bytes'] = (
+            statistics.median(cgroup_io_samples) if len(cgroup_io_samples) == len(arms) else None)
         result['summary'][label]['median_major_faults'] = statistics.median(
             row['process_io_and_fault_deltas'].get('major_faults', 0) for row in arms)
     result['comparison'] = {'all_pairs_passed': not failures, 'failures': failures}
