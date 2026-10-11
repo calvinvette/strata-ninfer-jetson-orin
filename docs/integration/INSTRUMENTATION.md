@@ -138,8 +138,9 @@ batch-window device owners; the forced profile owner balances on Orin. The
 [device-plan follow-up](../../bench/results/2026-10-10-phase3-verifier-device-plan/README.md)
 exercises and balances its 64-byte scratch and 40,000-byte slot-offset copy.
 The opt-in Q8-fuse owner now has a runtime allocation/free smoke, but its full
-GDN state fingerprint differs from the default route and remains unqualified;
-probabilistic-sampling buffers remain runtime-untested. Primary and batch
+GDN state fingerprint differs from the default route and remains unqualified.
+The probabilistic-sampling owner now has a Q2_0 runtime allocation/free smoke;
+that checks scratch lifecycle, not distribution quality or end-to-end parity. Primary and batch
 session backings now emit explicit frees at orderly teardown and balance in the
 Q2_0 owner ledger. Split-stage backing release is implemented and builds for
 CUDA/HIP, but remains runtime-untested on available hardware. Graph
