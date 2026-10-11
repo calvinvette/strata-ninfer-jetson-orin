@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "cuda": {
+    "backend": "CUDA 12.6 / SM87",
+    "host": "orin1",
+    "status": "pass",
+    "scope": "cmake --build build/integration/candidate --target strata --parallel 1",
+    "binary_sha256": "06772055ca4a7e0ab4955002f7e92f12438129a398ea05a57d6b5c56d42aded0",
+    "source_sha256": "005f1b6e0b8dd25dd2a14e1ef99ab0c97b9bb86b7d82e14a556e68d329872176"
+  },
+  "hip": {
+    "backend": "HIP gfx1100",
+    "host": "maestro1",
+    "status": "pass",
+    "scope": "full cmake --build build-hip --parallel 1",
+    "binary_sha256": "88c256d7638904701a0e8d331886c76b5cc20d1c197444fe43b1a5f068873f2b",
+    "source_sha256": "005f1b6e0b8dd25dd2a14e1ef99ab0c97b9bb86b7d82e14a556e68d329872176",
+    "performance_qualification": false
+  },
+  "sycl": {
+    "backend": "Intel SYCL",
+    "host": "maestro1",
+    "status": "changed translation unit compiled; full engine link pending",
+    "scope": "ninja CMakeFiles/strata_engine.dir/src/core/verify.cpp.o -j1",
+    "object_sha256": "de3a8787196f0fbd6175232f1de217bee13f83950afe8f3e85f49e7322cf0071",
+    "source_sha256": "f074b226fe91013748a185aca0f918d25ac1c00242d8afab5e8fdb991e908dcf",
+    "limitation": "Reconfigured tree had been missing CMakeFiles/rules.ninja; full strata target required a clean 94-object rebuild on a 3.7 GiB host. Compile-only validation is recorded; repeat a full link during Phase 8."
+  },
+  "tests": {
+    "focused_ctest_count": 5,
+    "status": "pass",
+    "minimum_host_memavailable_bytes": 30316105728,
+    "integration_python_unittest_count": 75,
+    "integration_python_unittest_status": "pass"
+  },
+  "maestro1_is_build_evidence_only": true
+}

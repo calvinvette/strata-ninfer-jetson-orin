@@ -1,0 +1,185 @@
+{
+  "schema": 1,
+  "measured_on": "orin1",
+  "measured_date": "2026-10-11",
+  "engine_sha256_before_trace_coverage_patch": "3e1e003c2097d58591db30b60412acbd8798e5ab39ce857f1e3e2c0ebd241a5b",
+  "workload": {
+    "model": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0",
+    "spec": 2,
+    "mtp": false,
+    "requested_expert_cache_slots": 256,
+    "actual_expert_cache_slots": 256,
+    "context": 4096,
+    "prefill_chunk": 512,
+    "protocol": "7 real-model HTTP/streaming/cancellation-recovery scenarios"
+  },
+  "measurement": "root NVMap IOVMM client bytes for engine PID, sampled at 0.1 s; service graph calls timestamped by a test-only CUDA runtime interposer",
+  "runs": [
+    {
+      "name": "repeat-00",
+      "pid": 2710316,
+      "runtime_graph_instantiations": 4,
+      "runtime_graph_statuses": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "instrumented_verifier_window_events": 3,
+      "stable_nvmap_samples_before_first_graph_bytes": [
+        5237268480,
+        5237268480,
+        5237268480
+      ],
+      "nvmap_before_bytes": 5237268480,
+      "nvmap_after_last_bytes": 5309693952,
+      "net_nvmap_delta_bytes": 72425472,
+      "nvmap_bracket_monotonic_s": [
+        978756.628802044,
+        978762.294448203
+      ],
+      "graph_event_monotonic_s": [
+        978756.723595,
+        978756.731303,
+        978761.694177,
+        978762.227031
+      ],
+      "protocol_scenarios": 7,
+      "protocol_scenarios_passed": 7,
+      "protocol_statuses": [
+        "pass",
+        "pass",
+        "pass",
+        "pass",
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "supervisor_status": "pass",
+      "minimum_host_memavailable_bytes": 22865539072,
+      "supervisor_elapsed_s": 52.344032905995846
+    },
+    {
+      "name": "repeat-01",
+      "pid": 2736421,
+      "runtime_graph_instantiations": 4,
+      "runtime_graph_statuses": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "instrumented_verifier_window_events": 3,
+      "stable_nvmap_samples_before_first_graph_bytes": [
+        5237268480,
+        5237268480,
+        5237268480
+      ],
+      "nvmap_before_bytes": 5237268480,
+      "nvmap_after_last_bytes": 5309693952,
+      "net_nvmap_delta_bytes": 72425472,
+      "nvmap_bracket_monotonic_s": [
+        978868.252760078,
+        978874.100769992
+      ],
+      "graph_event_monotonic_s": [
+        978868.310287,
+        978868.31992,
+        978873.505534,
+        978874.01124
+      ],
+      "protocol_scenarios": 7,
+      "protocol_scenarios_passed": 7,
+      "protocol_statuses": [
+        "pass",
+        "pass",
+        "pass",
+        "pass",
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "supervisor_status": "pass",
+      "minimum_host_memavailable_bytes": 22889918464,
+      "supervisor_elapsed_s": 54.3388442810392
+    },
+    {
+      "name": "repeat-02",
+      "pid": 2762490,
+      "runtime_graph_instantiations": 4,
+      "runtime_graph_statuses": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "instrumented_verifier_window_events": 3,
+      "stable_nvmap_samples_before_first_graph_bytes": [
+        5237268480,
+        5237268480,
+        5237268480,
+        5237268480
+      ],
+      "nvmap_before_bytes": 5237268480,
+      "nvmap_after_last_bytes": 5309693952,
+      "net_nvmap_delta_bytes": 72425472,
+      "nvmap_bracket_monotonic_s": [
+        978921.348295214,
+        978924.978321433
+      ],
+      "graph_event_monotonic_s": [
+        978921.374872,
+        978921.381836,
+        978924.397801,
+        978924.955592
+      ],
+      "protocol_scenarios": 7,
+      "protocol_scenarios_passed": 7,
+      "protocol_statuses": [
+        "pass",
+        "pass",
+        "pass",
+        "pass",
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "supervisor_status": "pass",
+      "minimum_host_memavailable_bytes": 22730596352,
+      "supervisor_elapsed_s": 42.87384897097945
+    }
+  ],
+  "repeat_delta_bytes": [
+    72425472,
+    72425472,
+    72425472
+  ],
+  "same_delta_all_runs": true,
+  "delta_mib": 69.0703125,
+  "runtime_graph_calls_per_run": 4,
+  "runtime_graph_calls_successful_per_run": true,
+  "owner_event_gap": "The measured pre-patch Q2_0 processes had four successful CUDA runtime graph-instantiation calls but only three integration owner events. Source inspection identified the verifier commit-state graph capture as the untagged call. A separate verifier-commit-graph event is now present; a post-patch Q2_0 service check observed all four owner events for all four successful runtime calls.",
+  "interpretation": "The stable-to-stable NVMap change spans initial verifier graph capture through the fourth successful runtime instantiate during the first real-model request. It includes synchronous adjacent device-owner allocations and is not an isolated graph executable size or graph-disabled differential.",
+  "phase3_complete": false,
+  "trace_coverage_check": {
+    "engine_sha256": "06772055ca4a7e0ab4955002f7e92f12438129a398ea05a57d6b5c56d42aded0",
+    "runtime_graph_instantiation_calls": 4,
+    "runtime_graph_instantiation_statuses": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "integration_graph_owner_events": [
+      "verifier",
+      "verifier-commit-graph",
+      "verifier",
+      "verifier"
+    ],
+    "protocol_scenarios": 7,
+    "protocol_scenarios_passed": 7,
+    "minimum_host_memavailable_bytes": 23100706816,
+    "interpretation": "The added verifier-commit-graph event accounts for the previously untagged fourth successful runtime graph call in this Q2_0 spec2 protocol check.",
+    "backend_builds": "See ../2026-10-11-phase3-commit-graph-trace-tests/backend-builds.json; native CUDA and full HIP builds pass; SYCL changed-object compilation passes and full link is pending."
+  }
+}

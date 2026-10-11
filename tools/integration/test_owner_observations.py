@@ -9,8 +9,8 @@ import unittest
 from owner_observations import PREFIX, summarize
 
 
-def event(kind, address=100, size=0, instance=1, device=0):
-    return PREFIX + json.dumps(dict(schema=1, owner='verifier', kind=kind,
+def event(kind, address=100, size=0, instance=1, device=0, owner='verifier'):
+    return PREFIX + json.dumps(dict(schema=1, owner=owner, kind=kind,
         allocation=address, requested_bytes=size, instance=instance,
         device=device, count=1 if kind in ('graph_instantiate', 'view') else 0))
 
@@ -24,10 +24,13 @@ class OwnerObservationTests(unittest.TestCase):
     def test_reused_address_and_concurrent_arena_peaks(self):
         result = summarize([event('allocate', size=10), event('allocate', 200, 20),
             event('free'), event('allocate', size=5), event('free', 200), event('free'),
-            event('graph_instantiate', 0)])
+            event('graph_instantiate', 0),
+            event('graph_instantiate', 0, owner='verifier-commit-graph')])
         self.assertEqual(result['owners'][0]['peak_observed_requested_bytes'], 30)
         self.assertEqual(result['owners'][0]['live_observed_requested_bytes'], 0)
         self.assertEqual(result['owners'][0]['successful_graph_instantiations'], 1)
+        commit_graph = next(row for row in result['owners'] if row['owner'] == 'verifier-commit-graph')
+        self.assertEqual(commit_graph['successful_graph_instantiations'], 1)
         self.assertEqual(result['observed_allocation_bytes_by_device']['peak'], {'0': 30})
         self.assertEqual(result['observed_allocation_bytes_by_device']['live_at_log_end'], {'0': 0})
 

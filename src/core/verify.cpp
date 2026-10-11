@@ -1878,6 +1878,9 @@ bool Verifier::capture_commit(std::string& err) {
         return false;
     }
     cudaGraphDestroy(graph);
+    // Keep commit-state graph lifetime visible separately from verifier-window graphs.
+    strata::platform::integration_trace::event("verifier-commit-graph", "graph_instantiate", this, nullptr, 0,
+                                                device_, 1);
     return true;
 }
 

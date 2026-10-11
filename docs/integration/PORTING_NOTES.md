@@ -527,8 +527,13 @@ counter and `tegrastats` did not show a commensurate change. The root-readable
 NVMap IOVMM client table did: its per-process total rose by exactly 512 MiB and
 returned to baseline after free. The three-process graph follow-up measured an
 83,427,328-byte net process-owner increase across ten graph-instantiation calls
-in each service startup. This is an interval cost for that IQ1_M configuration;
-other graph paths and non-NVMap allocations remain unpriced. For Splash,
+in each service startup. This is an interval cost for that IQ1_M configuration. A separate Q2_0 spec2
+measurement found the same 72,425,472-byte stable-to-stable increase in three
+processes through four successful runtime graph-instantiation calls. That run
+exposed a missing verifier-commit graph owner event, now instrumented and checked
+against all four runtime calls. Both NVMap results include adjacent synchronous
+allocations and are configuration-specific intervals; they are not graph-executable
+sizes. Other graph paths and non-NVMap allocations remain unpriced. For Splash,
 calibrate each Metal and OS memory counter against a known live allocation
 before using it to price graph, heap or residency costs, and retain an unpriced
 status when the calibration fails.
