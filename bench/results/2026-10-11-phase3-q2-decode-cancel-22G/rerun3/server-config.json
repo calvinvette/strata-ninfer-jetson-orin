@@ -1,0 +1,47 @@
+{
+  "exe": "/home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/candidate/strata",
+  "args": [
+    "--pack",
+    "/home/calvin/models/strata-orin-validation/q2-ple-pack",
+    "--native",
+    "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+    "--ple-gguf",
+    "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+    "--expert-profile",
+    "/home/calvin/models/strata-orin-validation/q2-expert-profile.bin",
+    "--expert-cache",
+    "256",
+    "--prefill",
+    "512",
+    "--spec",
+    "2",
+    "--max-context",
+    "4096",
+    "--mmap-experts",
+    "--prompt-cache",
+    "0",
+    "--vram-reserve-mib",
+    "3072",
+    "--pcie-frac",
+    "0.55",
+    "--no-prefill-borrow"
+  ],
+  "cwd": "/home/calvin/workspace/strata-ninfer-jetson-orin",
+  "tokenizer": "/home/calvin/models/strata-orin-validation/pack/tokenizer",
+  "model_name": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-Orin-validation",
+  "log": "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-11-phase3-q2-decode-cancel-22G/rerun3/engine.log",
+  "lib_dirs": [
+    "/usr/local/cuda-12/lib64"
+  ],
+  "port": 18462,
+  "host": "127.0.0.1",
+  "cuda": 12,
+  "open_browser": false,
+  "draft_vocab": "cjk",
+  "env": {
+    "STRATA_TRACE": "1",
+    "STRATA_INTEGRATION_TRACE": "1",
+    "LD_PRELOAD": "/tmp/strata-graph-driver-probe-timestamp.so",
+    "STRATA_STATE_HASH": "1"
+  }
+}

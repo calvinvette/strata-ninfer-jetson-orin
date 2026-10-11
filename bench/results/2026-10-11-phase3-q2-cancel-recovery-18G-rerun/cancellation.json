@@ -1,0 +1,30 @@
+{
+  "scope": "single long-prefill stream cancellation followed by same-process short API recovery",
+  "model": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-Orin-validation",
+  "long_cell": "full-chunk-2048",
+  "requested_prompt_tokens": 2048,
+  "cancel_after_s": 1.0,
+  "checks": [
+    {
+      "check": "cancel_long_prefill",
+      "status": "pass",
+      "http_status": 200,
+      "response_headers_at_s": 0.007510959054343402,
+      "reason": "client stream closed after bounded delay",
+      "elapsed_s": 1.007872128044255
+    },
+    {
+      "check": "short_request_recovery",
+      "status": "started"
+    }
+  ],
+  "health": {
+    "status": "ok",
+    "max_context": 4096,
+    "model": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-Orin-validation",
+    "images": false,
+    "api_key": false,
+    "loaded": true,
+    "service": "strata"
+  }
+}

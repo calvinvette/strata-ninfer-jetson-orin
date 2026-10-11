@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "scope": "MTP accepted-prefix cancellation state parity and same-process recovery",
+  "model": "Qwen3.8-Flash-Next-Coder-IQ1_M-Orin-validation",
+  "workload_cell": "open-ended-integer-list",
+  "prompt_text": "Write the integers from 1 through 1000 separated by single spaces. Do not add an introduction or conclusion, and do not stop before 1000.",
+  "requested_output_tokens": 1024,
+  "cancel_after_nonempty_deltas": 1,
+  "checks": [
+    {
+      "check": "stream_cancel",
+      "status": "pass",
+      "visible_text": "1",
+      "visible_deltas": 1,
+      "committed_tokens": 5,
+      "accepted_prefix_trace": [
+        {
+          "position": 47,
+          "window": 1,
+          "accepted_drafts": 0,
+          "committed": 1,
+          "token_ids": [
+            16
+          ],
+          "state": {
+            "L": "48",
+            "gdn": "eaafdacf2370a83f",
+            "ple": "0768d31945cfccef",
+            "tail": "99dae379b4d34f41",
+            "dead": "b00ed689a2c3ca75",
+            "pooled": "b8be3bf445fceada",
+            "pooled_full": "b4c3a4e47071d4c4",
+            "kv": "ac30d2279ed9ef11",
+            "mtp": "f771affb912c163b",
+            "stale": "14650fb0739d0383",
+            "ple_prev": "248069,271"
+          }
+        },
+        {
+          "position": 48,
+          "window": 4,
+          "accepted_drafts": 3,
+          "committed": 4,
+          "token_ids": [
+            220,
+            17,
+            220,
+            18
+          ],
+          "state": {
+            "L": "52",
+            "gdn": "d0d76abf240e56eb",
+            "ple": "71de6a3551a64102",
+            "tail": "a485574e779ef087",
+            "dead": "b00ed689a2c3ca75",
+            "pooled": "d406ab05b22bd696",
+            "pooled_full": "b2f36771ae8b97f4",
+            "kv": "24f8a4aeb0bc1043",
+            "mtp": "062df3505f9c5e6a",
+            "stale": "14650fb0739d0383",
+            "ple_prev": "17,220"
+          }
+        }
+      ],
+      "prompt_summary": "strata serve: prompt 48 tokens = 0 reused + 48 read in 3213 ms (14.9 tok/s), 5 generated in 1304 ms (3.8 tok/s), drafts accepted 3 of 3, 1 checkpoints (cancelled)"
+    },
+    {
+      "check": "same_process_recovery",
+      "status": "pass",
+      "response_text": "Hello Orin!",
+      "reason": "expected recovery response",
+      "server_alive": true
+    },
+    {
+      "check": "fresh_exact_length_reference",
+      "status": "fail",
+      "completion_tokens": 5,
+      "comparison": {
+        "passed": false,
+        "failures": [
+          "persistent state differs at accepted prefix L=48",
+          "persistent state differs at accepted prefix L=52"
+        ],
+        "cancelled_token_ids": [
+          16,
+          220,
+          17,
+          220,
+          18
+        ],
+        "reference_token_ids": [
+          16,
+          220,
+          17,
+          220,
+          18
+        ],
+        "shared_state_lengths": [],
+        "cancelled_final_state": {
+          "L": "52",
+          "gdn": "d0d76abf240e56eb",
+          "ple": "71de6a3551a64102",
+          "tail": "a485574e779ef087",
+          "dead": "b00ed689a2c3ca75",
+          "pooled": "d406ab05b22bd696",
+          "pooled_full": "b2f36771ae8b97f4",
+          "kv": "24f8a4aeb0bc1043",
+          "mtp": "062df3505f9c5e6a",
+          "stale": "14650fb0739d0383",
+          "ple_prev": "17,220"
+        },
+        "reference_final_state": {
+          "L": "52",
+          "gdn": "54756873c0a261cb",
+          "ple": "71de6a3551a64102",
+          "tail": "e4d5e1d593d3d7ba",
+          "dead": "09850edc054214e9",
+          "pooled": "a655c6d5b8c207f2",
+          "pooled_full": "d8ce39e357a32540",
+          "kv": "4cfab5e74c513232",
+          "mtp": "2dfbab14195105e2",
+          "stale": "14650fb0739d0383",
+          "ple_prev": "17,220"
+        },
+        "cancel_visible_text_is_reference_prefix": true
+      },
+      "reason": "persistent state differs at accepted prefix L=48; persistent state differs at accepted prefix L=52"
+    }
+  ],
+  "canceled_token_count": 5
+}

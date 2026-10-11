@@ -5404,6 +5404,22 @@ int main(int argc, char** argv) {
     // would otherwise be staged through a pageable bounce buffer on the critical path.
     std::FILE* layer_dump = nullptr;
     float* layer_stage = nullptr;
+    struct LayerDumpCleanup {
+        std::FILE*& file;
+        float*& stage;
+        ~LayerDumpCleanup() {
+            if (file != nullptr) {
+                std::fclose(file);
+                file = nullptr;
+            }
+            if (stage != nullptr) {
+                strata::platform::integration_trace::event("layer-dump-pinned-host", "free", &stage,
+                                                          stage, 0, -1);
+                cudaFreeHost(stage);
+                stage = nullptr;
+            }
+        }
+    } layer_dump_cleanup{layer_dump, layer_stage};
     const size_t layer_floats = (size_t) (g.n_layers + 1) * (size_t) g.hc * (size_t) g.n_embd;
     if (!o.dump_layers.empty()) {
         layer_dump = std::fopen(o.dump_layers.c_str(), "wb");
@@ -8865,6 +8881,7 @@ int main(int argc, char** argv) {
             } busy_scope;
             stop_req.store(false);   // a STOP that arrived between requests is stale
             err.clear();
+            bool req_ignore_eos = false;  // opt-in per-request Strata extension; default keeps service behavior
             // Disk sessions: SAVE <path> | RESTORE <path>, between requests (the path runs to the end of the line,
             // UTF-8).  The file holds what a parked conversation holds (conversation_file.hpp).  Answers: SAVED /
             // RESTORED <tokens> <bytes> <ms>; SERR <invalid|storage|memory|io> <published 0|1> <reason> for a refusal
@@ -9119,6 +9136,7 @@ int main(int argc, char** argv) {
                     const std::string key = tok.substr(0, eq);
                     const float fv = std::strtof(tok.c_str() + eq + 1, nullptr);
                     if (key == "cvec") req_cvec = std::atoi(tok.c_str() + eq + 1);
+                    else if (key == "ignore_eos") req_ignore_eos = std::atoi(tok.c_str() + eq + 1) != 0;
                     else if (key == "ckpt") req_ckpt = std::atoi(tok.c_str() + eq + 1) != 0;
                     else if (key == "pin") req_pin = std::max<long long>(0, std::atoll(tok.c_str() + eq + 1));
                     else if (key == "temperature") req_temperature = fv;
@@ -10808,7 +10826,7 @@ int main(int argc, char** argv) {
                     int a = 0;
                     while (a < A.T - 1 && A.tok[a + 1] == outp[(size_t) a]) ++a;
                     const auto retained = strata::core::published_prefix(outp.data(), a + 1, produced_n, max_new,
-                                                                          o.eos_ids.data(), o.eos_ids.size(), true);
+                                                                          o.eos_ids.data(), o.eos_ids.size(), !req_ignore_eos);
                     const int publish_n = retained.count;
                     const bool eos = retained.eos;
                     if (!V1(A).pl_commit_async(publish_n, err)) return die(err);
@@ -11059,7 +11077,7 @@ int main(int argc, char** argv) {
                 if (!drive.d.usage.empty() && !ajob && ((rounds + 1) % o.adapt_every) == 0)
                     adapt_thr = std::thread([&] { adapt_ok = adapt(); });
                 const auto retained = strata::core::published_prefix(outv.data(), a + 1, produced_n, max_new,
-                                                                      o.eos_ids.data(), o.eos_ids.size(), true);
+                                                                      o.eos_ids.data(), o.eos_ids.size(), !req_ignore_eos);
                 const int publish_n = retained.count;
                 const bool eos = retained.eos;
                 if (!ver.commit(publish_n, err)) {
@@ -11251,7 +11269,8 @@ int main(int argc, char** argv) {
                          (long long) n, (long long) resume, read_txt, prompt_ms,
                          prompt_ms > 0 ? 1000.0 * read_n / prompt_ms : 0.0, (long long) produced_n, decode_ms,
                          decode_ms > 0 ? 1000.0 * produced_n / decode_ms : 0.0, (long long) draft_accepted,
-                         (long long) draft_offered, checks.size(), cancelled ? " (cancelled)" : "");
+                         (long long) draft_offered, checks.size(),
+                         cancelled || std::strcmp(finish, "cancel") == 0 ? " (cancelled)" : "");
             // the VRAM share of the experts the pool looked up while decoding; experts it sent over PCIe for the GPU
             // to read (--pcie-frac) are in neither count - #588: so that share is said beside it (raising --pcie-frac
             // raises the hit rate while the PCIe reads may make the decode slower)
@@ -12222,10 +12241,12 @@ int main(int argc, char** argv) {
     }
     if (layer_dump != nullptr) {
         std::fclose(layer_dump);
+        layer_dump = nullptr;
         if (layer_stage != nullptr) {
             strata::platform::integration_trace::event("layer-dump-pinned-host", "free", &layer_stage,
                                                        layer_stage, 0, -1);
             cudaFreeHost(layer_stage);
+            layer_stage = nullptr;
         }
         std::printf("%-24s %s (%lld layers + the input x %d streams x %lld per position)\n", "layers dumped",
                     o.dump_layers.c_str(), (long long) g.n_layers, (int) g.hc, (long long) g.n_embd);

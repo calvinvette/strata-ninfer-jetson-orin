@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "scope": "MTP accepted-prefix cancellation state parity and same-process recovery",
+  "model": "Qwen3.8-Flash-Next-Coder-IQ1_M-Orin-validation",
+  "workload_cell": "pp512+tg64",
+  "prompt_tokens": 512,
+  "requested_output_tokens": 64,
+  "cancel_after_nonempty_deltas": 8,
+  "checks": [
+    {
+      "check": "stream_cancel",
+      "status": "fail",
+      "reason": "The 512/64 workload completed naturally after 11 generated tokens (MTP accepted 6/12) before the client cutoff could cancel the stream; no canceled-state comparison was produced. The waiting harness was then interrupted by the supervisor signal."
+    }
+  ],
+  "validity": "failed_setup",
+  "failure_reason": "The 512/64 workload completed naturally after 11 generated tokens (MTP accepted 6/12) before the client cutoff could cancel the stream; no canceled-state comparison was produced. The waiting harness was then interrupted by the supervisor signal.",
+  "finished_wall_time_s": 1791733006.6887887
+}

@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "scope": "MTP accepted-prefix cancellation state parity and same-process recovery",
+  "model": "Qwen3.8-Flash-Next-Coder-IQ1_M-Orin-validation",
+  "workload_cell": "pp2048+tg128",
+  "prompt_tokens": 2048,
+  "requested_output_tokens": 128,
+  "cancel_after_nonempty_deltas": 8,
+  "checks": [
+    {
+      "check": "stream_cancel",
+      "status": "fail",
+      "reason": "The pp2048+tg128 fixture generated the same 11-token early-EOS response as the short fixture before reaching the eight-delta cutoff. No stream-cancellation or state-comparison evidence was produced; the waiting harness was interrupted by the supervisor signal."
+    }
+  ],
+  "validity": "failed_setup",
+  "failure_reason": "The pp2048+tg128 fixture generated the same 11-token early-EOS response as the short fixture before reaching the eight-delta cutoff. No stream-cancellation or state-comparison evidence was produced; the waiting harness was interrupted by the supervisor signal.",
+  "finished_wall_time_s": 1791733243.0154665
+}

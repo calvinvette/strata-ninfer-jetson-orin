@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "scope": "MTP accepted-prefix cancellation state parity and same-process recovery",
+  "model": "Qwen3.8-Flash-Next-Coder-IQ1_M-Orin-validation",
+  "workload_cell": "open-ended-integer-list",
+  "prompt_text": "Write the integers from 1 through 1000 separated by single spaces. Do not add an introduction or conclusion, and do not stop before 1000.",
+  "requested_output_tokens": 256,
+  "cancel_after_nonempty_deltas": 8,
+  "checks": [
+    {
+      "check": "stream_cancel",
+      "status": "fail",
+      "reason": "TimeoutError: engine did not record a canceled request"
+    }
+  ],
+  "error": "TimeoutError: engine did not record a canceled request"
+}

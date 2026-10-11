@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "scope": "MTP accepted-prefix cancellation state parity and same-process recovery",
+  "model": "Qwen3.8-Flash-Next-Coder-IQ1_M-Orin-validation",
+  "workload_cell": "open-ended-integer-list",
+  "prompt_text": "Write an exhaustive technical explanation of at least 1200 words about how a modern computer processor executes instructions. Cover fetch, decode, scheduling, execution units, branch prediction, cache hierarchy, virtual memory, interrupts, and retirement. Use several paragraphs and continue until the explanation is complete.",
+  "requested_output_tokens": 1024,
+  "cancel_after_nonempty_deltas": 1,
+  "checks": [
+    {
+      "check": "stream_cancel",
+      "status": "fail",
+      "reason": "RuntimeError: engine completed the request before client cancellation was observed"
+    }
+  ],
+  "error": "RuntimeError: engine completed the request before client cancellation was observed"
+}
