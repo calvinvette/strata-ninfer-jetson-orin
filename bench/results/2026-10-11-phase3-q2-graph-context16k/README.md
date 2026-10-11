@@ -14,8 +14,11 @@ verifier windows and one commit graph) matched the four graph owner events.
 
 The session owner requested 559,240,704 bytes (533.1 MiB), compared with
 343,102,976 bytes (327.1 MiB) at 8K and 235,034,112 bytes (224.1 MiB) at 4K.
-Each context doubling added 108,068,864 bytes (103.0 MiB) to this session
-backing in the measured configurations. The 100 ms NVMap samples were stable
+The increments were 108,068,864 bytes (103 MiB) from 4K to 8K and
+216,137,728 bytes (206 MiB) from 8K to 16K. The follow-up 32K run measured a
+further 432,275,456 bytes (412 MiB) increase. In these four observed points,
+the increment doubles with each context doubling; this is configuration data,
+not a general allocation formula. The 100 ms NVMap samples were stable
 at 5,561,524,224 bytes before graph instantiation and 5,633,949,696 bytes after
 the fourth call, a 72,425,472-byte (69 MiB) increase. This matches the 4K and
 8K graph intervals. As in those runs, the NVMap interval includes synchronous

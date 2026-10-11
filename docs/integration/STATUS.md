@@ -579,8 +579,12 @@ size or closure of the remaining Phase 3 gates.
 The [16K-context Q2_0 graph follow-up](../../bench/results/2026-10-11-phase3-q2-graph-context16k/README.md)
 also passed all seven protocol/recovery scenarios with 21.04 GiB minimum host
 availability. Session backing increased from 224.1 MiB at 4K to 327.1 MiB at
-8K and 533.1 MiB at 16K, adding 103.0 MiB per context doubling. The four
-successful graph calls and balanced owner events repeated, while the stable
-NVMap capture interval remained 72,425,472 bytes. This describes the tested
-Q2_0 startup configurations; broader memory attribution and transfer/admission
-gates still keep Phase 3 in progress.
+8K and 533.1 MiB at 16K. The [32K configured-reservation follow-up](../../bench/results/2026-10-11-phase3-q2-graph-context32k/README.md)
+also passed all seven protocol/recovery scenarios (20.50 GiB minimum host
+availability) and measured 945.1 MiB of session backing. The session increments
+were 103, 206 and 412 MiB across successive context doublings. Four graph calls
+and balanced owner events repeated at 32K; stable NVMap capture growth remained
+72,425,472 bytes. These are configured startup reservations, not requests at
+32K actual prompt length or capacity. This describes the tested Q2_0 startup
+configurations; broader memory attribution and transfer/admission gates still
+keep Phase 3 in progress.
