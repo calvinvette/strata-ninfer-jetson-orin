@@ -10194,9 +10194,9 @@ int main(int argc, char** argv) {
                 if (std::getenv("STRATA_STATE_HASH_GDN") != nullptr && ss.gdn_alloc > 0) {   // per GDN layer: which one differs first
                     const size_t per = z.gdn / (size_t) ss.gdn_alloc;
                     std::string s;
-                    char b[8];
+                    char b[32];
                     for (int64_t i = 0; i < ss.gdn_alloc; ++i) {
-                        std::snprintf(b, sizeof(b), "%04llx ", (unsigned long long) (hash_dev((const uint8_t*) ss.gdn_state + i * per, per, 1469598103934665603ull) & 0xffff));
+                        std::snprintf(b, sizeof(b), "%016llx ", (unsigned long long) hash_dev((const uint8_t*) ss.gdn_state + i * per, per, 1469598103934665603ull));
                         s += b;
                     }
                     std::fprintf(stderr, "strata serve: STATE_HASH_GDN %s\n", s.c_str());
