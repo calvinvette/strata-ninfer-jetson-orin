@@ -135,6 +135,10 @@ allocations. The [clocked repeat](../../bench/results/2026-10-09-stage-pin-trans
 records dynamic CPU/GPU frequencies and unsupported EMC sampling. These
 screens do not close Phase 3's broader pressure, unique-backing or transfer gates.
 
+The trace-free seven-pair [2,048-token pinned-stage confirmation](../../bench/results/2026-10-11-phase3-stage-pin-timing2048/README.md) adds a held-out prompt-length cell. Generated IDs and fixed 3,903-slot cache use matched; state hashes were intentionally not collected. Total request delta was −0.18% (paired 95% interval −18.49% to +1.48%), while decode was variable; minimum `MemAvailable` was 13.02 GiB. This does not establish a product benefit or close the broader transfer gate.
+
+The current-binary Q2_0 [PLE rerun](../../bench/results/2026-10-11-phase3-q2-ple-current-rerun/README.md) passed, and the serial [Phase 3 memory/owner CTest selection](../../bench/results/2026-10-11-phase3-q2-memory-ctest-current/README.md) passed 22/22, including the slower PLE reader self-test. Minimum host availability was 24.55 GiB during the suite. These contract checks do not close the remaining Phase 3 pressure, graph-backing or transfer/admission gates.
+
 The [pinned registration fallback check](../../bench/results/2026-10-09-pinned-fallback-pressure/README.md)
 forces `cudaHostRegister` failure in the existing arena test, confirms the
 registration error is cleared, and verifies a pageable copy round trip. This
