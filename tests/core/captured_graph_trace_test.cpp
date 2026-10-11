@@ -3,8 +3,11 @@
 #include <cuda_runtime.h>
 
 #include <array>
+#include <chrono>
+#include <cstdlib>
 #include <cstdio>
 #include <string>
+#include <thread>
 
 namespace {
 
@@ -12,6 +15,20 @@ bool check(cudaError_t status, const char* operation) {
     if (status == cudaSuccess) return true;
     std::fprintf(stderr, "%s: %s\n", operation, cudaGetErrorString(status));
     return false;
+}
+
+void trace_pause(const char* marker) {
+    const char* value = std::getenv("STRATA_CAPTURED_GRAPH_TRACE_PAUSE_MS");
+    if (!value || !*value) return;
+    char* end = nullptr;
+    const long milliseconds = std::strtol(value, &end, 10);
+    if (end == value || *end != '\0' || milliseconds <= 0 || milliseconds > 10000) return;
+    const double now = std::chrono::duration<double>(
+        std::chrono::steady_clock::now().time_since_epoch()).count();
+    std::fprintf(stderr, "captured graph trace marker: {\"marker\":\"%s\",\"monotonic_s\":%.9f}\n",
+                 marker, now);
+    std::fflush(stderr);
+    std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 }
 
 }  // namespace
@@ -29,6 +46,7 @@ int main() {
         return 1;
     }
 
+    trace_pause("before_capture");
     std::string err;
     bool ok = true;
     {
@@ -45,6 +63,7 @@ int main() {
             ok = graph.end(stream, err);
             if (!ok) std::fprintf(stderr, "CapturedGraph::end: %s\n", err.c_str());
         }
+        if (ok) trace_pause("after_instantiate");
         if (ok) {
             ok = graph.launch(stream, err);
             if (!ok) std::fprintf(stderr, "CapturedGraph::launch: %s\n", err.c_str());
