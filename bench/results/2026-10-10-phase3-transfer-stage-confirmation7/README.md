@@ -31,7 +31,9 @@ scoped read bytes were 10.303 GB and 9.930 GB respectively; the median paired
 stage-minus-fill read delta was −0.472 GB. Every fill arm reported zero staged
 blobs consumed and zero decode-wait fetches. Staged arms consumed 205–325
 prefetched blobs and reported 1,143.7–3,395.9 ms aggregate wait across 1,292–
-1,729 fetches. The engine therefore takes staged buffers in real requests, but
+1,729 fetches. Owner traces observed a pageable host staging allocation peak
+of 175,718,400 bytes (167.6 MiB) in one stage arm; fill arms had no staging
+allocation. The engine therefore takes staged buffers in real requests, but
 the measured wait also shows that read-ahead does not always finish before
 consumption.
 
