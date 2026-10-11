@@ -1007,6 +1007,22 @@ void drive_pool_split(void* user, const float* x_f, const int32_t* ids, int64_t 
 /// Layer split across GPUs: a later stage on its own device, with its own copy of the dense weights, a session, an
 /// expert cache for its layers, a verify window and a prompt path; the last one also holds the head (the drafter
 /// lives on its device too).
+struct SessionBackingOwner {
+    strata::core::SessionState* state = nullptr;
+    void* base = nullptr;
+    const char* owner = "session-batch";
+    int device = 0;
+    void release() {
+        if (base == nullptr) return;
+        const strata::core::OnDevice on(device);
+        if (state != nullptr) strata::core::session_release(*state);
+        if (cudaFree(base) == cudaSuccess && state != nullptr)
+            strata::platform::integration_trace::event(owner, "free", state, base, 0, device);
+        base = nullptr;
+    }
+    ~SessionBackingOwner() { release(); }
+};
+
 struct GpuStage {
     int dev = 0;
     int64_t lb = 0, le = 0;
@@ -1015,6 +1031,7 @@ struct GpuStage {
     strata::core::NativeDense dense;
     strata::core::NativeHead head;
     strata::core::SessionState ss;
+    SessionBackingOwner session_backing;                 ///< destroyed after verifiers, before the carved state
     void* session_buf = nullptr;                         ///< device backing for this stage's carved session
     uint64_t session_buf_bytes = 0;
     cudaStream_t stream = nullptr;
@@ -2830,6 +2847,7 @@ int main(int argc, char** argv) {
 
     strata::core::SessionState ss;
     void* sbuf = nullptr;   // allocated after the layer-split search, sized to CUDA0's own layer range (the carve)
+    SessionBackingOwner primary_session_backing{&ss, nullptr, "session", 0};
     // **THE ENGINE RAN ON THE LEGACY DEFAULT STREAM, WHICH ON WDDM IS THE SLOW PATH.**  All four session
     // calls - `session_capture`, `session_replay`, `session_token` and `session_loop` - were handed `nullptr`,
     // i.e. stream 0.  `bench/micro/kernel_costs.cu` measures what that costs: EVERY kernel it launches through
@@ -3854,11 +3872,12 @@ int main(int argc, char** argv) {
             std::fprintf(stderr, "strata generate: session state allocation failed\n");
             return 1;
         }
+        primary_session_backing.base = sbuf;
+        strata::platform::integration_trace::event("session", "allocate", &ss, sbuf, sbuf_bytes, 0);
         if (strata::core::session_init(g, o.max_context, K, sbuf, ss, 0, hi0) == 0) {
             std::fprintf(stderr, "strata generate: session_init failed\n");
             return 1;
         }
-        strata::platform::integration_trace::event("session", "allocate", &ss, sbuf, sbuf_bytes, 0);
         if (g.n_qsa_layers() > 0 && ss.qsa_states[ss.qsa_primary()].kv_mode == 1)
             std::fprintf(stderr, "strata generate: KV streaming: %lld of %lld cells per QSA layer in VRAM, the K/V in "
                                  "%.2f GiB of pinned RAM\n",
@@ -3890,6 +3909,10 @@ int main(int argc, char** argv) {
             std::fprintf(stderr, "strata generate: layer split, CUDA%d: the session state failed\n", st.dev);
             return 1;
         }
+        st.session_backing.state = &st.ss;
+        st.session_backing.base = st.session_buf;
+        st.session_backing.owner = "session-stage";
+        st.session_backing.device = st.dev;
         strata::platform::integration_trace::event("session-stage", "allocate", &st.ss, st.session_buf,
                                                    st.session_buf_bytes, st.dev);
         if (strata::core::session_init(g, o.max_context, K, st.session_buf, st.ss, st.lb, st.le) == 0) {
@@ -3930,6 +3953,7 @@ int main(int argc, char** argv) {
         }
     }
     std::vector<std::vector<std::unique_ptr<strata::core::SessionState>>> bslot_ss;
+    std::vector<std::vector<std::unique_ptr<SessionBackingOwner>>> bslot_backing;
     if (o.batch != 0) {
         const int cap = strata::kernels::kVerifyMaxT;
         const char* off = !o.serve ? "it needs --serve" : o.batch < 2 ? "it needs 2 or more slots"
@@ -3965,6 +3989,7 @@ int main(int argc, char** argv) {
     }
     if (o.batch > 0) {
         bslot_ss.resize(1 + stages.size());
+        bslot_backing.resize(1 + stages.size());
         int fit = o.batch;   // the slots every stage could carve
         uint64_t bytes0 = 0;
         for (size_t k = 0; k < bslot_ss.size(); ++k) {
@@ -4002,6 +4027,12 @@ int main(int argc, char** argv) {
                     break;
                 }
                 strata::core::session_zero(*u, g, nullptr, nullptr);
+                auto backing = std::make_unique<SessionBackingOwner>();
+                backing->state = u.get();
+                backing->base = buf;
+                backing->owner = "session-batch";
+                backing->device = dev;
+                bslot_backing[k].push_back(std::move(backing));
                 bslot_ss[k].push_back(std::move(u));
             }
             cudaDeviceSynchronize();
@@ -4010,10 +4041,16 @@ int main(int argc, char** argv) {
             std::fprintf(stderr, "strata generate: --batch: %d slot sessions on CUDA%d (%.2f GiB each); %.2f GiB free\n",
                          (int) bslot_ss[k].size(), dev, (double) bytes / 1073741824.0, (double) fb / 1073741824.0);
         }
-        for (auto& v : bslot_ss) if ((int) v.size() > fit) v.resize((size_t) fit);   // the same count on every stage
+        for (size_t k = 0; k < bslot_ss.size(); ++k) {
+            if ((int) bslot_ss[k].size() > fit) {
+                bslot_backing[k].resize((size_t) fit);   // free arenas while their SessionStates still exist
+                bslot_ss[k].resize((size_t) fit);
+            }
+        }
         if (fit < 2) {
             std::fprintf(stderr, "strata generate: WARNING: --batch is off: not two slot sessions fit (a smaller "
                                  "--max-context or KV streaming, --kv-resident, makes them smaller)\n");
+            bslot_backing.clear();
             bslot_ss.clear();
             o.batch = 0;
         } else {
@@ -12299,8 +12336,15 @@ int main(int argc, char** argv) {
     cudaFree(d_logits);
     cudaFree(d_emb);
     cudaFree(d_parts);
-    if (cudaFree(sbuf) == cudaSuccess)
-        strata::platform::integration_trace::event("session", "free", &ss, sbuf, 0, 0);
+    // Destroy session users before releasing their carved backing. This also keeps session_release ahead of the
+    // shared model arena teardown and makes the normal shutdown path visible in the owner trace.
+    for (auto& d : slot_mtp) if (d) d->set_ple_session(nullptr);
+    slot_mtp.clear();
+    mtp.set_ple_session(nullptr);
+    bslot_backing.clear();
+    bslot_ss.clear();
+    stages.clear();
+    primary_session_backing.release();
     cudaFree(arena);
     return 0;
 }
