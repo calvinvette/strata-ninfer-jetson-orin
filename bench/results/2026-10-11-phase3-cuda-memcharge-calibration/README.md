@@ -9,8 +9,8 @@ supervised repetitions passed the six-GiB host `MemAvailable` floor. The
 second repetition also sampled `cuMemGetInfo` before, during and after the
 allocation.
 
-The CUDA calls returned success, but no available gauge showed a 512 MiB
-change. In the second run, `cuMemGetInfo` reported total memory fixed at
+The CUDA calls returned success, but none of the gauges sampled by these two
+runs showed a 512 MiB change. In the second run, `cuMemGetInfo` reported total memory fixed at
 32,187,883,520 bytes; free memory changed from 26,466,254,848 bytes before to
 26,464,190,464 bytes while the allocation was live, then to 26,463,412,224
 bytes after free. Host `MemAvailable` moved by about 2 MiB between the direct
@@ -21,13 +21,14 @@ unrelated system activity. The first repetition likewise showed only
 background-sized movement in host availability, session-cgroup usage and
 `tegrastats` RAM.
 
-This is an instrumentation-boundary result, not a measurement of the
-allocation's physical backing or CUDA graph memory. It indicates that these
-gauges, as sampled here, do not independently attribute the known CUDA request
-to the process and cannot price graph executable storage. The request may be
-served through an allocation path whose physical commitment is not represented
-by these counters. Keep graph memory unpriced and retain the six-GiB physical
-headroom guard until a calibrated allocation-level counter is available.
+This was an instrumentation-boundary result, not a measurement of the
+allocation's physical backing or CUDA graph memory. These gauges, as sampled
+here, did not independently attribute the known CUDA request to the process.
+A later [NVMap calibration and service trace](../2026-10-11-phase3-graph-nvmap-calibration/README.md)
+validated the root-readable IOVMM client table against an exact 512 MiB live
+allocation and measured the graph-startup owner increment for three service
+processes. The earlier readings remain useful as global pressure context but
+are not per-allocation measures.
 
 The source is `cuda_memcharge_calibration.cpp`; no binary is stored in Git.
 Both supervisor outputs, memory samples and tegrastats logs are retained here.

@@ -499,7 +499,7 @@ A 256-slot Q2_0 cache request failed at 8 and 9 GiB cgroup caps (zero slots), th
 The Q2_0 artifact-aware PLE oracle also passes inside a 10 GiB cgroup scope, with all seven stages checked for three tokens and the real native key reconstructed byte-for-byte. The 32.1 MiB scope peak is specific to the short operator test; it does not price full-model service memory. For Splash, test correctness fixtures inside a constrained scope separately from full-runtime admission, and do not treat a small fixture's cgroup peak as a serving estimate.
 
 
-A second graph-memory probe wrapped both the CUDA runtime instantiate call and public Driver allocation APIs. The direct Driver allocation/free calibration was visible, but the real service's 10 graph instantiations produced no interposable Driver allocation events. This is evidence about the probe boundary only; graph executable memory is still unpriced. For Splash, validate instrumentation against the exact native graph-creation path, and treat absent allocator events as unknown until an independent heap or system-pressure delta can bound them.
+A second graph-memory probe wrapped both the CUDA runtime instantiate call and public Driver allocation APIs. The direct Driver allocation/free calibration was visible, but the real service's 10 graph instantiations produced no interposable Driver allocation events. A later root-readable NVMap IOVMM client trace, calibrated against a live 512 MiB CUDA allocation, measured the same 83,427,328-byte process-owner increase across ten graph-instantiation calls in each of three IQ1_M service startups. This is a measured capture/instantiate interval for that setup, not a universal executable size or graph-disabled differential. For Splash, validate instrumentation against the exact native graph-creation path, and treat absent allocator events as unknown until an independent heap or system-pressure delta can bound them.
 
 
 The one-token Q2_0 cache-cap bracket does not predict longer-generation admission: at 256 slots, 64-token requests were aborted under 9.5, 10 and 12 GiB scopes before prefill, and at 16 GiB after prefill; 18 and 20 GiB cells completed. Effective cgroup availability, including file-cache charge, must be sampled during the request. Keep prompt/generation length and actual admitted cache slots in every support cell on a future Strata + Splash port.
@@ -523,9 +523,12 @@ operator or task-level oracle to decide which policy is accurate.
 
 An Orin visibility calibration successfully allocated and touched 512 MiB
 through CUDA, but `cuMemGetInfo`, host availability, the interactive cgroup
-counter and `tegrastats` did not show a commensurate change. This does not say
-the allocation lacked physical backing; it shows these counters do not provide
-an independent per-allocation physical-byte measure on this setup. For Splash,
+counter and `tegrastats` did not show a commensurate change. The root-readable
+NVMap IOVMM client table did: its per-process total rose by exactly 512 MiB and
+returned to baseline after free. The three-process graph follow-up measured an
+83,427,328-byte net process-owner increase across ten graph-instantiation calls
+in each service startup. This is an interval cost for that IQ1_M configuration;
+other graph paths and non-NVMap allocations remain unpriced. For Splash,
 calibrate each Metal and OS memory counter against a known live allocation
 before using it to price graph, heap or residency costs, and retain an unpriced
 status when the calibration fails.

@@ -17,9 +17,12 @@ The zero Driver allocation count is not evidence that graph executable or
 driver storage is zero. The driver allocator wrapper is validated for direct
 application calls, but CUDA's runtime/library-internal graph path did not
 resolve those allocation calls through the interposed public symbols, or used
-other/private APIs. Graph memory therefore remains unpriced. This probe
-confirms a measurement boundary and does not close Phase 3's graph accounting
-requirement. It does not alter runtime code or dispatch.
+other/private APIs. This probe confirms a measurement boundary and does not
+alter runtime code or dispatch. The later [calibrated NVMap owner trace](../2026-10-11-phase3-graph-nvmap-calibration/README.md)
+measured 83,427,328 bytes of net process-owner growth across ten graph calls in
+each of three IQ1_M service startups. That result prices the capture/instantiate
+interval for that configuration; the zero public Driver event count above
+still cannot be interpreted as zero graph memory.
 
 The run's protocol results and engine log are in `service-run-calibrated/`;
 the physical-memory supervisor record is in `service-driver-calibrated/`.

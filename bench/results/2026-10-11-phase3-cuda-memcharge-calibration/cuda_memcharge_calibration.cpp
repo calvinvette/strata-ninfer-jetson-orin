@@ -15,6 +15,7 @@ int main(){
  CUresult s=cuInit(0); CUdevice d{}; CUcontext c{}; CUdeviceptr p{};
  if(s==CUDA_SUCCESS)s=cuDeviceGet(&d,0); if(s==CUDA_SUCCESS)s=cuCtxCreate(&c,0,d);
  sample("before");
+ std::this_thread::sleep_for(std::chrono::seconds(2));
  if(s==CUDA_SUCCESS)s=cuMemAlloc(&p,512ull<<20);
  if(s==CUDA_SUCCESS)s=cuMemsetD8(p,0x5a,512ull<<20);
  if(s==CUDA_SUCCESS)s=cuCtxSynchronize();

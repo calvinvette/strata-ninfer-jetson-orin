@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "measured_on": "orin1",
+  "measured_date": "2026-10-11",
+  "engine_sha256": "3e1e003c2097d58591db30b60412acbd8798e5ab39ce857f1e3e2c0ebd241a5b",
+  "measurement": "per-process Linux Tegra NVMap IOVMM client SIZE, sampled every 0.1 s as root; calibrated against a live 512 MiB CUDA allocation and free",
+  "runs": [
+    {
+      "name": "initial",
+      "strata_pid": 2708737,
+      "nvmap_bytes_before": 20514680832,
+      "nvmap_bytes_after": 20598108160,
+      "delta_bytes": 83427328,
+      "supervisor_minimum_host_available_bytes": 8278888448
+    },
+    {
+      "name": "repeat-01",
+      "strata_pid": 2708872,
+      "nvmap_bytes_before": 19176341504,
+      "nvmap_bytes_after": 19259768832,
+      "delta_bytes": 83427328,
+      "supervisor_minimum_host_available_bytes": 9480867840
+    },
+    {
+      "name": "repeat-02",
+      "strata_pid": 2709026,
+      "nvmap_bytes_before": 20544172032,
+      "nvmap_bytes_after": 20627599360,
+      "delta_bytes": 83427328,
+      "supervisor_minimum_host_available_bytes": 8258203648
+    }
+  ],
+  "graph_instantiation_calls_per_run": 10,
+  "successful_graph_instantiations_per_run": 10,
+  "interposable_public_driver_alloc_calls_during_instantiation_per_run": 0,
+  "net_nvmap_client_bytes_across_graph_initialization": 83427328,
+  "net_nvmap_client_mib_across_graph_initialization": 79.5625,
+  "matches_across_three_processes": true,
+  "minimum_host_memavailable_gib": [
+    7.710315704345703,
+    8.82974624633789,
+    7.691051483154297
+  ],
+  "protocol_scenarios_per_run": 7,
+  "protocol_scenarios_passed_per_run": 7,
+  "interpretation": "Net process-owned NVMap bytes grew by the same 83,427,328 bytes from the stable sample immediately before the first graph-instantiation event through the sample immediately after the tenth successful event in all three service startups. This prices the graph-capture/instantiation startup interval for this IQ1_M configuration; it includes any other synchronous device-owner allocations in that interval and is not a graph-disabled differential or a universal per-graph executable size.",
+  "phase3_complete": false
+}
