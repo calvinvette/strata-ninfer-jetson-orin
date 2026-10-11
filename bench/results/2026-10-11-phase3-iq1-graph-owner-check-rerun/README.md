@@ -37,10 +37,12 @@ Validation:
   `source-sha256.txt` and `backend-builds.json`.
 - HIP `strata` target rebuilt on maestro1 with one job. This is x86 build
   evidence only.
-- SYCL's changed MTP translation unit compiled on maestro1. A full SYCL target
-  link was not run because the configured tree triggered a clean 94-object
-  rebuild; an earlier bounded full-target attempt was interrupted to avoid
-  consuming the memory-limited host. This is not SYCL runtime evidence.
+- The complete SYCL `strata` target built on maestro1 with one job using the
+  expanded tree. The first link lacked the installed oneMKL library directory;
+  retrying with `LIBRARY_PATH` set to that directory passed. The linker warned
+  about transitive `libsvml`, `libirng`, `libimf`, and `libintlc` dependencies
+  of `libOpenCL`; no unresolved libraries remained. This is x86 build evidence,
+  not SYCL device runtime evidence.
 - The focused owner-observation Python tests passed (22 tests); full integration-tooling unittest discovery passed (75 tests).
 - A fresh six-GiB supervised CTest selection passed all five tests: `conversation_cache_test`, `conversation_memory_test`, `vmm_test`, artifact-aware Q2_0 `ple_parity`, and `expert_cache_memory_test`. Minimum `MemAvailable` was 24.48 GiB.
 

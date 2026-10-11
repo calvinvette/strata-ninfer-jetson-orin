@@ -13,11 +13,13 @@
     "evidence_scope": "x86 build only; not Orin runtime evidence"
   },
   "maestro1_sycl": {
-    "target": "strata_engine MTP translation unit",
-    "status": "compile_pass_full_link_not_run",
-    "command": "ninja -C build-sycl CMakeFiles/strata_engine.dir/src/core/mtp.cpp.o",
-    "object_sha256": "69173354d75f3ae10cb7e84a1bb059cc94ebf7b6cbd1124dd5ed10fd158b2c41",
-    "reason": "A full target triggered a clean 94-object rebuild on the memory-limited host; it was stopped to avoid a redundant full rebuild."
+    "target": "strata",
+    "status": "pass",
+    "command": "LIBRARY_PATH=<oneAPI MKL lib> cmake --build build-sycl-expanded --target strata --parallel 1",
+    "binary_sha256": "ffa8587e0760f01ec223952f56bd62a1adedfc483aa8ac8090be0dc92bf3d14e",
+    "changed_object_sha256": "e327c91d68fd5c526bdc466d0e77caef8314f736b7a3ccbee30b05f5a3a7c2a1",
+    "evidence_scope": "x86 build only; not SYCL device runtime or Orin performance evidence",
+    "link_note": "The first link attempt lacked the existing oneMKL library directory; retry succeeded with LIBRARY_PATH. Linker emitted warnings for libsvml, libirng, libimf and libintlc dependencies of libOpenCL."
   },
   "remote_reference_restored": {
     "cuda_source_sha256": "f7d43ed3b3082d02b13af5d7135b93dbbdfe30c3865c7397e687bed01bd26e05",
