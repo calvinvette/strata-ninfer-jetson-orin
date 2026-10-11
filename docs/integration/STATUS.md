@@ -566,3 +566,12 @@ earlier Q2_0 repeats; this interval still includes adjacent synchronous device
 allocations. Minimum host availability was 21.15 GiB. This confirms one model
 and graph configuration after the new verifier code, not general graph pricing
 or pressure qualification.
+
+The [8K-context Q2_0 follow-up](../../bench/results/2026-10-11-phase3-q2-graph-context8k/README.md)
+also passed all seven API/cancellation/recovery scenarios, with 21.24 GiB
+minimum host availability. Its four verifier/commit graph calls matched owner
+events; session, expert cache, verifier arena, mapped host staging and pageable
+expert staging allocations balanced at teardown. Stable NVMap growth was again
+72,425,472 bytes across capture/instantiation, equal to the 4K run. This adds a
+second context point for the same request/configuration, not a universal graph
+size or closure of the remaining Phase 3 gates.
