@@ -156,6 +156,8 @@ def main():
     parser.add_argument('--repetitions', type=int, default=3)
     parser.add_argument('--seed', type=int, required=True)
     parser.add_argument('--baseline-workers', type=int, default=11)
+    parser.add_argument('--timing-only', action='store_true',
+                        help='disable tracing; check API output/cache but not accepted-prefix state')
     args = parser.parse_args()
     if args.repetitions < 2 or len(set(args.workers)) != len(args.workers) or any(n < 1 for n in args.workers):
         parser.error('workers must be unique positive counts and repetitions must be at least two')
@@ -177,6 +179,8 @@ def main():
     rng = random.Random(args.seed)
     result = {
         'scope': 'randomized process-block screen; one fixed real-model API workload per process after a warmup',
+        'correctness_mode': 'API output/cache only; tracing disabled' if args.timing_only else
+                            'full accepted-prefix state and output; tracing enabled',
         'seed': args.seed, 'planned_repetitions': args.repetitions,
         'workers': sorted(args.workers), 'baseline_workers': args.baseline_workers,
         'engine_sha256': hashlib.sha256(Path(cfg['exe']).read_bytes()).hexdigest(),
@@ -195,8 +199,15 @@ def main():
             set_arg(run_cfg['args'], '--prompt-cache', 6)
             run_cfg['port'] = base_port + repetition * len(args.workers) + cell_index
             run_cfg['log'] = str((run_dir / 'engine.log').resolve())
-            run_cfg['env'] = {**cfg.get('env', {}), 'STRATA_TRACE': '1',
-                              'STRATA_STATE_HASH': '1', 'STRATA_INTEGRATION_TRACE': '1', 'STRATA_ACCEPTED_PREFIX_TRACE': '1'}
+            run_cfg['env'] = dict(cfg.get('env', {}))
+            if args.timing_only:
+                for key in ('STRATA_TRACE', 'STRATA_STATE_HASH', 'STRATA_STATE_HASH_GDN',
+                            'STRATA_INTEGRATION_TRACE', 'STRATA_ACCEPTED_PREFIX_TRACE'):
+                    run_cfg['env'].pop(key, None)
+            else:
+                run_cfg['env'].update({'STRATA_TRACE': '1', 'STRATA_STATE_HASH': '1',
+                                       'STRATA_INTEGRATION_TRACE': '1',
+                                       'STRATA_ACCEPTED_PREFIX_TRACE': '1'})
             config_path = run_dir / 'server-config.json'
             config_path.write_text(json.dumps(run_cfg, indent=2) + '\n')
             request_path = run_dir / 'requests.json'
@@ -204,6 +215,8 @@ def main():
                        '--workloads', str(args.workloads.resolve()), '--output', str(request_path),
                        '--warmup-workloads', str(warmup_path.resolve()),
                        '--variant', 'candidate', '--rounds', '1']
+            if args.timing_only:
+                command.append('--no-trace')
             with (run_dir / 'launcher.log').open('w') as log:
                 completed = subprocess.run(command, cwd=cfg.get('cwd', str(ROOT)),
                                            stdout=log, stderr=subprocess.STDOUT,
@@ -218,14 +231,15 @@ def main():
                 text = log_path.read_text(errors='replace')
                 slot_counts = {int(n) for n in re.findall(r'expert cache (\d+) slots', text)}
                 row['actual_expert_cache_slots'] = next(iter(slot_counts)) if len(slot_counts) == 1 else None
-                row['state_hashes'] = read_state_hashes(log_path)
-                row['accepted_prefix_trace'] = read_accepted_prefix_trace(log_path)
-                if not row['state_hashes']:
-                    raise ValueError(f'missing state fingerprints in {log_path}')
-                if not row['accepted_prefix_trace']:
-                    raise ValueError(f'missing accepted-prefix trace in {log_path}')
-                if sum(len(trace['token_ids']) for trace in row['accepted_prefix_trace']) != row['generated_tokens']:
-                    raise ValueError(f'accepted-prefix trace does not cover every generated token in {log_path}')
+                if not args.timing_only:
+                    row['state_hashes'] = read_state_hashes(log_path)
+                    row['accepted_prefix_trace'] = read_accepted_prefix_trace(log_path)
+                    if not row['state_hashes']:
+                        raise ValueError(f'missing state fingerprints in {log_path}')
+                    if not row['accepted_prefix_trace']:
+                        raise ValueError(f'missing accepted-prefix trace in {log_path}')
+                    if sum(len(trace['token_ids']) for trace in row['accepted_prefix_trace']) != row['generated_tokens']:
+                        raise ValueError(f'accepted-prefix trace does not cover every generated token in {log_path}')
                 if row['actual_expert_cache_slots'] is None:
                     raise ValueError(f'cache capacity missing or conflicting in {log_path}')
             except (OSError, KeyError, ValueError, RuntimeError) as exc:
@@ -241,11 +255,12 @@ def main():
     else:
         slots = {row['actual_expert_cache_slots'] for row in valid}
         result['actual_cache_slots_equal'] = len(slots) == 1
-        state = [row['state_hashes'][-1] for row in valid]
-        result['measured_state_equal'] = len({json.dumps(row, sort_keys=True) for row in state}) == 1
         result['measured_output_equal'] = len({row['output_sha256'] for row in valid}) == 1
-        result['measured_accepted_prefix_equal'] = len({json.dumps(row['accepted_prefix_trace'], sort_keys=True)
-                                                        for row in valid}) == 1
+        if not args.timing_only:
+            state = [row['state_hashes'][-1] for row in valid]
+            result['measured_state_equal'] = len({json.dumps(row, sort_keys=True) for row in state}) == 1
+            result['measured_accepted_prefix_equal'] = len({json.dumps(row['accepted_prefix_trace'], sort_keys=True)
+                                                            for row in valid}) == 1
         result['paired_request_time_delta_percent'] = paired_deltas(valid, args.baseline_workers)
         result['bootstrap_95pct_median_intervals_percent'] = {
             worker: bootstrap_median(values, args.seed + int(worker))
@@ -261,16 +276,17 @@ def main():
                 'median_request_ms': statistics.median(row['request_ms'] for row in selected),
                 'output_hashes': sorted({row['output_sha256'] for row in selected}),
             }
-        result['passed'] = (result['actual_cache_slots_equal'] and result['measured_state_equal'] and
-                            result['measured_output_equal'] and result['measured_accepted_prefix_equal'] and
+        result['passed'] = (result['actual_cache_slots_equal'] and result['measured_output_equal'] and
+                            (args.timing_only or (result['measured_state_equal'] and
+                                                  result['measured_accepted_prefix_equal'])) and
                             not result['failures'])
         if not result['actual_cache_slots_equal']:
             result['failures'].append({'failure': 'actual expert-cache capacity differs across cells'})
-        if not result['measured_state_equal']:
+        if not args.timing_only and not result['measured_state_equal']:
             result['failures'].append({'failure': 'measured persistent-state fingerprints differ across cells'})
         if not result['measured_output_equal']:
             result['failures'].append({'failure': 'measured output content differs across worker counts'})
-        if not result['measured_accepted_prefix_equal']:
+        if not args.timing_only and not result['measured_accepted_prefix_equal']:
             result['failures'].append({'failure': 'accepted token IDs or committed state differ at a verifier boundary'})
     (args.output / 'results.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps({key: result.get(key) for key in

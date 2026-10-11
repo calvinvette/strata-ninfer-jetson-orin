@@ -1,6 +1,7 @@
 """Own one loopback server for a measured block, inside run_control's group."""
 import argparse
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -8,6 +9,26 @@ import time
 import urllib.error
 
 from benchmark_control import request
+
+
+TRACE_ENV_KEYS = (
+    'STRATA_TRACE', 'STRATA_STATE_HASH', 'STRATA_STATE_HASH_GDN',
+    'STRATA_INTEGRATION_TRACE', 'STRATA_ACCEPTED_PREFIX_TRACE',
+)
+
+
+def configure_trace_environment(config_env, inherited_env, no_trace):
+    """Build the environment the server and its engine child will inherit."""
+    config_env = dict(config_env or {})
+    inherited_env = dict(inherited_env)
+    if no_trace:
+        for key in TRACE_ENV_KEYS:
+            config_env.pop(key, None)
+            inherited_env.pop(key, None)
+    else:
+        config_env['STRATA_TRACE'] = '1'
+    inherited_env.update({str(key): str(value) for key, value in config_env.items()})
+    return config_env, inherited_env
 
 
 def check_port(port):
@@ -35,18 +56,21 @@ def main():
     parser.add_argument('--rounds', type=int, default=1)
     parser.add_argument('--validate-api-only', action='store_true')
     parser.add_argument('--require-kv-streaming', action='store_true')
+    parser.add_argument('--no-trace', action='store_true',
+                        help='do not force STRATA_TRACE for timing-only API cells')
     args = parser.parse_args()
     cfg = json.loads(args.config.read_text())
     base = 'http://127.0.0.1:' + str(cfg['port'])
     # Never adopt an existing listener as this block's owned engine.
     check_port(cfg['port'])
     cfg['log'] = str((args.output.parent / 'engine.log').resolve())
-    cfg['env'] = {**cfg.get('env', {}), 'STRATA_TRACE': '1'}
+    cfg['env'], server_env = configure_trace_environment(cfg.get('env', {}), os.environ,
+                                                        args.no_trace)
     owned_config = args.output.parent / 'server-config.json'
     owned_config.write_text(json.dumps(cfg, indent=2) + '\n')
     server = subprocess.Popen([sys.executable, '-m', 'serve.server', '--engine', 'strata',
                                '--config', str(owned_config.resolve()), '--host', '127.0.0.1',
-                               '--port', str(cfg['port'])], cwd=cfg['cwd'])
+                               '--port', str(cfg['port'])], cwd=cfg['cwd'], env=server_env)
     try:
         deadline = time.monotonic() + 240
         while True:
