@@ -29,7 +29,11 @@ def main():
     p.add_argument('--vision-exe', type=Path, required=True)
     p.add_argument('--mmproj', type=Path, required=True)
     p.add_argument('--port', type=int, default=18124)
+    p.add_argument('--vision-max-tokens', type=int, default=16)
+    p.add_argument('--vision-min-tokens', type=int, default=16)
     a = p.parse_args()
+    if a.vision_min_tokens < 1 or a.vision_max_tokens < a.vision_min_tokens:
+        p.error('vision token limits must satisfy 1 <= min <= max')
     out = a.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
     cfg = json.loads(a.config.read_text())
@@ -49,7 +53,8 @@ def main():
     cfg['vision'] = {
         'exe': str(a.vision_exe.resolve()), 'mmproj': str(a.mmproj.resolve()),
         'model': str(model_path),
-        'gpu': True, 'threads': 8, 'min_tokens': 16, 'max_tokens': 16,
+        'gpu': True, 'threads': 8, 'min_tokens': a.vision_min_tokens,
+        'max_tokens': a.vision_max_tokens,
     }
     cfg['env'] = {**cfg.get('env', {}), 'STRATA_INTEGRATION_TRACE': '1'}
     owned_cfg = out / 'server-config.json'
@@ -60,7 +65,9 @@ def main():
             [sys.executable, '-m', 'serve.server', '--engine', 'strata', '--config',
              str(owned_cfg), '--host', '127.0.0.1', '--port', str(a.port)],
             cwd=cfg['cwd'], stdout=log, stderr=subprocess.STDOUT)
-        result = {'server_pid': server.pid, 'port': a.port, 'status': 'not_run'}
+        result = {'server_pid': server.pid, 'port': a.port,
+                  'vision_min_tokens': a.vision_min_tokens,
+                  'vision_max_tokens': a.vision_max_tokens, 'status': 'not_run'}
         try:
             deadline = time.monotonic() + 360
             while True:
