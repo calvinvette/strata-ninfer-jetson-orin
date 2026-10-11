@@ -4,7 +4,8 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT / 'tools'), str(ROOT / 'tools/integration')]
-from mtp_window_screen import canonical_args, one_measured
+from mtp_window_screen import (canonical_args, one_measured, select_workload,
+                               validate_mtp_arm_args)
 
 
 class MtpWindowScreenTests(unittest.TestCase):
@@ -30,6 +31,29 @@ class MtpWindowScreenTests(unittest.TestCase):
             path.write_text('{"checks": [{"warmup": false}, {"warmup": false}]}')
             with self.assertRaises(ValueError):
                 one_measured(path)
+
+    def test_selects_named_workload_from_multi_cell_file(self):
+        rows = {'workloads': [{'cell': 'short'}, {'cell': 'long'}]}
+        self.assertEqual(select_workload(rows, 'long'), {'cell': 'long'})
+        with self.assertRaises(ValueError):
+            select_workload(rows)
+        with self.assertRaises(ValueError):
+            select_workload(rows, 'missing')
+
+    def test_mtp_window_requires_existing_draft_weights(self):
+        with __import__('tempfile').TemporaryDirectory() as directory:
+            weights = Path(directory) / 'mtp.bin'
+            weights.write_bytes(b'weights')
+            validate_mtp_arm_args(['--spec', '2', '--mtp', str(weights),
+                                   '--mtp-max-t', '2'], 2)
+            validate_mtp_arm_args(['--spec', '2'], 0)
+            with self.assertRaises(ValueError):
+                validate_mtp_arm_args(['--spec', '2', '--mtp-max-t', '2'], 2)
+            with self.assertRaises(ValueError):
+                validate_mtp_arm_args(['--spec', '2', '--mtp', str(weights),
+                                       '--mtp-max-t', '3'], 2)
+            with self.assertRaises(ValueError):
+                validate_mtp_arm_args(['--spec', '2', '--mtp', str(weights)], 0)
 
 
 if __name__ == '__main__':

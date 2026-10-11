@@ -38,10 +38,36 @@ def one_measured(path):
     return rows[0]
 
 
+def select_workload(workload_data, cell=None):
+    rows = workload_data.get('workloads', [])
+    if cell is not None:
+        rows = [row for row in rows if row.get('cell') == cell]
+    if len(rows) != 1:
+        raise ValueError(f'expected exactly one selected workload, found {len(rows)}')
+    return rows[0]
+
+
+def validate_mtp_arm_args(args, window):
+    has_weights = '--mtp' in args
+    if window == 0:
+        if has_weights:
+            raise ValueError('MTP-off arm still has draft weights configured')
+        return
+    if not has_weights:
+        raise ValueError(f'MTP window {window} has no --mtp draft weights configured')
+    path = Path(args[args.index('--mtp') + 1])
+    if not path.exists():
+        raise ValueError(f'MTP draft weights do not exist: {path}')
+    if '--mtp-max-t' not in args or int(args[args.index('--mtp-max-t') + 1]) != window:
+        raise ValueError(f'MTP window {window} does not match --mtp-max-t')
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', type=Path, required=True)
     parser.add_argument('--workloads', type=Path, required=True)
+    parser.add_argument('--workload-cell',
+                        help='select one named workload from a multi-cell workload file')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--windows', type=int, nargs='+', default=[0, 2, 3, 4])
     parser.add_argument('--blocks', type=int, default=3)
@@ -56,12 +82,27 @@ def main() -> int:
         parser.error('output path already exists')
     cfg = json.loads(args.config.read_text())
     workload_data = json.loads(args.workloads.read_text())
-    if len(workload_data.get('workloads', [])) != 1:
-        parser.error('this screen requires exactly one prepared workload cell')
+    try:
+        selected_workload = select_workload(workload_data, args.workload_cell)
+    except ValueError as exc:
+        parser.error(str(exc))
+    arm_args_by_window = {}
+    try:
+        for window in args.windows:
+            arm_args = args_for(cfg, window)
+            validate_mtp_arm_args(arm_args, window)
+            arm_args_by_window[window] = arm_args
+    except (ValueError, OSError) as exc:
+        parser.error(str(exc))
     args.output.mkdir(parents=True)
+    selected_data = dict(workload_data)
+    selected_data['workloads'] = [selected_workload]
+    selected_workloads_path = args.output / 'selected-workloads.json'
+    selected_workloads_path.write_text(json.dumps(selected_data, indent=2) + '\n')
     rng = random.Random(args.seed)
     campaign = {'schema': 1, 'source_config': str(args.config.resolve()),
                 'workloads': str(args.workloads.resolve()), 'windows': args.windows,
+                'selected_workload': selected_workload.get('cell'),
                 'blocks': args.blocks, 'seed': args.seed,
                 'scope': 'one warmup and one measured request in each fresh process; randomized windows within blocks; no trace',
                 'started_wall_time_s': time.time(), 'runs': [], 'comparisons': []}
@@ -81,7 +122,7 @@ def main() -> int:
         for window in ordered:
             run_dir = args.output / f'block-{block:02d}-window-{window}'
             run_dir.mkdir()
-            arm_args = args_for(cfg, window)
+            arm_args = list(arm_args_by_window[window])
             arm_args[arm_args.index('--prompt-cache') + 1] = '0'
             run_cfg = dict(cfg)
             run_cfg.update(args=arm_args, env=base_env, port=args.first_port + block * len(args.windows) + window,
@@ -92,7 +133,7 @@ def main() -> int:
             command = [sys.executable, str(script_dir / 'run_control.py'), '--output',
                        str((run_dir / 'supervisor').resolve()), '--timeout', '1800', '--',
                        sys.executable, str(script_dir / 'api_control_block.py'), '--config',
-                       str(config_path.resolve()), '--workloads', str(args.workloads.resolve()),
+                       str(config_path.resolve()), '--workloads', str(selected_workloads_path.resolve()),
                        '--output', str(request_path.resolve()), '--variant', 'candidate',
                        '--rounds', '1', '--no-trace']
             row = {'block': block, 'window': window, 'name': 'mtp-off' if window == 0 else f'mtp-window{window}',
