@@ -809,8 +809,8 @@ adjacent correctness evidence.
 
 At a 64K configured context with an actual 32K prompt and 3,000 cache slots,
 the Q2_0 request completed under a 22-GiB cgroup cap with 7.47 GiB minimum
-effective headroom. A matched 18-GiB scope reached the six-GiB guard during
-the first 512-token prefill chunk: host `MemAvailable` was still 16.431 GiB,
+effective headroom. A matched 18-GiB scope reached the six-GiB guard after the
+prompt trace advanced from chunk offset 0 to 512: host `MemAvailable` was still 16.431 GiB,
 and the cgroup had no OOM events. For a future Strata + Splash run, sample
 whole-device availability and the limiting cgroup's `memory.max -
 memory.current` together. Preserve supervisor pressure aborts as incomplete
