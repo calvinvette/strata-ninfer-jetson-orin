@@ -669,3 +669,32 @@ zero-byte baseline. This proves that the primitive is available and the tested
 allocation can be released. Before using stream-ordered pools for an engine
 buffer, measure allocator latency, pool retention under concurrency, RAM
 headroom, and request-level impact against the existing allocator.
+
+## Separate configured reservations from work actually exercised
+
+The current Q2_0 admission screen crosses 3,000/5,000 requested expert slots
+with 4K, 8K, 16K, 32K and 64K configured context. The added 16K/32K/64K cells
+each used a 512-token prompt and one output token. Session and owner requested
+bytes rose with the configured context, and all cells stayed above the six-GiB
+host floor, but none is a long-context request or supported-capacity result.
+For a future Splash port, record the configured reservation and actual prompt
+length as separate axes; use a real long prompt before claiming execution at
+that context.
+
+The current-binary cgroup recheck also produced a state-dependent result: the
+8/10/12/14-GiB scopes hit the six-GiB effective cgroup guard, while 16 GiB
+completed one 512/1 request. Host `MemAvailable` stayed high in the stopped
+cells and no OOM event occurred. Earlier 10/12-GiB runs had passed under a
+different charged-cache state. For Splash, calibrate the cgroup availability
+policy against reclaimable file pages and retain every pressure abort; a
+successful or failed cap is one observation, not a minimum device-memory
+requirement.
+
+At 64K/spec4, three fresh Q2_0 service starts each matched three successful
+graph instantiations to owner events. Calibrated NVMap client backing increased
+by the same 48,709,632 bytes in all runs, equal to the measured 32K/spec4
+interval. The interval includes adjacent synchronous allocations, so it does
+not price graph executables or prove context-independent graph memory. A
+future Metal/OS counter should be calibrated, sampled around stable pre/post
+plateaus, and tied to instantiation events; report platform-owner deltas
+separately from the engine's unique requested-allocation ledger.
