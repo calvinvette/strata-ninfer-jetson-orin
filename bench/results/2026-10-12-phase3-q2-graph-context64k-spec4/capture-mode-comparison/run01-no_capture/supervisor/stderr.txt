@@ -1,0 +1,38 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/serve/server.py", line 5897, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/serve/server.py", line 5722, in main
+    engine = StrataEngine(exe, engine_args(cfg) + (effort_end or []), cwd=cfg.get("cwd"), log=cfg.get("log"),
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/serve/server.py", line 693, in __init__
+    raise RuntimeError(why + (f" (see {log})" if log else "") +
+RuntimeError: the engine exited before it was ready (see /home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-12-phase3-q2-graph-context64k-spec4/capture-mode-comparison/run01-no_capture/engine.log)
+the engine log's last lines:
+  strata integration: {"schema":1,"monotonic_s":1057986.721524382,"owner":"expert-stage-pageable-host","kind":"free","instance":281474245230624,"allocation":187651582498544,"requested_bytes":0,"device":-1,"count":0}
+  strata integration: {"schema":1,"monotonic_s":1057986.721526878,"owner":"expert-stage-pageable-host","kind":"free","instance":281474245230624,"allocation":187651583880960,"requested_bytes":0,"device":-1,"count":0}
+  strata integration: {"schema":1,"monotonic_s":1057986.721529406,"owner":"expert-stage-pageable-host","kind":"free","instance":281474245230624,"allocation":187651585263376,"requested_bytes":0,"device":-1,"count":0}
+  strata integration: {"schema":1,"monotonic_s":1057986.721531902,"owner":"expert-stage-pageable-host","kind":"free","instance":281474245230624,"allocation":187651586645792,"requested_bytes":0,"device":-1,"count":0}
+  strata integration: {"schema":1,"monotonic_s":1057986.721534430,"owner":"expert-stage-pageable-host","kind":"free","instance":281474245230624,"allocation":187651588028208,"requested_bytes":0,"device":-1,"count":0}
+  strata integration: {"schema":1,"monotonic_s":1057986.721537150,"owner":"expert-stage-pageable-host","kind":"free","instance":281474245230624,"allocation":187651589410624,"requested_bytes":0,"device":-1,"count":0}
+  strata integration: {"schema":1,"monotonic_s":1057986.721539934,"owner":"expert-stage-pageable-host","kind":"free","instance":281474245230624,"allocation":187651590793040,"requested_bytes":0,"device":-1,"count":0}
+  strata integration: {"schema":1,"monotonic_s":1057986.721542685,"owner":"expert-stage-pageable-host","kind":"free","instance":281474245230624,"allocation":187651592175456,"requested_bytes":0,"device":-1,"count":0}
+  strata integration: {"schema":1,"monotonic_s":1057986.721545437,"owner":"expert-stage-pageable-host","kind":"free","instance":281474245230624,"allocation":187651593557872,"requested_bytes":0,"device":-1,"count":0}
+  strata integration: {"schema":1,"monotonic_s":1057986.721548125,"owner":"expert-stage-pageable-host","kind":"free","instance":281474245230624,"allocation":187651594940288,"requested_bytes":0,"device":-1,"count":0}
+  strata integration: {"schema":1,"monotonic_s":1057986.721550621,"owner":"expert-stage-pageable-host","kind":"free","instance":281474245230624,"allocation":187651596322704,"requested_bytes":0,"device":-1,"count":0}
+  strata integration: {"schema":1,"monotonic_s":1057986.721553149,"owner":"expert-stage-pageable-host","kind":"free","instance":281474245230624,"allocation":187651597705120,"requested_bytes":0,"device":-1,"count":0}
+  strata integration: {"schema":1,"monotonic_s":1057986.721558525,"owner":"expert-stage-pageable-host","kind":"free","instance":281474245230624,"allocation":187651599087536,"requested_bytes":0,"device":-1,"count":0}
+  strata integration: {"schema":1,"monotonic_s":1057986.721561309,"owner":"expert-stage-pageable-host","kind":"free","instance":281474245230624,"allocation":187651600469952,"requested_bytes":0,"device":-1,"count":0}
+  strata integration: {"schema":1,"monotonic_s":1057986.721564093,"owner":"expert-stage-pageable-host","kind":"free","instance":281474245230624,"allocation":187651601852368,"requested_bytes":0,"device":-1,"count":0}
+  strata integration: {"schema":1,"monotonic_s":1057986.721566844,"owner":"expert-stage-pageable-host","kind":"free","instance":281474245230624,"allocation":187651603234784,"requested_bytes":0,"device":-1,"count":0}
+  strata integration: {"schema":1,"monotonic_s":1057986.721569564,"owner":"expert-stage-pageable-host","kind":"free","instance":281474245230624,"allocation":187651604617200,"requested_bytes":0,"device":-1,"count":0}
+  strata integration: {"schema":1,"monotonic_s":1057986.721572060,"owner":"expert-stage-pageable-host","kind":"free","instance":281474245230624,"allocation":187651605999616,"requested_bytes":0,"device":-1,"count":0}
+  strata integration: {"schema":1,"monotonic_s":1057986.766059433,"owner":"expert-stage-pageable-host","kind":"free","instance":281474245230624,"allocation":187651607382032,"requested_bytes":0,"device":-1,"count":0}
+  strata integration: {"schema":1,"monotonic_s":1057986.825752800,"owner":"session","kind":"free","instance":281474245229568,"allocation":11941249024,"requested_bytes":0,"device":0,"count":0}
+Traceback (most recent call last):
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-12-phase3-q2-graph-context64k-spec4/run_graph_probe.py", line 15, in <module>
+    if server.poll() is not None: raise RuntimeError(f'server exited: {server.returncode}')
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: server exited: 1

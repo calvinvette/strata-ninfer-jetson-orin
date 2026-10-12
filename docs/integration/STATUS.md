@@ -1013,3 +1013,11 @@ time −15.121 s and decode interval spanning zero. All pairs emitted identical
 tokens and stayed above 18.01 GiB minimum host availability. Dynamic CPU/GPU
 clocks, one synthetic prompt, and unqualified accepted-prefix state differences
 limit this to a performance screen; neither chunk setting is promoted.
+
+An attempted Q2_0 64K captured-versus-disabled graph control was unsupported:
+`--no-capture` triggers the native-route guard because it would omit routed
+CPU-pool experts, and `--no-token-graph` is rejected by the serving layer before
+readiness. Both failures occurred above 21 GiB host availability and issued no
+request. See the [control compatibility probe](../../bench/results/2026-10-12-phase3-q2-graph-context64k-spec4/graph-control-compatibility/README.md).
+The existing supported captured-path NVMap attribution remains scoped to its
+tested configuration; Phase 3 graph-backing qualification remains open.
