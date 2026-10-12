@@ -994,3 +994,10 @@ same-prompt warm-up was rejected by the harness because prompt caching reused
 control. For Splash, make cache policy and the warm-up prompt part of the
 measurement design, and retain harness failures separately from API/runtime
 failures. See the [trace report](../../bench/results/2026-10-13-phase3-q2-admit16k-22G-trace/README.md).
+
+A second 16K admission point passed at an 18-GiB cap. Its minimum effective
+headroom (8.338 GiB) was lower than the 19-GiB run (8.686 GiB), despite the
+higher nominal cap, because page-cache and cgroup starting conditions varied.
+For Splash, measure actual headroom through the run and repeat admission points;
+do not infer a monotonic curve from configured caps. See the
+[18-GiB run](../../bench/results/2026-10-13-phase3-q2-admit16k-18G/README.md).
