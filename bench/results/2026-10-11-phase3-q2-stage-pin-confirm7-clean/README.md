@@ -22,9 +22,11 @@ slower), with a whole-pair percentile-bootstrap 95% interval of **−2.01% to
 +10.36%**. Prompt latency was +3.28% (interval +0.30% to +14.00%); decode was
 +1.02% (−3.86% to +2.77%). Positive values mean pinned took longer. With seven
 blocks these bootstrap intervals are coarse and should be read as screening
-uncertainty, not a service-tail guarantee. The request interval spans zero, so
-this provides no end-to-end benefit for pinning and does not justify changing
-the default.
+uncertainty, not a service-tail guarantee. The request interval spans zero.
+More importantly, the warmup hashes differ in two pairs, and the separate
+traced follow-up found a persistent-state mismatch in one of three pairs when
+the warmup output differed. The timings are therefore diagnostic only: they do
+not qualify a product-level effect or support a default change.
 
 Descriptive per-arm medians were 20.940 s pinned and 20.105 s pageable for the
 measured request; prompt medians were 8.749 s and 8.273 s, and decode medians
@@ -58,6 +60,14 @@ each engine process. No `GRAPH_DRIVER_MEM` events appear in these timing logs.
 `analyze.py` reproduces per-arm medians and the 200,000-resample paired
 bootstrap in `summary.json`. Raw request logs, supervisor samples, OOM
 counters, and tegrastats are retained in each `pair-*` directory.
+
+The warmup-separated traced follow-up at
+[`q2-stage-pin-warmup-state3`](../2026-10-11-phase3-q2-stage-pin-warmup-state3/README.md)
+found 2/3 pairs with matching warmup, measured output and persistent state. In
+the remaining pair the 64-token warmup outputs differed, measured output IDs
+still matched, but GDN, tail, pooled, full-pooled and KV fingerprints differed.
+The harness now rejects a warmup-completion mismatch explicitly. This is an
+unresolved correctness limitation for warmup-assisted comparisons.
 
 The earlier directory
 [`q2-stage-pin-confirm7`](../2026-10-11-phase3-q2-stage-pin-confirm7/README.md)

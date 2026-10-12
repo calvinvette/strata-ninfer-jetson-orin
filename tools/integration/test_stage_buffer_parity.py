@@ -6,7 +6,8 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT), str(ROOT / 'tools'), str(ROOT / 'tools/integration')]
 from stage_buffer_parity import (paired_ratio_effect, stage_environment, state_hashes,
-                                 stamp_arm_end, stamp_arm_start)
+                                 stamp_arm_end, stamp_arm_start,
+                                 warmup_completions_equal)
 
 
 class StageBufferEnvironmentTests(unittest.TestCase):
@@ -65,6 +66,13 @@ class StageBufferEnvironmentTests(unittest.TestCase):
                             'pooled=aa pooled_full=aa kv=aa ple_prev=1,2\n')
             with self.assertRaisesRegex(ValueError, 'expected 2'):
                 state_hashes(path, expected_count=2)
+
+    def test_warmup_completion_must_match_across_staging_arms(self):
+        same = {'prompt_sha256': 'prompt', 'ids_sha256': 'ids', 'generated_tokens': 64}
+        diff = {'prompt_sha256': 'prompt', 'ids_sha256': 'other', 'generated_tokens': 64}
+        self.assertTrue(warmup_completions_equal({'warmup': same}, {'warmup': same}))
+        self.assertFalse(warmup_completions_equal({'warmup': same}, {'warmup': diff}))
+        self.assertIsNone(warmup_completions_equal({}, {}))
 
 
 if __name__ == '__main__':

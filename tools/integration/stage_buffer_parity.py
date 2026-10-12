@@ -81,6 +81,18 @@ def state_hashes(path, expected_count=1):
     return found[-1]
 
 
+def warmup_completions_equal(pageable, pinned):
+    """Whether both arms produced the same separately warmed completion."""
+    left, right = pageable.get('warmup'), pinned.get('warmup')
+    if left is None and right is None:
+        return None
+    if left is None or right is None:
+        return False
+    return (left.get('prompt_sha256') == right.get('prompt_sha256') and
+            left.get('ids_sha256') == right.get('ids_sha256') and
+            left.get('generated_tokens') == right.get('generated_tokens'))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', type=Path, required=True)
@@ -221,6 +233,9 @@ def main():
         by_name = {row['name']: row for row in pair_rows}
         pageable, pinned = by_name['pageable'], by_name['pinned']
         failures = []
+        warmup_equal = warmup_completions_equal(pageable, pinned)
+        if warmup_equal is False:
+            failures.append('warmup completion differs between staging arms')
         if pageable['ids'] != pinned['ids']:
             failures.append('generated token IDs differ')
         state_differences = []
@@ -234,6 +249,7 @@ def main():
                 failures.append('pinned stage backing was not observed')
         result['pair_comparisons'].append({
             'pair': pair, 'order': [label for label, _ in order],
+            'warmup_completion_equal': warmup_equal,
             'token_ids_equal': pageable['ids'] == pinned['ids'],
             'persistent_state_equal': None if args.timing_only else not state_differences,
             'differing_state_fields': state_differences, 'failures': failures})
