@@ -898,3 +898,13 @@ admission cells at 3,000/5,000 slots. All generated one token from a 512-token
 prompt, so they do not qualify long-context requests or establish capacity
 limits. Graph and driver-private backing and broader pressure interactions
 remain unmeasured; Phase 3 remains open.
+
+A current-binary [Q2_0 cgroup pressure recheck](../../bench/results/2026-10-11-phase3-q2-cgroup-retest/README.md)
+ran the same supervised 512/1 request under 8–16 GiB transient cgroup caps.
+The 8/10/12/14-GiB scopes crossed the six-GiB effective-headroom floor and were
+pressure-aborted without OOM; the 16-GiB scope passed with 3,000 slots and
+output token 32. Host `MemAvailable` stayed at 18.52 GiB or higher in the
+14/16-GiB cells. Unlike the older 8-GiB observation, the new 8-GiB attempt
+aborted before cache admission, so it does not reproduce the residency-table
+error. Earlier successful 10/12-GiB cells remain as distinct state-dependent
+observations; current pressure behavior is not a stable capacity boundary.
