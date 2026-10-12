@@ -710,3 +710,18 @@ not price graph executables or prove context-independent graph memory. A
 future Metal/OS counter should be calibrated, sampled around stable pre/post
 plateaus, and tied to instantiation events; report platform-owner deltas
 separately from the engine's unique requested-allocation ledger.
+
+
+## Phase 3 continuation — Allocation refusal and retry evidence
+
+A current Q2_0 candidate repeated the injected automatic expert-cache allocation
+refusal in three fresh Orin processes at the same configured context and request
+shape. All three retried at smaller capacities, returned the expected token and
+balanced the instrumented allocation ledger. The admitted slot count changed
+with available shared memory at retry time, so record both the initial request
+and chosen fallback; never turn one fallback size into a general capacity limit.
+For a future Strata + Splash port, exercise the allocator's refusal path with
+its native physical-memory guard, retain failure and retry telemetry separately,
+and verify same-process or process-restart recovery according to that engine's
+service architecture. A simulated refusal does not establish behavior under a
+real Metal allocation failure.
