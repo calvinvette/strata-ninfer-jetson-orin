@@ -1125,3 +1125,15 @@ results across settings that did not execute. See the spec3 trace
 (../../bench/results/2026-10-13-phase3-q2-graph-fine-nvmap-context64k-spec3/README.md)
 and spec1 refusal
 (../../bench/results/2026-10-13-phase3-q2-graph-fine-nvmap-context64k-spec1/README.md).
+
+## 2026-10-13 — Preserve quantization contracts in ARM operator comparisons
+
+An exact Q8_0 operator comparison on Orin found ggml's Cortex-A78AE NEON path
+about 8× faster than Strata's scalar Q8_0 oracle across three independent
+processes, with byte-identical blocks. This is an optimization lead only:
+Strata's production worker uses Q8_1 activations, so Q8_0 parity and speed do
+not qualify a drop-in replacement. For a future Splash port, first match block
+layout, rounding, scale/sum fields and the downstream consumer contract with an
+independent oracle; then benchmark the complete CPU/GPU contribution under real
+contention. Report operator time separately from model/request results. See the
+[Orin experiment](../../bench/results/2026-10-13-phase4-q8-neon-quant/README.md).
