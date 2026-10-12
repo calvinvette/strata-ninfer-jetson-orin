@@ -38,6 +38,11 @@ memory sample with `--sample-clocks`; `--privileged-emc` reads the protected EMC
 rate through noninteractive `sudo` and implies clock sampling. These are
 observed dynamic rates, not clock controls. Raw tegrastats remains separately
 retained and does not establish process-attributed energy.
+The supervisor result records `minimum_available_bytes` for host
+`MemAvailable` and `minimum_admission_available_bytes` for the minimum of host
+availability and all finite cgroup-ancestor `memory.max - memory.current`
+values. Keep both values: cgroup headroom is an admission bound, not another
+physical-memory pool to add to host RAM or GPU capacity.
 
 Measure request stages with a monotonic clock and align telemetry to those windows.
 Decode rate excludes prefill; state the treatment of the first token. In operator

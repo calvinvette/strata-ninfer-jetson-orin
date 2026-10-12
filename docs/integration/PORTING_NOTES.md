@@ -822,3 +822,7 @@ lower minimum effective headroom due to a larger cgroup charge. For Splash,
 compare the measured remaining headroom and `memory.events` at each sample;
 the configured cap alone does not order outcomes when page-cache charge differs
 between starts.
+The integration supervisor now writes its minimum host-available and
+minimum admission-headroom values separately in each terminal result, while
+preserving the raw ancestor samples. Reuse this dual summary in future reports;
+older runs require calculating the effective minimum from their `memory.jsonl`.

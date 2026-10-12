@@ -173,6 +173,8 @@ def run(command, output, *, floor_bytes=6 * GIB, interval_s=1, timeout_s=3600,
             if clocks is not None:
                 initial['clock_observations'] = clocks
             result['initial_memory'] = initial
+            result['minimum_available_bytes'] = initial['available_bytes']
+            result['minimum_admission_available_bytes'] = initial['admission_available_bytes']
             if initial['admission_available_bytes'] < floor_bytes:
                 result.update(status='pressure_abort', reason='prelaunch physical/cgroup headroom')
                 return result
@@ -197,7 +199,9 @@ def run(command, output, *, floor_bytes=6 * GIB, interval_s=1, timeout_s=3600,
                     samples.write(json.dumps(row) + '\n')
                     samples.flush()
                     os.fsync(samples.fileno())
-                    result['minimum_available_bytes'] = min(result.get('minimum_available_bytes', initial['available_bytes']), row['available_bytes'])
+                    result['minimum_available_bytes'] = min(result['minimum_available_bytes'], row['available_bytes'])
+                    result['minimum_admission_available_bytes'] = min(
+                        result['minimum_admission_available_bytes'], row['admission_available_bytes'])
                     if row['admission_available_bytes'] < floor_bytes:
                         result.update(status='pressure_abort', reason='physical/cgroup headroom during execution')
                         break

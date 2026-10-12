@@ -28,6 +28,7 @@ class SupervisorTests(unittest.TestCase):
                               sample=lambda: {'available_bytes': 5 * GIB,
                                               'admission_available_bytes': 5 * GIB})
         self.assertEqual(result['status'], 'pressure_abort')
+        self.assertEqual(result['minimum_admission_available_bytes'], 5 * GIB)
         self.assertFalse((self.root / 'run/stdout.txt').exists())
         self.assertEqual(json.loads((self.root / 'run/result.json').read_text())['status'], 'pressure_abort')
 
@@ -61,6 +62,19 @@ class SupervisorTests(unittest.TestCase):
             return {'available_bytes': available, 'admission_available_bytes': available}
         result = self.execute('import time; time.sleep(60)', sample=sample)
         self.assertEqual(result['status'], 'pressure_abort')
+
+    def test_result_keeps_host_and_limiting_headroom_minima_separate(self):
+        calls = iter([
+            {'available_bytes': 10 * GIB, 'admission_available_bytes': 9 * GIB},
+            {'available_bytes': 8 * GIB, 'admission_available_bytes': 7 * GIB},
+            {'available_bytes': 7 * GIB, 'admission_available_bytes': 5 * GIB},
+        ])
+        result = self.execute('import time; time.sleep(60)', sample=lambda: next(calls))
+        self.assertEqual(result['status'], 'pressure_abort')
+        self.assertEqual(result['minimum_available_bytes'], 7 * GIB)
+        self.assertEqual(result['minimum_admission_available_bytes'], 5 * GIB)
+        saved = json.loads((self.root / 'run/result.json').read_text())
+        self.assertEqual(saved['minimum_admission_available_bytes'], 5 * GIB)
 
     def test_timeout_kills_term_ignoring_descendant(self):
         marker = self.root / 'child.pid'
