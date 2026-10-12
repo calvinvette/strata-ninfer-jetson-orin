@@ -1,25 +1,33 @@
-# Q2_0 64K configured-context owner refresh — Orin — 2026-10-12
+# Q2_0 64K configured-context cache admission and owner screen — Orin — 2026-10-12
 
 The current candidate passed a supervised 512-token prompt plus one greedy
-output token with `--max-context 65536`, `--expert-cache 3000`, and the explicit
-`--vram-reserve-mib 3072`. The model is the local Qwen3.8 Flash-Next Q2_0
+output token at `--max-context 65536`, first with `--expert-cache 3000`, then
+with `--expert-cache 5000`, retaining the explicit `--vram-reserve-mib 3072`
+in both runs. The model is the local Qwen3.8 Flash-Next Q2_0
 two-shard GGUF at `/home/calvin/models/strata-orin-validation/Q2_0/`, loaded
 with the Q2_0 native pack, expert profile and the second GGUF shard as the PLE
 table source. The executable SHA-256 is
 `bdde041e60d8593dac593a846d471c117fee2c5397b01dfd99c9502253dd0f7d`.
 
-The six-GiB supervisor passed and observed minimum host `MemAvailable` of
-18,184,941,568 bytes (16.94 GiB). The owner parser found 278 allocation and
-278 free events, with zero requested bytes live at process exit. Peak observed
-requested bytes by device were 7,534,843,648 on CUDA device 0 and 354,492,280
-on host device `-1`. The device peak included a 4,147,200,000-byte expert
-cache and a 1,856,067,072-byte session allocation. Pageable expert staging
-peaked at 353,894,400 requested host bytes. These remain requested-payload
-observations, not complete physical-backing totals; device and host columns are
-kept separate, and graph-pool/driver bytes are not inferred.
+Both six-GiB supervisor runs passed. Minimum host `MemAvailable` was
+18,184,941,568 bytes (16.94 GiB) at 3,000 slots and 15,417,085,952 bytes
+(14.36 GiB) at 5,000 slots. Each owner parser found 278 allocations and 278
+frees, with zero requested bytes live at process exit. Session backing stayed
+at 1,856,067,072 requested bytes. The expert-cache owner grew from
+4,147,200,000 to 6,912,000,000 bytes; device-0 peak grew by the same
+2,764,800,000 bytes, from 7,534,843,648 to 10,299,643,648. Pageable expert
+staging stayed at 353,894,400 requested host bytes, and the host-owner peak
+stayed at 354,492,280 bytes. These remain requested-payload observations, not
+complete physical-backing totals; device and host columns are kept separate,
+and graph-pool/driver bytes are not inferred.
 
-The 3,072 MiB reserve was explicit, so this run emitted no automatic cache
+The runs were sequential in 3,000-then-5,000 order and measure admission and
+requested allocation scaling only. They are not a randomized pair or timing
+comparison.
+
+The 3,072 MiB reserve was explicit, so these runs emitted no automatic cache
 reservation events. Its context setting does not mean that 65,536 prompt
 tokens were ingested. Dynamic CPU/GPU/EMC clocks were sampled; energy was not
 measured. Raw supervisor logs, memory samples, the full parsed owner summary,
-and command metadata are retained in this directory.
+the two full parsed owner summaries, and command metadata are retained in this
+directory.
