@@ -890,9 +890,10 @@ but do not port Linux cap numbers or infer a stable capacity from one run.
 
 ## 2026-10-12 — Recover after actual long prompt ingestion
 
-A 32,768-token Q2_0 request followed by a short request in the same live
-Strata process passed. Owner events left only the model weight arena live after
-both requests. Carry this pattern to Splash: test request cleanup and a second
+A 32,768-token Q2_0 request followed by a short request passed in one live
+Strata process at both 3,000 and 5,000 cache slots. The token IDs matched
+across arms, while endpoint fingerprints differed across cache settings. Owner
+events left only the model weight arena live after both requests. Carry this pattern to Splash: test request cleanup and a second
 request after a real long prompt in one process, trace per-request state owners,
 and observe the platform's actual shared-memory availability throughout. Keep
 this separate from cancellation recovery and from task-quality evaluation; the
