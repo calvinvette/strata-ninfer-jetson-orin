@@ -25,9 +25,19 @@ The runs were sequential in 3,000-then-5,000 order and measure admission and
 requested allocation scaling only. They are not a randomized pair or timing
 comparison.
 
+The 5,000-slot/64K-configured cell was then repeated under transient cgroup
+caps of 24 GiB and 18 GiB. Both passed the six-GiB guard. Minimum effective
+availability was 13,930,741,760 bytes (12.98 GiB) at 24 GiB and
+7,160,496,128 bytes (6.67 GiB) at 18 GiB; minimum physical availability was
+14.41 and 14.51 GiB, respectively. Both owner ledgers again balanced 278/278
+events with zero requested bytes live at exit; device-0 peak was
+10,299,643,648 bytes and pageable host staging peaked at 354,492,280 bytes.
+No OOM kills occurred. The 18-GiB result leaves about 0.67 GiB above the guard
+and is retained as a single near-floor observation, not a capacity boundary.
+
 The 3,072 MiB reserve was explicit, so these runs emitted no automatic cache
 reservation events. Its context setting does not mean that 65,536 prompt
 tokens were ingested. Dynamic CPU/GPU/EMC clocks were sampled; energy was not
-measured. Raw supervisor logs, memory samples, the full parsed owner summary,
-the two full parsed owner summaries, and command metadata are retained in this
-directory.
+measured. Raw supervisor logs, memory samples, both parsed owner summaries,
+and command metadata are retained in this directory, including both cgroup
+supervisors and their owner summaries.
