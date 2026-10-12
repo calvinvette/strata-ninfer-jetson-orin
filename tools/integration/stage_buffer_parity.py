@@ -73,6 +73,29 @@ def context_reservation(prompt_tokens, generated_tokens):
     return max(prompt_tokens + generated_tokens + 32, 8192)
 
 
+def exact_prompt_variant(target, encode, variant):
+    """Build an exact-length control prompt; keep primary byte-identical."""
+    if variant == 'primary':
+        return exact_prompt(target, encode)
+    if variant != 'heldout_blue':
+        raise ValueError(f'unknown prompt variant: {variant}')
+    prefix = 'Case file: '
+    suffix = ('\nExplain how data moves from input through working memory to storage. '
+              'Begin with the memory controller.')
+    low, high = 0, target
+    while low <= high:
+        count = (low + high) // 2
+        text = prefix + 'blue ' * count + suffix
+        actual = len(encode(text))
+        if actual == target:
+            return text
+        if actual < target:
+            low = count + 1
+        else:
+            high = count - 1
+    raise ValueError(f'cannot construct exactly {target} tokens for {variant}')
+
+
 def state_hashes(path, expected_count=1):
     found = []
     for line in path.read_text(encoding='utf-8').splitlines():
@@ -105,6 +128,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--prompt-tokens', type=int, default=4096)
     parser.add_argument('--generated-tokens', type=int, default=64)
+    parser.add_argument('--prompt-variant', choices=('primary', 'heldout_blue'), default='primary',
+                        help='exact formatted prompt content; primary preserves the original control')
     parser.add_argument('--warmup-tokens', type=int, default=0,
                         help='optional distinct formatted request per process before measurement')
     parser.add_argument('--warmup-generated-tokens', type=int, default=64)
@@ -128,7 +153,7 @@ def main():
     template = ChatTemplate(template_path if template_path.exists() else ROOT / 'serve/chat_template.jinja')
     render = lambda text: tokenizer.encode(
         template.render([{'role': 'user', 'content': text}], enable_thinking=False), parse_special=True)
-    prompt_text = exact_prompt(args.prompt_tokens, render)
+    prompt_text = exact_prompt_variant(args.prompt_tokens, render, args.prompt_variant)
     prompt = render(prompt_text)
     if len(prompt) != args.prompt_tokens:
         raise ValueError(f'formatted prompt has {len(prompt)} tokens, expected {args.prompt_tokens}')
@@ -154,6 +179,7 @@ def main():
             parser.error('resume directory has no results.json')
         result = json.loads(result_path.read_text(encoding='utf-8'))
         if (result.get('prompt_sha256') != prompt_hash or
+                result.get('prompt_variant', 'primary') != args.prompt_variant or
                 result.get('generated_tokens') != args.generated_tokens or
                 result.get('warmup_prompt_tokens', 0) != args.warmup_tokens or
                 result.get('warmup_generated_tokens', 0) != (args.warmup_generated_tokens if args.warmup_tokens else 0) or
@@ -167,6 +193,7 @@ def main():
         args.output.mkdir(mode=0o700, parents=False, exist_ok=False)
         result = {'scope': 'exact real-model prompt, randomized paired staging diagnostic; screening only',
                   'mode': 'timing_only' if args.timing_only else 'traced_correctness_and_timing',
+                  'prompt_variant': args.prompt_variant,
                   'prompt_tokens': len(prompt), 'prompt_sha256': prompt_hash,
                   'generated_tokens': args.generated_tokens, 'planned_pairs': args.pairs,
                   'warmup_prompt_tokens': args.warmup_tokens,

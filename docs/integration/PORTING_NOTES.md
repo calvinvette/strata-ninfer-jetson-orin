@@ -1019,3 +1019,12 @@ outlier and only three pairs make it a screening signal. Both modes requested
 stage owner explicit and require an independent confirmation prompt before
 concluding that pinning helps end-to-end. See the
 [Orin screen](../../bench/results/2026-10-13-phase3-q2-stage-pin-16k/README.md).
+
+The seven-pair held-out confirmation used a distinct 16K formatted prompt and
+tracing-off timing arms. It matched output IDs in every pair and found a
+−0.23% paired request-time delta (95% interval −2.47% to +0.72%); a separate
+traced pair matched state and owner lifetimes. This did not confirm a useful
+pinned-stage gain, so preserve pageable staging as the default. For Splash,
+keep correctness/ownership runs separate from timing runs when tracing alters
+execution, and confirm candidate effects on a distinct prompt. See the
+[held-out Orin report](../../bench/results/2026-10-13-phase3-q2-stage-pin-16k-heldout/README.md).

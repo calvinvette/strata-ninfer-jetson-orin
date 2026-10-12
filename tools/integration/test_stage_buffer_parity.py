@@ -5,12 +5,27 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT), str(ROOT / 'tools'), str(ROOT / 'tools/integration')]
-from stage_buffer_parity import (context_reservation, paired_ratio_effect, stage_environment, state_hashes,
+from prepare_controls import exact_prompt
+from stage_buffer_parity import (context_reservation, exact_prompt_variant, paired_ratio_effect,
+                                 stage_environment, state_hashes,
                                  stamp_arm_end, stamp_arm_start,
                                  warmup_completions_equal)
 
 
 class StageBufferEnvironmentTests(unittest.TestCase):
+    def test_primary_prompt_variant_preserves_existing_prompt(self):
+        encode = lambda text: text.split()
+        self.assertEqual(exact_prompt_variant(128, encode, 'primary'), exact_prompt(128, encode))
+
+    def test_heldout_prompt_variant_is_exact_length_and_distinct(self):
+        encode = lambda text: text.split()
+        primary = exact_prompt_variant(128, encode, 'primary')
+        heldout = exact_prompt_variant(128, encode, 'heldout_blue')
+        self.assertEqual(len(encode(heldout)), 128)
+        self.assertNotEqual(heldout, primary)
+        with self.assertRaisesRegex(ValueError, 'unknown prompt variant'):
+            exact_prompt_variant(128, encode, 'unexpected')
+
     def test_context_reservation_leaves_request_margin_and_minimum(self):
         self.assertEqual(context_reservation(512, 8), 8192)
         self.assertEqual(context_reservation(8192, 8), 8232)
