@@ -54,3 +54,19 @@ clock samples are retained in each cell directory. Large GDN/logit binaries
 are deliberately kept in ignored `build/integration/`; their paths, sizes and
 hashes are recorded in `dump-manifest.json`. No model or build product is in
 Git. Clocks were observed without control; energy was not measured.
+
+## CPU-order reduction follow-up
+
+The opt-in `--expert-cache-cpu-order` path was then run once at each capacity
+against the exact first 511 token IDs of the prompt. Both passed the six-GiB
+supervisor, selected token 271, and had 19.39 GiB (3,000 slots) and 16.88 GiB
+(5,000 slots) minimum host availability. Cache hits were 68/480 and 104/480.
+The full 29,417,472-float accepted-prefix GDN dumps were byte-identical to the
+corresponding default-path dumps at each capacity. The two capacities still
+differed by 1.659% relative L2, with the first material layer divergence at
+layer 3. Thus this reduction-order toggle does not explain the observed
+capacity effect in this prompt; the hit/miss path and other capacity-dependent
+effects remain unisolated. This one-run-per-setting check is diagnostic, not a
+default-policy or performance result. The CPU-order cross-capacity comparison
+is in `cpu-order-gdn-comparison.json`; raw dump hashes are added to
+`dump-manifest.json`.

@@ -968,3 +968,8 @@ selected token 32, and a shared 511-token prefix also diverged beginning at
 layer 3. The diagnostic does not establish whether this numerical difference
 is acceptable or identify its cause; expert hit/miss compute is a lead only.
 No cache default or quality claim follows. Phase 3 remains open.
+
+The same diagnostic's opt-in CPU-order reduction follow-up reproduced the
+default-path accepted-prefix GDN dumps byte-for-byte at both capacities. It
+therefore did not explain the cross-capacity difference for this prompt; the
+cause remains open and the experimental flag is not promoted.

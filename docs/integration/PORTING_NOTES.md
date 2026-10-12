@@ -735,3 +735,8 @@ compare output IDs, raw logits and persistent-state tensors. Matching text or
 argmax alone is not a state-parity check. Retain raw dumps outside Git with
 hashes and record the first state layer or operator that diverges; do not
 promote a profile until its numerical and task-level effects are understood.
+An opt-in CPU-order reduction toggle left these two capacity-specific state
+dumps byte-identical to their default-path controls, so that arithmetic order
+toggle alone did not account for the capacity effect. For Splash, test such
+debug toggles with raw state equality and retain negative results; a plausible
+mechanism is not a diagnosis until an intervention changes the observed effect.
