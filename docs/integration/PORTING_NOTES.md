@@ -832,3 +832,11 @@ is a useful same-configuration state control across cgroup caps; it does not
 remove the separately observed 3,000-vs-5,000-slot state mismatch. For Splash,
 repeat state checks at fixed model, prompt and scheduling configuration before
 interpreting capacity changes as harmless from matching output text alone.
+At fixed 20-GiB cap, 64K context and 5,000 slots, a 256-token prefill chunk
+lowered requested prefill-owner and device peaks by about 80 MiB versus the
+512-token control. The minimum cgroup headroom moved in the opposite direction
+by 0.73 GiB while host availability increased slightly, reflecting different
+page-cache/scope charging in sequential runs. Both produced the same output ID,
+but all 36 GDN hashes differed. For Splash, retain chunk size as both a memory
+and numerical-state factor; report physical/cgroup telemetry and accepted state
+separately, and do not infer which state is better without an oracle.
