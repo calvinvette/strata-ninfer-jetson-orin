@@ -18,12 +18,13 @@ output token. The final cgroup
 sample recorded zero `oom`, `oom_kill` and `oom_group_kill` events. The run is
 a pressure abort, not a successful capacity or quality result.
 
-For the same 32K prompt, cache size, context, binary and reserve, the earlier
-22-GiB scope completed with 7.47 GiB minimum effective cgroup headroom. This
-brackets the tested outcomes between an 18-GiB scope that hit the guard during
-prefill and a 22-GiB scope that completed. Page-cache charging and initial
-cgroup state make that a configuration-specific observation, not a general
-minimum RAM/cgroup setting.
+For the same 32K prompt, cache size, context, binary and reserve, the [20-GiB
+scope](../2026-10-12-phase3-q2-actual32k-context64k-20G/README.md) completed
+with 7.930 GiB minimum effective cgroup headroom; the 22-GiB scope completed
+with 7.47 GiB. The 20-GiB process had a lower cgroup charge than the 22-GiB
+process, so the outcomes do not form a monotonic capacity curve. Page-cache
+charging and initial cgroup state make them configuration-specific
+observations, not a general minimum RAM/cgroup setting.
 
 The supervisor retained 38 one-second memory/clock samples, tegrastats, the
 engine log and complete cgroup events. The process was stopped by the

@@ -816,3 +816,9 @@ whole-device availability and the limiting cgroup's `memory.max -
 memory.current` together. Preserve supervisor pressure aborts as incomplete
 workloads, separate them from OOM failures, and do not infer a general minimum
 from this one pass/abort bracket.
+The follow-up 20-GiB run completed the same prompt and matched the 22-GiB
+run's final and per-layer GDN fingerprints, while the 22-GiB sample had a
+lower minimum effective headroom due to a larger cgroup charge. For Splash,
+compare the measured remaining headroom and `memory.events` at each sample;
+the configured cap alone does not order outcomes when page-cache charge differs
+between starts.
