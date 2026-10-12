@@ -16,6 +16,15 @@ separate Q8_1 activation contract, no expert dot/GPU/request timing is included,
 and no dispatch/default changed. Task-level quality remains open and Phase 4
 continues.
 
+A test-only [Strata-contract Q8_1 NEON screen](../../bench/results/2026-10-13-phase4-q8_1-neon-contract/README.md)
+then matched scale, codes, sums and correction values across all 20,480 blocks
+per process, including signed half-ties, in three independent Orin processes.
+The median of process medians was 1.211 ms scalar and 0.841 ms NEON per 16 × 256
+rows (−30.550%). ggml's ARM Q8_1 quantizer is not a byte-parity control because
+it rounds ties differently. This remains operator-only screening evidence; the
+candidate is not yet integrated into production or measured in the CPU expert
+and request paths.
+
 The focused [SessionLoopScratch owner check](../../bench/results/2026-10-11-phase3-session-loop-scratch-owner-retest/README.md) traces a 65,536-byte mapped/pinned host allocation and one matching free; repeated teardown is idempotent. The serial [Phase 3 owner/PLE regression](../../bench/results/2026-10-11-phase3-session-owner-ctest/README.md) passed 23/23. CUDA relink and maestro1 HIP compile identities are retained. The validated native pack bypasses the legacy session-loop route; broader unique-backing and graph accounting remain open.
 
 The fresh [Q2_0 PLE and owner/graph regression](../../bench/results/2026-10-11-phase3-followup-fresh/README.md) passed the artifact-aware PLE oracle and all 19 selected ownership/graph tests on the current candidate. The seven PLE stages passed for three tokens (worst relative L1 `1.148e-7`); CTest passed 19/19 with 24.52 GiB minimum host availability. This reconfirms selected contracts only; graph-pool pricing, broad pressure behavior and remaining transfer/admission cells remain open.
