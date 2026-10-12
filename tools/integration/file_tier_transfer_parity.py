@@ -187,6 +187,15 @@ def block_device_counters(path):
             'read_sectors': int(fields[2]), 'read_bytes': int(fields[2]) * 512}
 
 
+def resolve_disk_counter_path(pack_path, explicit_path=None):
+    """Select an existing artifact on the model filesystem for device-wide counters."""
+    path = Path(explicit_path) if explicit_path else Path(pack_path) / 'experts.bin'
+    if not path.is_file():
+        raise FileNotFoundError(
+            f'expected a model artifact on the measured filesystem for block telemetry: {path}')
+    return path
+
+
 def state_hashes(path):
     found = []
     for line in path.read_text(encoding='utf-8').splitlines():
@@ -220,6 +229,8 @@ def main():
                         help='compare prefetch page-cache fill (stage=0) with staging (stage=1)')
     parser.add_argument('--expert-cache', type=str,
                         help='override auto sizing to hold expert residency constant across paired arms')
+    parser.add_argument('--disk-counter-file', type=Path,
+                        help='model artifact on the filesystem to sample device-wide block reads; defaults to pack/experts.bin')
     parser.add_argument('--tegrastats-energy', action='store_true',
                         help='sample Orin rails and clocks around each request; board-level, not process-attributed')
     parser.add_argument('--tegrastats-interval-ms', type=int, default=100)
@@ -259,6 +270,7 @@ def main():
                 result.get('generated_tokens') != args.generated_tokens or
                 result.get('planned_pairs') != args.pairs or result.get('seed') != args.seed or
                 result.get('expert_cache') != args.expert_cache or result.get('io_threads') != args.io_threads or
+                result.get('disk_counter_file') != (str(args.disk_counter_file.resolve()) if args.disk_counter_file else None) or
                 result.get('compare_prefetch_stage', False) != args.compare_prefetch_stage or
                 any(row.get('engine_sha256') != binary_hash for row in result.get('arms', []))):
             parser.error('resume inputs differ from the retained incomplete run')
@@ -270,6 +282,7 @@ def main():
                   'prompt_tokens': len(prompt), 'prompt_sha256': prompt_hash,
                   'generated_tokens': args.generated_tokens, 'planned_pairs': args.pairs,
                   'io_threads': args.io_threads, 'expert_cache': args.expert_cache,
+                  'disk_counter_file': str(args.disk_counter_file.resolve()) if args.disk_counter_file else None,
                   'seed': args.seed, 'compare_prefetch_stage': args.compare_prefetch_stage,
                   'arms': [], 'pair_comparisons': []}
     sampler = None
@@ -281,9 +294,7 @@ def main():
         atexit.register(sampler.stop)
     args_for = list(cfg['args'])
     pack_path = Path(args_for[args_for.index('--pack') + 1])
-    disk_counter_path = pack_path / 'experts.bin'
-    if not disk_counter_path.is_file():
-        raise FileNotFoundError(f'expected packed expert file for block telemetry: {disk_counter_path}')
+    disk_counter_path = resolve_disk_counter_path(pack_path, args.disk_counter_file)
     for key, value in (('--max-context', str(max(args.prompt_tokens + args.generated_tokens, 8192))),
                        ('--prompt-cache', '6')):
         if key in args_for:

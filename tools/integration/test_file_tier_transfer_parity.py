@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 from file_tier_transfer_parity import (actual_expert_cache_slots, cgroup_io_read_bytes,
-                                      transfer_modes)
+                                      resolve_disk_counter_path, transfer_modes)
 
 
 class TransferModeTests(unittest.TestCase):
@@ -42,6 +42,29 @@ class ActualExpertCacheSlotsTests(unittest.TestCase):
         self.assertIsNone(actual_expert_cache_slots('startup without cache report'))
         self.assertIsNone(actual_expert_cache_slots(
             'expert cache 3903 slots\nexpert cache 6519 slots\n'))
+
+
+class DiskCounterPathTests(unittest.TestCase):
+    def test_defaults_to_packed_experts_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            pack = Path(tmp) / 'pack'
+            pack.mkdir()
+            experts = pack / 'experts.bin'
+            experts.write_bytes(b'pack')
+            self.assertEqual(resolve_disk_counter_path(pack), experts)
+
+    def test_explicit_gguf_artifact_supports_native_packs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            pack = Path(tmp) / 'pack'
+            pack.mkdir()
+            gguf = Path(tmp) / 'native.gguf'
+            gguf.write_bytes(b'gguf')
+            self.assertEqual(resolve_disk_counter_path(pack, gguf), gguf)
+
+    def test_rejects_missing_counter_artifact(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(FileNotFoundError):
+                resolve_disk_counter_path(Path(tmp))
 
 
 if __name__ == '__main__':

@@ -932,6 +932,13 @@ a +3.25% pinned request-time delta with a −1.67% to +31.58% interval and one
 large prompt-time outlier. It does not show a reliable gain; pageable remains
 the default and broader transfer/pressure gates stay open.
 
+A Q2_0 [prefetch-fill versus prefetch-stage screen](../../bench/results/2026-10-11-phase3-q2-prefetch-stage-screen-explicit-disk/README.md)
+matched outputs, persistent state, and cache capacity in three pairs. The
+paired median stage request-time delta was −1.88% (95% interval −5.08% to
++3.84%); process and cgroup I/O counters were unavailable, while device-wide
+block reads included unrelated activity. The native-pack block-counter path
+now accepts an explicit GGUF artifact. No mode was promoted.
+
 An exploratory [Q2_0 worker/read-policy correctness screen](../../bench/results/2026-10-11-phase6-q2-worker-transfer-screen/README.md)
 completed its 12 mapped/pread × four/eight-worker cells, but one cell had
 different accepted-prefix state hashes despite identical output tokens. A
