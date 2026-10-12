@@ -1153,3 +1153,13 @@ with 512/32,768 prompt tokens read and no output; the same service returned
 zero OOM events. The 304/303 owner ledger again left only resident weights
 live. This is one cell, not a long-context quality claim; graph/driver backing
 and broader pressure gates remain open.
+
+A [fine-resolution Q2_0 graph/NVMap trace](../../bench/results/2026-10-13-phase3-q2-graph-fine-nvmap/README.md)
+sampled the process NVMap owner counter at a requested 2-ms interval across
+three fresh short-request processes. The two later verifier-graph events each
+had repeatable 20-ms event-centered owner deltas of 23,117,824 and 22,831,104
+bytes, with no instrumented ordinary allocation/free event in those windows.
+The nearest-sample changes were smaller and phase-dependent; the first
+verifier and commit-graph brackets overlap. This narrows graph-related
+attribution but does not isolate executable/pool bytes. The native graph-off
+control remains unsupported, so graph-memory qualification remains open.

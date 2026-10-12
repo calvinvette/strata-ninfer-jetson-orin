@@ -990,6 +990,22 @@ and cleanup tests, but keep admission and quality/recall claims separate. See
 the [Orin 32K run](../../bench/results/2026-10-13-phase3-q2-cancel-32k/README.md).
 
 
+## 2026-10-13 — Align graph-owner counters at millisecond resolution
+
+Sampling the Linux NVMap process-owner table at roughly 2.5-ms actual intervals
+showed repeatable 20-ms event-centered changes of 23,117,824 and 22,831,104
+bytes around the second and third verifier-graph events in three Q2_0 runs.
+No ordinary owner allocation/free event appeared in those windows. The
+nearest-sample changes varied from zero to about 2.1 MB as sampling phase
+shifted, and the initial verifier/commit events were too close to separate.
+For Splash, align the platform's native physical-owner counter to graph
+lifecycle event timestamps, retain the sampler cadence/jitter, and report the
+bracket width. A repeatable event-aligned delta is useful attribution, but it
+still cannot identify graph executable bytes when the platform counter includes
+other driver/runtime allocations. NVMap and Linux tracing do not apply to Metal.
+See the [Orin trace](../../bench/results/2026-10-13-phase3-q2-graph-fine-nvmap/README.md).
+
+
 ## 2026-10-13 — Add a 16K actual-prompt admission point
 
 A Q2_0 service accepted the exact 16,384-token prompt twice under a 19-GiB
