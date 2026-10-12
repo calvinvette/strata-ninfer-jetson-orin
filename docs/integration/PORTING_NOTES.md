@@ -804,3 +804,15 @@ initialization failure here shows that a mismatched warmup set can reject a
 campaign before measured traffic. Keep traced prefix-state checks separate from
 timing runs, and report their binary/configuration identity when using them as
 adjacent correctness evidence.
+
+## Phase 3 continuation — Cgroup pressure boundary
+
+At a 64K configured context with an actual 32K prompt and 3,000 cache slots,
+the Q2_0 request completed under a 22-GiB cgroup cap with 7.47 GiB minimum
+effective headroom. A matched 18-GiB scope reached the six-GiB guard during
+the first 512-token prefill chunk: host `MemAvailable` was still 16.431 GiB,
+and the cgroup had no OOM events. For a future Strata + Splash run, sample
+whole-device availability and the limiting cgroup's `memory.max -
+memory.current` together. Preserve supervisor pressure aborts as incomplete
+workloads, separate them from OOM failures, and do not infer a general minimum
+from this one pass/abort bracket.
