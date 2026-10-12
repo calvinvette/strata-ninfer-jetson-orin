@@ -1,10 +1,12 @@
 import sys
+import tempfile
 from pathlib import Path
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT), str(ROOT / 'tools'), str(ROOT / 'tools/integration')]
-from stage_buffer_parity import paired_ratio_effect, stage_environment, stamp_arm_end, stamp_arm_start
+from stage_buffer_parity import (paired_ratio_effect, stage_environment, state_hashes,
+                                 stamp_arm_end, stamp_arm_start)
 
 
 class StageBufferEnvironmentTests(unittest.TestCase):
@@ -44,6 +46,24 @@ class StageBufferEnvironmentTests(unittest.TestCase):
         stamp_arm_end(arm)
         self.assertLessEqual(arm['started_wall_s'], arm['finished_wall_s'])
         self.assertLessEqual(arm['started_monotonic_s'], arm['finished_monotonic_s'])
+
+    def test_warmup_and_measured_fingerprints_select_measured_state(self):
+        keys = ('L', 'gdn', 'ple', 'tail', 'dead', 'pooled', 'pooled_full', 'kv', 'ple_prev')
+        first = dict(zip(keys, ('172',) + ('1a',) * 7 + ('1,2',)))
+        last = dict(zip(keys, ('512',) + ('2b',) * 7 + ('3,4',)))
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'engine.log'
+            path.write_text('strata serve: STATE_HASH ' + ' '.join(f'{k}={v}' for k, v in first.items()) + '\n' +
+                            'strata serve: STATE_HASH ' + ' '.join(f'{k}={v}' for k, v in last.items()) + '\n')
+            self.assertEqual(state_hashes(path, expected_count=2), last)
+
+    def test_rejects_unexpected_state_fingerprint_count(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'engine.log'
+            path.write_text('strata serve: STATE_HASH L=512 gdn=aa ple=aa tail=aa dead=aa '
+                            'pooled=aa pooled_full=aa kv=aa ple_prev=1,2\n')
+            with self.assertRaisesRegex(ValueError, 'expected 2'):
+                state_hashes(path, expected_count=2)
 
 
 if __name__ == '__main__':

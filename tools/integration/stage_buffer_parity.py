@@ -67,7 +67,7 @@ def stamp_arm_end(arm):
     arm['finished_monotonic_s'] = time.monotonic()
 
 
-def state_hashes(path):
+def state_hashes(path, expected_count=1):
     found = []
     for line in path.read_text(encoding='utf-8').splitlines():
         if 'STATE_HASH L=' in line:
@@ -75,9 +75,9 @@ def state_hashes(path):
             if not set(STATE_KEYS) <= fields.keys():
                 raise ValueError('incomplete persistent state fingerprint')
             found.append({key: fields[key] for key in STATE_KEYS})
-    if len(found) != 1:
-        raise ValueError(f'expected one completed-request state fingerprint, got {len(found)}')
-    return found[0]
+    if len(found) != expected_count:
+        raise ValueError(f'expected {expected_count} completed-request state fingerprints, got {len(found)}')
+    return found[-1]
 
 
 def main():
@@ -87,6 +87,9 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--prompt-tokens', type=int, default=4096)
     parser.add_argument('--generated-tokens', type=int, default=64)
+    parser.add_argument('--warmup-tokens', type=int, default=0,
+                        help='optional distinct formatted request per process before measurement')
+    parser.add_argument('--warmup-generated-tokens', type=int, default=64)
     parser.add_argument('--pairs', type=int, default=1)
     parser.add_argument('--seed', type=int, default=870126)
     parser.add_argument('--resume', action='store_true', help='continue an incomplete output directory after a harness interruption')
@@ -96,6 +99,8 @@ def main():
     args = parser.parse_args()
     if args.prompt_tokens < 512 or args.generated_tokens < 8 or args.pairs < 1:
         parser.error('require prompt >=512, generation >=8 and pairs >=1')
+    if args.warmup_tokens and (args.warmup_tokens < 1 or args.warmup_generated_tokens < 1):
+        parser.error('warmup prompt and generation lengths must be positive')
     if args.output.exists() != args.resume:
         parser.error('use a new output directory, or pass --resume for an existing one')
 
@@ -110,6 +115,15 @@ def main():
     if len(prompt) != args.prompt_tokens:
         raise ValueError(f'formatted prompt has {len(prompt)} tokens, expected {args.prompt_tokens}')
     print(f'formatted prompt tokens: {len(prompt)}')
+    warmup_prompt = []
+    warmup_prompt_hash = None
+    if args.warmup_tokens:
+        warmup_text = exact_prompt(args.warmup_tokens, render)
+        warmup_prompt = render(warmup_text)
+        if len(warmup_prompt) != args.warmup_tokens:
+            raise ValueError(f'formatted warmup has {len(warmup_prompt)} tokens, expected {args.warmup_tokens}')
+        warmup_prompt_hash = hashlib.sha256(json.dumps(warmup_prompt, separators=(',', ':')).encode()).hexdigest()
+        print(f'formatted warmup prompt tokens: {len(warmup_prompt)}')
     if not args.run:
         return 0
 
@@ -123,6 +137,9 @@ def main():
         result = json.loads(result_path.read_text(encoding='utf-8'))
         if (result.get('prompt_sha256') != prompt_hash or
                 result.get('generated_tokens') != args.generated_tokens or
+                result.get('warmup_prompt_tokens', 0) != args.warmup_tokens or
+                result.get('warmup_generated_tokens', 0) != (args.warmup_generated_tokens if args.warmup_tokens else 0) or
+                result.get('warmup_prompt_sha256') != warmup_prompt_hash or
                 result.get('planned_pairs') != args.pairs or result.get('seed') != args.seed or
                 result.get('mode') != ('timing_only' if args.timing_only else 'traced_correctness_and_timing') or
                 any(row.get('engine_sha256') != binary_hash for row in result.get('arms', []))):
@@ -134,6 +151,9 @@ def main():
                   'mode': 'timing_only' if args.timing_only else 'traced_correctness_and_timing',
                   'prompt_tokens': len(prompt), 'prompt_sha256': prompt_hash,
                   'generated_tokens': args.generated_tokens, 'planned_pairs': args.pairs,
+                  'warmup_prompt_tokens': args.warmup_tokens,
+                  'warmup_generated_tokens': args.warmup_generated_tokens if args.warmup_tokens else 0,
+                  'warmup_prompt_sha256': warmup_prompt_hash,
                   'seed': args.seed, 'arms': [], 'pair_comparisons': []}
     args_for = list(cfg['args'])
     for key, value in (('--max-context', str(max(args.prompt_tokens + args.generated_tokens, 8192))),
@@ -168,16 +188,26 @@ def main():
             engine = StrataEngine(str(args.engine.resolve()), args_for, cwd=cfg.get('cwd'),
                                   log=str(log), env=env)
             try:
+                warmup = None
+                if warmup_prompt:
+                    warmup_ids = [token for token in engine.generate(
+                        warmup_prompt, args.warmup_generated_tokens, {'temperature': 0}, threading.Event())
+                        if token is not None]
+                    warmup = {'prompt_tokens': len(warmup_prompt), 'generated_tokens': len(warmup_ids),
+                              'requested_generated_tokens': args.warmup_generated_tokens,
+                              'prompt_sha256': warmup_prompt_hash,
+                              'ids_sha256': hashlib.sha256(json.dumps(
+                                  warmup_ids, separators=(',', ':')).encode()).hexdigest()}
                 ids = [token for token in engine.generate(prompt, args.generated_tokens,
                        {'temperature': 0}, threading.Event()) if token is not None]
-                arm.update(ids=ids, text=tokenizer.decode(ids), usage=dict(engine.last))
+                arm.update(ids=ids, text=tokenizer.decode(ids), usage=dict(engine.last), warmup=warmup)
             finally:
                 try:
                     engine.close()
                 finally:
                     stamp_arm_end(arm)
             if not args.timing_only:
-                arm['state'] = state_hashes(log)
+                arm['state'] = state_hashes(log, 1 + (1 if args.warmup_tokens else 0))
                 owners = summarize(log.read_text(encoding='utf-8').splitlines())
                 arm['owner_observations'] = owners
                 arm['stage_requested_bytes'] = {
