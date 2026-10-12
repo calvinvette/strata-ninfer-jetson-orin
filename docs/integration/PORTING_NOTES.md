@@ -933,3 +933,13 @@ supervisor and reproduced prompt-end state; effective headroom minima differed
 This is a useful pattern for Splash—repeat admission points and compare state
 and ownership—but not evidence for a portable cap or a stable capacity curve.
 See the [repeat record](../../bench/results/2026-10-12-phase3-q2-actual32k-context64k-19G-repeat2/README.md).
+
+An 8K Q2_0 paired screen compared pageable and pinned host staging buffers.
+Both completed pairs matched outputs and persistent state; each mode requested
+337.5 MiB, and pinned timing changed sign across the two pairs. The supervisor
+aborted the third pair at the six-GiB floor with host availability still above
+17 GiB. For Splash, track pinned host payloads as their own owner, retain
+per-request frees, and let the admission supervisor stop an incomplete
+campaign; do not infer that host headroom is interchangeable with cgroup
+headroom. The harness also needs strict context slack beyond prompt plus output.
+See the [partial Orin report](../../bench/results/2026-10-12-phase3-q2-stage-pin-8k/README.md).

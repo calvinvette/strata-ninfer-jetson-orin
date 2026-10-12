@@ -1045,6 +1045,8 @@ A randomized Q2_0 [32K prompt mapped-versus-pread screen](../../bench/results/20
 
 The [Q2_0 19-GiB admission repeat](../../bench/results/2026-10-12-phase3-q2-actual32k-context64k-19G-repeat2/README.md) passed the same exact prompt, cache and context configuration as the earlier 19-GiB run. It reproduced token 32, all prompt-end state fingerprints, and all 36 layer GDN hashes. Minimum effective headroom was 9.11 GiB (the first run reached 6.98 GiB); observed ownership again left only the service-lifetime weight arena. Both runs passed, but differing starting cgroup/page-cache conditions mean this is repeatability evidence, not a capacity boundary. Phase 3 remains open.
 
+The Q2_0 [8K pageable-versus-pinned expert staging screen](../../bench/results/2026-10-12-phase3-q2-stage-pin-8k/README.md) completed two randomized pairs; both matched output IDs, persistent state and 3,000 cache slots. Each stage owner requested 337.5 MiB and freed it after the request. Pinned staging was 4.78% faster in one pair and 0.94% slower in the other. The supervisor safely aborted the third pair at 5.65 GiB effective headroom with 17.76 GiB host availability and no OOM. This is partial, inconclusive evidence and no mode changed. A harness context-margin fix passed its 9 focused tests and full Python integration discovery passed 120/120.
+
 The standalone CUDA [grouped expert-hit parity check](../../bench/results/2026-10-12-phase3-q2-cache-context-state/README.md)
 also passed after a memory-bounded target build. Synthetic Q2_0 host-count,
 device-count, mixed-scale, window and alignment cases matched the prior kernels

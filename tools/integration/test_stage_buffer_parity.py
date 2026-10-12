@@ -5,12 +5,16 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT), str(ROOT / 'tools'), str(ROOT / 'tools/integration')]
-from stage_buffer_parity import (paired_ratio_effect, stage_environment, state_hashes,
+from stage_buffer_parity import (context_reservation, paired_ratio_effect, stage_environment, state_hashes,
                                  stamp_arm_end, stamp_arm_start,
                                  warmup_completions_equal)
 
 
 class StageBufferEnvironmentTests(unittest.TestCase):
+    def test_context_reservation_leaves_request_margin_and_minimum(self):
+        self.assertEqual(context_reservation(512, 8), 8192)
+        self.assertEqual(context_reservation(8192, 8), 8232)
+
     def test_timing_mode_removes_inherited_trace_instrumentation(self):
         source = {'STRATA_TRACE': '1', 'STRATA_STATE_HASH': '1',
                   'STRATA_INTEGRATION_TRACE': '1', 'STRATA_STATE_HASH_GDN': '1',

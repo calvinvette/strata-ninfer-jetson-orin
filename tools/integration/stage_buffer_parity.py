@@ -68,6 +68,11 @@ def stamp_arm_end(arm):
     arm['finished_monotonic_s'] = time.monotonic()
 
 
+def context_reservation(prompt_tokens, generated_tokens):
+    """Leave room for Strata's strict prompt-plus-output context guard."""
+    return max(prompt_tokens + generated_tokens + 32, 8192)
+
+
 def state_hashes(path, expected_count=1):
     found = []
     for line in path.read_text(encoding='utf-8').splitlines():
@@ -169,7 +174,8 @@ def main():
                   'warmup_prompt_sha256': warmup_prompt_hash,
                   'seed': args.seed, 'arms': [], 'pair_comparisons': []}
     args_for = list(cfg['args'])
-    for key, value in (('--max-context', str(max(args.prompt_tokens + args.generated_tokens, 8192))),
+    for key, value in (('--max-context', str(context_reservation(args.prompt_tokens,
+                                                                 args.generated_tokens))),
                        ('--prompt-cache', '6')):
         if key in args_for:
             args_for[args_for.index(key) + 1] = value

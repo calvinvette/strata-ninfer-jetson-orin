@@ -1,0 +1,40 @@
+{
+  "experiment": "Q2_0 exact 8K prompt, pageable versus pinned host expert staging",
+  "host": "Jetson AGX Orin",
+  "engine_sha256": "bdde041e60d8593dac593a846d471c117fee2c5397b01dfd99c9502253dd0f7d",
+  "prompt_tokens": 8192,
+  "generated_tokens": 8,
+  "context_reservation": 8232,
+  "requested_and_actual_cache_slots": 3000,
+  "io_workers": 8,
+  "prefetch_and_host_staging": true,
+  "systemd_memory_max": "24G",
+  "supervisor_floor_gib": 6,
+  "complete_pairs": 2,
+  "planned_pairs": 3,
+  "completed_pairs_match_ids_state_and_cache": true,
+  "paired_pinned_minus_pageable_request_time_delta_percent": {
+    "definition": "(pinned / pageable - 1) * 100; positive means pinned slower",
+    "per_pair": [-4.779102542845514, 0.9427664818042913],
+    "median": -1.9181680305206115,
+    "uncertainty": "Only two pairs; not a qualified performance estimate"
+  },
+  "stage_owner_requested_bytes": {
+    "pageable_host": 353894400,
+    "pinned_host": 353894400,
+    "interpretation": "Concurrent requested payload, not physical RAM accounting"
+  },
+  "memory_supervisor": {
+    "status": "pressure_abort during pair 3",
+    "minimum_host_available_gib": 17.76,
+    "minimum_effective_cgroup_headroom_gib": 5.65,
+    "oom_events": 0,
+    "oom_kill_events": 0
+  },
+  "pairs": [
+    {"pair": 0, "order": ["pageable", "pinned"], "token_ids_equal": true, "persistent_state_equal": true, "cache_slots_equal": true, "pageable_prompt_ms": 63745.5, "pinned_prompt_ms": 60676.1, "pageable_decode_ms": 2597.5, "pinned_decode_ms": 2496.3, "request_delta_percent": -4.779102542845514},
+    {"pair": 1, "order": ["pinned", "pageable"], "token_ids_equal": true, "persistent_state_equal": true, "cache_slots_equal": true, "pageable_prompt_ms": 60865.6, "pinned_prompt_ms": 61257.1, "pageable_decode_ms": 2352.6, "pinned_decode_ms": 2557.1, "request_delta_percent": 0.9427664818042913}
+  ],
+  "aborted_pair": {"pair": 2, "started_arm": "pinned", "minimum_effective_headroom_gib": 5.65, "request_completion": false},
+  "interpretation": "Partial correctness and ownership screen; no mode promotion or speed claim."
+}
