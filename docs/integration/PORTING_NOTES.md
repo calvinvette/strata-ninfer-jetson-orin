@@ -858,3 +858,20 @@ matched every persistent hash from its 20-GiB repeat. Keep narrow admitted
 passes with their exact model, prompt, cache, chunk, and cgroup context; compare
 full hashes as well as output IDs. Do not infer a capacity threshold by
 contrasting this with the unmatched 3,000-slot / prefill-512 abort.
+
+
+## 2026-10-12 — Cache-capacity state carries through long-context continuation
+
+A matched Q2_0 32K-prompt continuation compared 3,000 and 5,000 expert-cache
+slots at 64K configured context, using accepted-prefix fingerprints for each of
+32 generated tokens. Token IDs matched at each commit, but state fingerprints
+differed from the first committed boundary through the end. For future Strata +
+Splash work, retain the accepted-prefix state as a separate correctness axis
+from generated-text equality, and compare state starting at the first commit
+after an exact, hashed prompt. Record which subsystems differ at each boundary;
+matching MTP/dead-state fields do not imply matching recurrent/KV state. The
+trace was synchronization-heavy and correctness-only. On Apple, identify and
+trace the actual Metal/CPU recurrent and attention state owners, keeping
+platform-specific memory pressure and allocation evidence separate. This single
+Orin prompt/capacity pair does not establish quality impact or explain the
+difference; no cache default is promoted and Phase 3 remains open.
