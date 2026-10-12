@@ -1027,6 +1027,14 @@ integration Python unittest discovery (113/113). Minimum host availability was
 checks, not active-pressure, whole-model quality, or ownership closure; Phase 3
 remains open.
 
+A fresh [Q2_0 PLE and integration regression rerun](../../bench/results/2026-10-12-phase3-q2-ple-current-rerun/README.md)
+again passed all seven PLE stages for three tokens (worst relative L1
+`1.148e-7`), the focused 15/15 memory/owner/PLE CTests, and integration Python
+discovery (117/117). Minimum host availability was 24.60 GiB for both
+supervised GPU runs. This reconfirms software contracts; it does not close
+Phase 3's pressure recovery, physical backing, graph accounting or transfer
+qualification gates.
+
 A trace-free [seven-pair Q2_0 prefill-chunk timing screen](../../bench/results/2026-10-12-phase3-q2-cache-state-diagnostic/prefill-chunk-timing/README.md)
 at fixed 3,000-slot cache/context/reserve found chunk 512 faster than chunk 64
 for this 511-token prompt and eight-token continuation: median client elapsed
