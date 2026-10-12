@@ -1001,3 +1001,10 @@ higher nominal cap, because page-cache and cgroup starting conditions varied.
 For Splash, measure actual headroom through the run and repeat admission points;
 do not infer a monotonic curve from configured caps. See the
 [18-GiB run](../../bench/results/2026-10-13-phase3-q2-admit16k-18G/README.md).
+
+The same traced 16K request also passed at an 18-GiB scope cap and reproduced
+the target fingerprint, but effective headroom reached only 6.205 GiB, about
+0.205 GiB above the guard. For Splash, retain near-floor passes as narrow
+observations, preserve an explicit safety margin, and repeat them before
+setting any support boundary. See the
+[18-GiB traced run](../../bench/results/2026-10-13-phase3-q2-admit16k-18G-trace/README.md).
