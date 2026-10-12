@@ -771,3 +771,12 @@ them with separately traced state/owner diagnostics on the exact same prompt
 and factors. On this Orin screen chunk 512 improved median client elapsed over
 chunk 64, but accepted-prefix states differed; the timing result cannot qualify
 chunk 512 as a safe default. Reproduce both checks independently for Splash.
+
+The Oct 12 automatic-cache follow-up reconciled the engine's planned
+prefill-workspace hold with the unique requested-allocation peak of that owner
+on one real Q2_0 request: a 500 MiB hold covered a 333.8 MiB peak, while the
+separate 3 GiB workspace slack remained distinct. For Splash, preserve the
+planned-versus-materialized distinction, attribute each materialized allocation
+to one owner, and compare the owner ledger with platform physical-memory
+telemetry. A planned hold is metadata, not backing, and an owner request peak
+does not price allocator or driver overhead.
