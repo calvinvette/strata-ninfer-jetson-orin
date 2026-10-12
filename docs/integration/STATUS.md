@@ -887,3 +887,14 @@ requested-live peaks were 7,024,653,944 and 9,789,453,944 bytes, and the
 session owner requested 991,516,160 bytes. These are configured-reservation
 admission points with 512-token requests, not 32K workload evidence. Graph and
 driver backing remains outside the owner trace; Phase 3 remains open.
+
+The [64K configured-context extension](../../bench/results/2026-10-11-phase3-q2-admission-64k/README.md)
+passed at the same cache sizes, with 17.21 and 14.51 GiB minimum
+`MemAvailable`. Each owner trace balanced 278 allocation/free events; requested
+live peaks were 7,889,335,928 and 10,654,135,928 bytes, with a
+1,856,067,072-byte session allocation request. Together, the 4K/8K, 16K, 32K
+and 64K points exercise the planned Q2_0 cache-by-configured-context
+admission cells at 3,000/5,000 slots. All generated one token from a 512-token
+prompt, so they do not qualify long-context requests or establish capacity
+limits. Graph and driver-private backing and broader pressure interactions
+remain unmeasured; Phase 3 remains open.
