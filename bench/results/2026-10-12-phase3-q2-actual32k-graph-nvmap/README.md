@@ -1,0 +1,9 @@
+# Q2_0 actual 32K prompt graph interval — NVMap trace — Orin — 2026-10-12
+
+This run sampled the Tegra NVMap IOVMM client table while the exact 32,768-token Q2_0 prompt ran at 65,536-token configured context, 5,000 expert-cache slots, prefill 512, speculation window 2, and the existing 3,072 MiB workspace reserve. It used a transient 20-GiB cgroup scope and the standard six-GiB supervisor. Model files remained under `~/models/`.
+
+The request passed and generated token ID 32. Minimum host availability was 13.84 GiB and minimum effective cgroup availability was 8.08 GiB, with no OOM events. The owner trace observed four successful runtime graph instantiations (three verifier windows and one verifier commit graph), matching four owner events. The final persistent fingerprint and all 36 GDN hashes matched the same-prompt 20-GiB/cache-5000/prefill-512 control.
+
+The process-owned NVMap sample immediately before the first graph event was 13,454,663,680 B; the first sample after the fourth graph event was 13,526,646,784 B, a 71,983,104 B (68.65 MiB) increase. This brackets the actual long-prompt request's initial verifier graph interval and adjacent synchronous allocations. It is not an isolated graph executable size, a graph-disabled differential, or total physical memory. One process is insufficient to generalize the interval; driver-private and non-NVMap backing remain outside this counter. The separate owner ledger reports requested bytes only.
+
+The owner trace recorded 304 allocations and 303 frees, with only the 1,485,606,400-byte service-lifetime weight arena live at log end. Raw 0.1-second NVMap samples, supervisor telemetry, engine log, workload and parsed owner ledger are retained. The executable SHA-256 is `bdde041e60d8593dac593a846d471c117fee2c5397b01dfd99c9502253dd0f7d`.

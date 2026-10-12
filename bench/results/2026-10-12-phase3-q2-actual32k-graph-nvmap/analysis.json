@@ -1,0 +1,188 @@
+{
+  "scope": "NVMap process-owner backing bracketing first actual 32K Q2_0 request graph-instantiation interval; includes adjacent synchronous allocations and is not isolated graph size",
+  "nvmap_sampler": {
+    "samples": 2466,
+    "interval_s": 0.1,
+    "process_pid": 3368127,
+    "process_name": "strata",
+    "process_samples": 1936,
+    "pre_graph_sample_monotonic_s": 1071824.615269503,
+    "pre_graph_bytes": 13454663680,
+    "post_fourth_graph_sample_monotonic_s": 1071826.229041778,
+    "post_fourth_graph_bytes": 13526646784,
+    "interval_delta_bytes": 71983104,
+    "interval_delta_mib": 68.6484375,
+    "max_observed_process_nvmap_bytes": 13526646784
+  },
+  "graphs": {
+    "runtime_instantiations": 4,
+    "owner_events": [
+      {
+        "owner": "expert-cache",
+        "instance": 281473921924432,
+        "device": 0,
+        "peak_observed_requested_bytes": 6912000000,
+        "live_observed_requested_bytes": 0,
+        "view_events": 0,
+        "last_owner_reported_payload_bytes": null,
+        "successful_graph_instantiations": 0
+      },
+      {
+        "owner": "expert-stage-pageable-host",
+        "instance": 281473921958176,
+        "device": -1,
+        "peak_observed_requested_bytes": 353894400,
+        "live_observed_requested_bytes": 0,
+        "view_events": 0,
+        "last_owner_reported_payload_bytes": null,
+        "successful_graph_instantiations": 0
+      },
+      {
+        "owner": "prefill",
+        "instance": 187651550684528,
+        "device": 0,
+        "peak_observed_requested_bytes": 350079744,
+        "live_observed_requested_bytes": 0,
+        "view_events": 34,
+        "last_owner_reported_payload_bytes": null,
+        "successful_graph_instantiations": 0
+      },
+      {
+        "owner": "session",
+        "instance": 281473921957120,
+        "device": 0,
+        "peak_observed_requested_bytes": 1856067072,
+        "live_observed_requested_bytes": 0,
+        "view_events": 0,
+        "last_owner_reported_payload_bytes": null,
+        "successful_graph_instantiations": 0
+      },
+      {
+        "owner": "session-loop-scratch-host",
+        "instance": 281473921920768,
+        "device": -1,
+        "peak_observed_requested_bytes": 102400,
+        "live_observed_requested_bytes": 0,
+        "view_events": 0,
+        "last_owner_reported_payload_bytes": null,
+        "successful_graph_instantiations": 0
+      },
+      {
+        "owner": "verifier",
+        "instance": 281473921965432,
+        "device": 0,
+        "peak_observed_requested_bytes": 45968128,
+        "live_observed_requested_bytes": 0,
+        "view_events": 0,
+        "last_owner_reported_payload_bytes": null,
+        "successful_graph_instantiations": 3
+      },
+      {
+        "owner": "verifier-commit-graph",
+        "instance": 281473921965432,
+        "device": 0,
+        "peak_observed_requested_bytes": 0,
+        "live_observed_requested_bytes": 0,
+        "view_events": 0,
+        "last_owner_reported_payload_bytes": null,
+        "successful_graph_instantiations": 1
+      },
+      {
+        "owner": "verifier-mapped-host",
+        "instance": 281473921965432,
+        "device": -1,
+        "peak_observed_requested_bytes": 495480,
+        "live_observed_requested_bytes": 0,
+        "view_events": 0,
+        "last_owner_reported_payload_bytes": null,
+        "successful_graph_instantiations": 0
+      },
+      {
+        "owner": "weight-arena",
+        "instance": 281473921915976,
+        "device": 0,
+        "peak_observed_requested_bytes": 1485606400,
+        "live_observed_requested_bytes": 1485606400,
+        "view_events": 0,
+        "last_owner_reported_payload_bytes": null,
+        "successful_graph_instantiations": 0
+      }
+    ],
+    "successful_graphs_by_owner": {
+      "verifier": 3,
+      "verifier-commit-graph": 1
+    },
+    "instantiation_monotonic_s": [
+      1071824.673267668,
+      1071824.680836194,
+      1071825.714295572,
+      1071826.162556689
+    ]
+  },
+  "workload": {
+    "prompt_tokens": 32768,
+    "prompt_sha256": "705dea47aafbfc991d0616621f3a13bf0136a43c546d60c7693c2efdced4d3a3",
+    "generated_ids": [
+      32
+    ],
+    "usage": {
+      "generated": 1,
+      "prompt_tokens": 32768,
+      "prompt_ms": 164983.1,
+      "decode_ms": 205.9,
+      "finish": "length",
+      "drafts_accepted": 0,
+      "drafts_offered": 0,
+      "reused": 0,
+      "hits": 111,
+      "lookups": 480,
+      "ram_blobs": 0,
+      "file_blobs": 0,
+      "file_mb": 510.1,
+      "prompt_read": 32768,
+      "offloaded": 0
+    },
+    "engine_args": [
+      "--pack",
+      "/home/calvin/models/strata-orin-validation/q2-ple-pack",
+      "--native",
+      "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+      "--ple-gguf",
+      "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+      "--expert-profile",
+      "/home/calvin/models/strata-orin-validation/q2-expert-profile.bin",
+      "--expert-cache",
+      "5000",
+      "--prefill",
+      "512",
+      "--spec",
+      "2",
+      "--max-context",
+      "65536",
+      "--mmap-experts",
+      "--prompt-cache",
+      "6",
+      "--vram-reserve-mib",
+      "3072",
+      "--pcie-frac",
+      "0.55",
+      "--no-prefill-borrow"
+    ],
+    "passed": true
+  },
+  "supervisor": {
+    "status": "pass",
+    "minimum_host_available_bytes": 14855516160,
+    "minimum_effective_cgroup_available_bytes": 8677384192,
+    "floor_bytes": 6442450944,
+    "elapsed_s": 201.02817399217747
+  },
+  "state_comparison": "Final persistent fingerprint and all 36 GDN hashes match the 20-GiB/cache5000/prefill512 exact-prompt control.",
+  "limitations": [
+    "one process only",
+    "NVMap IOVMM counter covers process-owned NVMap backing only",
+    "interval includes adjacent synchronous allocations; not an isolated graph executable size",
+    "NVMap totals are not total physical memory",
+    "no graph-disabled differential or energy measurement"
+  ]
+}

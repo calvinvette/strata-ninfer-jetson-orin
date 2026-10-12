@@ -663,6 +663,12 @@ owner events, with a 48.71 MB stable NVMap interval; spec2 had four calls and a
 per-graph executable costs. For Splash, vary context and graph/speculation shape
 as separate factors, calibrate the platform counter, and retain actual request
 length so a configured reservation is not presented as long-context execution.
+One actual 32,768-token request at 64K configured context and spec2 also recorded
+four owner-matched instantiations and a 71,983,104-byte (68.65 MiB) NVMap
+increase across the first-to-fourth graph interval. The long prompt extends the
+measured workload shape, but the interval still contains adjacent allocations
+and has one process only; Splash should add repeated and graph-disabled controls
+before attributing a platform-memory delta to graph pools.
 
 ## Bounded vision admission and per-process ownership
 
