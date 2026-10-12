@@ -851,6 +851,67 @@ bool session_token(const WeightTable& tables, const ModelGeometry& g, int64_t po
     return true;
 }
 
+bool session_eager(const WeightTable& tables, const ModelGeometry& g, int64_t pos, int32_t pos_base,
+                   SessionState& s, float* parts_dev, PoolFn pool, HitFn hits, void* user, void* stream,
+                   std::string& err, SessionLoopScratch* scratch) {
+    if (s.db == nullptr) {
+        err = "session_eager: no doorbell";
+        return false;
+    }
+    if (parts_dev == nullptr) {
+        err = "session_eager: no expert-parts device buffer";
+        return false;
+    }
+    if (pool == nullptr) {
+        err = "session_eager: no CPU expert pool";
+        return false;
+    }
+    if (scratch == nullptr || scratch->y_miss == nullptr ||
+        scratch->parts_bytes != (size_t)s.k * g.n_embd * sizeof(float)) {
+        err = "session_eager: missing or incorrectly sized scratch";
+        return false;
+    }
+    cudaStream_t cs = (cudaStream_t)stream;
+    doorbell_reset(*s.db);
+    int64_t qsa_index = 0;
+    for (int64_t l = 0; l < g.n_layers; ++l) {
+        gdn_point_at(g, l, s);
+        const bool qsa = is_qsa_layer(g, l);
+        QsaState& qst = qsa ? s.qsa_states[qsa_index] : s.qsa_states[0];
+        err.clear();
+        if (!block_layer_pre(tables, g, l, pos, pos_base, s.gdn, qst, s.qsa_bufs, s.moe, s.k, s.block, cs, err,
+                             s.db, s.ple.ready() ? &s.ple : nullptr)) {
+            err = "session_eager: pre layer " + std::to_string(l) + ": " + err;
+            return false;
+        }
+        cudaError_t e = cudaStreamSynchronize(cs);
+        if (e != cudaSuccess) {
+            err = "session_eager: sync pre layer " + std::to_string(l) + ": " + cudaGetErrorString(e);
+            return false;
+        }
+        strata::platform::mapped_memory_acquire();
+        if (hits != nullptr) hits(user, cs, HitPhase::Launch, s.db->h_ids, s.k);
+        pool(user, s.db->h_x_f, s.db->h_ids, s.db->h_weights, g.n_embd, s.k, scratch->y_miss);
+        e = cudaMemcpyAsync(parts_dev, scratch->y_miss, scratch->parts_bytes, cudaMemcpyHostToDevice, cs);
+        if (e != cudaSuccess) {
+            err = "session_eager: stage expert parts: " + std::string(cudaGetErrorString(e));
+            return false;
+        }
+        if (hits != nullptr) hits(user, cs, HitPhase::Combine, nullptr, 0);
+        if (!block_layer_post(tables, g, l, s.k, s.moe, s.block, parts_dev, cs, err)) {
+            err = "session_eager: post layer " + std::to_string(l) + ": " + err;
+            return false;
+        }
+        if (qsa) ++qsa_index;
+    }
+    const cudaError_t e = cudaStreamSynchronize(cs);
+    if (e != cudaSuccess) {
+        err = "session_eager: final sync: " + std::string(cudaGetErrorString(e));
+        return false;
+    }
+    return true;
+}
+
 }  // namespace strata::core
 
 namespace strata::core {

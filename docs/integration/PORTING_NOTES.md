@@ -1146,3 +1146,29 @@ are insufficient: two blocks both named Q8_1 can still differ in tie behavior.
 For Splash, carry the producer's rounding and correction formula through the
 consumer boundary, then verify the real CPU/GPU path and held-out requests
 before promotion. See the [Orin report](../../bench/results/2026-10-13-phase4-q8_1-neon-contract/README.md).
+
+## 2026-10-13 — Build eager decoding at the routed-expert seam
+
+A genuine no-capture control must preserve the layer's expert contribution.
+The Q2_0 path now exposes `session_eager`: call the layer pre/router half,
+wait until the mapped host doorbell is visible, dispatch the normal GPU-hit and
+CPU-miss callbacks, then run that same layer's post/combine half. This keeps
+routing and combine weights aligned while making the synchronization cost
+explicit. A direct layer loop with a preinitialized `parts` buffer is not a
+valid eager control because it silently omits routed experts.
+
+The eager Q2_0 and captured controls matched all generated token IDs, all nine
+final persistent-state fields, and every accepted-prefix trace for MTP-off and
+window 2. These are one-run correctness controls; the observed timing is not a
+performance result. The exact binary, prompt, memory observations, initial
+failed startup probes and reproduction commands are recorded in the
+[eager/captured report](../../bench/results/2026-10-13-phase5-q2-eager-captured/README.md).
+
+For future Strata + Splash work, keep this control at the engine's layer
+pre/router and post/combine boundary. Map the GPU/CPU expert callback contract,
+state advancement, and synchronization semantics to the target backend rather
+than copying CUDA doorbell mechanics. If speculation uses a separate verifier,
+keep any residency metadata it requires alive even when target decoding is
+uncaptured. Compare token output and committed recurrent/KV state at every
+shared commit boundary before timing; then randomize paired request runs and
+report launch, pool, transfer, and end-to-end costs separately.

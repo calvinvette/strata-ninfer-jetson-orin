@@ -88,6 +88,9 @@ struct SessionState {
     PleRun ple;
 };
 
+using PoolFn = void (*)(void* user, const float* x_f, const int32_t* ids, const float* weights, int64_t n_embd,
+                        int64_t k, float* out);
+
 /// Bytes for a whole session at `max_cells` of context.  Every layer's state is sized at once, because P2.T10
 /// requires ZERO token-path allocations - a `cudaMalloc` that happened on the first token of a longer sequence
 /// would satisfy every test here and fail that one.
@@ -121,6 +124,13 @@ void session_zero(SessionState& s, const ModelGeometry& g, const float* R_init, 
 bool session_token(const WeightTable& tables, const ModelGeometry& g, int64_t pos, int32_t pos_base,
                    SessionState& s, const float* parts, void* stream, bool sync_every_layer,
                    std::string& err);
+
+/// Eager routed-expert token path. Runs layer pre/router, dispatches GPU hits and CPU misses, then combines
+/// that layer's outputs before advancing the residual. Requires a doorbell and reusable session scratch.
+struct SessionLoopScratch;
+bool session_eager(const WeightTable& tables, const ModelGeometry& g, int64_t pos, int32_t pos_base, SessionState& s, float* parts_dev,
+                   PoolFn pool, HitFn hits, void* user, void* stream, std::string& err,
+                   SessionLoopScratch* scratch);
 
 // ================================ the captured form ================================
 
@@ -311,9 +321,6 @@ void session_graphs_free(SessionGraphs& gr);
 /// WHAT THE POOL HAS TO DO, as the loop sees it: given the `x_f` a layer published and the miss list it
 /// selected, produce the `k` expert outputs into `out` (k x n_embd, HOST memory).  A function pointer rather
 /// than a virtual class because the loop is the thing under test and the pool is the thing being faked.
-using PoolFn = void (*)(void* user, const float* x_f, const int32_t* ids, const float* weights, int64_t n_embd,
-                        int64_t k, float* out);
-
 /// **R4.2c: THE VRAM-RESIDENT HALF OF THE LAYER'S EXPERTS.**  Called by the loop after the misses have been
 /// staged into `parts` and before `post[l]` is launched, so its kernels are stream-ordered between them: the
 /// misses are already in `parts`, the hits overwrite the rows the CPU zeroed, and `post[l]`'s `moe_combine`

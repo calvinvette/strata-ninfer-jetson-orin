@@ -5283,29 +5283,11 @@ int main(int argc, char** argv) {
         }
     }
 
-    // **`--no-capture` AND THE EXPERTS ARE MUTUALLY EXCLUSIVE, AND SILENTLY SO.**
-    //
-    // The CPU expert pool is wired into `session_loop` - the host loop around the captured graphs - and
-    // `session_token` has no pool hook at all.  So `--no-capture` did not merely change HOW the layers were
-    // launched: it ran the whole model with `parts` left at whatever the buffer held, which is ZERO, and the
-    // only symptom was `expert blobs 0` in a stats line nobody had to read.  A run that silently omits the
-    // routed experts is not a slow measurement of this model, it is a measurement of a different model.
-    //
-    // Refusing is the fix.  `--no-pool` is the explicit way to say "I want the GPU-only floor".
-    if (o.no_capture && !o.no_pool) {
-        std::fprintf(stderr,
-                     "strata generate: --no-capture runs `session_token`, which has NO CPU expert pool hook, so "
-                     "the routed experts would silently contribute nothing. Pass --no-pool as well if the "
-                     "GPU-only floor is what you want.\n");
-        return 2;
-    }
-    // The ladder is written by `session_loop`, and `session_token` does not touch the staging buffer at all - so
-    // accepting the flag there would produce a file of uninitialised memory, which reads as a wrong answer rather
-    // than as a mistake.  `--no-capture` without `--no-pool` is already refused above, so this catches the pair.
+    // `session_loop` writes the layer ladder; the eager executor does not fill it, so refuse that combination.
     if (o.no_capture && !o.dump_layers.empty()) {
         std::fprintf(stderr,
-                     "strata generate: --dump-layers is written by `session_loop`; `--no-capture` runs "
-                     "`session_token` instead, which never fills the staging buffer. Drop one of the two.\n");
+                     "strata generate: --dump-layers is written by `session_loop`, not the eager path. "
+                     "Drop one of the two.\n");
         return 2;
     }
     if (o.no_capture && !o.dump_halves.empty()) {
@@ -5742,7 +5724,7 @@ int main(int argc, char** argv) {
     int32_t* d_hit_count = nullptr;
     strata::core::TokenHits thits;
     const bool graph_hits = hit_fn != nullptr && !profile.empty() && !o.no_pool;
-    if (graph_hits && !o.no_capture && !o.no_token_graph && layer_dump == nullptr && half_dump == nullptr) {
+    if (graph_hits && layer_dump == nullptr && half_dump == nullptr) {
         host_res.assign((size_t) (g.n_layers * g.n_expert), strata::core::kNotResident);
         int64_t resident = 0;
         for (int64_t l = 0; l < g.n_layers; ++l)
@@ -6370,7 +6352,7 @@ int main(int argc, char** argv) {
     }
     if (o.serve) {
         if (o.spec < 2 || o.prefill_chunk <= 0 ||
-            (graph_hits && (thits.d_res == nullptr || host_res.empty()))) {
+            (graph_hits && !o.no_capture && (thits.d_res == nullptr || host_res.empty()))) {
             std::fprintf(stderr, "strata serve: needs --spec T and --prefill CHUNK (and a fillable "
                                  "--expert-cache; the graphed hit path additionally needs --expert-profile P)\n");
             return 2;
@@ -11592,9 +11574,13 @@ int main(int argc, char** argv) {
         drive.d.failed = false;
         err.clear();
         if (o.no_capture) {
-            if (!strata::core::session_token(wt, g, pos, /*pos_base=*/0, ss, d_parts, main_cs,
-                                             o.sync_every_layer, err)) {
-                std::fprintf(stderr, "strata generate: session_token: %s\n", err.c_str());
+            const bool eager_ok = o.no_pool
+                ? strata::core::session_token(wt, g, pos, /*pos_base=*/0, ss, d_parts, main_cs,
+                                              o.sync_every_layer, err)
+                : strata::core::session_eager(wt, g, pos, /*pos_base=*/0, ss, d_parts, pool_fn, hit_fn,
+                                               pool_user, main_cs, err, &loop_scratch);
+            if (!eager_ok) {
+                std::fprintf(stderr, "strata generate: eager token: %s\n", err.c_str());
                 return 1;
             }
         } else {

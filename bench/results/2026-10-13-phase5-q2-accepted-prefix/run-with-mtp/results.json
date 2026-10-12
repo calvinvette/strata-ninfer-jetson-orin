@@ -1,0 +1,998 @@
+{
+  "prompt_sha256": "ca13a79c83650d0bda01e8db5cc641308e496ff8342cb17471916c8d0a502729",
+  "max_new": 8,
+  "kv_format": "fp16",
+  "state_fields": [
+    "L",
+    "gdn",
+    "ple",
+    "tail",
+    "dead",
+    "pooled",
+    "pooled_full",
+    "kv",
+    "ple_prev"
+  ],
+  "arms": [
+    {
+      "name": "mtp-off",
+      "spec": 0,
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/q2-ple-pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/models/strata-orin-validation/q2-expert-profile.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "512",
+        "--spec",
+        "2",
+        "--max-context",
+        "65536",
+        "--mmap-experts",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55",
+        "--no-prefill-borrow",
+        "--adapt-swaps",
+        "0",
+        "--suffix-draft",
+        "0",
+        "--spec-min-p",
+        "0"
+      ],
+      "info": {
+        "version": "0.1.41",
+        "context": 65536,
+        "kv": "fp16",
+        "kv_resident": 0,
+        "expert_slots": 3000,
+        "expert_cache_mib": 3955,
+        "expert_slots_primary": 3000,
+        "expert_cache_primary_mib": 3955,
+        "spec": 2,
+        "mtp_max": 0,
+        "lookup": 0,
+        "vram_free_mib": 16951,
+        "cvec": 0,
+        "arena_mib": 0,
+        "pool_workers": 11,
+        "pcie_frac": "0.55",
+        "spec_min_p": "0.00",
+        "conversation_cache_mib": 0,
+        "conversation_cache_slots": 4,
+        "conversation_cache_min_free_mib": 2560,
+        "tail_role_token": -1,
+        "vram_elastic": 0,
+        "engine": "0.1.41"
+      },
+      "records": [
+        {
+          "ids": [
+            32,
+            6165,
+            11036,
+            1928,
+            1472,
+            264,
+            6150,
+            11
+          ],
+          "text": "A computer processes information through a complex,",
+          "generated": 8,
+          "prompt_tokens": 512,
+          "prompt_ms": 12994.9,
+          "decode_ms": 4578.4,
+          "finish": "length",
+          "drafts_accepted": 0,
+          "drafts_offered": 0,
+          "reused": 0,
+          "hits": 475,
+          "lookups": 3840,
+          "ram_blobs": 0,
+          "file_blobs": 0,
+          "file_mb": 4651.8,
+          "prompt_read": 512,
+          "offloaded": 0,
+          "state": {
+            "L": "519",
+            "gdn": "7585c41a3646dcb1",
+            "ple": "4da3dcc2f1ed1344",
+            "tail": "71c8dc38705676ae",
+            "dead": "32bc7cd19b5e0670",
+            "pooled": "c41733d0afff4cd2",
+            "pooled_full": "68c150f62f67319d",
+            "kv": "4dd7ca6bcb08f0ed",
+            "ple_prev": "264,6150"
+          },
+          "accepted_prefix_trace": [
+            {
+              "position": 511,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                32
+              ],
+              "state": {
+                "L": "512",
+                "gdn": "56f6626d26019df4",
+                "ple": "6bc445f9eed8a66b",
+                "tail": "13fdeba27f3ae135",
+                "dead": "32bc7cd19b5e0670",
+                "pooled": "9251a25ceac0c0a4",
+                "pooled_full": "671ecbbc955d2043",
+                "kv": "bcc69987d2e846fd",
+                "mtp": "14650fb0739d0383",
+                "stale": "14650fb0739d0383",
+                "ple_prev": "248069,271"
+              }
+            },
+            {
+              "position": 512,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                6165
+              ],
+              "state": {
+                "L": "513",
+                "gdn": "c5c5a12c0f8a8f67",
+                "ple": "29d45ad6911496f7",
+                "tail": "592bd287d5594a98",
+                "dead": "32bc7cd19b5e0670",
+                "pooled": "9251a25ceac0c0a4",
+                "pooled_full": "671ecbbc955d2043",
+                "kv": "79b550e6a5d1200d",
+                "mtp": "14650fb0739d0383",
+                "stale": "3452ac1b08ca8383",
+                "ple_prev": "271,32"
+              }
+            },
+            {
+              "position": 513,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                11036
+              ],
+              "state": {
+                "L": "514",
+                "gdn": "52b496c6642922b5",
+                "ple": "ed44b26100a346dc",
+                "tail": "ab05d1dc39df4e5c",
+                "dead": "32bc7cd19b5e0670",
+                "pooled": "9251a25ceac0c0a4",
+                "pooled_full": "671ecbbc955d2043",
+                "kv": "85f817c1be289185",
+                "mtp": "14650fb0739d0383",
+                "stale": "b1c3695b6c660383",
+                "ple_prev": "32,6165"
+              }
+            },
+            {
+              "position": 514,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                1928
+              ],
+              "state": {
+                "L": "515",
+                "gdn": "8f4e06256ddc7f93",
+                "ple": "9e9c30d483c0a9de",
+                "tail": "b3b7db56f2d48181",
+                "dead": "32bc7cd19b5e0670",
+                "pooled": "9251a25ceac0c0a4",
+                "pooled_full": "671ecbbc955d2043",
+                "kv": "b67238dbf72dc607",
+                "mtp": "14650fb0739d0383",
+                "stale": "011a3fe290018383",
+                "ple_prev": "6165,11036"
+              }
+            },
+            {
+              "position": 515,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                1472
+              ],
+              "state": {
+                "L": "516",
+                "gdn": "022ff761a830fc39",
+                "ple": "adaf6edf2fdde222",
+                "tail": "b3b7db56f2d48181",
+                "dead": "32bc7cd19b5e0670",
+                "pooled": "c41733d0afff4cd2",
+                "pooled_full": "68c150f62f67319d",
+                "kv": "f2063f1a58466d95",
+                "mtp": "14650fb0739d0383",
+                "stale": "14650fb0739d0383",
+                "ple_prev": "11036,1928"
+              }
+            },
+            {
+              "position": 516,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                264
+              ],
+              "state": {
+                "L": "517",
+                "gdn": "8b2d09a720e6e5af",
+                "ple": "536194effa7c1601",
+                "tail": "4eeff578c48d5701",
+                "dead": "32bc7cd19b5e0670",
+                "pooled": "c41733d0afff4cd2",
+                "pooled_full": "68c150f62f67319d",
+                "kv": "0a8490cbf4ee5367",
+                "mtp": "14650fb0739d0383",
+                "stale": "3452ac1b08ca8383",
+                "ple_prev": "1928,1472"
+              }
+            },
+            {
+              "position": 517,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                6150
+              ],
+              "state": {
+                "L": "518",
+                "gdn": "bc3d8d3c34a0743e",
+                "ple": "82a62c2d974d4ab9",
+                "tail": "5da921616c55c4c2",
+                "dead": "32bc7cd19b5e0670",
+                "pooled": "c41733d0afff4cd2",
+                "pooled_full": "68c150f62f67319d",
+                "kv": "ab90bbc9a27fbf1d",
+                "mtp": "14650fb0739d0383",
+                "stale": "b1c3695b6c660383",
+                "ple_prev": "1472,264"
+              }
+            },
+            {
+              "position": 518,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                11
+              ],
+              "state": {
+                "L": "519",
+                "gdn": "7585c41a3646dcb1",
+                "ple": "4da3dcc2f1ed1344",
+                "tail": "71c8dc38705676ae",
+                "dead": "32bc7cd19b5e0670",
+                "pooled": "c41733d0afff4cd2",
+                "pooled_full": "68c150f62f67319d",
+                "kv": "4dd7ca6bcb08f0ed",
+                "mtp": "14650fb0739d0383",
+                "stale": "011a3fe290018383",
+                "ple_prev": "264,6150"
+              }
+            }
+          ]
+        }
+      ],
+      "engine_sha256": "66cf3491ee06a30f340d8210084626fad78c730ccc819d9f15f167f4c0291a62"
+    },
+    {
+      "name": "mtp-window2",
+      "spec": 2,
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/q2-ple-pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/models/strata-orin-validation/q2-expert-profile.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "512",
+        "--spec",
+        "2",
+        "--max-context",
+        "65536",
+        "--mmap-experts",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55",
+        "--no-prefill-borrow",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--adapt-swaps",
+        "0",
+        "--suffix-draft",
+        "0",
+        "--spec-min-p",
+        "0",
+        "--mtp-max-t",
+        "2"
+      ],
+      "info": {
+        "version": "0.1.41",
+        "context": 65536,
+        "kv": "fp16",
+        "kv_resident": 0,
+        "expert_slots": 3000,
+        "expert_cache_mib": 3955,
+        "expert_slots_primary": 3000,
+        "expert_cache_primary_mib": 3955,
+        "spec": 2,
+        "mtp_max": 2,
+        "lookup": 0,
+        "vram_free_mib": 16101,
+        "cvec": 0,
+        "arena_mib": 0,
+        "pool_workers": 11,
+        "pcie_frac": "0.55",
+        "spec_min_p": "0.00",
+        "conversation_cache_mib": 0,
+        "conversation_cache_slots": 4,
+        "conversation_cache_min_free_mib": 2560,
+        "tail_role_token": -1,
+        "vram_elastic": 0,
+        "engine": "0.1.41"
+      },
+      "records": [
+        {
+          "ids": [
+            32,
+            6165,
+            11036,
+            1928,
+            1472,
+            264,
+            6150,
+            11
+          ],
+          "text": "A computer processes information through a complex,",
+          "generated": 8,
+          "prompt_tokens": 512,
+          "prompt_ms": 15494.3,
+          "decode_ms": 3542.0,
+          "finish": "length",
+          "drafts_accepted": 4,
+          "drafts_offered": 4,
+          "reused": 0,
+          "hits": 543,
+          "lookups": 4320,
+          "ram_blobs": 0,
+          "file_blobs": 0,
+          "file_mb": 4346.3,
+          "prompt_read": 512,
+          "offloaded": 0,
+          "state": {
+            "L": "519",
+            "gdn": "7585c41a3646dcb1",
+            "ple": "4da3dcc2f1ed1344",
+            "tail": "71c8dc38705676ae",
+            "dead": "32bc7cd19b5e0670",
+            "pooled": "c41733d0afff4cd2",
+            "pooled_full": "68c150f62f67319d",
+            "kv": "4dd7ca6bcb08f0ed",
+            "ple_prev": "264,6150"
+          },
+          "accepted_prefix_trace": [
+            {
+              "position": 511,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                32
+              ],
+              "state": {
+                "L": "512",
+                "gdn": "56f6626d26019df4",
+                "ple": "6bc445f9eed8a66b",
+                "tail": "13fdeba27f3ae135",
+                "dead": "32bc7cd19b5e0670",
+                "pooled": "9251a25ceac0c0a4",
+                "pooled_full": "671ecbbc955d2043",
+                "kv": "bcc69987d2e846fd",
+                "mtp": "5861f9009c1de900",
+                "stale": "14650fb0739d0383",
+                "ple_prev": "248069,271"
+              }
+            },
+            {
+              "position": 512,
+              "window": 2,
+              "accepted_drafts": 1,
+              "committed": 2,
+              "token_ids": [
+                6165,
+                11036
+              ],
+              "state": {
+                "L": "514",
+                "gdn": "52b496c6642922b5",
+                "ple": "ed44b26100a346dc",
+                "tail": "ab05d1dc39df4e5c",
+                "dead": "32bc7cd19b5e0670",
+                "pooled": "9251a25ceac0c0a4",
+                "pooled_full": "671ecbbc955d2043",
+                "kv": "85f817c1be289185",
+                "mtp": "30fbe66fd7444cf5",
+                "stale": "b1c3695b6c660383",
+                "ple_prev": "32,6165"
+              }
+            },
+            {
+              "position": 514,
+              "window": 2,
+              "accepted_drafts": 1,
+              "committed": 2,
+              "token_ids": [
+                1928,
+                1472
+              ],
+              "state": {
+                "L": "516",
+                "gdn": "022ff761a830fc39",
+                "ple": "adaf6edf2fdde222",
+                "tail": "b3b7db56f2d48181",
+                "dead": "32bc7cd19b5e0670",
+                "pooled": "c41733d0afff4cd2",
+                "pooled_full": "68c150f62f67319d",
+                "kv": "f2063f1a58466d95",
+                "mtp": "2b83e3cf081b7df6",
+                "stale": "14650fb0739d0383",
+                "ple_prev": "11036,1928"
+              }
+            },
+            {
+              "position": 516,
+              "window": 2,
+              "accepted_drafts": 1,
+              "committed": 2,
+              "token_ids": [
+                264,
+                6150
+              ],
+              "state": {
+                "L": "518",
+                "gdn": "bc3d8d3c34a0743e",
+                "ple": "82a62c2d974d4ab9",
+                "tail": "5da921616c55c4c2",
+                "dead": "32bc7cd19b5e0670",
+                "pooled": "c41733d0afff4cd2",
+                "pooled_full": "68c150f62f67319d",
+                "kv": "ab90bbc9a27fbf1d",
+                "mtp": "64ff99d5f8b63085",
+                "stale": "b1c3695b6c660383",
+                "ple_prev": "1472,264"
+              }
+            },
+            {
+              "position": 518,
+              "window": 2,
+              "accepted_drafts": 1,
+              "committed": 1,
+              "token_ids": [
+                11
+              ],
+              "state": {
+                "L": "519",
+                "gdn": "7585c41a3646dcb1",
+                "ple": "4da3dcc2f1ed1344",
+                "tail": "71c8dc38705676ae",
+                "dead": "32bc7cd19b5e0670",
+                "pooled": "c41733d0afff4cd2",
+                "pooled_full": "68c150f62f67319d",
+                "kv": "4dd7ca6bcb08f0ed",
+                "mtp": "a912c1d178787c8c",
+                "stale": "510c2df12949ec49",
+                "ple_prev": "264,6150"
+              }
+            }
+          ]
+        }
+      ],
+      "engine_sha256": "66cf3491ee06a30f340d8210084626fad78c730ccc819d9f15f167f4c0291a62"
+    },
+    {
+      "name": "mtp-window3",
+      "spec": 3,
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/q2-ple-pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/models/strata-orin-validation/q2-expert-profile.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "512",
+        "--spec",
+        "3",
+        "--max-context",
+        "65536",
+        "--mmap-experts",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55",
+        "--no-prefill-borrow",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--adapt-swaps",
+        "0",
+        "--suffix-draft",
+        "0",
+        "--spec-min-p",
+        "0",
+        "--mtp-max-t",
+        "3"
+      ],
+      "info": {
+        "version": "0.1.41",
+        "context": 65536,
+        "kv": "fp16",
+        "kv_resident": 0,
+        "expert_slots": 3000,
+        "expert_cache_mib": 3955,
+        "expert_slots_primary": 3000,
+        "expert_cache_primary_mib": 3955,
+        "spec": 3,
+        "mtp_max": 3,
+        "lookup": 0,
+        "vram_free_mib": 16093,
+        "cvec": 0,
+        "arena_mib": 0,
+        "pool_workers": 11,
+        "pcie_frac": "0.55",
+        "spec_min_p": "0.00",
+        "conversation_cache_mib": 0,
+        "conversation_cache_slots": 4,
+        "conversation_cache_min_free_mib": 2560,
+        "tail_role_token": -1,
+        "vram_elastic": 0,
+        "engine": "0.1.41"
+      },
+      "records": [
+        {
+          "ids": [
+            32,
+            6165,
+            11036,
+            1928,
+            1472,
+            264,
+            6150,
+            11
+          ],
+          "text": "A computer processes information through a complex,",
+          "generated": 8,
+          "prompt_tokens": 512,
+          "prompt_ms": 16547.3,
+          "decode_ms": 3711.8,
+          "finish": "length",
+          "drafts_accepted": 5,
+          "drafts_offered": 6,
+          "reused": 0,
+          "hits": 596,
+          "lookups": 4800,
+          "ram_blobs": 0,
+          "file_blobs": 0,
+          "file_mb": 4407.1,
+          "prompt_read": 512,
+          "offloaded": 0,
+          "state": {
+            "L": "519",
+            "gdn": "7585c41a3646dcb1",
+            "ple": "4da3dcc2f1ed1344",
+            "tail": "71c8dc38705676ae",
+            "dead": "32bc7cd19b5e0670",
+            "pooled": "c41733d0afff4cd2",
+            "pooled_full": "68c150f62f67319d",
+            "kv": "4dd7ca6bcb08f0ed",
+            "ple_prev": "264,6150"
+          },
+          "accepted_prefix_trace": [
+            {
+              "position": 511,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                32
+              ],
+              "state": {
+                "L": "512",
+                "gdn": "56f6626d26019df4",
+                "ple": "6bc445f9eed8a66b",
+                "tail": "13fdeba27f3ae135",
+                "dead": "32bc7cd19b5e0670",
+                "pooled": "9251a25ceac0c0a4",
+                "pooled_full": "671ecbbc955d2043",
+                "kv": "bcc69987d2e846fd",
+                "mtp": "5861f9009c1de900",
+                "stale": "14650fb0739d0383",
+                "ple_prev": "248069,271"
+              }
+            },
+            {
+              "position": 512,
+              "window": 3,
+              "accepted_drafts": 2,
+              "committed": 3,
+              "token_ids": [
+                6165,
+                11036,
+                1928
+              ],
+              "state": {
+                "L": "515",
+                "gdn": "8f4e06256ddc7f93",
+                "ple": "9e9c30d483c0a9de",
+                "tail": "b3b7db56f2d48181",
+                "dead": "32bc7cd19b5e0670",
+                "pooled": "9251a25ceac0c0a4",
+                "pooled_full": "671ecbbc955d2043",
+                "kv": "b67238dbf72dc607",
+                "mtp": "32c7654facfa526d",
+                "stale": "011a3fe290018383",
+                "ple_prev": "6165,11036"
+              }
+            },
+            {
+              "position": 515,
+              "window": 3,
+              "accepted_drafts": 2,
+              "committed": 3,
+              "token_ids": [
+                1472,
+                264,
+                6150
+              ],
+              "state": {
+                "L": "518",
+                "gdn": "bc3d8d3c34a0743e",
+                "ple": "82a62c2d974d4ab9",
+                "tail": "5da921616c55c4c2",
+                "dead": "32bc7cd19b5e0670",
+                "pooled": "c41733d0afff4cd2",
+                "pooled_full": "68c150f62f67319d",
+                "kv": "ab90bbc9a27fbf1d",
+                "mtp": "97025878c655e17b",
+                "stale": "b1c3695b6c660383",
+                "ple_prev": "1472,264"
+              }
+            },
+            {
+              "position": 518,
+              "window": 3,
+              "accepted_drafts": 1,
+              "committed": 1,
+              "token_ids": [
+                11
+              ],
+              "state": {
+                "L": "519",
+                "gdn": "7585c41a3646dcb1",
+                "ple": "4da3dcc2f1ed1344",
+                "tail": "71c8dc38705676ae",
+                "dead": "32bc7cd19b5e0670",
+                "pooled": "c41733d0afff4cd2",
+                "pooled_full": "68c150f62f67319d",
+                "kv": "4dd7ca6bcb08f0ed",
+                "mtp": "cc6dbadcfb46c77e",
+                "stale": "510c2df12949ec49",
+                "ple_prev": "264,6150"
+              }
+            }
+          ]
+        }
+      ],
+      "engine_sha256": "66cf3491ee06a30f340d8210084626fad78c730ccc819d9f15f167f4c0291a62"
+    },
+    {
+      "name": "mtp-window4",
+      "spec": 4,
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/q2-ple-pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/models/strata-orin-validation/q2-expert-profile.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "512",
+        "--spec",
+        "4",
+        "--max-context",
+        "65536",
+        "--mmap-experts",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55",
+        "--no-prefill-borrow",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--adapt-swaps",
+        "0",
+        "--suffix-draft",
+        "0",
+        "--spec-min-p",
+        "0",
+        "--mtp-max-t",
+        "4"
+      ],
+      "info": {
+        "version": "0.1.41",
+        "context": 65536,
+        "kv": "fp16",
+        "kv_resident": 0,
+        "expert_slots": 3000,
+        "expert_cache_mib": 3955,
+        "expert_slots_primary": 3000,
+        "expert_cache_primary_mib": 3955,
+        "spec": 4,
+        "mtp_max": 4,
+        "lookup": 0,
+        "vram_free_mib": 16106,
+        "cvec": 0,
+        "arena_mib": 0,
+        "pool_workers": 11,
+        "pcie_frac": "0.55",
+        "spec_min_p": "0.00",
+        "conversation_cache_mib": 0,
+        "conversation_cache_slots": 4,
+        "conversation_cache_min_free_mib": 2560,
+        "tail_role_token": -1,
+        "vram_elastic": 0,
+        "engine": "0.1.41"
+      },
+      "records": [
+        {
+          "ids": [
+            32,
+            6165,
+            11036,
+            1928,
+            1472,
+            264,
+            6150,
+            11
+          ],
+          "text": "A computer processes information through a complex,",
+          "generated": 8,
+          "prompt_tokens": 512,
+          "prompt_ms": 15893.0,
+          "decode_ms": 3048.2,
+          "finish": "length",
+          "drafts_accepted": 5,
+          "drafts_offered": 6,
+          "reused": 0,
+          "hits": 536,
+          "lookups": 4320,
+          "ram_blobs": 0,
+          "file_blobs": 0,
+          "file_mb": 3632.9,
+          "prompt_read": 512,
+          "offloaded": 0,
+          "state": {
+            "L": "519",
+            "gdn": "7585c41a3646dcb1",
+            "ple": "4da3dcc2f1ed1344",
+            "tail": "71c8dc38705676ae",
+            "dead": "32bc7cd19b5e0670",
+            "pooled": "c41733d0afff4cd2",
+            "pooled_full": "68c150f62f67319d",
+            "kv": "4dd7ca6bcb08f0ed",
+            "ple_prev": "264,6150"
+          },
+          "accepted_prefix_trace": [
+            {
+              "position": 511,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                32
+              ],
+              "state": {
+                "L": "512",
+                "gdn": "56f6626d26019df4",
+                "ple": "6bc445f9eed8a66b",
+                "tail": "13fdeba27f3ae135",
+                "dead": "32bc7cd19b5e0670",
+                "pooled": "9251a25ceac0c0a4",
+                "pooled_full": "671ecbbc955d2043",
+                "kv": "bcc69987d2e846fd",
+                "mtp": "5861f9009c1de900",
+                "stale": "14650fb0739d0383",
+                "ple_prev": "248069,271"
+              }
+            },
+            {
+              "position": 512,
+              "window": 4,
+              "accepted_drafts": 3,
+              "committed": 4,
+              "token_ids": [
+                6165,
+                11036,
+                1928,
+                1472
+              ],
+              "state": {
+                "L": "516",
+                "gdn": "022ff761a830fc39",
+                "ple": "adaf6edf2fdde222",
+                "tail": "b3b7db56f2d48181",
+                "dead": "32bc7cd19b5e0670",
+                "pooled": "c41733d0afff4cd2",
+                "pooled_full": "68c150f62f67319d",
+                "kv": "f2063f1a58466d95",
+                "mtp": "1c9de186eab95135",
+                "stale": "14650fb0739d0383",
+                "ple_prev": "11036,1928"
+              }
+            },
+            {
+              "position": 516,
+              "window": 4,
+              "accepted_drafts": 2,
+              "committed": 3,
+              "token_ids": [
+                264,
+                6150,
+                11
+              ],
+              "state": {
+                "L": "519",
+                "gdn": "7585c41a3646dcb1",
+                "ple": "4da3dcc2f1ed1344",
+                "tail": "71c8dc38705676ae",
+                "dead": "32bc7cd19b5e0670",
+                "pooled": "c41733d0afff4cd2",
+                "pooled_full": "68c150f62f67319d",
+                "kv": "4dd7ca6bcb08f0ed",
+                "mtp": "dcb303884d8edd28",
+                "stale": "d6a0002092422c3e",
+                "ple_prev": "264,6150"
+              }
+            }
+          ]
+        }
+      ],
+      "engine_sha256": "66cf3491ee06a30f340d8210084626fad78c730ccc819d9f15f167f4c0291a62"
+    }
+  ],
+  "comparisons": [
+    {
+      "candidate": "mtp-window2",
+      "token_ids_equal": true,
+      "final_state_equal": true,
+      "final_state_differing_fields": [],
+      "drafts_offered": 4,
+      "drafts_accepted": 4,
+      "matched_commit_boundaries": [
+        {
+          "generated_prefix_tokens": 1,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 3,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 5,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 7,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 8,
+          "equal": true,
+          "differing_state_fields": []
+        }
+      ],
+      "failures": []
+    },
+    {
+      "candidate": "mtp-window3",
+      "token_ids_equal": true,
+      "final_state_equal": true,
+      "final_state_differing_fields": [],
+      "drafts_offered": 6,
+      "drafts_accepted": 5,
+      "matched_commit_boundaries": [
+        {
+          "generated_prefix_tokens": 1,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 4,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 7,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 8,
+          "equal": true,
+          "differing_state_fields": []
+        }
+      ],
+      "failures": []
+    },
+    {
+      "candidate": "mtp-window4",
+      "token_ids_equal": true,
+      "final_state_equal": true,
+      "final_state_differing_fields": [],
+      "drafts_offered": 6,
+      "drafts_accepted": 5,
+      "matched_commit_boundaries": [
+        {
+          "generated_prefix_tokens": 1,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 5,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 8,
+          "equal": true,
+          "differing_state_fields": []
+        }
+      ],
+      "failures": []
+    }
+  ],
+  "passed": true
+}
