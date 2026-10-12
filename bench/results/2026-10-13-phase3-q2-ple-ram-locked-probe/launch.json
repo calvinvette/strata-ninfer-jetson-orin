@@ -1,0 +1,38 @@
+{
+  "scope": "Q2_0 PLE RAM-mode lock probe; commands are isolated transient systemd services",
+  "user": "calvin (uid 1000, primary gid 1000, init supplementary groups)",
+  "memory_floor_bytes": 6442450944,
+  "runs": [
+    {
+      "result_directory": "supervisor/",
+      "systemd_properties": {
+        "MemoryMax": "22G",
+        "IOAccounting": true,
+        "LimitMEMLOCK": "8589934592 bytes"
+      },
+      "status": "pressure_abort before request completion"
+    },
+    {
+      "result_directory": "supervisor-uncapped/",
+      "systemd_properties": {
+        "IOAccounting": true,
+        "LimitMEMLOCK": "8589934592 bytes"
+      },
+      "status": "request passed; mlock failed and pages remained reclaimable"
+    },
+    {
+      "result_directory": "supervisor-memlock12g/",
+      "systemd_properties": {
+        "IOAccounting": true,
+        "LimitMEMLOCK": "12884901888 bytes"
+      },
+      "status": "request passed; mlock failed and pages remained reclaimable"
+    }
+  ],
+  "common_engine_arguments": [
+    "--expert-cache", "3000", "--prefill", "512", "--spec", "2",
+    "--max-context", "4096", "--mmap-experts", "--prompt-cache", "0",
+    "--vram-reserve-mib", "3072", "--ple-io", "ram"
+  ],
+  "clock_policy": "dynamic; sampled read-only"
+}

@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "model": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0",
+  "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
+  "cache_slots": 3000,
+  "prompt_tokens": 512,
+  "generated_token_id": 32,
+  "ple_mode": "ram",
+  "runs": [
+    {
+      "name": "supervisor",
+      "status": "pressure_abort",
+      "reason": "physical/cgroup headroom during execution",
+      "memlock_limit_bytes": 8589934592,
+      "cgroup_limit_bytes": 23622320128,
+      "minimum_host_available_bytes": 24640557056,
+      "minimum_effective_cgroup_headroom_bytes": 6280151040,
+      "oom_kills": 0,
+      "elapsed_s": 10.823464800138026,
+      "locked": false,
+      "mlock_failure": null,
+      "ple_load_line": null,
+      "prompt_result_lines": []
+    },
+    {
+      "name": "supervisor-uncapped",
+      "status": "pass",
+      "reason": "command exit; numerical/workload qualification is separate",
+      "memlock_limit_bytes": 8589934592,
+      "cgroup_limit_bytes": null,
+      "minimum_host_available_bytes": 20048744448,
+      "minimum_effective_cgroup_headroom_bytes": 20048744448,
+      "oom_kills": 0,
+      "elapsed_s": 48.690219020005316,
+      "locked": false,
+      "mlock_failure": "strata: PLE table mlock failed (Cannot allocate memory; raise `ulimit -l`): its pages stay faulted in but may be reclaimed",
+      "ple_load_line": "strata generate: PLE table loaded (not locked) (--ple-io ram) in 8.0 s",
+      "prompt_result_lines": [
+        "output  : 32",
+        "prefill                  511 tokens in 16870.0 ms  ->  30.29 tok/s  (time to first token 28135.6 ms)"
+      ]
+    },
+    {
+      "name": "supervisor-memlock12g",
+      "status": "pass",
+      "reason": "command exit; numerical/workload qualification is separate",
+      "memlock_limit_bytes": 12884901888,
+      "cgroup_limit_bytes": null,
+      "minimum_host_available_bytes": 19971829760,
+      "minimum_effective_cgroup_headroom_bytes": 19971829760,
+      "oom_kills": 0,
+      "elapsed_s": 42.982879059854895,
+      "locked": false,
+      "mlock_failure": "strata: PLE table mlock failed (Cannot allocate memory; raise `ulimit -l`): its pages stay faulted in but may be reclaimed",
+      "ple_load_line": "strata generate: PLE table loaded (not locked) (--ple-io ram) in 7.5 s",
+      "prompt_result_lines": [
+        "output  : 32",
+        "prefill                  511 tokens in 17217.4 ms  ->  29.68 tok/s  (time to first token 20473.2 ms)"
+      ]
+    }
+  ],
+  "interpretation": "The table did not lock with process RLIMIT_MEMLOCK 8 or 12 GiB. In the capped 22-GiB trial the six-GiB effective-headroom supervisor aborted before request completion at 5.85 GiB; host availability remained 22.95 GiB and no OOM occurred. Uncapped trials completed but fell back to faulted, reclaimable pages. No locked-RAM benefit or performance claim."
+}
