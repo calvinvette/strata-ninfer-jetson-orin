@@ -189,7 +189,9 @@ this board. Verify vendor support before scheduling it. If undertaken, compare
 toolchains at identical clocks first, then a separate clock-profile experiment.
 
 Phases 1 and 2 are closed with their capability matrices, contracts and
-exclusions recorded. Continue with Phase 3's unique-allocation ownership and
-transfer experiments before promoting any execution path. Do not change kernels,
-quantization, model, toolchain and clocks simultaneously; select each candidate
-from measured bottlenecks and qualify its contract first.
+exclusions recorded. Phase 3 is closed for the tested Orin Q2_0 scope under
+[its closeout](PHASE3_CLOSEOUT.md); reopen it if allocation lifetimes, transfer
+defaults, graph-disable support or model/backend scope changes. Continue the
+remaining Phase 4 and Phase 5 work before promoting any execution path. Do not
+change kernels, quantization, model, toolchain and clocks simultaneously; select
+each candidate from measured bottlenecks and qualify its contract first.

@@ -4,8 +4,9 @@ This project starts from Strata's validated ARM64 port and applies the architect
 correctness methods and measured SM87 lessons from the NInfer Orin port. The first
 deliverable was an integration plan and an auditable source/evidence import.
 This remains an active integration and qualification effort, not a claim of
-combined-runtime speedup. Phases 1 and 2 are complete; Phases 3, 4 and 5 are in
-progress. Current admission, transfer, profiling and speculation evidence is summarized in
+combined-runtime speedup. Phases 1 and 2 are complete, and Phase 3 is closed for
+the tested Orin Q2_0 scope. Phases 4 and 5 remain in progress. Current admission,
+transfer, profiling and speculation evidence is summarized in
 [status](STATUS.md). See [control reproduction](PHASE1.md) and
 [porting notes for future engines](PORTING_NOTES.md) for reproducible methods
 and lessons for a future Strata + Splash integration.
