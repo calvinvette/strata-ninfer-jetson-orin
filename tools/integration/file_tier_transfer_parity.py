@@ -30,6 +30,11 @@ def transfer_modes(compare_prefetch_stage):
     return [('mapped', '0', '0'), ('pread', '1', '0')]
 
 
+def context_reservation(prompt_tokens, generated_tokens):
+    """Leave room beyond both the exact prompt and the requested decode length."""
+    return max(prompt_tokens + generated_tokens + 32, 8192)
+
+
 class TegraSampler:
     """Opt-in board-rail sampler; request energy is system-level, never process-attributed."""
     _POWER = re.compile(r'([A-Z0-9_]+)\s+(\d+)mW(?:/(\d+)mW)?')
@@ -295,7 +300,8 @@ def main():
     args_for = list(cfg['args'])
     pack_path = Path(args_for[args_for.index('--pack') + 1])
     disk_counter_path = resolve_disk_counter_path(pack_path, args.disk_counter_file)
-    for key, value in (('--max-context', str(max(args.prompt_tokens + args.generated_tokens, 8192))),
+    for key, value in (('--max-context', str(context_reservation(
+                           args.prompt_tokens, args.generated_tokens))),
                        ('--prompt-cache', '6')):
         if key in args_for:
             args_for[args_for.index(key) + 1] = value

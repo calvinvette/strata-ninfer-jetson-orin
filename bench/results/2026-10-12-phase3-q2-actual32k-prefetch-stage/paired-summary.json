@@ -1,0 +1,459 @@
+{
+  "experiment": "Q2_0 exact 32K prompt, 8 generated tokens; prefetch-fill vs prefetch-stage",
+  "model_identity": "Qwen3.8-Flash-Next-GSQ-RCO Q2_0; local files identified in ../2026-10-11-phase3-q2-admission/artifact-identities.json",
+  "engine_sha256": "bdde041e60d8593dac593a846d471c117fee2c5397b01dfd99c9502253dd0f7d",
+  "prompt_tokens": 32768,
+  "prompt_sha256": "705dea47aafbfc991d0616621f3a13bf0136a43c546d60c7693c2efdced4d3a3",
+  "requested_expert_cache_slots": 3000,
+  "actual_slots_all_arms": [
+    3000
+  ],
+  "context_reservation": 32808,
+  "generated_tokens": 8,
+  "pair_count": 3,
+  "all_pairs_passed": true,
+  "same_ids_and_state_within_every_pair": true,
+  "request_time_delta_percent": {
+    "definition": "(prefetch-stage / prefetch-fill - 1) * 100; positive means staging slower",
+    "per_pair": [
+      33.434103049295175,
+      16.960577069177376,
+      -0.5038706570954177
+    ],
+    "median": 16.960577069177376,
+    "paired_bootstrap_95_percentile_interval": [
+      -0.5038706570954177,
+      33.434103049295175
+    ]
+  },
+  "prompt_time_delta_percent": {
+    "per_pair": [
+      33.809870875803625,
+      17.169149650826967,
+      -0.5151265896193524
+    ],
+    "median": 17.169149650826967,
+    "paired_bootstrap_95_percentile_interval": [
+      -0.5151265896193524,
+      33.809870875803625
+    ]
+  },
+  "decode_time_delta_percent": {
+    "per_pair": [
+      4.3964357767317,
+      0.7872367153804349,
+      0.3451181829126293
+    ],
+    "median": 0.7872367153804349
+  },
+  "scoped_read_delta_gb_decimal": {
+    "definition": "prefetch-stage minus prefetch-fill",
+    "per_pair": [
+      -1.512292352,
+      1.78661376,
+      -1.233997824
+    ],
+    "median": -1.233997824
+  },
+  "major_fault_delta_stage_minus_fill": {
+    "per_pair": [
+      -2064,
+      14486,
+      -30826
+    ],
+    "median": -2064
+  },
+  "pairs": [
+    {
+      "pair": 0,
+      "source_campaign": "pilot",
+      "arm_order": [
+        "prefetch-fill",
+        "prefetch-stage"
+      ],
+      "passed": true,
+      "token_ids_match": true,
+      "state_match": true,
+      "cache_slots_match": true,
+      "fill": {
+        "request_ms": 186233.2,
+        "prompt_ms": 183854.0,
+        "decode_ms": 2379.2,
+        "generated_ids": [
+          32,
+          6165,
+          11036,
+          1928,
+          1472,
+          264,
+          6150,
+          11
+        ],
+        "state": {
+          "L": "32775",
+          "gdn": "1c898a0e55932b12",
+          "ple": "3d8647162b2e94a7",
+          "tail": "326e98a02d565893",
+          "dead": "31a4bff535844690",
+          "pooled": "eb0cf8953446c151",
+          "pooled_full": "fb8f9ac43c96ce02",
+          "kv": "0904a3643b8ee59f",
+          "ple_prev": "264,6150"
+        },
+        "actual_expert_cache_slots": 3000,
+        "cgroup_io_read_bytes": 11877441536,
+        "minor_faults": 425396,
+        "major_faults": 4198,
+        "cpu_clock_mhz_min": 729,
+        "cpu_clock_mhz_median": 729.0,
+        "cpu_clock_mhz_max": 3199,
+        "gpu_clock_samples": 0,
+        "emc_clock_samples": 1654,
+        "rail_energy_j_estimate": {
+          "VDD_GPU_SOC": 3129.4173638708207,
+          "VDD_CPU_CV": 186.42224011863829,
+          "VIN_SYS_5V0": 1398.7990167525945
+        },
+        "energy_scope": "named tegrastats system rail sampled during request; includes unrelated system activity",
+        "engine_log_sha256": "f76f472899f939188ce839749c3cd0aa32b92c8af0eafe88df01937e51c5d582"
+      },
+      "stage": {
+        "request_ms": 248498.59999999998,
+        "prompt_ms": 246014.8,
+        "decode_ms": 2483.8,
+        "generated_ids": [
+          32,
+          6165,
+          11036,
+          1928,
+          1472,
+          264,
+          6150,
+          11
+        ],
+        "state": {
+          "L": "32775",
+          "gdn": "1c898a0e55932b12",
+          "ple": "3d8647162b2e94a7",
+          "tail": "326e98a02d565893",
+          "dead": "31a4bff535844690",
+          "pooled": "eb0cf8953446c151",
+          "pooled_full": "fb8f9ac43c96ce02",
+          "kv": "0904a3643b8ee59f",
+          "ple_prev": "264,6150"
+        },
+        "actual_expert_cache_slots": 3000,
+        "cgroup_io_read_bytes": 10365149184,
+        "minor_faults": 417869,
+        "major_faults": 2134,
+        "cpu_clock_mhz_min": 729,
+        "cpu_clock_mhz_median": 729.0,
+        "cpu_clock_mhz_max": 3199,
+        "gpu_clock_samples": 0,
+        "emc_clock_samples": 2198,
+        "rail_energy_j_estimate": {
+          "VDD_GPU_SOC": 3346.515965079469,
+          "VDD_CPU_CV": 341.42328974625985,
+          "VIN_SYS_5V0": 1678.8958705675097
+        },
+        "energy_scope": "named tegrastats system rail sampled during request; includes unrelated system activity",
+        "engine_log_sha256": "977912c6646c6d50e43d0f6e7fc23d885e1cbf56600b28629b8a55032951c4ba"
+      },
+      "request_delta_percent": 33.434103049295175,
+      "prompt_delta_percent": 33.809870875803625,
+      "decode_delta_percent": 4.3964357767317,
+      "cgroup_read_delta_gb_decimal": -1.512292352,
+      "major_fault_delta": -2064,
+      "source_pair_index": 0
+    },
+    {
+      "pair": 1,
+      "source_campaign": "repeat",
+      "arm_order": [
+        "prefetch-fill",
+        "prefetch-stage"
+      ],
+      "passed": true,
+      "token_ids_match": true,
+      "state_match": true,
+      "cache_slots_match": true,
+      "fill": {
+        "request_ms": 187568.5,
+        "prompt_ms": 185180.4,
+        "decode_ms": 2388.1,
+        "generated_ids": [
+          32,
+          6165,
+          11036,
+          1928,
+          1472,
+          264,
+          6150,
+          11
+        ],
+        "state": {
+          "L": "32775",
+          "gdn": "1c898a0e55932b12",
+          "ple": "3d8647162b2e94a7",
+          "tail": "326e98a02d565893",
+          "dead": "31a4bff535844690",
+          "pooled": "eb0cf8953446c151",
+          "pooled_full": "fb8f9ac43c96ce02",
+          "kv": "0904a3643b8ee59f",
+          "ple_prev": "264,6150"
+        },
+        "actual_expert_cache_slots": 3000,
+        "cgroup_io_read_bytes": 9239556096,
+        "minor_faults": 409722,
+        "major_faults": 3825,
+        "cpu_clock_mhz_min": 363,
+        "cpu_clock_mhz_median": 729,
+        "cpu_clock_mhz_max": 3199,
+        "gpu_clock_samples": 0,
+        "emc_clock_samples": 1663,
+        "rail_energy_j_estimate": {
+          "VDD_GPU_SOC": 3130.512234475162,
+          "VDD_CPU_CV": 192.06293836234198,
+          "VIN_SYS_5V0": 1403.764921174763
+        },
+        "energy_scope": "named tegrastats system rail sampled during request; includes unrelated system activity",
+        "engine_log_sha256": "b2c1ad8955b2bdd36c4358420e7eceba7d12239586331d479b402d75b35411f9"
+      },
+      "stage": {
+        "request_ms": 219381.19999999998,
+        "prompt_ms": 216974.3,
+        "decode_ms": 2406.9,
+        "generated_ids": [
+          32,
+          6165,
+          11036,
+          1928,
+          1472,
+          264,
+          6150,
+          11
+        ],
+        "state": {
+          "L": "32775",
+          "gdn": "1c898a0e55932b12",
+          "ple": "3d8647162b2e94a7",
+          "tail": "326e98a02d565893",
+          "dead": "31a4bff535844690",
+          "pooled": "eb0cf8953446c151",
+          "pooled_full": "fb8f9ac43c96ce02",
+          "kv": "0904a3643b8ee59f",
+          "ple_prev": "264,6150"
+        },
+        "actual_expert_cache_slots": 3000,
+        "cgroup_io_read_bytes": 11026169856,
+        "minor_faults": 408467,
+        "major_faults": 18311,
+        "cpu_clock_mhz_min": 363,
+        "cpu_clock_mhz_median": 729.0,
+        "cpu_clock_mhz_max": 3199,
+        "gpu_clock_samples": 0,
+        "emc_clock_samples": 1944,
+        "rail_energy_j_estimate": {
+          "VDD_GPU_SOC": 3258.1213733320255,
+          "VDD_CPU_CV": 272.53103378304854,
+          "VIN_SYS_5V0": 1553.9644074048983
+        },
+        "energy_scope": "named tegrastats system rail sampled during request; includes unrelated system activity",
+        "engine_log_sha256": "7b9183ebae5c017e1b9af43ee0ad868fa77dc2ef83dbfb13a6315282978271e9"
+      },
+      "request_delta_percent": 16.960577069177376,
+      "prompt_delta_percent": 17.169149650826967,
+      "decode_delta_percent": 0.7872367153804349,
+      "cgroup_read_delta_gb_decimal": 1.78661376,
+      "major_fault_delta": 14486,
+      "source_pair_index": 0
+    },
+    {
+      "pair": 2,
+      "source_campaign": "repeat",
+      "arm_order": [
+        "prefetch-stage",
+        "prefetch-fill"
+      ],
+      "passed": true,
+      "token_ids_match": true,
+      "state_match": true,
+      "cache_slots_match": true,
+      "fill": {
+        "request_ms": 190445.69999999998,
+        "prompt_ms": 187953.8,
+        "decode_ms": 2491.9,
+        "generated_ids": [
+          32,
+          6165,
+          11036,
+          1928,
+          1472,
+          264,
+          6150,
+          11
+        ],
+        "state": {
+          "L": "32775",
+          "gdn": "1c898a0e55932b12",
+          "ple": "3d8647162b2e94a7",
+          "tail": "326e98a02d565893",
+          "dead": "31a4bff535844690",
+          "pooled": "eb0cf8953446c151",
+          "pooled_full": "fb8f9ac43c96ce02",
+          "kv": "0904a3643b8ee59f",
+          "ple_prev": "264,6150"
+        },
+        "actual_expert_cache_slots": 3000,
+        "cgroup_io_read_bytes": 12655951872,
+        "minor_faults": 412871,
+        "major_faults": 57968,
+        "cpu_clock_mhz_min": 363,
+        "cpu_clock_mhz_median": 729,
+        "cpu_clock_mhz_max": 3199,
+        "gpu_clock_samples": 0,
+        "emc_clock_samples": 1691,
+        "rail_energy_j_estimate": {
+          "VDD_GPU_SOC": 3146.0092696434435,
+          "VDD_CPU_CV": 207.21505876293696,
+          "VIN_SYS_5V0": 1425.7639010990335
+        },
+        "energy_scope": "named tegrastats system rail sampled during request; includes unrelated system activity",
+        "engine_log_sha256": "dbe8351947dd2335a008136d6eb66c6f0499638539d657c76420de5b5318da3c"
+      },
+      "stage": {
+        "request_ms": 189486.1,
+        "prompt_ms": 186985.6,
+        "decode_ms": 2500.5,
+        "generated_ids": [
+          32,
+          6165,
+          11036,
+          1928,
+          1472,
+          264,
+          6150,
+          11
+        ],
+        "state": {
+          "L": "32775",
+          "gdn": "1c898a0e55932b12",
+          "ple": "3d8647162b2e94a7",
+          "tail": "326e98a02d565893",
+          "dead": "31a4bff535844690",
+          "pooled": "eb0cf8953446c151",
+          "pooled_full": "fb8f9ac43c96ce02",
+          "kv": "0904a3643b8ee59f",
+          "ple_prev": "264,6150"
+        },
+        "actual_expert_cache_slots": 3000,
+        "cgroup_io_read_bytes": 11421954048,
+        "minor_faults": 406598,
+        "major_faults": 27142,
+        "cpu_clock_mhz_min": 729,
+        "cpu_clock_mhz_median": 729.0,
+        "cpu_clock_mhz_max": 3199,
+        "gpu_clock_samples": 0,
+        "emc_clock_samples": 1684,
+        "rail_energy_j_estimate": {
+          "VDD_GPU_SOC": 3149.9456918407723,
+          "VDD_CPU_CV": 200.06231932884765,
+          "VIN_SYS_5V0": 1425.5348486244525
+        },
+        "energy_scope": "named tegrastats system rail sampled during request; includes unrelated system activity",
+        "engine_log_sha256": "ac0304abc610ddb5ac59591d325fb3e06a9a40875af66ece6a611150e246059c"
+      },
+      "request_delta_percent": -0.5038706570954177,
+      "prompt_delta_percent": -0.5151265896193524,
+      "decode_delta_percent": 0.3451181829126293,
+      "cgroup_read_delta_gb_decimal": -1.233997824,
+      "major_fault_delta": -30826,
+      "source_pair_index": 1
+    }
+  ],
+  "cap_campaigns": [
+    {
+      "campaign": "one-pair pilot",
+      "memory_max_gib": 24,
+      "supervisor_status": "pass",
+      "minimum_host_available_bytes": 18412613632,
+      "minimum_effective_headroom_bytes": 10876796928
+    },
+    {
+      "campaign": "three-pair repeat",
+      "memory_max_gib": 24,
+      "supervisor_status": "pressure_abort after two complete pairs, during third engine startup",
+      "minimum_host_available_bytes": 18523930624,
+      "minimum_effective_headroom_bytes": 6343372800,
+      "oom_events": 0,
+      "completed_pairs": 2,
+      "aborted_cell": "pair 2 prefetch-stage startup; no request submitted"
+    }
+  ],
+  "timing_conclusion": "inconclusive screening only; three pairs, one pilot was fill-first, timing direction varied and the follow-up campaign pressure-aborted during an additional startup. Do not promote either mode.",
+  "observed_dynamic_clocks_campaign_wide": {
+    "pilot": {
+      "cpu": {
+        "samples": 5424,
+        "min_mhz": 729.6,
+        "median_mhz": 729.6,
+        "max_mhz": 2201.6
+      },
+      "gpu": {
+        "samples": 452,
+        "min_mhz": 306.0,
+        "median_mhz": 1122.0,
+        "max_mhz": 1300.5
+      },
+      "emc": {
+        "samples": 452,
+        "min_mhz": 3199.0,
+        "median_mhz": 3199.0,
+        "max_mhz": 3199.0
+      }
+    },
+    "repeat": {
+      "cpu": {
+        "samples": 9912,
+        "min_mhz": 729.6,
+        "median_mhz": 729.6,
+        "max_mhz": 2201.6
+      },
+      "gpu": {
+        "samples": 826,
+        "min_mhz": 306.0,
+        "median_mhz": 1122.0,
+        "max_mhz": 1300.5
+      },
+      "emc": {
+        "samples": 826,
+        "min_mhz": 3199.0,
+        "median_mhz": 3199.0,
+        "max_mhz": 3199.0
+      }
+    }
+  },
+  "pressure_abort_attempt": {
+    "planned_pair_index": 2,
+    "arm": "prefetch-stage",
+    "raw_engine_log_sha256": "13d2e2a2c5941e693edcd67c6a29dd7c5cf4b364b078e56835878b97428e5e87",
+    "raw_engine_log_bytes": 1266,
+    "request_submitted": false,
+    "reason": "the 24-GiB supervisor stopped during third engine startup at 5.908 GiB effective headroom; no GEN request appears in the retained engine log",
+    "scope_minimum_host_available_bytes": 18523930624,
+    "scope_minimum_effective_headroom_bytes": 6343372800,
+    "cgroup_oom_events": 0
+  },
+  "excluded_setup_attempts": [
+    {
+      "attempt": "default counter artifact",
+      "result": "failed before any model process; the Q2 PLE pack has no experts.bin",
+      "stderr_sha256": "444edcafda7c3c6d46b961b74094340b6b1ef61c1a5b7bcc028ec0358fd7448d"
+    },
+    {
+      "attempt": "first explicit GGUF counter attempt",
+      "result": "engine rejected prompt+max_new equal to context reservation before request execution; fixed by reserving an extra 32 context tokens",
+      "stderr_sha256": "3818a2cbaad80220b95d6d09c1afa7346e1415a67f262b40f4c0ecc1e07fc32b"
+    }
+  ]
+}

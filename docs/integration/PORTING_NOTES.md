@@ -899,3 +899,17 @@ and observe the platform's actual shared-memory availability throughout. Keep
 this separate from cancellation recovery and from task-quality evaluation; the
 Orin result covers one model/cache/context and says nothing about Metal lifetime
 behavior.
+
+
+## 2026-10-12 — Long-prompt transfer measurement and native artifact counters
+
+The Q2_0 native PLE pack has no `experts.bin`. The 32K transfer harness now
+uses an explicit Q2_0 GGUF shard to select the filesystem device for block
+telemetry, while `IOAccounting=yes` supplies scoped per-request read deltas.
+For future Splash work, select a real model artifact on the measured filesystem
+rather than assuming a packed-experts filename; keep scoped I/O and device-wide
+block reads labeled separately. This screen compared prefetch page-cache fill
+with host staging under an exact long prompt and matched accepted output/state,
+but timing and read deltas varied across three pairs. Preserve the paired
+uncertainty and do not promote a mode from this point. Also leave context room
+beyond prompt plus generation when formatting near-limit test requests.

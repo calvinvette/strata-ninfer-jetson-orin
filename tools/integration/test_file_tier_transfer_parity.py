@@ -4,7 +4,8 @@ import unittest
 from pathlib import Path
 
 from file_tier_transfer_parity import (actual_expert_cache_slots, cgroup_io_read_bytes,
-                                      resolve_disk_counter_path, transfer_modes)
+                                      context_reservation, resolve_disk_counter_path,
+                                      transfer_modes)
 
 
 class TransferModeTests(unittest.TestCase):
@@ -14,6 +15,10 @@ class TransferModeTests(unittest.TestCase):
 
     def test_original_mapped_and_pread_pair_is_unchanged(self):
         self.assertEqual(transfer_modes(False), [('mapped', '0', '0'), ('pread', '1', '0')])
+
+    def test_context_reservation_leaves_decode_margin(self):
+        self.assertEqual(context_reservation(512, 64), 8192)
+        self.assertEqual(context_reservation(32768, 8), 32808)
 
 
 class CgroupIoReadBytesTests(unittest.TestCase):
