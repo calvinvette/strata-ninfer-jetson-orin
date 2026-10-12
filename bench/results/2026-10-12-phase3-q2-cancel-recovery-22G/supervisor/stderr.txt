@@ -1,0 +1,19 @@
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/serve/server.py", line 5897, in <module>
+    sys.exit(main())
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/serve/server.py", line 5722, in main
+    engine = StrataEngine(exe, engine_args(cfg) + (effort_end or []), cwd=cfg.get("cwd"), log=cfg.get("log"),
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/serve/server.py", line 693, in __init__
+    raise RuntimeError(why + (f" (see {log})" if log else "") +
+RuntimeError: the engine exited before it was ready (see /home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-12-phase3-q2-cancel-recovery-22G/engine.log)
+the engine log's last lines:
+  [strata] 2026-10-12 00:18:22 engine started: /home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/candidate/strata --serve --pack /home/calvin/models/strata-orin-validation/q2-ple-pack --native /home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf --ple-gguf /home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf --expert-profile /home/calvin/models/strata-orin-validation/q2-expert-profile.bin --expert-cache 256 --prefill 512 --spec 2 --max-context 4096 --mmap-experts --prompt-cache 0 --vram-reserve-mib 3072 --pcie-frac 0.55 --no-prefill-borrow
+  NvRmMemInitNvmap failed with Permission denied
+  356: Memory Manager Not supported
+  ****NvRmMemMgrInit failed**** error type: 196626
+  strata generate: ARM CPU experts use ggml-cpu's native kernels
+  strata generate: native embedding: cannot pin 260 MiB: unknown error, nor place it in VRAM
