@@ -632,6 +632,18 @@ traced diagnostic, then collect timing with all instrumentation disabled and
 report its own per-arm buffer/copy counters separately. Do not combine the two
 runs or use request text alone as a state-parity check.
 
+The Q2_0 native pack has no `experts.bin`; its expert tensors come from a GGUF
+shard. The transfer harness therefore accepts an explicit model artifact to
+identify the backing block device. The resulting block-sector counter is still
+whole-device and includes unrelated reads; process and cgroup counters must be
+reported separately when available. For Splash, keep filesystem selection
+independent from the engine's model-format assumptions and calibrate the
+counter scope. A Q2_0 worker/read-policy matrix also had one intermediate and
+final state-fingerprint mismatch despite identical generated IDs; three fixed
+worker/mapped repeats passed, but did not explain it. Preserve the failed
+cross-cell state trace and require committed-state parity before timing a
+transfer/scheduling factorial.
+
 The configured-context × speculation graph screen now has Q2_0 observations at
 32K for spec2 and spec4. At spec4, three Driver instantiate calls matched three
 owner events, with a 48.71 MB stable NVMap interval; spec2 had four calls and a
