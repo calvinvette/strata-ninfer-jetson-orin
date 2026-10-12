@@ -913,3 +913,15 @@ with host staging under an exact long prompt and matched accepted output/state,
 but timing and read deltas varied across three pairs. Preserve the paired
 uncertainty and do not promote a mode from this point. Also leave context room
 beyond prompt plus generation when formatting near-limit test requests.
+
+
+## 2026-10-12 — Mapped reads versus asynchronous pread at 32K
+
+A separate randomized 32K-prompt screen compared mapped reads with asynchronous
+`pread`. All three pairs matched generated IDs, cache capacity and persistent
+state, while request time ranged from pread 0.48% faster to 14.58% slower. The
+first arm can populate the shared page cache for the second, so lower scoped
+read bytes and major faults under pread are not cold-storage evidence. For
+Splash, record cache state or use a defensible cache protocol, randomize order,
+retain paired state checks, and report uncertainty; do not infer transfer wins
+from logical bytes or fault counts alone. See the [full Orin report](../../bench/results/2026-10-12-phase3-q2-actual32k-mapped-pread/README.md).

@@ -1,0 +1,42 @@
+{
+  "experiment": "Q2_0 exact 32K prompt, 8 generated tokens; mapped versus asynchronous pread",
+  "host": "Jetson AGX Orin; same-day randomized paired screen",
+  "engine_sha256": "bdde041e60d8593dac593a846d471c117fee2c5397b01dfd99c9502253dd0f7d",
+  "prompt_tokens": 32768,
+  "prompt_sha256": "705dea47aafbfc991d0616621f3a13bf0136a43c546d60c7693c2efdced4d3a3",
+  "generated_tokens": 8,
+  "context_reservation": 32808,
+  "requested_and_actual_cache_slots": 3000,
+  "pread_workers": 8,
+  "staging": false,
+  "pair_count": 3,
+  "all_pairs_passed": true,
+  "same_ids_state_and_cache_within_every_pair": true,
+  "request_time_delta_percent": {
+    "definition": "(pread / mapped - 1) * 100; positive means pread slower",
+    "per_pair": [14.580031282314042, -0.4787319054169181, -0.001060797486329701],
+    "median": -0.001060797486329701,
+    "paired_bootstrap_95_percentile_interval": [-0.4787319054169181, 14.580031282314042]
+  },
+  "scoped_cgroup_read_delta_gb_decimal_pread_minus_mapped": {
+    "per_pair": [-5.153005568, -5.397864448, -2.855174144],
+    "median": -5.153005568,
+    "interpretation_limit": "Page-cache carryover; these are not cold-cache or attributed physical-disk measurements"
+  },
+  "major_fault_delta_pread_minus_mapped": [-250700, -297582, -264931],
+  "memory_supervisor": {
+    "systemd_memory_max": "28G",
+    "minimum_host_available_gib": 17.16,
+    "minimum_effective_cgroup_headroom_gib": 8.34,
+    "six_gib_admission_floor_preserved": true,
+    "oom_events": 0,
+    "returncode": 0
+  },
+  "clock_scope": "CPU clocks varied dynamically; EMC readback was 3199 MHz; GPU request-clock sampling unsupported; no clock control",
+  "arms": [
+    {"pair": 0, "order": ["mapped", "pread"], "request_ms": {"mapped": 191673.8, "pread": 219619.9}, "ids_state_cache_match": true, "mapped_log_sha256": "be4a8276006d7a9d4bd675651c5fd748b18be2755d8459bcffc578a1df88ffae", "pread_log_sha256": "1d9ce89ec72dca8a329e307f90a00e0d89f1ee2aaac4c19f02a35b54c5605077"},
+    {"pair": 1, "order": ["pread", "mapped"], "request_ms": {"mapped": 190837.5, "pread": 189923.9}, "ids_state_cache_match": true, "mapped_log_sha256": "0b52419b358789afd133abe7097bd4ab5d68c7baa6d1dc3cdb850d75239a168a", "pread_log_sha256": "26313f9644436693847e4fe8e51577cb9d6824a2b880123db932ae73c7fa11b6"},
+    {"pair": 2, "order": ["pread", "mapped"], "request_ms": {"mapped": 188537.4, "pread": 188535.4}, "ids_state_cache_match": true, "mapped_log_sha256": "3e54c0bb7fa2d7a4f3029c1d98401eb1eae0947a5e3ff1c39e10ad6010cb2549", "pread_log_sha256": "e9386c6309af2c27ec7d4ac8e5dea0e42f280ece63d4fe64d00fd7d6caef8edb"}
+  ],
+  "interpretation": "Inconclusive screen; cache carryover and first-pair order effect preclude a cold-read conclusion. No mode or default promoted."
+}
