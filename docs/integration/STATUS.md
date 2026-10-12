@@ -839,3 +839,15 @@ opt-in for further Phase 4 qualification; synthetic prompt construction,
 task quality, other workload classes, GPU/EMC clock frequencies and energy
 remain limitations. Phase 4 remains open, and Phase 3 ownership/transfer gates
 remain active.
+
+A clean [Q2_0 stage-backing warmup/state rerun](../../bench/results/2026-10-11-phase3-q2-stage-pin-warmup-state3-rerun3-nocap/README.md)
+adds three trace-enabled pageable/pinned pairs after the earlier 2/3 state
+result. All three now matched warmup completion, measured IDs and all nine
+persistent-state fields, with the expected owner types and 353,894,400 requested
+stage bytes per arm. Minimum effective availability was 21.11 GiB; sampled CPU
+and GPU clocks were retained, EMC sampling was unavailable, and no timing claim
+is drawn. The earlier mismatch did not recur, but its cause remains unknown.
+A separate attempt with an added 28-GiB experiment cgroup was safely aborted at
+5.81 GiB cgroup headroom while host availability remained 24.95 GB; it is kept
+as a distinct pressure-abort record. Focused stage-parity tests passed 8/8.
+Phase 3 remains open for broader pressure, graph-backing and transfer gates.
