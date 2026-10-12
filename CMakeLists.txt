@@ -1315,6 +1315,13 @@ if(STRATA_NATIVE_EXPERTS)
     add_test(NAME q8_oracle_contract_test COMMAND q8_oracle_contract_test)
     set_tests_properties(q8_oracle_contract_test PROPERTIES SKIP_RETURN_CODE 77)
   endif()
+  if(STRATA_BUILD_TESTS AND CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64|ARM64")
+    add_executable(q8_1_contract_test src/kernels/cpu/q8_1_contract_test.cpp)
+    target_link_libraries(q8_1_contract_test PRIVATE strata_kernels_cpu)
+    add_test(NAME q8_1_scalar_contract_test COMMAND q8_1_contract_test scalar)
+    add_test(NAME q8_1_neon_contract_test COMMAND q8_1_contract_test neon)
+    set_tests_properties(q8_1_neon_contract_test PROPERTIES ENVIRONMENT "STRATA_Q8_1_NEON=1")
+  endif()
   # the AVX-2 expert kernels' variants (iq_avx2.cpp, q2_avx2.cpp) bit for bit against each other at 1..8 tokens and
   # against ggml-cpu's dot, on random blocks; --bench: ms per expert on one thread, the weights streamed from DRAM
   if(STRATA_CPU_X86)

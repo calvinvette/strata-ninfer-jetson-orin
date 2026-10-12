@@ -6,6 +6,11 @@
 #include "strata/kernels/cpu/expert.hpp"
 
 #include "strata/platform/cpu_arch.hpp"
+#if defined(__aarch64__)
+#include <arm_neon.h>
+#elif defined(_M_ARM64)
+#include <arm64_neon.h>
+#endif
 #if STRATA_CPU_X86
 #include <immintrin.h>
 #if defined(_MSC_VER)
@@ -23,6 +28,57 @@
 
 namespace strata::kernels::cpu {
 namespace {
+
+#if defined(__aarch64__) || defined(_M_ARM64)
+// Experimental opt-in path. Keep the existing scalar implementation as the
+// default until end-to-end CPU/GPU contention and held-out request tests pass.
+bool q8_1_neon_enabled() {
+    static const bool enabled = [] {
+        const char* value = std::getenv("STRATA_Q8_1_NEON");
+        return value != nullptr && std::strcmp(value, "1") == 0;
+    }();
+    return enabled;
+}
+
+void quantize_q8_1_neon(const float* x, int n, ActQ& out) {
+    out.nchunks = n / QKA;
+    for (int b = 0; b < out.nchunks; ++b) {
+        const float* p = x + b * QKA;
+        float32x4_t values[8], abs_values[8];
+        for (int j = 0; j < 8; ++j) {
+            values[j] = vld1q_f32(p + 4 * j);
+            abs_values[j] = vabsq_f32(values[j]);
+        }
+        const float32x4_t max0 = vmaxq_f32(vmaxq_f32(abs_values[0], abs_values[1]),
+                                            vmaxq_f32(abs_values[2], abs_values[3]));
+        const float32x4_t max1 = vmaxq_f32(vmaxq_f32(abs_values[4], abs_values[5]),
+                                            vmaxq_f32(abs_values[6], abs_values[7]));
+        const float amax = vmaxvq_f32(vmaxq_f32(max0, max1));
+        const float scale = amax > 0.f ? amax / 127.f : 0.f;
+        const float inv = scale > 0.f ? 1.f / scale : 0.f;
+        const float32x4_t vinv = vdupq_n_f32(inv);
+        const float32x4_t zero = vdupq_n_f32(0.f);
+        const float32x4_t half = vdupq_n_f32(0.5f);
+        const float32x4_t minus_half = vdupq_n_f32(-0.5f);
+        int32_t sum = 0;
+        alignas(16) int32_t converted[QKA];
+        for (int j = 0; j < 8; ++j) {
+            const float32x4_t scaled = vmulq_f32(values[j], vinv);
+            // Strata rounds half away from zero; vcvtn would silently change
+            // the tie contract to nearest-even.
+            const float32x4_t bias = vbslq_f32(vcltq_f32(scaled, zero), minus_half, half);
+            int32x4_t q = vcvtq_s32_f32(vaddq_f32(scaled, bias));
+            q = vmaxq_s32(vdupq_n_s32(-127), vminq_s32(vdupq_n_s32(127), q));
+            vst1q_s32(converted + j * 4, q);
+            sum += vaddvq_s32(q);
+        }
+        for (int j = 0; j < QKA; ++j) out.q[b * QKA + j] = static_cast<int8_t>(converted[j]);
+        out.scale[b] = scale;
+        out.sum[b] = sum;
+        out.hx[b] = scale * static_cast<float>(sum);
+    }
+}
+#endif
 
 /// fp16 -> fp32, written out rather than using `_cvtsh_ss`, because the F16C intrinsic's behaviour on
 /// subnormals is the one place the two can differ and the scales in this artifact are small.
@@ -400,6 +456,12 @@ void act_quant_q8_1(const float* x, int n, ActQ& a) {
         quantize_oracle_q8_0(x, n, a);
         return;
     }
+#if defined(__aarch64__) || defined(_M_ARM64)
+    if (q8_1_neon_enabled()) {
+        quantize_q8_1_neon(x, n, a);
+        return;
+    }
+#endif
     a.nchunks = n / QKA;
     // Plan v0.3 P6: AVX-512, the same operations per element as the scalar loop below (max of |x|, one multiply,
     // +-0.5 away from zero, truncation, clamp), so the result is bitwise the scalar one.  The scalar loop took

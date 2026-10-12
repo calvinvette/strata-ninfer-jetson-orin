@@ -1138,12 +1138,11 @@ independent oracle; then benchmark the complete CPU/GPU contribution under real
 contention. Report operator time separately from model/request results. See the
 [Orin experiment](../../bench/results/2026-10-13-phase4-q8-neon-quant/README.md).
 
-A separate test-only NEON screen then preserved Strata's Q8_1 rule exactly,
-including half-away-from-zero ties, and reduced quantization time by about 30.6%
-with no scale/code/sum/correction mismatches across 20,480 blocks per process.
-This shows why format labels are insufficient: two blocks both named Q8_1 can
-still have different tie behavior. For Splash, carry the producer's precise
-rounding and correction formula through the consumer boundary, and test signed
-half ties explicitly before timing. This remains an isolated operator result;
-the production CPU/GPU path and held-out requests still need measurement. See
-the [Orin screen](../../bench/results/2026-10-13-phase4-q8_1-neon-contract/README.md).
+A contract-preserving NEON routine is now integrated behind Strata's opt-in
+`STRATA_Q8_1_NEON=1` setting. Seven paired process measurements found a 29.7%
+operator reduction with a bootstrap interval that excludes zero; exact
+scale/code/sum/correction tests include signed half ties. Format labels alone
+are insufficient: two blocks both named Q8_1 can still differ in tie behavior.
+For Splash, carry the producer's rounding and correction formula through the
+consumer boundary, then verify the real CPU/GPU path and held-out requests
+before promotion. See the [Orin report](../../bench/results/2026-10-13-phase4-q8_1-neon-contract/README.md).

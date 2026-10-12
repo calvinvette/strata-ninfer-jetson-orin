@@ -16,14 +16,19 @@ separate Q8_1 activation contract, no expert dot/GPU/request timing is included,
 and no dispatch/default changed. Task-level quality remains open and Phase 4
 continues.
 
-A test-only [Strata-contract Q8_1 NEON screen](../../bench/results/2026-10-13-phase4-q8_1-neon-contract/README.md)
-then matched scale, codes, sums and correction values across all 20,480 blocks
-per process, including signed half-ties, in three independent Orin processes.
-The median of process medians was 1.211 ms scalar and 0.841 ms NEON per 16 × 256
-rows (−30.550%). ggml's ARM Q8_1 quantizer is not a byte-parity control because
-it rounds ties differently. This remains operator-only screening evidence; the
-candidate is not yet integrated into production or measured in the CPU expert
-and request paths.
+A Strata-contract Q8_1 NEON candidate now exists behind the opt-in
+`STRATA_Q8_1_NEON=1` setting; scalar remains the default. Its independent
+mathematical contract tests pass for both dispatches. A seven-pair production
+dispatch operator confirmation measured −29.666% (paired bootstrap interval
+−29.845% to −29.432%), with exact scale/code/sum/correction values. This does
+not qualify CPU expert contention or end-to-end performance. A three-pair
+Q2_0 API screen at 512 prompt tokens and 8K context matched generated text in
+all pairs. Median paired total-request delta was +0.019%; prompt time was
+0.444% slower. This screen gives no end-to-end win and does not cover held-out
+prompt/context shapes. The candidate remains opt-in. Maestro1 HIP/SYCL full
+builds are still running; that host can provide compile evidence only. The
+[report](../../bench/results/2026-10-13-phase4-q8_1-neon-contract/README.md)
+retains operator, API-screen and implementation details.
 
 The focused [SessionLoopScratch owner check](../../bench/results/2026-10-11-phase3-session-loop-scratch-owner-retest/README.md) traces a 65,536-byte mapped/pinned host allocation and one matching free; repeated teardown is idempotent. The serial [Phase 3 owner/PLE regression](../../bench/results/2026-10-11-phase3-session-owner-ctest/README.md) passed 23/23. CUDA relink and maestro1 HIP compile identities are retained. The validated native pack bypasses the legacy session-loop route; broader unique-backing and graph accounting remain open.
 
