@@ -1076,3 +1076,17 @@ request behavior changes in another direction. Extend the exact-length
 held-out prompt helper and store its formatted token IDs for reproducible
 cross-engine comparisons. See the
 [Orin confirmation](../../bench/results/2026-10-13-phase3-q2-mapped-pread-16k-heldout/README.md).
+
+## 2026-10-13 — Keep prefetch fill separate from host staging
+
+A seven-pair held-out Q2_0 comparison held asynchronous prefetch constant and
+changed only whether transferred expert blobs also entered host staging. Every
+pair matched output IDs, cache capacity and persistent state. Staging was 0.40%
+slower end to end (paired 95% interval 0.17% to 1.86%) and raised median major
+faults from 38,262 to 58,975. Shared page-cache conditions and whole-device I/O
+counters limit the storage interpretation; board rail readings were not
+process-attributed. Keep the fill-only route for this workload and do not infer
+a product-wide rule. For Splash, distinguish read scheduling, page-cache fill,
+explicit pinned/pageable staging and device ownership as independent factors,
+and hold all but one fixed in paired tests. A staging path can alter host faults
+without reducing request time. See the [Orin confirmation](../../bench/results/2026-10-13-phase3-q2-prefetch-stage-16k-heldout/README.md).
