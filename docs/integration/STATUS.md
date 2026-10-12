@@ -925,6 +925,13 @@ matched token IDs; the paired median pinned request-time delta was −6.81%, wit
 a 95% bootstrap interval of −12.26% to +17.02%. This remains a single 512/64
 screen with dynamic clocks and no energy measurement; pageable remains default.
 
+At 2,048/64, a separate [Q2_0 correctness and owner check](../../bench/results/2026-10-11-phase3-q2-stage-pin-2048/README.md)
+passed all three pageable/pinned state comparisons and observed the expected
+353,894,400-byte stage buffers. Its trace-free three-pair timing follow-up had
+a +3.25% pinned request-time delta with a −1.67% to +31.58% interval and one
+large prompt-time outlier. It does not show a reliable gain; pageable remains
+the default and broader transfer/pressure gates stay open.
+
 An exploratory [Q2_0 worker/read-policy correctness screen](../../bench/results/2026-10-11-phase6-q2-worker-transfer-screen/README.md)
 completed its 12 mapped/pread × four/eight-worker cells, but one cell had
 different accepted-prefix state hashes despite identical output tokens. A
