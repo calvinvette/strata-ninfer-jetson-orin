@@ -973,3 +973,12 @@ The same diagnostic's opt-in CPU-order reduction follow-up reproduced the
 default-path accepted-prefix GDN dumps byte-for-byte at both capacities. It
 therefore did not explain the cross-capacity difference for this prompt; the
 cause remains open and the experimental flag is not promoted.
+
+A randomized [Q2_0 prefill-chunk × cache-capacity screen](../../bench/results/2026-10-12-phase3-q2-cache-state-diagnostic/README.md)
+crossed chunks 64/128/256/512 with 3,000/5,000 cache slots, using two fresh
+processes per cell on the same 511-token prefix. All 16 runs passed above the
+six-GiB floor and selected token 271; repeat GDN dumps matched byte-for-byte
+within each cell. Across cells, chunk changes produced 2.19–3.30% GDN relative
+L2 differences and cache changes 1.66–2.29%. The numerical cause and task-level
+effect remain unqualified; this is a one-prompt, one-token diagnostic, not a
+quality result or timing promotion. Keep Phase 3 open.

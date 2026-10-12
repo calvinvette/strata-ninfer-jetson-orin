@@ -740,3 +740,9 @@ dumps byte-identical to their default-path controls, so that arithmetic order
 toggle alone did not account for the capacity effect. For Splash, test such
 debug toggles with raw state equality and retain negative results; a plausible
 mechanism is not a diagnosis until an intervention changes the observed effect.
+The 16-cell Q2_0 screen further found repeatable accepted-prefix GDN changes
+across both prefill chunks (64/128/256/512) and cache capacities (3,000/5,000),
+while a one-token output stayed the same. For Splash, cross these two resource
+factors in the same prompt-prefix experiment and compare raw recurrent state;
+validate longer task output separately before deciding whether the deltas fit
+the numerical contract.

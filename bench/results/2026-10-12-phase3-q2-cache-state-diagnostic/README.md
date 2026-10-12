@@ -70,3 +70,28 @@ effects remain unisolated. This one-run-per-setting check is diagnostic, not a
 default-policy or performance result. The CPU-order cross-capacity comparison
 is in `cpu-order-gdn-comparison.json`; raw dump hashes are added to
 `dump-manifest.json`.
+
+## Prefill-chunk × cache-capacity state screen
+
+A randomized 2 × 4 screen crossed 3,000/5,000 expert-cache slots with prefill
+chunks 64/128/256/512. Each cell used two fresh supervised processes on the
+same exact first 511 token IDs, followed by one generated token. All 16 runs
+passed the six-GiB floor (minimum host availability 15.57 GiB), selected token
+271 and had bit-identical GDN dumps across the two process repeats within each
+cell. This shows the state differences are repeatable for these configurations.
+
+Full tensor comparisons found 2.19–3.30% relative L2 between chunk sizes at
+fixed cache capacity. At each chunk size, the 3,000/5,000-slot states differed
+by 1.66–2.29% relative L2. Chunk-size differences first exceeded `1e-4`
+per-layer relative L2 at layer 1; cache-size differences first exceeded it at
+layer 3. Both factors therefore affect accepted-prefix GDN state even though
+this one-token output remained the same. `prefill-cache-factorial.json` records
+the cell results, repeat hashes and 10 pairwise tensor comparisons; the full
+per-layer comparisons are separate JSON files. Raw GDN dumps remain ignored
+under `build/integration/` and are listed in `dump-manifest.json`.
+
+The screen does not establish that the state deltas are acceptable, identify
+the responsible operator, or measure task quality. Each cell has two repeats,
+one prompt and one generated token; clocks were dynamic and energy was not
+measured. Keep prefill chunk and cache capacity jointly qualified, and do not
+promote a profile based on matching this token alone.

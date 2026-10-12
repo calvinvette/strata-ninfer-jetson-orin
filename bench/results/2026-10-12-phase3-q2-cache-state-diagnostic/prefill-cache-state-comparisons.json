@@ -1,0 +1,69 @@
+{
+  "design": "two randomized independent processes per cache(3000/5000) x prefill chunk(64/512), same exact 511-token prefix",
+  "comparisons": [
+    {
+      "comparison": "chunk64-vs512-cache3000",
+      "reference": "chunk64-cache3000-r1",
+      "candidate": "chunk512-cache3000-r1",
+      "sha256_reference": "d85bd4d241daf8a7bac0304582db5441faf3d82a67322863581f9bc6873ce876",
+      "sha256_candidate": "7ac357b2e942cc5cefdb0599f5428b408c6499ecdc65a40ec12e671500f8cedf",
+      "fraction_different": 0.9837933048767753,
+      "global_relative_l2": 0.023525664957771978,
+      "global_rms_abs_delta": 0.00626506797122654,
+      "max_element_error": {
+        "index": 813994,
+        "layer": 33,
+        "max_abs": 0.6899834871292114
+      },
+      "first_material_layer": 0
+    },
+    {
+      "comparison": "chunk64-vs512-cache5000",
+      "reference": "chunk64-cache5000-r1",
+      "candidate": "chunk512-cache5000-r1",
+      "sha256_reference": "efd95a6be80ce0a7114f27dac828ae6d17d80f6c4a2f4669011052d9b5678ce4",
+      "sha256_candidate": "f43e71a9096689ae6c193bf3d3a17b84f748183a3d7f440a8867429067b586fb",
+      "fraction_different": 0.9837931009163534,
+      "global_relative_l2": 0.02618605664020403,
+      "global_rms_abs_delta": 0.006973714092290025,
+      "max_element_error": {
+        "index": 801601,
+        "layer": 33,
+        "max_abs": 1.153829574584961
+      },
+      "first_material_layer": 0
+    },
+    {
+      "comparison": "cache3000-vs5000-chunk64",
+      "reference": "chunk64-cache3000-r1",
+      "candidate": "chunk64-cache5000-r1",
+      "sha256_reference": "d85bd4d241daf8a7bac0304582db5441faf3d82a67322863581f9bc6873ce876",
+      "sha256_candidate": "efd95a6be80ce0a7114f27dac828ae6d17d80f6c4a2f4669011052d9b5678ce4",
+      "fraction_different": 0.9531407729392927,
+      "global_relative_l2": 0.022891470200809737,
+      "global_rms_abs_delta": 0.006096176963618641,
+      "max_element_error": {
+        "index": 801601,
+        "layer": 33,
+        "max_abs": 1.1359636783599854
+      },
+      "first_material_layer": 2
+    },
+    {
+      "comparison": "cache3000-vs5000-chunk512",
+      "reference": "chunk512-cache3000-r1",
+      "candidate": "chunk512-cache5000-r1",
+      "sha256_reference": "7ac357b2e942cc5cefdb0599f5428b408c6499ecdc65a40ec12e671500f8cedf",
+      "sha256_candidate": "f43e71a9096689ae6c193bf3d3a17b84f748183a3d7f440a8867429067b586fb",
+      "fraction_different": 0.9350262660231308,
+      "global_relative_l2": 0.016592659892509565,
+      "global_rms_abs_delta": 0.004419565896470978,
+      "max_element_error": {
+        "index": 791199,
+        "layer": 16,
+        "max_abs": 0.4099283218383789
+      },
+      "first_material_layer": 3
+    }
+  ]
+}
