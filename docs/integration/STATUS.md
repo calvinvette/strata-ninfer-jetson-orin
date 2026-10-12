@@ -1021,3 +1021,14 @@ readiness. Both failures occurred above 21 GiB host availability and issued no
 request. See the [control compatibility probe](../../bench/results/2026-10-12-phase3-q2-graph-context64k-spec4/graph-control-compatibility/README.md).
 The existing supported captured-path NVMap attribution remains scoped to its
 tested configuration; Phase 3 graph-backing qualification remains open.
+
+The opt-in [Q6_K warp-dequant 32K-context confirmation](../../bench/results/2026-10-12-phase4-q6-warp-context32k-screen/README.md)
+passed seven randomized pairs on a new exact 2,048/128 synthetic incident-log
+request. All arms passed above 12.37 GiB minimum availability. Client elapsed
+time improved by a median 5.96% (paired bootstrap 95% interval 4.34–7.05%
+faster); prompt time improved 6.89% (4.98–7.13% faster), while decode spans
+zero. One pair differed by one accepted draft and contains a slow baseline
+outlier; all seven matched text, token counts and cache sizes. A separate
+traced state pair matched all accepted-prefix commits and final state. This
+adds a 32K configured-context cell, not task-quality evidence or default
+promotion; Phase 4 remains open.
