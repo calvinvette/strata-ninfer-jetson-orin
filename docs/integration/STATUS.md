@@ -25,10 +25,12 @@ not qualify CPU expert contention or end-to-end performance. A three-pair
 Q2_0 API screen at 512 prompt tokens and 8K context matched generated text in
 all pairs. Median paired total-request delta was +0.019%; prompt time was
 0.444% slower. This screen gives no end-to-end win and does not cover held-out
-prompt/context shapes. The candidate remains opt-in. Maestro1 HIP/SYCL full
-builds are still running; that host can provide compile evidence only. The
-[report](../../bench/results/2026-10-13-phase4-q8_1-neon-contract/README.md)
-retains operator, API-screen and implementation details.
+prompt/context shapes. The candidate remains opt-in. Full HIP and SYCL builds
+passed on maestro1, followed by compilation and app relinking with the exact
+current `expert.cpp`; this is x86 compile evidence only, not runtime qualification.
+The [backend record](../../bench/results/2026-10-13-phase4-q8_1-neon-contract/MAESTRO1_BUILDS.md)
+and [main report](../../bench/results/2026-10-13-phase4-q8_1-neon-contract/README.md)
+retain the build and experiment details.
 
 The focused [SessionLoopScratch owner check](../../bench/results/2026-10-11-phase3-session-loop-scratch-owner-retest/README.md) traces a 65,536-byte mapped/pinned host allocation and one matching free; repeated teardown is idempotent. The serial [Phase 3 owner/PLE regression](../../bench/results/2026-10-11-phase3-session-owner-ctest/README.md) passed 23/23. CUDA relink and maestro1 HIP compile identities are retained. The validated native pack bypasses the legacy session-loop route; broader unique-backing and graph accounting remain open.
 
