@@ -919,6 +919,12 @@ two configurations, while adjacent synchronous allocations remain included.
 Legacy graph shapes, non-NVMap bytes and isolated executable cost remain open;
 Phase 3 continues.
 
+A trace-free Q2_0 [pageable/pinned stage timing screen](../../bench/results/2026-10-11-phase3-q2-stage-pin-timing512/README.md)
+added three order-balanced pairs to the earlier three-pair run. All six pairs
+matched token IDs; the paired median pinned request-time delta was −6.81%, with
+a 95% bootstrap interval of −12.26% to +17.02%. This remains a single 512/64
+screen with dynamic clocks and no energy measurement; pageable remains default.
+
 An exploratory [Q2_0 worker/read-policy correctness screen](../../bench/results/2026-10-11-phase6-q2-worker-transfer-screen/README.md)
 completed its 12 mapped/pread × four/eight-worker cells, but one cell had
 different accepted-prefix state hashes despite identical output tokens. A
