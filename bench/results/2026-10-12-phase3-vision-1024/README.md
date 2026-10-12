@@ -28,3 +28,33 @@ refresh for one fixture, not vision-quality or image-complexity qualification.
 The small 1.43-GiB margin makes this cell sensitive to different cache/system
 state. Dynamic clocks were observed without control; energy was not measured.
 Models and build products remain outside Git.
+
+## CUDA runtime allocation attribution repeat
+
+The 1,024-token request was repeated with the test-only
+`/tmp/strata-cuda-alloc-probe.so` interposer inherited by both the encoder and
+the Strata engine. The request again returned HTTP 200 with the same fixture,
+1,049 prompt tokens and 48 completion tokens. The interposer observed six
+successful CUDA runtime allocation/free events in the encoder process, with a
+1,037,613,696-byte high-water mark and zero tracked bytes at process exit. In
+the engine process it observed 366 successful allocations and 349 frees (715
+events total) and an 18,755,110,608-byte high-water mark; 1,476,945,656 bytes remained at shutdown,
+matching the service-lifetime weight arena in the separate owner ledger.
+
+The engine owner parser observed 55 allocations and 54 frees, with a
+16,112,294,072-byte peak across instrumented device owners and the expected
+1,475,120,640-byte weight arena live at log end. The interposer and owner parser
+cover different, potentially overlapping scopes. Neither total is a count of
+unique physical board memory, and they must not be added or subtracted to
+estimate graph/driver bytes. Whole-board `MemAvailable` is the admission
+authority; the supervised minimum was 7,624,368,128 bytes (7.10 GiB), with no
+cgroup OOM events. The 6 GiB floor was preserved.
+
+The current engine SHA-256 is
+`bdde041e60d8593dac593a846d471c117fee2c5397b01dfd99c9502253dd0f7d`; the
+vision executable and fixture match the hashes in the prior section. Raw
+interposer lines, per-process summary, owner summary, API response and
+supervisor telemetry are retained under `interposed-experiment/` and
+`interposed-supervisor/`. This fills the missing separate-process request
+attribution for this one vision fixture, but does not establish a complete
+physical allocation ledger or an image-size admission envelope.
