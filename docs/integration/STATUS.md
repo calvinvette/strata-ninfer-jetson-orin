@@ -996,3 +996,12 @@ fingerprints repeated exactly within each cell. Fingerprints differed from the
 3,000-slot/chunk-512 control at every commit when either factor changed. This
 is one prompt with greedy decoding; it does not qualify task quality or resolve
 the state difference. Phase 3 remains open.
+
+A trace-free [seven-pair Q2_0 prefill-chunk timing screen](../../bench/results/2026-10-12-phase3-q2-cache-state-diagnostic/prefill-chunk-timing/README.md)
+at fixed 3,000-slot cache/context/reserve found chunk 512 faster than chunk 64
+for this 511-token prompt and eight-token continuation: median client elapsed
+delta −44.87% (paired bootstrap 95% interval −49.76% to −40.45%), with prompt
+time −15.121 s and decode interval spanning zero. All pairs emitted identical
+tokens and stayed above 18.01 GiB minimum host availability. Dynamic CPU/GPU
+clocks, one synthetic prompt, and unqualified accepted-prefix state differences
+limit this to a performance screen; neither chunk setting is promoted.

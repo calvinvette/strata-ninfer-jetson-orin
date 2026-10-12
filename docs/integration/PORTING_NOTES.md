@@ -754,3 +754,8 @@ the tested profiles while accepted-prefix fingerprints differed at every
 commit. For Splash, include a fixed greedy continuation and compare every
 published prefix; equal text alone does not prove recurrence-state parity, and
 different fingerprints still need a separate task-level quality criterion.
+When measuring prefill chunk performance, keep timing arms trace-free and pair
+them with separately traced state/owner diagnostics on the exact same prompt
+and factors. On this Orin screen chunk 512 improved median client elapsed over
+chunk 64, but accepted-prefix states differed; the timing result cannot qualify
+chunk 512 as a safe default. Reproduce both checks independently for Splash.

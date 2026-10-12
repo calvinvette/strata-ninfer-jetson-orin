@@ -1,0 +1,238 @@
+{
+  "design": "Seven randomized paired trace-free process blocks; exact 511-token prefix, 8 greedy output tokens, 3,000 requested expert-cache slots and context 640; one warmup per chunk arm.",
+  "artifacts": {
+    "engine_sha256": "bdde041e60d8593dac593a846d471c117fee2c5397b01dfd99c9502253dd0f7d",
+    "model_repository_revision": "5348543e0147355ac9cbcb031184a3546350988e",
+    "model_shards": [
+      {
+        "name": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+        "sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720"
+      },
+      {
+        "name": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+        "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+      }
+    ],
+    "prompt_tokens": 511,
+    "prompt_sha256": "bbbcc4221a991dc78f6de446e4ed7faafed0e984026ab969f4de6747a02f2004",
+    "output_tokens": 8,
+    "temperature": 0
+  },
+  "randomization": {
+    "seed": 20261013,
+    "warmup_order": [
+      64,
+      512
+    ],
+    "pair_order": {
+      "1": [
+        512,
+        64
+      ],
+      "2": [
+        64,
+        512
+      ],
+      "3": [
+        64,
+        512
+      ],
+      "4": [
+        512,
+        64
+      ],
+      "5": [
+        64,
+        512
+      ],
+      "6": [
+        512,
+        64
+      ],
+      "7": [
+        512,
+        64
+      ]
+    },
+    "pairs": 7
+  },
+  "paired_metrics": {
+    "client_elapsed_relative_delta_pct": {
+      "median": -44.8743953744445,
+      "paired_bootstrap_95_interval": [
+        -49.76129338711143,
+        -40.45305667961032
+      ],
+      "samples": [
+        -39.20087576390717,
+        -44.66823106070551,
+        -49.76129338711143,
+        -47.255813604300556,
+        -40.45305667961032,
+        -52.12654772656939,
+        -44.8743953744445
+      ]
+    },
+    "prompt_delta_ms": {
+      "median": -15121.000000000002,
+      "paired_bootstrap_95_interval": [
+        -15694.8,
+        -11998.2
+      ],
+      "samples": [
+        -11998.2,
+        -12396.600000000002,
+        -15694.8,
+        -15236.2,
+        -11318.3,
+        -17685.2,
+        -15121.000000000002
+      ]
+    },
+    "decode_delta_ms": {
+      "median": 82.09999999999991,
+      "paired_bootstrap_95_interval": [
+        -643.3000000000002,
+        201.5
+      ],
+      "samples": [
+        82.09999999999991,
+        -711.9000000000001,
+        -643.3000000000002,
+        313.0,
+        -515.3,
+        201.5,
+        196.4000000000001
+      ]
+    }
+  },
+  "minimum_available_gib": 18.01165771484375,
+  "clock_ranges_hz": {
+    "cpu_hz": [
+      729600000,
+      2201600000
+    ],
+    "gpu_hz": [
+      306000000,
+      1300500000
+    ],
+    "emc_hz": [
+      3199000000,
+      3199000000
+    ]
+  },
+  "same_output_hash": "8284a16a1f8dd5b1025bc647a10241fd755102fb3bd56c090aa4cef0b81a497b",
+  "pairs": [
+    {
+      "pair": 1,
+      "chunk64_client_elapsed_s": 30.39746413496323,
+      "chunk512_client_elapsed_s": 18.481391984038055,
+      "client_elapsed_delta_s": -11.916072150925174,
+      "client_elapsed_relative_delta_pct": -39.20087576390717,
+      "chunk64_prompt_ms": 28139.0,
+      "chunk512_prompt_ms": 16140.8,
+      "prompt_delta_ms": -11998.2,
+      "chunk64_decode_ms": 2256.6,
+      "chunk512_decode_ms": 2338.7,
+      "decode_delta_ms": 82.09999999999991,
+      "outputs_identical": true,
+      "minimum_available_gib": 18.10934829711914
+    },
+    {
+      "pair": 2,
+      "chunk64_client_elapsed_s": 29.34740300802514,
+      "chunk512_client_elapsed_s": 16.23843722208403,
+      "client_elapsed_delta_s": -13.108965785941109,
+      "client_elapsed_relative_delta_pct": -44.66823106070551,
+      "chunk64_prompt_ms": 26434.4,
+      "chunk512_prompt_ms": 14037.8,
+      "prompt_delta_ms": -12396.600000000002,
+      "chunk64_decode_ms": 2910.8,
+      "chunk512_decode_ms": 2198.9,
+      "decode_delta_ms": -711.9000000000001,
+      "outputs_identical": true,
+      "minimum_available_gib": 18.01165771484375
+    },
+    {
+      "pair": 3,
+      "chunk64_client_elapsed_s": 32.834136066026986,
+      "chunk512_client_elapsed_s": 16.495445287087932,
+      "client_elapsed_delta_s": -16.338690778939053,
+      "client_elapsed_relative_delta_pct": -49.76129338711143,
+      "chunk64_prompt_ms": 30112.1,
+      "chunk512_prompt_ms": 14417.3,
+      "prompt_delta_ms": -15694.8,
+      "chunk64_decode_ms": 2720.3,
+      "chunk512_decode_ms": 2077.0,
+      "decode_delta_ms": -643.3000000000002,
+      "outputs_identical": true,
+      "minimum_available_gib": 18.09439468383789
+    },
+    {
+      "pair": 4,
+      "chunk64_client_elapsed_s": 31.58026566589251,
+      "chunk512_client_elapsed_s": 16.65675418707542,
+      "client_elapsed_delta_s": -14.92351147881709,
+      "client_elapsed_relative_delta_pct": -47.255813604300556,
+      "chunk64_prompt_ms": 29281.0,
+      "chunk512_prompt_ms": 14044.8,
+      "prompt_delta_ms": -15236.2,
+      "chunk64_decode_ms": 2297.7,
+      "chunk512_decode_ms": 2610.7,
+      "decode_delta_ms": 313.0,
+      "outputs_identical": true,
+      "minimum_available_gib": 18.220378875732422
+    },
+    {
+      "pair": 5,
+      "chunk64_client_elapsed_s": 29.25195965007879,
+      "chunk512_client_elapsed_s": 17.418647832935676,
+      "client_elapsed_delta_s": -11.833311817143112,
+      "client_elapsed_relative_delta_pct": -40.45305667961032,
+      "chunk64_prompt_ms": 26815.5,
+      "chunk512_prompt_ms": 15497.2,
+      "prompt_delta_ms": -11318.3,
+      "chunk64_decode_ms": 2434.5,
+      "chunk512_decode_ms": 1919.2,
+      "decode_delta_ms": -515.3,
+      "outputs_identical": true,
+      "minimum_available_gib": 18.127315521240234
+    },
+    {
+      "pair": 6,
+      "chunk64_client_elapsed_s": 33.541628018021584,
+      "chunk512_client_elapsed_s": 16.05753528093919,
+      "client_elapsed_delta_s": -17.484092737082392,
+      "client_elapsed_relative_delta_pct": -52.12654772656939,
+      "chunk64_prompt_ms": 30829.9,
+      "chunk512_prompt_ms": 13144.7,
+      "prompt_delta_ms": -17685.2,
+      "chunk64_decode_ms": 2709.7,
+      "chunk512_decode_ms": 2911.2,
+      "decode_delta_ms": 201.5,
+      "outputs_identical": true,
+      "minimum_available_gib": 18.18952178955078
+    },
+    {
+      "pair": 7,
+      "chunk64_client_elapsed_s": 33.25929273082875,
+      "chunk512_client_elapsed_s": 18.334386212052777,
+      "client_elapsed_delta_s": -14.92490651877597,
+      "client_elapsed_relative_delta_pct": -44.8743953744445,
+      "chunk64_prompt_ms": 30821.4,
+      "chunk512_prompt_ms": 15700.4,
+      "prompt_delta_ms": -15121.000000000002,
+      "chunk64_decode_ms": 2436.0,
+      "chunk512_decode_ms": 2632.4,
+      "decode_delta_ms": 196.4000000000001,
+      "outputs_identical": true,
+      "minimum_available_gib": 18.28345489501953
+    }
+  ],
+  "limits": [
+    "One synthetic exact-length prompt and one model/capacity/context cell.",
+    "Clocks were observed dynamically; no clocks were controlled.",
+    "No energy measurement; timing runner had no engine owner/state tracing.",
+    "Separate state diagnostics on this same prompt found repeatable persistent-state differences across prefill chunks; matching these eight tokens is not a quality or state-parity qualification."
+  ]
+}
