@@ -851,3 +851,16 @@ A separate attempt with an added 28-GiB experiment cgroup was safely aborted at
 5.81 GiB cgroup headroom while host availability remained 24.95 GB; it is kept
 as a distinct pressure-abort record. Focused stage-parity tests passed 8/8.
 Phase 3 remains open for broader pressure, graph-backing and transfer gates.
+
+Two three-startup [Q2_0 cancellation/recovery checks](../../bench/results/2026-10-11-phase3-q2-cancel-prefill128-recovery3/README.md)
+extend cleanup coverage with a `--prefill 128` configuration. Closing the
+stream after eight seconds cancelled at 256 prompt tokens in all runs; closing
+after eighteen seconds cancelled at 768 tokens, after three completed batches,
+in all later-point runs. Every same-service `Hello Orin!` recovery passed.
+Each trace recorded 304 allocations and 303 frees; only the expected
+1,485,606,400-byte process-lifetime weight arena remained. Both supervisors
+passed without extra cgroup caps, with at least 21.10 GiB available and no OOM
+events. CPU and GPU clocks were sampled dynamically, EMC sampling was denied,
+and energy was not measured. This covers two cancellation progress points for
+one model/configuration; recovery after allocation failure and broader request
+sizes remain open.
