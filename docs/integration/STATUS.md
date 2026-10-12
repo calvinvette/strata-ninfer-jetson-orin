@@ -1163,3 +1163,15 @@ The nearest-sample changes were smaller and phase-dependent; the first
 verifier and commit-graph brackets overlap. This narrows graph-related
 attribution but does not isolate executable/pool bytes. The native graph-off
 control remains unsupported, so graph-memory qualification remains open.
+
+The held-out [seven-pair 16K prefetch-fill versus staging confirmation](../../bench/results/2026-10-13-phase3-q2-prefetch-stage-16k-heldout/README.md)
+passed output, cache-slot and all nine persistent-state comparisons in every
+pair. Staging was +0.40% slower end to end (paired 95% bootstrap interval
++0.17% to +1.86%); prompt time was +0.40%, while decode was −0.67% with an
+interval spanning no change. Major faults rose from a 38,262 median to 58,975.
+The 28-GiB scope retained 17.77 GiB minimum host availability and 7.32 GiB
+effective headroom, with zero OOM kills. Shared page cache and whole-device
+I/O counters limit storage conclusions; board energy is not process-attributed.
+Keep fill-only behavior and defaults unchanged. This closes the held-out
+staging comparison for this cell; Phase 3 remains open for broader pressure,
+unique physical backing and graph accounting gates.
