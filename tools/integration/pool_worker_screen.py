@@ -140,6 +140,41 @@ def paired_deltas(rows, baseline):
     return deltas
 
 
+def worker_transfer_effects(rows, baseline_workers, transfer_modes):
+    """Return paired worker, transfer and difference-in-differences effects."""
+    by_cell = {(row['repetition'], row['workers'], row['transfer_mode']): row
+               for row in rows}
+    repetitions = sorted({row['repetition'] for row in rows})
+    effects = {'worker_delta_percent_by_mode': {},
+               'pread_delta_percent_by_workers': {},
+               'interaction_percentage_points': []}
+    if 'mapped' not in transfer_modes or 'pread' not in transfer_modes:
+        return effects
+    workers = sorted({row['workers'] for row in rows})
+    for mode in transfer_modes:
+        effects['worker_delta_percent_by_mode'][mode] = {
+            str(worker): [
+                100.0 * (by_cell[rep, worker, mode]['request_ms'] /
+                         by_cell[rep, baseline_workers, mode]['request_ms'] - 1.0)
+                for rep in repetitions]
+            for worker in workers if worker != baseline_workers
+        }
+    for worker in workers:
+        effects['pread_delta_percent_by_workers'][str(worker)] = [
+            100.0 * (by_cell[rep, worker, 'pread']['request_ms'] /
+                     by_cell[rep, worker, 'mapped']['request_ms'] - 1.0)
+            for rep in repetitions]
+    if baseline_workers in workers and len(workers) > 1:
+        candidate_workers = [w for w in workers if w != baseline_workers]
+        if len(candidate_workers) == 1:
+            candidate = str(candidate_workers[0])
+            effects['interaction_percentage_points'] = [
+                low - high for low, high in zip(
+                    effects['pread_delta_percent_by_workers'][candidate],
+                    effects['pread_delta_percent_by_workers'][str(baseline_workers)])]
+    return effects
+
+
 def bootstrap_median(values, seed, draws=200_000):
     rng = random.Random(seed)
     samples = sorted(statistics.median(values[rng.randrange(len(values))] for _ in values)
@@ -153,14 +188,21 @@ def main():
     parser.add_argument('--workloads', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--workers', type=int, nargs='+', default=[1, 2, 4, 8, 11])
+    parser.add_argument('--transfer-modes', choices=('mapped', 'pread'), nargs='+',
+                        default=['mapped'],
+                        help='randomized file-tier read policies; use both for a 2x2 interaction screen')
+    parser.add_argument('--io-threads', type=int, default=8,
+                        help='pread worker count when --transfer-modes includes pread')
     parser.add_argument('--repetitions', type=int, default=3)
     parser.add_argument('--seed', type=int, required=True)
     parser.add_argument('--baseline-workers', type=int, default=11)
     parser.add_argument('--timing-only', action='store_true',
                         help='disable tracing; check API output/cache but not accepted-prefix state')
     args = parser.parse_args()
-    if args.repetitions < 2 or len(set(args.workers)) != len(args.workers) or any(n < 1 for n in args.workers):
-        parser.error('workers must be unique positive counts and repetitions must be at least two')
+    if (args.repetitions < 2 or len(set(args.workers)) != len(args.workers) or
+            any(n < 1 for n in args.workers) or args.io_threads < 1 or
+            len(set(args.transfer_modes)) != len(args.transfer_modes)):
+        parser.error('workers/modes must be unique, worker counts and I/O threads positive, and repetitions at least two')
     if args.baseline_workers not in args.workers:
         parser.error('baseline worker count must be in --workers')
     if args.output.exists():
@@ -182,24 +224,30 @@ def main():
         'correctness_mode': 'API output/cache only; tracing disabled' if args.timing_only else
                             'full accepted-prefix state and output; tracing enabled',
         'seed': args.seed, 'planned_repetitions': args.repetitions,
-        'workers': sorted(args.workers), 'baseline_workers': args.baseline_workers,
+        'workers': sorted(args.workers), 'transfer_modes': list(args.transfer_modes),
+        'io_threads': args.io_threads, 'baseline_workers': args.baseline_workers,
         'engine_sha256': hashlib.sha256(Path(cfg['exe']).read_bytes()).hexdigest(),
         'runs': [], 'failures': [],
     }
     base_port = int(cfg['port'])
     for repetition in range(args.repetitions):
-        order = list(args.workers)
+        order = [(workers, mode) for workers in args.workers for mode in args.transfer_modes]
         rng.shuffle(order)
-        for cell_index, workers in enumerate(order):
-            run_dir = runs / f'rep-{repetition:02d}-workers-{workers}'
+        for cell_index, (workers, transfer_mode) in enumerate(order):
+            run_dir = runs / f'rep-{repetition:02d}-workers-{workers}-{transfer_mode}'
             run_dir.mkdir()
             run_cfg = dict(cfg)
             run_cfg['args'] = list(cfg['args'])
             set_arg(run_cfg['args'], '--pool-workers', workers)
             set_arg(run_cfg['args'], '--prompt-cache', 6)
-            run_cfg['port'] = base_port + repetition * len(args.workers) + cell_index
+            run_cfg['port'] = base_port + repetition * len(args.workers) * len(args.transfer_modes) + cell_index
             run_cfg['log'] = str((run_dir / 'engine.log').resolve())
             run_cfg['env'] = dict(cfg.get('env', {}))
+            run_cfg['env'].update({
+                'STRATA_IO_PREFETCH': '1' if transfer_mode == 'pread' else '0',
+                'STRATA_IO_PF_THREADS': str(args.io_threads),
+                'STRATA_IO_PF_STAGE': '0',
+            })
             if args.timing_only:
                 for key in ('STRATA_TRACE', 'STRATA_STATE_HASH', 'STRATA_STATE_HASH_GDN',
                             'STRATA_INTEGRATION_TRACE', 'STRATA_ACCEPTED_PREFIX_TRACE'):
@@ -221,7 +269,8 @@ def main():
                 completed = subprocess.run(command, cwd=cfg.get('cwd', str(ROOT)),
                                            stdout=log, stderr=subprocess.STDOUT,
                                            timeout=900, check=False)
-            row = {'repetition': repetition, 'workers': workers, 'order': order,
+            row = {'repetition': repetition, 'workers': workers, 'transfer_mode': transfer_mode,
+                   'order': [[count, mode] for count, mode in order], 'cell_order': cell_index,
                    'returncode': completed.returncode, 'request_file': str(request_path.relative_to(args.output))}
             try:
                 if completed.returncode != 0:
@@ -250,7 +299,7 @@ def main():
             (args.output / 'results.json').write_text(json.dumps(result, indent=2) + '\n')
 
     valid = [row for row in result['runs'] if 'failure' not in row]
-    if len(valid) != args.repetitions * len(args.workers):
+    if len(valid) != args.repetitions * len(args.workers) * len(args.transfer_modes):
         result['passed'] = False
     else:
         slots = {row['actual_expert_cache_slots'] for row in valid}
@@ -261,21 +310,43 @@ def main():
             result['measured_state_equal'] = len({json.dumps(row, sort_keys=True) for row in state}) == 1
             result['measured_accepted_prefix_equal'] = len({json.dumps(row['accepted_prefix_trace'], sort_keys=True)
                                                             for row in valid}) == 1
-        result['paired_request_time_delta_percent'] = paired_deltas(valid, args.baseline_workers)
-        result['bootstrap_95pct_median_intervals_percent'] = {
-            worker: bootstrap_median(values, args.seed + int(worker))
-            for worker, values in result['paired_request_time_delta_percent'].items()}
+        if len(args.transfer_modes) == 1:
+            result['paired_request_time_delta_percent'] = paired_deltas(valid, args.baseline_workers)
+            result['bootstrap_95pct_median_intervals_percent'] = {
+                worker: bootstrap_median(values, args.seed + int(worker))
+                for worker, values in result['paired_request_time_delta_percent'].items()}
+        else:
+            result['factorial_effects'] = worker_transfer_effects(
+                valid, args.baseline_workers, args.transfer_modes)
+            effects = result['factorial_effects']
+            result['factorial_effects']['bootstrap_95pct_median_intervals'] = {
+                'worker_delta_percent_by_mode': {
+                    mode: {worker: bootstrap_median(values, args.seed + int(worker) +
+                                                    (0 if mode == 'mapped' else 1000))
+                           for worker, values in workers.items()}
+                    for mode, workers in effects['worker_delta_percent_by_mode'].items()},
+                'pread_delta_percent_by_workers': {
+                    worker: bootstrap_median(values, args.seed + int(worker) + 2000)
+                    for worker, values in effects['pread_delta_percent_by_workers'].items()},
+                'interaction_percentage_points': bootstrap_median(
+                    effects['interaction_percentage_points'], args.seed + 3000)
+                    if effects['interaction_percentage_points'] else None,
+            }
         result['summary'] = {}
         for workers in sorted(args.workers):
-            selected = [row for row in valid if row['workers'] == workers]
-            result['summary'][str(workers)] = {
-                'samples': len(selected),
-                'median_prompt_ms': statistics.median(row['prompt_ms'] for row in selected),
-                'median_decode_ms': statistics.median(row['decode_ms'] for row in selected),
-                'median_ttft_ms': statistics.median(row['ttft_ms'] for row in selected),
-                'median_request_ms': statistics.median(row['request_ms'] for row in selected),
-                'output_hashes': sorted({row['output_sha256'] for row in selected}),
-            }
+            by_mode = {}
+            for mode in args.transfer_modes:
+                selected = [row for row in valid if row['workers'] == workers and
+                            row['transfer_mode'] == mode]
+                by_mode[mode] = {
+                    'samples': len(selected),
+                    'median_prompt_ms': statistics.median(row['prompt_ms'] for row in selected),
+                    'median_decode_ms': statistics.median(row['decode_ms'] for row in selected),
+                    'median_ttft_ms': statistics.median(row['ttft_ms'] for row in selected),
+                    'median_request_ms': statistics.median(row['request_ms'] for row in selected),
+                    'output_hashes': sorted({row['output_sha256'] for row in selected}),
+                }
+            result['summary'][str(workers)] = by_mode[args.transfer_modes[0]] if len(args.transfer_modes) == 1 else by_mode
         result['passed'] = (result['actual_cache_slots_equal'] and result['measured_output_equal'] and
                             (args.timing_only or (result['measured_state_equal'] and
                                                   result['measured_accepted_prefix_equal'])) and
@@ -291,7 +362,7 @@ def main():
     (args.output / 'results.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps({key: result.get(key) for key in
           ('passed', 'failures', 'summary', 'measured_accepted_prefix_equal', 'paired_request_time_delta_percent',
-           'bootstrap_95pct_median_intervals_percent')}, indent=2))
+           'bootstrap_95pct_median_intervals_percent', 'factorial_effects')}, indent=2))
     return 0 if result.get('passed') else 1
 
 

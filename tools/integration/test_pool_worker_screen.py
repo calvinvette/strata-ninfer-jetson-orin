@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 
 from pool_worker_screen import (exact_warmup_prompt, paired_deltas, read_accepted_prefix_trace,
+                                worker_transfer_effects,
                                 read_state_hashes, set_arg)
 
 
@@ -79,6 +80,28 @@ class PoolWorkerScreenTests(unittest.TestCase):
             dict(workers=4, repetition=1, request_ms=180),
         ]
         self.assertEqual(paired_deltas(rows, 11), {'4': [-10.0, -10.0]})
+
+    def test_worker_transfer_effects_pair_within_randomized_blocks(self):
+        rows = []
+        values = {
+            (0, 4, 'mapped'): 100, (0, 4, 'pread'): 120,
+            (0, 8, 'mapped'): 90, (0, 8, 'pread'): 99,
+            (1, 4, 'mapped'): 200, (1, 4, 'pread'): 240,
+            (1, 8, 'mapped'): 180, (1, 8, 'pread'): 198,
+        }
+        for (rep, workers, mode), request_ms in values.items():
+            rows.append({'repetition': rep, 'workers': workers,
+                         'transfer_mode': mode, 'request_ms': request_ms})
+        effects = worker_transfer_effects(rows, 8, ['mapped', 'pread'])
+        for actual, expected in zip(effects['pread_delta_percent_by_workers']['4'], [20.0, 20.0]):
+            self.assertAlmostEqual(actual, expected)
+        for actual, expected in zip(effects['pread_delta_percent_by_workers']['8'], [10.0, 10.0]):
+            self.assertAlmostEqual(actual, expected)
+        for actual, expected in zip(effects['interaction_percentage_points'], [10.0, 10.0]):
+            self.assertAlmostEqual(actual, expected)
+        for actual, expected in zip(effects['worker_delta_percent_by_mode']['mapped']['4'],
+                                    [100.0 * (100 / 90 - 1), 100.0 * (200 / 180 - 1)]):
+            self.assertAlmostEqual(actual, expected)
 
 
 if __name__ == '__main__':

@@ -918,3 +918,9 @@ Calibrated NVMap plateaus were exactly 6,870,433,792 bytes before and
 two configurations, while adjacent synchronous allocations remain included.
 Legacy graph shapes, non-NVMap bytes and isolated executable cost remain open;
 Phase 3 continues.
+
+An exploratory [Q2_0 worker/read-policy correctness screen](../../bench/results/2026-10-11-phase6-q2-worker-transfer-screen/README.md)
+completed its 12 mapped/pread × four/eight-worker cells, but one cell had
+different accepted-prefix state hashes despite identical output tokens. A
+focused three-run repeat passed; the mismatch cause is unknown, so no timing
+comparison was made and no policy was promoted.
