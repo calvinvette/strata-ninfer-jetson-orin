@@ -1,4 +1,4 @@
-# Q2_0 locked PLE RAM-mode probe — Orin — 2026-10-13
+# Q2_0 locked PLE RAM-mode probe — Orin — 2026-10-12
 
 `--ple-io ram` is intended to fault in and lock the PLE table. The earlier three-pair screen fell back because the inherited process memlock ceiling was about 3.75 GiB. This probe used transient systemd **service** limits (no system-wide change) to test 8-GiB and 12-GiB `RLIMIT_MEMLOCK` values. It retained the normal six-GiB physical headroom guard. The exact launch properties and all raw telemetry are recorded here.
 

@@ -1,4 +1,4 @@
-# Q2_0 32K prompt at 64K context reservation — Orin — 2026-10-13
+# Q2_0 32K prompt at 64K context reservation — Orin — 2026-10-12
 
 This extends the cache/context admission screen with the same exact 32,768-token prompt under a 65,536-token configured context at 3,000 and 5,000 requested cache slots. Each independent process ran under a transient 22-GiB `MemoryMax` scope and the standard six-GiB effective-headroom supervisor. Models and packs remain in `~/models/`. The PLE pack, model revision and expert profile are the same artifacts listed in the [Q2_0 identity record](../2026-10-11-phase3-q2-admission/artifact-identities.json); the prompt SHA-256 is `705dea47aafbfc991d0616621f3a13bf0136a43c546d60c7693c2efdced4d3a3`.
 
