@@ -1136,3 +1136,12 @@ and unscoped NVMe counters prevent a cold-read or product-wide conclusion. The
 28-GiB systemd ceiling preserved 17.76 GiB minimum host availability and 7.34
 GiB effective headroom, with zero OOM kills. Phase 3 remains open for broader
 transfer alternatives and graph/driver physical-backing accounting.
+
+A fresh [Q2_0 exact-16K cancellation/recovery run](../../bench/results/2026-10-13-phase3-q2-cancel-16k/README.md)
+closed the stream after 1.02 seconds with 512 of 16,384 prompt tokens read and
+no output tokens. The same live service then returned `Hello Orin!` (five
+tokens). The 28-GiB scope retained 17.10 GiB minimum host availability and
+14.82 GiB effective headroom, with zero OOM events. The 304/303 requested
+owner ledger left only the service-lifetime weight arena live. This adds one
+intermediate-length cleanup/recovery point; broader pressure and graph/driver
+backing gates remain open.

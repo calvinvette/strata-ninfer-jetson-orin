@@ -973,6 +973,15 @@ owner remainder. Pairing the same prompt and binary across scope caps is useful
 for Splash admission/recovery testing, but these two runs do not define a
 capacity threshold. See the [22-GiB run](../../bench/results/2026-10-13-phase3-q2-cancel-8k-22G/README.md).
 
+An exact 16K request was then cancelled after one second with 512 prompt tokens
+read, followed by a successful `Hello Orin!` response from the same service.
+At a 28-GiB cgroup ceiling, minimum host availability was 17.10 GiB and
+effective scope headroom 14.82 GiB; the requested-owner trace left only the
+resident weight arena live. For Splash, sample the effective prompt progress at
+disconnect, verify no partial response escaped, then issue a real follow-up on
+the same process and reconcile request owners. See the
+[Orin 16K run](../../bench/results/2026-10-13-phase3-q2-cancel-16k/README.md).
+
 
 ## 2026-10-13 — Add a 16K actual-prompt admission point
 
