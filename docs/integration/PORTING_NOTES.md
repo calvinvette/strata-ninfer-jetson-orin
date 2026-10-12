@@ -985,3 +985,12 @@ those gates or imply a general capacity. For Splash, preserve actual formatted
 prompt length, configured context, output length, physical availability and
 cgroup headroom as separate dimensions in the capacity ladder. See the
 [Orin admission run](../../bench/results/2026-10-13-phase3-q2-admit16k-19G/README.md).
+
+A traced repeat added accepted-state and owner evidence for that prompt. It
+matched the `L=16384` target fingerprint from the same prompt, and all 304
+allocations had corresponding frees except the resident model weight arena. A
+same-prompt warm-up was rejected by the harness because prompt caching reused
+16,377 tokens on the measured call; a distinct exact-length warm-up fixed the
+control. For Splash, make cache policy and the warm-up prompt part of the
+measurement design, and retain harness failures separately from API/runtime
+failures. See the [trace report](../../bench/results/2026-10-13-phase3-q2-admit16k-22G-trace/README.md).
