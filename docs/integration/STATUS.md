@@ -1011,6 +1011,14 @@ observed state difference to cache capacity for this request, not context
 reservation; its cause and task-quality effect remain unresolved. No cache
 default changed and Phase 3 remains open.
 
+The standalone CUDA [grouped expert-hit parity check](../../bench/results/2026-10-12-phase3-q2-cache-context-state/README.md)
+also passed after a memory-bounded target build. Synthetic Q2_0 host-count,
+device-count, mixed-scale, window and alignment cases matched the prior kernels
+bitwise and passed the independent double-precision row oracle (worst reported
+error `1.10e-7` of sum-of-absolute-terms). This narrows the unresolved cache
+capacity effect beyond the isolated grouped hit operator; full-model hit/miss
+combination and task-quality explanations remain open.
+
 The current-binary [Q2_0 PLE and memory-contract confirmation](../../bench/results/2026-10-12-phase3-q2-ple-confirmation/README.md)
 passed the supervised artifact-aware PLE oracle (worst stage relative L1
 `1.148e-7`), the focused memory/VMM/cache/PLE CTest selection (15/15), and

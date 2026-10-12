@@ -45,6 +45,20 @@ quality, or a performance effect. Do not infer correctness from the shared
 output token or promote a cache default. No timings or energy comparisons were
 collected; clocks were observed dynamically.
 
+As an operator-level cross-check, the standalone current CUDA
+`s2_expert_grouped_parity --selftest` target rebuilt and passed under the
+six-GiB supervisor. Its synthetic Q2_0 fixtures covered host-count and
+device-count hit paths, mixed-precision activation scales, multi-token/window
+hits, and alignment fallbacks. Every case was bitwise identical to the prior
+kernel and passed the independent double-precision row reference (worst
+reported error `1.10e-7` of sum-of-absolute-terms); the test recorded zero
+failures and 24.60 GiB minimum host availability. This validates the isolated
+grouped hit operator on its synthetic contract, not the full model's
+hit/miss-combine path or the cross-capacity state result. The build and test
+supervisor records are in `cuda-hit-parity-build-supervisor/` and
+`cuda-hit-parity-supervisor/`; the test binary SHA-256 is
+`9c86664c388ca66e130cbf531af17a85e1aac4ea0580c47a017a7f890d4969cd`.
+
 `campaign.py`, `runner.py` and `analyze.py` preserve the randomized process
 matrix, exact commands, state fingerprints and comparison. Raw request logs,
 owner summaries, tegrastats and supervisor memory/clock samples are under
