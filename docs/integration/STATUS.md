@@ -825,3 +825,17 @@ was 24.48 GiB and 24.32 GiB, respectively, under the six-GiB supervisor. The
 [rerun report](../../bench/results/2026-10-11-phase3-current-regression-after-harness/README.md)
 reconfirms selected contracts but does not resolve the warmup-state finding or
 close the broader Phase 3 gates.
+
+The held-out [Q6_K warp-dequant 16K-context confirmation](../../bench/results/2026-10-11-phase4-q6-warp-context16k-confirm7/README.md)
+adds seven same-day randomized pairs at a 16,384 context with a new 2,048/128
+synthetic incident-log input. All cells passed; warmup and measured output
+hashes, token counts, speculative counts and cache-slot counts matched within
+pairs. Median request time fell 5.33% (whole-pair bootstrap 95% interval
+−7.87% to −2.67%); the prompt median fell 5.63%, while decode interval spans
+zero. A separate traced pair matched all three accepted-prefix commits and the
+full/GDN state fingerprints. Minimum host availability was 12.88 GiB with no
+OOM events. Alongside the 8K confirmation, this supports keeping the candidate
+opt-in for further Phase 4 qualification; synthetic prompt construction,
+task quality, other workload classes, GPU/EMC clock frequencies and energy
+remain limitations. Phase 4 remains open, and Phase 3 ownership/transfer gates
+remain active.
