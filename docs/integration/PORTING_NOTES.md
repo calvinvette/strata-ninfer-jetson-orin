@@ -725,3 +725,13 @@ its native physical-memory guard, retain failure and retry telemetry separately,
 and verify same-process or process-restart recovery according to that engine's
 service architecture. A simulated refusal does not establish behavior under a
 real Metal allocation failure.
+
+The Oct 12 Q2_0 cache-capacity diagnostic found bit-identical first logits and
+repeatable GDN state within each 3,000- or 5,000-slot setting, but different
+logits and accepted-prefix state across settings despite the same prompt and
+selected token. For a future Strata + Splash integration, pair cache/allocation
+profiles with exact prompt token IDs, repeat each profile independently, and
+compare output IDs, raw logits and persistent-state tensors. Matching text or
+argmax alone is not a state-parity check. Retain raw dumps outside Git with
+hashes and record the first state layer or operator that diverges; do not
+promote a profile until its numerical and task-level effects are understood.

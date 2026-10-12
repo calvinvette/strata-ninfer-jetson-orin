@@ -958,3 +958,13 @@ completed its 12 mapped/pread × four/eight-worker cells, but one cell had
 different accepted-prefix state hashes despite identical output tokens. A
 focused three-run repeat passed; the mismatch cause is unknown, so no timing
 comparison was made and no policy was promoted.
+
+The [Q2_0 cache-capacity state diagnostic](../../bench/results/2026-10-12-phase3-q2-cache-state-diagnostic/README.md)
+reproduced the 3,000/5,000-slot state difference with the same exact 512-token
+prompt. Same-capacity process repeats produced bit-identical first verifier
+logits and repeatable GDN state; cross-capacity logits differed in every FP32
+element and full GDN state differed by 1.11% relative L2. Both configurations
+selected token 32, and a shared 511-token prefix also diverged beginning at
+layer 3. The diagnostic does not establish whether this numerical difference
+is acceptable or identify its cause; expert hit/miss compute is a lead only.
+No cache default or quality claim follows. Phase 3 remains open.
