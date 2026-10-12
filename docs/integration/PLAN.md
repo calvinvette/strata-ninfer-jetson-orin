@@ -59,7 +59,7 @@ Dependencies: Phase 1; required before changing execution or formats.
   unchanged default route passes regression checks; chosen numerical tolerance is
   justified before inspecting candidate performance.
 
-## Phase 3 — Admission, memory ownership and transfer experiments
+## Phase 3 — Admission, memory ownership and transfer experiments (complete for tested Orin Q2_0 scope)
 
 Dependencies: Phase 2; kernel work in Phase 4 may follow independently once its
 own contracts are complete.
