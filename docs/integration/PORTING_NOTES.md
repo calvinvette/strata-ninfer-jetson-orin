@@ -925,3 +925,11 @@ read bytes and major faults under pread are not cold-storage evidence. For
 Splash, record cache state or use a defensible cache protocol, randomize order,
 retain paired state checks, and report uncertainty; do not infer transfer wins
 from logical bytes or fault counts alone. See the [full Orin report](../../bench/results/2026-10-12-phase3-q2-actual32k-mapped-pread/README.md).
+
+The same-day Q2_0 admission run at a 19-GiB process cap was repeated with the
+same exact prompt, cache and configured context. Both runs passed the six-GiB
+supervisor and reproduced prompt-end state; effective headroom minima differed
+(6.98 versus 9.11 GiB) as cgroup and page-cache starting conditions changed.
+This is a useful pattern for Splash—repeat admission points and compare state
+and ownership—but not evidence for a portable cap or a stable capacity curve.
+See the [repeat record](../../bench/results/2026-10-12-phase3-q2-actual32k-context64k-19G-repeat2/README.md).
