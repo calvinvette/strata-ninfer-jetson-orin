@@ -1,5 +1,6 @@
 """Run one short Q2_0 request with automatic cache sizing and retain its holds."""
 import hashlib
+import argparse
 import json
 from pathlib import Path
 import sys
@@ -11,7 +12,6 @@ from file_tier_transfer_parity import ChatTemplate, StrataEngine, exact_prompt, 
 from owner_observations import summarize
 
 CONFIG = ROOT / 'bench/results/2026-10-12-phase3-q2-cache-context-state/campaign/base-config.json'
-OUT = Path(sys.argv[1]).resolve()
 
 
 def replace(args, key, value):
@@ -22,11 +22,16 @@ def replace(args, key, value):
 
 
 def main():
-    OUT.mkdir(parents=True, exist_ok=False)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--context', type=int, default=8192)
+    parser.add_argument('--output', type=Path, required=True)
+    cli = parser.parse_args()
+    out = cli.output.resolve()
+    out.mkdir(parents=True, exist_ok=False)
     config = json.loads(CONFIG.read_text())
     args = list(config['args'])
     replace(args, '--expert-cache', 'auto')
-    replace(args, '--max-context', 8192)
+    replace(args, '--max-context', cli.context)
     replace(args, '--prompt-cache', 0)
     env = dict(config.get('env', {}))
     env.update({'STRATA_INTEGRATION_TRACE': '1', 'STRATA_STATE_HASH': '1'})
@@ -39,7 +44,7 @@ def main():
     if len(prompt) != 512:
         raise RuntimeError(f'prepared prompt has {len(prompt)} tokens, expected 512')
     engine = StrataEngine(config['exe'], args, cwd=config.get('cwd'),
-                          log=str(OUT / 'engine.log'), env=env)
+                          log=str(out / 'engine.log'), env=env)
     try:
         generated = [token for token in engine.generate(
             prompt, 1, {'temperature': 0}, threading.Event()) if token is not None]
@@ -50,15 +55,16 @@ def main():
             'engine_sha256': hashlib.sha256(Path(config['exe']).read_bytes()).hexdigest(),
             'engine_args': args,
             'engine': dict(engine.last),
+            'configured_context': cli.context,
             'passed': len(generated) == 1,
         }
-        (OUT / 'workload.json').write_text(json.dumps(result, indent=2) + '\n')
+        (out / 'workload.json').write_text(json.dumps(result, indent=2) + '\n')
         if not result['passed']:
             raise RuntimeError('one-token request failed')
     finally:
         engine.close()
-    summary = summarize((OUT / 'engine.log').read_text().splitlines())
-    (OUT / 'owner-summary.json').write_text(json.dumps(summary, indent=2) + '\n')
+    summary = summarize((out / 'engine.log').read_text().splitlines())
+    (out / 'owner-summary.json').write_text(json.dumps(summary, indent=2) + '\n')
     print(json.dumps({'passed': result['passed'], 'generated_ids': generated,
                       'engine_sha256': result['engine_sha256'],
                       'planned_reservations': summary['planned_reservations'],

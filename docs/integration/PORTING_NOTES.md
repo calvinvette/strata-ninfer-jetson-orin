@@ -780,3 +780,11 @@ planned-versus-materialized distinction, attribute each materialized allocation
 to one owner, and compare the owner ledger with platform physical-memory
 telemetry. A planned hold is metadata, not backing, and an owner request peak
 does not price allocator or driver overhead.
+
+The randomized three-process-per-cell Q2_0 cache × context screen found that a
+64K context added 1.41 GiB to the session owner while automatic cache allocation
+fell by 1.37 GiB; the combined unique device-request peak differed by 44.3 MiB
+between 8K and 64K. Output IDs matched, but this was an admission experiment,
+not a quality or speed comparison. For Splash, cross configured context with
+automatic cache sizing using fresh processes, preserve each chosen cache size
+and reservation, and report the complete owner peak beside platform telemetry.
