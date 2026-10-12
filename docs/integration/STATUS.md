@@ -871,3 +871,11 @@ memory, cache, VMM, graph, and conversation-state CTests (19/19 total), plus
 integration Python discovery (106/106). This is software-contract evidence
 without a memory supervisor or serving request; the broader Phase 3 physical
 backing, pressure, graph-pool, and transfer/admission gates remain open.
+
+The [Q2_0 16K configured-context extension](../../bench/results/2026-10-11-phase3-q2-admission-16k/README.md)
+passed one-token requests at 3,000 and 5,000 expert-cache slots, with 18.27 and
+15.83 GiB minimum `MemAvailable`, respectively, under the six-GiB floor. Each
+instrumented owner trace balanced 278 allocations/frees; requested-live peaks
+were 6,592,312,952 and 9,357,112,952 bytes. This extends the 4K/8K admission
+screen but is not a long-context request or capacity claim. Graph/driver backing
+remains outside the owner trace and Phase 3 remains open.
