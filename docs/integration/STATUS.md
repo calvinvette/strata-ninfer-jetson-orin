@@ -1117,4 +1117,22 @@ traced state pair matched all accepted-prefix commits and final state. This
 adds a 32K configured-context cell, not task-quality evidence or default
 promotion; Phase 4 remains open.
 
-The Q2_0 [8K-context captured-graph NVMap repeat](../../bench/results/2026-10-13-phase3-q2-graph-context8k/README.md) extended the short-request graph-backing sample to 3,000 cache slots, speculation 2 and context 8,232. Three processes passed with identical output/state and four matched graph-owner events each. The NVMap process-owner interval was exactly 71,983,104 bytes in all three runs, matching the separate 32K/spec2 observation; it still includes adjacent allocations and is not executable size or total physical memory. Minimum host/effective headroom was 17.83 GiB with no OOM. The graph-disabled control remains unsupported, and legacy graph shapes/non-NVMap backing remain open.
+
+A fresh supervised [Q2_0 PLE and memory regression rerun](../../bench/results/2026-10-13-phase3-q2-ple-user-rerun/README.md)
+passed all seven PLE stages for three tokens (worst relative L1 `1.148e-7`),
+the selected 15/15 memory/owner/PLE CTests, and integration Python discovery
+(124/124). Minimum host availability was 24.42 GiB for PLE and 24.45 GiB for
+CTest. This refreshes selected contracts; physical and graph backing under
+broader pressure remain open.
+
+The randomized held-out [seven-pair Q2_0 16K mapped-versus-pread confirmation](../../bench/results/2026-10-13-phase3-q2-mapped-pread-16k-heldout/README.md)
+matched output IDs, cache capacity and all nine state fields in every pair.
+Pread's median request time was 2.23% lower (paired bootstrap 95% interval
+−3.91% to −1.94%); prompt time improved 2.42%, while decode was 6.33% slower.
+The request gain is below the proposed 5% promotion threshold and decode
+exceeds its regression guard, so mapped remains the default. Process major
+faults and whole-device reads favored pread, but shared page-cache conditions
+and unscoped NVMe counters prevent a cold-read or product-wide conclusion. The
+28-GiB systemd ceiling preserved 17.76 GiB minimum host availability and 7.34
+GiB effective headroom, with zero OOM kills. Phase 3 remains open for broader
+transfer alternatives and graph/driver physical-backing accounting.

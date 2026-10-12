@@ -39,6 +39,29 @@ def exact_prompt(target, encode):
     raise ValueError(f'cannot construct exactly {target} tokens using this template/tokenizer')
 
 
+def exact_prompt_variant(target, encode, variant):
+    """Build an exact-length control prompt; keep primary byte-identical."""
+    if variant == 'primary':
+        return exact_prompt(target, encode)
+    if variant != 'heldout_blue':
+        raise ValueError(f'unknown prompt variant: {variant}')
+    prefix = 'Case file: '
+    suffix = ('\nExplain how data moves from input through working memory to storage. '
+              'Begin with the memory controller.')
+    low, high = 0, target
+    while low <= high:
+        count = (low + high) // 2
+        text = prefix + 'blue ' * count + suffix
+        actual = len(encode(text))
+        if actual == target:
+            return text
+        if actual < target:
+            low = count + 1
+        else:
+            high = count - 1
+    raise ValueError(f'cannot construct exactly {target} tokens for {variant}')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--tokenizer', type=Path, required=True)

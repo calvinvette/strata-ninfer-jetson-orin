@@ -6,9 +6,23 @@ from pathlib import Path
 from file_tier_transfer_parity import (actual_expert_cache_slots, cgroup_io_read_bytes,
                                       context_reservation, resolve_disk_counter_path,
                                       transfer_modes)
+from prepare_controls import exact_prompt, exact_prompt_variant
 
 
 class TransferModeTests(unittest.TestCase):
+    def test_primary_prompt_variant_preserves_existing_prompt(self):
+        encode = lambda text: text.split()
+        self.assertEqual(exact_prompt_variant(128, encode, 'primary'), exact_prompt(128, encode))
+
+    def test_heldout_prompt_variant_is_exact_and_distinct(self):
+        encode = lambda text: text.split()
+        primary = exact_prompt_variant(128, encode, 'primary')
+        heldout = exact_prompt_variant(128, encode, 'heldout_blue')
+        self.assertEqual(len(encode(heldout)), 128)
+        self.assertNotEqual(heldout, primary)
+        with self.assertRaisesRegex(ValueError, 'unknown prompt variant'):
+            exact_prompt_variant(128, encode, 'other')
+
     def test_prefetch_stage_pair_holds_io_path_constant(self):
         self.assertEqual(transfer_modes(True), [
             ('prefetch-fill', '1', '0'), ('prefetch-stage', '1', '1')])

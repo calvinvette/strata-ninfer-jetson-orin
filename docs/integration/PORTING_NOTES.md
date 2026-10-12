@@ -1028,3 +1028,19 @@ pinned-stage gain, so preserve pageable staging as the default. For Splash,
 keep correctness/ownership runs separate from timing runs when tracing alters
 execution, and confirm candidate effects on a distinct prompt. See the
 [held-out Orin report](../../bench/results/2026-10-13-phase3-q2-stage-pin-16k-heldout/README.md).
+
+
+## 2026-10-13 — Confirm mapped reads versus pread on a held-out prompt
+
+A seven-pair Q2_0 16K confirmation found pread 2.23% faster for total request
+time, with a paired 95% interval from 1.94% to 3.91% faster. Prompt improved
+2.42%, but decode was 6.33% slower; the gain missed the proposed promotion
+threshold and no default changed. Pread reduced process major faults by about
+99%, while whole-device read counters were lower by 33%; those device counters
+include unrelated reads and cache was shared, not flushed. For Splash, keep
+host faults, scoped I/O and whole-device reads distinct, and evaluate latency
+and faults together: a transfer metric can improve while decode or total
+request behavior changes in another direction. Extend the exact-length
+held-out prompt helper and store its formatted token IDs for reproducible
+cross-engine comparisons. See the
+[Orin confirmation](../../bench/results/2026-10-13-phase3-q2-mapped-pread-16k-heldout/README.md).

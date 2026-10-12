@@ -16,7 +16,7 @@ import time
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT), str(ROOT / 'tools'), str(ROOT / 'tools/integration')]
 from conversation_cache_parity import load_tokenizer
-from prepare_controls import exact_prompt
+from prepare_controls import exact_prompt_variant
 from owner_observations import summarize
 from serve.frontend import ChatTemplate
 from serve.server import StrataEngine, child_env
@@ -228,6 +228,8 @@ def main():
     parser.add_argument('--prompt-tokens', type=int, default=4096)
     parser.add_argument('--generated-tokens', type=int, default=64)
     parser.add_argument('--pairs', type=int, default=1)
+    parser.add_argument('--prompt-variant', choices=('primary', 'heldout_blue'), default='primary',
+                        help='select a byte-distinct exact-length prompt for confirmation')
     parser.add_argument('--seed', type=int, default=870126)
     parser.add_argument('--io-threads', type=int, default=8)
     parser.add_argument('--compare-prefetch-stage', action='store_true',
@@ -255,7 +257,7 @@ def main():
     template = ChatTemplate(template_path if template_path.exists() else ROOT / 'serve/chat_template.jinja')
     render = lambda text: tokenizer.encode(
         template.render([{'role': 'user', 'content': text}], enable_thinking=False), parse_special=True)
-    prompt_text = exact_prompt(args.prompt_tokens, render)
+    prompt_text = exact_prompt_variant(args.prompt_tokens, render, args.prompt_variant)
     prompt = render(prompt_text)
     if len(prompt) != args.prompt_tokens:
         raise ValueError(f'formatted prompt has {len(prompt)} tokens, expected {args.prompt_tokens}')
@@ -273,6 +275,7 @@ def main():
         result = json.loads(result_path.read_text(encoding='utf-8'))
         if (result.get('prompt_sha256') != prompt_hash or
                 result.get('generated_tokens') != args.generated_tokens or
+                result.get('prompt_variant', 'primary') != args.prompt_variant or
                 result.get('planned_pairs') != args.pairs or result.get('seed') != args.seed or
                 result.get('expert_cache') != args.expert_cache or result.get('io_threads') != args.io_threads or
                 result.get('disk_counter_file') != (str(args.disk_counter_file.resolve()) if args.disk_counter_file else None) or
@@ -285,6 +288,7 @@ def main():
                             if args.compare_prefetch_stage else
                             'exact real-model prompt, randomized mapped-versus-pread file-tier transfer screen; screening only'),
                   'prompt_tokens': len(prompt), 'prompt_sha256': prompt_hash,
+                  'prompt_variant': args.prompt_variant,
                   'generated_tokens': args.generated_tokens, 'planned_pairs': args.pairs,
                   'io_threads': args.io_threads, 'expert_cache': args.expert_cache,
                   'disk_counter_file': str(args.disk_counter_file.resolve()) if args.disk_counter_file else None,

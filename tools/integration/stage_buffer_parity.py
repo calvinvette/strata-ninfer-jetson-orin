@@ -13,7 +13,7 @@ import time
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT), str(ROOT / 'tools'), str(ROOT / 'tools/integration')]
 from conversation_cache_parity import load_tokenizer
-from prepare_controls import exact_prompt
+from prepare_controls import exact_prompt, exact_prompt_variant
 from owner_observations import summarize
 from serve.frontend import ChatTemplate
 from serve.server import StrataEngine, child_env
@@ -71,29 +71,6 @@ def stamp_arm_end(arm):
 def context_reservation(prompt_tokens, generated_tokens):
     """Leave room for Strata's strict prompt-plus-output context guard."""
     return max(prompt_tokens + generated_tokens + 32, 8192)
-
-
-def exact_prompt_variant(target, encode, variant):
-    """Build an exact-length control prompt; keep primary byte-identical."""
-    if variant == 'primary':
-        return exact_prompt(target, encode)
-    if variant != 'heldout_blue':
-        raise ValueError(f'unknown prompt variant: {variant}')
-    prefix = 'Case file: '
-    suffix = ('\nExplain how data moves from input through working memory to storage. '
-              'Begin with the memory controller.')
-    low, high = 0, target
-    while low <= high:
-        count = (low + high) // 2
-        text = prefix + 'blue ' * count + suffix
-        actual = len(encode(text))
-        if actual == target:
-            return text
-        if actual < target:
-            low = count + 1
-        else:
-            high = count - 1
-    raise ValueError(f'cannot construct exactly {target} tokens for {variant}')
 
 
 def state_hashes(path, expected_count=1):
