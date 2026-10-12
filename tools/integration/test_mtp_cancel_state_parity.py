@@ -5,7 +5,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT / 'tools'), str(ROOT / 'tools/integration')]
 from mtp_cancel_state_parity import (STATE_KEYS, compare_prefix_traces,
-                                    parse_prefix_entries)
+                                    parse_prefix_entries, state_dump_env)
 from serve.server import StrataEngine
 
 
@@ -49,6 +49,14 @@ class MtpCancelStateParityTests(unittest.TestCase):
         result = compare_prefix_traces(cancel, reference)
         self.assertFalse(result['passed'])
         self.assertIn('committed token IDs differ', result['failures'])
+
+    def test_gdn_dump_environment_is_opt_in_and_does_not_mutate_base(self):
+        base = {'STRATA_STATE_HASH': '1'}
+        self.assertEqual(state_dump_env(base, '/tmp/state.bin', None), base)
+        configured = state_dump_env(base, '/tmp/state.bin', 48)
+        self.assertEqual(configured['STRATA_STATE_DUMP_GDN_AT'], '48')
+        self.assertEqual(configured['STRATA_STATE_HASH'], '1')
+        self.assertNotIn('STRATA_STATE_DUMP_GDN_AT', base)
 
 
 if __name__ == '__main__':

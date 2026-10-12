@@ -103,6 +103,22 @@ def stop_server(process):
             process.wait(timeout=5)
 
 
+def state_dump_env(env, output_path, accepted_length):
+    """Enable a one-shot GDN dump at an exact accepted-prefix length."""
+    result = dict(env)
+    if accepted_length is not None:
+        result['STRATA_STATE_DUMP_GDN'] = str(Path(output_path).resolve())
+        result['STRATA_STATE_DUMP_GDN_AT'] = str(accepted_length)
+    return result
+
+
+def config_with_engine_env(config, env):
+    """Make the server config's engine overrides agree with the server process env."""
+    result = dict(config)
+    result['env'] = dict(env)
+    return result
+
+
 def reset_stream(response):
     """Close the read side; the server's EOF watcher then sends STOP to the engine."""
     response.close()
@@ -127,12 +143,16 @@ def main() -> int:
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--cancel-chunks', type=int, default=8,
                         help='close the stream after this many non-empty text deltas')
+    parser.add_argument('--reference-repeats', type=int, default=3,
+                        help='fresh exact-length reference processes used to distinguish cancellation drift from run variation')
+    parser.add_argument('--dump-gdn-at', type=int,
+                        help='optionally dump float32 GDN state at this exact accepted length in each process')
     parser.add_argument('--prompt-text', default=(
         'Write the integers from 1 through 1000 separated by single spaces. '
         'Do not add an introduction or conclusion, and do not stop before 1000.'))
     args = parser.parse_args()
-    if args.output.exists() or args.cancel_chunks < 1:
-        parser.error('output must be new and cancel-chunks must be positive')
+    if args.output.exists() or args.cancel_chunks < 1 or args.reference_repeats < 1:
+        parser.error('output must be new, cancel-chunks and reference-repeats must be positive')
     cfg = json.loads(args.config.read_text())
     if '--mtp' not in cfg.get('args', []):
         parser.error('source config has no --mtp weights path')
@@ -143,17 +163,27 @@ def main() -> int:
     result = {'schema': 1, 'scope': 'MTP accepted-prefix cancellation state parity and same-process recovery',
               'model': cfg.get('model_name'), 'workload_cell': 'open-ended-integer-list',
               'prompt_text': args.prompt_text, 'requested_output_tokens': 1024,
-              'cancel_after_nonempty_deltas': args.cancel_chunks, 'checks': []}
+              'cancel_after_nonempty_deltas': args.cancel_chunks,
+              'reference_repeats': args.reference_repeats,
+              'dump_gdn_at': args.dump_gdn_at,
+              'effective_engine_env': {
+                  key: base_value for key, base_value in {
+                      'STRATA_PREFILL_CPU_SHARE': '0', 'STRATA_MTP_BATCH': '1',
+                      'STRATA_STATE_HASH': '1', 'STRATA_STATE_HASH_GDN': '1',
+                      'STRATA_ACCEPTED_PREFIX_TRACE': '1',
+                  }.items()},
+              'checks': []}
     result_path = args.output / 'result.json'
     write_result(result_path, result)
     base_env = dict(cfg.get('env', {}))
     base_env.update({'STRATA_STATE_HASH': '1', 'STRATA_ACCEPTED_PREFIX_TRACE': '1',
                      'STRATA_INTEGRATION_TRACE': '1', 'STRATA_MTP_BATCH': '1',
-                     'STRATA_PREFILL_CPU_SHARE': '0'})
+                     'STRATA_STATE_HASH_GDN': '1', 'STRATA_PREFILL_CPU_SHARE': '0'})
     body_base = {'messages': [{'role': 'user', 'content': args.prompt_text}],
                  'chat_template_kwargs': {'enable_thinking': False},
                  'temperature': 0, 'strata_tune': {'ignore_eos': True}}
-    cancel_cfg = dict(cfg)
+    cancel_env = state_dump_env(base_env, args.output / 'gdn-cancel.bin', args.dump_gdn_at)
+    cancel_cfg = config_with_engine_env(cfg, cancel_env)
     cancel_cfg.update(port=int(cfg['port']) + 20,
                       log=str((args.output / 'engine-cancel.log').resolve()))
     cancel_config_path = args.output / 'server-config-cancel.json'
@@ -163,7 +193,7 @@ def main() -> int:
     write_result(result_path, result)
     cancel_server = None
     try:
-        cancel_server, cancel_base, cancel_health = start_server(cancel_cfg, cancel_config_path, base_env)
+        cancel_server, cancel_base, cancel_health = start_server(cancel_cfg, cancel_config_path, cancel_env)
         cancel_body = dict(body_base, model=cancel_health['model'], max_tokens=1024, stream=True)
         stream_request = urllib.request.Request(
             cancel_base + '/v1/chat/completions',
@@ -228,47 +258,86 @@ def main() -> int:
         if cancel_server is not None:
             stop_server(cancel_server)
 
-    reference_cfg = dict(cfg)
-    reference_cfg.update(port=int(cfg['port']) + 21,
-                         log=str((args.output / 'engine-reference.log').resolve()))
-    reference_config_path = args.output / 'server-config-reference.json'
-    reference_config_path.write_text(json.dumps(reference_cfg, indent=2) + '\n')
-    reference = {'check': 'fresh_exact_length_reference', 'status': 'started'}
+    reference = {'check': 'fresh_exact_length_references', 'status': 'started',
+                 'runs': [], 'comparisons': []}
     result['checks'].append(reference)
     write_result(result_path, result)
-    reference_server = None
+    reference_traces = []
+    reference_texts = []
     try:
-        reference_server, reference_base, reference_health = start_server(reference_cfg,
-                                                                            reference_config_path,
-                                                                            base_env)
-        reference_body = dict(body_base, model=reference_health['model'],
-                              max_tokens=result['canceled_token_count'], stream=False)
-        response = get_json(reference_base, '/v1/chat/completions', timeout=300,
-                            body=reference_body)
-        reference_text = response['choices'][0]['message'].get('content', '')
-        lines = Path(reference_cfg['log']).read_text(errors='replace').splitlines()
-        ref_trace = parse_prefix_entries(lines)
-        comparison = compare_prefix_traces(cancel_trace, ref_trace)
-        comparison['cancel_visible_text_is_reference_prefix'] = reference_text.startswith(cancel_row['visible_text'])
-        if not comparison['cancel_visible_text_is_reference_prefix']:
-            comparison['failures'].append('visible canceled text is not a prefix of the exact-length reference')
-            comparison['passed'] = False
-        reference.update(status='pass' if comparison['passed'] else 'fail',
-                         completion_tokens=response.get('usage', {}).get('completion_tokens'),
-                         comparison=comparison,
-                         reason='all canceled accepted-prefix state matches exact-length reference' if comparison['passed'] else
-                                '; '.join(comparison['failures']))
-        result['checks'][-1] = reference
+        for repeat in range(args.reference_repeats):
+            reference_env = state_dump_env(base_env, args.output / f'gdn-reference-{repeat:02d}.bin',
+                                           args.dump_gdn_at)
+            reference_cfg = config_with_engine_env(cfg, reference_env)
+            reference_cfg.update(
+                port=int(cfg['port']) + 21 + repeat,
+                log=str((args.output / f'engine-reference-{repeat:02d}.log').resolve()))
+            reference_config_path = args.output / f'server-config-reference-{repeat:02d}.json'
+            reference_config_path.write_text(json.dumps(reference_cfg, indent=2) + '\n')
+            reference_server = None
+            try:
+                reference_server, reference_base, reference_health = start_server(
+                    reference_cfg, reference_config_path, reference_env)
+                reference_body = dict(body_base, model=reference_health['model'],
+                                      max_tokens=result['canceled_token_count'], stream=False)
+                response = get_json(reference_base, '/v1/chat/completions', timeout=300,
+                                    body=reference_body)
+                reference_text = response['choices'][0]['message'].get('content', '')
+                lines = Path(reference_cfg['log']).read_text(errors='replace').splitlines()
+                ref_trace = parse_prefix_entries(lines)
+                cancel_comparison = compare_prefix_traces(cancel_trace, ref_trace)
+                visible_prefix = reference_text.startswith(cancel_row['visible_text'])
+                if not visible_prefix:
+                    cancel_comparison['failures'].append(
+                        'visible canceled text is not a prefix of the exact-length reference')
+                    cancel_comparison['passed'] = False
+                repeat_row = {
+                    'repeat': repeat, 'status': 'pass' if cancel_comparison['passed'] else 'fail',
+                    'completion_tokens': response.get('usage', {}).get('completion_tokens'),
+                    'reference_text': reference_text,
+                    'cancel_visible_text_is_reference_prefix': visible_prefix,
+                    'reference_trace': ref_trace,
+                    'cancellation_comparison': cancel_comparison,
+                }
+                if reference_traces:
+                    baseline_comparison = compare_prefix_traces(reference_traces[0], ref_trace)
+                    repeat_row['reference_repeatability'] = baseline_comparison
+                    reference['comparisons'].append({
+                        'repeat': repeat,
+                        'matches_first_reference': baseline_comparison['passed'],
+                        'comparison': baseline_comparison,
+                    })
+                else:
+                    reference['comparisons'].append({
+                        'repeat': repeat, 'matches_first_reference': True,
+                        'comparison': None,
+                    })
+                reference_traces.append(ref_trace)
+                reference_texts.append(reference_text)
+                reference['runs'].append(repeat_row)
+                reference['status'] = 'running'
+                write_result(result_path, result)
+            finally:
+                if reference_server is not None:
+                    stop_server(reference_server)
+        all_cancel_match = all(row['cancellation_comparison']['passed']
+                               for row in reference['runs'])
+        references_repeat = all(row['matches_first_reference']
+                                for row in reference['comparisons'])
+        texts_repeat = len(set(reference_texts)) == 1
+        reference['references_repeatable'] = references_repeat and texts_repeat
+        reference['status'] = 'pass' if all_cancel_match and references_repeat and texts_repeat else 'fail'
+        reference['reason'] = ('all references match canceled committed state and each other'
+                               if reference['status'] == 'pass' else
+                               'cancellation parity or exact-length reference repeatability failed')
         write_result(result_path, result)
-        return int(not comparison['passed'] or any(row.get('status') != 'pass' for row in result['checks']))
+        return int(reference['status'] != 'pass' or
+                   any(row.get('status') != 'pass' for row in result['checks']))
     except Exception as exc:
         reference.update(status='fail', reason=f'{type(exc).__name__}: {exc}')
         result['error'] = reference['reason']
         write_result(result_path, result)
         return 1
-    finally:
-        if reference_server is not None:
-            stop_server(reference_server)
 
 
 if __name__ == '__main__':

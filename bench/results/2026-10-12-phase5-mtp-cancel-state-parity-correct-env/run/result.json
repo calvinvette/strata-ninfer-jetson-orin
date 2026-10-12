@@ -1,0 +1,612 @@
+{
+  "schema": 1,
+  "scope": "MTP accepted-prefix cancellation state parity and same-process recovery",
+  "model": "Qwen3.8-Flash-Next-Coder-IQ1_M-Orin-validation",
+  "workload_cell": "open-ended-integer-list",
+  "prompt_text": "Write the integers from 1 through 1000 separated by single spaces. Do not add an introduction or conclusion, and do not stop before 1000.",
+  "requested_output_tokens": 1024,
+  "cancel_after_nonempty_deltas": 1,
+  "reference_repeats": 3,
+  "dump_gdn_at": null,
+  "effective_engine_env": {
+    "STRATA_PREFILL_CPU_SHARE": "0",
+    "STRATA_MTP_BATCH": "1",
+    "STRATA_STATE_HASH": "1",
+    "STRATA_STATE_HASH_GDN": "1",
+    "STRATA_ACCEPTED_PREFIX_TRACE": "1"
+  },
+  "checks": [
+    {
+      "check": "stream_cancel",
+      "status": "pass",
+      "visible_text": "1",
+      "visible_deltas": 1,
+      "committed_tokens": 5,
+      "accepted_prefix_trace": [
+        {
+          "position": 47,
+          "window": 1,
+          "accepted_drafts": 0,
+          "committed": 1,
+          "token_ids": [
+            16
+          ],
+          "state": {
+            "L": "48",
+            "gdn": "a1f2128c0885a21c",
+            "ple": "e2bf43719555488c",
+            "tail": "2205ea53e2e8ad06",
+            "dead": "42a6682eb1304a30",
+            "pooled": "f346d460fc0ccfbf",
+            "pooled_full": "20a4315dccb9e8f8",
+            "kv": "0b617096e36facbb",
+            "mtp": "3773ad5782000553",
+            "stale": "14650fb0739d0383",
+            "ple_prev": "248069,271"
+          }
+        },
+        {
+          "position": 48,
+          "window": 4,
+          "accepted_drafts": 3,
+          "committed": 4,
+          "token_ids": [
+            220,
+            17,
+            220,
+            18
+          ],
+          "state": {
+            "L": "52",
+            "gdn": "f2cedac362f07b45",
+            "ple": "71de6a3551a64102",
+            "tail": "1ee8a1e87385f33c",
+            "dead": "42a6682eb1304a30",
+            "pooled": "be5bd8db19293672",
+            "pooled_full": "1ba789f5ffb9fe7d",
+            "kv": "22f2032f40e3d22d",
+            "mtp": "08cb02aab59ec78d",
+            "stale": "14650fb0739d0383",
+            "ple_prev": "17,220"
+          }
+        }
+      ],
+      "prompt_summary": "strata serve: prompt 48 tokens = 0 reused + 48 read in 3461 ms (13.9 tok/s), 5 generated in 1283 ms (3.9 tok/s), drafts accepted 3 of 3, 1 checkpoints (cancelled)"
+    },
+    {
+      "check": "same_process_recovery",
+      "status": "pass",
+      "response_text": "Hello Orin!",
+      "reason": "expected recovery response",
+      "server_alive": true
+    },
+    {
+      "check": "fresh_exact_length_references",
+      "status": "fail",
+      "runs": [
+        {
+          "repeat": 0,
+          "status": "fail",
+          "completion_tokens": 5,
+          "reference_text": "1 2 3",
+          "cancel_visible_text_is_reference_prefix": true,
+          "reference_trace": [
+            {
+              "position": 47,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                16
+              ],
+              "state": {
+                "L": "48",
+                "gdn": "c9491ff7d5c9ea8d",
+                "ple": "3f8d15a9f8dacdaa",
+                "tail": "def33eb455338dff",
+                "dead": "047657f09ee8efe6",
+                "pooled": "ef9ad344ca146c99",
+                "pooled_full": "fd7bdd84933d6294",
+                "kv": "f5a98e571c3f0f0f",
+                "mtp": "5a58460ee0a8f2ff",
+                "stale": "14650fb0739d0383",
+                "ple_prev": "248069,271"
+              }
+            },
+            {
+              "position": 48,
+              "window": 4,
+              "accepted_drafts": 3,
+              "committed": 4,
+              "token_ids": [
+                220,
+                17,
+                220,
+                18
+              ],
+              "state": {
+                "L": "52",
+                "gdn": "5b2f2e49bbd953e2",
+                "ple": "a0d6755fb2f4bb19",
+                "tail": "ba4f1fc39c7ad113",
+                "dead": "047657f09ee8efe6",
+                "pooled": "df7b513b9d52f002",
+                "pooled_full": "1bfac5209fe508b3",
+                "kv": "26852a48aa94ef77",
+                "mtp": "8a40dc3b54bb8fbd",
+                "stale": "14650fb0739d0383",
+                "ple_prev": "17,220"
+              }
+            }
+          ],
+          "cancellation_comparison": {
+            "passed": false,
+            "failures": [
+              "persistent state differs at accepted prefix L=48",
+              "persistent state differs at accepted prefix L=52"
+            ],
+            "cancelled_token_ids": [
+              16,
+              220,
+              17,
+              220,
+              18
+            ],
+            "reference_token_ids": [
+              16,
+              220,
+              17,
+              220,
+              18
+            ],
+            "shared_state_lengths": [],
+            "cancelled_final_state": {
+              "L": "52",
+              "gdn": "f2cedac362f07b45",
+              "ple": "71de6a3551a64102",
+              "tail": "1ee8a1e87385f33c",
+              "dead": "42a6682eb1304a30",
+              "pooled": "be5bd8db19293672",
+              "pooled_full": "1ba789f5ffb9fe7d",
+              "kv": "22f2032f40e3d22d",
+              "mtp": "08cb02aab59ec78d",
+              "stale": "14650fb0739d0383",
+              "ple_prev": "17,220"
+            },
+            "reference_final_state": {
+              "L": "52",
+              "gdn": "5b2f2e49bbd953e2",
+              "ple": "a0d6755fb2f4bb19",
+              "tail": "ba4f1fc39c7ad113",
+              "dead": "047657f09ee8efe6",
+              "pooled": "df7b513b9d52f002",
+              "pooled_full": "1bfac5209fe508b3",
+              "kv": "26852a48aa94ef77",
+              "mtp": "8a40dc3b54bb8fbd",
+              "stale": "14650fb0739d0383",
+              "ple_prev": "17,220"
+            }
+          }
+        },
+        {
+          "repeat": 1,
+          "status": "fail",
+          "completion_tokens": 5,
+          "reference_text": "1 2 3",
+          "cancel_visible_text_is_reference_prefix": true,
+          "reference_trace": [
+            {
+              "position": 47,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                16
+              ],
+              "state": {
+                "L": "48",
+                "gdn": "5d39c04474786fa1",
+                "ple": "e2bf43719555488c",
+                "tail": "328fff6c066ecc53",
+                "dead": "949e6ddcc5cadb03",
+                "pooled": "e2bacaa3aa2f324a",
+                "pooled_full": "0ca39e697fd2f5ae",
+                "kv": "836603e104903674",
+                "mtp": "2fc1d673969439f0",
+                "stale": "14650fb0739d0383",
+                "ple_prev": "248069,271"
+              }
+            },
+            {
+              "position": 48,
+              "window": 4,
+              "accepted_drafts": 3,
+              "committed": 4,
+              "token_ids": [
+                220,
+                17,
+                220,
+                18
+              ],
+              "state": {
+                "L": "52",
+                "gdn": "3f868b5359b01690",
+                "ple": "71de6a3551a64102",
+                "tail": "b2801b0d6e8a2f97",
+                "dead": "949e6ddcc5cadb03",
+                "pooled": "76930b9723364beb",
+                "pooled_full": "749134d07b724d1f",
+                "kv": "1b246ee8db4cbdb7",
+                "mtp": "054608807f253cb9",
+                "stale": "14650fb0739d0383",
+                "ple_prev": "17,220"
+              }
+            }
+          ],
+          "cancellation_comparison": {
+            "passed": false,
+            "failures": [
+              "persistent state differs at accepted prefix L=48",
+              "persistent state differs at accepted prefix L=52"
+            ],
+            "cancelled_token_ids": [
+              16,
+              220,
+              17,
+              220,
+              18
+            ],
+            "reference_token_ids": [
+              16,
+              220,
+              17,
+              220,
+              18
+            ],
+            "shared_state_lengths": [],
+            "cancelled_final_state": {
+              "L": "52",
+              "gdn": "f2cedac362f07b45",
+              "ple": "71de6a3551a64102",
+              "tail": "1ee8a1e87385f33c",
+              "dead": "42a6682eb1304a30",
+              "pooled": "be5bd8db19293672",
+              "pooled_full": "1ba789f5ffb9fe7d",
+              "kv": "22f2032f40e3d22d",
+              "mtp": "08cb02aab59ec78d",
+              "stale": "14650fb0739d0383",
+              "ple_prev": "17,220"
+            },
+            "reference_final_state": {
+              "L": "52",
+              "gdn": "3f868b5359b01690",
+              "ple": "71de6a3551a64102",
+              "tail": "b2801b0d6e8a2f97",
+              "dead": "949e6ddcc5cadb03",
+              "pooled": "76930b9723364beb",
+              "pooled_full": "749134d07b724d1f",
+              "kv": "1b246ee8db4cbdb7",
+              "mtp": "054608807f253cb9",
+              "stale": "14650fb0739d0383",
+              "ple_prev": "17,220"
+            }
+          },
+          "reference_repeatability": {
+            "passed": false,
+            "failures": [
+              "persistent state differs at accepted prefix L=48",
+              "persistent state differs at accepted prefix L=52"
+            ],
+            "cancelled_token_ids": [
+              16,
+              220,
+              17,
+              220,
+              18
+            ],
+            "reference_token_ids": [
+              16,
+              220,
+              17,
+              220,
+              18
+            ],
+            "shared_state_lengths": [],
+            "cancelled_final_state": {
+              "L": "52",
+              "gdn": "5b2f2e49bbd953e2",
+              "ple": "a0d6755fb2f4bb19",
+              "tail": "ba4f1fc39c7ad113",
+              "dead": "047657f09ee8efe6",
+              "pooled": "df7b513b9d52f002",
+              "pooled_full": "1bfac5209fe508b3",
+              "kv": "26852a48aa94ef77",
+              "mtp": "8a40dc3b54bb8fbd",
+              "stale": "14650fb0739d0383",
+              "ple_prev": "17,220"
+            },
+            "reference_final_state": {
+              "L": "52",
+              "gdn": "3f868b5359b01690",
+              "ple": "71de6a3551a64102",
+              "tail": "b2801b0d6e8a2f97",
+              "dead": "949e6ddcc5cadb03",
+              "pooled": "76930b9723364beb",
+              "pooled_full": "749134d07b724d1f",
+              "kv": "1b246ee8db4cbdb7",
+              "mtp": "054608807f253cb9",
+              "stale": "14650fb0739d0383",
+              "ple_prev": "17,220"
+            }
+          }
+        },
+        {
+          "repeat": 2,
+          "status": "fail",
+          "completion_tokens": 5,
+          "reference_text": "1 2 3",
+          "cancel_visible_text_is_reference_prefix": true,
+          "reference_trace": [
+            {
+              "position": 47,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                16
+              ],
+              "state": {
+                "L": "48",
+                "gdn": "864229d965db019f",
+                "ple": "e2bf43719555488c",
+                "tail": "caabf60201febc51",
+                "dead": "430bf9b9a61448f3",
+                "pooled": "01b5162d1e68f6b6",
+                "pooled_full": "26f7ccf8688eec3e",
+                "kv": "e36f8ade3fce2f6b",
+                "mtp": "1f0ee9fae777e334",
+                "stale": "14650fb0739d0383",
+                "ple_prev": "248069,271"
+              }
+            },
+            {
+              "position": 48,
+              "window": 4,
+              "accepted_drafts": 3,
+              "committed": 4,
+              "token_ids": [
+                220,
+                17,
+                220,
+                18
+              ],
+              "state": {
+                "L": "52",
+                "gdn": "cb27fef35710e880",
+                "ple": "71de6a3551a64102",
+                "tail": "7b79b9997d378fce",
+                "dead": "430bf9b9a61448f3",
+                "pooled": "c9d598af6c04e166",
+                "pooled_full": "3ab9260a4e1bb1f6",
+                "kv": "7eb6628a36f1875a",
+                "mtp": "991404d39ad32f91",
+                "stale": "14650fb0739d0383",
+                "ple_prev": "17,220"
+              }
+            }
+          ],
+          "cancellation_comparison": {
+            "passed": false,
+            "failures": [
+              "persistent state differs at accepted prefix L=48",
+              "persistent state differs at accepted prefix L=52"
+            ],
+            "cancelled_token_ids": [
+              16,
+              220,
+              17,
+              220,
+              18
+            ],
+            "reference_token_ids": [
+              16,
+              220,
+              17,
+              220,
+              18
+            ],
+            "shared_state_lengths": [],
+            "cancelled_final_state": {
+              "L": "52",
+              "gdn": "f2cedac362f07b45",
+              "ple": "71de6a3551a64102",
+              "tail": "1ee8a1e87385f33c",
+              "dead": "42a6682eb1304a30",
+              "pooled": "be5bd8db19293672",
+              "pooled_full": "1ba789f5ffb9fe7d",
+              "kv": "22f2032f40e3d22d",
+              "mtp": "08cb02aab59ec78d",
+              "stale": "14650fb0739d0383",
+              "ple_prev": "17,220"
+            },
+            "reference_final_state": {
+              "L": "52",
+              "gdn": "cb27fef35710e880",
+              "ple": "71de6a3551a64102",
+              "tail": "7b79b9997d378fce",
+              "dead": "430bf9b9a61448f3",
+              "pooled": "c9d598af6c04e166",
+              "pooled_full": "3ab9260a4e1bb1f6",
+              "kv": "7eb6628a36f1875a",
+              "mtp": "991404d39ad32f91",
+              "stale": "14650fb0739d0383",
+              "ple_prev": "17,220"
+            }
+          },
+          "reference_repeatability": {
+            "passed": false,
+            "failures": [
+              "persistent state differs at accepted prefix L=48",
+              "persistent state differs at accepted prefix L=52"
+            ],
+            "cancelled_token_ids": [
+              16,
+              220,
+              17,
+              220,
+              18
+            ],
+            "reference_token_ids": [
+              16,
+              220,
+              17,
+              220,
+              18
+            ],
+            "shared_state_lengths": [],
+            "cancelled_final_state": {
+              "L": "52",
+              "gdn": "5b2f2e49bbd953e2",
+              "ple": "a0d6755fb2f4bb19",
+              "tail": "ba4f1fc39c7ad113",
+              "dead": "047657f09ee8efe6",
+              "pooled": "df7b513b9d52f002",
+              "pooled_full": "1bfac5209fe508b3",
+              "kv": "26852a48aa94ef77",
+              "mtp": "8a40dc3b54bb8fbd",
+              "stale": "14650fb0739d0383",
+              "ple_prev": "17,220"
+            },
+            "reference_final_state": {
+              "L": "52",
+              "gdn": "cb27fef35710e880",
+              "ple": "71de6a3551a64102",
+              "tail": "7b79b9997d378fce",
+              "dead": "430bf9b9a61448f3",
+              "pooled": "c9d598af6c04e166",
+              "pooled_full": "3ab9260a4e1bb1f6",
+              "kv": "7eb6628a36f1875a",
+              "mtp": "991404d39ad32f91",
+              "stale": "14650fb0739d0383",
+              "ple_prev": "17,220"
+            }
+          }
+        }
+      ],
+      "comparisons": [
+        {
+          "repeat": 0,
+          "matches_first_reference": true,
+          "comparison": null
+        },
+        {
+          "repeat": 1,
+          "matches_first_reference": false,
+          "comparison": {
+            "passed": false,
+            "failures": [
+              "persistent state differs at accepted prefix L=48",
+              "persistent state differs at accepted prefix L=52"
+            ],
+            "cancelled_token_ids": [
+              16,
+              220,
+              17,
+              220,
+              18
+            ],
+            "reference_token_ids": [
+              16,
+              220,
+              17,
+              220,
+              18
+            ],
+            "shared_state_lengths": [],
+            "cancelled_final_state": {
+              "L": "52",
+              "gdn": "5b2f2e49bbd953e2",
+              "ple": "a0d6755fb2f4bb19",
+              "tail": "ba4f1fc39c7ad113",
+              "dead": "047657f09ee8efe6",
+              "pooled": "df7b513b9d52f002",
+              "pooled_full": "1bfac5209fe508b3",
+              "kv": "26852a48aa94ef77",
+              "mtp": "8a40dc3b54bb8fbd",
+              "stale": "14650fb0739d0383",
+              "ple_prev": "17,220"
+            },
+            "reference_final_state": {
+              "L": "52",
+              "gdn": "3f868b5359b01690",
+              "ple": "71de6a3551a64102",
+              "tail": "b2801b0d6e8a2f97",
+              "dead": "949e6ddcc5cadb03",
+              "pooled": "76930b9723364beb",
+              "pooled_full": "749134d07b724d1f",
+              "kv": "1b246ee8db4cbdb7",
+              "mtp": "054608807f253cb9",
+              "stale": "14650fb0739d0383",
+              "ple_prev": "17,220"
+            }
+          }
+        },
+        {
+          "repeat": 2,
+          "matches_first_reference": false,
+          "comparison": {
+            "passed": false,
+            "failures": [
+              "persistent state differs at accepted prefix L=48",
+              "persistent state differs at accepted prefix L=52"
+            ],
+            "cancelled_token_ids": [
+              16,
+              220,
+              17,
+              220,
+              18
+            ],
+            "reference_token_ids": [
+              16,
+              220,
+              17,
+              220,
+              18
+            ],
+            "shared_state_lengths": [],
+            "cancelled_final_state": {
+              "L": "52",
+              "gdn": "5b2f2e49bbd953e2",
+              "ple": "a0d6755fb2f4bb19",
+              "tail": "ba4f1fc39c7ad113",
+              "dead": "047657f09ee8efe6",
+              "pooled": "df7b513b9d52f002",
+              "pooled_full": "1bfac5209fe508b3",
+              "kv": "26852a48aa94ef77",
+              "mtp": "8a40dc3b54bb8fbd",
+              "stale": "14650fb0739d0383",
+              "ple_prev": "17,220"
+            },
+            "reference_final_state": {
+              "L": "52",
+              "gdn": "cb27fef35710e880",
+              "ple": "71de6a3551a64102",
+              "tail": "7b79b9997d378fce",
+              "dead": "430bf9b9a61448f3",
+              "pooled": "c9d598af6c04e166",
+              "pooled_full": "3ab9260a4e1bb1f6",
+              "kv": "7eb6628a36f1875a",
+              "mtp": "991404d39ad32f91",
+              "stale": "14650fb0739d0383",
+              "ple_prev": "17,220"
+            }
+          }
+        }
+      ],
+      "references_repeatable": false,
+      "reason": "cancellation parity or exact-length reference repeatability failed"
+    }
+  ],
+  "canceled_token_count": 5
+}

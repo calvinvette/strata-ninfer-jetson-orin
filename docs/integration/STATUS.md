@@ -1,6 +1,6 @@
 # Integration status
 
-Updated: 2026-10-11. Phases 1 and 2 are complete with their supported, failed,
+Updated: 2026-10-12. Phases 1 and 2 are complete with their supported, failed,
 unsupported and untested scopes recorded. Phase 3 memory ownership and transfer
 work is active; its admission screens and focused owner tests are recorded below,
 with broader pressure and transfer gates still open. No NInfer execution
@@ -9,6 +9,10 @@ component has been promoted into Strata.
 The focused [SessionLoopScratch owner check](../../bench/results/2026-10-11-phase3-session-loop-scratch-owner-retest/README.md) traces a 65,536-byte mapped/pinned host allocation and one matching free; repeated teardown is idempotent. The serial [Phase 3 owner/PLE regression](../../bench/results/2026-10-11-phase3-session-owner-ctest/README.md) passed 23/23. CUDA relink and maestro1 HIP compile identities are retained. The validated native pack bypasses the legacy session-loop route; broader unique-backing and graph accounting remain open.
 
 The fresh [Q2_0 PLE and owner/graph regression](../../bench/results/2026-10-11-phase3-followup-fresh/README.md) passed the artifact-aware PLE oracle and all 19 selected ownership/graph tests on the current candidate. The seven PLE stages passed for three tokens (worst relative L1 `1.148e-7`); CTest passed 19/19 with 24.52 GiB minimum host availability. This reconfirms selected contracts only; graph-pool pricing, broad pressure behavior and remaining transfer/admission cells remain open.
+
+The [2026-10-12 Q2_0 PLE follow-up](../../bench/results/2026-10-12-phase3-ple-followup/README.md) repeated the current-binary oracle and selected owner/graph checks: all seven PLE stages passed for three tokens (worst relative L1 `1.148e-7`), CTest passed 19/19, and integration Python discovery passed 111/111. Minimum host availability was 24.66 GiB for PLE and 24.53 GiB for CTest under the six-GiB supervisor. This refreshes contract evidence only; Phase 3 pressure, graph-backing, and transfer/admission gates remain open.
+
+The corrected [MTP cancellation state-parity rerun](../../bench/results/2026-10-12-phase5-mtp-cancel-state-parity-correct-env/README.md) explicitly wrote `STRATA_PREFILL_CPU_SHARE=0` into each generated engine config. Cancellation and same-process recovery passed; three fresh exact-length references returned matching tokens and matching state hashes to one another, but all differed from cancellation at accepted lengths 48 and 52. The earlier repeat and numeric-dump runs had inherited a config override of `0.5`, so they are invalid as zero-CPU-prefill controls. This remains an unresolved Phase 5 failure and provides no Phase 3 performance evidence.
 
 After the Q6_K opt-in kernel change, the same [Q2_0 PLE and ownership regression](../../bench/results/2026-10-11-phase3-current-kernel-ple-regression/README.md) passed again on the current binary: all seven PLE stages for three tokens (worst relative L1 `1.148e-7`), 19/19 selected CTests and 103/103 integration Python tests. Minimum host availability was 27.21 GiB. The new kernel environment variable was unset, confirming the default route retains the established PLE behavior.
 
