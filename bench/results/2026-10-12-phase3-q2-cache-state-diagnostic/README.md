@@ -108,3 +108,27 @@ requested owner payloads at instrumented sites, not physical backing totals;
 CUDA graph/driver-private bytes remain outside this trace. See
 `prefill-cache-owners.json`; host availability and tegrastats are retained per
 run.
+
+## Sixty-four-token output follow-up
+
+To check whether the state differences changed the immediate output sequence,
+the same 511-token prompt was run for 64 greedy tokens at both endpoints of
+the chunk/cache screen: chunks 64/512 × caches 3,000/5,000, with two fresh
+processes per cell. All eight requests returned 64 tokens, and every token
+sequence was identical (SHA-256
+`b10c76bf98fb70ceeaea81138d5a5034c50470900e2a874d319a525d4924f2f4`). Each
+run recorded 64 accepted-prefix commits; fingerprints were byte-for-byte
+repeatable between processes within each cell, but differed from the
+3,000-slot/chunk-512 control at every commit when either factor changed. The
+lowest `MemAvailable` was 15.57 GiB, above the supervisor floor. Raw token IDs,
+accepted-prefix logs, commands and per-run telemetry are retained in the cell
+directories; `long-output-comparison.json` summarizes them.
+
+This establishes same-sequence output for one exact prompt and greedy 64-token
+continuation despite persistent-state differences. It is not an independent
+quality oracle, a held-out prompt result, or a long-context quality test. No
+cache or prefill default is promoted. The initial attempts with context 576
+were rejected by request validation because the runtime reserves eight extra
+positions; one queued attempt was interrupted after a result-directory
+collision. Those setup records are retained and excluded from the valid
+comparison in `long-output-failed-attempts.json`.

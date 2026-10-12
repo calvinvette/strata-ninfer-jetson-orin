@@ -1,0 +1,58 @@
+{
+  "scope": "Attempt records excluded from the valid 2x2 long-output comparison; none is counted as a model output result.",
+  "context_setup_failures": [
+    {
+      "directory": "long64-attempt2-chunk512-cache3000-r1",
+      "supervisor_status": "fail",
+      "reason": "setup rejected before request: prompt 511 + max_new 64 exceeded configured context 576; Strata reserves an additional eight positions",
+      "output_tokens": 0,
+      "stderr_tail": "                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/calvin/workspace/strata-ninfer-jetson-orin/serve/server.py\", line 1563, in generate\n    raise ValueError(line[4:].strip())\nValueError: prompt (511 tokens) + max_new (64) exceeds the context (576)\n"
+    },
+    {
+      "directory": "long64-chunk512-cache3000-r1",
+      "supervisor_status": "fail",
+      "reason": "setup rejected before request: prompt 511 + max_new 64 exceeded configured context 576; Strata reserves an additional eight positions",
+      "output_tokens": 0,
+      "stderr_tail": "                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/calvin/workspace/strata-ninfer-jetson-orin/serve/server.py\", line 1563, in generate\n    raise ValueError(line[4:].strip())\nValueError: prompt (511 tokens) + max_new (64) exceeds the context (576)\n"
+    },
+    {
+      "directory": "long64-chunk512-cache3000-r3",
+      "supervisor_status": "fail",
+      "reason": "setup rejected before request: prompt 511 + max_new 64 exceeded configured context 576; Strata reserves an additional eight positions",
+      "output_tokens": 0,
+      "stderr_tail": "                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/calvin/workspace/strata-ninfer-jetson-orin/serve/server.py\", line 1563, in generate\n    raise ValueError(line[4:].strip())\nValueError: prompt (511 tokens) + max_new (64) exceeds the context (576)\n"
+    },
+    {
+      "directory": "long64-chunk64-cache3000-r2",
+      "supervisor_status": "fail",
+      "reason": "setup rejected before request: prompt 511 + max_new 64 exceeded configured context 576; Strata reserves an additional eight positions",
+      "output_tokens": 0,
+      "stderr_tail": "                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/calvin/workspace/strata-ninfer-jetson-orin/serve/server.py\", line 1563, in generate\n    raise ValueError(line[4:].strip())\nValueError: prompt (511 tokens) + max_new (64) exceeds the context (576)\n"
+    },
+    {
+      "directory": "long64-chunk64-cache3000-r3",
+      "supervisor_status": "fail",
+      "reason": "setup rejected before request: prompt 511 + max_new 64 exceeded configured context 576; Strata reserves an additional eight positions",
+      "output_tokens": 0,
+      "stderr_tail": "                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/calvin/workspace/strata-ninfer-jetson-orin/serve/server.py\", line 1563, in generate\n    raise ValueError(line[4:].strip())\nValueError: prompt (511 tokens) + max_new (64) exceeds the context (576)\n"
+    },
+    {
+      "directory": "long64-chunk64-cache5000-r2",
+      "supervisor_status": "not_run",
+      "reason": "setup rejected before request: prompt 511 + max_new 64 exceeded configured context 576; Strata reserves an additional eight positions",
+      "output_tokens": 0,
+      "stderr_tail": "                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/calvin/workspace/strata-ninfer-jetson-orin/serve/server.py\", line 1563, in generate\n    raise ValueError(line[4:].strip())\nValueError: prompt (511 tokens) + max_new (64) exceeds the context (576)\n"
+    }
+  ],
+  "interrupted_run": {
+    "directory": "long64-chunk512-cache3000-r2",
+    "classification": "not_run; partially executed then terminated to stop the queued batch after an output-directory collision",
+    "accepted_prefix_records": 18,
+    "workload_result_written": false
+  },
+  "directory_collision": {
+    "requested_directory": "long64-chunk64-cache5000-r2",
+    "classification": "run_control refused to overwrite a directory from the failed first attempt; no new supervised run launched there"
+  },
+  "correction": "The runner now reserves 16 context positions beyond prompt plus requested generation and all valid runs used configured context 640."
+}

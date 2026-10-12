@@ -988,3 +988,11 @@ prefill owner request rose from 197.2 to 350.1 MB across chunks 64–512; the
 expert-cache owner requested 4.147/6.912 GB at 3,000/5,000 slots. These are
 instrumented requested payloads, not physical backing totals; graph and driver
 bytes remain outside the trace. Full cell accounting is in the linked report.
+
+A [Q2_0 64-token continuation follow-up](../../bench/results/2026-10-12-phase3-q2-cache-state-diagnostic/README.md)
+used two fresh processes per endpoint cell (chunk 64/512 × cache 3,000/5,000).
+All eight requests returned the same 64-token sequence, and accepted-prefix
+fingerprints repeated exactly within each cell. Fingerprints differed from the
+3,000-slot/chunk-512 control at every commit when either factor changed. This
+is one prompt with greedy decoding; it does not qualify task quality or resolve
+the state difference. Phase 3 remains open.

@@ -749,3 +749,8 @@ the numerical contract.
 Record the corresponding unique owner requests beside OS-level available
 memory and platform counters. Do not treat an owner ledger as a physical-memory
 total when driver or graph backing is outside its instrumentation.
+The Q2_0 continuation check also held the same 64-token output sequence across
+the tested profiles while accepted-prefix fingerprints differed at every
+commit. For Splash, include a fixed greedy continuation and compare every
+published prefix; equal text alone does not prove recurrence-state parity, and
+different fingerprints still need a separate task-level quality criterion.
