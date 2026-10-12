@@ -20,6 +20,7 @@ reading and pinning that engine's actual source and license:
 | Own process lifecycle in the harness | One cooperating campaign lock, child process groups, bounded TERM/KILL, partial JSON | Implement equivalent process cleanup and platform telemetry; Linux `/proc` is not portable |
 | Promote narrow seams | Existing Strata scheduler, physical owner and persistent state remain authoritative | Identify the existing Metal/CPU owner; avoid a duplicate scheduler or memory ledger |
 | Attribute weight arenas | Main CUDA `WeightTable` dense arena is one explicit allocation with an opt-in owner event; do not count its suballocated tensor views again | Inventory each dense/packed arena and its lifetime; distinguish backing allocations from tensor views and confirm successful free events |
+| Attribute helper-process allocations | `cuda_alloc_observations.py` groups a test interposer's runtime allocation events by PID; pair it with the owner event ledger and whole-board MemAvailable | Instrument the encoder/helper process as well as the engine; keep process request totals separate from physical capacity and from each other |
 | Independent correctness before schedules | Codec/math oracle and accepted-prefix state gates remain pending | CPU FP64 or independent exact codec reference; directly inspect recurrent/KV state for speculation |
 
 `tools/integration/run_control.py` supervises explicit commands. It samples
@@ -79,6 +80,17 @@ cannot be labeled as per-request storage bytes. A future Splash harness should
 inventory the platform's actual process-I/O and GPU-allocation telemetry before
 designing per-request accounting; Linux procfs/cgroup assumptions do not carry
 over to Apple platforms.
+
+For the 1,024-token Orin vision smoke, a test-only CUDA runtime interposer
+observed the vision encoder and Strata engine as separate PIDs. The
+`tools/integration/cuda_alloc_observations.py` parser retains per-process
+high-water and shutdown-current request counts. This supplements the Strata
+owner trace, which cannot account for a separate executable. The interposer
+observes selected CUDA runtime allocation calls only: it does not measure
+driver-private, graph-pool, or unique physical backing, and its process totals
+must not be summed as if they were separate memory pools. The authoritative
+admission check remains whole-board MemAvailable under the six-GiB floor. See
+the [vision attribution rerun](../../bench/results/2026-10-12-phase3-vision-1024/README.md).
 
 For Orin, a temporary systemd scope with `IOAccounting=yes` did expose leaf
 `io.stat`. A 64 MiB `O_DIRECT` read moved the scope's `rbytes` by exactly 64

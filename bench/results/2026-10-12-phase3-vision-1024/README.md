@@ -58,3 +58,16 @@ supervisor telemetry are retained under `interposed-experiment/` and
 `interposed-supervisor/`. This fills the missing separate-process request
 attribution for this one vision fixture, but does not establish a complete
 physical allocation ledger or an image-size admission envelope.
+
+
+The summaries are reproducible from the retained log with:
+
+```sh
+python tools/integration/owner_observations.py \
+  --engine-log bench/results/2026-10-12-phase3-vision-1024/interposed-experiment/engine.log \
+  --output /tmp/vision-owner-summary.json
+python tools/integration/cuda_alloc_observations.py \
+  --engine-log bench/results/2026-10-12-phase3-vision-1024/interposed-experiment/engine.log \
+  --output /tmp/vision-cuda-summary.json \
+  --label 3328358='vision encoder' --label 3328374='Strata engine'
+```
