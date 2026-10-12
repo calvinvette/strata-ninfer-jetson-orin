@@ -788,3 +788,19 @@ between 8K and 64K. Output IDs matched, but this was an admission experiment,
 not a quality or speed comparison. For Splash, cross configured context with
 automatic cache sizing using fresh processes, preserve each chosen cache size
 and reservation, and report the complete owner peak beside platform telemetry.
+
+## Phase 4 continuation — Held-out kernel confirmation
+
+The opt-in Q6_K warp-layout path reduced request time in seven paired 8K-context
+processes for both 512/64 and 2,048/128 workloads, with each pair matching text,
+speculative draft/accept counts and actual cache capacity. The paired benefit
+came from prompt processing; decode effects were small and mixed. The result
+does not establish task quality or justify changing dispatch. For a future
+Strata + Splash comparison, keep kernel selection opt-in while collecting
+matched formatted prompts, per-stage timings, output identity, cache capacity,
+platform clock observations and physical-memory headroom in independent paired
+processes. Use distinct warmups with one cell per measured cell; the retained
+initialization failure here shows that a mismatched warmup set can reject a
+campaign before measured traffic. Keep traced prefix-state checks separate from
+timing runs, and report their binary/configuration identity when using them as
+adjacent correctness evidence.

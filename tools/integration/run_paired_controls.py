@@ -22,6 +22,10 @@ def main():
                         help='distinct workload sent once before each measured block')
     parser.add_argument('--no-trace', action='store_true',
                         help='disable request-path tracing for timing-only comparisons')
+    parser.add_argument('--sample-clocks', action='store_true',
+                        help='record observed CPU/GPU/EMC rates during every supervised process')
+    parser.add_argument('--privileged-emc', action='store_true',
+                        help='read the protected EMC rate using sudo -n; implies --sample-clocks')
     parser.add_argument('--prior-campaign', type=Path, help='completed compatible campaign to extend with additional independent pairs')
     args = parser.parse_args()
     first_block = 0
@@ -66,9 +70,14 @@ def main():
         run_dir = args.output / name
         config = args.baseline_config if row['variant'] == 'baseline' else args.candidate_config
         command = [sys.executable, str(directory / 'run_control.py'), '--output', str(run_dir.resolve()),
-                   '--timeout', '1800', '--', sys.executable, str(directory / 'api_control_block.py'),
+                   '--timeout', '1800']
+        if args.sample_clocks or args.privileged_emc:
+            command.append('--sample-clocks')
+        if args.privileged_emc:
+            command.append('--privileged-emc')
+        command.extend(['--', sys.executable, str(directory / 'api_control_block.py'),
                    '--config', str(config.resolve()), '--workloads', row['workloads'],
-                   '--output', str((run_dir / 'requests.json').resolve()), '--variant', row['variant']]
+                   '--output', str((run_dir / 'requests.json').resolve()), '--variant', row['variant']])
         if args.warmup_workloads is not None:
             command.extend(['--warmup-workloads', str(args.warmup_workloads.resolve())])
         if args.no_trace:
