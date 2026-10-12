@@ -1008,3 +1008,14 @@ the target fingerprint, but effective headroom reached only 6.205 GiB, about
 observations, preserve an explicit safety margin, and repeat them before
 setting any support boundary. See the
 [18-GiB traced run](../../bench/results/2026-10-13-phase3-q2-admit16k-18G-trace/README.md).
+
+
+## 2026-10-13 — Extend pageable/pinned staging screen to a 16K prompt
+
+Three randomized pairs at 16K matched token IDs and persistent state. Pinned
+staging had a −2.56% median paired request-time delta, but one large pageable
+outlier and only three pairs make it a screening signal. Both modes requested
+337.5 MiB and balanced their stage-buffer lifetimes. For Splash, keep the host
+stage owner explicit and require an independent confirmation prompt before
+concluding that pinning helps end-to-end. See the
+[Orin screen](../../bench/results/2026-10-13-phase3-q2-stage-pin-16k/README.md).
