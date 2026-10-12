@@ -817,3 +817,11 @@ screen is the direct-request control. Minimum
 The earlier probe-enabled timing is retained but excluded from inference.
 Focused stage-parity tests passed 8/8 and integration Python discovery passed
 106/106 after the warmup-completion validation. Phase 3 remains open.
+
+The current Orin candidate was then rechecked with the artifact-aware Q2_0 PLE
+oracle and the selected 19-test Phase 3 CTest set. All seven PLE stages passed
+(worst relative L1 `1.148e-7`), and CTest passed 19/19. Minimum host availability
+was 24.48 GiB and 24.32 GiB, respectively, under the six-GiB supervisor. The
+[rerun report](../../bench/results/2026-10-11-phase3-current-regression-after-harness/README.md)
+reconfirms selected contracts but does not resolve the warmup-state finding or
+close the broader Phase 3 gates.
