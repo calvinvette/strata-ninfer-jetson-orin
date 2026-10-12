@@ -1,0 +1,52 @@
+{
+  "experiment": "Q2_0 exact 8K prompt, pageable versus pinned host expert staging",
+  "host": "Jetson AGX Orin",
+  "engine_sha256": "bdde041e60d8593dac593a846d471c117fee2c5397b01dfd99c9502253dd0f7d",
+  "prompt_tokens": 8192,
+  "generated_tokens": 8,
+  "context_reservation": 8232,
+  "requested_and_log_confirmed_cache_slots": 3000,
+  "io_workers": 8,
+  "prefetch_and_host_staging": true,
+  "systemd_memory_max": "28G",
+  "supervisor_floor_gib": 6,
+  "complete_pairs": 3,
+  "planned_pairs": 3,
+  "all_pairs_passed": true,
+  "all_pairs_match_ids_and_persistent_state": true,
+  "paired_pinned_minus_pageable_request_time_delta_percent": {
+    "definition": "(pinned / pageable - 1) * 100; positive means pinned slower",
+    "per_pair": [-4.797102644707374, 46.16127231704152, 0.8331861745677571],
+    "median": 0.8331861745677571,
+    "paired_bootstrap_95_percentile_interval": [-4.797102644707374, 46.16127231704152],
+    "bootstrap_iterations": 100000
+  },
+  "paired_pinned_minus_pageable_prompt_time_delta_percent": {
+    "per_pair": [-4.690606004435893, 48.146041912153926, -0.9178882884810835],
+    "median": -0.9178882884810835,
+    "paired_bootstrap_95_percentile_interval": [-4.690606004435893, 48.146041912153926]
+  },
+  "paired_pinned_minus_pageable_decode_time_delta_percent": {
+    "per_pair": [-7.106229644515272, -0.735749690210652, 43.06798935398015],
+    "median": -0.735749690210652,
+    "paired_bootstrap_95_percentile_interval": [-7.106229644515272, 43.06798935398015]
+  },
+  "stage_owner_requested_bytes_per_arm": 353894400,
+  "stage_owner_allocation_and_free_events_per_arm": {"allocations": 256, "frees": 256},
+  "memory_supervisor": {
+    "status": "pass",
+    "minimum_host_available_gib": 17.75,
+    "minimum_effective_cgroup_headroom_gib": 10.60,
+    "oom_events": 0,
+    "oom_kill_events": 0
+  },
+  "observed_clocks_mhz": {"cpu": [729.6, 2201.6], "gpu": [306.0, 1300.5], "emc": [3199.0, 3199.0]},
+  "clock_control": "none; dynamic frequencies observed",
+  "energy_scope": "no process-attributed energy result; board rails are not used for an energy-per-token claim",
+  "pairs": [
+    {"pair": 0, "order": ["pageable", "pinned"], "ids_and_state_match": true, "pageable_prompt_ms": 62580.4, "pinned_prompt_ms": 59645.0, "pageable_decode_ms": 2886.2, "pinned_decode_ms": 2681.1, "request_delta_percent": -4.797102644707374, "pageable_log_sha256": "697c7963ee6c502470a14ff8c24ef8f207870ba13b1f1e4b12010d3ca9eb649c", "pinned_log_sha256": "b9a401012b6e2a1afff5aab7c6ec99880ce2d7bd6475cf21c6b3560b8d2d6f0b"},
+    {"pair": 1, "order": ["pinned", "pageable"], "ids_and_state_match": true, "pageable_prompt_ms": 90395.9, "pinned_prompt_ms": 61018.1, "pageable_decode_ms": 2563.4, "pinned_decode_ms": 2582.4, "request_delta_percent": 46.16127231704152, "pageable_log_sha256": "f44d30fb9e3c6185dca58fda671224a88b0990544e6661c4ec375895ffa229b1", "pinned_log_sha256": "0b43f5ff6127585b1ec0d39071b3351aa552ccfe795e9767edd5234958bbcacb"},
+    {"pair": 2, "order": ["pageable", "pinned"], "ids_and_state_match": true, "pageable_prompt_ms": 59811.2, "pinned_prompt_ms": 59262.2, "pageable_decode_ms": 2479.8, "pinned_decode_ms": 3547.8, "request_delta_percent": 0.8331861745677571, "pageable_log_sha256": "79b3de06d2d65454e301d052eaa3570926386d2ac269673e7452ec64a3f72635c", "pinned_log_sha256": "189ba9a0975f843b0ba8ec017f2db96c46a64cfba99aa45ffa2fc396d48edf5"}
+  ],
+  "interpretation": "Three-pair exploratory screen with large first-arm/order-sensitive outlier; no pinned staging promotion."
+}
