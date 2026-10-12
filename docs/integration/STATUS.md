@@ -1,6 +1,6 @@
 # Integration status
 
-Updated: 2026-10-12. Phases 1 and 2 are complete with their supported, failed,
+Updated: 2026-10-13. Phases 1 and 2 are complete with their supported, failed,
 unsupported and untested scopes recorded. Phase 3 memory ownership and transfer
 work is active; its admission screens and focused owner tests are recorded below,
 with broader pressure and transfer gates still open. No NInfer execution
