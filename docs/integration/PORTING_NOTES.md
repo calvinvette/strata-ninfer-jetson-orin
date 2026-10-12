@@ -826,3 +826,9 @@ The integration supervisor now writes its minimum host-available and
 minimum admission-headroom values separately in each terminal result, while
 preserving the raw ancestor samples. Reuse this dual summary in future reports;
 older runs require calculating the effective minimum from their `memory.jsonl`.
+At the same 5,000-slot/cache setting, a 20-GiB scope completed the exact 32K
+prompt and matched the 22-GiB run's final and per-layer GDN fingerprints. This
+is a useful same-configuration state control across cgroup caps; it does not
+remove the separately observed 3,000-vs-5,000-slot state mismatch. For Splash,
+repeat state checks at fixed model, prompt and scheduling configuration before
+interpreting capacity changes as harmless from matching output text alone.

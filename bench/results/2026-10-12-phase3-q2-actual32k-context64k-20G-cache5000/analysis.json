@@ -1,0 +1,73 @@
+{
+  "comparison": {
+    "baseline": "2026-10-12-phase3-q2-actual32k-context64k/cache5000-run (22-GiB scope)",
+    "same_prompt_sha256": true,
+    "same_generated_ids": true,
+    "final_persistent_fingerprint_equal": true,
+    "per_layer_gdn_fingerprints_equal": true,
+    "gdn_layers_compared": 36
+  },
+  "run": {
+    "workload": {
+      "prompt_tokens": 32768,
+      "prompt_sha256": "705dea47aafbfc991d0616621f3a13bf0136a43c546d60c7693c2efdced4d3a3",
+      "generated_ids": [
+        32
+      ],
+      "usage": {
+        "generated": 1,
+        "prompt_tokens": 32768,
+        "prompt_ms": 164134.2,
+        "decode_ms": 217.6,
+        "finish": "length",
+        "drafts_accepted": 0,
+        "drafts_offered": 0,
+        "reused": 0,
+        "hits": 111,
+        "lookups": 480,
+        "ram_blobs": 0,
+        "file_blobs": 0,
+        "file_mb": 510.1,
+        "prompt_read": 32768,
+        "offloaded": 0
+      },
+      "engine_args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/q2-ple-pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/models/strata-orin-validation/q2-expert-profile.bin",
+        "--expert-cache",
+        "5000",
+        "--prefill",
+        "512",
+        "--spec",
+        "2",
+        "--max-context",
+        "65536",
+        "--mmap-experts",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55",
+        "--no-prefill-borrow"
+      ],
+      "passed": true
+    },
+    "owner_allocation_events": 304,
+    "owner_free_events": 303,
+    "requested_device_peak_bytes": 10649721344,
+    "requested_device_live_bytes_at_log_end": 1485606400,
+    "minimum_host_available_bytes": 14893555712,
+    "minimum_effective_cgroup_available_bytes": 10067988480,
+    "elapsed_s": 199.97915172600187,
+    "supervisor_status": "pass",
+    "floor_bytes": 6442450944,
+    "executable_sha256": "bdde041e60d8593dac593a846d471c117fee2c5397b01dfd99c9502253dd0f7d"
+  }
+}
