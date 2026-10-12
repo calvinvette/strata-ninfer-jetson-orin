@@ -864,3 +864,10 @@ events. CPU and GPU clocks were sampled dynamically, EMC sampling was denied,
 and energy was not measured. This covers two cancellation progress points for
 one model/configuration; recovery after allocation failure and broader request
 sizes remain open.
+
+The latest [current-candidate regression](../../bench/results/2026-10-11-phase3-q2-followup-regression/README.md)
+passed the artifact-aware Q2_0 PLE parity test and 18 additional selected
+memory, cache, VMM, graph, and conversation-state CTests (19/19 total), plus
+integration Python discovery (106/106). This is software-contract evidence
+without a memory supervisor or serving request; the broader Phase 3 physical
+backing, pressure, graph-pool, and transfer/admission gates remain open.
