@@ -982,6 +982,13 @@ disconnect, verify no partial response escaped, then issue a real follow-up on
 the same process and reconcile request owners. See the
 [Orin 16K run](../../bench/results/2026-10-13-phase3-q2-cancel-16k/README.md).
 
+The same test passed with a 32K actual prompt and 64K context reservation:
+512 tokens had been read when the stream closed, and the same service again
+returned `Hello Orin!`. Minimum host and cgroup-effective headroom were both
+16.38 GiB. For Splash, include at least one near-limit prompt in cancellation
+and cleanup tests, but keep admission and quality/recall claims separate. See
+the [Orin 32K run](../../bench/results/2026-10-13-phase3-q2-cancel-32k/README.md).
+
 
 ## 2026-10-13 — Add a 16K actual-prompt admission point
 

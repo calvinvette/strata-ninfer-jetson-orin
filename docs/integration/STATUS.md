@@ -1145,3 +1145,11 @@ tokens). The 28-GiB scope retained 17.10 GiB minimum host availability and
 owner ledger left only the service-lifetime weight arena live. This adds one
 intermediate-length cleanup/recovery point; broader pressure and graph/driver
 backing gates remain open.
+
+The exact [Q2_0 32K cancellation/recovery repeat](../../bench/results/2026-10-13-phase3-q2-cancel-32k/README.md)
+also passed at 64K configured context. The stream closed after 1.04 seconds
+with 512/32,768 prompt tokens read and no output; the same service returned
+`Hello Orin!`. Minimum host and effective headroom were both 16.38 GiB, with
+zero OOM events. The 304/303 owner ledger again left only resident weights
+live. This is one cell, not a long-context quality claim; graph/driver backing
+and broader pressure gates remain open.
