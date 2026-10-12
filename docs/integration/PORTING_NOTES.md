@@ -952,3 +952,23 @@ allocations. In Splash, align platform-owner samples to graph lifecycle events
 and keep the platform's physical-memory authority separate from owner payloads.
 The Orin NVMap count and Linux sampling method do not transfer to Metal.
 See the [graph-context report](../../bench/results/2026-10-13-phase3-q2-graph-context8k/README.md).
+
+
+## 2026-10-13 — Cancel an 8K prefill and recover the service
+
+An exact 8,192-token Q2_0 stream was cancelled after one second, after 512
+prompt tokens had been read. The service answered a short follow-up with the
+expected `Hello Orin!`; transient requested owners were gone at log end while
+the model weight arena remained service-resident. The launch's `--spec 2`
+becomes a four-token verifier window because suffix drafting is enabled by
+default, while the MTP draft window stays two. For Splash, record user-facing
+settings and effective runtime windows separately, and pair cancellation with
+a real subsequent request plus owner and platform-memory observations. Keep
+that evidence distinct from clean shutdown and from long-context quality. See
+the [Orin run](../../bench/results/2026-10-13-phase3-q2-cancel-8k/README.md).
+
+A second exact 8K cancellation/recovery run used a 22-GiB cgroup cap. It passed
+with 13.157 GiB minimum effective headroom and the same service-lifetime-only
+owner remainder. Pairing the same prompt and binary across scope caps is useful
+for Splash admission/recovery testing, but these two runs do not define a
+capacity threshold. See the [22-GiB run](../../bench/results/2026-10-13-phase3-q2-cancel-8k-22G/README.md).
