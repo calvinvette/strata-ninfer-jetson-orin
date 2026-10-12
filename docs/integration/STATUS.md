@@ -797,3 +797,15 @@ separate 22-GiB attempt was safely stopped at 5.97 GiB sampled effective
 headroom and is retained as a pressure abort; no OOM occurred. This adds a
 Q2_0 transfer-correctness point but leaves the broader Phase 3 transfer gate
 open.
+
+A seven-pair [warmup-separated Q2_0 stage-backing timing confirmation](../../bench/results/2026-10-11-phase3-q2-stage-pin-confirm7-clean/README.md)
+reran the pageable/pinned comparison with genuinely trace-free engine processes
+after an earlier run was found to retain the graph probe via `LD_PRELOAD`. All
+measured token IDs matched. The paired request delta was +0.58% (pinned slower,
+95% whole-pair bootstrap interval −2.01% to +10.36%); no end-to-end benefit or
+default change is supported. Minimum `MemAvailable` was 21.18 GiB and minimum
+28-GiB cgroup headroom 18.68 GiB, with no OOM events. Two pairs differed in
+warmup completion hash but each generated all 64 warmup tokens; this is
+recorded as a reproducibility limitation. The earlier probe-enabled timing is
+retained but excluded from inference. Focused stage-parity tests and all 105
+integration Python tests passed after the harness fix. Phase 3 remains open.

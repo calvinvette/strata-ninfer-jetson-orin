@@ -13,6 +13,7 @@ class StageBufferEnvironmentTests(unittest.TestCase):
     def test_timing_mode_removes_inherited_trace_instrumentation(self):
         source = {'STRATA_TRACE': '1', 'STRATA_STATE_HASH': '1',
                   'STRATA_INTEGRATION_TRACE': '1', 'STRATA_STATE_HASH_GDN': '1',
+                  'LD_PRELOAD': '/tmp/instrumentation.so',
                   'STRATA_PREFILL_CPU_SHARE': '0'}
         env = stage_environment(source, '1', timing_only=True)
         self.assertEqual(env, {'STRATA_STAGE_PIN': '1', 'STRATA_MTP_BATCH': '1',

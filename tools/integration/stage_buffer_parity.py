@@ -19,8 +19,9 @@ from serve.frontend import ChatTemplate
 from serve.server import StrataEngine, child_env
 
 STATE_KEYS = ('L', 'gdn', 'ple', 'tail', 'dead', 'pooled', 'pooled_full', 'kv', 'ple_prev')
-TRACE_ENV_KEYS = ('STRATA_TRACE', 'STRATA_STATE_HASH', 'STRATA_INTEGRATION_TRACE',
-                  'STRATA_STATE_HASH_GDN')
+TIMING_INSTRUMENTATION_ENV_KEYS = ('STRATA_TRACE', 'STRATA_STATE_HASH',
+                                   'STRATA_INTEGRATION_TRACE', 'STRATA_STATE_HASH_GDN',
+                                   'LD_PRELOAD')
 
 
 def stage_environment(env, pin, timing_only=False):
@@ -32,7 +33,7 @@ def stage_environment(env, pin, timing_only=False):
     env['STRATA_IO_PREFETCH'] = '1'
     env['STRATA_IO_PF_STAGE'] = '1'
     if timing_only:
-        for key in TRACE_ENV_KEYS:
+        for key in TIMING_INSTRUMENTATION_ENV_KEYS:
             env.pop(key, None)
     else:
         env.update({'STRATA_TRACE': '1', 'STRATA_STATE_HASH': '1',
