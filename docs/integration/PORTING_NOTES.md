@@ -346,6 +346,12 @@ activity and are not additive or process-attributed. The [failed auto-cache
 diagnostics](../../bench/results/2026-10-10-phase3-transfer-energy/README.md)
 and [fixed-cache transfer screen](../../bench/results/2026-10-10-phase3-transfer-energy-fixed-cache/README.md)
 preserve the comparison and its limits.
+At a 32K prompt, changing Q2_0 cache capacity from 3,000 to 5,000 preserved
+the emitted token but changed 94.32% of 29.4 million GDN floats; whole-state
+relative L2 was 4.687%, with material drift first at layer 3. Repeat state
+checks at fixed capacities and measure cross-capacity drift numerically. For
+Splash, compare against an independent state/quality oracle before choosing a
+capacity, since output text alone does not identify the more accurate result.
 
 A seven-pair randomized fixed-cache follow-up measured mapped request time
 4.14% lower at the median for the same 512+64 workload, with a bootstrap
