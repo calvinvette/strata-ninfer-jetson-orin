@@ -1099,3 +1099,12 @@ whole-device reads by about 32%, yet neither metric established request benefit
 under shared page-cache conditions. For Splash, use prompt-length-specific
 held-out pairs and report the full paired distribution; reduced host faults do
 not guarantee lower request time. See the [Orin confirmation](../../bench/results/2026-10-13-phase3-q2-mapped-pread-32k-heldout/README.md).
+
+At a 65,536-token context, three fresh Q2_0 requests again showed a repeatable
+23.1 MB NVMap process-owner bracket around verifier graph event two, but event
+three varied from 6.36 to 22.83 MB; the same event at 8,232 context was
+22.83 MB in all three runs. Treat event alignment as attribution evidence, not
+graph executable sizing. For Splash, repeat platform-native backing traces at
+more than one reservation and context, preserve sample jitter, and retain a
+non-graph control only if it has equivalent model/service behavior. See the
+[Orin 64K trace](../../bench/results/2026-10-13-phase3-q2-graph-fine-nvmap-context64k/README.md).

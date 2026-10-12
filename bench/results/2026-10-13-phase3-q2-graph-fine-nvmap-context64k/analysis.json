@@ -1,0 +1,238 @@
+{
+  "scope": "Q2_0 native serving graph captures; 31-token prompt and 24 generated tokens",
+  "model": "Qwen3.8-Flash-Next-GSQ-RCO Q2_0; files remain in ~/models/",
+  "configured_context": 65536,
+  "expert_cache_slots": 3000,
+  "cli_spec": 2,
+  "systemd_memory_max": "28G",
+  "nvmap_sample_requested_interval_ms": 2,
+  "all_requests_passed": true,
+  "all_supervisors_passed": true,
+  "all_oom_and_oom_kill_counters_zero": true,
+  "later_verifier_event_brackets": [
+    {
+      "verifier_event_index": 2,
+      "per_run_twenty_ms_event_centered_deltas_bytes": [
+        23117824,
+        23117824,
+        23117824
+      ],
+      "median_twenty_ms_delta_bytes": 23117824,
+      "range_twenty_ms_delta_bytes": [
+        23117824,
+        23117824
+      ],
+      "no_instrumented_cuda_alloc_free_in_any_window": true
+    },
+    {
+      "verifier_event_index": 3,
+      "per_run_twenty_ms_event_centered_deltas_bytes": [
+        8454144,
+        22831104,
+        6356992
+      ],
+      "median_twenty_ms_delta_bytes": 8454144,
+      "range_twenty_ms_delta_bytes": [
+        6356992,
+        22831104
+      ],
+      "no_instrumented_cuda_alloc_free_in_any_window": true
+    }
+  ],
+  "later_verifier_context_comparison": [
+    {
+      "verifier_event_index": 2,
+      "context_8232_median_bytes": 23117824,
+      "context_65536_median_bytes": 23117824,
+      "context_65536_range_bytes": [
+        23117824,
+        23117824
+      ]
+    },
+    {
+      "verifier_event_index": 3,
+      "context_8232_median_bytes": 22831104,
+      "context_65536_median_bytes": 8454144,
+      "context_65536_range_bytes": [
+        6356992,
+        22831104
+      ]
+    }
+  ],
+  "context_8232_reference": "2026-10-13-phase3-q2-graph-fine-nvmap/analysis.json",
+  "interpretation_limit": "20-ms event-centered NVMap process-owner deltas are repeatable brackets, not isolated graph executable size; driver-private and adjacent uninstrumented allocations remain possible.",
+  "runs": [
+    {
+      "path": "repeat-01",
+      "spec": 2,
+      "configured_context": "65536",
+      "request_status": "pass",
+      "prompt_tokens": 31,
+      "generated_tokens": 24,
+      "supervisor_status": "pass",
+      "minimum_host_available_bytes": 17595305984,
+      "minimum_effective_headroom_bytes": 14194307072,
+      "oom_events": 0,
+      "oom_kill_events": 0,
+      "nvmap_sample_count": 18288,
+      "nvmap_interval_ms": {
+        "median": 2.4754551704972982,
+        "max": 16.166327986866236
+      },
+      "events": [
+        {
+          "monotonic_s": 1094990.776573171,
+          "owner": "verifier",
+          "nearest_before_gap_ms": 1.4548739418387413,
+          "nearest_after_gap_ms": 1.188129186630249,
+          "nearest_sample_delta_bytes": 0,
+          "twenty_ms_event_centered_delta_bytes": 8454144,
+          "instrumented_device0_alloc_free_events_within_twenty_ms": []
+        },
+        {
+          "monotonic_s": 1094990.788257025,
+          "owner": "verifier-commit-graph",
+          "nearest_before_gap_ms": 0.007872004061937332,
+          "nearest_after_gap_ms": 2.596411155536771,
+          "nearest_sample_delta_bytes": 0,
+          "twenty_ms_event_centered_delta_bytes": 0,
+          "instrumented_device0_alloc_free_events_within_twenty_ms": []
+        },
+        {
+          "monotonic_s": 1094997.90277495,
+          "owner": "verifier",
+          "nearest_before_gap_ms": 2.323779044672847,
+          "nearest_after_gap_ms": 0.08047791197896004,
+          "nearest_sample_delta_bytes": 2162688,
+          "twenty_ms_event_centered_delta_bytes": 23117824,
+          "instrumented_device0_alloc_free_events_within_twenty_ms": []
+        },
+        {
+          "monotonic_s": 1094998.237035524,
+          "owner": "verifier",
+          "nearest_before_gap_ms": 1.5174320433288813,
+          "nearest_after_gap_ms": 0.9079449810087681,
+          "nearest_sample_delta_bytes": 2097152,
+          "twenty_ms_event_centered_delta_bytes": 8454144,
+          "instrumented_device0_alloc_free_events_within_twenty_ms": []
+        }
+      ],
+      "engine_sha256": "b62e3275f7ab2a6337640c2db4e31571d8a2858c9cc36d1dcccf8825eb335f59"
+    },
+    {
+      "path": "repeat-02",
+      "spec": 2,
+      "configured_context": "65536",
+      "request_status": "pass",
+      "prompt_tokens": 31,
+      "generated_tokens": 24,
+      "supervisor_status": "pass",
+      "minimum_host_available_bytes": 17595305984,
+      "minimum_effective_headroom_bytes": 14194307072,
+      "oom_events": 0,
+      "oom_kill_events": 0,
+      "nvmap_sample_count": 18609,
+      "nvmap_interval_ms": {
+        "median": 2.4685109965503216,
+        "max": 22.598478011786938
+      },
+      "events": [
+        {
+          "monotonic_s": 1095051.491645152,
+          "owner": "verifier",
+          "nearest_before_gap_ms": 0.3305829595774412,
+          "nearest_after_gap_ms": 2.1319440566003323,
+          "nearest_sample_delta_bytes": 0,
+          "twenty_ms_event_centered_delta_bytes": 6291456,
+          "instrumented_device0_alloc_free_events_within_twenty_ms": []
+        },
+        {
+          "monotonic_s": 1095051.499908135,
+          "owner": "verifier-commit-graph",
+          "nearest_before_gap_ms": 1.1687369551509619,
+          "nearest_after_gap_ms": 1.4633859973400831,
+          "nearest_sample_delta_bytes": 0,
+          "twenty_ms_event_centered_delta_bytes": 2097152,
+          "instrumented_device0_alloc_free_events_within_twenty_ms": []
+        },
+        {
+          "monotonic_s": 1095057.532838308,
+          "owner": "verifier",
+          "nearest_before_gap_ms": 0.5692651029676199,
+          "nearest_after_gap_ms": 1.7001479864120483,
+          "nearest_sample_delta_bytes": 0,
+          "twenty_ms_event_centered_delta_bytes": 23117824,
+          "instrumented_device0_alloc_free_events_within_twenty_ms": []
+        },
+        {
+          "monotonic_s": 1095057.948106088,
+          "owner": "verifier",
+          "nearest_before_gap_ms": 2.1872390061616898,
+          "nearest_after_gap_ms": 0.02623908221721649,
+          "nearest_sample_delta_bytes": 2097152,
+          "twenty_ms_event_centered_delta_bytes": 22831104,
+          "instrumented_device0_alloc_free_events_within_twenty_ms": []
+        }
+      ],
+      "engine_sha256": "22c951d5f65321e77463bafe250c33e735687296d744c0f37619deecb967d96f"
+    },
+    {
+      "path": "repeat-03",
+      "spec": 2,
+      "configured_context": "65536",
+      "request_status": "pass",
+      "prompt_tokens": 31,
+      "generated_tokens": 24,
+      "supervisor_status": "pass",
+      "minimum_host_available_bytes": 17595305984,
+      "minimum_effective_headroom_bytes": 14194307072,
+      "oom_events": 0,
+      "oom_kill_events": 0,
+      "nvmap_sample_count": 18008,
+      "nvmap_interval_ms": {
+        "median": 2.477599075064063,
+        "max": 17.241562949493527
+      },
+      "events": [
+        {
+          "monotonic_s": 1095110.210451864,
+          "owner": "verifier",
+          "nearest_before_gap_ms": 0.19964296370744705,
+          "nearest_after_gap_ms": 2.454528119415045,
+          "nearest_sample_delta_bytes": 0,
+          "twenty_ms_event_centered_delta_bytes": 6291456,
+          "instrumented_device0_alloc_free_events_within_twenty_ms": []
+        },
+        {
+          "monotonic_s": 1095110.218409031,
+          "owner": "verifier-commit-graph",
+          "nearest_before_gap_ms": 0.2386178821325302,
+          "nearest_after_gap_ms": 2.2780841682106256,
+          "nearest_sample_delta_bytes": 0,
+          "twenty_ms_event_centered_delta_bytes": 2097152,
+          "instrumented_device0_alloc_free_events_within_twenty_ms": []
+        },
+        {
+          "monotonic_s": 1095115.374853349,
+          "owner": "verifier",
+          "nearest_before_gap_ms": 1.0501809883862734,
+          "nearest_after_gap_ms": 1.3909710105508566,
+          "nearest_sample_delta_bytes": 2162688,
+          "twenty_ms_event_centered_delta_bytes": 23117824,
+          "instrumented_device0_alloc_free_events_within_twenty_ms": []
+        },
+        {
+          "monotonic_s": 1095115.691039626,
+          "owner": "verifier",
+          "nearest_before_gap_ms": 1.946380129083991,
+          "nearest_after_gap_ms": 0.43365289457142353,
+          "nearest_sample_delta_bytes": 2097152,
+          "twenty_ms_event_centered_delta_bytes": 6356992,
+          "instrumented_device0_alloc_free_events_within_twenty_ms": []
+        }
+      ],
+      "engine_sha256": "31ff5293fdaf62759696aff64dc67a78d418276b2decaf38ccc5b0c427a43433"
+    }
+  ],
+  "harness_note": "Three fresh service processes; each used the same short supported request and 64K context reservation."
+}

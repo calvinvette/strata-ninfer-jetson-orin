@@ -1185,3 +1185,13 @@ pread, but cache was shared and device counters include unrelated I/O. Minimum
 host availability was 17.17 GiB and effective headroom 7.70 GiB under the
 28-GiB scope, with zero OOM kills. Keep mapped as default. This adds a held-out
 32K point without establishing a general transfer winner; Phase 3 remains open.
+
+A [64K-context fine NVMap graph trace](../../bench/results/2026-10-13-phase3-q2-graph-fine-nvmap-context64k/README.md)
+repeated the supported short request in three fresh processes. The second
+verifier event again had a repeatable 23,117,824-byte event-centered bracket;
+the third event varied from 6.36 to 22.83 MB, unlike the stable 8,232-context
+trace. No instrumented ordinary device allocation/free event fell within the
+brackets. The 28-GiB campaign retained 16.39 GiB minimum host availability and
+13.22 GiB effective headroom with zero OOM kills. This variation does not
+isolate graph-pool bytes or support a context sizing rule; graph/driver physical
+backing remains open.
