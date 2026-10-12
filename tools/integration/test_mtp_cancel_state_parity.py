@@ -5,7 +5,8 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT / 'tools'), str(ROOT / 'tools/integration')]
 from mtp_cancel_state_parity import (STATE_KEYS, compare_prefix_traces,
-                                    parse_prefix_entries, state_dump_env)
+                                    config_with_expert_cache, parse_prefix_entries,
+                                    state_dump_env)
 from serve.server import StrataEngine
 
 
@@ -57,6 +58,16 @@ class MtpCancelStateParityTests(unittest.TestCase):
         self.assertEqual(configured['STRATA_STATE_DUMP_GDN_AT'], '48')
         self.assertEqual(configured['STRATA_STATE_HASH'], '1')
         self.assertNotIn('STRATA_STATE_DUMP_GDN_AT', base)
+
+    def test_fixed_expert_cache_overrides_copy_without_mutating_source(self):
+        source = {'args': ['--expert-cache', 'auto', '--prefill', '64']}
+        configured = config_with_expert_cache(source, 3000)
+        self.assertEqual(configured['args'], ['--expert-cache', '3000', '--prefill', '64'])
+        self.assertEqual(source['args'], ['--expert-cache', 'auto', '--prefill', '64'])
+
+    def test_fixed_expert_cache_is_added_when_absent(self):
+        self.assertEqual(config_with_expert_cache({'args': ['--prefill', '64']}, 3000)['args'],
+                         ['--prefill', '64', '--expert-cache', '3000'])
 
 
 if __name__ == '__main__':

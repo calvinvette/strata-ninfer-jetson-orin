@@ -119,6 +119,18 @@ def config_with_engine_env(config, env):
     return result
 
 
+def config_with_expert_cache(config, slots):
+    """Copy a server config with one fixed expert-cache capacity."""
+    result = dict(config)
+    engine_args = list(config.get('args', []))
+    if '--expert-cache' in engine_args:
+        engine_args[engine_args.index('--expert-cache') + 1] = str(slots)
+    else:
+        engine_args.extend(['--expert-cache', str(slots)])
+    result['args'] = engine_args
+    return result
+
+
 def reset_stream(response):
     """Close the read side; the server's EOF watcher then sends STOP to the engine."""
     response.close()
@@ -147,12 +159,15 @@ def main() -> int:
                         help='fresh exact-length reference processes used to distinguish cancellation drift from run variation')
     parser.add_argument('--dump-gdn-at', type=int,
                         help='optionally dump float32 GDN state at this exact accepted length in each process')
+    parser.add_argument('--fixed-expert-cache', type=int,
+                        help='override every process with the same positive expert-cache slot count')
     parser.add_argument('--prompt-text', default=(
         'Write the integers from 1 through 1000 separated by single spaces. '
         'Do not add an introduction or conclusion, and do not stop before 1000.'))
     args = parser.parse_args()
-    if args.output.exists() or args.cancel_chunks < 1 or args.reference_repeats < 1:
-        parser.error('output must be new, cancel-chunks and reference-repeats must be positive')
+    if (args.output.exists() or args.cancel_chunks < 1 or args.reference_repeats < 1
+            or (args.fixed_expert_cache is not None and args.fixed_expert_cache < 1)):
+        parser.error('output must be new; cancel-chunks, reference-repeats and fixed expert-cache must be positive')
     cfg = json.loads(args.config.read_text())
     if '--mtp' not in cfg.get('args', []):
         parser.error('source config has no --mtp weights path')
@@ -160,11 +175,14 @@ def main() -> int:
     if not mtp_path.exists():
         parser.error(f'MTP weights do not exist: {mtp_path}')
     args.output.mkdir(parents=True)
+    if args.fixed_expert_cache is not None:
+        cfg = config_with_expert_cache(cfg, args.fixed_expert_cache)
     result = {'schema': 1, 'scope': 'MTP accepted-prefix cancellation state parity and same-process recovery',
               'model': cfg.get('model_name'), 'workload_cell': 'open-ended-integer-list',
               'prompt_text': args.prompt_text, 'requested_output_tokens': 1024,
               'cancel_after_nonempty_deltas': args.cancel_chunks,
               'reference_repeats': args.reference_repeats,
+              'fixed_expert_cache_slots': args.fixed_expert_cache,
               'dump_gdn_at': args.dump_gdn_at,
               'effective_engine_env': {
                   key: base_value for key, base_value in {
