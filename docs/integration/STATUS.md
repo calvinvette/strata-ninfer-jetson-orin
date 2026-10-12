@@ -1175,3 +1175,13 @@ I/O counters limit storage conclusions; board energy is not process-attributed.
 Keep fill-only behavior and defaults unchanged. This closes the held-out
 staging comparison for this cell; Phase 3 remains open for broader pressure,
 unique physical backing and graph accounting gates.
+
+The held-out [seven-pair 32K Q2_0 mapped-versus-pread confirmation](../../bench/results/2026-10-13-phase3-q2-mapped-pread-32k-heldout/README.md)
+matched output IDs, actual cache slots and all nine persistent-state fields in
+every pair. Pread's paired median request delta was −1.12%, but two pair
+reversals widened the 95% interval to −1.58% through +16.23%; prompt and decode
+intervals also span regressions. Major faults and whole-device reads favored
+pread, but cache was shared and device counters include unrelated I/O. Minimum
+host availability was 17.17 GiB and effective headroom 7.70 GiB under the
+28-GiB scope, with zero OOM kills. Keep mapped as default. This adds a held-out
+32K point without establishing a general transfer winner; Phase 3 remains open.

@@ -1,0 +1,184 @@
+{
+  "experiment_prompt_sha256": "699cea3bf930d3a3373dd08c46f0064512b226a4a49f67da5422a07a1a253120",
+  "prompt_variant": "heldout_blue",
+  "prompt_tokens": 32768,
+  "pairs": 7,
+  "times": {
+    "request": {
+      "median_ms": {
+        "mapped": 172810.8,
+        "pread": 170875.0
+      },
+      "pread_vs_mapped": {
+        "median_delta_pct": -1.1201846180909913,
+        "bootstrap_95pct_interval_pct": [
+          -1.5812904277234252,
+          16.231132765032097
+        ],
+        "pair_deltas_pct": [
+          -1.5812904277234252,
+          -1.3014137326068265,
+          -0.5132129102074945,
+          -1.1201846180909913,
+          16.231132765032097,
+          16.881398474362186,
+          -2.1982932438176506
+        ]
+      }
+    },
+    "prompt": {
+      "median_ms": {
+        "mapped": 170550.3,
+        "pread": 168857.8
+      },
+      "pread_vs_mapped": {
+        "median_delta_pct": -0.9923758562723095,
+        "bootstrap_95pct_interval_pct": [
+          -1.7231160937170475,
+          16.354077033720383
+        ],
+        "pair_deltas_pct": [
+          -1.7231160937170475,
+          -1.2983932566920209,
+          -0.45360822313614824,
+          -0.9923758562723095,
+          16.354077033720383,
+          17.046672188064417,
+          -2.2127824621748338
+        ]
+      }
+    },
+    "decode": {
+      "median_ms": {
+        "mapped": 2097.4,
+        "pread": 2082.8
+      },
+      "pread_vs_mapped": {
+        "median_delta_pct": -1.0123093008887252,
+        "bootstrap_95pct_interval_pct": [
+          -4.637137850943307,
+          5.9767677254542795
+        ],
+        "pair_deltas_pct": [
+          11.332973556395043,
+          -1.553540798823816,
+          -4.637137850943307,
+          -10.763105507631055,
+          5.9767677254542795,
+          3.4089825498235804,
+          -1.0123093008887252
+        ]
+      }
+    }
+  },
+  "counters": {
+    "major_faults": {
+      "median_mapped": 270366,
+      "median_pread": 4126,
+      "paired_pread_minus_mapped": [
+        -215114,
+        -231569,
+        -220002,
+        -268882,
+        -288355,
+        -246582,
+        -289471
+      ],
+      "paired_ratio_median_delta_pct": -98.1180441525269
+    },
+    "minor_faults": {
+      "median_mapped": 451267,
+      "median_pread": 389535,
+      "paired_pread_minus_mapped": [
+        -40835,
+        -60617,
+        -68283,
+        -64767,
+        -65305,
+        -73576,
+        -65009
+      ],
+      "paired_ratio_median_delta_pct": -14.321146305734157
+    },
+    "block_device_read_bytes": {
+      "median_mapped": 14805893120,
+      "median_pread": 10406637568,
+      "paired_pread_minus_mapped": [
+        -4335603712,
+        -4547080192,
+        -3251064832,
+        -4664049664,
+        -5771894784,
+        -2442977280,
+        -5068181504
+      ],
+      "paired_ratio_median_delta_pct": -31.50130577195468
+    }
+  },
+  "memory": {
+    "floor_bytes": 6442450944,
+    "minimum_host_available_bytes": 18438508544,
+    "minimum_effective_headroom_bytes": 8270716928,
+    "oom_kill_max": 0,
+    "sample_count": 2681,
+    "elapsed_s": 2836.259840326151,
+    "returncode": 0,
+    "status": "pass"
+  },
+  "clocks": {
+    "cpu_mhz": {
+      "samples": 32172,
+      "min": 729.6,
+      "median": 729.6,
+      "max": 2201.6
+    },
+    "gpu_mhz": {
+      "samples": 2681,
+      "min": 306.0,
+      "median": 1224.0,
+      "max": 1300.5
+    },
+    "emc_mhz": {
+      "samples": 0,
+      "min": null,
+      "median": null,
+      "max": null
+    }
+  },
+  "board_energy_by_arm": {
+    "mapped": {
+      "VIN_SYS_5V0": {
+        "n": 7,
+        "median_j": 1317.6920055413057
+      },
+      "VDD_CPU_CV": {
+        "n": 7,
+        "median_j": 199.9605357762278
+      },
+      "VDD_GPU_SOC": {
+        "n": 7,
+        "median_j": 3060.207756506306
+      }
+    },
+    "pread": {
+      "VIN_SYS_5V0": {
+        "n": 7,
+        "median_j": 1308.8646646926054
+      },
+      "VDD_CPU_CV": {
+        "n": 7,
+        "median_j": 173.45478199347247
+      },
+      "VDD_GPU_SOC": {
+        "n": 7,
+        "median_j": 3046.327866927126
+      }
+    }
+  },
+  "interpretation_limits": [
+    "rail energy is whole-board system activity, not process-attributed; rails are separate and not additive",
+    "disk reads are whole-device counters and include unrelated host activity and kernel readahead",
+    "page-cache state was not flushed; results are warm/shared-cache observations",
+    "clock observations are dynamic and do not control or normalize frequency"
+  ]
+}

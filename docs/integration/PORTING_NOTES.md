@@ -1090,3 +1090,12 @@ a product-wide rule. For Splash, distinguish read scheduling, page-cache fill,
 explicit pinned/pageable staging and device ownership as independent factors,
 and hold all but one fixed in paired tests. A staging path can alter host faults
 without reducing request time. See the [Orin confirmation](../../bench/results/2026-10-13-phase3-q2-prefetch-stage-16k-heldout/README.md).
+
+A separate seven-pair held-out 32K mapped-versus-`pread` comparison passed all
+state/output checks but did not resolve the transfer choice: the paired median
+request effect was −1.12% for `pread`, while two pair reversals widened the 95%
+interval to −1.58% through +16.23%. Major faults fell by about 98% and
+whole-device reads by about 32%, yet neither metric established request benefit
+under shared page-cache conditions. For Splash, use prompt-length-specific
+held-out pairs and report the full paired distribution; reduced host faults do
+not guarantee lower request time. See the [Orin confirmation](../../bench/results/2026-10-13-phase3-q2-mapped-pread-32k-heldout/README.md).
