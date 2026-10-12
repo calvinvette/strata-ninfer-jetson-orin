@@ -18,7 +18,16 @@ memory ledger; graph-pool and driver-private backing are excluded. This
 qualifies the existing simulated refusal/retry path for this Q2_0 workload,
 not recovery from a physical CUDA OOM or a general cache-capacity limit.
 
+A fourth fresh process repeated the injected retry in a transient `MemoryMax=24G`
+scope. It retried at 7,967 slots, generated token 32, and balanced 278/278
+allocation events with zero requested bytes live at exit. Minimum physical
+availability was 10.74 GiB and minimum effective cgroup headroom was 12.93 GiB.
+This adds one cache-refusal × cgroup-cap admission point; it does not define a
+pressure threshold.
+
 The model is the local Qwen3.8 Flash-Next Q2_0 two-shard GGUF and Q2 PLE pack;
-all model files remain under `~/models`. The launch command and exact supervisor telemetry are in `supervisor/`,
-`repeat2/` and `repeat3/`, with corresponding owner summaries alongside them. Dynamic clocks were observed without control; energy was
-not measured.
+all model files remain under `~/models`. The launch command and exact
+supervisor telemetry are in `supervisor/`, `repeat2/`, `repeat3/` and
+`retry24g/`, with corresponding owner summaries alongside them. The last run
+used a transient user scope with `MemoryMax=24G`. Dynamic clocks were observed
+without control; energy was not measured.
