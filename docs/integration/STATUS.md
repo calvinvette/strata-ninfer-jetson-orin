@@ -997,6 +997,14 @@ fingerprints repeated exactly within each cell. Fingerprints differed from the
 is one prompt with greedy decoding; it does not qualify task quality or resolve
 the state difference. Phase 3 remains open.
 
+The current-binary [Q2_0 PLE and memory-contract confirmation](../../bench/results/2026-10-12-phase3-q2-ple-confirmation/README.md)
+passed the supervised artifact-aware PLE oracle (worst stage relative L1
+`1.148e-7`), the focused memory/VMM/cache/PLE CTest selection (15/15), and
+integration Python unittest discovery (113/113). Minimum host availability was
+24.47 GiB for both the direct PLE test and CTest. These are contract
+checks, not active-pressure, whole-model quality, or ownership closure; Phase 3
+remains open.
+
 A trace-free [seven-pair Q2_0 prefill-chunk timing screen](../../bench/results/2026-10-12-phase3-q2-cache-state-diagnostic/prefill-chunk-timing/README.md)
 at fixed 3,000-slot cache/context/reserve found chunk 512 faster than chunk 64
 for this 511-token prompt and eight-token continuation: median client elapsed
