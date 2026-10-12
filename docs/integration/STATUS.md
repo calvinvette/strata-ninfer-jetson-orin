@@ -999,6 +999,18 @@ fingerprints repeated exactly within each cell. Fingerprints differed from the
 is one prompt with greedy decoding; it does not qualify task quality or resolve
 the state difference. Phase 3 remains open.
 
+The randomized [Q2_0 cache × context state screen](../../bench/results/2026-10-12-phase3-q2-cache-context-state/README.md)
+crossed 3,000/5,000 cache slots with 8K/64K context reservations in three fresh
+processes per cell. All 12 cells selected token 271 and repeated byte-identical
+accepted-prefix hashes within each setting. Full GDN state was identical
+between contexts at each cache size, but cache size changed GDN/tail/pooled/KV
+state at both contexts (first GDN difference at layer 3; global relative L2
+1.659%). Minimum host availability was 13.66 GiB; allocation/free events
+balanced except for the service-lifetime weight arena. This isolates the
+observed state difference to cache capacity for this request, not context
+reservation; its cause and task-quality effect remain unresolved. No cache
+default changed and Phase 3 remains open.
+
 The current-binary [Q2_0 PLE and memory-contract confirmation](../../bench/results/2026-10-12-phase3-q2-ple-confirmation/README.md)
 passed the supervised artifact-aware PLE oracle (worst stage relative L1
 `1.148e-7`), the focused memory/VMM/cache/PLE CTest selection (15/15), and
