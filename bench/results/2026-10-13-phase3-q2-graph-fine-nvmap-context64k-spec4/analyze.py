@@ -78,7 +78,7 @@ def analyze_run(path):
     oom_kill = max((cg.get('memory_events', {}).get('oom_kill', 0)
                     for row in memory_rows for cg in row.get('cgroups', [])), default=0)
     return {
-        'path': str(path.relative_to(ROOT)), 'spec': 2,
+        'path': str(path.relative_to(ROOT)), 'spec': 4,
         'configured_context': config['args'][config['args'].index('--max-context') + 1],
         'request_status': requests[0].get('status') if requests else None,
         'prompt_tokens': requests[0].get('usage', {}).get('prompt_tokens') if requests else None,

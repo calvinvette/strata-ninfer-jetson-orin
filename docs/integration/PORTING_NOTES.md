@@ -1116,3 +1116,12 @@ spec2's three, while the first-event bracket was only 6.29–8.45 MB. For Splash
 compare like graph lifecycle events at fixed context and preserve event count;
 a single process-wide delta cannot be divided by graph count to price each
 executable. See the [Orin spec4 trace](../../bench/results/2026-10-13-phase3-q2-graph-fine-nvmap-context64k-spec4/README.md).
+
+At 64K context, spec3 passed in three processes and had repeatable second and
+third verifier-event brackets (23.78 and 22.83 MB). Native Q2_0 refused spec1
+before readiness because the route requires spec >=2. For Splash, record
+unsupported window sizes at the route boundary and never compare graph-memory
+results across settings that did not execute. See the spec3 trace
+(../../bench/results/2026-10-13-phase3-q2-graph-fine-nvmap-context64k-spec3/README.md)
+and spec1 refusal
+(../../bench/results/2026-10-13-phase3-q2-graph-fine-nvmap-context64k-spec1/README.md).

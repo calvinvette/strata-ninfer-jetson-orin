@@ -1204,3 +1204,14 @@ The first-event bracket ranged from 6.29 to 8.45 MB. Minimum host and effective
 headroom were both 16.31 GiB, with no OOM events. These are event-centered
 NVMap owner changes, not isolated graph-pool sizes; graph-memory qualification
 remains open.
+
+The 64K-context spec3 NVMap trace passed in three fresh processes. It
+instantiated three verifier graphs; events two and three had repeatable 23.78
+MB and 22.83 MB event-centered owner brackets. A spec1 attempt was refused
+before readiness because native Q2_0 requires spec >= 2; its no-request result
+is retained as unsupported. These traces extend graph-owner coverage across
+supported spec2/3/4 settings, but do not isolate graph-pool storage, so the
+Phase 3 graph accounting limitation remains explicit. See the spec3 trace
+(../../bench/results/2026-10-13-phase3-q2-graph-fine-nvmap-context64k-spec3/README.md)
+and spec1 refusal
+(../../bench/results/2026-10-13-phase3-q2-graph-fine-nvmap-context64k-spec1/README.md).
