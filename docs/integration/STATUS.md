@@ -879,3 +879,11 @@ instrumented owner trace balanced 278 allocations/frees; requested-live peaks
 were 6,592,312,952 and 9,357,112,952 bytes. This extends the 4K/8K admission
 screen but is not a long-context request or capacity claim. Graph/driver backing
 remains outside the owner trace and Phase 3 remains open.
+
+The [32K configured-context extension](../../bench/results/2026-10-11-phase3-q2-admission-32k/README.md)
+also passed at 3,000 and 5,000 slots, with 18.03 and 15.34 GiB minimum
+`MemAvailable`. The traces balanced 278 allocation/free events per process;
+requested-live peaks were 7,024,653,944 and 9,789,453,944 bytes, and the
+session owner requested 991,516,160 bytes. These are configured-reservation
+admission points with 512-token requests, not 32K workload evidence. Graph and
+driver backing remains outside the owner trace; Phase 3 remains open.
