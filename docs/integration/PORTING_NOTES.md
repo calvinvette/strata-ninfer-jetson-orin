@@ -875,3 +875,14 @@ trace the actual Metal/CPU recurrent and attention state owners, keeping
 platform-specific memory pressure and allocation evidence separate. This single
 Orin prompt/capacity pair does not establish quality impact or explain the
 difference; no cache default is promoted and Phase 3 remains open.
+
+
+## 2026-10-12 — Effective cgroup headroom is an observed runtime condition
+
+For a 32K Q2_0 request, nominal 18-GiB scope was safely aborted at 5.927 GiB
+effective headroom, while a separate 19-GiB run completed at 6.98 GiB and
+matched its 20-GiB state control. This remains specific to Linux cgroup charging
+and page-cache history. In future Strata + Splash work, retain the general
+method—record real platform availability, per-process/device allocation and
+headroom over time, stop before a documented safety floor, and preserve aborts—
+but do not port Linux cap numbers or infer a stable capacity from one run.

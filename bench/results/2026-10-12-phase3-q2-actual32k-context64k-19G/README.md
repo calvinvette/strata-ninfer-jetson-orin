@@ -1,0 +1,9 @@
+# Q2_0 32K prompt pressure pass at 19 GiB — Orin — 2026-10-12
+
+This adds an intermediate cgroup-cap observation for the same 3,000-slot cache, exact 32,768-token prompt, 65,536-token configured context, and binary used in the [18-GiB pressure abort](../2026-10-12-phase3-q2-actual32k-context64k-18G/README.md) and [20-GiB pass](../2026-10-12-phase3-q2-actual32k-context64k-20G/README.md). Only the transient `MemoryMax` changed. The six-GiB effective-headroom supervisor remained active; model files stayed under `~/models/`.
+
+The 19-GiB process completed all 32,768 prompt tokens and generated token ID 32. The prompt SHA-256 was `705dea47aafbfc991d0616621f3a13bf0136a43c546d60c7693c2efdced4d3a3`. Minimum host availability was 16.42 GiB and minimum effective scope headroom was 6.98 GiB, 0.98 GiB above the supervisor floor. The leaf scope recorded zero `oom`, `oom_kill`, and `oom_group_kill` events. The 304/303 allocation/free owner trace left only the 1,485,606,400-byte service-lifetime weight arena live. Final persistent state and all 36 GDN hashes matched the same-day 20-GiB run for this exact configuration.
+
+This is one successful admitted run. The earlier 18-GiB run was safely aborted at 5.927 GiB effective headroom, while 20-GiB and 22-GiB runs also passed. Different starting cgroup/page-cache state affects effective headroom and these samples do not form a general or monotonic capacity curve. No memory setting or support threshold follows.
+
+`comparison.json` records the workload, owner totals, state match, supervisor minimums, OOM events, and raw engine-log hash. The run directory retains workload and parsed owner data; the supervisor directory retains raw host/cgroup/clock samples and tegrastats. The raw engine log is locally ignored (`*.log`) and remains on the Orin. Reproduce with the command in the `run_control.py` invocation stored in `supervisor/result.json`.
