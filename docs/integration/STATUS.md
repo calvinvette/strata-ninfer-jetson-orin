@@ -808,7 +808,10 @@ of seven pairs. A three-pair traced [warmup/state follow-up](../../bench/results
 passed measured token and state parity in the two pairs with matching warmup
 outputs; the third had matching measured IDs but differed in five state fields
 after its warmup completion diverged. Treat the timing as diagnostic only.
-The stage harness now marks warmup-output mismatches as failed pairs. Minimum
+The stage harness now marks warmup-output mismatches as failed pairs. A direct
+172-token isolation probe was rejected before startup because the harness
+requires at least 512 measured prompt tokens; the existing no-warmup 512/64
+screen is the direct-request control. Minimum
 `MemAvailable` was 21.18 GiB and minimum
 28-GiB cgroup headroom 18.68 GiB, with no OOM events. Two pairs differed in
 The earlier probe-enabled timing is retained but excluded from inference.
