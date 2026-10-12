@@ -1,0 +1,48 @@
+{
+  "exe": "/home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/candidate/strata",
+  "args": [
+    "--pack",
+    "/home/calvin/models/strata-orin-validation/q2-ple-pack",
+    "--native",
+    "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+    "--ple-gguf",
+    "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+    "--expert-profile",
+    "/home/calvin/models/strata-orin-validation/q2-expert-profile.bin",
+    "--expert-cache",
+    "3000",
+    "--prefill",
+    "64",
+    "--spec",
+    "2",
+    "--max-context",
+    "8192",
+    "--mmap-experts",
+    "--prompt-cache",
+    "0",
+    "--vram-reserve-mib",
+    "3072",
+    "--pcie-frac",
+    "0.55",
+    "--no-prefill-borrow",
+    "--mtp",
+    "/home/calvin/models/strata-orin-validation/mtp/rt",
+    "--mtp-max-t",
+    "2"
+  ],
+  "cwd": "/home/calvin/workspace/strata-ninfer-jetson-orin",
+  "tokenizer": "/home/calvin/models/strata-orin-validation/pack/tokenizer",
+  "model_name": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-Orin-validation",
+  "log": "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-12-phase5-q2-graph-eager-screen/mtp2/block-1-baseline/engine.log",
+  "lib_dirs": [
+    "/usr/local/cuda-12/lib64"
+  ],
+  "port": 18603,
+  "host": "127.0.0.1",
+  "cuda": 12,
+  "open_browser": false,
+  "draft_vocab": "cjk",
+  "env": {
+    "STRATA_PREFILL_CPU_SHARE": "0"
+  }
+}
