@@ -972,3 +972,16 @@ with 13.157 GiB minimum effective headroom and the same service-lifetime-only
 owner remainder. Pairing the same prompt and binary across scope caps is useful
 for Splash admission/recovery testing, but these two runs do not define a
 capacity threshold. See the [22-GiB run](../../bench/results/2026-10-13-phase3-q2-cancel-8k-22G/README.md).
+
+
+## 2026-10-13 — Add a 16K actual-prompt admission point
+
+A Q2_0 service accepted the exact 16,384-token prompt twice under a 19-GiB
+cgroup ceiling with a 32K context reservation; both requests generated one
+token and passed with 8.686 GiB minimum effective headroom. This fills one
+workload-length point between the existing 8K and 32K Orin cases. Instrumented
+ownership and state were intentionally not collected, so this does not close
+those gates or imply a general capacity. For Splash, preserve actual formatted
+prompt length, configured context, output length, physical availability and
+cgroup headroom as separate dimensions in the capacity ladder. See the
+[Orin admission run](../../bench/results/2026-10-13-phase3-q2-admit16k-19G/README.md).
