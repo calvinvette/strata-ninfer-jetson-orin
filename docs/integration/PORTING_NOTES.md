@@ -1108,3 +1108,11 @@ graph executable sizing. For Splash, repeat platform-native backing traces at
 more than one reservation and context, preserve sample jitter, and retain a
 non-graph control only if it has equivalent model/service behavior. See the
 [Orin 64K trace](../../bench/results/2026-10-13-phase3-q2-graph-fine-nvmap-context64k/README.md).
+
+At 64K context with spec4, the second verifier event produced the same
+22.90 MB NVMap owner bracket in three fresh requests, close to 23.12 MB for
+spec2 at that context. Spec4 instantiated two verifier graphs rather than
+spec2's three, while the first-event bracket was only 6.29–8.45 MB. For Splash,
+compare like graph lifecycle events at fixed context and preserve event count;
+a single process-wide delta cannot be divided by graph count to price each
+executable. See the [Orin spec4 trace](../../bench/results/2026-10-13-phase3-q2-graph-fine-nvmap-context64k-spec4/README.md).

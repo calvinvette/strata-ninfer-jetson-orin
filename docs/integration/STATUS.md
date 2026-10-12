@@ -1195,3 +1195,12 @@ brackets. The 28-GiB campaign retained 16.39 GiB minimum host availability and
 13.22 GiB effective headroom with zero OOM kills. This variation does not
 isolate graph-pool bytes or support a context sizing rule; graph/driver physical
 backing remains open.
+
+A [64K-context spec4 fine NVMap trace](../../bench/results/2026-10-13-phase3-q2-graph-fine-nvmap-context64k-spec4/README.md)
+passed the same short request in three fresh processes. It instantiated two
+verifier graphs; the later verifier event had a repeatable 22,896,640-byte
+20-ms owner bracket, close to spec2's 23,117,824 bytes at the same context.
+The first-event bracket ranged from 6.29 to 8.45 MB. Minimum host and effective
+headroom were both 16.31 GiB, with no OOM events. These are event-centered
+NVMap owner changes, not isolated graph-pool sizes; graph-memory qualification
+remains open.

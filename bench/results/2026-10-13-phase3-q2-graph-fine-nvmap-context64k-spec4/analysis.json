@@ -1,0 +1,214 @@
+{
+  "scope": "Q2_0 native serving graph captures; 31-token prompt and 24 generated tokens",
+  "model": "Qwen3.8-Flash-Next-GSQ-RCO Q2_0; files remain in ~/models/",
+  "configured_context": 65536,
+  "expert_cache_slots": 3000,
+  "cli_spec": 4,
+  "systemd_memory_max": "28G",
+  "nvmap_sample_requested_interval_ms": 2,
+  "all_requests_passed": true,
+  "all_supervisors_passed": true,
+  "all_oom_and_oom_kill_counters_zero": true,
+  "verifier_event_brackets": [
+    {
+      "verifier_event_index": 1,
+      "per_run_twenty_ms_event_centered_deltas_bytes": [
+        6291456,
+        6356992,
+        8454144
+      ],
+      "median_twenty_ms_delta_bytes": 6356992,
+      "range_twenty_ms_delta_bytes": [
+        6291456,
+        8454144
+      ],
+      "no_instrumented_cuda_alloc_free_in_any_window": true
+    },
+    {
+      "verifier_event_index": 2,
+      "per_run_twenty_ms_event_centered_deltas_bytes": [
+        22896640,
+        22896640,
+        22896640
+      ],
+      "median_twenty_ms_delta_bytes": 22896640,
+      "range_twenty_ms_delta_bytes": [
+        22896640,
+        22896640
+      ],
+      "no_instrumented_cuda_alloc_free_in_any_window": true
+    }
+  ],
+  "verifier_context65536_spec2_vs_spec4": [
+    {
+      "verifier_event_index": 2,
+      "spec2_median_bytes": 23117824,
+      "spec4_median_bytes": 22896640,
+      "spec4_range_bytes": [
+        22896640,
+        22896640
+      ]
+    }
+  ],
+  "verifier_graph_instantiation_count": 2,
+  "later_verifier_context_comparison": [
+    {
+      "verifier_event_index": 2,
+      "spec2_median_bytes": 23117824,
+      "spec4_median_bytes": 22896640,
+      "spec4_range_bytes": [
+        22896640,
+        22896640
+      ]
+    }
+  ],
+  "spec2_context65536_reference": "2026-10-13-phase3-q2-graph-fine-nvmap-context64k/analysis.json",
+  "interpretation_limit": "20-ms event-centered NVMap process-owner deltas are repeatable brackets, not isolated graph executable size; driver-private and adjacent uninstrumented allocations remain possible.",
+  "runs": [
+    {
+      "path": "repeat-01",
+      "spec": 2,
+      "configured_context": "65536",
+      "request_status": "pass",
+      "prompt_tokens": 31,
+      "generated_tokens": 24,
+      "supervisor_status": "pass",
+      "minimum_host_available_bytes": 17509908480,
+      "minimum_effective_headroom_bytes": 17509908480,
+      "oom_events": 0,
+      "oom_kill_events": 0,
+      "nvmap_sample_count": 18065,
+      "nvmap_interval_ms": {
+        "median": 2.475837944075465,
+        "max": 16.74301386810839
+      },
+      "events": [
+        {
+          "monotonic_s": 1095293.059368392,
+          "owner": "verifier",
+          "nearest_before_gap_ms": 2.238309010863304,
+          "nearest_after_gap_ms": 0.4801799077540636,
+          "nearest_sample_delta_bytes": 2097152,
+          "twenty_ms_event_centered_delta_bytes": 6291456,
+          "instrumented_device0_alloc_free_events_within_twenty_ms": []
+        },
+        {
+          "monotonic_s": 1095293.068998763,
+          "owner": "verifier-commit-graph",
+          "nearest_before_gap_ms": 1.3935321476310492,
+          "nearest_after_gap_ms": 1.055043889209628,
+          "nearest_sample_delta_bytes": 0,
+          "twenty_ms_event_centered_delta_bytes": 2097152,
+          "instrumented_device0_alloc_free_events_within_twenty_ms": []
+        },
+        {
+          "monotonic_s": 1095297.695839793,
+          "owner": "verifier",
+          "nearest_before_gap_ms": 0.29272795654833317,
+          "nearest_after_gap_ms": 2.0838810596615076,
+          "nearest_sample_delta_bytes": 0,
+          "twenty_ms_event_centered_delta_bytes": 22896640,
+          "instrumented_device0_alloc_free_events_within_twenty_ms": []
+        }
+      ],
+      "engine_sha256": "a696354d34c56b30c81922d0131a51689810e14e5ec2dfa2f225eb262aa0c716"
+    },
+    {
+      "path": "repeat-02",
+      "spec": 2,
+      "configured_context": "65536",
+      "request_status": "pass",
+      "prompt_tokens": 31,
+      "generated_tokens": 24,
+      "supervisor_status": "pass",
+      "minimum_host_available_bytes": 17509908480,
+      "minimum_effective_headroom_bytes": 17509908480,
+      "oom_events": 0,
+      "oom_kill_events": 0,
+      "nvmap_sample_count": 18265,
+      "nvmap_interval_ms": {
+        "median": 2.4775825440883636,
+        "max": 17.358870012685657
+      },
+      "events": [
+        {
+          "monotonic_s": 1095349.120573123,
+          "owner": "verifier",
+          "nearest_before_gap_ms": 1.1416019406169653,
+          "nearest_after_gap_ms": 1.529559027403593,
+          "nearest_sample_delta_bytes": 0,
+          "twenty_ms_event_centered_delta_bytes": 6356992,
+          "instrumented_device0_alloc_free_events_within_twenty_ms": []
+        },
+        {
+          "monotonic_s": 1095349.128811722,
+          "owner": "verifier-commit-graph",
+          "nearest_before_gap_ms": 1.5074489638209343,
+          "nearest_after_gap_ms": 0.9991091210395098,
+          "nearest_sample_delta_bytes": 0,
+          "twenty_ms_event_centered_delta_bytes": 4194304,
+          "instrumented_device0_alloc_free_events_within_twenty_ms": []
+        },
+        {
+          "monotonic_s": 1095353.867530972,
+          "owner": "verifier",
+          "nearest_before_gap_ms": 0.9298629593104124,
+          "nearest_after_gap_ms": 1.5298801008611917,
+          "nearest_sample_delta_bytes": 2162688,
+          "twenty_ms_event_centered_delta_bytes": 22896640,
+          "instrumented_device0_alloc_free_events_within_twenty_ms": []
+        }
+      ],
+      "engine_sha256": "529f23a420676c8446ff3664184ef2b998e436a7584fa2afbb2ba2f08cffd9e7"
+    },
+    {
+      "path": "repeat-03",
+      "spec": 2,
+      "configured_context": "65536",
+      "request_status": "pass",
+      "prompt_tokens": 31,
+      "generated_tokens": 24,
+      "supervisor_status": "pass",
+      "minimum_host_available_bytes": 17509908480,
+      "minimum_effective_headroom_bytes": 17509908480,
+      "oom_events": 0,
+      "oom_kill_events": 0,
+      "nvmap_sample_count": 18415,
+      "nvmap_interval_ms": {
+        "median": 2.4761268869042397,
+        "max": 9.18295793235302
+      },
+      "events": [
+        {
+          "monotonic_s": 1095404.833184698,
+          "owner": "verifier",
+          "nearest_before_gap_ms": 1.7317298334091902,
+          "nearest_after_gap_ms": 0.9059610310941935,
+          "nearest_sample_delta_bytes": 0,
+          "twenty_ms_event_centered_delta_bytes": 8454144,
+          "instrumented_device0_alloc_free_events_within_twenty_ms": []
+        },
+        {
+          "monotonic_s": 1095404.841574333,
+          "owner": "verifier-commit-graph",
+          "nearest_before_gap_ms": 2.3267229553312063,
+          "nearest_after_gap_ms": 0.13753212988376617,
+          "nearest_sample_delta_bytes": 0,
+          "twenty_ms_event_centered_delta_bytes": 0,
+          "instrumented_device0_alloc_free_events_within_twenty_ms": []
+        },
+        {
+          "monotonic_s": 1095409.769340876,
+          "owner": "verifier",
+          "nearest_before_gap_ms": 1.8461591098457575,
+          "nearest_after_gap_ms": 0.360758975148201,
+          "nearest_sample_delta_bytes": 2162688,
+          "twenty_ms_event_centered_delta_bytes": 22896640,
+          "instrumented_device0_alloc_free_events_within_twenty_ms": []
+        }
+      ],
+      "engine_sha256": "536ac7fd3c8bb9e2a0cc752d2fe526c5a45a949c3d14a51cae4e4e056225639a"
+    }
+  ],
+  "harness_note": "Three fresh service processes; each used the same short supported request, spec4 and 64K context reservation."
+}
