@@ -943,3 +943,12 @@ remained above 17 GiB. For Splash, track pinned host payloads as their own
 owner, retain per-request frees, and keep cgroup headroom separate from host
 availability. The harness also needs strict context slack beyond prompt plus
 output. See the [Orin report](../../bench/results/2026-10-12-phase3-q2-stage-pin-8k/README.md).
+
+Three Q2_0 short-request captures at an 8K configured context each produced
+the same four graph-instantiation events and 71,983,104-byte NVMap owner
+interval as the separate 32K/spec2 sample. This is a cross-context observation
+for one verifier shape; the interval still contains adjacent synchronous
+allocations. In Splash, align platform-owner samples to graph lifecycle events
+and keep the platform's physical-memory authority separate from owner payloads.
+The Orin NVMap count and Linux sampling method do not transfer to Metal.
+See the [graph-context report](../../bench/results/2026-10-13-phase3-q2-graph-context8k/README.md).

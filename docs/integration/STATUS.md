@@ -1098,3 +1098,5 @@ outlier; all seven matched text, token counts and cache sizes. A separate
 traced state pair matched all accepted-prefix commits and final state. This
 adds a 32K configured-context cell, not task-quality evidence or default
 promotion; Phase 4 remains open.
+
+The Q2_0 [8K-context captured-graph NVMap repeat](../../bench/results/2026-10-13-phase3-q2-graph-context8k/README.md) extended the short-request graph-backing sample to 3,000 cache slots, speculation 2 and context 8,232. Three processes passed with identical output/state and four matched graph-owner events each. The NVMap process-owner interval was exactly 71,983,104 bytes in all three runs, matching the separate 32K/spec2 observation; it still includes adjacent allocations and is not executable size or total physical memory. Minimum host/effective headroom was 17.83 GiB with no OOM. The graph-disabled control remains unsupported, and legacy graph shapes/non-NVMap backing remain open.

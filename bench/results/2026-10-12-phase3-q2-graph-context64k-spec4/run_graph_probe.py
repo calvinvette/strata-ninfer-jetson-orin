@@ -6,7 +6,16 @@ from run_control import write_result
 out=Path(sys.argv[1]).resolve()
 cfg=json.loads((out/'server-config.json').read_text())
 base=f"http://127.0.0.1:{cfg['port']}"
-result={'scope':'Q2_0 native verifier spec4 graph capture at 64K configured context','model':cfg['model_name'],'spec':4,'configured_context':65536,'checks':[]}
+args=cfg.get('args', [])
+def configured_arg(name, default):
+ try:
+  return int(args[args.index(name)+1])
+ except (ValueError, IndexError, TypeError):
+  return default
+spec=configured_arg('--spec', None)
+context=configured_arg('--max-context', None)
+result={'scope':f'Q2_0 native verifier spec{spec} graph capture at {context} configured context',
+        'model':cfg['model_name'],'spec':spec,'configured_context':context,'checks':[]}
 server=subprocess.Popen([sys.executable,'-m','serve.server','--engine','strata','--config',str(out/'server-config.json'),'--host','127.0.0.1','--port',str(cfg['port'])],cwd=cfg['cwd'])
 sampler=None
 try:
