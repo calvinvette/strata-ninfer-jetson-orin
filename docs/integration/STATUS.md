@@ -982,3 +982,9 @@ within each cell. Across cells, chunk changes produced 2.19–3.30% GDN relative
 L2 differences and cache changes 1.66–2.29%. The numerical cause and task-level
 effect remain unqualified; this is a one-prompt, one-token diagnostic, not a
 quality result or timing promotion. Keep Phase 3 open.
+Owner traces in the same cells balanced 304 allocations against 303 frees,
+with the 1,485,606,400-byte weight arena remaining for process lifetime. The
+prefill owner request rose from 197.2 to 350.1 MB across chunks 64–512; the
+expert-cache owner requested 4.147/6.912 GB at 3,000/5,000 slots. These are
+instrumented requested payloads, not physical backing totals; graph and driver
+bytes remain outside the trace. Full cell accounting is in the linked report.

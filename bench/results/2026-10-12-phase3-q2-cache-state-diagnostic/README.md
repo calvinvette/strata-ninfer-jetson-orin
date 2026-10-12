@@ -95,3 +95,16 @@ the responsible operator, or measure task quality. Each cell has two repeats,
 one prompt and one generated token; clocks were dynamic and energy was not
 measured. Keep prefill chunk and cache capacity jointly qualified, and do not
 promote a profile based on matching this token alone.
+
+The same 16 logs also give consistent owner requests in both repeats. The
+prefill owner peak grew from 197,201,152 bytes at chunk 64 to 350,079,744 bytes
+at chunk 512 (145.8 MiB); the 128/256 peaks were 214,533,888/251,841,280 bytes.
+The expert-cache owner requested 4,147,200,000 bytes at 3,000 slots and
+6,912,000,000 bytes at 5,000. Instrumented device requested-live peaks ranged
+from 6,017,027,072 to 8,934,705,664 bytes; host owner peaks were 354,492,280
+bytes. All logs had 304 allocation and 303 free events, with the expected
+1,485,606,400-byte weight arena remaining until process exit. These are unique
+requested owner payloads at instrumented sites, not physical backing totals;
+CUDA graph/driver-private bytes remain outside this trace. See
+`prefill-cache-owners.json`; host availability and tegrastats are retained per
+run.

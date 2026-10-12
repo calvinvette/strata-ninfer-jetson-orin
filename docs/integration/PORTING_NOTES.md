@@ -746,3 +746,6 @@ while a one-token output stayed the same. For Splash, cross these two resource
 factors in the same prompt-prefix experiment and compare raw recurrent state;
 validate longer task output separately before deciding whether the deltas fit
 the numerical contract.
+Record the corresponding unique owner requests beside OS-level available
+memory and platform counters. Do not treat an owner ledger as a physical-memory
+total when driver or graph backing is outside its instrumentation.
