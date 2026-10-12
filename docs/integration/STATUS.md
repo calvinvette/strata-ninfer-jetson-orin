@@ -32,6 +32,13 @@ The [backend record](../../bench/results/2026-10-13-phase4-q8_1-neon-contract/MA
 and [main report](../../bench/results/2026-10-13-phase4-q8_1-neon-contract/README.md)
 retain the build and experiment details.
 
+The fresh [Phase 3 Q2_0 regression on the Q8_1 candidate binary](../../bench/results/2026-10-13-phase3-q2-ple-q8-neon-refresh/README.md)
+passed artifact-aware `ple_parity` and the selected memory/owner/PLE CTests
+(15/15), then integration Python discovery (124/124). The Q8_1 opt-in was
+unset. Minimum availability was 24.415 GiB for CTest and 24.408 GiB for Python
+tests under the six-GiB supervisor. This refreshes selected contracts only; it
+does not extend Phase 3 capacity or graph-backing claims.
+
 The focused [SessionLoopScratch owner check](../../bench/results/2026-10-11-phase3-session-loop-scratch-owner-retest/README.md) traces a 65,536-byte mapped/pinned host allocation and one matching free; repeated teardown is idempotent. The serial [Phase 3 owner/PLE regression](../../bench/results/2026-10-11-phase3-session-owner-ctest/README.md) passed 23/23. CUDA relink and maestro1 HIP compile identities are retained. The validated native pack bypasses the legacy session-loop route; broader unique-backing and graph accounting remain open.
 
 The fresh [Q2_0 PLE and owner/graph regression](../../bench/results/2026-10-11-phase3-followup-fresh/README.md) passed the artifact-aware PLE oracle and all 19 selected ownership/graph tests on the current candidate. The seven PLE stages passed for three tokens (worst relative L1 `1.148e-7`); CTest passed 19/19 with 24.52 GiB minimum host availability. This reconfirms selected contracts only; graph-pool pricing, broad pressure behavior and remaining transfer/admission cells remain open.
