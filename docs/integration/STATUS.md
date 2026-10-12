@@ -908,3 +908,13 @@ output token 32. Host `MemAvailable` stayed at 18.52 GiB or higher in the
 aborted before cache admission, so it does not reproduce the residency-table
 error. Earlier successful 10/12-GiB cells remain as distinct state-dependent
 observations; current pressure behavior is not a stable capacity boundary.
+
+The [64K/spec4 graph-backing confirmation](../../bench/results/2026-10-11-phase3-q2-graph-context64k-confirm3/README.md)
+passed three independent 31/24-token API requests under the six-GiB supervisor.
+Each startup matched all three successful graph instantiations to owner events.
+Calibrated NVMap plateaus were exactly 6,870,433,792 bytes before and
+6,919,143,424 bytes after the graph sequence in every run, a repeatable
+48,709,632-byte owner increase. This matches the 32K/spec4 interval for these
+two configurations, while adjacent synchronous allocations remain included.
+Legacy graph shapes, non-NVMap bytes and isolated executable cost remain open;
+Phase 3 continues.
