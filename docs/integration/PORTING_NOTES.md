@@ -840,3 +840,9 @@ page-cache/scope charging in sequential runs. Both produced the same output ID,
 but all 36 GDN hashes differed. For Splash, retain chunk size as both a memory
 and numerical-state factor; report physical/cgroup telemetry and accepted state
 separately, and do not infer which state is better without an oracle.
+The same 5,000-slot / prefill-256 request also passed under an 18-GiB scope at
+6.49 GiB minimum effective headroom, 0.49 GiB above the unchanged guard, and
+matched every persistent hash from its 20-GiB repeat. Keep narrow admitted
+passes with their exact model, prompt, cache, chunk, and cgroup context; compare
+full hashes as well as output IDs. Do not infer a capacity threshold by
+contrasting this with the unmatched 3,000-slot / prefill-512 abort.
