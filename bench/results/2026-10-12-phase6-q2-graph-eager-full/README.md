@@ -63,8 +63,45 @@ fingerprints match each other. The trace narrows the discrepancy to state
 outside those matching PLE/tail fields, but does not yet identify its cause.
 
 This is unresolved output sensitivity in the shared runtime. Do not promote
-eager decode or interpret paired timing deltas as qualified until output
-quality is checked against an independent budget.
+eager decode or interpret paired timing deltas as qualified without an
+independent output-quality budget.
+
+## Independent quality screen
+
+This screen compares the same deterministic computer-information prompt
+with default adaptive swaps and `--adapt-swaps 0`. The prompt is built on the
+retained `pp2048-tg128` token fixture (`tokens_sha256`
+`6989a4393a67b2aec9bbf7073ed97b13f9c5d16d78c9b305b77c73a6028d4db5`); after
+chat formatting the API reports 2,094 prompt tokens. Its rubric requires at
+least 200 words, the exact `Processor:` prefix and `17 x 19 = 323` statement,
+and mentions of fetch, decode, execute, RAM, binary, input and output.
+Temperature is zero. Each fresh service receives one request; adaptive and
+no-swaps runs are sequential, under a 28 GiB cgroup with the six-GiB host floor.
+No clocks are changed and energy is not attributed.
+
+The initial 256-token pair produced identical 205-word replies (SHA256
+`81043c22955fe9b7fe912cdd6c436c6c87575e08babcae60bb67e518ecea6f9d`) with
+the required prefix, arithmetic and six of seven topic terms. Both stopped at
+the length limit before mentioning output, so this pair is retained as an
+incomplete rubric result. The matched 512-token-cap pair finished naturally
+after 304 adaptive and 306 no-swaps tokens. Both passed the full checklist and
+were over 200 words (245 and 247 by whitespace-separated word count). Their
+reply hashes were respectively
+`64053be6f7507139c24fba69372796113bf3e4dcb90fa37de2cbeba245279dd8` and
+`97912693cfc2677df85c1581f9fdd5793e66be45a494666c40942e0585244caf`; the
+small wording difference is in the output-device explanation. Both supervisor
+runs passed with minimum available memory of 18.00 and 17.96 GiB. API elapsed
+times were 116.0 s and 164.6 s, respectively; a single unrandomized pair is
+not timing evidence.
+
+This is a narrow task-level screen, not a general language-quality evaluation
+or a demonstrated quality budget for expert residency changes. It shows that
+both settings can satisfy this one task; it does not classify the previously
+observed output changes as acceptable for broader workloads. No configuration
+is promoted and Phase 6 remains open. Raw API outputs, configs and supervisor
+telemetry are retained in `quality-adaptive*/` and `quality-no-swaps*/`; the
+512-token workload definition SHA256 is
+`e43741901e121b6bdf36c58f8ed8698bd63b6475806f2d3e16d486c50cf9a340`.
 
 The API harness's built-in warmup is a full-length request, so the follow-up
 under `minimal-sequence-captured/` and `minimal-sequence-eager/` first showed

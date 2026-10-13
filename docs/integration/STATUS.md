@@ -25,6 +25,15 @@ retained records include a failed `--spec 0` startup, corrected to the native
 pack's required `--spec 2` while keeping MTP disabled. No performance candidate
 is promoted.
 
+The Phase 6 report now includes a narrow deterministic output-quality screen
+for default adaptive expert swaps versus swaps disabled. With a 512-token cap,
+both replies passed the 200-word prompt rubric, including its exact arithmetic
+statement and all required concepts; they differed only in the output-device
+explanation. This is one task-level screen, not a general quality budget or
+approval of residency-driven output variation. The initial 256-token pair is
+retained as incomplete because it stopped before the output concept. No path or
+default is promoted.
+
 The [exact Q8_0 scalar-versus-ARM quantization experiment](../../bench/results/2026-10-13-phase4-q8-neon-quant/README.md)
 compares Strata's explicit scalar oracle against ggml's Cortex-A78AE NEON path
 on 256 rows of width 2,560. Three independent processes matched every Q8_0 byte;
