@@ -49,6 +49,17 @@ improved while decode time was about 2% slower. The interaction estimate was
 small and uncertain. This single-model screen is not held-out confirmation or
 a general quality qualification, so no default changed.
 
+The [accepted-prefix MTP investigation](../../bench/results/2026-10-13-phase6-q6-warp-mtp-confirm7/README.md)
+now captures activations at the two GDN layers bracketing the first state
+mismatch on the 512-token suffix. Layer-2 GDN input differs at position 515,
+while the preceding layer-1 GDN capture is still bitwise equal there and first
+differs at position 520. This narrows the discrepancy to work between those
+capture points; the intervening residual/FFN and verifier-row arithmetic are
+not isolated. The 28-GiB supervised run retained 13.21 GiB minimum host and
+effective admission availability, with no OOM events. A focused 10/10 CUDA
+verifier/GDN/speculation/PLE/graph test set passed. Phase 5 remains open, and
+MTP remains unqualified for this incident workload.
+
 The [exact Q8_0 scalar-versus-ARM quantization experiment](../../bench/results/2026-10-13-phase4-q8-neon-quant/README.md)
 compares Strata's explicit scalar oracle against ggml's Cortex-A78AE NEON path
 on 256 rows of width 2,560. Three independent processes matched every Q8_0 byte;

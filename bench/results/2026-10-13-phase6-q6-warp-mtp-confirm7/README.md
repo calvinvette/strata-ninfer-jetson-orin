@@ -79,3 +79,37 @@ retained under `run/`. The direct trace commands are the Python harnesses
 `compare_incident_windows.py` (off/windows 2/3/4). State-trace and supervisor
 records are retained under `run/incident-state-*` and
 `run/incident-window-sweep*`.
+
+## Layer-input localization follow-up
+
+The later layer-input capture repeats the exact 512-token suffix with the same
+current engine, fixed 32-token generation limit, and fresh no-MTP/window-4
+services. The accepted-prefix trace again first differs at generated prefix 5;
+the output first differs at token index 10. Window 4 offered 42 drafts and
+accepted 18. Both requests completed without OOM events under the 28-GiB
+supervisor; minimum host and effective admission availability were 13.21 GiB.
+The comparison is correctness-only because capture/state tracing synchronizes
+GPU work.
+
+At the selected GDN capture points, absolute layer 2 (the third model layer,
+GDN ordinal 2) first differs at position 515/token 3766. Its pre-GDN mixed
+activation differs in all 2,560 values (relative L2 0.002102, maximum absolute
+delta 0.004664); QKV, convolution input, gate, beta, z, and recurrent output
+also differ. Absolute layer 1 (the second model layer, GDN ordinal 1) remains
+bitwise equal at shared captured positions through 519; its first difference
+is at position 520/token 11040 (all 2,560 mixed-activation values, relative L2
+0.002666, maximum absolute delta 0.006456). This brackets the first observed
+activation discrepancy between the layer-1 GDN capture and layer-2 GDN input
+for the shared row at position 515. The intervening residual/FFN operations
+and MTP verifier-row arithmetic are not yet separated, so this is not a root
+cause or a fix. No tolerance or alternate route is adopted.
+
+The capture format is opt-in (`STRATA_VERIFY_DUMP_GDN_LAYER` plus
+`STRATA_VERIFY_DUMP_GDN_PATH`) and records bounded verifier rows in a binary
+`STGDIAG1` stream. `analyze_gdn_diag.py` compares the first two appended capture
+streams by absolute position and token. State hashes, rather than the binary
+state snapshot, remain authoritative for persistent state because the one-token
+commit path can mutate convolution history before the snapshot. Large raw
+float32 dumps were removed after extracting these compact metrics; logs and
+supervisor telemetry remain. The new CUDA binary passed the focused 10-test
+verifier/GDN/speculation/PLE/graph regression.

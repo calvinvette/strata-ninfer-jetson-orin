@@ -64,6 +64,36 @@ namespace {
 constexpr float EPS = 1e-6f;
 using Clock = std::chrono::steady_clock;
 double ms_since(Clock::time_point t) { return std::chrono::duration<double, std::milli>(Clock::now() - t).count(); }
+
+#pragma pack(push, 1)
+struct GdnDiagHeader {
+    char magic[8];
+    uint32_t version;
+    int32_t layer, rows;
+    int64_t pos0;
+    uint64_t n_embd, conv_channels, v_heads, value_dim, state_floats;
+    int32_t tokens[strata::kernels::kVerifyMaxT];
+};
+#pragma pack(pop)
+
+struct GdnDiagOffsets {
+    size_t x, qkv, h, gate, beta, z, y, state, bytes;
+};
+
+GdnDiagOffsets gdn_diag_offsets(int rows, size_t n, size_t c, size_t hv, size_t zv, size_t state_floats) {
+    GdnDiagOffsets o{};
+    o.x = 0;
+    o.qkv = o.x + (size_t) rows * n * sizeof(float);
+    o.h = o.qkv + (size_t) rows * c * sizeof(float);
+    o.gate = o.h + (size_t) rows * c * sizeof(float);
+    o.beta = o.gate + (size_t) rows * hv * sizeof(float);
+    o.z = o.beta + (size_t) rows * hv * sizeof(float);
+    o.y = o.z + (size_t) rows * zv * sizeof(float);
+    o.state = o.y + (size_t) rows * zv * sizeof(float);
+    o.bytes = o.state + state_floats * sizeof(float);
+    return o;
+}
+
 const bool g_dbg = std::getenv("STRATA_VERIFY_DEBUG") != nullptr;
 inline bool g_lfuse() { static const bool on = [] { const char* v = std::getenv("STRATA_LFUSE"); return v != nullptr && v[0] == '1'; }(); return on; }
 // STRATA_ROUTE_RESIDENT=<margin logits> (+ STRATA_ROUTE_RESIDENT_RANKS=lo-hi, default 6-9): residency-biased routing.
@@ -410,6 +440,9 @@ Verifier::~Verifier() {
     if (ev_commit_) cudaEventDestroy(ev_commit_);
     if (prof_pin_ && cudaFreeHost(prof_pin_) == cudaSuccess)
         strata::platform::integration_trace::event("verifier-pinned-host", "free", this, prof_pin_, 0, -1);
+    if (gdn_diag_h_ && cudaFreeHost(gdn_diag_h_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
+                                                    gdn_diag_h_, 0, -1);
     if (ev_fork_) cudaEventDestroy(ev_fork_);
     if (ev_join_) cudaEventDestroy(ev_join_);
     for (cudaStream_t s : df_side_)
@@ -490,9 +523,34 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
     const uint64_t NH = (uint64_t) g.n_head, HD = (uint64_t) g.head_dim, NKV = (uint64_t) g.n_head_kv;
     const uint64_t IQ = (uint64_t) g.idx_q_heads, ID = (uint64_t) g.idx_key_dim;
     const uint64_t nG = (uint64_t) g.n_gdn_layers(), nQ = (uint64_t) g.n_qsa_layers();
+    const uint64_t gdn_floats = (uint64_t) g.ssm_state_size * g.ssm_v_heads * g.ssm_state_size +
+                                (uint64_t) g.ssm_conv_channels * (g.ssm_d_conv - 1);
     const uint64_t HS = (uint64_t) strata::kernels::NG_HIST * strata::kernels::NG_HC_DIM;
     const uint64_t TS = (uint64_t) (s.idx_block - 1) * ID;
     const int max_in = (int) std::max<uint64_t>(std::max<uint64_t>(N, ZV), NH * HD);
+
+    if (const char* layer = std::getenv("STRATA_VERIFY_DUMP_GDN_LAYER")) {
+        const char* path = std::getenv("STRATA_VERIFY_DUMP_GDN_PATH");
+        char* end = nullptr;
+        const long parsed = std::strtol(layer, &end, 10);
+        if (end == layer || *end != '\0' || parsed < 0 || parsed >= g.n_layers || !path || !*path) {
+            err = "verify: STRATA_VERIFY_DUMP_GDN_LAYER needs a valid layer and STRATA_VERIFY_DUMP_GDN_PATH";
+            return false;
+        }
+        gdn_diag_layer_ = (int) parsed;
+        gdn_diag_path_ = path;
+        const GdnDiagOffsets diag = gdn_diag_offsets(max_t, N, C, HV, ZV, gdn_floats);
+        gdn_diag_capacity_ = diag.bytes;
+        if (cudaHostAlloc((void**) &gdn_diag_h_, gdn_diag_capacity_, cudaHostAllocPortable) != cudaSuccess) {
+            gdn_diag_h_ = nullptr;
+            err = "verify: could not allocate the opt-in GDN diagnostic buffer";
+            return false;
+        }
+        strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "allocate", this,
+                                                    gdn_diag_h_, gdn_diag_capacity_, -1);
+        std::fprintf(stderr, "strata verify: opt-in GDN activation dump at layer %d -> %s (%zu bytes)\n",
+                     gdn_diag_layer_, gdn_diag_path_.c_str(), gdn_diag_capacity_);
+    }
 
     // ---- mapped staging
     bool ok = mapped(this, T * 4, (void**) &h_tok_, (void**) &m_tok_) &&
@@ -1057,6 +1115,37 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                 mm(wg, z_ + (size_t) tb * ZV, (int) N, (int) ZV);
                 stamp(l, 5, grp);
                 }
+                const bool dump_gdn = gdn_diag_h_ != nullptr && l == gdn_diag_layer_ && !batch_rec_;
+                GdnDiagOffsets diag{};
+                if (dump_gdn) {
+                    diag = gdn_diag_offsets(T, (size_t) N, (size_t) C, (size_t) HV, (size_t) ZV,
+                                            (size_t) gdn_floats);
+                    auto copy_diag = [&](size_t offset, const void* source, size_t bytes) {
+                        return cudaMemcpyAsync((uint8_t*) gdn_diag_h_ + offset, source, bytes,
+                                               cudaMemcpyDeviceToHost, cs) == cudaSuccess;
+                    };
+                    const size_t row = (size_t) tb;
+                    const size_t nr = (size_t) n;
+                    bool copied = copy_diag(diag.x + row * (size_t) N * sizeof(float), xm,
+                                            nr * (size_t) N * sizeof(float)) &&
+                                  copy_diag(diag.qkv + row * (size_t) C * sizeof(float), qkv + (size_t) tb * C,
+                                            nr * (size_t) C * sizeof(float)) &&
+                                  copy_diag(diag.h + row * (size_t) C * sizeof(float), hb + (size_t) tb * C,
+                                            nr * (size_t) C * sizeof(float)) &&
+                                  copy_diag(diag.gate + row * (size_t) HV * sizeof(float), gate + (size_t) tb * HV,
+                                            nr * (size_t) HV * sizeof(float)) &&
+                                  copy_diag(diag.beta + row * (size_t) HV * sizeof(float), beta + (size_t) tb * HV,
+                                            nr * (size_t) HV * sizeof(float)) &&
+                                  copy_diag(diag.z + row * (size_t) ZV * sizeof(float), z_ + (size_t) tb * ZV,
+                                            nr * (size_t) ZV * sizeof(float));
+                    if (copied && tb == 0)
+                        copied = copy_diag(diag.state, state, (size_t) gdn_floats * sizeof(float));
+                    if (!copied) {
+                        err = "verify: could not capture opt-in GDN layer inputs";
+                        return false;
+                    }
+                    gdn_diag_captured_ = true;
+                }
                 // the recurrence from the untouched state over tokens [0, te); outputs only for this group's
                 if (batch_rec_) {   // each slot's recurrence over its own proposed-token group
                     for (int t = tb; t < te;) {
@@ -1072,6 +1161,15 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                 } else
                 gdn_step_norm_multi(state, hb, (int) C, gate, beta, z_, (const float*) wnm->data, EPS, y_, (int) HK,
                                     (int) HV, te, self_commit ? one_ : nullptr, cs, tb, g_qfuse() ? (void*) xq_ : nullptr);
+                if (dump_gdn) {
+                    const size_t row = (size_t) tb;
+                    if (cudaMemcpyAsync((uint8_t*) gdn_diag_h_ + diag.y + row * (size_t) ZV * sizeof(float),
+                                        y_ + (size_t) tb * ZV, (size_t) n * (size_t) ZV * sizeof(float),
+                                        cudaMemcpyDeviceToHost, cs) != cudaSuccess) {
+                        err = "verify: could not capture opt-in GDN layer outputs";
+                        return false;
+                    }
+                }
                 stamp(l, 6, grp);
                 // STRATA_QFUSE: done above by gdn_step_norm_multi - but a batch's per-slot recurrence passes it no q8_1
                 // destination (#1139: the out-projection read stale bytes), so that case quantizes here as without it
@@ -2100,6 +2198,37 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
     const cudaError_t se = cudaStreamSynchronize(cs_);
     trace_ev("SYNCED", -1, -1, (int64_t) se);
     if (se != cudaSuccess) { err = std::string("verify: ") + cudaGetErrorString(se); return false; }
+    if (gdn_diag_captured_) {
+        const uint64_t gdn_floats = (uint64_t) g.ssm_state_size * g.ssm_v_heads * g.ssm_state_size +
+                                    (uint64_t) g.ssm_conv_channels * (g.ssm_d_conv - 1);
+        const GdnDiagOffsets diag = gdn_diag_offsets(T, (size_t) g.n_embd, (size_t) g.ssm_conv_channels,
+                                                     (size_t) g.ssm_v_heads, (size_t) g.ssm_value_dim,
+                                                     (size_t) gdn_floats);
+        GdnDiagHeader header{};
+        std::memcpy(header.magic, "STGDIAG1", sizeof(header.magic));
+        header.version = 1;
+        header.layer = gdn_diag_layer_;
+        header.rows = T;
+        header.pos0 = pos0;
+        header.n_embd = (uint64_t) g.n_embd;
+        header.conv_channels = (uint64_t) g.ssm_conv_channels;
+        header.v_heads = (uint64_t) g.ssm_v_heads;
+        header.value_dim = (uint64_t) g.ssm_value_dim;
+        header.state_floats = gdn_floats;
+        for (int t = 0; t < T; ++t) header.tokens[t] = tokens[t];
+        std::FILE* dump = std::fopen(gdn_diag_path_.c_str(), "ab");
+        bool written = false;
+        if (dump) {
+            const bool header_ok = std::fwrite(&header, sizeof(header), 1, dump) == 1;
+            const bool data_ok = header_ok && std::fwrite(gdn_diag_h_, 1, diag.bytes, dump) == diag.bytes;
+            const bool close_ok = std::fclose(dump) == 0;
+            written = header_ok && data_ok && close_ok;
+        }
+        if (!written) {
+            err = "verify: could not write opt-in GDN layer diagnostic";
+            return false;
+        }
+    }
     if (ar_on() && h_plan_err_ != nullptr && *(volatile uint32_t*) h_plan_err_ != 0) {   // #871: refresh_ar saw the table whole
         *(volatile uint32_t*) h_plan_err_ = 0;
         err = "verify: the all-resident plan met an expert that is not in VRAM (the residency table changed during the window)";
