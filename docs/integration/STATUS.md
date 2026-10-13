@@ -10,22 +10,20 @@ into Strata. See the [Phase 3 gate audit](PHASE3_CLOSEOUT.md).
 Phase 6 Q2_0 graph/eager extended screening is recorded in the
 [2026-10-12 result](../../bench/results/2026-10-12-phase6-q2-graph-eager-full/README.md).
 The MTP-off long cell failed output parity in 2/7 eager pairs, correlated with
-short-before-long request order. A traced same-service follow-up found that
-captured and eager outputs agree with each other but differ from the long-only
-output after request cycling; prompt-end GDN/KV hashes differ while PLE/tail
-hashes match. A native-pack `--spec 2` repeat with MTP disabled also changed
-its long output between
-warmup and measured passes in both routes. This is an unresolved shared
-request-cycle correctness issue, so graph/eager timing remains descriptive
-and Phase 6 stays open. A direct no-warmup API driver confirmed that one
+short-before-long request order. A direct no-warmup API driver confirmed that one
 512/64 request followed by one 2048/128 request changes the long output at
 token index 8 versus a fresh long-only service, identically in captured and
-eager routes. The retained records include the failed startup caused
-by `--spec 0`; it was corrected to the native pack's required `--spec 2` while
-keeping MTP disabled. A same-shape state-hash trace changes
-the output back to the cold-run text while still reporting different GDN/KV
-hashes, so the trace is perturbative and does not locate the uninstrumented
-fault. No performance candidate is promoted.
+eager routes. Disabling adaptive expert swaps, or delaying them past the test,
+made captured and eager sequences match the fresh long-only output. This
+localizes the sensitivity to adaptive residency changes, which can change
+whether experts use the GPU or CPU path; those paths may round differently.
+It is not yet classified as unacceptable quality loss or a state-reset defect.
+The state-hash trace changes the output again while reporting different GDN/KV
+hashes, so it is perturbative. Graph/eager timing remains descriptive until an
+independent output-quality budget is checked, and Phase 6 stays open. The
+retained records include a failed `--spec 0` startup, corrected to the native
+pack's required `--spec 2` while keeping MTP disabled. No performance candidate
+is promoted.
 
 The [exact Q8_0 scalar-versus-ARM quantization experiment](../../bench/results/2026-10-13-phase4-q8-neon-quant/README.md)
 compares Strata's explicit scalar oracle against ggml's Cortex-A78AE NEON path

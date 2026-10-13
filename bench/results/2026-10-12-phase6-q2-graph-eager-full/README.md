@@ -62,10 +62,9 @@ fingerprint changes from GDN `cc1f42c906e4e844`, KV
 fingerprints match each other. The trace narrows the discrepancy to state
 outside those matching PLE/tail fields, but does not yet identify its cause.
 
-This is an unresolved shared-runtime request-order correctness failure. Do
-not promote eager decode or interpret the paired timing deltas as qualified
-until a minimal same-service reproduction is understood and the accepted
-prefix state is checked against an independent reference.
+This is unresolved output sensitivity in the shared runtime. Do not promote
+eager decode or interpret paired timing deltas as qualified until output
+quality is checked against an independent budget.
 
 The API harness's built-in warmup is a full-length request, so the follow-up
 under `minimal-sequence-captured/` and `minimal-sequence-eager/` first showed
@@ -82,9 +81,24 @@ response SHA256 was
 the fresh long-only response SHA256 was
 `a868c12065a20f134dd5dbd9ec87132a8a471cb9743019ed60ca1292596e3376`. Both
 responses contain 128 tokenizer IDs; the first token difference is at index
-8. The short output was byte-identical across routes. This establishes a
-single-short-request order effect on the tested binary and configuration;
-captured/eager mode does not explain it.
+8. The short output was byte-identical across routes. This establishes output
+sensitivity to expert-residency history in the tested binary and configuration;
+captured/eager mode alone does not explain it.
+
+An ablation localized the sensitivity to adaptive swaps. With default swaps,
+the fresh long-only captured output was `a868c120…` and the short→long output
+was `4035b292…`. With `--adapt-swaps 0`, captured and eager short→long runs
+and the captured long-only control all produced `863e819f…`. Keeping swap
+tracking enabled but setting `--adapt-every 100000` produced that same
+`863e819f…` output for both the short→long sequence and the long-only control.
+Thus the observed text change follows performing adaptive residency swaps,
+not merely allocating or updating usage counters, and it reproduces across
+both decode routes when swaps are disabled. This does not prove that swapped
+expert weights are wrong: the runtime can compute a resident expert on GPU and
+a nonresident expert on CPU, and those paths may round differently. The source
+documents this sensitivity around adaptive swap timing. We need an independent
+quality budget before classifying the output shift as unacceptable or accepting
+the optimization.
 
 The accepted-prefix trace adds an important limit: with state-hash tracing
 enabled, the same direct short→long sequence produced the long-only output
@@ -97,9 +111,9 @@ qualification on uninstrumented output/state checks until a non-perturbing
 accepted-prefix observation is available.
 
 The initial `--spec 0` attempt failed startup because the native pack requires
-`--spec 2`; that artifact remains with the corrected runs. The next step is to
-locate the underlying state divergence without changing execution timing or
-synchronization.
+`--spec 2`; that artifact remains with the corrected runs. State hashing also
+changes the sequence output, so the next step is an independent quality check
+and a non-perturbing observation of the expert-residency path.
 
 ## Retained evidence
 
@@ -113,6 +127,9 @@ synchronization.
 - `manual-traced-sequence-captured/` and `manual-traced-long-captured/` retain
   accepted-prefix state hashes. The trace changes the output of the sequence
   case, so it is explicitly treated as intrusive diagnostic evidence.
+- `noadapt-*` and `adapt-delayed-*` retain swap ablations and matched controls.
+- `trace-adapt-sequence-captured/` retains the opt-in trace attempt; the
+  serving path emitted no per-round trace lines.
 - `api-traced-captured-retry/` and `api-traced-eager/` contain long-only
   comparison runs. The failed initial adapter invocation is retained in
   `api-traced-captured/` with its failure artifacts.
