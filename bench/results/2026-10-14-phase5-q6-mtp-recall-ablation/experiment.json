@@ -1,0 +1,151 @@
+{
+  "design": "one independent fresh-service paired marker-recall ablation; accepted-only adaptive policy and warp-dequant held fixed; MTP off versus MTP window 4",
+  "seed": 20261014,
+  "order": [
+    "mtp4",
+    "mtp0"
+  ],
+  "prompt": "same 7,498-token 8K planted-marker workload",
+  "workload": "bench/results/2026-10-14-phase7-q6-recall/workloads/workload-8192.json",
+  "warmup": "bench/results/2026-10-13-phase6-q6-warp-mtp-confirm7/warmup-workloads.json",
+  "configs": {
+    "mtp0": "bench/results/2026-10-14-phase5-q6-mtp-recall-ablation/config-mtp0.json",
+    "mtp4": "bench/results/2026-10-14-phase5-q6-mtp-recall-ablation/config-mtp4.json"
+  },
+  "status": "complete_screen",
+  "randomized_blocks": [
+    [
+      "mtp4",
+      "mtp0"
+    ],
+    [
+      "mtp4",
+      "mtp0"
+    ],
+    [
+      "mtp0",
+      "mtp4"
+    ]
+  ],
+  "runs": [
+    {
+      "block": 1,
+      "order": [
+        "mtp4",
+        "mtp0"
+      ],
+      "status": "pass",
+      "paths": {
+        "mtp4": "mtp4",
+        "mtp0": "mtp0"
+      },
+      "results": {
+        "mtp4": {
+          "result": "pass",
+          "supervisor": "pass",
+          "min_available_bytes": 14275227648,
+          "answer": "EARLY=MAPLE-ORBIT-731, MIDDLE=COBALT-HARBOR-284, LATE=VELVET-COPPER-956",
+          "recovery": "RECOVERED",
+          "prompt_ms": 307695.1,
+          "decode_ms": 2615.8,
+          "draft_n": 32,
+          "draft_n_accepted": 30
+        },
+        "mtp0": {
+          "result": "pass",
+          "supervisor": "pass",
+          "min_available_bytes": 15324098560,
+          "answer": "EARLY=MAPLE-ORBIT-731, MIDDLE=COBALT-HARBOR-284, LATE=VELVET-COPPER-956",
+          "recovery": "RECOVERED",
+          "prompt_ms": 303994.8,
+          "decode_ms": 3125.6,
+          "draft_n": 0,
+          "draft_n_accepted": 0
+        }
+      },
+      "answers_equal": true,
+      "recovery_equal": true
+    },
+    {
+      "block": 2,
+      "order": [
+        "mtp4",
+        "mtp0"
+      ],
+      "status": "pass",
+      "paths": {
+        "mtp4": "pair-2/mtp4",
+        "mtp0": "pair-2/mtp0"
+      },
+      "results": {
+        "mtp4": {
+          "result": "pass",
+          "supervisor": "pass",
+          "min_available_bytes": 14173708288,
+          "answer": "EARLY=MAPLE-ORBIT-731, MIDDLE=COBALT-HARBOR-284, LATE=VELVET-COPPER-956",
+          "recovery": "RECOVERED",
+          "prompt_ms": 306977.8,
+          "decode_ms": 2596.7,
+          "draft_n": 32,
+          "draft_n_accepted": 30
+        },
+        "mtp0": {
+          "result": "pass",
+          "supervisor": "pass",
+          "min_available_bytes": 15385845760,
+          "answer": "EARLY=MAPLE-ORBIT-731, MIDDLE=COBALT-HARBOR-284, LATE=VELVET-COPPER-956",
+          "recovery": "RECOVERED",
+          "prompt_ms": 304564.2,
+          "decode_ms": 3081.6,
+          "draft_n": 0,
+          "draft_n_accepted": 0
+        }
+      },
+      "answers_equal": true,
+      "recovery_equal": true
+    },
+    {
+      "block": 3,
+      "order": [
+        "mtp0",
+        "mtp4"
+      ],
+      "status": "pass",
+      "paths": {
+        "mtp0": "pair-3/mtp0",
+        "mtp4": "pair-3/mtp4"
+      },
+      "results": {
+        "mtp0": {
+          "result": "pass",
+          "supervisor": "pass",
+          "min_available_bytes": 15454035968,
+          "answer": "EARLY=MAPLE-ORBIT-731, MIDDLE=COBALT-HARBOR-284, LATE=VELVET-COPPER-956",
+          "recovery": "RECOVERED",
+          "prompt_ms": 304919.1,
+          "decode_ms": 3096.3,
+          "draft_n": 0,
+          "draft_n_accepted": 0
+        },
+        "mtp4": {
+          "result": "pass",
+          "supervisor": "pass",
+          "min_available_bytes": 14329683968,
+          "answer": "EARLY=MAPLE-ORBIT-731, MIDDLE=COBALT-HARBOR-284, LATE=VELVET-COPPER-956",
+          "recovery": "RECOVERED",
+          "prompt_ms": 307345.6,
+          "decode_ms": 2634.1,
+          "draft_n": 32,
+          "draft_n_accepted": 30
+        }
+      },
+      "answers_equal": true,
+      "recovery_equal": true
+    }
+  ],
+  "state_trace": {
+    "status": "pass",
+    "path": "state-trace-retry/trace/results.json",
+    "initial_wrapper_attempt": "state-trace/ (parser failure after valid MTP-off trace; retained)"
+  }
+}
