@@ -1596,5 +1596,11 @@ host availability was 13.10 GiB, effective headroom 10.60 GiB, and sampled
 cgroup OOM/limit counters stayed zero. However, the generated eight-token
 prefix differed between settings in all seven pairs (stable within each arm),
 so this short-generation performance confirmation does not establish output
-parity or task quality. No setting is promoted; longer held-out quality and
-parity evidence remain open.
+parity or task quality and cannot support profile promotion.
+
+The same 1,069-token prompt was then allowed to complete at both chunk sizes.
+Each response ended naturally and exceeded 200 words, but both failed the
+prompt's explicit opening instruction to start with the processor. This is a
+task failure for both settings, not evidence of a relative quality difference.
+The performance signal remains valid only for its short-generation workload;
+no profile is promoted. See the [held-out full-task result](../../bench/results/2026-10-14-phase6-q6-prefill-confirm7/quality-full-task/README.md).

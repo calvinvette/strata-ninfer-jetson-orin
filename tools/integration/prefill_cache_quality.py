@@ -20,9 +20,15 @@ def api_json(base, route, body=None, timeout=3600):
         return json.load(response)
 
 
-def rubric(text):
+def rubric(text, profile='comprehensive'):
     words = text.split()
     lower = text.lower()
+    if profile == 'computer-explanation':
+        checks = {
+            'starts_with_processor': text.lstrip().lower().startswith('processor'),
+            'at_least_200_words': len(words) >= 200,
+        }
+        return checks, len(words)
     checks = {
         'starts_processor': text.lstrip().startswith('Processor:'),
         'at_least_200_words': len(words) >= 200,
@@ -35,7 +41,7 @@ def rubric(text):
     return checks, len(words)
 
 
-def run_cell(config, workload, output, python):
+def run_cell(config, workload, output, python, rubric_profile):
     output.mkdir()
     cfg = dict(config)
     cfg['port'] = int(config['port'])
@@ -77,9 +83,10 @@ def run_cell(config, workload, output, python):
         (output / 'response.json').write_text(json.dumps(response, indent=2) + '\n')
         message = response['choices'][0]['message']
         content = message.get('content', '') or ''
-        checks, count = rubric(content)
+        checks, count = rubric(content, rubric_profile)
         result = {'status': 'pass' if all(checks.values()) else 'fail',
                   'word_count': count, 'rubric': checks,
+                  'rubric_profile': rubric_profile,
                   'finish_reason': response['choices'][0].get('finish_reason'),
                   'usage': response.get('usage'), 'timings': response.get('timings'),
                   'metrics': api_json(base, '/metrics')}
@@ -101,6 +108,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--cache-values', type=int, nargs='+', default=[3000, 5000])
     parser.add_argument('--prefill-values', type=int, nargs='+', default=[32, 128])
+    parser.add_argument('--rubric', choices=['comprehensive', 'computer-explanation'],
+                        default='comprehensive')
     parser.add_argument('--python', default=sys.executable)
     args = parser.parse_args()
     config = json.loads(args.config.read_text())
@@ -117,7 +126,8 @@ def main():
             row = {'cell': name, 'expert_cache_argument': cache,
                    'prefill_chunk_tokens': prefill}
             try:
-                row.update(run_cell(cell_config, workloads[0], args.output / name, args.python))
+                row.update(run_cell(cell_config, workloads[0], args.output / name,
+                                    args.python, args.rubric))
             except Exception as exc:
                 row.update(status='fail', reason=f'{type(exc).__name__}: {exc}')
             rows.append(row)

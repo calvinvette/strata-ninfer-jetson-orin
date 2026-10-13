@@ -19,6 +19,15 @@ class PrefillCacheQualityTest(unittest.TestCase):
         self.assertFalse(checks['at_least_200_words'])
         self.assertFalse(checks['exact_arithmetic'])
 
+    def test_task_specific_computer_explanation_rubric(self):
+        accepted, count = rubric('Processor: ' + 'Computer information. ' * 100,
+                                 'computer-explanation')
+        rejected, _ = rubric('A processor handles information. ' * 100,
+                             'computer-explanation')
+        self.assertEqual(count, 201)
+        self.assertTrue(all(accepted.values()))
+        self.assertFalse(rejected['starts_with_processor'])
+
 
 if __name__ == '__main__':
     unittest.main()

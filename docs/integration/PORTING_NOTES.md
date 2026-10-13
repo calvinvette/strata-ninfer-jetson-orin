@@ -1232,7 +1232,11 @@ and reduced request time by 65.7%, but its eight generated tokens differed from
 the baseline in every pair (each arm was internally stable). For Splash, a
 large prefill win still needs an output/state contract check: do not infer
 quality from a short, divergent prefix, and keep performance evidence separate
-from task completion. See the [held-out confirmation](../../bench/results/2026-10-14-phase6-q6-prefill-confirm7/README.md).
+from task completion. Full-length responses on this prompt then ended naturally
+and exceeded 200 words at both chunk sizes, but each failed the explicit opening
+requirement to start with the processor. Preserve rubric failures per setting;
+do not treat a longer answer as a pass. See the [held-out confirmation](../../bench/results/2026-10-14-phase6-q6-prefill-confirm7/README.md)
+and [full-task check](../../bench/results/2026-10-14-phase6-q6-prefill-confirm7/quality-full-task/README.md).
 
 A separate 7,498-token IQ1_M prefill-cancellation cell closed the stream after
 the first 64-token prompt chunk, logged cancellation before generation, and
