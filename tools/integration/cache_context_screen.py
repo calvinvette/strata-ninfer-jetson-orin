@@ -33,6 +33,18 @@ def cell_configs(config, cache_values, context_values):
     return cells
 
 
+def api_command(runtime_python, tools, cfgpath, workloads, request_path, rounds,
+                timeout_s=1800, no_trace=False):
+    command = [str(runtime_python), str(tools / 'run_control.py'), '--output',
+               str((request_path.parent / 'supervisor').resolve()), '--timeout', str(timeout_s), '--',
+               str(runtime_python), str(tools / 'api_control_block.py'), '--config',
+               str(cfgpath.resolve()), '--workloads', str(workloads.resolve()),
+               '--output', str(request_path.resolve()), '--variant', 'candidate', '--rounds', str(rounds)]
+    if no_trace:
+        command.append('--no-trace')
+    return command
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', type=Path, required=True)
@@ -45,6 +57,8 @@ def main():
     parser.add_argument('--timeout', type=int, default=1800)
     parser.add_argument('--python', type=Path, default=Path(sys.executable),
                         help='Python executable with the server dependencies installed')
+    parser.add_argument('--no-trace', action='store_true',
+                        help='disable STRATA_TRACE for request timing')
     args = parser.parse_args()
     if args.rounds < 3 or args.timeout < 1:
         parser.error('screening requires at least three measured rounds and a positive timeout')
@@ -61,6 +75,7 @@ def main():
     campaign = {'seed': args.seed, 'cache_values': args.cache_values,
                 'context_values': args.context_values, 'planned_cells': len(cells),
                 'rounds_per_cell': args.rounds,
+                'trace_enabled': not args.no_trace,
                 'scope': 'randomized order; independent server process per cell; one warmup and three or more measured requests per process; admission and screening evidence only',
                 'started_wall_time_s': time.time(), 'cells': []}
     manifest = args.output / 'campaign.json'
@@ -74,10 +89,9 @@ def main():
         cfgpath.write_text(json.dumps(cell.pop('config'), indent=2) + '\n')
         request_path = out / 'requests.json'
         runtime_python = str(args.python.resolve())
-        command = [runtime_python, str(tools / 'run_control.py'), '--output', str((out / 'supervisor').resolve()),
-                   '--timeout', str(args.timeout), '--', runtime_python, str(tools / 'api_control_block.py'),
-                   '--config', str(cfgpath.resolve()), '--workloads', str(args.workloads.resolve()),
-                   '--output', str(request_path.resolve()), '--variant', 'candidate', '--rounds', str(args.rounds)]
+        command = api_command(args.python.resolve(), tools, cfgpath, args.workloads,
+                              request_path, args.rounds, timeout_s=args.timeout,
+                              no_trace=args.no_trace)
         row = dict(cell, order=index, status='not_run', command=command)
         campaign['cells'].append(row)
         write_result(manifest, campaign)

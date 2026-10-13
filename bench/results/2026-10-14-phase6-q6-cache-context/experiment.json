@@ -1,0 +1,51 @@
+{
+  "design": "randomized complete block screen: Q6_K warp-dequant + accepted-only MTP4; requested expert-cache lower bound \u00d7 max-context; FP16 KV fixed",
+  "cache_values": [
+    3000,
+    5000
+  ],
+  "context_values": [
+    8192,
+    16384
+  ],
+  "rounds_per_service": 3,
+  "trace_enabled": false,
+  "base_config": "base-config.json",
+  "workloads": "workloads.json",
+  "blocks": [
+    {
+      "block": 1,
+      "seed": 202610141,
+      "order": [
+        "cache3000-ctx8192",
+        "cache5000-ctx16384",
+        "cache5000-ctx8192",
+        "cache3000-ctx16384"
+      ],
+      "output": "block-01"
+    },
+    {
+      "block": 2,
+      "seed": 202610142,
+      "order": [
+        "cache5000-ctx16384",
+        "cache5000-ctx8192",
+        "cache3000-ctx8192",
+        "cache3000-ctx16384"
+      ],
+      "output": "block-02"
+    },
+    {
+      "block": 3,
+      "seed": 202610143,
+      "order": [
+        "cache5000-ctx16384",
+        "cache3000-ctx8192",
+        "cache3000-ctx16384",
+        "cache5000-ctx8192"
+      ],
+      "output": "block-03"
+    }
+  ],
+  "status": "completed_screen_all_cells_pass_quality_not_qualified"
+}

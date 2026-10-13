@@ -1530,3 +1530,14 @@ comparison overlapped an accidentally launched unsupervised process and is
 retained as confounded; the isolated supervised rerun passed. This strengthens
 the accepted-row boundary but does not close Phase 5's wider transaction,
 quality, or termination gates. See the [refactor record](../../bench/results/2026-10-14-phase5-accepted-usage-refactor/README.md).
+
+A [three-block randomized Q6 cache × context screen](../../bench/results/2026-10-14-phase6-q6-cache-context/README.md)
+completed all 12 fresh-service cells and 36 measured requests. Every request
+used 512 prompt tokens and generated 64 tokens without prompt-cache reuse; all
+cells passed the 28-GiB process ceiling and six-GiB host-availability floor.
+Actual cache allocation varied under the 5,000-slot request (4,600–6,519
+slots), and response text was not byte-identical in every request. The prompt
+was capped before its 200-word quality rubric could be checked, so the
+throughput and interaction estimates remain exploratory. This screen does not
+promote a cache/context profile or close Phase 6; held-out quality and
+confirmation evidence remain necessary.

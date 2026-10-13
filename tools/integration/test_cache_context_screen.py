@@ -1,7 +1,8 @@
 """Offline checks for the cache × context screen configuration builder."""
 import unittest
 
-from cache_context_screen import cell_configs, replace_option
+from cache_context_screen import api_command, cell_configs, replace_option
+from pathlib import Path
 
 
 class CacheContextScreenTest(unittest.TestCase):
@@ -24,6 +25,18 @@ class CacheContextScreenTest(unittest.TestCase):
             'cache5000-ctx4096', 'cache5000-ctx8192'])
         self.assertEqual(source['args'], ['--expert-cache', '3000', '--max-context', '4096', '--prefill', '64'])
         self.assertEqual(cells[-1]['config']['args'], ['--expert-cache', '5000', '--max-context', '8192', '--prefill', '64'])
+
+    def test_no_trace_is_opt_in_and_reaches_api_driver(self):
+        root = Path('/tmp/cache-context-test')
+        tools = root / 'tools'
+        cfg = root / 'config.json'
+        workloads = root / 'workloads.json'
+        request = root / 'cell' / 'requests.json'
+        traced = api_command(Path('/usr/bin/python3'), tools, cfg, workloads, request, 3)
+        untraced = api_command(Path('/usr/bin/python3'), tools, cfg, workloads, request, 3, no_trace=True)
+        self.assertNotIn('--no-trace', traced)
+        self.assertEqual(untraced[-1], '--no-trace')
+        self.assertEqual(untraced[untraced.index('--timeout') + 1], '1800')
 
 
 if __name__ == '__main__':
