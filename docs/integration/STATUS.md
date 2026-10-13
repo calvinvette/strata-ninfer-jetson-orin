@@ -7,12 +7,14 @@ graph-disabled native control is unsupported; these limits do not imply a genera
 capacity or cross-model result. No NInfer execution component has been promoted
 into Strata. See the [Phase 3 gate audit](PHASE3_CLOSEOUT.md).
 
-A fresh [Q2_0 PLE and Phase 3 regression rerun](../../bench/results/2026-10-13-phase3-q2-ple-user-rerun-2/README.md)
-on the current binary passed all seven artifact-aware PLE stages for three
-tokens (worst relative L1 `1.148e-7`), the selected memory/owner/PLE CTests
-(15/15), and integration Python discovery (124/124). Minimum availability
-across the three supervised runs was 24.39 GiB. This reconfirms selected
-contracts without changing the Phase 3 scope or its graph-backing exclusions.
+A fresh [Q2_0 PLE and Phase 3 regression rerun](../../bench/results/2026-10-13-phase3-q2-ple-final-refresh/README.md)
+passed all seven artifact-aware PLE stages for three tokens (worst relative L1
+`1.148e-7`), the selected memory/owner/PLE CTests (15/15), and integration
+Python discovery (124/124). Minimum availability across the three supervised
+runs was 24.40 GiB. This reconfirms selected contracts without changing the
+Phase 3 scope or its graph-backing exclusions. The earlier
+[same-day refresh](../../bench/results/2026-10-13-phase3-q2-ple-user-rerun-2/README.md)
+is retained as a separate run.
 
 Phase 6 Q2_0 graph/eager extended screening is recorded in the
 [2026-10-12 result](../../bench/results/2026-10-12-phase6-q2-graph-eager-full/README.md).
