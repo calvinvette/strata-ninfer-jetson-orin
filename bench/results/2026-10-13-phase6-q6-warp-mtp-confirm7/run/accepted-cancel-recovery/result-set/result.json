@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "scope": "MTP accepted-prefix cancellation state parity and same-process recovery",
+  "model": "Qwen3.8-Flash-Next-Coder-IQ1_M-Orin-validation",
+  "workload_cell": "open-ended-integer-list",
+  "prompt_text": "Write the integers from 1 through 1000 separated by single spaces. Do not add an introduction or conclusion, and do not stop before 1000.",
+  "requested_output_tokens": 1024,
+  "cancel_after_nonempty_deltas": 1,
+  "reference_repeats": 2,
+  "fixed_expert_cache_slots": 3000,
+  "dump_gdn_at": null,
+  "effective_engine_env": {
+    "STRATA_PREFILL_CPU_SHARE": "0",
+    "STRATA_MTP_BATCH": "1",
+    "STRATA_STATE_HASH": "1",
+    "STRATA_STATE_HASH_GDN": "1",
+    "STRATA_ACCEPTED_PREFIX_TRACE": "1"
+  },
+  "checks": [
+    {
+      "check": "stream_cancel",
+      "status": "fail",
+      "visible_text": "1",
+      "visible_deltas": 1,
+      "committed_tokens": 4,
+      "accepted_prefix_trace": [
+        {
+          "position": 47,
+          "window": 1,
+          "accepted_drafts": 0,
+          "committed": 1,
+          "token_ids": [
+            16
+          ],
+          "state": {
+            "L": "48",
+            "gdn": "bae30b0e6fa6584f",
+            "ple": "deab6fac24eb4d64",
+            "tail": "dcdd903a63f35b25",
+            "dead": "7a110cb9c06aa586",
+            "pooled": "458c88ffa93be364",
+            "pooled_full": "e640ea66c44bf4c9",
+            "kv": "96f93a5a8c680178",
+            "mtp": "b8f895d281a24b07",
+            "stale": "14650fb0739d0383",
+            "ple_prev": "248069,271"
+          }
+        },
+        {
+          "position": 48,
+          "window": 3,
+          "accepted_drafts": 2,
+          "committed": 3,
+          "token_ids": [
+            220,
+            17,
+            220
+          ],
+          "state": {
+            "L": "51",
+            "gdn": "879e22edb02282b9",
+            "ple": "d970c3ffe31b47f9",
+            "tail": "b9d54e7fa3df9c08",
+            "dead": "7a110cb9c06aa586",
+            "pooled": "458c88ffa93be364",
+            "pooled_full": "e640ea66c44bf4c9",
+            "kv": "7f8703e8189d7573",
+            "mtp": "fd2294f1720ecf87",
+            "stale": "011a3fe290018383",
+            "ple_prev": "220,17"
+          }
+        }
+      ],
+      "prompt_summary": "strata serve: prompt 48 tokens = 0 reused + 48 read in 4542 ms (10.6 tok/s), 4 generated in 1292 ms (3.1 tok/s), drafts accepted 2 of 2, 1 checkpoints (cancelled)",
+      "reason": "HTTPError: HTTP Error 400: Bad Request"
+    },
+    {
+      "check": "same_process_recovery",
+      "status": "started"
+    }
+  ],
+  "canceled_token_count": 4,
+  "error": "HTTPError: HTTP Error 400: Bad Request"
+}

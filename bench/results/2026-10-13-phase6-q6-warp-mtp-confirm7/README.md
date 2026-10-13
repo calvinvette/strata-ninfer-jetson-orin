@@ -284,3 +284,66 @@ translation units for `generate.cpp` and `expert_source.cpp` compiled and the
 full `strata` target linked on maestro1 after syncing the stale remote
 `session.cpp`; see [backend build scope](MAESTRO1_ACCEPTED_USAGE_BUILD.md). No
 HIP runtime or SYCL build/runtime is claimed.
+
+## Accepted-only verifier-window matrix
+
+The boundary-capped candidate was compared before the request-lifetime fix below
+on the same 2,048-token prompt
+for 32 outputs with MTP off and windows 2, 3, and 4. All three MTP arms matched
+all 32 published token IDs, final main state, and every state fingerprint at
+shared accepted-prefix boundaries. The comparisons had 22, 20, and 17 shared
+boundaries respectively. Drafts offered/accepted were 16/10, 24/12, and 31/15.
+The 28-GiB supervisor passed with a six-GiB floor, a 13.37-GiB minimum host
+availability, and no OOM events. Clocks remained dynamic; EMC sampling was
+denied and energy was not measured. This extends correctness evidence across
+the planned MTP windows for this prompt and runtime configuration, not across
+other prompts, KV formats, termination paths, or performance/quality behavior.
+The direct JSON contains all four traces and the cross-window comparisons;
+the supervisor record contains host/cgroup/clock telemetry.
+
+After the staging-lifetime correction, the four-arm comparison was repeated on
+binary SHA256
+`2403c73bfde5b942022266e1f77502e7b53b418a7d700c5bf5cd5a3826989b77`. The same
+three exact output/state comparisons passed, with a 13.56-GiB minimum host
+availability. Post-fix traces and supervisor telemetry are in
+`run/accepted-window-matrix-fixed/` and
+`run/accepted-window-matrix-fixed-supervisor/`.
+
+The same rebuilt candidate was also checked on a distinct 2,048-token watershed
+incident-analysis prompt at a 16K context reservation, again with 32 output
+tokens and MTP off/windows 2/3/4. All three MTP arms matched every output token
+and all shared accepted-prefix state checkpoints (21, 16, and 12 boundaries);
+draft offered/accepted counts were 15/11, 22/16, and 29/20. The 28-GiB
+supervisor passed with a 13.19-GiB minimum host availability and no OOM events.
+This adds one held-out prompt/context correctness cell, not an independent
+performance or task-quality result. The source workload is the retained
+`2026-10-11-phase4-q6-warp-context16k-confirm7/workloads.json`; direct traces and
+telemetry are in `run/accepted-window-heldout16k/` and
+`run/accepted-window-heldout16k-supervisor/`.
+
+## Cancellation and same-service recovery
+
+Enabling the candidate exposed a request-lifetime bug that the completed-request
+matrix could not see. A streamed integer-list request canceled after one visible
+delta committed four tokens, then the same service returned HTTP 400 on recovery:
+the prior verifier's row-staging vector remained set to its old window size.
+The accepted usage is now accumulated at commit and the staging vector is
+cleared immediately afterward. This keeps staging scoped to one verifier
+transaction. The first failing run is retained in
+`run/accepted-cancel-recovery/`.
+
+After rebuilding, the same test passed: one visible delta, four committed
+tokens, exact state parity at `L=48` and `L=51` against two fresh references,
+repeatable reference outputs, and same-service recovery returned exactly
+`Hello Orin!`. The 28-GiB supervisor retained 13.22 GiB minimum host
+availability, above the six-GiB floor, with no OOM events. This is one short
+stream-cancellation cell with a 3,000-slot cache and MTP4; it does not qualify
+long-prefill cancellation or other termination shapes. The failure, corrected
+run, reference traces, and telemetry are retained under
+`run/accepted-cancel-recovery*`.
+
+After the fix, the selected CUDA memory/owner/PLE regression passed 15/15 and
+the integration Python suite passed 124/124. The accepted-window matrix was
+repeated on the same rebuilt binary. The fixed candidate's source SHA256, HIP
+build evidence, and artifact hashes are appended to
+`MAESTRO1_ACCEPTED_USAGE_BUILD.md`.

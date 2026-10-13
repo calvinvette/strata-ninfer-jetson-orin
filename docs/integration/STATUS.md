@@ -70,6 +70,38 @@ link was not completed. The separate SYCL verifier sources were unchanged.
 Phase 5 remains open; MTP is unqualified for this incident workload, and no
 defaults changed.
 
+The opt-in accepted-row/accepted-token adaptation candidate now matches MTP-off
+output and accepted-prefix state on the 2,048-token incident prompt for windows
+2, 3, and 4, using 32 output tokens. Each arm matched all shared state
+fingerprints (22, 20, and 17 shared boundaries); draft offered/accepted counts
+were 16/10, 24/12, and 31/15. The supervised four-arm run passed with a
+13.37-GiB minimum host availability and no OOM events. This closes the
+reproduced parity failure for those window sizes on that prompt. A distinct
+held-out watershed prompt at 16K context then matched for the same three MTP
+windows, with 21/16/12 shared state checkpoints and offered/accepted counts
+15/11, 22/16, and 29/20. It passed the same 28-GiB supervisor with 13.19 GiB
+minimum host availability and no OOM events. These are two correctness cells;
+other prompts, KV formats, performance and task quality remain open. Defaults
+are unchanged. See the [accepted-only matrix report](../../bench/results/2026-10-13-phase6-q6-warp-mtp-confirm7/README.md).
+
+The accepted-only stream-cancellation follow-up initially found a real
+recovery defect: after the canceled request committed four tokens, the next
+request failed because per-window usage staging still had the previous
+verifier size. Clearing that staging buffer after its committed rows are
+counted fixed the issue. The rerun canceled after one visible delta, matched
+all persistent fields at `L=48` and `L=51` in two exact-prefix references, and
+recovered on the same service with `Hello Orin!`; minimum host availability was
+13.22 GiB and there were no OOM events. This closes only that short MTP4
+cancellation/recovery cell; longer prefill cancellation and other termination
+paths remain open. The failed run is retained alongside the [passing run](../../bench/results/2026-10-13-phase6-q6-warp-mtp-confirm7/README.md).
+
+After the fix, the four-arm accepted-only MTP-window matrix passed again on
+the rebuilt binary: windows 2/3/4 matched all IDs and shared state checkpoints,
+with 22/20/17 matching boundaries. The selected CUDA Phase 3 regression passed
+15/15 and the integration Python suite passed 124/124. The changed
+`generate.cpp` was rebuilt and linked in the maestro1 HIP tree; the separate
+SYCL generator copy was not changed, so this gives no SYCL feature claim.
+
 The [exact Q8_0 scalar-versus-ARM quantization experiment](../../bench/results/2026-10-13-phase4-q8-neon-quant/README.md)
 compares Strata's explicit scalar oracle against ggml's Cortex-A78AE NEON path
 on 256 rows of width 2,560. Three independent processes matched every Q8_0 byte;

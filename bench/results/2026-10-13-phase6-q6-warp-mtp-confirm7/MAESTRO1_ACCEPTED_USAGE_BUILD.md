@@ -25,3 +25,24 @@ target linked and a repeat build reported no work. The successful build emitted
 ignored-HIP-return-value warnings but no errors. SYCL's program and expert-source
 files live under a separate `sycl/` source tree; that tree was not changed by this
 candidate. No SYCL runtime or build claim is made.
+
+## Accepted-row staging lifetime correction
+
+The follow-up fix clears the per-window accepted-usage staging vector after
+committing only the published rows. Its purpose is to keep a canceled request's
+last verifier size from contaminating the next request. The updated source was
+copied to the same isolated validation tree and the HIP `strata` target rebuilt
+and linked successfully with `cmake --build .../build-hip --target strata -j2`.
+An immediate rebuild reported `ninja: no work to do` (retained in the
+`accepted-usage-fix-hip-recheck.log`, SHA256
+`c2ed93ffd93c840755c0e91392ae593b1b52de9b7aaf6c208123feaceb1dde2e`).
+
+| File or artifact | SHA256 |
+| --- | --- |
+| Updated `src/program/generate.cpp` | `8aa4337a66d8b573750f222fd99ed29e4a9066fd66abf6040232f8abdb9c3534` |
+| maestro1 HIP `generate.cpp.o` | `605419cc610fbf2cac484d92b7afc07dbe6896eb615f12cc14d5cb4228a46cb8` |
+| maestro1 HIP `strata` executable | `235369ce2e8bfd9343a94c4a0b6e0e4f47bcba491a83ffa591a25bb05d402655` |
+
+This is x86 HIP compile/link evidence only; maestro1 has no Orin runtime claim.
+The separate SYCL source tree carries its own `generate.cpp` copy, which was
+unchanged and not rebuilt for this fix.

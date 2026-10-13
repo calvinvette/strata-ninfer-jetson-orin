@@ -11136,6 +11136,11 @@ int main(int argc, char** argv) {
                     for (size_t expert = 0; expert < drive.d.usage.size(); ++expert)
                         for (int row = 0; row < publish_n; ++row)
                             drive.d.usage[expert] += drive.d.usage_rows[expert * (size_t) T + (size_t) row];
+                    // The staging buffer belongs to this verifier transaction only. In particular,
+                    // a canceled request can be followed by another request with a different
+                    // first verifier-window size; leaving these rows live makes that dispatch
+                    // reject the new window as a staging-size mismatch.
+                    drive.d.usage_rows.clear();
                 }
                 if (o.adapt_accepted_only && !drive.d.usage.empty() && !ajob) {
                     adapt_accepted_tokens += publish_n;
