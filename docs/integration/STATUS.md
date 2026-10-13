@@ -7,6 +7,13 @@ graph-disabled native control is unsupported; these limits do not imply a genera
 capacity or cross-model result. No NInfer execution component has been promoted
 into Strata. See the [Phase 3 gate audit](PHASE3_CLOSEOUT.md).
 
+A fresh [Q2_0 PLE and Phase 3 regression rerun](../../bench/results/2026-10-13-phase3-q2-ple-user-rerun-2/README.md)
+on the current binary passed all seven artifact-aware PLE stages for three
+tokens (worst relative L1 `1.148e-7`), the selected memory/owner/PLE CTests
+(15/15), and integration Python discovery (124/124). Minimum availability
+across the three supervised runs was 24.39 GiB. This reconfirms selected
+contracts without changing the Phase 3 scope or its graph-backing exclusions.
+
 Phase 6 Q2_0 graph/eager extended screening is recorded in the
 [2026-10-12 result](../../bench/results/2026-10-12-phase6-q2-graph-eager-full/README.md).
 The MTP-off long cell failed output parity in 2/7 eager pairs, correlated with
@@ -33,6 +40,14 @@ explanation. This is one task-level screen, not a general quality budget or
 approval of residency-driven output variation. The initial 256-token pair is
 retained as incomplete because it stopped before the output concept. No path or
 default is promoted.
+
+A [three-block randomized Q6_K warp-dequant × MTP screen](../../bench/results/2026-10-12-phase6-q6-warp-mtp-screen/README.md)
+then completed 12 fresh-service cells with exact generated-output parity in
+every block and all memory gates passing. Warp-dequant reduced median total
+request time by 6.35% with MTP off and 5.53% with MTP window 4; prompt time
+improved while decode time was about 2% slower. The interaction estimate was
+small and uncertain. This single-model screen is not held-out confirmation or
+a general quality qualification, so no default changed.
 
 The [exact Q8_0 scalar-versus-ARM quantization experiment](../../bench/results/2026-10-13-phase4-q8-neon-quant/README.md)
 compares Strata's explicit scalar oracle against ggml's Cortex-A78AE NEON path
