@@ -166,3 +166,25 @@ are in
 `run/incident-no-adapt/activation-comparison.json`, and
 `run/incident-delayed-adapt/activation-comparison.json`; raw float tensors were
 discarded.
+
+## Full incident prompt delayed-swap control
+
+To test whether the delayed-swap control extended beyond the 512-token suffix,
+the original formatted 2,048-token incident prompt was run with fresh no-MTP and
+window-4 services, 32 generated tokens, CPU prefill sharing disabled, and
+`--adapt-every 100000`. The two outputs matched exactly. All 14 shared accepted
+commit boundaries matched all recorded persistent-state hashes, and final main
+state matched. Window 4 offered 39 drafts and accepted 21. In the second
+independent run, all 38 shared layer-1 activation capture rows were bitwise
+equal. This is one prompt, one output length, and one delayed-swap setting; it
+does not qualify the default swap schedule or establish a general remedy.
+
+The first run's state/output record and the repeated numeric activation result
+are under `run/incident-delayed-adapt-2048/` and
+`run/incident-delayed-adapt-2048-repeat2/`; supervisor telemetry is retained in
+the corresponding `*-supervisor/` directories. Minimum host availability in
+the first run was 13.45 GiB and minimum effective admission availability was
+12.58 GiB; the repeat remained above the six-GiB floor. There were no OOM
+kills. Raw activation tensors were removed after confirming bitwise equality.
+The comparison harness is `compare_delayed_adapt_incident_prompt.py`; pass it
+an unused output directory as its argument when reproducing the run.
