@@ -43,6 +43,27 @@ occurred. EMC frequency was inaccessible; CPU/GPU rates were sampled without
 changing clocks. Energy is not process-attributed. State tracing can perturb
 runtime timing, so no timings are taken from that harness.
 
+Two diagnostic controls narrow the failure. First, repeating off/window 4 with
+`STRATA_GDN_COMMIT_SPLIT=0` (the ordinary multi-row GDN commit kernel) produced
+the same first output mismatch at token index 13 and the same shared-prefix
+state mismatch at prefix 8. Its GDN dump comparison also had exactly 27,782,662
+different floats (94.443%), relative L2 0.01908 and RMS absolute delta 0.00514;
+the first differing layer was layer 2. The optimized split commit kernel is
+therefore not the sole cause. Second, a 512-token suffix of the same formatted prompt also
+diverged: state first differed at shared prefix 5 and output IDs at index 10.
+This argues against a failure unique to 2K prefill length, but the suffix is a
+diagnostic token shape, not a standalone quality prompt. These results are
+retained under `run/incident-state-unsplit-commit*` and
+`run/incident-state-short-context*`.
+
+The existing CUDA `gdn_parity --selftest` also passes: the multi-token GDN
+recurrence is bitwise equal to repeated single-token recurrence in 84 synthetic
+cases, and accepted-prefix convolution history matches in 44 cases. That
+supports the kernel-level recurrence contract for its fixtures but does not
+exercise activations from this production model's multi-token verification
+path. The mismatch therefore still needs a live activation/intermediate-level
+comparison; no numerical tolerance or code workaround is adopted yet.
+
 This is a workload-specific Phase 5 correctness failure that reopens the MTP
 accepted-prefix gate for the 2,048-token incident workload. It does not negate
 the separately passing short-prompt or other long-prompt transaction tests.
