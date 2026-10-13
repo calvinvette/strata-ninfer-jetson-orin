@@ -1,0 +1,182 @@
+{
+  "schema": 1,
+  "scope": "MTP accepted-prefix cancellation state parity and same-process recovery",
+  "model": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-Orin-validation",
+  "workload_cell": "open-ended-integer-list",
+  "prompt_text": "Write the integers from 1 through 1000 separated by single spaces. Do not add an introduction or conclusion, and do not stop before 1000.",
+  "requested_output_tokens": 1024,
+  "cancel_after_nonempty_deltas": 8,
+  "reference_repeats": 3,
+  "fixed_expert_cache_slots": 3000,
+  "dump_gdn_at": null,
+  "effective_engine_env": {
+    "STRATA_PREFILL_CPU_SHARE": "0",
+    "STRATA_MTP_BATCH": "1",
+    "STRATA_STATE_HASH": "1",
+    "STRATA_STATE_HASH_GDN": "1",
+    "STRATA_ACCEPTED_PREFIX_TRACE": "1"
+  },
+  "checks": [
+    {
+      "check": "stream_cancel",
+      "status": "pass",
+      "visible_text": "1 2 3 4 ",
+      "visible_deltas": 8,
+      "committed_tokens": 11,
+      "accepted_prefix_trace": [
+        {
+          "position": 47,
+          "window": 1,
+          "accepted_drafts": 0,
+          "committed": 1,
+          "token_ids": [
+            16
+          ],
+          "state": {
+            "L": "48",
+            "gdn": "a200e87b11be101a",
+            "ple": "157f31514a429c86",
+            "tail": "c07523ed348b7489",
+            "dead": "bb663b023054a943",
+            "pooled": "95a7cae27edaa68e",
+            "pooled_full": "44b8081fb937d7fa",
+            "kv": "77875774270b750d",
+            "mtp": "6d3e4064f572955e",
+            "stale": "14650fb0739d0383",
+            "ple_prev": "248069,271"
+          }
+        },
+        {
+          "position": 48,
+          "window": 2,
+          "accepted_drafts": 1,
+          "committed": 2,
+          "token_ids": [
+            220,
+            17
+          ],
+          "state": {
+            "L": "50",
+            "gdn": "d17bd3ddd38e36c7",
+            "ple": "16ddb791bf4673e3",
+            "tail": "c7537aec1a6a9d3e",
+            "dead": "bb663b023054a943",
+            "pooled": "95a7cae27edaa68e",
+            "pooled_full": "44b8081fb937d7fa",
+            "kv": "a2c3fb83b49dade2",
+            "mtp": "e49197fb519e900d",
+            "stale": "b1c3695b6c660383",
+            "ple_prev": "16,220"
+          }
+        },
+        {
+          "position": 50,
+          "window": 2,
+          "accepted_drafts": 1,
+          "committed": 2,
+          "token_ids": [
+            220,
+            18
+          ],
+          "state": {
+            "L": "52",
+            "gdn": "13e9872610ec3a23",
+            "ple": "025030bf60a08244",
+            "tail": "1d62ab6964d7072d",
+            "dead": "bb663b023054a943",
+            "pooled": "75a3a23c1e106807",
+            "pooled_full": "aaa64607856836d7",
+            "kv": "bd6a1124879fe751",
+            "mtp": "5e87e72cb05d9eac",
+            "stale": "14650fb0739d0383",
+            "ple_prev": "17,220"
+          }
+        },
+        {
+          "position": 52,
+          "window": 2,
+          "accepted_drafts": 1,
+          "committed": 2,
+          "token_ids": [
+            220,
+            19
+          ],
+          "state": {
+            "L": "54",
+            "gdn": "ec14153f51ec994b",
+            "ple": "4408a0998e48f8fe",
+            "tail": "16943cb7d257a17f",
+            "dead": "bb663b023054a943",
+            "pooled": "75a3a23c1e106807",
+            "pooled_full": "aaa64607856836d7",
+            "kv": "ccc7021749b2434a",
+            "mtp": "2b1ae31ac43f27f0",
+            "stale": "b1c3695b6c660383",
+            "ple_prev": "18,220"
+          }
+        },
+        {
+          "position": 54,
+          "window": 2,
+          "accepted_drafts": 1,
+          "committed": 2,
+          "token_ids": [
+            220,
+            20
+          ],
+          "state": {
+            "L": "56",
+            "gdn": "e8d8a421594b9bdb",
+            "ple": "e901f3280b84dc0c",
+            "tail": "49fcf9aa28660bf0",
+            "dead": "bb663b023054a943",
+            "pooled": "72e635462a72e6f9",
+            "pooled_full": "ed92a51cbc6ff149",
+            "kv": "82138bf3ad0184c3",
+            "mtp": "903e070c27db4c8d",
+            "stale": "14650fb0739d0383",
+            "ple_prev": "19,220"
+          }
+        },
+        {
+          "position": 56,
+          "window": 2,
+          "accepted_drafts": 1,
+          "committed": 2,
+          "token_ids": [
+            220,
+            21
+          ],
+          "state": {
+            "L": "58",
+            "gdn": "a80de5ba37803403",
+            "ple": "838403400a31f5e0",
+            "tail": "f7d7e317d209d7f3",
+            "dead": "bb663b023054a943",
+            "pooled": "72e635462a72e6f9",
+            "pooled_full": "ed92a51cbc6ff149",
+            "kv": "9dbfa5541d3c6541",
+            "mtp": "e82ff47618c8aee3",
+            "stale": "b1c3695b6c660383",
+            "ple_prev": "20,220"
+          }
+        }
+      ],
+      "prompt_summary": "strata serve: prompt 48 tokens = 0 reused + 48 read in 10664 ms (4.5 tok/s), 11 generated in 4863 ms (2.3 tok/s), drafts accepted 5 of 5, 1 checkpoints (cancelled)"
+    },
+    {
+      "check": "same_process_recovery",
+      "status": "pass",
+      "response_text": "Hello Orin!",
+      "reason": "expected recovery response",
+      "server_alive": true
+    },
+    {
+      "check": "fresh_exact_length_references",
+      "status": "started",
+      "runs": [],
+      "comparisons": []
+    }
+  ],
+  "canceled_token_count": 11
+}
