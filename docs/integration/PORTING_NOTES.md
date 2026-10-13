@@ -1224,3 +1224,12 @@ transaction to fresh exact-length references at every shared accepted prefix,
 not only at the final output or recovery response. Keep the reference processes
 in the same hardware/memory scope, and report prompt cache, artifact and trace
 settings with the state result. See the [decode-cancel comparison](../../bench/results/2026-10-14-phase5-q6-decode-cancel-state-parity/README.md).
+
+The same MTP-off/MTP4 state comparison was extended from an 8K to a 16K
+retrieval prompt. At 15,003 prompt tokens, both arms returned the three planted
+markers and matched all nine state fields at 14 common generated-prefix
+boundaries through 41 tokens; MTP4 accepted 30 of 34 drafts. For Splash, scale
+the prompt/context without changing the artifact or state-trace contract, and
+compare each shared accepted prefix plus task success before considering
+performance. Trace and batch settings perturb execution and must stay out of
+timing runs. See the [16K trace](../../bench/results/2026-10-14-phase5-q6-mtp-16k-state-parity/README.md).

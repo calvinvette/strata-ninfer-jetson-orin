@@ -1558,3 +1558,12 @@ same service recovered with `Hello Orin!`. Minimum host availability was 13.07
 GiB and effective headroom was 12.23 GiB under the 28-GiB cap, with no OOM
 events. This covers one decode-cancel point for Q6 MTP4 and leaves other
 termination, quality and format gates open.
+
+The [Q6 16K accepted-prefix comparison](../../bench/results/2026-10-14-phase5-q6-mtp-16k-state-parity/README.md)
+extended the direct MTP-off/MTP4 trace to the 15,003-token retrieval prompt.
+Both arms returned all three markers in order and matched token IDs, all nine
+persistent-state fields, and each of 14 shared commit boundaries through 41
+generated tokens. MTP4 offered/accepted 34/30 drafts. Minimum host/effective
+availability was 13.01 GiB in the 28-GiB supervised run. This is one long
+prompt and one profile, with no performance claim; broader quality and format
+coverage remain open.
