@@ -35,6 +35,25 @@ elastic-KV configuration, while confirming short-request recovery and captured
 graph reuse through actual growth and trim. The 9- and 10-slot difference in
 expert-cache relinquishment is a plausible contributor because different
 resident experts can use GPU or CPU arithmetic, but the experiment does not
-prove that cause. No quality or performance result follows, and MTP with
-elastic KV remains unqualified for this workload pending a cache-matched or
-otherwise isolating follow-up.
+prove that cause. No quality or performance result follows.
+
+## Cache-matched diagnostic follow-up
+
+The [cache-matched run](../kv-grow-cache-match/matched-sequence/trace/results.json)
+used the same prompt sequence and elastic-KV settings. Startup probing found
+that an MTP-off `--expert-cache` setting of 2,993 MiB selected 3,895 actual
+slots, while the MTP4 setting of 3,000 MiB selected 3,903. During growth these
+services relinquished 102 and 110 slots respectively, ending with the same
+3,793 resident slots. The long request matched at every common accepted-prefix
+boundary (1, 4 and 8 committed tokens) across all nine state fields, and output
+IDs matched. This contrasts with the first equal-cache run, where long-request
+state diverged at boundaries 4 and 8.
+
+The complete matched-sequence run still fails its strict cross-MTP state gate:
+the initial and recovery short requests differ in GDN, tail, pooled, pooled-full
+and KV fields. Those requests ran at different initial actual cache capacities
+(3,895 versus 3,903 slots), so this run does not establish whole-sequence parity.
+Within each service, short-request recovery remains exact. This diagnostic
+supports resident cache capacity as an explanation for the long-request result
+in this cell; it does not qualify MTP with elastic KV generally or justify a
+default change. Minimum host availability was 14.423 GiB, with no OOM events.

@@ -31,6 +31,8 @@ def main():
     parser.add_argument('--long-tokens', type=int, default=9000)
     parser.add_argument('--tokens', type=int, default=8)
     parser.add_argument('--adapt-every', type=int, default=100000)
+    parser.add_argument('--mtp0-expert-cache-mib', type=int,
+                        help='override the MTP-off cache cap for cache-matched diagnosis')
     parser.add_argument('--no-kv-grow', action='store_true',
                         help='retain the same context and prompts but use eager full-context KV backing')
     args = parser.parse_args()
@@ -64,6 +66,7 @@ def main():
     short_ids = long_ids[-512:]
     results = {'sequence': ['short-512', f'long-{args.long_tokens}', 'short-512-recovery'],
                'context': args.context, 'adapt_every': args.adapt_every,
+               'mtp0_expert_cache_mib': args.mtp0_expert_cache_mib,
                'kv_grow': not args.no_kv_grow,
                'kv_grow_init_cells': 2048, 'kv_grow_step_cells': 2048,
                'tokens_per_request': args.tokens,
@@ -73,6 +76,8 @@ def main():
     for cfg, mtp in zip(configs, (0, 4)):
         label = f'mtp{mtp}'
         argv = list(cfg['args'])
+        if mtp == 0 and args.mtp0_expert_cache_mib is not None:
+            argv[argv.index('--expert-cache') + 1] = str(args.mtp0_expert_cache_mib)
         argv[argv.index('--max-context') + 1] = str(args.context)
         argv[argv.index('--adapt-every') + 1] = str(args.adapt_every)
         if not args.no_kv_grow and '--kv-grow' not in argv:
@@ -130,20 +135,38 @@ def main():
 
     reference, candidate = results['arms']
     checks = []
+    prefix_checks = []
     for index, name in enumerate(results['sequence']):
         a, b = reference['requests'][index], candidate['requests'][index]
         checks.append({'request': name, 'mtp_output_equal': a['ids'] == b['ids'],
                        'mtp_state_equal': all(a['state'][key] == b['state'][key] for key in STATE_KEYS)})
+        def by_prefix(trace):
+            count = 0
+            rows = {}
+            for row in trace:
+                count += row['committed']
+                rows[count] = row
+            return rows
+        left, right = by_prefix(a['trace']), by_prefix(b['trace'])
+        shared = []
+        for count in sorted(left.keys() & right.keys()):
+            differing = [key for key in STATE_KEYS
+                         if left[count]['state'].get(key) != right[count]['state'].get(key)]
+            shared.append({'committed_tokens': count, 'state_equal': not differing,
+                           'differing_fields': differing})
+        prefix_checks.append({'request': name, 'shared_boundaries': shared,
+                              'all_shared_states_equal': all(row['state_equal'] for row in shared)})
     checks.append({'request': 'short-before-vs-after-grow-trim',
                    'mtp0_output_equal': reference['requests'][0]['ids'] == reference['requests'][2]['ids'],
                    'mtp4_output_equal': candidate['requests'][0]['ids'] == candidate['requests'][2]['ids'],
                    'mtp0_state_equal': reference['requests'][0]['state'] == reference['requests'][2]['state'],
                    'mtp4_state_equal': candidate['requests'][0]['state'] == candidate['requests'][2]['state']})
     results['checks'] = checks
+    results['accepted_prefix_state_checks'] = prefix_checks
     results['passed'] = all(row.get('mtp_output_equal', True) and row.get('mtp_state_equal', True)
                             and row.get('mtp0_output_equal', True) and row.get('mtp4_output_equal', True)
                             and row.get('mtp0_state_equal', True) and row.get('mtp4_state_equal', True)
-                            for row in checks)
+                            for row in checks) and all(row['all_shared_states_equal'] for row in prefix_checks)
     (args.output / 'results.json').write_text(json.dumps(results, indent=2) + '\n')
     print(json.dumps({'checks': checks, 'passed': results['passed']}, indent=2))
     return 0 if results['passed'] else 1

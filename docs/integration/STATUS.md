@@ -174,10 +174,16 @@ but their final GDN, tail, pooled-index and KV state differed; the first shared
 boundary with main-state differences was four committed tokens. With full KV
 backing and the same context/prompt, MTP-off and MTP4 matched all state checks.
 The grow/trim supervisor retained 13.423 GiB minimum host availability; the
-full-KV control retained 13.011 GiB, with no OOM events. This localizes the
-tested state discrepancy to elastic KV × MTP, while the 9/10-slot difference
-in expert-cache relinquishment remains only a plausible cause. See the
-[grow/trim report](../../bench/results/2026-10-13-phase6-q6-warp-mtp-confirm7/run/kv-grow-graph-recovery/README.md).
+full-KV control retained 13.011 GiB, with no OOM events. A cache-matched
+diagnostic then selected 3,895 startup slots for MTP-off and 3,903 for MTP4;
+after relinquishing 102/110 slots during growth, both held 3,793. The 9K
+request matched all nine state fields at shared accepted-prefix boundaries
+1/4/8. The full sequence still fails cross-MTP state checks for the short
+requests because their startup capacities differed, although within-service
+short recovery remained exact. This supports resident cache capacity as an
+explanation for the long-request discrepancy in this cell, but does not qualify
+elastic-KV × MTP generally. The cache-matched run retained 14.423 GiB minimum
+host availability with no OOM events. See the [grow/trim report](../../bench/results/2026-10-13-phase6-q6-warp-mtp-confirm7/run/kv-grow-graph-recovery/README.md).
 
 After the fix, the four-arm accepted-only MTP-window matrix passed again on
 the rebuilt binary: windows 2/3/4 matched all IDs and shared state checkpoints,

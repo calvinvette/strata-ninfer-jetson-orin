@@ -1127,5 +1127,90 @@
       "mtp4_state_equal": true
     }
   ],
-  "passed": false
+  "passed": false,
+  "accepted_prefix_state_checks": [
+    {
+      "request": "short-512",
+      "shared_boundaries": [
+        {
+          "committed_tokens": 1,
+          "state_equal": true,
+          "differing_fields": []
+        },
+        {
+          "committed_tokens": 2,
+          "state_equal": true,
+          "differing_fields": []
+        },
+        {
+          "committed_tokens": 6,
+          "state_equal": true,
+          "differing_fields": []
+        },
+        {
+          "committed_tokens": 8,
+          "state_equal": true,
+          "differing_fields": []
+        }
+      ],
+      "all_shared_states_equal": true
+    },
+    {
+      "request": "long-9000",
+      "shared_boundaries": [
+        {
+          "committed_tokens": 1,
+          "state_equal": true,
+          "differing_fields": []
+        },
+        {
+          "committed_tokens": 4,
+          "state_equal": false,
+          "differing_fields": [
+            "gdn",
+            "tail",
+            "kv"
+          ]
+        },
+        {
+          "committed_tokens": 8,
+          "state_equal": false,
+          "differing_fields": [
+            "gdn",
+            "tail",
+            "pooled",
+            "pooled_full",
+            "kv"
+          ]
+        }
+      ],
+      "all_shared_states_equal": false
+    },
+    {
+      "request": "short-512-recovery",
+      "shared_boundaries": [
+        {
+          "committed_tokens": 1,
+          "state_equal": true,
+          "differing_fields": []
+        },
+        {
+          "committed_tokens": 2,
+          "state_equal": true,
+          "differing_fields": []
+        },
+        {
+          "committed_tokens": 6,
+          "state_equal": true,
+          "differing_fields": []
+        },
+        {
+          "committed_tokens": 8,
+          "state_equal": true,
+          "differing_fields": []
+        }
+      ],
+      "all_shared_states_equal": true
+    }
+  ]
 }
