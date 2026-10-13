@@ -34,6 +34,9 @@ randomized campaign and per-cell configs are under
 [`run/accepted-only-seven-block`](run/accepted-only-seven-block/experiment.json);
 model, MTP asset and tokenizer identities are recorded in
 [`model-identity.json`](run/accepted-only-seven-block/model-identity.json);
+[`capture-warmup-order.json`](run/accepted-only-seven-block/capture-warmup-order.json)
+shows captured verifier graphs completed before each measured 2,048-token
+request, after a distinct 512-token warmup request;
 [`analyze.py`](analyze.py) reproduces its result with `--accepted-only`.
 
 All 28 cells passed, and the generated output was byte-identical across all

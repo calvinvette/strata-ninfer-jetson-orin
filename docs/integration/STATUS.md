@@ -132,8 +132,17 @@ windows 2/3/4 matched route-to-route token IDs, final state, and all common
 accepted-prefix checkpoints (16, 11, 10, and 10 respectively); both routes also
 matched their MTP-off reference. The supervised runs retained 15.30 GiB
 minimum host availability for captured and 15.40 GiB for eager, with no OOM
-events. This is correctness-only evidence; warm capture, resize/recapture, and
-randomized performance comparisons remain open.
+events. This is correctness-only evidence, with eager-versus-captured
+performance and same-service resize/recapture behavior still open. The subsequent
+accepted-only Q6 seven-block confirmation exercised the warmed captured route:
+in every cell, verifier graphs were captured before the measured 2,048-token
+request after a distinct 512-token warmup, and outputs matched across MTP
+off/window4 and warp off/on. This verifies replay after warmup for fixed
+contexts; it does not isolate warm-capture cost. Context capacity is fixed for
+each service, and KV mappings are designed to keep addresses stable, so no
+resize-triggered graph recapture was expected or observed. Same-service elastic
+KV grow/trim with accepted-only state checks remains open; see the
+[capture order and seven-block report](../../bench/results/2026-10-13-phase6-q6-warp-mtp-confirm7/README.md).
 
 The accepted-only stream-cancellation follow-up initially found a real
 recovery defect: after the canceled request committed four tokens, the next

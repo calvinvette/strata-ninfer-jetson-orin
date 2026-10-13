@@ -60,6 +60,15 @@ warmup = json.loads((ROOT / 'warmup-workloads.json').read_text())['workloads']
 assert len(workload) == len(warmup) == 1
 assert (workload[0]['prompt_tokens'], workload[0]['generate_tokens']) == (2048, 128)
 assert (warmup[0]['prompt_tokens'], warmup[0]['generate_tokens']) == (512, 1)
+capture_order = json.loads((RUN / 'capture-warmup-order.json').read_text())
+assert len(capture_order) == 28
+for block in range(7):
+    for condition in CONDITIONS:
+        evidence = capture_order[f'block-{block}-{condition}']
+        captures = evidence['captured_graphs_before_measured_request']
+        assert captures and max(row['line'] for row in captures) < evidence['measured_request']['line']
+        assert 'prompt 512 tokens =' in evidence['warmup_request']['text']
+        assert 'prompt 2048 tokens =' in evidence['measured_request']['text']
 
 requests, supervisors, hashes, slots = {}, {}, {}, []
 minimum_host = minimum_effective = 2**63
@@ -157,6 +166,7 @@ report = {
     'seed': campaign['seed'], 'blocks': 7, 'conditions': list(CONDITIONS),
     'binary_sha256': hashlib.sha256(Path(configs[CONDITIONS[0]]['exe']).read_bytes()).hexdigest(),
     'all_28_runs_passed': True,
+    'captured_graphs_ready_before_measured_request': True,
     'q6_warp_output_parity_at_each_fixed_mtp_level': True,
     'mtp_off_vs_window4_output_parity': all(
         hashes[(b, 'baseline-mtp0')] == hashes[(b, 'baseline-mtp4')] for b in range(7)),
