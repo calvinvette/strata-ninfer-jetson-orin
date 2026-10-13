@@ -13,18 +13,19 @@ from serve.frontend import ChatTemplate
 from serve.server import StrataEngine, child_env
 
 HERE=Path(__file__).resolve().parent
-if len(sys.argv) not in (2,5,6,7):
- raise SystemExit(f'usage: {Path(sys.argv[0]).name} OUTPUT_DIRECTORY [WORKLOADS_JSON OUTPUT_TOKENS CONTEXT [CONFIG_JSON [KV_FORMAT]]]')
+if len(sys.argv) not in (2,5,6,7,8):
+ raise SystemExit(f'usage: {Path(sys.argv[0]).name} OUTPUT_DIRECTORY [WORKLOADS_JSON OUTPUT_TOKENS CONTEXT [CONFIG_JSON [KV_FORMAT [ROUTE]]]]')
 OUT=Path(sys.argv[1]).resolve()
 OUT.mkdir(parents=True,exist_ok=False)
-config_path=Path(sys.argv[5]).resolve() if len(sys.argv)==6 else HERE/'baseline-mtp4-config.json'
-if len(sys.argv)==7: config_path=Path(sys.argv[5]).resolve()
+config_path=Path(sys.argv[5]).resolve() if len(sys.argv)>=6 else HERE/'baseline-mtp4-config.json'
 CONFIG=json.loads(config_path.read_text())
 workloads_path=Path(sys.argv[2]).resolve() if len(sys.argv)>=5 else HERE/'workloads.json'
 generated_limit=int(sys.argv[3]) if len(sys.argv)>=5 else 32
 context=int(sys.argv[4]) if len(sys.argv)>=5 else 8192
-kv_format=sys.argv[6] if len(sys.argv)==7 else None
+kv_format=sys.argv[6] if len(sys.argv)>=7 else None
 if kv_format not in (None,'fp16','int8','q4_0','k8v4'): raise SystemExit(f'unsupported KV format {kv_format}')
+route=sys.argv[7] if len(sys.argv)==8 else 'captured'
+if route not in ('captured','eager'): raise SystemExit(f'unsupported route {route}')
 TOKENIZER=Path(CONFIG['tokenizer'])
 TOK=load_tokenizer(TOKENIZER)
 TEMPLATE=ChatTemplate(TOKENIZER/'chat_template.jinja')
@@ -38,6 +39,7 @@ env.pop('STRATA_MTP_BATCH',None)
 results={'prompt_tokens':len(PROMPT),'prompt_token_sha256':hashlib.sha256(json.dumps(PROMPT).encode()).hexdigest(),
          'workload_file':str(workloads_path),'config_file':str(config_path),
          'generated_limit':generated_limit,'context':context,'kv_format':kv_format or 'configured',
+         'route':route,
          'engine_sha256':hashlib.sha256(Path(CONFIG['exe']).read_bytes()).hexdigest(),'arms':[]}
 for spec in (0,2,3,4):
  label='mtp-off' if spec==0 else f'mtp-window{spec}'
@@ -49,6 +51,7 @@ for spec in (0,2,3,4):
  if kv_format is not None:
   if '--kv' in args: args[args.index('--kv')+1]=kv_format
   else: args += ['--kv',kv_format]
+ if route=='eager' and '--no-capture' not in args: args += ['--no-capture']
  args += ['--adapt-every','4','--adapt-accepted-only']
  if '--spec' in args: args[args.index('--spec')+1]=str(max(2,spec))
  else: args += ['--spec',str(max(2,spec))]

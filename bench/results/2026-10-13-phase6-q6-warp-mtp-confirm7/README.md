@@ -363,6 +363,21 @@ MTP-window screen for these Q2_0 artifacts and cache setting. It does not
 qualify quality or performance. Traces and telemetry are under
 `run/accepted-window-q2-long-{fp16,int8,q4_0,k8v4}*`.
 
+## Captured versus eager route
+
+The 512-token Q2_0 prompt was also run with accepted-only adaptation in both
+captured and `--no-capture` eager modes, using FP16 KV, 64K context, and 16
+generated tokens. In each route, MTP windows 2/3/4 matched the MTP-off output
+and every shared accepted-prefix state. A direct cross-route comparison also
+matched token IDs, final state, and all common accepted-prefix checkpoints for
+MTP off (16 checkpoints) and windows 2/3/4 (11/10/10 checkpoints). Both
+supervised runs passed above the six-GiB host floor, with 15.30 GiB minimum
+availability for captured and 15.40 GiB for eager; no OOM event occurred.
+This is correctness evidence only. Trace-enabled sequential runs do not
+measure eager/captured performance, warm capture behavior, or resize/recapture
+stability. Results and telemetry are under `run/accepted-window-q2-graph-*`
+and `run/accepted-window-q2-eager*`.
+
 ## Cancellation and same-service recovery
 
 Enabling the candidate exposed a request-lifetime bug that the completed-request

@@ -112,6 +112,15 @@ prompt × KV × MTP-window correctness matrix for these artifacts. It is not a
 quality or performance result; graph/eager behavior and broader prompts remain
 open.
 
+Accepted-only adaptation also matched across captured and `--no-capture` eager
+routes on the 512-token Q2_0 prompt, FP16 KV, and 16 outputs. MTP off and
+windows 2/3/4 matched route-to-route token IDs, final state, and all common
+accepted-prefix checkpoints (16, 11, 10, and 10 respectively); both routes also
+matched their MTP-off reference. The supervised runs retained 15.30 GiB
+minimum host availability for captured and 15.40 GiB for eager, with no OOM
+events. This is correctness-only evidence; warm capture, resize/recapture, and
+randomized performance comparisons remain open.
+
 The accepted-only stream-cancellation follow-up initially found a real
 recovery defect: after the canceled request committed four tokens, the next
 request failed because per-window usage staging still had the previous
