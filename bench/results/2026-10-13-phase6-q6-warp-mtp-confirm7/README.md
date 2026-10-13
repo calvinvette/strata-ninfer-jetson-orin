@@ -188,3 +188,55 @@ the first run was 13.45 GiB and minimum effective admission availability was
 kills. Raw activation tensors were removed after confirming bitwise equality.
 The comparison harness is `compare_delayed_adapt_incident_prompt.py`; pass it
 an unused output directory as its argument when reproducing the run.
+
+## Adaptive-round localization and cadence probe
+
+The opt-in server diagnostic `STRATA_TRACE_ADAPT=1` records the absolute
+verifier position and round where a swap is scheduled, becomes pending, and is
+applied. It also records the selected `(layer, incoming expert, outgoing
+expert)` tuples. The new default-schedule comparison reproduced the incident:
+MTP off and window 4 first differed in accepted state at the 8-token prefix and
+in published output at token index 13. Layer 1's FFN output first differed at
+position 2,051/token 3766 (all 2,560 values; relative L2 `0.004534`, max
+absolute difference `0.000226`).
+
+The first adaptive round ran at different absolute positions under the default
+cadence of four verifier windows. MTP off scheduled round 4 at position 2,050,
+queued 96 swaps after the commit to 2,051, then applied them before verifying
+position 2,051. Window 4 scheduled its round 4 at position 2,055, queued swaps
+after the commit to 2,056, and applied them before position 2,056. Thus the
+first observed layer-1 activation difference occurs after the no-MTP route has
+changed residency and before the MTP route has.
+
+An opt-in cadence probe used `--adapt-every 4` for MTP off and `--adapt-every 2`
+for window 4. This aligned the first apply boundary at position 2,051 and kept
+all 32 published token IDs equal, but accepted state still diverged at prefix
+8. At the aligned first swap, only 71 of the 96 `(layer,incoming,outgoing)`
+choices matched (Jaccard `0.587`); at the next corresponding epoch, only 10 of
+96 matched (Jaccard `0.055`). Layer 1's first-round choices differed as well.
+The first activation difference remained at position 2,051/token 3766 (all
+2,560 values; relative L2 `0.002788`, max absolute difference `0.000147`).
+Changing the window-count cadence alone therefore does not restore persistent
+state. The captured layer-1 router IDs are equal for the first four generated
+positions, then differ at the position where the FFN activation first diverges.
+Because route IDs themselves are downstream of changed activations, this does not
+isolate whether the residency choices or speculative usage totals initiate the
+difference. The routing trace was summarized with SHA-256 identities and the raw
+tensor/binary captures were removed; see `run/adapt-cadence4-vs2-routing/`.
+
+The evidence points to both the swap epoch and the expert set being sensitive
+to MTP windows. The serving verifier adds all `n_tok*k` routed entries to the
+adaptive usage totals before accepted-prefix length is known; rejected draft
+rows therefore contribute to the next choice. This code-path explanation is
+consistent with the measured choice differences, but an accepted-row-only
+adaptive policy has not yet been implemented or qualified. No default or
+adaptation setting was changed. Raw layer tensors were removed after analysis;
+compact activation and swap-choice comparisons, routing summaries and event logs, and
+supervisor telemetry are retained under `run/incident-default-adapt-2048-traced-v2*`,
+`run/adapt-cadence4-vs2-choices*`, and `run/adapt-cadence4-vs2-routing*`.
+
+The server-loop trace implementation is opt-in and changes no swap or dispatch
+decision. Its CUDA focused CTest selection passed 10/10 and `strata --help`
+passed. The HIP-configured GNU C++ translation unit also compiled on maestro1;
+see [backend compile scope](MAESTRO1_ADAPT_TRACE_BUILD.md). No SYCL source was
+changed because its program entry point is maintained separately.

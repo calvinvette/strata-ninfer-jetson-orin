@@ -7619,6 +7619,16 @@ int main(int argc, char** argv) {
             }
             std::sort(swaps.begin(), swaps.end(), [](const Swap& a, const Swap& b) { return a.gain > b.gain; });
             if ((int) swaps.size() > o.adapt_swaps) swaps.resize((size_t) o.adapt_swaps);
+            static const bool trace_swap_choices = [] {
+                const char* e = std::getenv("STRATA_TRACE_ADAPT");
+                return e != nullptr && e[0] == '1';
+            }();
+            if (trace_swap_choices) {
+                std::fprintf(stderr, "strata serve: ADAPT choices count=%zu", swaps.size());
+                for (const Swap& s : swaps)
+                    std::fprintf(stderr, " %d:%d>%d", (int) s.layer, (int) s.in, (int) s.out);
+                std::fprintf(stderr, "\n");
+            }
             // the copies back read the cache of the card that owns each layer (see resident_stage_swaps)
             auto home_of = [&](int64_t layer) -> SwapHome {
                 const int stn = multi_gpu ? stage_of(layer) : 0;
@@ -8286,6 +8296,10 @@ int main(int argc, char** argv) {
         std::fflush(stdout);
         std::string line;
         int64_t rounds = 0;
+        static const bool trace_adapt = [] {
+            const char* e = std::getenv("STRATA_TRACE_ADAPT");
+            return e != nullptr && e[0] == '1';
+        }();
         const int S = o.spec;
         const int S_mtp = o.mtp_max_t > 0 ? std::min(o.mtp_max_t, S) : S;   // the MTP's windows; suffixes go up to S
         if (use_mtp && S_mtp < S) mtp.set_max_drafts(S_mtp - 1);
@@ -11003,8 +11017,16 @@ int main(int argc, char** argv) {
                 // #463: the previous adapt round's copies land first - with a non-blocking query, whether a swapped-in
                 // expert ran on the GPU or the CPU (they round differently) depended on the copy's timing
                 // (STRATA_ADAPT_NOWAIT=1: 0.1.37's non-blocking query, the A/B)
+                const size_t pending_before = pending.size();
+                if (trace_adapt && pending_before != 0)
+                    std::fprintf(stderr, "strata serve: ADAPT pending position=%lld round=%lld count=%zu age=%d\n",
+                                 (long long) p, (long long) rounds, pending_before, pending_age);
                 if (adapt_nowait()) apply_pending(false);
                 else if (pending.empty() || ++pending_age >= adapt_lag()) apply_pending(true);
+                if (trace_adapt && pending_before != 0)
+                    std::fprintf(stderr, "strata serve: ADAPT %s position=%lld round=%lld count=%zu\n",
+                                 pending.empty() ? "applied" : "still-pending", (long long) p,
+                                 (long long) rounds, pending.empty() ? pending_before : pending.size());
                 if (!adapt_tick(false)) {   // --adapt-async: the round in flight moves on a step when it can
                     std::printf("ERR an adaptive refill failed\n");
                     return 1;
@@ -11062,9 +11084,15 @@ int main(int argc, char** argv) {
                 const Clock::time_point tw1 = Clock::now();
                 std::thread adapt_thr;   // the adaptive tier beside the commit and the draft (as in generate)
                 bool adapt_ok = true;
+                bool adapt_scheduled = false;
                 // (--adapt-async 1: the asynchronous tier above instead, ticked before the window)
-                if (!drive.d.usage.empty() && !ajob && ((rounds + 1) % o.adapt_every) == 0)
+                if (!drive.d.usage.empty() && !ajob && ((rounds + 1) % o.adapt_every) == 0) {
+                    adapt_scheduled = true;
+                    if (trace_adapt)
+                        std::fprintf(stderr, "strata serve: ADAPT schedule position=%lld round=%lld window=%d\n",
+                                     (long long) p, (long long) (rounds + 1), T);
                     adapt_thr = std::thread([&] { adapt_ok = adapt(); });
+                }
                 const auto retained = strata::core::published_prefix(outv.data(), a + 1, produced_n, max_new,
                                                                       o.eos_ids.data(), o.eos_ids.size(), !req_ignore_eos);
                 const int publish_n = retained.count;
@@ -11118,6 +11146,9 @@ int main(int argc, char** argv) {
                     ++dec_windows; dec_T += T;
                 }
                 if (adapt_thr.joinable()) adapt_thr.join();
+                if (trace_adapt && adapt_scheduled)
+                    std::fprintf(stderr, "strata serve: ADAPT queued position=%lld committed=%d round=%lld pending=%zu\n",
+                                 (long long) (p + publish_n), publish_n, (long long) rounds, pending.size());
                 if (!adapt_ok) {
                     std::printf("ERR an adaptive refill failed\n");
                     return 1;
