@@ -134,6 +134,16 @@ prompt × KV × MTP-window correctness matrix for these artifacts. It is not a
 quality or performance result; graph/eager behavior and broader prompts remain
 open.
 
+The opt-in accepted-only path also passed a [128-token IQ1_M accepted-prefix
+trace](../../bench/results/2026-10-14-phase5-iq1-accepted-prefix-128/README.md)
+on the exact 2,048-token incident prompt at 8K context. MTP windows 2/3/4
+matched MTP-off output IDs, final state, and every shared commit state (78, 74,
+and 58 boundaries). They offered/accepted 66/50, 89/54, and 120/70 drafts.
+Minimum host availability was 13.34 GiB and effective admission headroom was
+10.36 GiB, with no OOM events. This extends the candidate's correctness chain
+on IQ1_M; it remains one prompt and one opt-in swap policy, without a quality,
+performance or default-promotion claim.
+
 Accepted-only adaptation also matched across captured and `--no-capture` eager
 routes on the 512-token Q2_0 prompt, FP16 KV, and 16 outputs. MTP off and
 windows 2/3/4 matched route-to-route token IDs, final state, and all common
