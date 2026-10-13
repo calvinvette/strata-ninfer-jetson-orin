@@ -23,6 +23,51 @@ their output SHA prefixes were `7b7cd547444e` (MTP off) and `ec417a6f0a71`
 MTP/warp profile or support changing defaults. MTP offered 153 drafts and
 accepted 79 in each window-4 cell.
 
+## Accepted-only randomized confirmation
+
+A second seven-block campaign reran the same four-cell design with
+`--adapt-every 4 --adapt-accepted-only` added to every cell. It used the same
+held-out request, model files, 3,903-slot cache, warmup, context, binary
+(`2403c73bfde5b942022266e1f77502e7b53b418a7d700c5bf5cd5a3826989b77`),
+six-GiB memory floor and separate three-GiB workspace reserve. The new
+randomized campaign and per-cell configs are under
+[`run/accepted-only-seven-block`](run/accepted-only-seven-block/experiment.json);
+model, MTP asset and tokenizer identities are recorded in
+[`model-identity.json`](run/accepted-only-seven-block/model-identity.json);
+[`analyze.py`](analyze.py) reproduces its result with `--accepted-only`.
+
+All 28 cells passed, and the generated output was byte-identical across all
+seven blocks, between MTP-off and MTP-window4, and between Q6 warp-dequant
+off/on at each MTP level. MTP4 offered 125 drafts per request in the latest
+block and accepted 71; accepted counts varied by block. Minimum whole-host and
+effective availability were both 13.075 GiB, above the required floor. Read-only
+telemetry observed CPU frequencies from 729 to 2,201 MHz, GPU temperatures from
+48.0 to 58.0 C, and SoC temperatures from 50.1 to 62.1 C. No clocks were set;
+energy is not process-attributed.
+
+Across the seven paired blocks, warp-dequant reduced median request time by
+7.279% with MTP off (paired bootstrap 95% interval −7.716% to −5.118%) and
+6.355% with MTP window 4 (−7.979% to −4.433%). Prompt time improved by 8.342%
+and 8.575%, respectively. Decode time was +0.457% (interval −1.210% to
++5.349%) and +3.405% (−1.025% to +18.559%). The request interaction estimate
+was +0.669% (−0.896% to +1.058%), so this design does not show a material
+warp × MTP interaction in total request time. The result supports this
+workload-specific operator-path improvement under accepted-only adaptation;
+it does not establish a general end-to-end profile, sustained service benefit,
+energy result or default change.
+
+Two paired decode observations were unusually slow: warp MTP-off in block 6
+and warp MTP4 in block 4 each took about 39 seconds to decode 128 tokens,
+versus roughly 9.5–11.3 seconds in the other cells. The paired medians and
+intervals still favor warp-dequant, but these points widen decode and
+interaction uncertainty. The recorded telemetry shows no unusual temperature
+extreme, and the current sampling does not identify the cause. External load,
+system scheduling, or transient memory/I/O pressure are plausible confounders,
+not established causes. A follow-up with per-request clock and I/O sampling and
+additional randomized blocks would distinguish a repeatable runtime effect from
+a transient system event. No energy or thermal-equilibrium claim follows from
+this screen.
+
 To localize the mismatch, a direct API harness captured published IDs and
 accepted-prefix state for 32 tokens from the identical prompt with MTP off and
 windows 2/3/4. The same harness was repeated with default batching after an

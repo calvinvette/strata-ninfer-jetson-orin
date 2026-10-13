@@ -20,14 +20,20 @@ def main():
     ap.add_argument('--output', type=Path, required=True, help='new output directory')
     ap.add_argument('--blocks', type=int, default=3)
     ap.add_argument('--seed', type=int, default=202610124)
+    ap.add_argument('--config-dir', type=Path,
+                    help='optional directory containing the four condition configs')
+    ap.add_argument('--accepted-only', action='store_true',
+                    help='derive per-cell configs with accepted-token adaptation enabled')
     ap.add_argument('--run', action='store_true', help='execute; otherwise print the randomized design')
     args = ap.parse_args()
     if args.blocks < 3 or args.output.exists():
         ap.error('screening needs at least 3 blocks and a new output path')
+    if args.run:
+        args.output.mkdir(parents=True, exist_ok=False)
     configs = {}
     for condition in CONDITIONS:
         label, mtp = condition.split('-mtp')
-        path = HERE / f'{label}-mtp{mtp}-config.json'
+        path = ((args.config_dir or HERE) / f'{label}-mtp{mtp}-config.json')
         cfg = json.loads(path.read_text())
         argv = cfg['args']
         actual_mtp = int(argv[argv.index('--spec') + 1])
@@ -40,6 +46,14 @@ def main():
             ap.error(f'{path}: warp environment does not match factor level')
         if '--suffix-draft' not in argv or argv[argv.index('--suffix-draft') + 1] != '0':
             ap.error(f'{path}: suffix drafting must be disabled in all four cells')
+        if args.accepted_only:
+            if '--adapt-accepted-only' in argv:
+                ap.error(f'{path}: accepted-only flag already present')
+            argv.extend(['--adapt-every', '4', '--adapt-accepted-only'])
+            derived = args.output / 'configs' / path.name
+            derived.parent.mkdir(parents=True, exist_ok=True)
+            derived.write_text(json.dumps(cfg, indent=2) + '\n')
+            path = derived
         configs[condition] = path
     rng = random.Random(args.seed)
     schedule = []
@@ -50,9 +64,9 @@ def main():
     print(json.dumps({'seed': args.seed, 'blocks': args.blocks, 'schedule': schedule}, indent=2))
     if not args.run:
         return 0
-    args.output.mkdir(parents=True, exist_ok=False)
-    campaign = {'schema': 1, 'design': 'seven-block randomized confirmation; held-out prompt; Q6_K warp-dequant (off/on) × MTP (off/window4)',
+    campaign = {'schema': 1, 'design': 'randomized confirmation; held-out prompt; Q6_K warp-dequant (off/on) × MTP (off/window4)',
                 'seed': args.seed, 'planned_blocks': args.blocks, 'started_wall_time_s': time.time(),
+                'adaptation_policy': 'accepted-only, --adapt-every 4' if args.accepted_only else 'configuration-defined',
                 'configurations': {k: str(v.resolve()) for k, v in configs.items()},
                 'workloads': str((HERE / 'workloads.json').resolve()),
                 'warmup_workloads': str((HERE / 'warmup-workloads.json').resolve()),

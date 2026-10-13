@@ -5,9 +5,15 @@ import json
 import random
 import statistics
 from pathlib import Path
+import argparse
 
 ROOT = Path(__file__).resolve().parent
-RUN = ROOT / 'run'
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--run', type=Path, default=ROOT / 'run')
+parser.add_argument('--config-dir', type=Path, default=ROOT)
+parser.add_argument('--accepted-only', action='store_true')
+args = parser.parse_args()
+RUN = args.run
 CONDITIONS = ('baseline-mtp0', 'warp-mtp0', 'baseline-mtp4', 'warp-mtp4')
 BOOTSTRAPS = 200_000
 
@@ -38,13 +44,16 @@ assert all(row['status'] == 'pass' and row['supervisor_returncode'] == 0
            for row in campaign['runs']), 'campaign contains failed or incomplete cells'
 assert campaign['seed'] == 202610131
 
-configs = {name: json.loads((ROOT / f'{name}-config.json').read_text())
+configs = {name: json.loads((args.config_dir / f'{name}-config.json').read_text())
            for name in CONDITIONS}
 for field in ('exe', 'tokenizer', 'model_name', 'cuda'):
     assert len({cfg[field] for cfg in configs.values()}) == 1, field
 for cfg in configs.values():
     assert cfg['args'][cfg['args'].index('--max-context') + 1] == '8192'
     assert cfg['args'][cfg['args'].index('--expert-cache') + 1] == '3000'
+    if args.accepted_only:
+        assert '--adapt-accepted-only' in cfg['args']
+        assert cfg['args'][cfg['args'].index('--adapt-every') + 1] == '4'
 
 workload = json.loads((ROOT / 'workloads.json').read_text())['workloads']
 warmup = json.loads((ROOT / 'warmup-workloads.json').read_text())['workloads']
@@ -94,8 +103,14 @@ for block in range(7):
     for mtp in (0, 4):
         assert hashes[(block, f'baseline-mtp{mtp}')] == hashes[(block, f'warp-mtp{mtp}')], (
             f'Q6 warp output differs at fixed MTP level in block {block}, window {mtp}')
+    assert hashes[(block, 'baseline-mtp0')] == hashes[(block, 'baseline-mtp4')], (
+        f'MTP off/window4 output differs in block {block}')
+    assert hashes[(block, 'warp-mtp0')] == hashes[(block, 'warp-mtp4')], (
+        f'warp MTP off/window4 output differs in block {block}')
 
 assert len(set(slots)) == 1 and slots[0] == 3903, slots
+assert len({hashes[(b, 'baseline-mtp0')] for b in range(7)}) == 1, (
+    'held-out output differed across randomized blocks')
 
 metrics = ('request_ms', 'prompt_ms', 'decode_ms', 'client_elapsed_ms')
 def value(row, name):
@@ -138,6 +153,7 @@ for metric in metrics:
 
 report = {
     'scope': 'seven-block randomized confirmation; held-out 2048/128 incident workload; Q6_K warp-dequant × MTP off/window4',
+    'adaptation_policy': 'accepted-only --adapt-every 4' if args.accepted_only else 'configuration-defined',
     'seed': campaign['seed'], 'blocks': 7, 'conditions': list(CONDITIONS),
     'binary_sha256': hashlib.sha256(Path(configs[CONDITIONS[0]]['exe']).read_bytes()).hexdigest(),
     'all_28_runs_passed': True,
@@ -157,6 +173,8 @@ report = {
     'warp_effects': effects, 'warp_by_mtp_interaction': interaction,
     'bootstrap_replicates': BOOTSTRAPS,
     'qualification': ('Seven-pair Q6 warp timing confirmation at each fixed MTP level for this one held-out prompt and model/context/cache configuration. '
+                      'Accepted-only policy applied to all cells.' if args.accepted_only else
+                      'Seven-pair Q6 warp timing confirmation at each fixed MTP level for this one held-out prompt and model/context/cache configuration. '
                       'MTP-off and MTP-window4 text differ deterministically; this is a Phase 5 output-equivalence failure requiring state-level follow-up. '
                       'Do not combine MTP-level timing as a quality-qualified optimization or promote a default.'),
 }

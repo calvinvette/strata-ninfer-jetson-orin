@@ -52,6 +52,20 @@ improved while decode time was about 2% slower. The interaction estimate was
 small and uncertain. This single-model screen is not held-out confirmation or
 a general quality qualification, so no default changed.
 
+The same seven-block Q6 warp × MTP design was rerun with the opt-in
+`--adapt-accepted-only --adapt-every 4` policy in every cell. All 28 cells
+passed, and generated output matched exactly across all blocks, warp settings,
+and MTP off/window4. At fixed MTP settings, warp-dequant reduced median
+request time by 7.279% (95% paired bootstrap interval −7.716% to −5.118%) with
+MTP off and 6.355% (−7.979% to −4.433%) with MTP4; the interaction estimate
+was +0.669% (−0.896% to +1.058%). Minimum host/effective availability was
+13.075 GiB with no floor breach. Two 39-second warp decode samples were
+retained; their cause is unknown. This supports only the exact held-out model,
+prompt, cache and policy configuration. Decode intervals include no-change or
+regression, energy is not process-attributed, and no default or general serving
+profile is promoted. The original default-adaptation campaign remains a
+separate state-parity failure. See the [accepted-only confirmation report](../../bench/results/2026-10-13-phase6-q6-warp-mtp-confirm7/README.md).
+
 The [accepted-prefix MTP investigation](../../bench/results/2026-10-13-phase6-q6-warp-mtp-confirm7/README.md)
 now captures the MoE boundary on the 512-token suffix. At the first bad row
 (position 515), layer-1 GDN output and FFN input match, but the combined FFN
