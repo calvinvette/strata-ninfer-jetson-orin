@@ -81,8 +81,26 @@ held-out watershed prompt at 16K context then matched for the same three MTP
 windows, with 21/16/12 shared state checkpoints and offered/accepted counts
 15/11, 22/16, and 29/20. It passed the same 28-GiB supervisor with 13.19 GiB
 minimum host availability and no OOM events. These are two correctness cells;
-other prompts, KV formats, performance and task quality remain open. Defaults
+other prompts/contexts, performance and task quality remain open. Defaults
 are unchanged. See the [accepted-only matrix report](../../bench/results/2026-10-13-phase6-q6-warp-mtp-confirm7/README.md).
+
+The same candidate also passed the 32-token MTP 2/3/4 matrix on the local Q2_0
+pack at 64K context with FP16 KV. Output IDs and every shared checkpoint
+matched, with 21/19/17 shared boundaries; offered/accepted drafts were
+16/11, 24/13, and 31/15. The 28-GiB supervisor retained 15.25 GiB minimum host
+availability with no OOM events. This extends correctness across the two local
+model configurations, but KV alternatives, quality and performance remain
+unqualified. An initial startup rejection due to suffix drafting being enabled
+is retained and excluded; the measured rerun disabled suffix drafting per the
+candidate's stated compatibility limits.
+
+The Q2_0 512-token screen was extended to INT8, Q4_0, and K8V4 KV at 16 output
+tokens. All three MTP windows matched all IDs and 11 shared state checkpoints
+for each format; offered/accepted drafts were 8/5, 14/5, and 17/5. Minimum host
+availability was 16.05, 16.49, and 16.30 GiB, respectively, with no OOM events.
+Together with the 32-token FP16 cell, this covers the candidate's short-prompt
+state parity across all four supported KV formats on Q2_0. Long prompts under
+each format, task quality and performance remain unqualified.
 
 The accepted-only stream-cancellation follow-up initially found a real
 recovery defect: after the canceled request committed four tokens, the next

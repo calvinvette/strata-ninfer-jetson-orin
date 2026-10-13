@@ -321,6 +321,36 @@ performance or task-quality result. The source workload is the retained
 telemetry are in `run/accepted-window-heldout16k/` and
 `run/accepted-window-heldout16k-supervisor/`.
 
+## Q2_0 pack parity check
+
+To cover the second local model configuration, the same four-arm matrix ran on
+the 512-token prompt retained by the Q6 warp screen, using the Q2_0 pack and
+native experts, FP16 KV, 3,000 expert-cache slots, and a 64K context reservation.
+With 32 output tokens, windows 2/3/4 matched MTP-off token IDs and every shared
+accepted-prefix state checkpoint (21, 19, and 17 boundaries). Draft
+offered/accepted counts were 16/11, 24/13, and 31/15. The supervisor passed
+with a 15.25-GiB minimum host availability and no OOM events. This is a
+correctness-only Q2_0 cell, not quality or performance qualification.
+
+The initial launch was rejected by the opt-in's explicit compatibility check
+because the reused Q2_0 configuration enabled suffix drafting. It did not enter
+model execution and is retained as a failed setup cell under
+`run/accepted-window-q2-supervisor/`; the measured rerun explicitly set
+`--suffix-draft 0` and is recorded under `run/accepted-window-q2-fixed/` and
+`run/accepted-window-q2-fixed-supervisor/`.
+
+The same 512-token prompt and Q2_0 model were then screened at 16 generated
+tokens under INT8, Q4_0, and K8V4 KV. For each format, MTP windows 2/3/4
+matched every output ID and every shared accepted-prefix checkpoint (11 shared
+boundaries per arm). Draft offered/accepted counts were 8/5, 14/5, and 17/5
+in each format. All 28-GiB supervisor runs passed without OOM events; minimum
+host availability was 16.05 GiB (INT8), 16.49 GiB (Q4_0), and 16.30 GiB
+(K8V4). Together with the 32-token FP16 run above, this completes the
+accepted-only candidate's short-prompt parity screen across the four currently
+supported KV formats on Q2_0. It does not cover a long prompt under each KV
+format, task quality, or runtime performance. Raw comparisons and telemetry are
+under `run/accepted-window-q2-{int8,q4_0,k8v4}*`.
+
 ## Cancellation and same-service recovery
 
 Enabling the candidate exposed a request-lifetime bug that the completed-request
