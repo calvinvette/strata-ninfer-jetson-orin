@@ -1541,3 +1541,11 @@ was capped before its 200-word quality rubric could be checked, so the
 throughput and interaction estimates remain exploratory. This screen does not
 promote a cache/context profile or close Phase 6; held-out quality and
 confirmation evidence remain necessary.
+
+An IQ1_M [long-prefill cancellation and recovery check](../../bench/results/2026-10-14-phase5-q6-prefill-cancel-recovery/README.md)
+closed the 7,498-token stream after the engine read its first 64 prompt tokens
+and before generation. The same MTP4 accepted-only service then returned
+`Hello Orin!` and remained alive. Under a 28-GiB cgroup cap, minimum host and
+effective availability were 12.95 GiB, with no OOM events. This adds one
+long-prefill termination point; it does not compare persistent state after
+cancellation or close Phase 5's other termination and quality gates.

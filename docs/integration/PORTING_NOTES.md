@@ -1192,3 +1192,26 @@ published tokens, and make state/residency changes occur at equivalent commit
 boundaries across verifier sizes. Check accepted-prefix recurrent and KV state
 directly; matching final text does not establish equivalent state. Confirm the
 behavior on held-out prompts and formats before measuring or promoting a policy.
+
+## 2026-10-13 — Separate cache/context screening from quality qualification
+
+A three-block randomized Orin screen crossed requested cache lower bounds of
+3,000/5,000 with 8K/16K reservations on the opt-in IQ1_M Q6 warp-dequant,
+accepted-only MTP4 route. Every fixed 512/64 request completed without prompt
+cache reuse and retained the six-GiB host floor, but reported cache slots under
+the 5,000 request ranged from 4,600 to 6,519. Response prose also varied in
+some requests, while the 64-token generation cap was too short to meet the
+prompt's 200-word rubric. The throughput deltas are therefore screening leads,
+not quality-qualified wins. For Splash, record requested and actual allocation
+separately, use enough output for a real task-level rubric, and keep screening
+cells out of a promotion decision until held-out quality and confirmation pass.
+See the [cache/context screen](../../bench/results/2026-10-14-phase6-q6-cache-context/README.md).
+
+A separate 7,498-token IQ1_M prefill-cancellation cell closed the stream after
+the first 64-token prompt chunk, logged cancellation before generation, and
+served `Hello Orin!` through the same MTP4 service. This confirms that the API
+client disconnect reached the engine and recovery completed for that exact
+profile; it does not establish post-cancel state-bit parity or cancellation at
+other points. For Splash, pair same-service recovery with backend-native cancel
+telemetry and direct committed-state checks when the state contract requires
+them. See the [cancellation record](../../bench/results/2026-10-14-phase5-q6-prefill-cancel-recovery/README.md).
