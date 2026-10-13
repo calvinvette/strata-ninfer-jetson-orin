@@ -1,7 +1,9 @@
 # Integration status
 
-Updated: 2026-10-14. Phases 1 through 4 are complete for their documented tested
-Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates).
+Updated: 2026-10-13. Phases 1 through 4 are complete for their documented tested
+Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 has
+initial long-context recall and sustained-service evidence and remains in
+progress; Phases 5 and 6 also remain open.
 Supported, failed, unsupported and untested cases are recorded. Phase 3
 graph-private allocation size remains unisolated and its
 graph-disabled native control is unsupported; these limits do not imply a general
@@ -24,6 +26,23 @@ GiB respectively. This reconfirms selected contracts without changing the
 Phase 3 scope or its graph-backing exclusions. The earlier
 [same-day refresh](../../bench/results/2026-10-13-phase3-q2-ple-user-rerun-2/README.md)
 is retained as a separate run.
+
+After the 40-minute Phase 7 cache-reuse soak, a separate current-build
+[Q2_0 PLE regression refresh](../../bench/results/2026-10-14-phase3-q2-ple-post-soak/README.md)
+again passed all seven PLE stages (worst relative L1 `1.148e-7`), the selected
+15/15 Phase 3 CTests, and integration Python discovery (124/124). Minimum host
+availability was 24.427, 24.418, and 24.516 GiB, respectively, under the
+28-GiB cgroup ceiling and six-GiB floor. The Q2_0 artifacts were already local;
+this refresh does not extend Phase 3's tested scope or its graph-backing limits.
+
+The opt-in IQ1_M [8K/16K/32K retrieval and recovery plus 40-minute stream soak](../../bench/results/2026-10-14-phase7-q6-recall/README.md)
+passed marker retrieval and same-service short recovery at all three context
+sizes. The 40-minute cache-reuse loop completed 1,579 streaming requests with
+zero failures; all markers were present once and in order. Minimum host
+availability was 12.67 GiB across the context tests and 13.34 GiB in the soak.
+Temperature stabilized near 76–77 °C for over 30 minutes. This covers one
+opt-in profile and marker task; Phase 7 remains in progress for cancellation,
+vision, repeated teardown, broader quality, and other service cases.
 
 Phase 6 Q2_0 graph/eager extended screening is recorded in the
 [2026-10-12 result](../../bench/results/2026-10-12-phase6-q2-graph-eager-full/README.md).
@@ -383,10 +402,11 @@ The new [generic captured-graph runtime test](../../bench/results/2026-10-11-pha
 
 Three Q2_0 64-token requests at a 20 GiB cgroup cap originally produced two complete, token-identical passes and one supervisor abort at 5.48 GiB effective scope headroom during prefill; host availability stayed above 21.65 GiB. One additional repeat also aborted at 5.55 GiB effective scope headroom while host availability stayed at 20.90 GiB; OOM/max events remained zero. The repeat set contains two passes and two safe supervisor aborts, confirming the cap is history-sensitive rather than a supported threshold. The passing repeat's cgroup `memory.stat` showed 8.29 GB file cache and 1.63 GB anonymous use at peak. See the [repeatability run](../../bench/results/2026-10-11-phase3-q2-cgroup20G-cache256-tg64-confirm3/README.md).
 
+| 3 — Admission, memory ownership and transfer | Complete for tested Orin Q2_0 scope | See [Phase 3 closeout](PHASE3_CLOSEOUT.md). The post-soak PLE/CTest/Python rerun passed; graph-private allocation size remains unisolated and graph-disabled native service remains unsupported. |
 | 4 — SM87/ARM kernels | Complete for tested candidates | See [Phase 4 closeout](PHASE4_CLOSEOUT.md). Q6_K warp-dequant meets real-shape oracle, held-out request and backend build checks for its recorded opt-in scope; Q8_1 NEON is contract-correct but had no serving win and remains opt-in; worker settings and CTA alternatives remain unpromoted. No default changed. Task-quality, energy and sustained-service evidence belong to later phases. |
 | 5 — Speculation and graphs | In progress | The QSA spare-row transaction fix restores the dead key after accepted-prefix replay. MTP off/2/3/4 match IDs and accepted-prefix state across the tested Q2_0 prompts and FP16/INT8/Q4_0/K8V4 formats; the short and 2,048-token cases also pass in the accepted-only matrix. The Q6 incident mismatch remains under default adaptive swaps. The opt-in `--adapt-accepted-only` path matches MTP-off output and persistent state in the tested prompt/KV/window matrices, and captured/eager output/state agree on a short Q2_0 case. The Q6 accepted-only seven-block screen confirms exact output parity across MTP off/window4 and warp off/on for its held-out request. Warm verifier graphs replay successfully after warmup. However, a same-service 512→2048→512 test changed 14/16 short output tokens after cadence-4 swaps for both MTP settings; `--adapt-every 100000` restored output and state equality. This points to swap-dependent output sensitivity but does not identify the arithmetic cause or quality impact. A 9K grow/trim test retained captured graphs and recovered short output/state, but MTP4 long-request state differed from MTP-off despite equal output; a full-KV control passed. Elastic KV × MTP is unqualified pending isolation. Cancellation/recovery passed after fixing stale usage staging. Eager/captured performance, broader task-quality qualification and other termination paths remain open; see the [accepted-prefix and graph investigation](../../bench/results/2026-10-13-phase6-q6-warp-mtp-confirm7/README.md), [same-service report](../../bench/results/2026-10-13-phase6-q6-warp-mtp-confirm7/run/same-service-short-long-short/README.md) and [KV grow/trim report](../../bench/results/2026-10-13-phase6-q6-warp-mtp-confirm7/run/kv-grow-graph-recovery/README.md). |
 | 6 — Multivariate tuning | In progress | The randomized worker × transfer screen remains inconclusive. The extended graph/eager screen completed seven MTP-off and three MTP2 pairs, but 2/7 eager MTP-off long outputs differed under short→long order. Direct no-swap and delayed-swap controls match the cold long-only output across captured/eager routes; the state trace changes output and is perturbative. A new seven-block held-out Q6_K warp × MTP confirmation measured warp request-time reductions of 7.25% (MTP off) and 6.15% (MTP4), with exact output parity only within each MTP regime. MTP-off and MTP4 outputs differed across all blocks, and the direct state trace found a material accepted-prefix mismatch, so these timings do not qualify a combined profile or promote a setting. The full-prompt delayed-swap control matches at 32 tokens but remains a correctness-only setting; default adaptive swaps and cadence-only adjustment still fail state parity. The boundary-capped accepted-row candidate passes this one prompt twice with exact state/output parity, but is correctness-only and not yet qualified across workloads or formats. Independent output-quality budget, default MTP fix/requalification and other interactions remain open. See [worker × transfer](../../bench/results/2026-10-12-phase6-q2-worker-transfer-rerun/README.md), [graph/eager](../../bench/results/2026-10-12-phase6-q2-graph-eager-full/README.md) and [seven-block confirmation/state investigation](../../bench/results/2026-10-13-phase6-q6-warp-mtp-confirm7/README.md). |
-| 7 — Capacity and service | Not started | Quality, recovery, thermal equilibrium and sustained workload |
+| 7 — Capacity and service | In progress | The opt-in IQ1_M profile passed planted-marker retrieval and same-service recovery at 8K/16K/32K prompt sizes. A 40-minute cache-reuse stream passed 1,579 requests with zero failures and over 30 minutes at stable temperature. Minimum host availability was 12.67 GiB in the 32K cell and 13.34 GiB during the soak. These results do not qualify cold-prefill capacity, concurrency, cancellation, vision, repeated teardown, broad task quality, or other models; see the [Phase 7 report](../../bench/results/2026-10-14-phase7-q6-recall/README.md). |
 | 8 — Release/upstream | Not started | Relevant backend builds, runtime matrix and reviewable changes |
 
 The held-out [1,069-token no-trace worker screen](../../bench/results/2026-10-11-phase4-pool-workers-1069-no-trace/README.md) had identical cache capacity and output across 1/4/8 workers; eight workers were fastest in each of three blocks. A seven-pair [4-vs-8 worker confirmation](../../bench/results/2026-10-11-phase4-pool-workers-1069-confirm7/README.md) on the current binary found a 1.54% lower median request time at eight workers, with the paired 95% median interval supporting a 0.80–1.91% slowdown for four workers; output/cache checks passed in all 14 runs. A separate current-binary trace follow-up matched final state and all accepted-prefix commits in two processes per arm. The small effect is confirmed only for one 1,069-token workload, 3,903 actual cache slots, MTP on and CPU prefill sharing disabled; task quality, GPU/EMC clock effects and general worker settings remain unqualified, so no default changed.
