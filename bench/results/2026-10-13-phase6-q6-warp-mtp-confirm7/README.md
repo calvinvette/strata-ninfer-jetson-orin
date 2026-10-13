@@ -351,6 +351,18 @@ supported KV formats on Q2_0. It does not cover a long prompt under each KV
 format, task quality, or runtime performance. Raw comparisons and telemetry are
 under `run/accepted-window-q2-{int8,q4_0,k8v4}*`.
 
+The Q2_0 screen was then repeated on the distinct 2,048-token watershed prompt
+at a 64K context reservation. FP16 KV used 32 output tokens; INT8, Q4_0, and
+K8V4 used 16 each. For all four KV formats, windows 2/3/4 exactly matched
+MTP-off output and every shared accepted-prefix state. Shared boundary counts
+were 20/16/15 for FP16, 10/8/8 for INT8, 10/8/8 for Q4_0, and 12/10/10 for
+K8V4. Every MTP arm offered and accepted drafts. The supervised runs passed
+with minimum host availability 15.48, 16.23, 16.62, and 16.46 GiB respectively;
+no OOM event occurred. This completes the correctness-only long-prompt × KV ×
+MTP-window screen for these Q2_0 artifacts and cache setting. It does not
+qualify quality or performance. Traces and telemetry are under
+`run/accepted-window-q2-long-{fp16,int8,q4_0,k8v4}*`.
+
 ## Cancellation and same-service recovery
 
 Enabling the candidate exposed a request-lifetime bug that the completed-request

@@ -99,8 +99,18 @@ tokens. All three MTP windows matched all IDs and 11 shared state checkpoints
 for each format; offered/accepted drafts were 8/5, 14/5, and 17/5. Minimum host
 availability was 16.05, 16.49, and 16.30 GiB, respectively, with no OOM events.
 Together with the 32-token FP16 cell, this covers the candidate's short-prompt
-state parity across all four supported KV formats on Q2_0. Long prompts under
-each format, task quality and performance remain unqualified.
+state parity across all four supported KV formats on Q2_0. Task quality and
+performance remain unqualified.
+
+The Q2_0 candidate matrix was extended to a distinct 2,048-token prompt at
+64K context for all four KV formats. MTP windows 2/3/4 matched MTP-off token
+IDs and every shared state checkpoint in all 12 comparisons; FP16 used 32
+generated tokens and the other formats 16. Minimum host availability was
+15.48 GiB (FP16), 16.23 GiB (INT8), 16.62 GiB (Q4_0), and 16.46 GiB (K8V4),
+with no OOM events. This completes the opt-in candidate's tested Q2_0 long
+prompt × KV × MTP-window correctness matrix for these artifacts. It is not a
+quality or performance result; graph/eager behavior and broader prompts remain
+open.
 
 The accepted-only stream-cancellation follow-up initially found a real
 recovery defect: after the canceled request committed four tokens, the next
