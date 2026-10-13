@@ -50,22 +50,19 @@ small and uncertain. This single-model screen is not held-out confirmation or
 a general quality qualification, so no default changed.
 
 The [accepted-prefix MTP investigation](../../bench/results/2026-10-13-phase6-q6-warp-mtp-confirm7/README.md)
-now captures activations at the two GDN layers bracketing the first state
-mismatch on the 512-token suffix. Layer-2 GDN input differs at position 515,
-while the preceding layer-1 GDN capture is still bitwise equal there and first
-differs at position 520. This narrows the discrepancy to work between those
-capture points; the intervening residual/FFN and verifier-row arithmetic are
-not isolated. Repeating the suffix with `STRATA_DEC_BATCH=0` retained the same
-prefix-5 state mismatch, output mismatch at index 10, and layer-1 first
-activation difference at position 520. This rules out that broad batching
-switch as the sole trigger, without isolating every per-window operation. The
-28-GiB supervised runs retained 13.21/13.24 GiB minimum host and effective
-admission availability, with no OOM events. A focused 10/10 CUDA
-verifier/GDN/speculation/PLE/graph test set passed. Phase 5 remains open, and
-MTP remains unqualified for this incident workload. maestro1 compiled the
-updated verifier translation unit in its HIP-configured Release tree; the full
-HIP application link was not completed, and the separate SYCL target required
-no rebuild because its verifier sources are independent and unchanged.
+now captures the MoE boundary on the 512-token suffix. At the first bad row
+(position 515), layer-1 GDN output and FFN input match, but the combined FFN
+output differs (relative L2 0.004423); layer-2 GDN input then differs. With
+`--adapt-swaps 0`, the same no-MTP/window-4 pair matches every output token,
+accepted-prefix state hash, and captured activation. This strongly implicates
+adaptive expert residency for this prompt/configuration, but does not identify
+the CPU/GPU arithmetic or swap mechanism. `STRATA_DEC_BATCH=0` did not remove
+the default-swap mismatch. The supervised runs retained at least 13.21 GiB
+host/effective availability with no OOM events. Focused CUDA regression passed
+10/10; the changed verifier translation unit compiled in the HIP-configured
+Release tree, while its full application link was not completed. The separate
+SYCL verifier sources were unchanged. Phase 5 remains open; MTP is unqualified
+for this incident workload, and no defaults changed.
 
 The [exact Q8_0 scalar-versus-ARM quantization experiment](../../bench/results/2026-10-13-phase4-q8-neon-quant/README.md)
 compares Strata's explicit scalar oracle against ggml's Cortex-A78AE NEON path

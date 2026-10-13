@@ -100,18 +100,17 @@ bitwise equal at shared captured positions through 519; its first difference
 is at position 520/token 11040 (all 2,560 mixed-activation values, relative L2
 0.002666, maximum absolute delta 0.006456). This brackets the first observed
 activation discrepancy between the layer-1 GDN capture and layer-2 GDN input
-for the shared row at position 515. The intervening residual/FFN operations
-and MTP verifier-row arithmetic are not yet separated, so this is not a root
-cause or a fix. No tolerance or alternate route is adopted.
+for the shared row at position 515. Later captures below separate more of the
+operations along this path; no workaround or tolerance is adopted.
 
 The capture format is opt-in (`STRATA_VERIFY_DUMP_GDN_LAYER` plus
-`STRATA_VERIFY_DUMP_GDN_PATH`) and records bounded verifier rows in a binary
-`STGDIAG1` stream. `analyze_gdn_diag.py` compares the first two appended capture
-streams by absolute position and token. State hashes, rather than the binary
-state snapshot, remain authoritative for persistent state because the one-token
-commit path can mutate convolution history before the snapshot. Large raw
-float32 dumps were removed after extracting these compact metrics; logs and
-supervisor telemetry remain. The new CUDA binary passed the focused 10-test
+`STRATA_VERIFY_DUMP_GDN_PATH`) and records bounded verifier rows in binary
+`STGDIAG1` through `STGDIAG4` streams. The current v4 stream captures GDN
+input/intermediate values, post-GDN projection, FFN input, and combined FFN
+output. `analyze_gdn_diag.py` compares appended capture streams by position and
+token. Persistent-state hashes remain authoritative for state parity. Large raw
+float32 dumps were removed after extracting compact per-field summaries; logs
+and supervisor telemetry remain. The CUDA binary passed the focused 10-test
 verifier/GDN/speculation/PLE/graph regression. On maestro1, the exact updated
 `src/core/verify.cpp` and header were copied into the isolated validation tree.
 The [maestro1 build record](MAESTRO1_DIAGNOSTIC_BUILD.md) lists their hashes and
@@ -135,3 +134,25 @@ that still processes a verifier window. The supervisor recorded 13.24 GiB
 minimum host/effective availability and zero OOM kills. The run is
 correctness-only; its retained results and telemetry are under
 `run/incident-no-decode-batch*`.
+
+The v4 capture adds the operations between the layer-1 and layer-2 GDN captures.
+At position 515/token 3766, layer-1's GDN projection and following FFN input
+still match bitwise, but the combined layer-1 FFN output differs in all 2,560
+values (relative L2 0.004423, maximum absolute delta 0.000192). The layer-2
+GDN input differs at that same position. This places the first observed
+activation discrepancy in the layer-1 MoE execution/combination or its final
+combine seam, before layer-2 attention; it does not identify which expert or
+prove whether CPU/GPU rounding, route selection, or swap timing is responsible.
+
+A paired control with `--adapt-swaps 0` removed the discrepancy on this exact
+suffix. MTP off and window 4 then matched all generated token IDs, final state,
+all shared accepted-prefix hashes, and every common captured layer-1 activation;
+window 4 offered/accepted 45/17 drafts. The 28-GiB supervisor retained 13.248
+GiB minimum host/effective availability with no OOM kills. Combined with the
+default-swap repeat, this strongly implicates adaptive expert residency in the
+failure on this prompt/configuration. It does not prove a bad expert copy or
+generalize to other prompts, caches, or output profiles. No adaptation or MTP
+default changed. The default-swap and no-swap activation summaries are in
+`run/incident-gdn-ffn-output/activation-comparison.json` and
+`run/incident-no-adapt/activation-comparison.json`; raw float tensors were
+discarded.

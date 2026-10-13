@@ -77,10 +77,10 @@ struct GdnDiagHeader {
 #pragma pack(pop)
 
 struct GdnDiagOffsets {
-    size_t x, qkv, h, gate, beta, z, y, state, bytes;
+    size_t x, qkv, h, gate, beta, z, y, gdn_out, ffn_x, ffn_y, bytes;
 };
 
-GdnDiagOffsets gdn_diag_offsets(int rows, size_t n, size_t c, size_t hv, size_t zv, size_t state_floats) {
+GdnDiagOffsets gdn_diag_offsets(int rows, size_t n, size_t c, size_t hv, size_t zv) {
     GdnDiagOffsets o{};
     o.x = 0;
     o.qkv = o.x + (size_t) rows * n * sizeof(float);
@@ -89,8 +89,10 @@ GdnDiagOffsets gdn_diag_offsets(int rows, size_t n, size_t c, size_t hv, size_t 
     o.beta = o.gate + (size_t) rows * hv * sizeof(float);
     o.z = o.beta + (size_t) rows * hv * sizeof(float);
     o.y = o.z + (size_t) rows * zv * sizeof(float);
-    o.state = o.y + (size_t) rows * zv * sizeof(float);
-    o.bytes = o.state + state_floats * sizeof(float);
+    o.gdn_out = o.y + (size_t) rows * zv * sizeof(float);
+    o.ffn_x = o.gdn_out + (size_t) rows * n * sizeof(float);
+    o.ffn_y = o.ffn_x + (size_t) rows * n * sizeof(float);
+    o.bytes = o.ffn_y + (size_t) rows * n * sizeof(float);
     return o;
 }
 
@@ -523,8 +525,6 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
     const uint64_t NH = (uint64_t) g.n_head, HD = (uint64_t) g.head_dim, NKV = (uint64_t) g.n_head_kv;
     const uint64_t IQ = (uint64_t) g.idx_q_heads, ID = (uint64_t) g.idx_key_dim;
     const uint64_t nG = (uint64_t) g.n_gdn_layers(), nQ = (uint64_t) g.n_qsa_layers();
-    const uint64_t gdn_floats = (uint64_t) g.ssm_state_size * g.ssm_v_heads * g.ssm_state_size +
-                                (uint64_t) g.ssm_conv_channels * (g.ssm_d_conv - 1);
     const uint64_t HS = (uint64_t) strata::kernels::NG_HIST * strata::kernels::NG_HC_DIM;
     const uint64_t TS = (uint64_t) (s.idx_block - 1) * ID;
     const int max_in = (int) std::max<uint64_t>(std::max<uint64_t>(N, ZV), NH * HD);
@@ -539,7 +539,7 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
         }
         gdn_diag_layer_ = (int) parsed;
         gdn_diag_path_ = path;
-        const GdnDiagOffsets diag = gdn_diag_offsets(max_t, N, C, HV, ZV, gdn_floats);
+        const GdnDiagOffsets diag = gdn_diag_offsets(max_t, N, C, HV, ZV);
         gdn_diag_capacity_ = diag.bytes;
         if (cudaHostAlloc((void**) &gdn_diag_h_, gdn_diag_capacity_, cudaHostAllocPortable) != cudaSuccess) {
             gdn_diag_h_ = nullptr;
@@ -1118,8 +1118,7 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                 const bool dump_gdn = gdn_diag_h_ != nullptr && l == gdn_diag_layer_ && !batch_rec_;
                 GdnDiagOffsets diag{};
                 if (dump_gdn) {
-                    diag = gdn_diag_offsets(T, (size_t) N, (size_t) C, (size_t) HV, (size_t) ZV,
-                                            (size_t) gdn_floats);
+                    diag = gdn_diag_offsets(T, (size_t) N, (size_t) C, (size_t) HV, (size_t) ZV);
                     auto copy_diag = [&](size_t offset, const void* source, size_t bytes) {
                         return cudaMemcpyAsync((uint8_t*) gdn_diag_h_ + offset, source, bytes,
                                                cudaMemcpyDeviceToHost, cs) == cudaSuccess;
@@ -1138,8 +1137,6 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                                             nr * (size_t) HV * sizeof(float)) &&
                                   copy_diag(diag.z + row * (size_t) ZV * sizeof(float), z_ + (size_t) tb * ZV,
                                             nr * (size_t) ZV * sizeof(float));
-                    if (copied && tb == 0)
-                        copied = copy_diag(diag.state, state, (size_t) gdn_floats * sizeof(float));
                     if (!copied) {
                         err = "verify: could not capture opt-in GDN layer inputs";
                         return false;
@@ -1176,6 +1173,13 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                 if (!g_qfuse() || batch_rec_) native_quantize_q8_1(y_ + (size_t) tb * ZV, xq_, (int) ZV, n, cs);
                 il_ready = false;
                 mm(wout, bo_ + tb * N, (int) ZV, (int) N);
+                if (dump_gdn &&
+                    cudaMemcpyAsync((uint8_t*) gdn_diag_h_ + diag.gdn_out + (size_t) tb * (size_t) N * sizeof(float),
+                                    bo_ + (size_t) tb * (size_t) N, (size_t) n * (size_t) N * sizeof(float),
+                                    cudaMemcpyDeviceToHost, cs) != cudaSuccess) {
+                    err = "verify: could not capture opt-in GDN projection output";
+                    return false;
+                }
             } else {
                 // ======================= QSA =======================
                 const int64_t qi = qsa_idx[(size_t) l];
@@ -1410,6 +1414,15 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
         }
         stamp(l, 16, grp);
         const bool q8_ffn = gr_read_group(1, true, inj_, inj2_);   // true: nat_xq_ holds the MoE input's q8_1 (STRATA_QFUSE)
+        if (gdn_diag_h_ != nullptr && l == gdn_diag_layer_ && !batch_rec_ && !is_qsa_layer(g, l) &&
+            cudaMemcpyAsync((uint8_t*) gdn_diag_h_ +
+                                gdn_diag_offsets(T, (size_t) N, (size_t) C, (size_t) HV, (size_t) ZV).ffn_x +
+                                (size_t) tb * (size_t) N * sizeof(float),
+                            mixed_ + (size_t) tb * (size_t) N, (size_t) n * (size_t) N * sizeof(float),
+                            cudaMemcpyDeviceToHost, cs) != cudaSuccess) {
+            err = "verify: could not capture opt-in GDN-layer FFN input";
+            return false;
+        }
         // with CPU experts in the window the shared expert forks off once the doorbell is published (it no longer
         // competes with it for the GPU's first microseconds); STRATA_SH_FORK_LATE=0 forks at the top as before
         static const bool sh_fork_late_env = [] {
@@ -1643,6 +1656,15 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
         }
         if (remote_opt_) remote_opt_->combine(bo_ + tb * N, y_dummy_ + tb * N, tb, n,
                               device_plan_ ? skip_ + grp : nullptr, ring, cs);
+        if (gdn_diag_h_ != nullptr && l == gdn_diag_layer_ && !batch_rec_ && !is_qsa_layer(g, l) &&
+            cudaMemcpyAsync((uint8_t*) gdn_diag_h_ +
+                                gdn_diag_offsets(T, (size_t) N, (size_t) C, (size_t) HV, (size_t) ZV).ffn_y +
+                                (size_t) tb * (size_t) N * sizeof(float),
+                            bo_ + (size_t) tb * (size_t) N, (size_t) n * (size_t) N * sizeof(float),
+                            cudaMemcpyDeviceToHost, cs) != cudaSuccess) {
+            err = "verify: could not capture opt-in GDN-layer FFN output";
+            return false;
+        }
         stamp(l, 24, grp);
         if (l == g.n_layers - 1) {
             if (!fuse_head_gr) {
@@ -2202,11 +2224,10 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
         const uint64_t gdn_floats = (uint64_t) g.ssm_state_size * g.ssm_v_heads * g.ssm_state_size +
                                     (uint64_t) g.ssm_conv_channels * (g.ssm_d_conv - 1);
         const GdnDiagOffsets diag = gdn_diag_offsets(T, (size_t) g.n_embd, (size_t) g.ssm_conv_channels,
-                                                     (size_t) g.ssm_v_heads, (size_t) g.ssm_value_dim,
-                                                     (size_t) gdn_floats);
+                                                     (size_t) g.ssm_v_heads, (size_t) g.ssm_value_dim);
         GdnDiagHeader header{};
-        std::memcpy(header.magic, "STGDIAG1", sizeof(header.magic));
-        header.version = 1;
+        std::memcpy(header.magic, "STGDIAG4", sizeof(header.magic));
+        header.version = 4;
         header.layer = gdn_diag_layer_;
         header.rows = T;
         header.pos0 = pos0;

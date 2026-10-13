@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare consecutive STGDIAG1 GDN capture streams by position and token."""
+"""Compare appended GDN capture streams by position and token."""
 import argparse
 import json
 import struct
@@ -9,7 +9,7 @@ import numpy as np
 
 FMT = "<8sIiiqQQQQQ8i"
 HEADER_BYTES = struct.calcsize(FMT)
-FIELDS = ("x", "qkv", "h", "gate", "beta", "z", "y", "state")
+FIELDS = ("x", "qkv", "h", "gate", "beta", "z", "y")
 
 
 def read_records(path):
@@ -20,11 +20,12 @@ def read_records(path):
         if offset + HEADER_BYTES > len(data):
             raise ValueError("truncated GDN diagnostic header")
         magic, version, layer, rows, pos0, n, c, hv, zv, state_n, *tokens = struct.unpack_from(FMT, data, offset)
-        if magic != b"STGDIAG1" or version != 1 or not 0 < rows <= 8:
+        if (magic, version) not in ((b"STGDIAG1", 1), (b"STGDIAG2", 2), (b"STGDIAG3", 3),
+                                    (b"STGDIAG4", 4)) or not 0 < rows <= 8:
             raise ValueError(f"unsupported GDN diagnostic record at byte {offset}")
         offset += HEADER_BYTES
-        dims = (n, c, c, hv, hv, zv, zv, None)
-        counts = (rows * n, rows * c, rows * c, rows * hv, rows * hv, rows * zv, rows * zv, state_n)
+        extra_counts = (state_n,) if version < 3 else (rows * n,) * (version - 1)
+        counts = (rows * n, rows * c, rows * c, rows * hv, rows * hv, rows * zv, rows * zv, *extra_counts)
         arrays = []
         for count in counts:
             size = count * 4
@@ -34,8 +35,14 @@ def read_records(path):
             offset += size
         for row in range(rows):
             fields = {}
+            dims = (n, c, c, hv, hv, zv, zv)
             for name, arr, dim in zip(FIELDS, arrays, dims):
-                fields[name] = arr[row * dim:(row + 1) * dim] if dim else None
+                fields[name] = arr[row * dim:(row + 1) * dim]
+            fields["gdn_out"] = arrays[-1][row * n:(row + 1) * n] if version == 2 else (
+                arrays[-(version - 1)][row * n:(row + 1) * n] if version >= 3 else None)
+            fields["ffn_x"] = arrays[-1][row * n:(row + 1) * n] if version == 3 else (
+                arrays[-2][row * n:(row + 1) * n] if version >= 4 else None)
+            fields["ffn_y"] = arrays[-1][row * n:(row + 1) * n] if version >= 4 else None
             records.append({"position": pos0 + row, "token": tokens[row], "fields": fields})
     return layer, records
 
@@ -57,9 +64,9 @@ def main():
     first = None
     for key in common:
         differences = {}
-        for field in FIELDS[:-1]:
+        for field in (*FIELDS, "gdn_out", "ffn_x", "ffn_y"):
             a, b = baseline[key][field], candidate[key][field]
-            if not np.array_equal(a, b):
+            if a is not None and b is not None and not np.array_equal(a, b):
                 differences[field] = {
                     "different_values": int(np.count_nonzero(a != b)),
                     "relative_l2": float(np.linalg.norm(a - b) / max(np.linalg.norm(a), 1e-30)),

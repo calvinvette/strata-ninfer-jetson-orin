@@ -28,3 +28,10 @@ The isolated SYCL `strata` target reported no work. The SYCL verifier uses the
 separate files `sycl/src/core/verify.cpp` and
 `sycl/include/strata/core/verify.hpp`; neither was changed by this diagnostic.
 No SYCL rebuild or runtime result is claimed.
+
+After extending the capture to v4, the HIP-configured compiler rebuilt the
+updated verifier object again. Its source SHA256 is
+`8217b1dc2806f4b8a98da9a7eeb65348ff9f8e94ea9b378106f6f16d797535e1`, the
+header SHA256 is unchanged, and the resulting object is 333,216 bytes. This
+later check is still object-level only; the full HIP engine link remains
+incomplete.
