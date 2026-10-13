@@ -1567,3 +1567,12 @@ generated tokens. MTP4 offered/accepted 34/30 drafts. Minimum host/effective
 availability was 13.01 GiB in the 28-GiB supervised run. This is one long
 prompt and one profile, with no performance claim; broader quality and format
 coverage remain open.
+
+A [three-block Q6 prefill-chunk × cache-budget screen](../../bench/results/2026-10-14-phase6-q6-prefill-cache/README.md)
+also passed all 12 fresh-service cells and 36 measured requests. Prefill chunk
+128 improved prompt throughput in every paired block and lowered median request
+time, while decode-rate changes were small and varied with cache setting.
+Actual allocation under the 5,000 `--expert-cache` budget ranged from 5,378 to
+6,519 resident slots; minimum host availability was 8.29 GiB with no OOM
+events. The 512/64 output cap was too short for the task-quality rubric, so this
+is exploratory only and does not promote a setting or close Phase 6.

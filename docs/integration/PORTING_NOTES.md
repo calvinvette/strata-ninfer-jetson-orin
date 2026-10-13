@@ -1208,6 +1208,15 @@ separately, use enough output for a real task-level rubric, and keep screening
 cells out of a promotion decision until held-out quality and confirmation pass.
 See the [cache/context screen](../../bench/results/2026-10-14-phase6-q6-cache-context/README.md).
 
+A second three-block screen crossed the same Q6 cache-budget arguments with
+prefill chunks 32 and 128. Chunk 128 increased measured prompt throughput in
+all paired blocks, but actual cache slots still varied under the 5,000 budget
+and the fixed 64-token output was too short to check the task rubric. For
+Splash, this nominates chunk 128 for a longer task-quality and held-out test;
+it is not enough to promote a default. Record throughput, decode, actual slot
+allocation and host floor together because a prompt-path win can coexist with a
+decode or memory tradeoff. See the [prefill/cache screen](../../bench/results/2026-10-14-phase6-q6-prefill-cache/README.md).
+
 A separate 7,498-token IQ1_M prefill-cancellation cell closed the stream after
 the first 64-token prompt chunk, logged cancellation before generation, and
 served `Hello Orin!` through the same MTP4 service. This confirms that the API

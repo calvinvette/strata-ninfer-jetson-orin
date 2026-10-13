@@ -1,0 +1,52 @@
+{
+  "design": "randomized complete blocks: Q6_K warp-dequant + accepted-only MTP4; --expert-cache budget argument \u00d7 prefill chunk; 8K context and FP16 KV fixed",
+  "expert_cache_arguments": [
+    3000,
+    5000
+  ],
+  "expert_cache_argument_units": "equivalents of the largest expert blob",
+  "prefill_chunk_tokens": [
+    32,
+    128
+  ],
+  "rounds_per_service": 3,
+  "trace_enabled": false,
+  "base_config": "base-config.json",
+  "workloads": "workloads.json",
+  "blocks": [
+    {
+      "block": 1,
+      "seed": 202610151,
+      "order": [
+        "cache3000-prefill128",
+        "cache3000-prefill32",
+        "cache5000-prefill128",
+        "cache5000-prefill32"
+      ],
+      "output": "block-01"
+    },
+    {
+      "block": 2,
+      "seed": 202610152,
+      "order": [
+        "cache3000-prefill128",
+        "cache5000-prefill32",
+        "cache5000-prefill128",
+        "cache3000-prefill32"
+      ],
+      "output": "block-02"
+    },
+    {
+      "block": 3,
+      "seed": 202610153,
+      "order": [
+        "cache3000-prefill128",
+        "cache5000-prefill128",
+        "cache5000-prefill32",
+        "cache3000-prefill32"
+      ],
+      "output": "block-03"
+    }
+  ],
+  "status": "completed_screen_all_cells_pass_quality_not_qualified"
+}
