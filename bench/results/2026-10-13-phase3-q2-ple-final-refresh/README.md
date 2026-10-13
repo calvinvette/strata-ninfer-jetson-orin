@@ -18,3 +18,12 @@ This refresh confirms selected Phase 3 contracts on this build. It does not
 price private CUDA Graph backing, establish a general capacity threshold, or
 extend model-quality evidence. Model and pack files remain outside Git under
 `/home/calvin/models/`.
+
+
+A current-checkout rerun after the opt-in adaptive trace build repeated the
+artifact-aware PLE oracle and the 15-test Phase 3 CTest selection. PLE passed
+all seven stages (worst relative L1 `1.148e-7`); CTest passed 15/15. Minimum
+host availability was 24.44 GiB for PLE and 24.56 GiB for CTest. The PLE
+executable identity is unchanged; the updated `SHA256SUMS.txt` records the
+current `strata` candidate hash (`9d066583…`). Raw telemetry and outputs are in
+`ple-current-check/` and `ctest-current-check/`.

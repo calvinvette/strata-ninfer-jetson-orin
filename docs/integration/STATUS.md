@@ -10,8 +10,9 @@ into Strata. See the [Phase 3 gate audit](PHASE3_CLOSEOUT.md).
 A fresh [Q2_0 PLE and Phase 3 regression rerun](../../bench/results/2026-10-13-phase3-q2-ple-final-refresh/README.md)
 passed all seven artifact-aware PLE stages for three tokens (worst relative L1
 `1.148e-7`), the selected memory/owner/PLE CTests (15/15), and integration
-Python discovery (124/124). Minimum availability across the three supervised
-runs was 24.40 GiB. This reconfirms selected contracts without changing the
+Python discovery (124/124). A rerun against the current diagnostic build again
+passed PLE and the same 15 CTests; minimum availability was 24.44 and 24.56
+GiB respectively. This reconfirms selected contracts without changing the
 Phase 3 scope or its graph-backing exclusions. The earlier
 [same-day refresh](../../bench/results/2026-10-13-phase3-q2-ple-user-rerun-2/README.md)
 is retained as a separate run.
