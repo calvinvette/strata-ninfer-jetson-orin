@@ -191,7 +191,10 @@ toolchains at identical clocks first, then a separate clock-profile experiment.
 Phases 1 and 2 are closed with their capability matrices, contracts and
 exclusions recorded. Phase 3 is closed for the tested Orin Q2_0 scope under
 [its closeout](PHASE3_CLOSEOUT.md); reopen it if allocation lifetimes, transfer
-defaults, graph-disable support or model/backend scope changes. Continue the
-remaining Phase 4 and Phase 5 work before promoting any execution path. Do not
-change kernels, quantization, model, toolchain and clocks simultaneously; select
-each candidate from measured bottlenecks and qualify its contract first.
+defaults, graph-disable support or model/backend scope changes. Phase 4 is
+closed for the tested opt-in kernel and CPU candidates under
+[its closeout](PHASE4_CLOSEOUT.md); no performance default was promoted. Continue
+Phase 5 state/graph qualification and Phase 6 interaction testing before
+selecting any serving profile. Do not change kernels, quantization, model,
+toolchain and clocks simultaneously; select each candidate from measured
+bottlenecks and qualify its contract first.
