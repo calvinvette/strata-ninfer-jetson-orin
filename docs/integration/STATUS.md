@@ -56,13 +56,16 @@ output differs (relative L2 0.004423); layer-2 GDN input then differs. With
 `--adapt-swaps 0`, the same no-MTP/window-4 pair matches every output token,
 accepted-prefix state hash, and captured activation. This strongly implicates
 adaptive expert residency for this prompt/configuration, but does not identify
-the CPU/GPU arithmetic or swap mechanism. `STRATA_DEC_BATCH=0` did not remove
-the default-swap mismatch. The supervised runs retained at least 13.21 GiB
-host/effective availability with no OOM events. Focused CUDA regression passed
-10/10; the changed verifier translation unit compiled in the HIP-configured
-Release tree, while its full application link was not completed. The separate
-SYCL verifier sources were unchanged. Phase 5 remains open; MTP is unqualified
-for this incident workload, and no defaults changed.
+the CPU/GPU arithmetic or swap mechanism. A tracking-enabled
+`--adapt-every 100000` control also restores exact parity, so the evidence
+points to swaps executing during generation, not tracking alone.
+`STRATA_DEC_BATCH=0` did not remove the default-swap mismatch. The supervised
+runs retained at least 13.126 GiB host/effective availability with no OOM
+events. Focused CUDA regression passed 10/10; the changed verifier translation
+unit compiled in the HIP-configured Release tree, while its full application
+link was not completed. The separate SYCL verifier sources were unchanged.
+Phase 5 remains open; MTP is unqualified for this incident workload, and no
+defaults changed.
 
 The [exact Q8_0 scalar-versus-ARM quantization experiment](../../bench/results/2026-10-13-phase4-q8-neon-quant/README.md)
 compares Strata's explicit scalar oracle against ggml's Cortex-A78AE NEON path

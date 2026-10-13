@@ -152,7 +152,17 @@ GiB minimum host/effective availability with no OOM kills. Combined with the
 default-swap repeat, this strongly implicates adaptive expert residency in the
 failure on this prompt/configuration. It does not prove a bad expert copy or
 generalize to other prompts, caches, or output profiles. No adaptation or MTP
-default changed. The default-swap and no-swap activation summaries are in
+default changed.
+
+A second control kept adaptive tracking enabled but set `--adapt-every 100000`,
+placing the swap interval well beyond this 32-token output. It also matched all
+token IDs, final state, shared accepted-prefix hashes, and common captured
+activations, with 45/17 drafts offered/accepted and 13.126 GiB minimum
+host/effective availability. This corroborates that executing swaps, rather
+than merely enabling tracking, triggers the observed difference in this
+configuration. The default-swap, no-swap, and delayed-swap activation summaries
+are in
 `run/incident-gdn-ffn-output/activation-comparison.json` and
-`run/incident-no-adapt/activation-comparison.json`; raw float tensors were
+`run/incident-no-adapt/activation-comparison.json`, and
+`run/incident-delayed-adapt/activation-comparison.json`; raw float tensors were
 discarded.
