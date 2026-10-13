@@ -1299,3 +1299,12 @@ cgroup pressure/OOM events. For Splash, separately record requested image-token
 count, actual API token usage, response completion status and memory while the
 encoder and projector are resident. This does not qualify higher token counts
 or visual grounding accuracy; see the same vision smoke report.
+
+A separate 32K near-limit quality run retrieved three facts at early, middle
+and late prompt positions and correctly summed their numeric suffixes, then
+passed same-service recovery. The exact 30,040-token request took 1,238.9 s and
+retained 12.75 GiB minimum effective availability. A first attempt with a stale
+expected-token count completed inference but discarded the answer; preserve
+such harness failures explicitly and verify final formatted usage before
+scoring quality. For Splash, repeat this with independent prompts and tasks
+before calling long-context quality supported. See the [Phase 7 report](../../bench/results/2026-10-14-phase7-longquality/README.md).
