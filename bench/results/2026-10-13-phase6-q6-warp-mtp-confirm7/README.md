@@ -112,4 +112,14 @@ state snapshot, remain authoritative for persistent state because the one-token
 commit path can mutate convolution history before the snapshot. Large raw
 float32 dumps were removed after extracting these compact metrics; logs and
 supervisor telemetry remain. The new CUDA binary passed the focused 10-test
-verifier/GDN/speculation/PLE/graph regression.
+verifier/GDN/speculation/PLE/graph regression. On maestro1, the exact updated
+`src/core/verify.cpp` and header were copied into the isolated validation tree.
+The [maestro1 build record](MAESTRO1_DIAGNOSTIC_BUILD.md) lists their hashes and
+scope. The HIP-configured Release build compiled the updated
+`strata_engine/src/core/verify.cpp.o` (331,392 bytes); a focused Ninja target
+recheck reported no work. The full HIP application build was stopped while
+compiling unrelated llama.cpp MMQ kernels, before the `strata_engine` archive
+and application link, so no full HIP build is claimed. The separate SYCL
+`strata` target reported no work; its independent `sycl/src/core/verify.cpp`
+and `sycl/include/strata/core/verify.hpp` were unchanged. Neither x86 check
+claims accelerator runtime behavior.

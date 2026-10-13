@@ -58,7 +58,10 @@ capture points; the intervening residual/FFN and verifier-row arithmetic are
 not isolated. The 28-GiB supervised run retained 13.21 GiB minimum host and
 effective admission availability, with no OOM events. A focused 10/10 CUDA
 verifier/GDN/speculation/PLE/graph test set passed. Phase 5 remains open, and
-MTP remains unqualified for this incident workload.
+MTP remains unqualified for this incident workload. maestro1 compiled the
+updated verifier translation unit in its HIP-configured Release tree; the full
+HIP application link was not completed, and the separate SYCL target required
+no rebuild because its verifier sources are independent and unchanged.
 
 The [exact Q8_0 scalar-versus-ARM quantization experiment](../../bench/results/2026-10-13-phase4-q8-neon-quant/README.md)
 compares Strata's explicit scalar oracle against ggml's Cortex-A78AE NEON path
