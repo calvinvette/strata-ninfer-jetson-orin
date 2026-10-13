@@ -144,6 +144,14 @@ Minimum host availability was 13.34 GiB and effective admission headroom was
 on IQ1_M; it remains one prompt and one opt-in swap policy, without a quality,
 performance or default-promotion claim.
 
+The same IQ1_M [128-token accepted-prefix matrix on eager decode](../../bench/results/2026-10-14-phase5-iq1-eager-accepted-prefix-128/README.md)
+also passed for MTP off/2/3/4. Direct captured/eager comparisons matched token
+IDs, final state, and every common accepted-prefix state at all four windows
+(128/78/74/58 boundaries). Minimum host availability was 13.47 GiB and minimum
+effective headroom was 10.43 GiB, with no OOM events. This closes one long-chain
+correctness cell for captured/eager routes; tracing makes it unsuitable for
+timing, and the default adaptation policy remains unqualified.
+
 Accepted-only adaptation also matched across captured and `--no-capture` eager
 routes on the 512-token Q2_0 prompt, FP16 KV, and 16 outputs. MTP off and
 windows 2/3/4 matched route-to-route token IDs, final state, and all common
