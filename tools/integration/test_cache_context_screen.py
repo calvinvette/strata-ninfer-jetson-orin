@@ -25,6 +25,8 @@ class CacheContextScreenTest(unittest.TestCase):
             'cache5000-ctx4096', 'cache5000-ctx8192'])
         self.assertEqual(source['args'], ['--expert-cache', '3000', '--max-context', '4096', '--prefill', '64'])
         self.assertEqual(cells[-1]['config']['args'], ['--expert-cache', '5000', '--max-context', '8192', '--prefill', '64'])
+        self.assertEqual(cells[-1]['expert_cache_argument'], 5000)
+        self.assertNotIn('requested_cache_lower_bound', cells[-1])
 
     def test_no_trace_is_opt_in_and_reaches_api_driver(self):
         root = Path('/tmp/cache-context-test')

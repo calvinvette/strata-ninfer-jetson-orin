@@ -28,7 +28,7 @@ def cell_configs(config, cache_values, context_values):
             args = replace_option(config['args'], '--expert-cache', cache)
             cfg['args'] = replace_option(args, '--max-context', context)
             cells.append({'name': f'cache{cache}-ctx{context}',
-                          'requested_cache_lower_bound': cache,
+                          'expert_cache_argument': cache,
                           'context_tokens': context, 'config': cfg})
     return cells
 

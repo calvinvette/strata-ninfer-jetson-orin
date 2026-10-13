@@ -1195,11 +1195,12 @@ behavior on held-out prompts and formats before measuring or promoting a policy.
 
 ## 2026-10-13 — Separate cache/context screening from quality qualification
 
-A three-block randomized Orin screen crossed requested cache lower bounds of
-3,000/5,000 with 8K/16K reservations on the opt-in IQ1_M Q6 warp-dequant,
-accepted-only MTP4 route. Every fixed 512/64 request completed without prompt
-cache reuse and retained the six-GiB host floor, but reported cache slots under
-the 5,000 request ranged from 4,600 to 6,519. Response prose also varied in
+A three-block randomized Orin screen crossed `--expert-cache` budget arguments
+of 3,000/5,000 (largest-expert-blob units) with 8K/16K reservations on the
+opt-in IQ1_M Q6 warp-dequant, accepted-only MTP4 route. Every fixed 512/64
+request completed without prompt cache reuse and retained the six-GiB host
+floor, but reported resident slots under the 5,000 setting ranged from 4,600 to
+6,519. Response prose also varied in
 some requests, while the 64-token generation cap was too short to meet the
 prompt's 200-word rubric. The throughput deltas are therefore screening leads,
 not quality-qualified wins. For Splash, record requested and actual allocation
