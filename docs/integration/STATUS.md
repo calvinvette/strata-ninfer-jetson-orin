@@ -1586,3 +1586,15 @@ host/effective availability; sampled OOM and cgroup limit event counters stayed
 zero. This closes only the task-success check for that prompt and four settings;
 one request per condition is not a quality comparison or held-out performance
 confirmation, so no setting is promoted and Phase 6 remains open.
+
+A [seven-pair held-out prefill confirmation](../../bench/results/2026-10-14-phase6-q6-prefill-confirm7/README.md)
+then compared chunks 32 and 128 at fixed cache budget 3,000 on a distinct
+1,069-token prompt. All 14 arms passed with 3,903 resident slots; chunk 128
+raised median prompt throughput 196.4% (95% paired bootstrap interval
+196.4–204.6%) and lowered median client time 65.7% (−66.5% to −65.6%). Minimum
+host availability was 13.10 GiB, effective headroom 10.60 GiB, and sampled
+cgroup OOM/limit counters stayed zero. However, the generated eight-token
+prefix differed between settings in all seven pairs (stable within each arm),
+so this short-generation performance confirmation does not establish output
+parity or task quality. No setting is promoted; longer held-out quality and
+parity evidence remain open.

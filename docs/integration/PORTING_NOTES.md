@@ -1226,6 +1226,14 @@ does not compare quality or qualify a profile. For Splash, carry the full task
 through factor screens and keep per-cell quality evidence separate from
 multi-block performance estimates. See the [full-task follow-up](../../bench/results/2026-10-14-phase6-q6-prefill-cache/quality-full-task/README.md).
 
+A seven-pair held-out run compared chunks 32/128 at cache budget 3,000 on a
+distinct 1,069-token prompt. Chunk 128 improved median prompt rate by 196.4%
+and reduced request time by 65.7%, but its eight generated tokens differed from
+the baseline in every pair (each arm was internally stable). For Splash, a
+large prefill win still needs an output/state contract check: do not infer
+quality from a short, divergent prefix, and keep performance evidence separate
+from task completion. See the [held-out confirmation](../../bench/results/2026-10-14-phase6-q6-prefill-confirm7/README.md).
+
 A separate 7,498-token IQ1_M prefill-cancellation cell closed the stream after
 the first 64-token prompt chunk, logged cancellation before generation, and
 served `Hello Orin!` through the same MTP4 service. This confirms that the API
