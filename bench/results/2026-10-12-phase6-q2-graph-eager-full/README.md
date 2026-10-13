@@ -67,23 +67,26 @@ not promote eager decode or interpret the paired timing deltas as qualified
 until a minimal same-service reproduction is understood and the accepted
 prefix state is checked against an independent reference.
 
-The follow-up under `minimal-sequence-captured/` and
-`minimal-sequence-eager/` used the API harness's built-in full-length warmup
-(short, then long) followed by the measured short/long sequence. It therefore
-does not remove warmups. The captured and eager arms matched exactly at each
-request. In each arm the first long response hash was
+The API harness's built-in warmup is a full-length request, so the follow-up
+under `minimal-sequence-captured/` and `minimal-sequence-eager/` first showed
+that each route repeated the same changed long output after a short/long
+warmup. To remove that extra history, `minimal_api_driver.py` then sent only
+one 512/64 request followed by one 2048/128 request to a fresh service, with
+temperature 0 and required MTP2. A separate fresh captured service received
+only the long request. Both direct sequence runs completed under the 28 GiB
+cap and six-GiB host floor; minimum available host RAM was 18.1 GiB. The
+captured and eager sequence outputs matched each other exactly. Their long
+response SHA256 was
 `4035b29278c046f4776864fe71c4ffc02c64aecbaf8b1ed2122168240eaba202`, while
-the second was
-`753ec32d031de32765bae05d48b773c34103c45616d04807faf1b5c36651e5c2`.
-The short outputs were identical in both arms and both iterations. The initial
-`--spec 0` attempt failed startup because the native pack requires `--spec 2`;
-that failed artifact is retained alongside the corrected runs. This follow-up
-confirms a repeated-workload effect in the shared service path, but the
-intervening long request means it is not yet a minimal short-to-long
-reproduction. A custom single-pass API client should next issue only one short
-request followed by one long request in a fresh service, then compare with a
-fresh long-only service and inspect the first divergent accepted-prefix state.
-Preserve both serving routes and the supported MTP2 configuration.
+the fresh long-only response SHA256 was
+`a868c12065a20f134dd5dbd9ec87132a8a471cb9743019ed60ca1292596e3376`. Both
+responses contain 128 tokenizer IDs; the first token difference is at index
+8. The short output was byte-identical across routes. The initial `--spec 0`
+attempt failed startup because the native pack requires `--spec 2`; that
+artifact remains with the corrected runs. This confirms a one-short-request
+order effect in the shared runtime, not an eager-only difference. The next
+step is a same-service direct accepted-prefix trace against a cold long-only
+reference to locate the first state field that diverges before output token 8.
 
 ## Retained evidence
 

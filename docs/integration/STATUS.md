@@ -16,7 +16,10 @@ output after request cycling; prompt-end GDN/KV hashes differ while PLE/tail
 hashes match. A supported-MTP2 repeat also changed its long output between
 warmup and measured passes in both routes. This is an unresolved shared
 request-cycle correctness issue, so graph/eager timing remains descriptive
-and Phase 6 stays open. The retained records include the failed startup caused
+and Phase 6 stays open. A direct no-warmup API driver confirmed that one
+512/64 request followed by one 2048/128 request changes the long output at
+token index 8 versus a fresh long-only service, identically in captured and
+eager routes. The retained records include the failed startup caused
 by an unsupported MTP-off option; it was corrected to the native pack's
 required MTP2 setting before the repeat.
 
