@@ -180,9 +180,17 @@ emits the new records.
 SYCL builds use migrated source copies when present, so editing only the native
 owner would silently miss that backend. Its single-window finalization is
 instrumented explicitly; batch coverage differences are recorded. The native
-CUDA build passes; isolated HIP/SYCL validation is pending. A future Splash
-integration must inspect its actual compilation route and ownership seams before
-assuming that a shared-looking filename means shared execution.
+CUDA build passes; isolated HIP/SYCL validation was pending at the time of this
+note. A future Splash integration must inspect its actual compilation route
+and ownership seams before assuming that a shared-looking filename means
+shared execution.
+
+The pending backend check has since been completed on maestro1 from a clean
+snapshot of the current integration revision: full single-job HIP and SYCL
+compile/link builds passed. These remain x86 build checks, not accelerator
+runtime evidence. The report retains toolchain identities, source checksums,
+binary hashes and build logs for future Strata/Splash parity work. See the
+[Phase 8 backend report](../../bench/results/2026-10-14-phase8-maestro1-4b72a72/README.md).
 
 
 ## Expanded owners and reproducibility diagnostics
