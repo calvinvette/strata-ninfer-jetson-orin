@@ -1274,3 +1274,10 @@ log the actual cache slots before and after each KV grow/trim operation, and
 separate cache-funded KV from fresh device allocation. A shared startup budget
 does not guarantee equal expert residency during growth. See the
 [cache-matched elastic-KV result](../../bench/results/2026-10-13-phase5-q6-kvgrow-cachematched/README.md).
+
+Three sequential fresh-service cycles each completed one distinct warmup and
+one measured request; after every stop, the loopback port rebound and no engine
+PID remained before the next load. For Splash, retain this process/listener
+check alongside request success and physical-memory telemetry. It verifies
+sequential reload only; it does not establish concurrent serving or a long
+reload soak. See the [IQ1_M teardown check](../../bench/results/2026-10-14-phase7-iq1-teardown3/README.md).
