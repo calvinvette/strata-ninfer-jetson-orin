@@ -1634,3 +1634,10 @@ prompt's explicit opening instruction to start with the processor. This is a
 task failure for both settings, not evidence of a relative quality difference.
 The performance signal remains valid only for its short-generation workload;
 no profile is promoted. See the [held-out full-task result](../../bench/results/2026-10-14-phase6-q6-prefill-confirm7/quality-full-task/README.md).
+
+A subsequent [current-checkout Q2_0 PLE and Phase 3 refresh](../../bench/results/2026-10-14-phase3-q2-ple-current/README.md)
+again passed the artifact-aware PLE oracle (7/7 stages, three tokens, worst
+relative L1 `1.148e-7`), selected Phase 3 CTests (15/15), and Python discovery
+(130/130). Minimum host/effective availability was 24.284, 24.407, and 24.377
+GiB, respectively, under separate 28-GiB scopes with zero cgroup pressure
+counters. This reconfirms, without extending, the documented Phase 3 scope.
