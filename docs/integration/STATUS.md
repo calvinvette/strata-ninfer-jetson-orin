@@ -1479,3 +1479,14 @@ Phase 3 graph accounting limitation remains explicit. See the spec3 trace
 (../../bench/results/2026-10-13-phase3-q2-graph-fine-nvmap-context64k-spec3/README.md)
 and spec1 refusal
 (../../bench/results/2026-10-13-phase3-q2-graph-fine-nvmap-context64k-spec1/README.md).
+
+The [IQ1_M graph × MTP screen and held-out confirmation](../../bench/results/2026-10-14-phase6-iq1-graph-mtp-screen/README.md)
+matched captured/eager output IDs, final persistent state and every shared
+accepted-prefix checkpoint for MTP off/2/3/4 on a distinct 2,048-token prompt.
+The initial three-pair MTP4 screen showed a large but inconsistent eager
+decode gain. In seven randomized held-out pairs all 14 arms passed, outputs
+matched, and eager's paired median request change was −0.57% (95% bootstrap
+interval −1.10% to +0.69%); prompt and decode intervals also included no
+change. Minimum host/effective availability was 13.12 GiB. The screen result
+did not replicate, so capture remains unchanged and no profile is promoted.
+Phase 6 remains open for other workload, KV and interaction cells.
