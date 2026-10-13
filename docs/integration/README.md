@@ -5,7 +5,7 @@ correctness methods and measured SM87 lessons from the NInfer Orin port. The fir
 deliverable was an integration plan and an auditable source/evidence import.
 This remains an active integration and qualification effort, not a claim of
 combined-runtime speedup. Phases 1 and 2 are complete, and Phase 3 is closed for
-the tested Orin Q2_0 scope. Phases 4 and 5 remain in progress. Current admission,
+the tested Orin Q2_0 scope. Phases 4 through 6 remain in progress. Current admission,
 transfer, profiling and speculation evidence is summarized in
 [status](STATUS.md). See [control reproduction](PHASE1.md) and
 [porting notes for future engines](PORTING_NOTES.md) for reproducible methods

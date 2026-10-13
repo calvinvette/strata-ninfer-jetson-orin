@@ -1172,3 +1172,23 @@ keep any residency metadata it requires alive even when target decoding is
 uncaptured. Compare token output and committed recurrent/KV state at every
 shared commit boundary before timing; then randomize paired request runs and
 report launch, pool, transfer, and end-to-end costs separately.
+
+## 2026-10-13 — Align adaptive residency with published speculative prefixes
+
+On one Q6_K 2,048-token incident prompt, counting every MTP verifier row and
+scheduling swaps by verifier-round count changed adaptive choices and left
+accepted state different from MTP-off. An opt-in candidate staged routed-expert
+usage per row, committed only rows in the successfully committed output prefix,
+counted cadence in published tokens, and shortened a verifier window when it
+would cross the next swap boundary. Two paired runs then matched all 32 token
+IDs and every shared persistent-state fingerprint between MTP-off and window 4.
+The candidate offered/accepted 31/15 drafts on this workload; this is correctness
+evidence only, not a performance result or a generally qualified policy. See the
+[Orin adaptive investigation](../../bench/results/2026-10-13-phase6-q6-warp-mtp-confirm7/README.md).
+
+For a future Strata + Splash port, keep speculative route usage separate from
+committed route usage, define the swap cadence against a stable unit such as
+published tokens, and make state/residency changes occur at equivalent commit
+boundaries across verifier sizes. Check accepted-prefix recurrent and KV state
+directly; matching final text does not establish equivalent state. Confirm the
+behavior on held-out prompts and formats before measuring or promoting a policy.

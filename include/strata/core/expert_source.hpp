@@ -302,6 +302,11 @@ struct ExpertDispatch {
     int64_t experts = 0;
     int64_t missing = 0;
 
+    // Optional server experiment: stage routed-expert usage per verifier row so
+    // only rows whose outputs are published can affect adaptive residency.
+    // Empty preserves the historical all-window accounting path.
+    std::vector<float> usage_rows;
+
     // ================================ R4: THE VRAM TIER, MEASURED BEFORE IT IS USED ================================
     //
     // **THE CACHE IS CONSULTED AND FILLED HERE, AND NOTHING IS COMPUTED FROM IT YET.**  That is deliberate and

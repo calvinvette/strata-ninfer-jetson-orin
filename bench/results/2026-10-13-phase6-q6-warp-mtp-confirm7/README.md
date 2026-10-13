@@ -240,3 +240,47 @@ decision. Its CUDA focused CTest selection passed 10/10 and `strata --help`
 passed. The HIP-configured GNU C++ translation unit also compiled on maestro1;
 see [backend compile scope](MAESTRO1_ADAPT_TRACE_BUILD.md). No SYCL source was
 changed because its program entry point is maintained separately.
+
+## Accepted-row, accepted-token adaptive candidate
+
+The first opt-in candidate stages routed-expert counts per verifier row, commits
+only counts for rows that produce the successfully committed output prefix, and
+schedules adaptive swaps by published-token count. A verifier window is shortened
+when its maximum prefix would cross the next adaptive boundary. This keeps a
+speculative window from using one residency set across a boundary that the MTP-off
+control would observe between single-token windows. The option is limited to
+blocking, single-request, single-GPU serve without suffix/lookup chaining; the
+default adaptive path is unchanged.
+
+For this Q2_0 shape, the per-window staging vector requests up to 196,608 bytes
+(48 layers × 256 experts × 4 verifier rows × 4 bytes) and is reused by the
+server's `Drive` object. This is a host heap request, not a separately measured
+physical backing delta.
+
+The first accepted-row-only trial without a window cap still diverged from
+MTP-off at output token 13, with state first differing at prefix 13. The final
+boundary-capped candidate was then run twice on the same 2,048-token incident
+prompt for 32 outputs. In both pairs, MTP-off and MTP window 4 matched all 32
+token IDs, final state and every one of 17 shared accepted-prefix fingerprints.
+The Q2_0 MTP arm offered/accepted 31/15 drafts. Its first two 96-swap choices
+matched the MTP-off choices, and both arms queued them at positions 2,051 and
+2,055. The uncapped trial's failures and the paired run records are retained in
+`run/accepted-usage-*`, `run/accepted-token-cadence-*`, and
+`run/accepted-boundary-*`; a compact index is
+[`accepted-usage-comparison.json`](accepted-usage-comparison.json).
+
+Across the two boundary-capped pairs, minimum host availability was 13.34 GiB;
+minimum effective availability was 13.13 GiB in the first pair and 13.34 GiB in
+the repeat. Both remained above the six-GiB guard. MTP-off output and final state
+also matched the earlier default-adaptation controls. These are correctness-only
+runs with state tracing, not performance measurements. This does not qualify MTP
+or the adaptive candidate beyond this prompt, cache, format and output length,
+and it does not close the Phase 5 matrix. No default changed.
+
+The current candidate build passed the 15-test Phase 3 memory/owner/PLE CTest
+selection and the 124-test integration Python suite. A second CTest run of the
+same selection also passed after the final boundary cap was added. HIP
+translation units for `generate.cpp` and `expert_source.cpp` compiled and the
+full `strata` target linked on maestro1 after syncing the stale remote
+`session.cpp`; see [backend build scope](MAESTRO1_ACCEPTED_USAGE_BUILD.md). No
+HIP runtime or SYCL build/runtime is claimed.

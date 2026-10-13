@@ -562,6 +562,7 @@ struct Options {
     /// the VRAM tier in place of the least-routed resident ones (decayed counts).  0 = static residency.
     int adapt_every = 4;
     float adapt_decay = 0.7f;   ///< the usage counts are multiplied by this after each adaptation (--adapt-decay)
+    bool adapt_accepted_only = false;  ///< opt-in: adaptive usage counts only published verifier rows
     /// --adapt-async 1 (--serve with the resident RAM mode; opt-in): the adaptive tier's rounds advance between verify
     /// windows on a helper thread instead of one window waiting for a whole round (see the tier in the --serve block).
     /// Not bit-exact run to run.  0 = the blocking tier.
@@ -732,6 +733,7 @@ void usage() {
                  "  --no-capture         run the layers directly instead of replaying graphs\n"
                  "  --shared-late        A/B: shared expert after the CPU pool (default: overlapped with it)\n"
                  "  --keep-canonical     A/B: also load canonical copies of natively served tensors (more VRAM)\n"
+                 "  --adapt-accepted-only --serve: count only published rows and schedule by accepted tokens\n"
                  "  --vision             --serve takes images too (GENI requests; embeddings from strata-vision)\n"
                  "  --prompt-cache N     --serve: keep N conversation checkpoints between requests (default 6, ~118 MB\n"
                  "                       of RAM each; 0 = read every prompt from the start)\n"
@@ -1816,6 +1818,7 @@ int main(int argc, char** argv) {
         else if (a == "--pcie-frac") o.pcie_frac = std::atof(next("--pcie-frac"));
         else if (a == "--adapt-every") o.adapt_every = std::atoi(next("--adapt-every"));
         else if (a == "--adapt-decay") o.adapt_decay = (float) std::atof(next("--adapt-decay"));
+        else if (a == "--adapt-accepted-only") o.adapt_accepted_only = true;
         else if (a == "--adapt-async") o.adapt_async = std::atoi(next("--adapt-async")) != 0 ? 1 : 0;
         else if (a == "--spec-min-p") o.spec_min_p = std::atof(next("--spec-min-p"));
         else if (a == "--stop-eos") o.stop_eos = true;
@@ -2352,6 +2355,14 @@ int main(int argc, char** argv) {
     }
     if (o.remote_expert_opt && !o.serve) {
         std::fprintf(stderr, "strata generate: --remote-expert-opt requires --serve\n");
+        return 2;
+    }
+    if (o.adapt_accepted_only && (!o.serve || o.adapt_every <= 0 || o.adapt_swaps <= 0 || o.adapt_async ||
+                                  o.batch != 0 || o.pipeline_windows != 0 || !o.layer_split.empty() || o.remote_expert_opt ||
+                                  o.peer_device >= 0 || o.expert_cache_remote[0] > 0 || o.suffix_draft > 0 ||
+                                  o.lookup_chain > 0)) {
+        std::fprintf(stderr, "strata generate: --adapt-accepted-only requires single-request --serve with blocking, "
+                             "single-GPU adaptive swaps\n");
         return 2;
     }
     // the peer tier is the second card's only user: a layer split or a remote expert cache would put a second engine
@@ -8296,6 +8307,8 @@ int main(int argc, char** argv) {
         std::fflush(stdout);
         std::string line;
         int64_t rounds = 0;
+        int64_t adapt_accepted_tokens = 0;
+        int64_t next_adapt_accepted_tokens = o.adapt_every;
         static const bool trace_adapt = [] {
             const char* e = std::getenv("STRATA_TRACE_ADAPT");
             return e != nullptr && e[0] == '1';
@@ -11003,8 +11016,19 @@ int main(int argc, char** argv) {
                         chain_n = policy.chain(T, p_mtp, chain_n, cm);
                     }
                 }
-                const int T_mtp = T;
+                int T_mtp = T;
                 T += chain_n;
+                // An accepted-token adaptive round must end on the same committed-token boundary
+                // regardless of verifier window size.  Shorten this opt-in window if its maximum
+                // published prefix would cross the next boundary; the final row will trigger the swap.
+                if (o.adapt_accepted_only && !drive.d.usage.empty()) {
+                    const int64_t allowance = std::max<int64_t>(1, next_adapt_accepted_tokens - adapt_accepted_tokens);
+                    if (T > allowance) {
+                        T = (int) allowance;
+                        if (T < T_mtp) { T_mtp = T; chain_n = 0; }
+                        else chain_n = T - T_mtp;
+                    }
+                }
                 const bool timed_round = !first_window;
                 const Clock::time_point round0 = Clock::now();
                 if (p + T > o.max_context) break;
@@ -11014,6 +11038,8 @@ int main(int argc, char** argv) {
                 drive.d.layers = 0;
                 drive.d.experts = 0;
                 drive.d.failed = false;
+                if (o.adapt_accepted_only)
+                    drive.d.usage_rows.assign(drive.d.usage.size() * (size_t) T, 0.0f);
                 // #463: the previous adapt round's copies land first - with a non-blocking query, whether a swapped-in
                 // expert ran on the GPU or the CPU (they round differently) depended on the copy's timing
                 // (STRATA_ADAPT_NOWAIT=1: 0.1.37's non-blocking query, the A/B)
@@ -11084,10 +11110,10 @@ int main(int argc, char** argv) {
                 const Clock::time_point tw1 = Clock::now();
                 std::thread adapt_thr;   // the adaptive tier beside the commit and the draft (as in generate)
                 bool adapt_ok = true;
-                bool adapt_scheduled = false;
                 // (--adapt-async 1: the asynchronous tier above instead, ticked before the window)
-                if (!drive.d.usage.empty() && !ajob && ((rounds + 1) % o.adapt_every) == 0) {
-                    adapt_scheduled = true;
+                bool adapt_scheduled = !drive.d.usage.empty() && !ajob && !o.adapt_accepted_only &&
+                                       ((rounds + 1) % o.adapt_every) == 0;
+                if (adapt_scheduled && !o.adapt_accepted_only) {
                     if (trace_adapt)
                         std::fprintf(stderr, "strata serve: ADAPT schedule position=%lld round=%lld window=%d\n",
                                      (long long) p, (long long) (rounds + 1), T);
@@ -11101,6 +11127,27 @@ int main(int argc, char** argv) {
                     if (adapt_thr.joinable()) adapt_thr.join();
                     std::printf("ERR %s\n", err.c_str());
                     return 1;
+                }
+                if (o.adapt_accepted_only && !drive.d.usage_rows.empty()) {
+                    if (drive.d.usage_rows.size() != drive.d.usage.size() * (size_t) T) {
+                        std::fprintf(stderr, "strata serve: adaptive usage staging size changed during verifier window\n");
+                        return 1;
+                    }
+                    for (size_t expert = 0; expert < drive.d.usage.size(); ++expert)
+                        for (int row = 0; row < publish_n; ++row)
+                            drive.d.usage[expert] += drive.d.usage_rows[expert * (size_t) T + (size_t) row];
+                }
+                if (o.adapt_accepted_only && !drive.d.usage.empty() && !ajob) {
+                    adapt_accepted_tokens += publish_n;
+                    adapt_scheduled = adapt_accepted_tokens >= next_adapt_accepted_tokens;
+                    if (adapt_scheduled) next_adapt_accepted_tokens = adapt_accepted_tokens + o.adapt_every;
+                }
+                if (adapt_scheduled && o.adapt_accepted_only) {
+                    if (trace_adapt)
+                        std::fprintf(stderr, "strata serve: ADAPT schedule position=%lld round=%lld window=%d accepted_rows=%d accepted_total=%lld\n",
+                                     (long long) p, (long long) (rounds + 1), T, publish_n,
+                                     (long long) adapt_accepted_tokens);
+                    adapt_thr = std::thread([&] { adapt_ok = adapt(); });
                 }
                 if (accepted_prefix_trace) {
                     if (!ver.wait_commit(err)) {
