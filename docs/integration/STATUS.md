@@ -239,6 +239,18 @@ explanation for the long-request discrepancy in this cell, but does not qualify
 elastic-KV × MTP generally. The cache-matched run retained 14.423 GiB minimum
 host availability with no OOM events. See the [grow/trim report](../../bench/results/2026-10-13-phase6-q6-warp-mtp-confirm7/run/kv-grow-graph-recovery/README.md).
 
+A direct 9K accepted-prefix comparison then held initial cache capacity at
+3,895 slots for both MTP-off and MTP4. With the default KV floor, growth retained
+3,793 slots for MTP-off and 3,786 for MTP4, and persistent state diverged at all
+shared commits despite matching token IDs. Setting
+`STRATA_KV_GROW_FLOOR=3793` kept both caches at 3,793; MTP4 mapped fresh chunks
+for its extra KV need, and both arms then matched token IDs and all nine state
+fields at all 15 shared commits. Minimum host/effective availability was 13.30
+GiB with zero OOM events. This isolates the tested mismatch to cache residency
+during growth for this prompt/configuration; it does not qualify the default
+floor for MTP or other contexts. Defaults are unchanged. See the [matched-cache
+state report](../../bench/results/2026-10-13-phase5-q6-kvgrow-cachematched/README.md).
+
 After the fix, the four-arm accepted-only MTP-window matrix passed again on
 the rebuilt binary: windows 2/3/4 matched all IDs and shared state checkpoints,
 with 22/20/17 matching boundaries. The selected CUDA Phase 3 regression passed

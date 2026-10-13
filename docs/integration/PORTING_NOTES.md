@@ -1264,3 +1264,13 @@ the prompt/context without changing the artifact or state-trace contract, and
 compare each shared accepted prefix plus task success before considering
 performance. Trace and batch settings perturb execution and must stay out of
 timing runs. See the [16K trace](../../bench/results/2026-10-14-phase5-q6-mtp-16k-state-parity/README.md).
+
+An elastic-KV grow test reproduced MTP-off/MTP4 state divergence when growth
+left 3,793 versus 3,786 resident cache slots, even though token IDs matched. A
+follow-up fixed the retained cache floor at 3,793 and let MTP4 allocate fresh
+chunks for its extra KV requirement; both arms then matched token IDs and all
+nine persistent fields at every shared commit through 32 tokens. For Splash,
+log the actual cache slots before and after each KV grow/trim operation, and
+separate cache-funded KV from fresh device allocation. A shared startup budget
+does not guarantee equal expert residency during growth. See the
+[cache-matched elastic-KV result](../../bench/results/2026-10-13-phase5-q6-kvgrow-cachematched/README.md).
