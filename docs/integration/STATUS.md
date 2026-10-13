@@ -13,15 +13,19 @@ The MTP-off long cell failed output parity in 2/7 eager pairs, correlated with
 short-before-long request order. A traced same-service follow-up found that
 captured and eager outputs agree with each other but differ from the long-only
 output after request cycling; prompt-end GDN/KV hashes differ while PLE/tail
-hashes match. A supported-MTP2 repeat also changed its long output between
+hashes match. A native-pack `--spec 2` repeat with MTP disabled also changed
+its long output between
 warmup and measured passes in both routes. This is an unresolved shared
 request-cycle correctness issue, so graph/eager timing remains descriptive
 and Phase 6 stays open. A direct no-warmup API driver confirmed that one
 512/64 request followed by one 2048/128 request changes the long output at
 token index 8 versus a fresh long-only service, identically in captured and
 eager routes. The retained records include the failed startup caused
-by an unsupported MTP-off option; it was corrected to the native pack's
-required MTP2 setting before the repeat.
+by `--spec 0`; it was corrected to the native pack's required `--spec 2` while
+keeping MTP disabled. A same-shape state-hash trace changes
+the output back to the cold-run text while still reporting different GDN/KV
+hashes, so the trace is perturbative and does not locate the uninstrumented
+fault. No performance candidate is promoted.
 
 The [exact Q8_0 scalar-versus-ARM quantization experiment](../../bench/results/2026-10-13-phase4-q8-neon-quant/README.md)
 compares Strata's explicit scalar oracle against ggml's Cortex-A78AE NEON path

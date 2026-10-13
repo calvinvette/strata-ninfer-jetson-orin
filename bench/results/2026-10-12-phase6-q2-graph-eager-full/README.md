@@ -72,7 +72,8 @@ under `minimal-sequence-captured/` and `minimal-sequence-eager/` first showed
 that each route repeated the same changed long output after a short/long
 warmup. To remove that extra history, `minimal_api_driver.py` then sent only
 one 512/64 request followed by one 2048/128 request to a fresh service, with
-temperature 0 and required MTP2. A separate fresh captured service received
+temperature 0 with MTP disabled (`--spec 2` is still required by the native
+pack). A separate fresh captured service received
 only the long request. Both direct sequence runs completed under the 28 GiB
 cap and six-GiB host floor; minimum available host RAM was 18.1 GiB. The
 captured and eager sequence outputs matched each other exactly. Their long
@@ -81,12 +82,24 @@ response SHA256 was
 the fresh long-only response SHA256 was
 `a868c12065a20f134dd5dbd9ec87132a8a471cb9743019ed60ca1292596e3376`. Both
 responses contain 128 tokenizer IDs; the first token difference is at index
-8. The short output was byte-identical across routes. The initial `--spec 0`
-attempt failed startup because the native pack requires `--spec 2`; that
-artifact remains with the corrected runs. This confirms a one-short-request
-order effect in the shared runtime, not an eager-only difference. The next
-step is a same-service direct accepted-prefix trace against a cold long-only
-reference to locate the first state field that diverges before output token 8.
+8. The short output was byte-identical across routes. This establishes a
+single-short-request order effect on the tested binary and configuration;
+captured/eager mode does not explain it.
+
+The accepted-prefix trace adds an important limit: with state-hash tracing
+enabled, the same direct short→long sequence produced the long-only output
+hash (`a868c120…`). Its prompt-end GDN/KV/pooled hashes still differed from the
+long-only traced run (`dd5f620e…` versus `cc1f42c9…` for GDN; `b4314dca…`
+versus `96fc7df6…` for KV). PLE and tail hashes matched. Because instrumentation
+changes the output of the failing no-trace case, these state logs are
+perturbative and cannot identify the production divergence. Keep correctness
+qualification on uninstrumented output/state checks until a non-perturbing
+accepted-prefix observation is available.
+
+The initial `--spec 0` attempt failed startup because the native pack requires
+`--spec 2`; that artifact remains with the corrected runs. The next step is to
+locate the underlying state divergence without changing execution timing or
+synchronization.
 
 ## Retained evidence
 
@@ -94,6 +107,12 @@ reference to locate the first state field that diverges before output token 8.
   per-arm request output, workload order, supervisor memory and clock samples.
 - `sequence-captured/` and `sequence-eager/` contain matched request-order
   traces, API responses, engine logs, and supervisor records.
+- `manual-sequence-*` and `manual-long-captured/` retain direct one-pass API
+  requests without the benchmark harness's automatic warmup. The driver is
+  `minimal_api_driver.py`.
+- `manual-traced-sequence-captured/` and `manual-traced-long-captured/` retain
+  accepted-prefix state hashes. The trace changes the output of the sequence
+  case, so it is explicitly treated as intrusive diagnostic evidence.
 - `api-traced-captured-retry/` and `api-traced-eager/` contain long-only
   comparison runs. The failed initial adapter invocation is retained in
   `api-traced-captured/` with its failure artifacts.
