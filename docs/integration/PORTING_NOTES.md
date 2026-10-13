@@ -1281,3 +1281,12 @@ PID remained before the next load. For Splash, retain this process/listener
 check alongside request success and physical-memory telemetry. It verifies
 sequential reload only; it does not establish concurrent serving or a long
 reload soak. See the [IQ1_M teardown check](../../bench/results/2026-10-14-phase7-iq1-teardown3/README.md).
+
+A bounded 56×56 image request on the current IQ1_M profile used a separate CUDA
+vision process and the local BF16 projector. The API returned HTTP 200 and the
+answer identified the checkerboard-like grid and its color gradient; the
+supervised run retained 11.99 GiB effective availability. For Splash, record
+the encoder, projector and main-model identities separately, count the encoder
+in total physical memory, and include fixture-specific visible-content checks.
+This is only a small-image smoke, not high-resolution grounding qualification.
+See the [vision smoke report](../../bench/results/2026-10-14-phase7-iq1-vision/README.md).
