@@ -1490,3 +1490,14 @@ interval −1.10% to +0.69%); prompt and decode intervals also included no
 change. Minimum host/effective availability was 13.12 GiB. The screen result
 did not replicate, so capture remains unchanged and no profile is promoted.
 Phase 6 remains open for other workload, KV and interaction cells.
+
+The accepted-only adaptive-usage fold is now isolated in a small transaction
+helper and directly tested for commit lengths 0/1/intermediate/all, rejected
+suffix isolation, staging-size changes between windows, and malformed input.
+Five focused CUDA CTests passed; the rebuilt IQ1_M Orin service matched MTP-off
+and MTP4 token IDs, final state, and all 17 shared commit boundaries. The
+changed generator also rebuilt and linked in maestro1's HIP tree. An initial
+comparison overlapped an accidentally launched unsupervised process and is
+retained as confounded; the isolated supervised rerun passed. This strengthens
+the accepted-row boundary but does not close Phase 5's wider transaction,
+quality, or termination gates. See the [refactor record](../../bench/results/2026-10-14-phase5-accepted-usage-refactor/README.md).

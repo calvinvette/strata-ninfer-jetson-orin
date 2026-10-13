@@ -66,6 +66,7 @@
 #include "strata/program/conv_cache.hpp"
 #include "strata/program/message_boundary.hpp"
 #include "strata/spec/draft_policy.hpp"
+#include "strata/spec/accepted_usage.hpp"
 #include "strata/spec/draft_source.hpp"
 #include "strata/spec/suffix_drafter.hpp"
 #include "strata/kernels/cvec.hpp"
@@ -11129,18 +11130,11 @@ int main(int argc, char** argv) {
                     return 1;
                 }
                 if (o.adapt_accepted_only && !drive.d.usage_rows.empty()) {
-                    if (drive.d.usage_rows.size() != drive.d.usage.size() * (size_t) T) {
+                    if (!strata::spec::commit_accepted_usage(drive.d.usage, drive.d.usage_rows,
+                                                              (size_t) T, (size_t) publish_n)) {
                         std::fprintf(stderr, "strata serve: adaptive usage staging size changed during verifier window\n");
                         return 1;
                     }
-                    for (size_t expert = 0; expert < drive.d.usage.size(); ++expert)
-                        for (int row = 0; row < publish_n; ++row)
-                            drive.d.usage[expert] += drive.d.usage_rows[expert * (size_t) T + (size_t) row];
-                    // The staging buffer belongs to this verifier transaction only. In particular,
-                    // a canceled request can be followed by another request with a different
-                    // first verifier-window size; leaving these rows live makes that dispatch
-                    // reject the new window as a staging-size mismatch.
-                    drive.d.usage_rows.clear();
                 }
                 if (o.adapt_accepted_only && !drive.d.usage.empty() && !ajob) {
                     adapt_accepted_tokens += publish_n;
