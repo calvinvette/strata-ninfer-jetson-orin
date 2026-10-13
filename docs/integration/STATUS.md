@@ -7,6 +7,19 @@ graph-disabled native control is unsupported; these limits do not imply a genera
 capacity or cross-model result. No NInfer execution component has been promoted
 into Strata. See the [Phase 3 gate audit](PHASE3_CLOSEOUT.md).
 
+Phase 6 Q2_0 graph/eager extended screening is recorded in the
+[2026-10-12 result](../../bench/results/2026-10-12-phase6-q2-graph-eager-full/README.md).
+The MTP-off long cell failed output parity in 2/7 eager pairs, correlated with
+short-before-long request order. A traced same-service follow-up found that
+captured and eager outputs agree with each other but differ from the long-only
+output after request cycling; prompt-end GDN/KV hashes differ while PLE/tail
+hashes match. A supported-MTP2 repeat also changed its long output between
+warmup and measured passes in both routes. This is an unresolved shared
+request-cycle correctness issue, so graph/eager timing remains descriptive
+and Phase 6 stays open. The retained records include the failed startup caused
+by an unsupported MTP-off option; it was corrected to the native pack's
+required MTP2 setting before the repeat.
+
 The [exact Q8_0 scalar-versus-ARM quantization experiment](../../bench/results/2026-10-13-phase4-q8-neon-quant/README.md)
 compares Strata's explicit scalar oracle against ggml's Cortex-A78AE NEON path
 on 256 rows of width 2,560. Three independent processes matched every Q8_0 byte;
