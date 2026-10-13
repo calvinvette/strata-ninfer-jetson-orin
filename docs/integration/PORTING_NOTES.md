@@ -1217,6 +1217,15 @@ it is not enough to promote a default. Record throughput, decode, actual slot
 allocation and host floor together because a prompt-path win can coexist with a
 decode or memory tradeoff. See the [prefill/cache screen](../../bench/results/2026-10-14-phase6-q6-prefill-cache/README.md).
 
+The follow-up used the same exact 512-token task prompt with a 512-token output
+allowance across all four cache × prefill conditions. Every answer ended
+naturally, met the full 200-word checklist, and ran with no prompt-cache reuse;
+minimum host/effective availability was 8.16 GiB and cgroup OOM/limit counters
+remained zero. This confirms task completion for one prompt per condition but
+does not compare quality or qualify a profile. For Splash, carry the full task
+through factor screens and keep per-cell quality evidence separate from
+multi-block performance estimates. See the [full-task follow-up](../../bench/results/2026-10-14-phase6-q6-prefill-cache/quality-full-task/README.md).
+
 A separate 7,498-token IQ1_M prefill-cancellation cell closed the stream after
 the first 64-token prompt chunk, logged cancellation before generation, and
 served `Hello Orin!` through the same MTP4 service. This confirms that the API

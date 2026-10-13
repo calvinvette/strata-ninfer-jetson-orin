@@ -1576,3 +1576,13 @@ Actual allocation under the 5,000 `--expert-cache` budget ranged from 5,378 to
 6,519 resident slots; minimum host availability was 8.29 GiB with no OOM
 events. The 512/64 output cap was too short for the task-quality rubric, so this
 is exploratory only and does not promote a setting or close Phase 6.
+
+A [full-task quality follow-up](../../bench/results/2026-10-14-phase6-q6-prefill-cache/quality-full-task/README.md)
+then reran the same four cache-budget × prefill-chunk conditions with a 512-token
+allowance and one fresh service per condition. All four outputs ended naturally
+at 315–340 tokens, passed the complete 200-word rubric, and used exactly 512
+prompt tokens with no cache reuse. The 28-GiB scope retained 8.16 GiB minimum
+host/effective availability; sampled OOM and cgroup limit event counters stayed
+zero. This closes only the task-success check for that prompt and four settings;
+one request per condition is not a quality comparison or held-out performance
+confirmation, so no setting is promoted and Phase 6 remains open.

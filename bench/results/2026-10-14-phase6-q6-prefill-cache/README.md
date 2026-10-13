@@ -39,7 +39,11 @@ sequences repeated one alternate prose digest on the second request, and the
 5,000/128 cell had additional variation. Since the 64-token output cap cannot
 complete the prepared 200-word quality rubric, the result is a throughput and
 admission screen only. No cache or prefill default changed. A task-quality
-check and held-out confirmation are needed before promoting chunk 128.
+check and held-out confirmation are needed before promoting chunk 128. The
+[full-task quality follow-up](quality-full-task/README.md) later gave all four
+conditions a 512-token allowance; each one-off response ended naturally and
+passed the rubric. That establishes task completion for this prompt, without a
+comparative quality estimate or held-out performance confirmation.
 
 Clocks were dynamic; EMC clock access and scoped energy were unavailable. The
 result covers one Orin, one IQ1_M artifact, one 512/64 workload and the opt-in
