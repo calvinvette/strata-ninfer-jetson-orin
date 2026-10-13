@@ -1549,3 +1549,12 @@ and before generation. The same MTP4 accepted-only service then returned
 effective availability were 12.95 GiB, with no OOM events. This adds one
 long-prefill termination point; it does not compare persistent state after
 cancellation or close Phase 5's other termination and quality gates.
+
+An IQ1_M [decode-cancellation accepted-prefix comparison](../../bench/results/2026-10-14-phase5-q6-decode-cancel-state-parity/README.md)
+then canceled after eight stream deltas and 12 committed tokens. Three fresh
+exact-length references matched token IDs and all 11 persistent-state fields at
+four shared boundaries (48, 51, 55, 59), as well as matching one another. The
+same service recovered with `Hello Orin!`. Minimum host availability was 13.07
+GiB and effective headroom was 12.23 GiB under the 28-GiB cap, with no OOM
+events. This covers one decode-cancel point for Q6 MTP4 and leaves other
+termination, quality and format gates open.

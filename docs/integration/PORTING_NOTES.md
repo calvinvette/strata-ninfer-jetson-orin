@@ -1215,3 +1215,12 @@ profile; it does not establish post-cancel state-bit parity or cancellation at
 other points. For Splash, pair same-service recovery with backend-native cancel
 telemetry and direct committed-state checks when the state contract requires
 them. See the [cancellation record](../../bench/results/2026-10-14-phase5-q6-prefill-cancel-recovery/README.md).
+
+An eight-delta Q6 MTP4 decode cancellation committed 12 tokens. Three fresh
+exact-length references matched the canceled token prefix and all 11 persistent
+state fields at four shared commit lengths; the references also matched each
+other, and the canceled service recovered. For Splash, compare the canceled
+transaction to fresh exact-length references at every shared accepted prefix,
+not only at the final output or recovery response. Keep the reference processes
+in the same hardware/memory scope, and report prompt cache, artifact and trace
+settings with the state result. See the [decode-cancel comparison](../../bench/results/2026-10-14-phase5-q6-decode-cancel-state-parity/README.md).
