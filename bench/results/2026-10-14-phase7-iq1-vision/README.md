@@ -29,3 +29,22 @@ Models and the encoder remain outside Git.
 library. It preserves the supplied cache setting unless an override is passed.
 The API response, owned service config, server logs, supervisor memory samples,
 clock observations and tegrastats are retained here.
+
+## 2048×2048 admission smoke at 1024 vision tokens
+
+The same current candidate engine and local CUDA encoder/projector were tested
+with the checked-in 2048×2048 fixture (SHA256
+`c594b1e0f86f7f0b4a653e291e85ff37b3b894b2f517d7a4129d83f9eab65b8d`). The
+encoder warmed at 1024 image tokens. A loopback API request returned HTTP 200
+with images enabled; usage reported 1,049 prompt tokens (1,024 image plus 25
+text) and 48 completion tokens. The answer started describing the geometric
+color pattern but ended with `finish_reason=length`, so this is an admission and
+runtime smoke, not a vision-quality pass.
+
+The 28-GiB supervisor sampled memory 91 times and retained 11.76 GiB minimum
+host/effective availability. Cgroup `high`, `max`, `oom`, and `oom_kill`
+counters were zero. The service exited cleanly. Clocks were observed under the
+dynamic policy; EMC readback was unavailable and energy was not measured. The
+request, owned config, logs, supervisor samples and tegrastats are in
+`run-1024/` and `run-1024-supervisor/`. This does not test higher image-token
+counts, multiple images, image grounding accuracy, or sustained vision service.

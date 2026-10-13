@@ -1290,3 +1290,12 @@ the encoder, projector and main-model identities separately, count the encoder
 in total physical memory, and include fixture-specific visible-content checks.
 This is only a small-image smoke, not high-resolution grounding qualification.
 See the [vision smoke report](../../bench/results/2026-10-14-phase7-iq1-vision/README.md).
+
+A second request used a 2048×2048 fixture and warmed the CUDA encoder at 1,024
+image tokens. The API admitted the request and reported 1,049 total prompt
+tokens; the answer hit its 48-token output cap, so it is runtime evidence only.
+The 28-GiB supervisor retained 11.76 GiB minimum host availability with zero
+cgroup pressure/OOM events. For Splash, separately record requested image-token
+count, actual API token usage, response completion status and memory while the
+encoder and projector are resident. This does not qualify higher token counts
+or visual grounding accuracy; see the same vision smoke report.
