@@ -55,8 +55,12 @@ mismatch on the 512-token suffix. Layer-2 GDN input differs at position 515,
 while the preceding layer-1 GDN capture is still bitwise equal there and first
 differs at position 520. This narrows the discrepancy to work between those
 capture points; the intervening residual/FFN and verifier-row arithmetic are
-not isolated. The 28-GiB supervised run retained 13.21 GiB minimum host and
-effective admission availability, with no OOM events. A focused 10/10 CUDA
+not isolated. Repeating the suffix with `STRATA_DEC_BATCH=0` retained the same
+prefix-5 state mismatch, output mismatch at index 10, and layer-1 first
+activation difference at position 520. This rules out that broad batching
+switch as the sole trigger, without isolating every per-window operation. The
+28-GiB supervised runs retained 13.21/13.24 GiB minimum host and effective
+admission availability, with no OOM events. A focused 10/10 CUDA
 verifier/GDN/speculation/PLE/graph test set passed. Phase 5 remains open, and
 MTP remains unqualified for this incident workload. maestro1 compiled the
 updated verifier translation unit in its HIP-configured Release tree; the full

@@ -123,3 +123,15 @@ and application link, so no full HIP build is claimed. The separate SYCL
 `strata` target reported no work; its independent `sycl/src/core/verify.cpp`
 and `sycl/include/strata/core/verify.hpp` were unchanged. Neither x86 check
 claims accelerator runtime behavior.
+
+As a follow-up control, the same suffix and output limit were repeated with
+`STRATA_DEC_BATCH=0`. MTP still offered/accepted 42/18 drafts; accepted-prefix
+state first differed at prefix 5 and token IDs at index 10, exactly as with the
+default batch setting. The layer-1 capture likewise first differed at
+position 520/token 11040 with the same x relative-L2 delta (0.002666) and max
+absolute delta (0.006456). This rules out the broad decode-batching switch as
+the sole trigger for this failure, though it does not isolate every operation
+that still processes a verifier window. The supervisor recorded 13.24 GiB
+minimum host/effective availability and zero OOM kills. The run is
+correctness-only; its retained results and telemetry are under
+`run/incident-no-decode-batch*`.
