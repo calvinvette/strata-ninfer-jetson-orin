@@ -1803,6 +1803,18 @@ pressure or OOM events. This extends longer-chain parity to two policies for
 one Q2_0 prompt/cache; it does not resolve other prompt/cache sensitivities or
 provide timing evidence. Phase 5 remains open.
 
+A current-binary [256-token Q2_0 accepted-prefix extension](../../bench/results/2026-10-14-phase5-q2-accepted-prefix256-current/README.md)
+then compared MTP off/2/3/4 on the same exact 2,048-token prompt with
+accepted-only swaps. All four arms emitted the same 256 token IDs and matched
+all nine persistent-state fields at final state and every shared accepted
+prefix. MTP2/3/4 offered/accepted 136/88, 201/106 and 264/122 drafts, with
+168/150/134 shared boundaries. The 28-GiB supervisor retained 16.935 GiB
+minimum host availability and 8.107 GiB minimum admission availability; sampled
+cgroup pressure, limit and OOM counters stayed zero. This extends one prompt
+and cache cell's long-chain correctness evidence, not performance or task
+quality; it does not resolve the separate residency-change recovery drift.
+Phase 5 remains open.
+
 A follow-up [8K-prompt Q2_0 MTP accepted-prefix check](../../bench/results/2026-10-14-phase5-q2-accepted-prefix8k-current/README.md)
 used the current binary, 16K context and the accepted-only adaptive-swap
 policy. MTP off/2/3/4 returned the same 32 token IDs and final state, with
