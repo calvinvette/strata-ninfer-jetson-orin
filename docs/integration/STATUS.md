@@ -1913,3 +1913,13 @@ The cancellation harness now accepts prompt files and explicit generation
 allowances; focused tests passed 9/9 and integration Python discovery 136/136.
 This covers one long-prompt cancellation point and does not close Phase 5's
 other termination, KV-format, quality or graph-lifetime gates.
+
+The Q2_0 [compact-KV MTP parity checks](../../bench/results/2026-10-14-phase5-q2-kv-mtp-parity/README.md)
+then compared MTP off/2/3/4 with int8 and q4_0 KV on the same 2,048-token
+prompt, 128-token continuation and accepted-only swap policy. All eight arms
+matched MTP-off token IDs and final persistent state; all shared accepted-prefix
+boundaries matched (int8: 84/74/65 for MTP2/3/4; q4_0: 82/75/64). Minimum
+host/effective availability was 17.058/8.798 GiB for int8 and 16.977/9.068 GiB
+for q4_0 under separate 28-GiB scopes, with zero sampled cgroup pressure or
+OOM events. These are traced state-correctness checks, not quality or timing
+claims; other prompts, formats and the remaining Phase 5 gates remain open.
