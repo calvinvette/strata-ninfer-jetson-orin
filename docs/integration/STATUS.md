@@ -276,6 +276,8 @@ OOM events. This implicates swaps occurring during the sequence, not a
 demonstrated state leak; the exact residency/arithmetic cause and task-quality
 impact remain unclassified. See the [same-service report](../../bench/results/2026-10-13-phase6-q6-warp-mtp-confirm7/run/same-service-short-long-short/README.md).
 
+A current-checkout [swap-choice attribution rerun](../../bench/results/2026-10-14-phase5-q6-swap-choice-attribution/README.md) logged all expert residency choices during the same sequence. Each request caused four updates; the first two selected 96 swaps each time, while recovery selected 96/79/74/73. All 12 choice batches matched between MTP-off and MTP4, as did outputs and persistent state request-by-request. Yet both settings again changed 14/16 recovery token IDs and seven state fingerprints versus the first short request. This strengthens the residency-change association and shows the symptom does not require MTP, but does not establish the numerical cause or task-quality impact. Adaptive swaps remain unqualified for this stability case; Phase 5 remains open.
+
 The accepted-only 16K-context elastic-KV test grew from 2,048 to 10,240 cells
 for a 9,000-token prompt, then trimmed to 2,048 before the short recovery
 request. Both graph sets were captured before growth, and recovery output and

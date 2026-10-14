@@ -23,6 +23,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--tokens', type=int, default=16)
     parser.add_argument('--adapt-every', type=int, default=4)
+    parser.add_argument('--trace-adapt-choices', action='store_true',
+                        help='log exact adaptive expert in/out choices for each update')
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=False)
     workloads = json.loads(args.workloads.read_text())['workloads']
@@ -56,6 +58,8 @@ def main():
         env.update({'STRATA_STATE_HASH': '1', 'STRATA_STATE_HASH_GDN': '1',
                     'STRATA_ACCEPTED_PREFIX_TRACE': '1', 'STRATA_INTEGRATION_TRACE': '1',
                     'STRATA_PREFILL_CPU_SHARE': '0'})
+        if args.trace_adapt_choices:
+            env['STRATA_TRACE_ADAPT'] = '1'
         env.pop('STRATA_MTP_BATCH', None)
         log = args.output / f'{label}.log'
         engine = StrataEngine(cfg['exe'], argv, cwd=cfg['cwd'], log=str(log), env=env)
