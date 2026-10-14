@@ -1899,3 +1899,17 @@ delta was +27.16% (three-pair bootstrap interval −3.98% to +28.78%), while
 median client TTFT and total-request time were 7.63% and 5.64% slower. This
 prefill-dominated screen does not justify a held-out timing confirmation or
 profile promotion. No setting changed, and Phase 6 remains open.
+
+A [7,498-token Q2_0 MTP4 decode-cancellation state check](../../bench/results/2026-10-14-phase5-q2-mtp8k-cancel-state-parity/README.md)
+extended the cancellation comparison from a short prompt. After four stream
+deltas the service had committed six tokens; two fresh exact-length references
+matched token IDs and all 11 persistent-state fields at accepted-prefix
+lengths 7,498, 7,500, 7,501 and 7,503. The same service recovered with the exact
+`Hello Orin!` response. Minimum host/effective availability was 16.86/6.76
+GiB under the 28-GiB cap, with zero sampled cgroup pressure or OOM events. The
+first attempt is retained but excluded because its 1,024-token generation
+allowance did not fit in the 8K context; the qualified rerun used 48 tokens.
+The cancellation harness now accepts prompt files and explicit generation
+allowances; focused tests passed 9/9 and integration Python discovery 136/136.
+This covers one long-prompt cancellation point and does not close Phase 5's
+other termination, KV-format, quality or graph-lifetime gates.

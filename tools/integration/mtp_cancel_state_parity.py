@@ -18,6 +18,9 @@ from run_control import write_result
 
 STATE_KEYS = ('L', 'gdn', 'ple', 'tail', 'dead', 'pooled', 'pooled_full',
               'kv', 'mtp', 'stale', 'ple_prev')
+DEFAULT_PROMPT_TEXT = (
+    'Write the integers from 1 through 1000 separated by single spaces. '
+    'Do not add an introduction or conclusion, and do not stop before 1000.')
 PREFIX_RE = re.compile(
     r'ACCEPTED_PREFIX position=(\d+) window=(\d+) accepted_drafts=(\d+) '
     r'committed=(\d+) tokens=([0-9,]+) state=\{STATE_HASH (.+)\}')
@@ -131,6 +134,15 @@ def config_with_expert_cache(config, slots):
     return result
 
 
+def load_prompt_text(prompt_text, prompt_file):
+    """Return inline or file-backed prompt text, rejecting ambiguous input."""
+    if prompt_file is not None:
+        if prompt_text is not None:
+            raise ValueError('choose either inline prompt text or a prompt file')
+        return Path(prompt_file).read_text()
+    return DEFAULT_PROMPT_TEXT if prompt_text is None else prompt_text
+
+
 def reset_stream(response):
     """Close the read side; the server's EOF watcher then sends STOP to the engine."""
     response.close()
@@ -157,18 +169,26 @@ def main() -> int:
                         help='close the stream after this many non-empty text deltas')
     parser.add_argument('--reference-repeats', type=int, default=3,
                         help='fresh exact-length reference processes used to distinguish cancellation drift from run variation')
+    parser.add_argument('--max-output-tokens', type=int, default=1024,
+                        help='generation allowance for the canceled streaming request')
     parser.add_argument('--dump-gdn-at', type=int,
                         help='optionally dump float32 GDN state at this exact accepted length in each process')
     parser.add_argument('--fixed-expert-cache', type=int,
                         help='override every process with the same positive expert-cache slot count')
-    parser.add_argument('--prompt-text', default=(
-        'Write the integers from 1 through 1000 separated by single spaces. '
-        'Do not add an introduction or conclusion, and do not stop before 1000.'))
+    prompt_group = parser.add_mutually_exclusive_group()
+    prompt_group.add_argument('--prompt-text')
+    prompt_group.add_argument('--prompt-file', type=Path,
+                              help='UTF-8 file containing the exact user prompt text')
     args = parser.parse_args()
     if (args.output.exists() or args.cancel_chunks < 1 or args.reference_repeats < 1
+            or args.max_output_tokens < 1
             or (args.fixed_expert_cache is not None and args.fixed_expert_cache < 1)):
-        parser.error('output must be new; cancel-chunks, reference-repeats and fixed expert-cache must be positive')
+        parser.error('output must be new; cancel-chunks, reference-repeats, max-output-tokens and fixed expert-cache must be positive')
     cfg = json.loads(args.config.read_text())
+    try:
+        prompt_text = load_prompt_text(args.prompt_text, args.prompt_file)
+    except (OSError, UnicodeError, ValueError) as exc:
+        parser.error(f'invalid prompt input: {exc}')
     if '--mtp' not in cfg.get('args', []):
         parser.error('source config has no --mtp weights path')
     mtp_path = Path(cfg['args'][cfg['args'].index('--mtp') + 1])
@@ -178,8 +198,9 @@ def main() -> int:
     if args.fixed_expert_cache is not None:
         cfg = config_with_expert_cache(cfg, args.fixed_expert_cache)
     result = {'schema': 1, 'scope': 'MTP accepted-prefix cancellation state parity and same-process recovery',
-              'model': cfg.get('model_name'), 'workload_cell': 'open-ended-integer-list',
-              'prompt_text': args.prompt_text, 'requested_output_tokens': 1024,
+              'model': cfg.get('model_name'),
+              'workload_cell': 'custom-prompt-file' if args.prompt_file else 'open-ended-integer-list',
+              'prompt_text': prompt_text, 'requested_output_tokens': args.max_output_tokens,
               'cancel_after_nonempty_deltas': args.cancel_chunks,
               'reference_repeats': args.reference_repeats,
               'fixed_expert_cache_slots': args.fixed_expert_cache,
@@ -197,7 +218,7 @@ def main() -> int:
     base_env.update({'STRATA_STATE_HASH': '1', 'STRATA_ACCEPTED_PREFIX_TRACE': '1',
                      'STRATA_INTEGRATION_TRACE': '1', 'STRATA_MTP_BATCH': '1',
                      'STRATA_STATE_HASH_GDN': '1', 'STRATA_PREFILL_CPU_SHARE': '0'})
-    body_base = {'messages': [{'role': 'user', 'content': args.prompt_text}],
+    body_base = {'messages': [{'role': 'user', 'content': prompt_text}],
                  'chat_template_kwargs': {'enable_thinking': False},
                  'temperature': 0, 'strata_tune': {'ignore_eos': True}}
     cancel_env = state_dump_env(base_env, args.output / 'gdn-cancel.bin', args.dump_gdn_at)
@@ -212,7 +233,8 @@ def main() -> int:
     cancel_server = None
     try:
         cancel_server, cancel_base, cancel_health = start_server(cancel_cfg, cancel_config_path, cancel_env)
-        cancel_body = dict(body_base, model=cancel_health['model'], max_tokens=1024, stream=True)
+        cancel_body = dict(body_base, model=cancel_health['model'],
+                           max_tokens=args.max_output_tokens, stream=True)
         stream_request = urllib.request.Request(
             cancel_base + '/v1/chat/completions',
             data=json.dumps(cancel_body).encode(),

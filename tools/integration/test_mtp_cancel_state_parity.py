@@ -1,16 +1,32 @@
 import sys
 from pathlib import Path
+import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT / 'tools'), str(ROOT / 'tools/integration')]
 from mtp_cancel_state_parity import (STATE_KEYS, compare_prefix_traces,
                                     config_with_expert_cache, parse_prefix_entries,
-                                    state_dump_env)
+                                    load_prompt_text, state_dump_env)
 from serve.server import StrataEngine
 
 
 class MtpCancelStateParityTests(unittest.TestCase):
+    def test_loads_prompt_from_file_without_changing_content(self):
+        with tempfile.TemporaryDirectory() as directory:
+            prompt_path = Path(directory) / 'prompt.txt'
+            prompt_path.write_text('exact prompt\nwith second line')
+            self.assertEqual(load_prompt_text(None, prompt_path),
+                             'exact prompt\nwith second line')
+
+    def test_prompt_input_defaults_inline_and_rejects_ambiguity(self):
+        self.assertEqual(load_prompt_text(None, None),
+                         'Write the integers from 1 through 1000 separated by single spaces. '
+                         'Do not add an introduction or conclusion, and do not stop before 1000.')
+        self.assertEqual(load_prompt_text('inline', None), 'inline')
+        with self.assertRaises(ValueError):
+            load_prompt_text('inline', Path('prompt.txt'))
+
     def test_ignore_eos_request_key_is_opt_in(self):
         self.assertNotIn('ignore_eos=', StrataEngine.sampling_keys({}))
         self.assertIn('ignore_eos=1', StrataEngine.sampling_keys(
