@@ -1693,6 +1693,16 @@ pressure or OOM events. This extends longer-chain parity to two policies for
 one Q2_0 prompt/cache; it does not resolve other prompt/cache sensitivities or
 provide timing evidence. Phase 5 remains open.
 
+A follow-up [8K-prompt Q2_0 MTP accepted-prefix check](../../bench/results/2026-10-14-phase5-q2-accepted-prefix8k-current/README.md)
+used the current binary, 16K context and the accepted-only adaptive-swap
+policy. MTP off/2/3/4 returned the same 32 token IDs and final state, with
+direct equality at all shared state boundaries (22/19/15 for MTP2/3/4).
+Drafts offered/accepted were 17/10, 24/13 and 31/17. The 28-GiB supervisor
+retained 16.713 GiB minimum host availability and 9.581 GiB minimum admission
+availability, with zero cgroup pressure or OOM events. This adds one long-
+prefill correctness cell; it is not task-quality or performance evidence.
+Phase 5 remains open.
+
 The same held-out Q2_0 graph/MTP prompt received a separate full-task quality
 check across all four settings. With a 1,024-token allowance each answer ended
 naturally at 850 tokens, was byte-identical, and covered input, working memory
