@@ -1673,10 +1673,13 @@ A Q2_0 [MTP task-quality check](../../bench/results/2026-10-14-phase5-q2-mtp-qua
 then ran a 2,048-token computer-processing task with MTP off, MTP2 and MTP4
 under the accepted-only adaptation policy. All three fresh services produced
 the same naturally completed 293-token answer and passed the full prompt rubric;
-MTP2 and MTP4 each offered/accepted 155/108 drafts. Minimum host availability
-was 16.87 GiB and admission availability 12.93 GiB under separate 28-GiB
-scopes. This is one task-level check, not broad quality or performance evidence;
-MTP remains opt-in and Phase 5 remains open.
+MTP2 and MTP4 each offered/accepted 155/108 drafts. A follow-up [MTP3 task
+check](../../bench/results/2026-10-14-phase5-q2-mtp3-quality/README.md) used
+the same task and policy on the current binary; its naturally completed answer
+also passed and matched all three existing answer hashes exactly. Minimum host
+availability was 17.02 GiB and minimum admission availability 12.77 GiB under
+the 28-GiB scope. These are task-quality checks, not broad quality or
+performance evidence; MTP remains opt-in and Phase 5 remains open.
 
 The same held-out Q2_0 graph/MTP prompt received a separate full-task quality
 check across all four settings. With a 1,024-token allowance each answer ended
