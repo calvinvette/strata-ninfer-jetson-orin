@@ -1,0 +1,8 @@
+Pre-launch setup notes (not measured evidence)
+
+Two initial wrapper invocations exited before any service or model process ran.
+The first config-preparation script attempted to index an absent --kv argument
+before checking for it. The corrected preparation created the configs, but the
+wrapper's output-directory creation had already left this directory behind, so
+that invocation then stopped with FileExistsError. The seven-block campaign is
+in run-retry1/ and is the only measured run.

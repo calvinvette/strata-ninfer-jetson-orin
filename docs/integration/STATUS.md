@@ -1975,3 +1975,14 @@ or default changed. The first setup attempt is retained and excluded because a
 static-cache screen inherited an incompatible `--adapt-accepted-only` flag;
 the argument normalizer now removes that flag when it disables adaptive swaps.
 Focused integration tests pass 12/12. Phase 6 remains open.
+
+A seven-block held-out [Q2_0 int8-KV MTP3 confirmation](../../bench/results/2026-10-14-phase6-q2-int8-mtp3-retrieval-confirm7/README.md)
+then compared MTP3 with MTP-off on a distinct 512-token retrieval-plus-arithmetic
+task. All 14 measured replies exactly returned the three expected markers and
+suffix sum `1768`; MTP3 offered/accepted 34/29 drafts in each block. Decode
+throughput rose 8.83% (paired 95% interval +7.34% to +10.63%), client total
+request time fell 2.82% (−4.68% to −1.23%), and TTFT was unresolved. Minimum
+host/admission availability was 16.911/6.211 GiB with zero sampled cgroup
+pressure or OOM events. This confirms the tested int8/MTP3 profile on one
+held-out task only; energy was not request-attributed, and defaults remain
+unchanged. Phase 6 remains open for broader workload and interaction evidence.
