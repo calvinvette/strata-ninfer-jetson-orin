@@ -69,6 +69,14 @@ was 10.146/10.355/10.307 GiB, with zero sampled cgroup pressure/OOM events.
 These three prompt/profile checks do not establish broad Q2_0 task quality or a
 general capacity boundary; Phase 7 remains in progress.
 
+A separate Q2_0 [32K retrieval-plus-arithmetic replication](../../bench/results/2026-10-14-phase7-q2-recall/quality-replication-32768/README.md)
+used a 30,040-token prompt. It returned all three markers in order and the
+independently checked suffix sum `1971`, then passed same-service recovery.
+The 28-GiB supervisor retained 16.292 GiB minimum host availability and
+10.274 GiB admission availability with zero sampled cgroup pressure/OOM events.
+This adds one long-context task-quality point; it does not establish a broad
+Q2_0 quality score or general capacity boundary. Phase 7 remains in progress.
+
 After the Q2_0 context ladder, a fresh [regression refresh](../../bench/results/2026-10-14-phase7-q2-recall/post-checks/README.md)
 again passed all seven PLE numerical stages (worst relative L1 `1.148e-7`),
 the selected 15/15 accounting/ownership/PLE CTests, and integration Python

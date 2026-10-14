@@ -20,6 +20,11 @@ this profile; it does not qualify other tasks, MTP settings, or general model
 quality. Individual 16K and 32K run details are in
 [README-16384.md](README-16384.md) and [README-32768.md](README-32768.md).
 
+A separate 30,040-token [32K retrieval-plus-arithmetic replication](quality-replication-32768/README.md)
+also returned the three codes in order and the independently checked suffix
+sum `1971`, then passed same-service recovery. This is a single task-quality
+check for the Q2_0 cohort, not a broad quality score.
+
 All three runs passed under a 28-GiB cgroup ceiling and the six-GiB
 host-availability guard. Minimum physical host availability was 16.967, 16.797
 and 16.363 GiB at 8K, 16K and 32K; minimum effective admission availability
