@@ -10,6 +10,14 @@ graph-disabled native control is unsupported; these limits do not imply a genera
 capacity or cross-model result. No NInfer execution component has been promoted
 into Strata. See the [Phase 3 gate audit](PHASE3_CLOSEOUT.md).
 
+The current-source MTP reset fix has now passed targeted HIP builds of the
+`strata` service and `native_expert_parity`, and a full 123-step SYCL `strata`
+service build on maestro1; both binaries passed `--help` load checks. These are
+x86_64 compile/link checks, not accelerator runtime evidence. See the retained
+[backend build report](../../bench/results/2026-10-14-phase8-mtp-reset-backends/README.md).
+Phase 8 remains open for its Orin runtime, supported-profile, regression and
+rollback gates.
+
 A Phase 5 [accepted-only adaptive-window boundary check](../../bench/results/2026-10-14-phase5-accepted-window-boundary/README.md)
 passed on Orin with the Q2_0 artifact: MTP off/2/3/4 emitted identical
 32-token outputs and matched all recorded persistent state at final state and

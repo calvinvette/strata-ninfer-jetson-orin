@@ -58,10 +58,12 @@ passed 15/15, and integration Python discovery passed 141/141. The full native
 build passed. Full CTest reported two optional IQ skips and two fixture failures:
 `expert_parity` and `pool_test` could not open the absent
 `build/integration/candidate/pack/full/experts.bin`; the other 115 runnable
-tests passed. The C++ source changes also require HIP and SYCL compile checks.
-Those current-source builds are in progress separately; this report does not
-close the Phase 8 backend gate. These checks do not expand Phase 3's support
-scope. All raw attempts, service logs, supervisor samples and result records are retained here. The
+tests passed. Current-source HIP and SYCL service targets and CLI smoke checks
+have since passed on maestro1; see the separate
+[backend build report](../2026-10-14-phase8-mtp-reset-backends/README.md).
+These x86_64 compile/load checks do not establish accelerator runtime behavior
+and do not close Phase 8. They do not expand Phase 3's support scope. All raw
+attempts, service logs, supervisor samples and result records are retained here. The
 first attempt omitted the prompt-cache prerequisite for state hashing; two
 valid pre-fix comparisons captured the MTP mismatch; attempts 04 and 05 are
 the passing FP16 runs, `attempt-06-int8` is the passing int8 run, and
