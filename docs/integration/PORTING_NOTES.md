@@ -1316,3 +1316,13 @@ expected-token count completed inference but discarded the answer; preserve
 such harness failures explicitly and verify final formatted usage before
 scoring quality. For Splash, repeat this with independent prompts and tasks
 before calling long-context quality supported. See the [Phase 7 report](../../bench/results/2026-10-14-phase7-longquality/README.md).
+
+
+The cache-matched elastic-KV check also passed on one distinct 15,003-token
+prompt at 16K context: MTP-off and MTP4 matched final output/state on
+short→long→short-recovery, as well as all three shared long-request commit
+states. Both grew to 16,384 cells and trimmed to 2,048 after graph capture.
+For Splash, retain this held-out prompt-length extension as one parity cell only;
+repeat other cache floors and prompt lengths before generalizing. Preserve the
+position-reset trace grouping fix when request logs omit standalone state-hash
+delimiters. See the [15K elastic-KV evidence](../../bench/results/2026-10-14-phase5-kvgrow-heldout/README.md).
