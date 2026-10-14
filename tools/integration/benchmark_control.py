@@ -62,7 +62,10 @@ def qualify(row, expected):
         return 'fail', 'formatted prompt count mismatch'
     if not usage.get('completion_tokens', 0):
         return 'fail', 'zero completion'
-    if usage['completion_tokens'] != expected['generate_tokens']:
+    if usage['completion_tokens'] > expected['generate_tokens']:
+        return 'fail', 'completion exceeded requested workload'
+    if (usage['completion_tokens'] != expected['generate_tokens'] and
+            not expected.get('allow_natural_stop', False)):
         return 'fail', 'early stop; requested workload not completed'
     if not timings or timings.get('cache_n', 0):
         return 'fail', 'missing timings or reused prompt; fresh-prefill control required'

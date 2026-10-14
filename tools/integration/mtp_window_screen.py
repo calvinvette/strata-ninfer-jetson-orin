@@ -66,6 +66,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', type=Path, required=True)
     parser.add_argument('--workloads', type=Path, required=True)
+    parser.add_argument('--warmup-workloads', type=Path,
+                        help='distinct short warmup request set shared by every arm')
     parser.add_argument('--workload-cell',
                         help='select one named workload from a multi-cell workload file')
     parser.add_argument('--output', type=Path, required=True)
@@ -136,6 +138,9 @@ def main() -> int:
                        str(config_path.resolve()), '--workloads', str(selected_workloads_path.resolve()),
                        '--output', str(request_path.resolve()), '--variant', 'candidate',
                        '--rounds', '1', '--no-trace']
+            if args.warmup_workloads is not None:
+                command.extend(['--warmup-workloads',
+                                str(args.warmup_workloads.resolve())])
             row = {'block': block, 'window': window, 'name': 'mtp-off' if window == 0 else f'mtp-window{window}',
                    'directory': str(run_dir.resolve()), 'status': 'not_run', 'command': command}
             campaign['runs'].append(row)

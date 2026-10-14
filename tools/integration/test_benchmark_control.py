@@ -17,6 +17,16 @@ class WorkloadQualificationTests(unittest.TestCase):
         self.row['response']['usage']['completion_tokens'] = 2
         self.assertEqual(qualify(self.row, self.cell)[0], 'fail')
 
+    def test_natural_stop_can_be_opted_in_for_variable_length_tasks(self):
+        self.row['response']['usage']['completion_tokens'] = 41
+        self.cell['allow_natural_stop'] = True
+        self.assertEqual(qualify(self.row, self.cell)[0], 'pass')
+
+    def test_natural_stop_cannot_exceed_the_requested_cap(self):
+        self.row['response']['usage']['completion_tokens'] = 65
+        self.cell['allow_natural_stop'] = True
+        self.assertEqual(qualify(self.row, self.cell)[0], 'fail')
+
     def test_template_mismatch_is_failed_cell(self):
         self.row['response']['usage']['prompt_tokens'] = 511
         self.assertEqual(qualify(self.row, self.cell)[0], 'fail')
