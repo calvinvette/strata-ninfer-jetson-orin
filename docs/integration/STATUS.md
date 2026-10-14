@@ -18,6 +18,16 @@ x86_64 compile/link checks, not accelerator runtime evidence. See the retained
 Phase 8 remains open for its Orin runtime, supported-profile, regression and
 rollback gates.
 
+A fresh Orin accepted-prefix regression passed all seven publication,
+accepted-usage, adaptive-window, verifier, GDN, speculative-verifier and QSA
+tests. The GPU convolution-history commit test covered every `keep=0..T` for
+`T=1..8` with bitwise comparison to an independent host selector. Under the
+28-GiB supervisor, minimum host/admission availability was 24.406 GiB and
+cgroup pressure/OOM counters remained zero. Zero-row behavior is covered by
+the state helpers; `Verifier::commit` itself requires `1..T`. This adds no
+end-to-end performance claim. See the retained
+[transaction regression](../../bench/results/2026-10-14-phase5-accepted-transaction-regression/README.md).
+
 A Phase 5 [accepted-only adaptive-window boundary check](../../bench/results/2026-10-14-phase5-accepted-window-boundary/README.md)
 passed on Orin with the Q2_0 artifact: MTP off/2/3/4 emitted identical
 32-token outputs and matched all recorded persistent state at final state and
