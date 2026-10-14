@@ -268,10 +268,7 @@ outputs and final state matched on all requests, and all 3 common long-request
 accepted-prefix states matched. Both arms captured graphs before growth,
 expanded to 16,384 KV cells, trimmed to 2,048, and recovered the short request.
 Minimum host/effective availability was 13.42 GiB with zero cgroup pressure
-counters. This extends the cache-matched correctness evidence to one longer
-prompt, but does not qualify elastic-KV × MTP generally, other cache floors, or
-performance. Defaults are unchanged. See the [matched-cache 9K report](../../bench/results/2026-10-13-phase5-q6-kvgrow-cachematched/README.md)
-and the [held-out 15K report](../../bench/results/2026-10-14-phase5-kvgrow-heldout/README.md).
+counters. A fresh focused [Phase 5 transaction/verifier CTest run](../../bench/results/2026-10-14-phase5-transaction-ctest/README.md) also passed all eight publication, accepted-usage, verifier, draft-policy, probabilistic-sampling, coupled-draft and captured-graph tests. This extends the cache-matched correctness evidence to one longer prompt, but does not qualify elastic-KV × MTP generally, other cache floors, or performance. Defaults are unchanged. See the [matched-cache 9K report](../../bench/results/2026-10-13-phase5-q6-kvgrow-cachematched/README.md) and the [held-out 15K report](../../bench/results/2026-10-14-phase5-kvgrow-heldout/README.md).
 
 After the fix, the four-arm accepted-only MTP-window matrix passed again on
 the rebuilt binary: windows 2/3/4 matched all IDs and shared state checkpoints,
