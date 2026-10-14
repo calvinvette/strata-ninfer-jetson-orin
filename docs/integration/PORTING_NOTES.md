@@ -1326,3 +1326,19 @@ For Splash, retain this held-out prompt-length extension as one parity cell only
 repeat other cache floors and prompt lengths before generalizing. Preserve the
 position-reset trace grouping fix when request logs omit standalone state-hash
 delimiters. See the [15K elastic-KV evidence](../../bench/results/2026-10-14-phase5-kvgrow-heldout/README.md).
+
+## 2026-10-14 — Adaptive residency can change same-service output
+
+A current-checkout IQ1_M `512 → 2,048 → 512` accepted-only sequence logged
+four cache-adaptation updates per request. MTP-off and MTP4 chose identical
+expert transitions and matched output/state for each request, but both changed
+14 of 16 recovery tokens and seven state fingerprints relative to the first
+short request. Delaying adaptation had previously restored exact same-prompt
+recovery. This supports an association with service-global cache residency;
+it does not establish the arithmetic source or task-quality impact. For a
+future Splash port, record every residency transition beside output and direct
+persistent-state checkpoints in a same-service A/B/A test. Keep MTP parity
+separate from cache-stability and task-quality claims, and do not impose exact
+text identity across different residency states without a stated numerical or
+product contract. The retained Orin trace is
+[here](../../bench/results/2026-10-14-phase5-q6-swap-choice-attribution/README.md).
