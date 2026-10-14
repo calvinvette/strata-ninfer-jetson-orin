@@ -39,6 +39,14 @@ for MTP2/3/4. Minimum host/admission availability was 16.88/8.43 GiB under the
 28-GiB supervisor; cgroup pressure/OOM counters stayed zero. This does not
 resolve same-service recovery drift after adaptive residency changes. See the
 [longer accepted-prefix run](../../bench/results/2026-10-14-phase5-accepted-window-256/README.md).
+After the fresh-sequence MTP reset fix, a 512-token prompt/64-token output
+comparison again matched all token IDs, all nine final main-state fields, and
+every shared accepted-prefix state boundary (38/31/27 for MTP2/3/4). Drafts
+offered/accepted were 37/26, 60/33, and 78/37. Under the 28-GiB supervisor,
+minimum host/admission availability was 16.89/8.50 GiB and sampled cgroup
+pressure/OOM counters were zero. This is a single-prompt state check, not a
+performance result or proof about same-service cancellation recovery. See the
+[post-reset comparison](../../bench/results/2026-10-14-phase5-q2-mtp-window-post-reset/README.md).
 The Orin CUDA build and focused ownership/state tests passed. maestro1 HIP and
 SYCL builds and `--help` smoke checks both passed on x86_64; the HIP accepted-
 window test also passed 1,515 checks. These are compile/help checks, not
