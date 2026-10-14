@@ -5,7 +5,8 @@ set -euo pipefail
 # committed source snapshot in source/; outputs are isolated below TRACE_ROOT.
 trace_root=${TRACE_ROOT:?set TRACE_ROOT to the isolated Phase 8 build directory}
 validation_tools="$HOME/workspace/strata-validation"
-export TMPDIR="$validation_tools/tmp"
+export TMPDIR="${TRACE_TMPDIR:-$validation_tools/tmp}"
+mkdir -p "$TMPDIR"
 export PATH="$validation_tools/toolchains/build-tools/bin:$PATH"
 mkdir -p "$trace_root/logs"
 

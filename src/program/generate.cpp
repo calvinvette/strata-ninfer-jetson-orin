@@ -67,6 +67,7 @@
 #include "strata/program/message_boundary.hpp"
 #include "strata/spec/draft_policy.hpp"
 #include "strata/spec/accepted_usage.hpp"
+#include "strata/spec/accepted_window.hpp"
 #include "strata/spec/draft_source.hpp"
 #include "strata/spec/suffix_drafter.hpp"
 #include "strata/kernels/cvec.hpp"
@@ -11024,11 +11025,14 @@ int main(int argc, char** argv) {
                 // published prefix would cross the next boundary; the final row will trigger the swap.
                 if (o.adapt_accepted_only && !drive.d.usage.empty()) {
                     const int64_t allowance = std::max<int64_t>(1, next_adapt_accepted_tokens - adapt_accepted_tokens);
-                    if (T > allowance) {
-                        T = (int) allowance;
-                        if (T < T_mtp) { T_mtp = T; chain_n = 0; }
-                        else chain_n = T - T_mtp;
+                    strata::spec::AcceptedWindow capped;
+                    if (!strata::spec::cap_accepted_window(T_mtp, chain_n, allowance, capped)) {
+                        std::fprintf(stderr, "strata serve: invalid adaptive verifier window\n");
+                        return 1;
                     }
+                    T_mtp = capped.mtp;
+                    chain_n = capped.chained;
+                    T = capped.total();
                 }
                 const bool timed_round = !first_window;
                 const Clock::time_point round0 = Clock::now();

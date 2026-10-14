@@ -10,6 +10,18 @@ graph-disabled native control is unsupported; these limits do not imply a genera
 capacity or cross-model result. No NInfer execution component has been promoted
 into Strata. See the [Phase 3 gate audit](PHASE3_CLOSEOUT.md).
 
+A Phase 5 [accepted-only adaptive-window boundary check](../../bench/results/2026-10-14-phase5-accepted-window-boundary/README.md)
+passed on Orin with the Q2_0 artifact: MTP off/2/3/4 emitted identical
+32-token outputs and matched all recorded persistent state at final state and
+every shared accepted prefix. The change isolates and unit-tests the integer
+cap policy (1,515 checks); it remains opt-in and provides no performance claim.
+The Orin CUDA build and focused ownership/state tests passed. maestro1 HIP and
+SYCL builds and `--help` smoke checks both passed on x86_64; the HIP accepted-
+window test also passed 1,515 checks. These are compile/help checks, not
+accelerator runtime evidence. A fresh supervised artifact-aware PLE rerun
+passed all seven stages for three tokens
+(worst relative L1 `1.148e-7`), with minimum host availability 24.51 GiB.
+
 The Q2_0 [held-out 8K MTP4 confirmation](../../bench/results/2026-10-14-phase6-q2-mtp8k-heldout-confirm7/README.md)
 completed seven randomized fresh-service pairs. All replies matched the held-out
 three-marker retrieval oracle. MTP4 improved median decode throughput by 17.09%
