@@ -1160,6 +1160,12 @@ void MtpDrafter::kv_restore(int64_t upto) {
     cudaStreamSynchronize(cs_);
 }
 
+void MtpDrafter::reset_sequence_state() {
+    const OnDevice on_device(device_);
+    qsa_state_zero(st_, *g_, cs_);
+    cudaStreamSynchronize(cs_);
+}
+
 bool MtpDrafter::prepare_prefill(std::string& err) {
     const OnDevice on_device(device_);
     const int64_t per_row = 1 + 4 + g_->n_head;

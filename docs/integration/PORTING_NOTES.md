@@ -1418,3 +1418,20 @@ record the engine's own final route categories. Add a Splash-specific replay
 adapter only after its activation quantization, packed-weight geometry and
 stream/scratch ownership are independently established; do not infer those
 contracts from CUDA's route labels or buffers.
+
+## 2026-10-14 — Reset draft state at the new-sequence boundary
+
+The Q2_0 MTP4 8K prefill-cancellation follow-up found that target state was
+reset at a fresh request while the MTP drafter's private QSA state was retained.
+After cancellation and short recovery, GDN/PLE/tail/index/KV hashes matched a
+fresh service, but the MTP draft-state hash differed in two repetitions. Clearing
+the drafter's QSA KV and index state whenever the service starts from
+`resume=0` made all 11 state fingerprints match in two post-fix FP16 repetitions
+and one int8-KV repetition. A no-cache run also recovered through the API,
+though it did not emit state hashes. Conversation-cache resumes keep using the
+saved MTP KV prefix. For a future Strata + Splash integration, identify every
+target and draft-state owner and align each fresh-sequence reset and resume
+restore with the same lifecycle boundary. Test cancellation/recovery with direct
+persistent-state checks; equal text alone would not have exposed this stale
+draft state. This result is limited to Q2_0 MTP4/8K cases under FP16 and int8 KV
+and does not prescribe how a Metal draft cache must be reset.
