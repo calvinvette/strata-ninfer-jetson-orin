@@ -17,6 +17,22 @@ parity and held-out request improvements; the NEON operator win did not produce
 a serving win. Defaults remain unchanged, and Phase 5's MTP/adaptive-swap state
 failure prevents qualification of a combined profile.
 
+On 2026-10-14 a same-service Q2_0 residency-quality sequence repeated 7,498-
+and 15,003-token exact retrieval prompts in 8K → 16K → 8K order, with MTP off
+and MTP4. All six replies matched the three-code oracle; answers and selected
+persistent-state fingerprints matched across MTP settings for each request.
+Within each MTP arm, however, the 8K recovery state differed in GDN, PLE, tail,
+pooled, pooled-full and KV fields after the intervening long request, despite
+identical recovery answer and token IDs. This confirms a state-drift signal on
+this task, not broad task degradation or exact recurrent-state equivalence.
+See the [residency-quality run](../../bench/results/2026-10-14-phase5-q2-residency-quality/README.md).
+
+A new [Phase 3 PLE regression refresh](../../bench/results/2026-10-14-phase3-q2-ple-rerun/README.md)
+passed all seven PLE numerical stages (worst relative L1 `1.148e-7`), selected
+CTest 15/15 and integration Python discovery 134/134. Minimum host availability
+was 24.404, 24.504 and 24.492 GiB. This reconfirms the existing Phase 3 Q2_0
+scope and does not close its graph-backing exclusions.
+
 A fresh [Q2_0 PLE and Phase 3 regression rerun](../../bench/results/2026-10-13-phase3-q2-ple-final-refresh/README.md)
 passed all seven artifact-aware PLE stages for three tokens (worst relative L1
 `1.148e-7`), the selected memory/owner/PLE CTests (15/15), and integration
