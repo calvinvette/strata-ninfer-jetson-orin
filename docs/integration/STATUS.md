@@ -208,6 +208,14 @@ cgroup pressure/OOM counters stayed at zero. The tegrastats `tj` sensor ranged
 was disabled, so this is not cache-reuse throughput evidence. Phase 7 remains
 open for broader quality, other service cases and support boundaries.
 
+The same Q2_0 profile also passed a [30-minute sustained 16K retrieval run](../../bench/results/2026-10-14-phase7-q2-recall/sustained-16k/README.md):
+eight serial requests each read 15,003 uncached prompt tokens, returned 41
+tokens, and passed independent marker count/order checks. Minimum host/admission
+availability was 16.75/9.77 GiB; peak scope use was 18.23 GiB, with zero sampled
+cgroup pressure or OOM events. Tegrastats `tj` ranged 49.5–58.5 °C. This adds
+one 16K sustained retrieval point, not broad task quality, cache-reuse
+throughput, or a general capacity boundary; Phase 7 remains open.
+
 After the Q2_0 context ladder, a fresh [regression refresh](../../bench/results/2026-10-14-phase7-q2-recall/post-checks/README.md)
 again passed all seven PLE numerical stages (worst relative L1 `1.148e-7`),
 the selected 15/15 accounting/ownership/PLE CTests, and integration Python
