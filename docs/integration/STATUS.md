@@ -1714,6 +1714,16 @@ task failure does not indicate an MTP quality difference and does not qualify
 the profile; the separate 32-token accepted-prefix parity check remains
 correctness evidence only. Phase 5 remains open.
 
+A separate [Q2_0 8K prefill cancellation and recovery check](../../bench/results/2026-10-14-phase5-q2-mtp8k-prefill-cancel/README.md)
+closed the client stream after 15 seconds. The engine had read 512 of 8,192
+prompt tokens and generated none. The same service then returned `Hello Orin!`
+in 7.53 seconds and remained healthy. The 28-GiB supervisor retained 16.712
+GiB minimum physical host availability and 16.712 GiB minimum admission
+availability; sampled cgroup pressure and OOM counters stayed at zero. This
+qualifies one cancellation point and short-request recovery for Q2_0 MTP4; it
+does not compare persistent state after cancellation or cover other positions.
+Phase 5 remains open.
+
 The same held-out Q2_0 graph/MTP prompt received a separate full-task quality
 check across all four settings. With a 1,024-token allowance each answer ended
 naturally at 850 tokens, was byte-identical, and covered input, working memory
