@@ -40,6 +40,13 @@ the accepted-prefix state transaction or explain the adaptive-residency state
 drift; it does not show that the two route results were mixed within one
 verifier token.
 
+A follow-up sampled actual service activations at layers 0, 12, 24 and 47. All
+four same-activation CPU/GPU comparisons passed; relative L1 ranged from
+`6.35e-8` to `1.03e-7`, with 4,638–5,691 of 7,680 output words differing
+bitwise. The selected routes included three VRAM-owned experts and one
+CPU-owned expert. See the [across-depth report](layer-samples/README.md) and
+retained raw captures and supervised logs under `layer-samples/`.
+
 Reproduction commands, using the checked-in Q2_0 service workload and pack:
 
 ```sh
@@ -99,5 +106,7 @@ The CUDA service executable SHA256 is
 capture source SHA256 is `8aec317048a6b4531313206137773ad2bba0650cdf8ca5282bfcdb485f3bddcf`,
 and the captured-activation parity source SHA256 is
 `1613466c6a08f61e8fdb962f04439e1f9521e5744f14febcc5e8976d1126962b`.
+The service capture-smoke harness SHA256 is
+`98da9ff4a2bdb619d483baa16f849d55cb164c0df63c14a5bea4d09cb9be05d7`.
 The complete report artifact tree, including backend build logs, has its own
 `SHA256SUMS.txt` manifest.

@@ -1406,6 +1406,13 @@ and 5,691 of 7,680 output words differed bitwise. These are small operator
 differences on two sampled activations, not a claim that rounding caused the
 adaptive-swap state drift. See the [capture report](../../bench/results/2026-10-14-phase5-moe-activation-capture/README.md).
 
+A short-task follow-up captured at layers 0, 12, 24 and 47 and replayed one
+routed expert per layer. CPU/GPU relative L1 ranged from `6.35e-8` to
+`1.03e-7` across these real activations; each service route and parity check
+passed. This broadens the sampled operator contract, but still does not
+reproduce route changes through the full state transaction. See the
+[across-depth report](../../bench/results/2026-10-14-phase5-moe-activation-capture/layer-samples/README.md).
+
 For a future Strata+Splash port, preserve this seam-level capture contract and
 record the engine's own final route categories. Add a Splash-specific replay
 adapter only after its activation quantization, packed-weight geometry and

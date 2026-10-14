@@ -50,13 +50,16 @@ GPU runtime evidence. See the raw [HIP build log](../../bench/results/2026-10-14
 
 The opt-in [service activation capture](../../bench/results/2026-10-14-phase5-moe-activation-capture/README.md)
 records exact Q2_0 verifier activations, routed expert IDs and final CPU/VRAM
-ownership without token text. The 8K retrieval and recovery passed; a short
-service smoke validated two captured rows, including one VRAM-owned expert.
-Replaying captured layer-0 activations through the standalone CPU/GPU parity
-tool passed for expert 333 (CPU route; relative L1 `9.85e-8`) and expert 2
-(VRAM route; relative L1 `1.03e-7`). These two rows show small operator-level
-differences on real activations; they do not establish a cause for adaptive
-residency's persistent-state drift. The capture is disabled by default.
+ownership without token text. The 8K retrieval and recovery passed. Four
+additional short-service smokes captured actual activations at layers 0, 12,
+24 and 47; all returned `READY` and passed the six-GiB floor under the 28-GiB
+scope. Same-activation CPU/GPU parity passed for one actually routed expert at
+each layer (three VRAM routes and one CPU route). Relative L1 ranged from
+`6.35e-8` to `1.03e-7`, while 4,638–5,691 of 7,680 words differed bitwise.
+This confirms small operator-level differences across the sampled depth; it
+does not establish that route differences cause adaptive-residency persistent-
+state drift. Capture remains disabled by default. See the [across-depth
+results](../../bench/results/2026-10-14-phase5-moe-activation-capture/layer-samples/README.md).
 
 A new [Phase 3 PLE regression refresh](../../bench/results/2026-10-14-phase3-q2-ple-rerun/README.md)
 passed all seven PLE numerical stages (worst relative L1 `1.148e-7`), selected

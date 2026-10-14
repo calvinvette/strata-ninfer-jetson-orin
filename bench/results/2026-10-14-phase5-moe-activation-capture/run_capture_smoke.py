@@ -19,6 +19,8 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--config", type=Path, required=True)
     ap.add_argument("--output", type=Path, required=True)
+    ap.add_argument("--layer", type=int, default=0,
+                    help="model layer to capture (-1 selects the first dispatch layer)")
     args = ap.parse_args()
     args.output.mkdir(parents=True, exist_ok=False)
     cfg = json.loads(args.config.read_text())
@@ -27,7 +29,7 @@ def main():
     capture_path = (args.output / "capture.jsonl").resolve()
     cfg["env"].update({
         "STRATA_CAPTURE_MOE_PATH": str(capture_path),
-        "STRATA_CAPTURE_MOE_LAYER": "0",
+        "STRATA_CAPTURE_MOE_LAYER": str(args.layer),
         "STRATA_CAPTURE_MOE_ROWS": "2",
     })
     config_path = args.output / "server-config.json"
@@ -62,15 +64,19 @@ def main():
         if len(records) < 2 or records[0].get("format") != "strata-moe-dispatch-v2":
             raise RuntimeError("capture did not contain a header and an activation row")
         width = int(records[0]["n_embd"])
+        captured_layer = args.layer
+        if captured_layer < 0 and len(records) > 1:
+            captured_layer = records[1]["layer"]
         for row in records[1:]:
-            if (row["layer"] != 0 or "dispatch" not in row or len(row["activation"]) != width or
+            if (row["layer"] != captured_layer or "dispatch" not in row or len(row["activation"]) != width or
                     len(row["ids"]) != row["k"] or len(row["route_kind"]) != row["k"] or
                     any(kind not in (-1, 0, 1, 2) for kind in row["route_kind"]) or
                     not all(math.isfinite(v) for v in row["activation"])):
                 raise RuntimeError("capture row failed its geometry, route, or finite-value checks")
         result.update(status="pass", model=health["model"], response=response,
                       capture_rows=len(records) - 1, n_embd=width,
-                      route_ids=records[1]["ids"], route_kind=records[1]["route_kind"])
+                      layer=captured_layer, route_ids=records[1]["ids"],
+                      route_kind=records[1]["route_kind"])
         (args.output / "result.json").write_text(json.dumps(result, indent=2) + "\n")
         return 0
     except Exception as exc:
