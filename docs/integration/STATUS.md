@@ -35,6 +35,14 @@ availability was 24.427, 24.418, and 24.516 GiB, respectively, under the
 28-GiB cgroup ceiling and six-GiB floor. The Q2_0 artifacts were already local;
 this refresh does not extend Phase 3's tested scope or its graph-backing limits.
 
+A further [Q2_0 PLE and Phase 3 refresh](../../bench/results/2026-10-14-phase3-q2-ple-final-refresh2/README.md)
+on the current checkout passed all seven PLE stages (worst relative L1
+`1.148e-7`), the selected 15/15 memory/owner/PLE CTests, and integration Python
+discovery (134/134). Minimum host/effective availability was 24.426, 24.462,
+and 24.507 GiB, respectively, under separate 28-GiB scopes and the six-GiB
+floor. This reconfirms Phase 3's completed Q2_0 scope without closing its
+documented graph-backing or native graph-disable exclusions.
+
 The opt-in IQ1_M [8K/16K/32K retrieval and recovery plus 40-minute stream soak](../../bench/results/2026-10-14-phase7-q6-recall/README.md)
 passed marker retrieval and same-service short recovery at all three context
 sizes. The 40-minute cache-reuse loop completed 1,579 streaming requests with
@@ -1778,3 +1786,12 @@ both MTP settings. MTP2 increased median request time by 16.93% captured and
 finding is limited to this Q2_0 artifact, prompt, cache and adaptation policy;
 energy was not request-attributed and no profile/default is promoted. Phase 6
 remains open for other workload and interaction cells.
+
+A three-block randomized [Q2_0 8K MTP4 versus MTP-off screen](../../bench/results/2026-10-14-phase6-q2-mtp8k-window-screen/README.md)
+used fresh services, a distinct 512-token warmup, a 7,498-token retrieval
+prompt, disabled prompt reuse and no adaptive swaps. All six measured requests
+returned the same 41-token answer. MTP4 accepted 29/33 drafts; its median decode
+delta was +27.16% (three-pair bootstrap interval −3.98% to +28.78%), while
+median client TTFT and total-request time were 7.63% and 5.64% slower. This
+prefill-dominated screen does not justify a held-out timing confirmation or
+profile promotion. No setting changed, and Phase 6 remains open.
