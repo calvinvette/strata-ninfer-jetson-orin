@@ -1686,3 +1686,17 @@ controller by opening with meta-commentary about the repeated-blue context.
 All four 512-token-cap attempts stopped mid-sentence and are excluded. This is
 a shared task failure, not a route difference; it does not qualify a profile.
 The outcomes are retained with the [Phase 6 confirmation](../../bench/results/2026-10-14-phase6-q2-graph-mtp-confirm7/README.md).
+
+A replacement [Q2_0 semantic graph × MTP confirmation](../../bench/results/2026-10-14-phase6-q2-semantic-graph-confirm7/README.md)
+used an exact 512-token held-out prompt in seven randomized blocks. All 28
+captured/eager × MTP-off/MTP2 cells passed, generated identical text, and
+preserved at least 16.899 GiB physical host availability and 11.832 GiB
+admission availability. Full-task checks under all four conditions then
+naturally stopped at 334 tokens, passed the 11-item task rubric, and returned
+byte-identical answers; minima were 16.928 GiB host and 13.454 GiB admission
+availability. Captured versus eager request-time intervals included zero in
+both MTP settings. MTP2 increased median request time by 16.93% captured and
+11.52% eager, with paired 95% intervals excluding zero. This task-qualified
+finding is limited to this Q2_0 artifact, prompt, cache and adaptation policy;
+energy was not request-attributed and no profile/default is promoted. Phase 6
+remains open for other workload and interaction cells.
