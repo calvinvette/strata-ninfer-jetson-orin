@@ -1214,7 +1214,9 @@
                 "ple_prev": "22,16"
               }
             }
-          ]
+          ],
+          "answer_normalization": "removed one terminal <|im_end|> stop token from diagnostic tokenizer decode",
+          "raw_answer_suffix": "<|im_end|> (terminal control token present in emitted IDs)"
         },
         {
           "name": "long-16384",
@@ -2366,7 +2368,9 @@
                 "ple_prev": "22,16"
               }
             }
-          ]
+          ],
+          "answer_normalization": "removed one terminal <|im_end|> stop token from diagnostic tokenizer decode",
+          "raw_answer_suffix": "<|im_end|> (terminal control token present in emitted IDs)"
         },
         {
           "name": "short-8192-recovery",
@@ -3518,7 +3522,9 @@
                 "ple_prev": "22,16"
               }
             }
-          ]
+          ],
+          "answer_normalization": "removed one terminal <|im_end|> stop token from diagnostic tokenizer decode",
+          "raw_answer_suffix": "<|im_end|> (terminal control token present in emitted IDs)"
         }
       ]
     },
@@ -4024,7 +4030,9 @@
                 "ple_prev": "22,16"
               }
             }
-          ]
+          ],
+          "answer_normalization": "removed one terminal <|im_end|> stop token from diagnostic tokenizer decode",
+          "raw_answer_suffix": "<|im_end|> (terminal control token present in emitted IDs)"
         },
         {
           "name": "long-16384",
@@ -4483,7 +4491,9 @@
                 "ple_prev": "22,16"
               }
             }
-          ]
+          ],
+          "answer_normalization": "removed one terminal <|im_end|> stop token from diagnostic tokenizer decode",
+          "raw_answer_suffix": "<|im_end|> (terminal control token present in emitted IDs)"
         },
         {
           "name": "short-8192-recovery",
@@ -4942,7 +4952,9 @@
                 "ple_prev": "22,16"
               }
             }
-          ]
+          ],
+          "answer_normalization": "removed one terminal <|im_end|> stop token from diagnostic tokenizer decode",
+          "raw_answer_suffix": "<|im_end|> (terminal control token present in emitted IDs)"
         }
       ]
     }
@@ -4970,14 +4982,35 @@
       "request": "mtp-off-recovery",
       "quality_pass_both": true,
       "same_answer_before_after_long": true,
-      "same_state_before_after_long": false
+      "same_state_before_after_long": false,
+      "differing_persistent_state_fields": [
+        "gdn",
+        "ple",
+        "tail",
+        "pooled",
+        "pooled_full",
+        "kv"
+      ]
     },
     {
       "request": "mtp4-recovery",
       "quality_pass_both": true,
       "same_answer_before_after_long": true,
-      "same_state_before_after_long": false
+      "same_state_before_after_long": false,
+      "differing_persistent_state_fields": [
+        "gdn",
+        "ple",
+        "tail",
+        "pooled",
+        "pooled_full",
+        "kv"
+      ]
     }
   ],
-  "passed": false
+  "passed": false,
+  "task_quality_pass": true,
+  "answer_parity_pass": true,
+  "persistent_state_parity_across_mtp": true,
+  "persistent_state_recovery_equal": false,
+  "analysis_note": "Exact retrieval-plus-arithmetic quality passes in all six requests and answers match across MTP. Recovery state changes under the default adaptive-swap cadence; a separate delayed-swap retrieval control restores exact state."
 }
