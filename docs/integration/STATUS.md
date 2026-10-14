@@ -24,7 +24,11 @@ persistent-state fingerprints matched across MTP settings for each request.
 Within each MTP arm, however, the 8K recovery state differed in GDN, PLE, tail,
 pooled, pooled-full and KV fields after the intervening long request, despite
 identical recovery answer and token IDs. This confirms a state-drift signal on
-this task, not broad task degradation or exact recurrent-state equivalence.
+this task, not broad task degradation or exact recurrent-state equivalence. A
+same-day control delayed adaptation to 100,000 accepted rounds; it emitted no
+swap-choice batches and restored exact recovery state in both MTP settings.
+This supports adaptive swaps as the trigger for this sequence's state drift,
+while the numerical mechanism and broader task effect remain open.
 See the [residency-quality run](../../bench/results/2026-10-14-phase5-q2-residency-quality/README.md).
 
 A new [Phase 3 PLE regression refresh](../../bench/results/2026-10-14-phase3-q2-ple-rerun/README.md)
@@ -293,6 +297,15 @@ demonstrated state leak; the exact residency/arithmetic cause and task-quality
 impact remain unclassified. See the [same-service report](../../bench/results/2026-10-13-phase6-q6-warp-mtp-confirm7/run/same-service-short-long-short/README.md).
 
 A current-checkout [swap-choice attribution rerun](../../bench/results/2026-10-14-phase5-q6-swap-choice-attribution/README.md) logged all expert residency choices during the same sequence. Each request caused four updates; the first two selected 96 swaps each time, while recovery selected 96/79/74/73. All 12 choice batches matched between MTP-off and MTP4, as did outputs and persistent state request-by-request. Yet both settings again changed 14/16 recovery token IDs and seven state fingerprints versus the first short request. This strengthens the residency-change association and shows the symptom does not require MTP, but does not establish the numerical cause or task-quality impact. Adaptive swaps remain unqualified for this stability case; Phase 5 remains open.
+
+The [Q2_0 retrieval-quality follow-up](../../bench/results/2026-10-14-phase5-q2-residency-quality/README.md)
+then confirmed all six adaptive-run answers against an exact three-code oracle.
+Both MTP settings changed six persistent fields after the 16K request while
+returning the exact original 8K answer. With adaptive updates delayed beyond
+the measured sequence, both settings recovered the original state exactly.
+This controlled contrast narrows the state-drift trigger to adaptive swaps for
+this Q2_0 profile; it does not identify the underlying arithmetic difference
+or qualify adaptive swaps for other workloads. Phase 5 remains open.
 
 The accepted-only 16K-context elastic-KV test grew from 2,048 to 10,240 cells
 for a 9,000-token prompt, then trimmed to 2,048 before the short recovery

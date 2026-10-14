@@ -34,6 +34,8 @@ def main():
     parser.add_argument('--long-workload', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--generation-cap', type=int, default=48)
+    parser.add_argument('--adapt-every', type=int,
+                        help='override the configured adaptive-swap interval (accepted-token rounds)')
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=False)
     cfg = json.loads(args.config.read_text())
@@ -65,6 +67,11 @@ def main():
     for window in (0, 4):
         label = 'mtp-off' if window == 0 else 'mtp4'
         engine_args = args_for(cfg, window, disable_adaptive_swaps=False)
+        if args.adapt_every is not None:
+            if '--adapt-every' in engine_args:
+                engine_args[engine_args.index('--adapt-every') + 1] = str(args.adapt_every)
+            else:
+                engine_args += ['--adapt-every', str(args.adapt_every)]
         # The repeated 8K prompt must be a fresh prefill; only expert residency persists.
         engine_args[engine_args.index('--prompt-cache') + 1] = '0'
         env = child_env(cfg)
@@ -75,7 +82,7 @@ def main():
         log_path = args.output / f'{label}.log'
         engine = StrataEngine(cfg['exe'], engine_args, cwd=cfg['cwd'], log=str(log_path), env=env)
         arm = {'name': label, 'window': window, 'engine_sha256': hashlib.sha256(Path(cfg['exe']).read_bytes()).hexdigest(),
-               'args': engine_args, 'requests': []}
+               'adapt_every': args.adapt_every, 'args': engine_args, 'requests': []}
         try:
             prior_trace_rows = 0
             for name in SEQUENCE:

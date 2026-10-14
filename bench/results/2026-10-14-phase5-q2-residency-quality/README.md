@@ -38,6 +38,19 @@ not process-attributed. The per-request prompt and decode times are retained
 in `trace-rerun/results.json`; they are descriptive, not a paired performance
 claim.
 
+A same-day delayed-swap control repeated the sequence with
+`--adapt-every 100000`, keeping the adaptive policy configured but placing its
+update threshold beyond these request lengths. No adaptive choice batches were
+emitted. All six replies again matched the marker oracle, accepted-prefix token
+traces matched published IDs, and both MTP arms recovered the exact initial
+8K persistent-state fingerprint after the 16K request. This contrast supports
+adaptive swaps as the trigger for the recovery-state drift in this Q2_0
+sequence. It does not identify which numerical operation differs between
+residency paths. The control lasted 1,658.0 seconds, retained 16.800 GiB
+minimum host availability and 6.445 GiB minimum admission availability, and
+had zero sampled cgroup pressure/OOM events. It is one controlled sequence per
+setting, not timing qualification.
+
 The first harness run is retained under `trace/` and `supervisor/`; it stopped
 after the first request because the parser expected a separate final-state log
 record. The corrected full run is under `trace-rerun/` and `supervisor-rerun/`.
@@ -46,10 +59,13 @@ both canonical text equality before stop-token normalization and identical
 recovery state. The corrected analysis preserves raw text and raw traces,
 normalizes the terminal stop token, and reports task-quality and state-drift
 checks separately. Its strict combined `passed` field remains false because
-the state fingerprints differ on recovery.
+the state fingerprints differ on recovery. The delayed-swap control is
+retained under `trace-delayed/` and `supervisor-delayed/`; its strict combined
+check passes.
 
 Reproduction uses the local model/config and workload paths recorded by the
 driver in `residency_quality_sequence.py`. The exact config and prompt workload
 SHA256 values are listed in the Phase 7 Q2_0 report manifest; model shard
-identity and byte sizes are documented in that report as well. The first attempt is retained
-as a harness failure and is not pooled with the corrected run.
+identity and byte sizes are documented in that report as well. The first
+attempt is retained as a harness failure and is not pooled with the corrected
+run.
