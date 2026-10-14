@@ -1,6 +1,6 @@
 # Integration status
 
-Updated: 2026-10-13. Phases 1 through 4 are complete for their documented tested
+Updated: 2026-10-14. Phases 1 through 4 are complete for their documented tested
 Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 has
 initial long-context recall and sustained-service evidence and remains in
 progress; Phases 5 and 6 also remain open.
@@ -1644,3 +1644,15 @@ relative L1 `1.148e-7`), selected Phase 3 CTests (15/15), and Python discovery
 (130/130). Minimum host/effective availability was 24.284, 24.407, and 24.377
 GiB, respectively, under separate 28-GiB scopes with zero cgroup pressure
 counters. This reconfirms, without extending, the documented Phase 3 scope.
+
+A [three-block randomized Q2_0 graph × MTP2 screen](../../bench/results/2026-10-14-phase5-phase6-graph-mtp-screen/README.md)
+completed all 12 captured/eager × MTP-off/window2 cells. Every 512/16 request
+passed and returned identical output text; MTP2 offered/accepted eight/six
+drafts in every cell. Prompt timing varied too widely for this small synthetic
+screen to distinguish route effects, and decode results did not show a stable
+MTP win. The 28-GiB scope retained 16.70 GiB minimum host availability and
+6.66 GiB minimum admission availability, with zero cgroup OOM/limit events.
+Clock readings were dynamic, EMC access was unavailable, and energy was not
+measured per process. This is screening evidence only: no route or serving
+profile is promoted, and Phase 5 state/quality gates and Phase 6 held-out
+confirmation remain open.
