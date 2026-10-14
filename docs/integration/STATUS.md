@@ -43,7 +43,10 @@ the floating reference by `1.13e-2` to `1.27e-2` due to the represented
 activation contract. This demonstrates widespread small CPU/GPU rounding
 differences in these operator samples, but does not explain the service drift:
 captured service activations and the experts selected/evicted by the adaptive
-trace remain to be checked.
+trace remain to be checked. The updated diagnostic reports bitwise differences
+without changing calculations or its pass criterion; CUDA rebuilt and passed
+on Orin, and the HIP target compiled/linked on maestro1. maestro1 supplied no
+GPU runtime evidence. See the raw [HIP build log](../../bench/results/2026-10-14-phase5-q2-cpu-gpu-expert-parity/hip-build.txt).
 
 A new [Phase 3 PLE regression refresh](../../bench/results/2026-10-14-phase3-q2-ple-rerun/README.md)
 passed all seven PLE numerical stages (worst relative L1 `1.148e-7`), selected

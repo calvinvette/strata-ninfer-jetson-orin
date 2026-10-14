@@ -45,3 +45,11 @@ retained in the prior [Q2_0 artifact identity manifest](../2026-10-11-phase3-q2-
 The executable and raw-output SHA256 values are in [SHA256SUMS](SHA256SUMS).
 The diagnostic change only reports CPU/GPU bitwise differences; it does not
 change either computation or the parity pass criterion.
+
+The updated target also compiled and linked with HIP on maestro1. The recorded
+build log is [hip-build.txt](hip-build.txt); the output contains existing
+nodiscard and unused-code warnings, with no errors, and ends by linking
+`native_expert_parity`. The remote source snapshot was restored afterward; its
+original test-source SHA256 (`724a4cde…`) matches the pre-change checkout file.
+The HIP binary SHA256 is retained in [backend-identities.txt](backend-identities.txt).
+maestro1 supplied compile/link evidence only; the binary was not run on a GPU.
