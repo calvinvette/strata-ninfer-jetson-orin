@@ -1373,3 +1373,41 @@ exact task oracles with same-service A/B/A state checks, capture actual
 residency choices, and include a no-transition control; score task output,
 cross-MTP parity and recovery-state equality as separate outcomes. See the
 [Q2_0 quality and control report](../../bench/results/2026-10-14-phase5-q2-residency-quality/README.md).
+
+## Capturing real service activations at the expert split
+
+For a CPU/GPU route comparison, sample the activation at the multi-token expert
+dispatch boundary, after residency, PCIe, peer and helper-GPU ownership have
+been resolved. `STRATA_CAPTURE_MOE_PATH` enables a bounded JSONL trace;
+`STRATA_CAPTURE_MOE_LAYER` selects a layer (default `-1`, all layers), and
+`STRATA_CAPTURE_MOE_ROWS` caps captured verifier rows (default 8, maximum 128).
+Each record contains layer/dispatch-call/row indices, top-k expert IDs, final
+route kind (`-1` CPU, `0` primary VRAM or foresight slot, `1` PCIe, `2` peer/helper
+GPU), and the exact host FP32 activation supplied to the expert dispatcher.
+It contains no token text. With the path unset, capture exits immediately and
+does not change inference arithmetic.
+
+`native_expert_parity` accepts `--expert E --activation-f32 FILE` for a raw
+little-endian vector of 2,560 float32 values. It reuses the chosen model shard
+to run the same captured activation through CPU and GPU expert implementations.
+The repeat across its three operator rows is for width-invariance checks; the
+service captured one activation row. Check its route ID first so the chosen
+expert actually appeared in that top-k list. This comparison isolates the
+operator on an actual service input; it does not recreate the verifier state
+transaction, identify a cause of later state drift, or substitute for an
+accepted-prefix replay test.
+
+On 2026-10-14, the Q2_0 8K retrieval service passed all three marker checks and
+same-service recovery while capturing layer 0, expert 333's CPU route. The
+same-day short service smoke captured a layer-0 row with expert 2 on VRAM.
+Using the corresponding captured activations, the independent CPU/GPU
+operator comparisons passed with relative L1 `9.85e-8` and `1.03e-7`; 5,586
+and 5,691 of 7,680 output words differed bitwise. These are small operator
+differences on two sampled activations, not a claim that rounding caused the
+adaptive-swap state drift. See the [capture report](../../bench/results/2026-10-14-phase5-moe-activation-capture/README.md).
+
+For a future Strata+Splash port, preserve this seam-level capture contract and
+record the engine's own final route categories. Add a Splash-specific replay
+adapter only after its activation quantization, packed-weight geometry and
+stream/scratch ownership are independently established; do not infer those
+contracts from CUDA's route labels or buffers.

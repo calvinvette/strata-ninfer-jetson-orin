@@ -51,7 +51,7 @@ constexpr int64_t H = 2560, FF = 640;
 
 // The three ways and the dequantizers for one expert blob; returns the number of failed checks.
 int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int seed, const std::string& label,
-               cudaStream_t s) {
+               cudaStream_t s, const std::vector<float>* service_activation = nullptr) {
     int failures = 0;
     // (a) the float reference
     const auto* tg = ggml_get_type_traits((ggml_type) f.gu_type);
@@ -65,7 +65,17 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
     std::mt19937 rng(11 + seed);
     std::normal_distribution<float> nd(0.f, 1.f);
     std::vector<float> x((size_t) NT * H);
-    for (auto& v : x) v = nd(rng);
+    if (service_activation != nullptr) {
+        if (service_activation->size() != (size_t) H) {
+            std::fprintf(stderr, "%s: service activation has %zu values; expected %lld\n", label.c_str(),
+                         service_activation->size(), (long long) H);
+            return 1;
+        }
+        for (int k = 0; k < NT; ++k)
+            std::copy(service_activation->begin(), service_activation->end(), x.begin() + (size_t) k * H);
+    } else {
+        for (auto& v : x) v = nd(rng);
+    }
     std::vector<float> ref((size_t) NT * H), got_c((size_t) NT * H), got_g((size_t) NT * H);
     for (int k = 0; k < NT; ++k) {
         std::vector<float> h(FF);
@@ -538,7 +548,7 @@ int check_bf16_embd(cudaStream_t s) {
 int main(int argc, char** argv) {
     setvbuf(stdout, nullptr, _IONBF, 0);   // keep the trail on a crash
     if (argc < 2) {
-        std::fprintf(stderr, "usage: native_expert_parity <shard.gguf> [layer ...]\n"
+        std::fprintf(stderr, "usage: native_expert_parity <shard.gguf> [--expert E] [--activation-f32 FILE] [layer ...]\n"
                              "       native_expert_parity --synthetic GU/DOWN ...   (ggml type names, e.g. q4_K/q5_1)\n"
                              "       native_expert_parity --q5_1-min\n"
                              "       native_expert_parity --bf16-embd\n");
@@ -579,7 +589,33 @@ int main(int argc, char** argv) {
     } else {
         const strata::GgufModel model(strata::gguf_split_paths(argv[1]));
         std::vector<int> layers;
-        for (int i = 2; i < argc; ++i) layers.push_back(std::atoi(argv[i]));
+        int expert = E;
+        std::string activation_path;
+        for (int i = 2; i < argc; ++i) {
+            const std::string arg = argv[i];
+            if (arg == "--expert" && i + 1 < argc) expert = std::atoi(argv[++i]);
+            else if (arg == "--activation-f32" && i + 1 < argc) activation_path = argv[++i];
+            else layers.push_back(std::atoi(argv[i]));
+        }
+        if (expert < 0 || expert >= cpu::NE) {
+            std::fprintf(stderr, "expert id %d is outside the model's %d experts\n", expert, cpu::NE);
+            return 2;
+        }
+        std::vector<float> service_activation;
+        if (!activation_path.empty()) {
+            FILE* f = std::fopen(activation_path.c_str(), "rb");
+            if (f == nullptr) { std::perror(activation_path.c_str()); return 2; }
+            service_activation.resize((size_t) H);
+            const size_t got = std::fread(service_activation.data(), sizeof(float), service_activation.size(), f);
+            const int extra = std::fgetc(f);
+            std::fclose(f);
+            if (got != service_activation.size() || extra != EOF ||
+                std::any_of(service_activation.begin(), service_activation.end(), [](float v) { return !std::isfinite(v); })) {
+                std::fprintf(stderr, "%s: expected exactly %lld finite float32 values\n", activation_path.c_str(), (long long) H);
+                return 2;
+            }
+            std::printf("using captured service activation: %s (%lld float32 values)\n", activation_path.c_str(), (long long) H);
+        }
         if (layers.empty()) layers = {0, 1, 2, 3, 20, 47};
         for (int l : layers) {
             const strata::TensorInfo* t[3] = {};
@@ -597,11 +633,13 @@ int main(int argc, char** argv) {
                 std::printf("layer %d: %s\n", l, err.c_str()); ++failures; continue;
             }
             std::vector<uint8_t> blob(f.bytes);
-            std::memcpy(blob.data(), data[0] + (size_t) E * f.up_off, f.up_off);
-            std::memcpy(blob.data() + f.up_off, data[1] + (size_t) E * f.up_off, f.up_off);
-            std::memcpy(blob.data() + f.down_off, data[2] + (size_t) E * (f.bytes - f.down_off),
+            std::memcpy(blob.data(), data[0] + (size_t) expert * f.up_off, f.up_off);
+            std::memcpy(blob.data() + f.up_off, data[1] + (size_t) expert * f.up_off, f.up_off);
+            std::memcpy(blob.data() + f.down_off, data[2] + (size_t) expert * (f.bytes - f.down_off),
                         f.bytes - f.down_off);
-            failures += check_blob(f, blob, l, "layer " + std::to_string(l), s);
+            const std::string label = "layer " + std::to_string(l) + " expert " + std::to_string(expert);
+            failures += check_blob(f, blob, l, label, s,
+                                   service_activation.empty() ? nullptr : &service_activation);
         }
     }
     std::printf("native_expert_parity: %d failures\n", failures);
