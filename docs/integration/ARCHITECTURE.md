@@ -84,6 +84,18 @@ only the accepted prefix. A claim of bitwise state reconstruction requires exact
 persistent-state comparisons against the same sequential arithmetic path. A
 tolerance-based oracle pass is a different claim. Plausible final text proves neither.
 
+For the current Strata verifier, raw-record ReplaySSM has no identified storage
+target. Verify keeps each GDN head's recurrent FP32 state in registers and does
+not write a state image for every proposal. The commit graph then replays the
+selected prefix from the committed checkpoint using the existing FP32 `h`, gate
+and beta intermediates; those intermediates also serve verification outputs and
+convolution commit. NInfer's BF16 `k`/`v` records are not precision-compatible
+with this path. A Strata-specific record would need to preserve FP32 represented
+inputs and recurrence operation order, so it would duplicate or replace live
+intermediates without eliminating per-position state snapshots. Reconsider only
+if a measured workspace redesign can remove those intermediates while preserving
+the exact recurrence and output path.
+
 Graph capture/replay requires stable buffer addresses, valid ownership through
 completion, explicit capture boundaries and qualified resizing/recapture. Pair
 graph and eager runs; test cancellation, reuse and cache resize before admission.

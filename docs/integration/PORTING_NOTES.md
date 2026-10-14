@@ -245,6 +245,23 @@ confirmed Strata fix matched every shared boundary in the 8-token MTP-off/2/3/4
 screen and 32-token MTP-off/window-4 chain. See the
 [raw report](../../bench/results/2026-10-11-phase5-spare-restore-long-chain/README.md).
 
+### ReplaySSM decision for the current Strata verifier
+
+The pinned NInfer ReplaySSM note is a useful transaction and precision
+reference, but its memory design does not map directly to this Strata path.
+`gdn_step_norm_multi_kernel` holds the FP32 recurrence rows in registers while
+verifying and writes the selected committed state only; it does not retain a
+full recurrent-state snapshot per proposal. The captured commit graph replays
+the accepted prefix from the checkpoint using `h_L_`, `gate_L_` and `beta_L_`.
+`qkv_L_` remains necessary for convolution-history commit. These buffers are
+also consumed by the regular verify/output path, so an additional raw-record
+plane would add storage. Replacing them would require a new exact FP32 replay
+and output pipeline, while NInfer's BF16 key/value record format would change
+the represented transition inputs. No ReplaySSM port is selected unless a
+workspace measurement identifies removable per-position state storage or a
+replacement record format with an exact operation-order oracle and net memory
+benefit.
+
 
 ## A codec oracle can be exact without mirroring conversion code
 
