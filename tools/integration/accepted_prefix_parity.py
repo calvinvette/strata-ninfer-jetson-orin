@@ -28,10 +28,13 @@ def parse_hashes(path):
     return found
 
 
-def args_for(cfg, spec, kv_format=None):
+def args_for(cfg, spec, kv_format=None, disable_adaptive_swaps=True):
     args = list(cfg['args'])
-    for key, value in (('--prompt-cache', '6'), ('--adapt-swaps', '0'),
-                       ('--suffix-draft', '0'), ('--spec-min-p', '0')):
+    overrides = [('--prompt-cache', '6'), ('--suffix-draft', '0'),
+                 ('--spec-min-p', '0')]
+    if disable_adaptive_swaps:
+        overrides.append(('--adapt-swaps', '0'))
+    for key, value in overrides:
         if key in args:
             args[args.index(key) + 1] = value
         else:
@@ -70,6 +73,8 @@ def main():
                     help='override the configured KV format for every arm')
     ap.add_argument('--windows', type=int, nargs='+', default=[0, 4],
                     help='MTP windows to compare; include 0 for the no-MTP reference')
+    ap.add_argument('--use-config-adaptive-swaps', action='store_true',
+                    help='preserve the config adaptive-swap policy instead of forcing --adapt-swaps 0')
     ap.add_argument('--run', action='store_true')
     a = ap.parse_args()
     if a.tokens < 8:
@@ -105,7 +110,8 @@ def main():
     for spec in a.windows:
         label = 'mtp-off' if spec == 0 else f'mtp-window{spec}'
         log = a.output / f'{label}.log'
-        command = args_for(cfg, spec, a.kv_format)
+        command = args_for(cfg, spec, a.kv_format,
+                           disable_adaptive_swaps=not a.use_config_adaptive_swaps)
         engine = StrataEngine(str(a.engine.resolve()), command, cwd=cfg.get('cwd'), log=str(log), env=env)
         arm = {'name': label, 'spec': spec, 'args': command, 'info': dict(engine.info), 'records': []}
         with a.engine.open('rb') as binary:

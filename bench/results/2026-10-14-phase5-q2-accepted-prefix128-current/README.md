@@ -23,6 +23,25 @@ floor and separate three-GiB workspace reserve were preserved. All sampled
 cgroup pressure and OOM counters were zero. Clocks were observed without
 changes; energy was not process-attributed.
 
+## Accepted-only adaptive swaps enabled
+
+The same current binary, prompt, cache, KV format and 128-token chain were then
+rerun with `--adapt-every 4 --adapt-accepted-only` from the Q2_0 MTP quality
+config. The harness's new `--use-config-adaptive-swaps` switch preserved that
+policy instead of forcing `--adapt-swaps 0`. MTP-off/2/3/4 again emitted
+identical token IDs and matched final state; every shared prefix matched
+directly at 83/71/61 boundaries for windows 2/3/4. Drafts offered/accepted
+were 67/45, 101/57 and 132/67. The supervisor passed with minimum host
+availability 16.903 GiB and minimum admission availability 8.812 GiB; cgroup
+pressure and OOM counters remained zero.
+
+This is stronger transaction evidence for accepted-only adaptation on this
+single current-build Q2_0 prompt and fixed cache. It does not resolve the
+separate prompt/cache cases where residency changes affected output, nor cover
+other KV formats, cancellation, or timing. The script's default still disables
+adaptive swaps so existing investigations remain isolated; its new switch is
+opt-in and has unit coverage in `tools/integration/test_accepted_prefix_parity.py`.
+
 Two setup attempts before the valid run are retained separately in
 `supervisor/` and `supervisor-no-adapt/` and excluded. The first was refused
 before model readiness because the harness forces `--adapt-swaps 0` while the
@@ -45,7 +64,12 @@ systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes \
   --tokens 128 --prompt-tokens 2048 --windows 0 2 3 4 --run
 ```
 
-This closes one long-chain accepted-prefix parity cell for this Q2_0 prompt,
-cache and no-swap policy. It does not address adaptive residency swaps, other
-KV formats, cancellation, quality beyond the separate task checks, or MTP
-performance. Phase 5 remains open.
+Repeat with the configured accepted-only adaptive-swap policy by using
+`--config bench/results/2026-10-14-phase5-q2-mtp-quality/config-mtp4.json`,
+writing telemetry to `supervisor-adaptive/`, writing traces to `run-adaptive/`,
+and adding `--use-config-adaptive-swaps` before `--run`.
+
+Together the two policies close one long-chain accepted-prefix parity cell for
+this Q2_0 prompt and cache. They do not establish parity for other prompts,
+cache sizes or KV formats, cancellation, or MTP performance. Phase 5 remains
+open.

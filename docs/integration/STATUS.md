@@ -1682,15 +1682,16 @@ the 28-GiB scope. These are task-quality checks, not broad quality or
 performance evidence; MTP remains opt-in and Phase 5 remains open.
 
 A current-binary [Q2_0 128-token accepted-prefix comparison](../../bench/results/2026-10-14-phase5-q2-accepted-prefix128-current/README.md)
-then compared MTP off/2/3/4 on a 2,048-token prompt with adaptive swaps
-disabled in every arm. All outputs and final persistent state matched; all
-shared accepted-prefix fingerprints matched across 75/64/55 boundaries for
-MTP2/3/4 respectively. Drafts offered/accepted were 74/53, 126/64 and 162/73.
-The 28-GiB supervisor retained 16.867 GiB minimum host availability and 8.703
-GiB minimum admission availability, with zero cgroup pressure or OOM events.
-This extends correctness to a longer Q2_0 chain under the no-swap control; it
-does not cover adaptive-swap sensitivity or provide timing evidence. Phase 5
-remains open.
+then compared MTP off/2/3/4 on a 2,048-token prompt under both no-swap and
+accepted-only adaptive-swap policies. All outputs and final persistent state
+matched; every shared accepted-prefix fingerprint matched across 75/64/55
+boundaries without swaps and 83/71/61 with accepted-only swaps for MTP2/3/4.
+Drafts offered/accepted were 74/53, 126/64 and 162/73 without swaps and 67/45,
+101/57 and 132/67 with swaps. The 28-GiB supervisors retained at least 16.867
+GiB host availability and 8.703 GiB admission availability, with zero cgroup
+pressure or OOM events. This extends longer-chain parity to two policies for
+one Q2_0 prompt/cache; it does not resolve other prompt/cache sensitivities or
+provide timing evidence. Phase 5 remains open.
 
 The same held-out Q2_0 graph/MTP prompt received a separate full-task quality
 check across all four settings. With a 1,024-token allowance each answer ended

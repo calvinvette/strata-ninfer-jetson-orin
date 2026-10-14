@@ -35,6 +35,18 @@ class AcceptedPrefixParityTests(unittest.TestCase):
         self.assertEqual(args[args.index('--spec') + 1], '3')
         self.assertEqual(args[args.index('--mtp-max-t') + 1], '3')
 
+    def test_config_adaptive_swap_policy_can_be_preserved(self):
+        cfg = {'args': ['--adapt-every', '4', '--adapt-accepted-only',
+                        '--mtp', 'mtp/rt', '--spec', '4']}
+        args = args_for(cfg, 3, disable_adaptive_swaps=False)
+        self.assertNotIn('--adapt-swaps', args)
+        self.assertIn('--adapt-accepted-only', args)
+        self.assertEqual(args[args.index('--adapt-every') + 1], '4')
+
+    def test_default_adaptive_swap_policy_is_disabled(self):
+        args = args_for({'args': ['--mtp', 'mtp/rt']}, 2)
+        self.assertEqual(args[args.index('--adapt-swaps') + 1], '0')
+
     def test_kv_format_override_preserves_mtp_arms(self):
         cfg = {'args': ['--native', 'model.gguf', '--mtp', 'mtp/rt', '--spec', '4', '--kv', 'fp16']}
         for spec in (0, 2, 3, 4):
