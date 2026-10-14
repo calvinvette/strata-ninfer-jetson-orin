@@ -15,6 +15,12 @@ passed on Orin with the Q2_0 artifact: MTP off/2/3/4 emitted identical
 32-token outputs and matched all recorded persistent state at final state and
 every shared accepted prefix. The change isolates and unit-tests the integer
 cap policy (1,515 checks); it remains opt-in and provides no performance claim.
+A 256-token follow-up with the same prompt also matched all token IDs and final
+state across MTP off/2/3/4, with 168/150/134 shared state boundaries matching
+for MTP2/3/4. Minimum host/admission availability was 16.88/8.43 GiB under the
+28-GiB supervisor; cgroup pressure/OOM counters stayed zero. This does not
+resolve same-service recovery drift after adaptive residency changes. See the
+[longer accepted-prefix run](../../bench/results/2026-10-14-phase5-accepted-window-256/README.md).
 The Orin CUDA build and focused ownership/state tests passed. maestro1 HIP and
 SYCL builds and `--help` smoke checks both passed on x86_64; the HIP accepted-
 window test also passed 1,515 checks. These are compile/help checks, not
