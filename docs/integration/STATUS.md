@@ -1958,3 +1958,20 @@ sampled cgroup pressure and OOM counters stayed zero. This supports only the
 four-worker/pread cell on this task; shared page-cache history prevents a cold-
 disk conclusion, so no default changed. Phase 6 remains open for other
 interactions and workloads.
+
+A same-day three-block [Q2_0 MTP-window × KV-format screen](../../bench/results/2026-10-14-phase6-q2-mtp-kv-window-screen/README.md)
+compared MTP off/2/3/4 under FP16 and int8 KV on the held-out 512-token
+semantic task. All 24 fresh-service cells passed, matched output within each
+format/block, and used 3,000 actual expert slots. Window 2 improved median
+decode rate by 8.78% with int8 KV and 2.77% with FP16; window 3 improved it by
+8.43% and 2.47%. Window 4 reduced decode rate by 5.98% and 9.83%, respectively.
+All three windows had higher TTFT medians, and the total-request effects were
+small for windows 2/3 but slower for window 4. Minimum physical host/admission
+availability was 16.914/6.278 GiB for int8 and 16.842/6.454 GiB for FP16, with
+zero sampled cgroup high/max/OOM events. This is a three-block timing screen:
+the two format campaigns ran sequentially, clocks were dynamic, and generation
+was capped at 64 tokens. The format interaction remains exploratory; no profile
+or default changed. The first setup attempt is retained and excluded because a
+static-cache screen inherited an incompatible `--adapt-accepted-only` flag;
+the argument normalizer now removes that flag when it disables adaptive swaps.
+Focused integration tests pass 12/12. Phase 6 remains open.

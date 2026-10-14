@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/serve/server.py", line 5897, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/serve/server.py", line 5722, in main
+    engine = StrataEngine(exe, engine_args(cfg) + (effort_end or []), cwd=cfg.get("cwd"), log=cfg.get("log"),
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/serve/server.py", line 693, in __init__
+    raise RuntimeError(why + (f" (see {log})" if log else "") +
+RuntimeError: the engine exited before it was ready (see /home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-14-phase6-q2-int8-mtp-window-screen/run/block-00-window-4/engine.log)
+the engine log's last lines:
+  [strata] 2026-10-14 14:25:21 engine started: /home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/candidate/strata --serve --pack /home/calvin/models/strata-orin-validation/q2-ple-pack --native /home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf --ple-gguf /home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf --expert-profile /home/calvin/models/strata-orin-validation/q2-expert-profile.bin --expert-cache 3000 --prefill 512 --spec 4 --max-context 8192 --mmap-experts --prompt-cache 0 --vram-reserve-mib 3072 --pcie-frac 0.55 --no-prefill-borrow --pool-workers 8 --suffix-draft 0 --spec-min-p 0 --adapt-every 4 --adapt-accepted-only --mtp /home/calvin/models/strata-orin-validation/mtp/rt --mtp-max-t 4 --kv int8 --adapt-swaps 0
+  strata generate: --adapt-accepted-only requires single-request --serve with blocking, single-GPU adaptive swaps
+Traceback (most recent call last):
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py", line 116, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py", line 78, in main
+    raise RuntimeError(f'server exited before readiness: {server.returncode}')
+RuntimeError: server exited before readiness: 1

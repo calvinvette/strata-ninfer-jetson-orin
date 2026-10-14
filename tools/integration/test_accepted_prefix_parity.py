@@ -47,6 +47,13 @@ class AcceptedPrefixParityTests(unittest.TestCase):
         args = args_for({'args': ['--mtp', 'mtp/rt']}, 2)
         self.assertEqual(args[args.index('--adapt-swaps') + 1], '0')
 
+    def test_static_cache_screen_removes_accepted_only_policy(self):
+        cfg = {'args': ['--adapt-every', '4', '--adapt-accepted-only',
+                        '--mtp', 'mtp/rt', '--spec', '4']}
+        args = args_for(cfg, 2)
+        self.assertNotIn('--adapt-accepted-only', args)
+        self.assertEqual(args[args.index('--adapt-swaps') + 1], '0')
+
     def test_kv_format_override_preserves_mtp_arms(self):
         cfg = {'args': ['--native', 'model.gguf', '--mtp', 'mtp/rt', '--spec', '4', '--kv', 'fp16']}
         for spec in (0, 2, 3, 4):

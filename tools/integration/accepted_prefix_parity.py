@@ -33,6 +33,10 @@ def args_for(cfg, spec, kv_format=None, disable_adaptive_swaps=True):
     overrides = [('--prompt-cache', '6'), ('--suffix-draft', '0'),
                  ('--spec-min-p', '0')]
     if disable_adaptive_swaps:
+        # Accepted-only scheduling is meaningful only while adaptive swaps are
+        # active. A static-cache screen must remove both halves of that policy.
+        if '--adapt-accepted-only' in args:
+            args.remove('--adapt-accepted-only')
         overrides.append(('--adapt-swaps', '0'))
     for key, value in overrides:
         if key in args:

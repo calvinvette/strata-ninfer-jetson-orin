@@ -1,0 +1,22 @@
+{
+  "workloads": [
+    {
+      "cell": "semantic-computer-task-512",
+      "prompt_tokens": 512,
+      "generate_tokens": 64,
+      "tokens_file": "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-14-phase6-q2-semantic-graph-confirm7/prompt.tokens",
+      "tokens_sha256": "860c3caebc8317ff48d89a528006fce9bba8e3fa95b967a6c59528b0f5f0b7a2",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Service desk training case. A clerk enters the expression 17 x 19 in a desktop calculator, reads the result, and saves a report to a solid-state drive. The machine is running a graphical operating system and a spreadsheet application. The keyboard sends electrical transitions over USB; the application receives a character event only after the operating system handles the device report. The display is an output device, and the report must remain available after the application closes.\n\nWorkstation notes: The processor is a general-purpose CPU with registers, arithmetic logic, caches, and execution units. Main memory is volatile DRAM. The operating system, calculator, spreadsheet, document, and file buffers are all represented by data in memory while the user works. The CPU reads and writes memory through a controller. A memory address identifies a location; it does not by itself say whether the bytes represent a number, an instruction, or text. Applications interpret the same bit patterns according to their data types.\n\nEvent record: A key press first exists as a signal. The keyboard controller reports a scan code. A device driver and operating-system input path turn that report into a key event. The application receives the event, updates its input field, and shows the characters on screen. The spreadsheet parses the expression, represents operands and operators in binary, and requests a calculation. The CPU fetches instructions, decodes each instruction, and executes the required operations. Registers and cache hold values temporarily; RAM holds the program, input, intermediate values, and result. The display controller reads image data prepared for the screen.\n\nWhen the clerk saves the report, the application converts its document representation into bytes and asks the operating system to write a file. The operating system may first copy those bytes into a file-system cache in RAM, then schedule a write to the drive. A successful save confirmation means the operating system accepted the request; durable storage follows the file-system and device write protocol. Later, opening the report reads bytes back from storage into memory before the application displays them.\n\nTask: Write a clear guide of at least 200 words explaining this route from keyboard input through calculation and report storage. Begin with the exact heading \u201cMemory controller:\u201d. Mention scan codes, input, the fetch-decode-execute cycle, binary representation, RAM, output, and storage. Include the exact arithmetic statement \u201c17 x 19 = 323\u201d. Do not discuss this prompt or describe the notes as a case file."
+        }
+      ],
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      }
+    }
+  ],
+  "tokenizer": "/home/calvin/models/strata-orin-validation/pack/tokenizer",
+  "policy": "same held-out formatted 512-token semantic prompt; 64-token cap for timing screen"
+}
