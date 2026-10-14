@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "source_config": "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-14-phase6-q2-mtp8k-window-screen-final/config-no-adapt.json",
+  "workloads": "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-14-phase6-q2-mtp8k-heldout-confirm7/workload/workload-8192.json",
+  "windows": [
+    0,
+    4
+  ],
+  "selected_workload": "heldout-multineedle-8192",
+  "blocks": 7,
+  "seed": 2026101407,
+  "scope": "one warmup and one measured request in each fresh process; randomized windows within blocks; no trace",
+  "started_wall_time_s": 1791974911.6451268,
+  "runs": [
+    {
+      "block": 0,
+      "window": 0,
+      "name": "mtp-off",
+      "directory": "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-14-phase6-q2-mtp8k-heldout-confirm7/campaign/block-00-window-0",
+      "status": "fail",
+      "command": [
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-14-phase6-q2-mtp8k-heldout-confirm7/campaign/block-00-window-0/supervisor",
+        "--timeout",
+        "1800",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-14-phase6-q2-mtp8k-heldout-confirm7/campaign/block-00-window-0/server-config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-14-phase6-q2-mtp8k-heldout-confirm7/campaign/selected-workloads.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-14-phase6-q2-mtp8k-heldout-confirm7/campaign/block-00-window-0/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-14-phase7-q2-recall/workloads/warmup-512.json"
+      ],
+      "supervisor_returncode": 1,
+      "minimum_available_bytes": null,
+      "elapsed_s": null,
+      "reason": "run_control wrapper exited 1"
+    }
+  ],
+  "comparisons": [],
+  "finished_wall_time_s": 1791974911.719286
+}

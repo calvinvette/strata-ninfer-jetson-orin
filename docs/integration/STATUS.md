@@ -10,6 +10,18 @@ graph-disabled native control is unsupported; these limits do not imply a genera
 capacity or cross-model result. No NInfer execution component has been promoted
 into Strata. See the [Phase 3 gate audit](PHASE3_CLOSEOUT.md).
 
+The Q2_0 [held-out 8K MTP4 confirmation](../../bench/results/2026-10-14-phase6-q2-mtp8k-heldout-confirm7/README.md)
+completed seven randomized fresh-service pairs. All replies matched the held-out
+three-marker retrieval oracle. MTP4 improved median decode throughput by 17.09%
+(paired bootstrap 95% interval +10.52% to +19.60%), but increased TTFT by a
+median 10.72% and total request time by 8.93%; all seven pairs were slower
+end-to-end. This confirms a decode-only tradeoff for this prefill-heavy prompt,
+not a serving win, and no profile is promoted. Minimum host/admission
+availability was 16.854/6.021 GiB with zero sampled cgroup pressure/OOM
+counters. See the retained
+[campaign](../../bench/results/2026-10-14-phase6-q2-mtp8k-heldout-confirm7/campaign-retry1/).
+Phase 6 remains open for its other supported interactions and configurations.
+
 The [Phase 4 closeout](PHASE4_CLOSEOUT.md) records the measured Q6_K warp-
 dequant and Q8_1 NEON candidates, backend build evidence, worker screens and
 their promotion limits. The opt-in Q6 candidate has exact tested operator
