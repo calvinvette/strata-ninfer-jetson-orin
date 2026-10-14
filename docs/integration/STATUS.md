@@ -1656,3 +1656,12 @@ Clock readings were dynamic, EMC access was unavailable, and energy was not
 measured per process. This is screening evidence only: no route or serving
 profile is promoted, and Phase 5 state/quality gates and Phase 6 held-out
 confirmation remain open.
+
+A Q2_0 [MTP task-quality check](../../bench/results/2026-10-14-phase5-q2-mtp-quality/README.md)
+then ran a 2,048-token computer-processing task with MTP off, MTP2 and MTP4
+under the accepted-only adaptation policy. All three fresh services produced
+the same naturally completed 293-token answer and passed the full prompt rubric;
+MTP2 and MTP4 each offered/accepted 155/108 drafts. Minimum host availability
+was 16.87 GiB and admission availability 12.93 GiB under separate 28-GiB
+scopes. This is one task-level check, not broad quality or performance evidence;
+MTP remains opt-in and Phase 5 remains open.
