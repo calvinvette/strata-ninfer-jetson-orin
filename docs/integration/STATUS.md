@@ -54,6 +54,15 @@ CTest 15/15 and integration Python discovery 134/134. Minimum host availability
 was 24.404, 24.504 and 24.492 GiB. This reconfirms the existing Phase 3 Q2_0
 scope and does not close its graph-backing exclusions.
 
+A further [Phase 3 regression refresh](../../bench/results/2026-10-14-phase3-q2-ple-followup/README.md)
+on the current checkout passed the Q2_0 PLE oracle (7/7 stages, worst relative
+L1 `1.148e-7`), selected accounting/ownership/PLE CTests (15/15), and integration
+Python discovery (134/134). Minimum host availability was 28.06, 27.86 and
+28.02 GiB, respectively, above the six-GiB floor. These commands had no
+per-command 28-GiB cgroup ceiling. This reconfirms the scoped Phase 3 result;
+it adds no pressure-cell evidence and leaves the documented graph-backing and
+graph-disabled native-control exclusions unchanged.
+
 A fresh [Q2_0 PLE and Phase 3 regression rerun](../../bench/results/2026-10-13-phase3-q2-ple-final-refresh/README.md)
 passed all seven artifact-aware PLE stages for three tokens (worst relative L1
 `1.148e-7`), the selected memory/owner/PLE CTests (15/15), and integration
