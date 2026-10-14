@@ -51,11 +51,21 @@ def main():
         raise ValueError('short and long workload marker oracle differs')
     expected_codes = short_workload['expected_codes']
     expected_text = f"EARLY={expected_codes[0]}, MIDDLE={expected_codes[1]}, LATE={expected_codes[2]}"
+    expected_sums = {item.get('expected_sum') for item in (short_workload, long_workload)}
+    if len(expected_sums) != 1:
+        raise ValueError('short and long workload arithmetic oracle differs')
+    expected_sum = expected_sums.pop()
+    if expected_sum is not None:
+        oracle_sum = sum(int(code.rsplit('-', 1)[1]) for code in expected_codes)
+        if oracle_sum != expected_sum:
+            raise ValueError(f'independent suffix-sum oracle mismatch: {oracle_sum} != {expected_sum}')
+        expected_text += f', SUM={expected_sum}'
     inputs = {'short-8192': short_ids, 'long-16384': long_ids,
               'short-8192-recovery': short_ids}
     results = {
         'sequence': list(SEQUENCE),
         'expected_codes': expected_codes,
+        'expected_sum': expected_sum,
         'expected_answer_text': expected_text,
         'generation_cap': args.generation_cap,
         'prompt_tokens': {name: len(ids) for name, ids in inputs.items()},

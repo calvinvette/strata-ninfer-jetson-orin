@@ -30,6 +30,10 @@ swap-choice batches and restored exact recovery state in both MTP settings.
 This supports adaptive swaps as the trigger for this sequence's state drift,
 while the numerical mechanism and broader task effect remain open.
 See the [residency-quality run](../../bench/results/2026-10-14-phase5-q2-residency-quality/README.md).
+An extended retrieval-plus-arithmetic sequence returned the same exact three
+codes and independently checked sum `1971` at both context sizes and MTP
+settings; it reproduced the same recovery-state drift fields. This shows no
+answer loss on this second bounded task, not broad quality qualification.
 
 A new [Phase 3 PLE regression refresh](../../bench/results/2026-10-14-phase3-q2-ple-rerun/README.md)
 passed all seven PLE numerical stages (worst relative L1 `1.148e-7`), selected

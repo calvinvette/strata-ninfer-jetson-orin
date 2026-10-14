@@ -51,6 +51,23 @@ minimum host availability and 6.445 GiB minimum admission availability, and
 had zero sampled cgroup pressure/OOM events. It is one controlled sequence per
 setting, not timing qualification.
 
+The same sequence was also repeated with an arithmetic retrieval task. The
+7,515- and 15,020-token prompts requested the three planted codes and the sum
+of their numeric suffixes. All six requests returned the exact oracle answer
+`EARLY=MAPLE-ORBIT-731, MIDDLE=COBALT-HARBOR-284, LATE=VELVET-COPPER-956,
+SUM=1971`; the independent check is `731 + 284 + 956 = 1971`. Each completion
+contained 48 token IDs, all covered by accepted-prefix tracing. MTP4 accepted
+33/37 offered drafts in each request. Corresponding MTP-off and MTP4 states
+matched, but within each arm the 8K recovery differed from the first 8K state
+in GDN, PLE, tail, pooled, pooled-full and KV fields. Thus this bounded
+retrieval-plus-arithmetic task also passed despite the state drift. The run
+took 1,686.9 seconds, retained 16.776 GiB minimum host availability and 6.868
+GiB minimum admission availability, and had zero sampled cgroup pressure/OOM
+events. Raw data are under `trace-arithmetic/` and
+`supervisor-arithmetic/`. The strict run result is false only for recovery
+state equality; answer quality, MTP parity and accepted-prefix token checks
+all pass. These few prompts do not establish broad task quality.
+
 The first harness run is retained under `trace/` and `supervisor/`; it stopped
 after the first request because the parser expected a separate final-state log
 record. The corrected full run is under `trace-rerun/` and `supervisor-rerun/`.
