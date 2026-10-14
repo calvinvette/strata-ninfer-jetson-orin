@@ -1342,3 +1342,17 @@ separate from cache-stability and task-quality claims, and do not impose exact
 text identity across different residency states without a stated numerical or
 product contract. The retained Orin trace is
 [here](../../bench/results/2026-10-14-phase5-q6-swap-choice-attribution/README.md).
+
+The Q2_0 follow-up extended that method to 7,498/15,003-token and
+7,515/15,020-token retrieval prompts, the latter requiring an independently
+checked suffix sum. Default adaptive cadence preserved exact task answers and
+MTP-off/MTP4 state parity at corresponding requests, but the same-service 8K
+recovery state differed in GDN, PLE, tail, pooled-index and KV fields after a
+16K request. With adaptation delayed beyond the sequence, both MTP settings
+recovered the exact original persistent fingerprint. This control supports
+residency updates as the trigger in these Q2_0 cells while leaving the
+arithmetic mechanism and broader task effect unclassified. For Splash, pair
+exact task oracles with same-service A/B/A state checks, capture actual
+residency choices, and include a no-transition control; score task output,
+cross-MTP parity and recovery-state equality as separate outcomes. See the
+[Q2_0 quality and control report](../../bench/results/2026-10-14-phase5-q2-residency-quality/README.md).
