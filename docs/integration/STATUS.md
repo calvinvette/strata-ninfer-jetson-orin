@@ -1657,6 +1657,18 @@ measured per process. This is screening evidence only: no route or serving
 profile is promoted, and Phase 5 state/quality gates and Phase 6 held-out
 confirmation remain open.
 
+The follow-up [seven-block held-out Q2_0 graph × MTP2 confirmation](../../bench/results/2026-10-14-phase6-q2-graph-mtp-confirm7/README.md)
+completed all 28 captured/eager × MTP-off/window2 cells on a distinct 512/64
+prompt. Output text matched across every block; all MTP2 cells offered/accepted
+33/24 drafts and used the same resident cache and FP16 KV. Neither graph/eager
+main effect had a request-time interval excluding no change, and the graph ×
+MTP interaction interval also included zero. On this workload MTP2 increased
+captured-route request time 6.12% (95% paired bootstrap interval +0.38% to
++7.12%) and reduced prompt throughput 10.33% (95% paired bootstrap interval −11.75% to −1.05%); decode did not improve.
+Minimum host and admission availability were 16.85 and 13.12 GiB, with zero
+cgroup limit/OOM events. This does not support a default change and does not
+qualify longer workloads, other KV formats or MTP windows.
+
 A Q2_0 [MTP task-quality check](../../bench/results/2026-10-14-phase5-q2-mtp-quality/README.md)
 then ran a 2,048-token computer-processing task with MTP off, MTP2 and MTP4
 under the accepted-only adaptation policy. All three fresh services produced
@@ -1665,3 +1677,12 @@ MTP2 and MTP4 each offered/accepted 155/108 drafts. Minimum host availability
 was 16.87 GiB and admission availability 12.93 GiB under separate 28-GiB
 scopes. This is one task-level check, not broad quality or performance evidence;
 MTP remains opt-in and Phase 5 remains open.
+
+The same held-out Q2_0 graph/MTP prompt received a separate full-task quality
+check across all four settings. With a 1,024-token allowance each answer ended
+naturally at 850 tokens, was byte-identical, and covered input, working memory
+and storage, but failed the explicit instruction to begin with the memory
+controller by opening with meta-commentary about the repeated-blue context.
+All four 512-token-cap attempts stopped mid-sentence and are excluded. This is
+a shared task failure, not a route difference; it does not qualify a profile.
+The outcomes are retained with the [Phase 6 confirmation](../../bench/results/2026-10-14-phase6-q2-graph-mtp-confirm7/README.md).
