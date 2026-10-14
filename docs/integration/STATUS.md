@@ -69,6 +69,13 @@ was 10.146/10.355/10.307 GiB, with zero sampled cgroup pressure/OOM events.
 These three prompt/profile checks do not establish broad Q2_0 task quality or a
 general capacity boundary; Phase 7 remains in progress.
 
+After the Q2_0 context ladder, a fresh [regression refresh](../../bench/results/2026-10-14-phase7-q2-recall/post-checks/README.md)
+again passed all seven PLE numerical stages (worst relative L1 `1.148e-7`),
+the selected 15/15 accounting/ownership/PLE CTests, and integration Python
+discovery 132/132. The supervised GPU checks retained at least 24.388 GiB
+host availability with no sampled OOM kills. This confirms the selected
+regression set after the campaign; it does not broaden the Phase 3 scope.
+
 The accepted-only Q6 MTP4 path also passed a [three-pair MTP-off retrieval
 ablation](../../bench/results/2026-10-14-phase5-q6-mtp-recall-ablation/README.md)
 on that same held-out 7,498-token prompt. All six fresh-service arms returned
