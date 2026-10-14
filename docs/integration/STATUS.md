@@ -60,6 +60,15 @@ Phase 7 remains in progress for broader task quality and other service cases;
 these results cover one opt-in profile and do not qualify defaults, higher
 image-token counts, or concurrent serving.
 
+The [Q2_0 8K near-limit retrieval and recovery check](../../bench/results/2026-10-14-phase7-q2-recall/README.md)
+adds a second model cohort at 8,192 configured context. The exact 7,498-token
+prompt returned all three markers exactly once and in order; a same-service
+short request then returned `RECOVERED`. This accepted-only MTP configuration
+had 16.967 GiB minimum host availability and 10.146 GiB admission availability
+under the 28-GiB cap, with zero sampled cgroup pressure/OOM events. It is one
+prompt/profile check, not broad Q2_0 quality or capacity qualification; Phase 7
+remains in progress.
+
 The accepted-only Q6 MTP4 path also passed a [three-pair MTP-off retrieval
 ablation](../../bench/results/2026-10-14-phase5-q6-mtp-recall-ablation/README.md)
 on that same held-out 7,498-token prompt. All six fresh-service arms returned
