@@ -216,6 +216,17 @@ cgroup pressure or OOM events. Tegrastats `tj` ranged 49.5–58.5 °C. This adds
 one 16K sustained retrieval point, not broad task quality, cache-reuse
 throughput, or a general capacity boundary; Phase 7 remains open.
 
+A bounded [Q2_0 streamed API concurrency-2 check](../../bench/results/2026-10-14-phase7-q2-recall/concurrency2/README.md)
+then passed on distinct 7,498- and 15,003-token prompts with swaps disabled:
+both simultaneous requests used separate active slots and passed exact prompt,
+completion, and marker checks. Minimum host/admission availability was
+15.66/7.36 GiB under the 28-GiB cap, with zero sampled cgroup pressure/OOM
+events. The serial-versus-two-slot latencies were 149/259 and 882/729 seconds
+for 8K/16K, so this cell shows no serving-latency benefit. The engine rejects
+`--adapt-accepted-only` with `--batch`; that failed start is retained. This
+single pair does not qualify general concurrency or adaptive swaps in batch
+mode; Phase 7 remains open.
+
 After the Q2_0 context ladder, a fresh [regression refresh](../../bench/results/2026-10-14-phase7-q2-recall/post-checks/README.md)
 again passed all seven PLE numerical stages (worst relative L1 `1.148e-7`),
 the selected 15/15 accounting/ownership/PLE CTests, and integration Python
