@@ -1,0 +1,554 @@
+{
+  "schema": 1,
+  "scope": "MTP accepted-prefix cancellation state parity and same-process recovery",
+  "model": "Q2_0 accepted-only MTP4 8K retrieval and recovery",
+  "workload_cell": "open-ended-integer-list",
+  "prompt_text": "Write the integers from 1 through 1000 separated by single spaces. Do not add an introduction or conclusion, and do not stop before 1000.",
+  "requested_output_tokens": 1024,
+  "cancel_after_nonempty_deltas": 4,
+  "reference_repeats": 2,
+  "fixed_expert_cache_slots": 3000,
+  "dump_gdn_at": null,
+  "effective_engine_env": {
+    "STRATA_PREFILL_CPU_SHARE": "0",
+    "STRATA_MTP_BATCH": "1",
+    "STRATA_STATE_HASH": "1",
+    "STRATA_STATE_HASH_GDN": "1",
+    "STRATA_ACCEPTED_PREFIX_TRACE": "1"
+  },
+  "checks": [
+    {
+      "check": "stream_cancel",
+      "status": "pass",
+      "visible_text": "1 2 ",
+      "visible_deltas": 4,
+      "committed_tokens": 6,
+      "accepted_prefix_trace": [
+        {
+          "position": 47,
+          "window": 1,
+          "accepted_drafts": 0,
+          "committed": 1,
+          "token_ids": [
+            16
+          ],
+          "state": {
+            "L": "48",
+            "gdn": "a200e87b11be101a",
+            "ple": "157f31514a429c86",
+            "tail": "c07523ed348b7489",
+            "dead": "bb663b023054a943",
+            "pooled": "95a7cae27edaa68e",
+            "pooled_full": "44b8081fb937d7fa",
+            "kv": "77875774270b750d",
+            "mtp": "6d3e4064f572955e",
+            "stale": "14650fb0739d0383",
+            "ple_prev": "248069,271"
+          }
+        },
+        {
+          "position": 48,
+          "window": 2,
+          "accepted_drafts": 1,
+          "committed": 2,
+          "token_ids": [
+            220,
+            17
+          ],
+          "state": {
+            "L": "50",
+            "gdn": "d17bd3ddd38e36c7",
+            "ple": "16ddb791bf4673e3",
+            "tail": "c7537aec1a6a9d3e",
+            "dead": "bb663b023054a943",
+            "pooled": "95a7cae27edaa68e",
+            "pooled_full": "44b8081fb937d7fa",
+            "kv": "a2c3fb83b49dade2",
+            "mtp": "e49197fb519e900d",
+            "stale": "b1c3695b6c660383",
+            "ple_prev": "16,220"
+          }
+        },
+        {
+          "position": 50,
+          "window": 1,
+          "accepted_drafts": 0,
+          "committed": 1,
+          "token_ids": [
+            220
+          ],
+          "state": {
+            "L": "51",
+            "gdn": "019fe1134c37024e",
+            "ple": "ec75d8e66a23d70e",
+            "tail": "1d62ab6964d7072d",
+            "dead": "bb663b023054a943",
+            "pooled": "95a7cae27edaa68e",
+            "pooled_full": "44b8081fb937d7fa",
+            "kv": "8770e9b01279d41b",
+            "mtp": "a565ace581b9c6ac",
+            "stale": "011a3fe290018383",
+            "ple_prev": "220,17"
+          }
+        },
+        {
+          "position": 51,
+          "window": 2,
+          "accepted_drafts": 1,
+          "committed": 2,
+          "token_ids": [
+            18,
+            220
+          ],
+          "state": {
+            "L": "53",
+            "gdn": "3c9294652a30ae1e",
+            "ple": "83f2f8a5f7a85184",
+            "tail": "dbe5fa68d87d46ae",
+            "dead": "bb663b023054a943",
+            "pooled": "5fc91753ed5926a0",
+            "pooled_full": "3d8d6eeb51399cd0",
+            "kv": "b6297bab82d41f6d",
+            "mtp": "2cc92a7fb9f05d7d",
+            "stale": "3452ac1b08ca8383",
+            "ple_prev": "220,18"
+          }
+        }
+      ],
+      "prompt_summary": "strata serve: prompt 48 tokens = 0 reused + 48 read in 10345 ms (4.6 tok/s), 6 generated in 3068 ms (2.0 tok/s), drafts accepted 2 of 2, 0 checkpoints (cancelled)"
+    },
+    {
+      "check": "same_process_recovery",
+      "status": "pass",
+      "response_text": "Hello Orin!",
+      "reason": "expected recovery response",
+      "server_alive": true
+    },
+    {
+      "check": "fresh_exact_length_references",
+      "status": "pass",
+      "runs": [
+        {
+          "repeat": 0,
+          "status": "pass",
+          "completion_tokens": 6,
+          "reference_text": "1 2 3 ",
+          "cancel_visible_text_is_reference_prefix": true,
+          "reference_trace": [
+            {
+              "position": 47,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                16
+              ],
+              "state": {
+                "L": "48",
+                "gdn": "a200e87b11be101a",
+                "ple": "157f31514a429c86",
+                "tail": "c07523ed348b7489",
+                "dead": "bb663b023054a943",
+                "pooled": "95a7cae27edaa68e",
+                "pooled_full": "44b8081fb937d7fa",
+                "kv": "77875774270b750d",
+                "mtp": "6d3e4064f572955e",
+                "stale": "14650fb0739d0383",
+                "ple_prev": "248069,271"
+              }
+            },
+            {
+              "position": 48,
+              "window": 2,
+              "accepted_drafts": 1,
+              "committed": 2,
+              "token_ids": [
+                220,
+                17
+              ],
+              "state": {
+                "L": "50",
+                "gdn": "d17bd3ddd38e36c7",
+                "ple": "16ddb791bf4673e3",
+                "tail": "c7537aec1a6a9d3e",
+                "dead": "bb663b023054a943",
+                "pooled": "95a7cae27edaa68e",
+                "pooled_full": "44b8081fb937d7fa",
+                "kv": "a2c3fb83b49dade2",
+                "mtp": "e49197fb519e900d",
+                "stale": "b1c3695b6c660383",
+                "ple_prev": "16,220"
+              }
+            },
+            {
+              "position": 50,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                220
+              ],
+              "state": {
+                "L": "51",
+                "gdn": "019fe1134c37024e",
+                "ple": "ec75d8e66a23d70e",
+                "tail": "1d62ab6964d7072d",
+                "dead": "bb663b023054a943",
+                "pooled": "95a7cae27edaa68e",
+                "pooled_full": "44b8081fb937d7fa",
+                "kv": "8770e9b01279d41b",
+                "mtp": "a565ace581b9c6ac",
+                "stale": "011a3fe290018383",
+                "ple_prev": "220,17"
+              }
+            },
+            {
+              "position": 51,
+              "window": 2,
+              "accepted_drafts": 1,
+              "committed": 2,
+              "token_ids": [
+                18,
+                220
+              ],
+              "state": {
+                "L": "53",
+                "gdn": "3c9294652a30ae1e",
+                "ple": "83f2f8a5f7a85184",
+                "tail": "dbe5fa68d87d46ae",
+                "dead": "bb663b023054a943",
+                "pooled": "5fc91753ed5926a0",
+                "pooled_full": "3d8d6eeb51399cd0",
+                "kv": "b6297bab82d41f6d",
+                "mtp": "2cc92a7fb9f05d7d",
+                "stale": "3452ac1b08ca8383",
+                "ple_prev": "220,18"
+              }
+            }
+          ],
+          "cancellation_comparison": {
+            "passed": true,
+            "failures": [],
+            "cancelled_token_ids": [
+              16,
+              220,
+              17,
+              220,
+              18,
+              220
+            ],
+            "reference_token_ids": [
+              16,
+              220,
+              17,
+              220,
+              18,
+              220
+            ],
+            "shared_state_lengths": [
+              "48",
+              "50",
+              "51",
+              "53"
+            ],
+            "cancelled_final_state": {
+              "L": "53",
+              "gdn": "3c9294652a30ae1e",
+              "ple": "83f2f8a5f7a85184",
+              "tail": "dbe5fa68d87d46ae",
+              "dead": "bb663b023054a943",
+              "pooled": "5fc91753ed5926a0",
+              "pooled_full": "3d8d6eeb51399cd0",
+              "kv": "b6297bab82d41f6d",
+              "mtp": "2cc92a7fb9f05d7d",
+              "stale": "3452ac1b08ca8383",
+              "ple_prev": "220,18"
+            },
+            "reference_final_state": {
+              "L": "53",
+              "gdn": "3c9294652a30ae1e",
+              "ple": "83f2f8a5f7a85184",
+              "tail": "dbe5fa68d87d46ae",
+              "dead": "bb663b023054a943",
+              "pooled": "5fc91753ed5926a0",
+              "pooled_full": "3d8d6eeb51399cd0",
+              "kv": "b6297bab82d41f6d",
+              "mtp": "2cc92a7fb9f05d7d",
+              "stale": "3452ac1b08ca8383",
+              "ple_prev": "220,18"
+            }
+          }
+        },
+        {
+          "repeat": 1,
+          "status": "pass",
+          "completion_tokens": 6,
+          "reference_text": "1 2 3 ",
+          "cancel_visible_text_is_reference_prefix": true,
+          "reference_trace": [
+            {
+              "position": 47,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                16
+              ],
+              "state": {
+                "L": "48",
+                "gdn": "a200e87b11be101a",
+                "ple": "157f31514a429c86",
+                "tail": "c07523ed348b7489",
+                "dead": "bb663b023054a943",
+                "pooled": "95a7cae27edaa68e",
+                "pooled_full": "44b8081fb937d7fa",
+                "kv": "77875774270b750d",
+                "mtp": "6d3e4064f572955e",
+                "stale": "14650fb0739d0383",
+                "ple_prev": "248069,271"
+              }
+            },
+            {
+              "position": 48,
+              "window": 2,
+              "accepted_drafts": 1,
+              "committed": 2,
+              "token_ids": [
+                220,
+                17
+              ],
+              "state": {
+                "L": "50",
+                "gdn": "d17bd3ddd38e36c7",
+                "ple": "16ddb791bf4673e3",
+                "tail": "c7537aec1a6a9d3e",
+                "dead": "bb663b023054a943",
+                "pooled": "95a7cae27edaa68e",
+                "pooled_full": "44b8081fb937d7fa",
+                "kv": "a2c3fb83b49dade2",
+                "mtp": "e49197fb519e900d",
+                "stale": "b1c3695b6c660383",
+                "ple_prev": "16,220"
+              }
+            },
+            {
+              "position": 50,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                220
+              ],
+              "state": {
+                "L": "51",
+                "gdn": "019fe1134c37024e",
+                "ple": "ec75d8e66a23d70e",
+                "tail": "1d62ab6964d7072d",
+                "dead": "bb663b023054a943",
+                "pooled": "95a7cae27edaa68e",
+                "pooled_full": "44b8081fb937d7fa",
+                "kv": "8770e9b01279d41b",
+                "mtp": "a565ace581b9c6ac",
+                "stale": "011a3fe290018383",
+                "ple_prev": "220,17"
+              }
+            },
+            {
+              "position": 51,
+              "window": 2,
+              "accepted_drafts": 1,
+              "committed": 2,
+              "token_ids": [
+                18,
+                220
+              ],
+              "state": {
+                "L": "53",
+                "gdn": "3c9294652a30ae1e",
+                "ple": "83f2f8a5f7a85184",
+                "tail": "dbe5fa68d87d46ae",
+                "dead": "bb663b023054a943",
+                "pooled": "5fc91753ed5926a0",
+                "pooled_full": "3d8d6eeb51399cd0",
+                "kv": "b6297bab82d41f6d",
+                "mtp": "2cc92a7fb9f05d7d",
+                "stale": "3452ac1b08ca8383",
+                "ple_prev": "220,18"
+              }
+            }
+          ],
+          "cancellation_comparison": {
+            "passed": true,
+            "failures": [],
+            "cancelled_token_ids": [
+              16,
+              220,
+              17,
+              220,
+              18,
+              220
+            ],
+            "reference_token_ids": [
+              16,
+              220,
+              17,
+              220,
+              18,
+              220
+            ],
+            "shared_state_lengths": [
+              "48",
+              "50",
+              "51",
+              "53"
+            ],
+            "cancelled_final_state": {
+              "L": "53",
+              "gdn": "3c9294652a30ae1e",
+              "ple": "83f2f8a5f7a85184",
+              "tail": "dbe5fa68d87d46ae",
+              "dead": "bb663b023054a943",
+              "pooled": "5fc91753ed5926a0",
+              "pooled_full": "3d8d6eeb51399cd0",
+              "kv": "b6297bab82d41f6d",
+              "mtp": "2cc92a7fb9f05d7d",
+              "stale": "3452ac1b08ca8383",
+              "ple_prev": "220,18"
+            },
+            "reference_final_state": {
+              "L": "53",
+              "gdn": "3c9294652a30ae1e",
+              "ple": "83f2f8a5f7a85184",
+              "tail": "dbe5fa68d87d46ae",
+              "dead": "bb663b023054a943",
+              "pooled": "5fc91753ed5926a0",
+              "pooled_full": "3d8d6eeb51399cd0",
+              "kv": "b6297bab82d41f6d",
+              "mtp": "2cc92a7fb9f05d7d",
+              "stale": "3452ac1b08ca8383",
+              "ple_prev": "220,18"
+            }
+          },
+          "reference_repeatability": {
+            "passed": true,
+            "failures": [],
+            "cancelled_token_ids": [
+              16,
+              220,
+              17,
+              220,
+              18,
+              220
+            ],
+            "reference_token_ids": [
+              16,
+              220,
+              17,
+              220,
+              18,
+              220
+            ],
+            "shared_state_lengths": [
+              "48",
+              "50",
+              "51",
+              "53"
+            ],
+            "cancelled_final_state": {
+              "L": "53",
+              "gdn": "3c9294652a30ae1e",
+              "ple": "83f2f8a5f7a85184",
+              "tail": "dbe5fa68d87d46ae",
+              "dead": "bb663b023054a943",
+              "pooled": "5fc91753ed5926a0",
+              "pooled_full": "3d8d6eeb51399cd0",
+              "kv": "b6297bab82d41f6d",
+              "mtp": "2cc92a7fb9f05d7d",
+              "stale": "3452ac1b08ca8383",
+              "ple_prev": "220,18"
+            },
+            "reference_final_state": {
+              "L": "53",
+              "gdn": "3c9294652a30ae1e",
+              "ple": "83f2f8a5f7a85184",
+              "tail": "dbe5fa68d87d46ae",
+              "dead": "bb663b023054a943",
+              "pooled": "5fc91753ed5926a0",
+              "pooled_full": "3d8d6eeb51399cd0",
+              "kv": "b6297bab82d41f6d",
+              "mtp": "2cc92a7fb9f05d7d",
+              "stale": "3452ac1b08ca8383",
+              "ple_prev": "220,18"
+            }
+          }
+        }
+      ],
+      "comparisons": [
+        {
+          "repeat": 0,
+          "matches_first_reference": true,
+          "comparison": null
+        },
+        {
+          "repeat": 1,
+          "matches_first_reference": true,
+          "comparison": {
+            "passed": true,
+            "failures": [],
+            "cancelled_token_ids": [
+              16,
+              220,
+              17,
+              220,
+              18,
+              220
+            ],
+            "reference_token_ids": [
+              16,
+              220,
+              17,
+              220,
+              18,
+              220
+            ],
+            "shared_state_lengths": [
+              "48",
+              "50",
+              "51",
+              "53"
+            ],
+            "cancelled_final_state": {
+              "L": "53",
+              "gdn": "3c9294652a30ae1e",
+              "ple": "83f2f8a5f7a85184",
+              "tail": "dbe5fa68d87d46ae",
+              "dead": "bb663b023054a943",
+              "pooled": "5fc91753ed5926a0",
+              "pooled_full": "3d8d6eeb51399cd0",
+              "kv": "b6297bab82d41f6d",
+              "mtp": "2cc92a7fb9f05d7d",
+              "stale": "3452ac1b08ca8383",
+              "ple_prev": "220,18"
+            },
+            "reference_final_state": {
+              "L": "53",
+              "gdn": "3c9294652a30ae1e",
+              "ple": "83f2f8a5f7a85184",
+              "tail": "dbe5fa68d87d46ae",
+              "dead": "bb663b023054a943",
+              "pooled": "5fc91753ed5926a0",
+              "pooled_full": "3d8d6eeb51399cd0",
+              "kv": "b6297bab82d41f6d",
+              "mtp": "2cc92a7fb9f05d7d",
+              "stale": "3452ac1b08ca8383",
+              "ple_prev": "220,18"
+            }
+          }
+        }
+      ],
+      "references_repeatable": true,
+      "reason": "all references match canceled committed state and each other"
+    }
+  ],
+  "canceled_token_count": 6
+}

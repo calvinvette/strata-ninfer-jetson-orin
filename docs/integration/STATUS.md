@@ -1834,6 +1834,16 @@ qualifies one cancellation point and short-request recovery for Q2_0 MTP4; it
 does not compare persistent state after cancellation or cover other positions.
 Phase 5 remains open.
 
+A supervised [Q2_0 decode-cancellation state comparison](../../bench/results/2026-10-14-phase5-q2-decode-cancel-state-parity/README.md)
+then canceled an accepted-only MTP4 stream after four nonempty deltas. Six
+tokens were committed, and the same service recovered with `Hello Orin!`.
+Two fresh exact-length references matched token IDs and all 11 persistent
+fields at shared accepted-prefix lengths 48, 50, 51 and 53, and matched each
+other. The prompt rendered to 48 tokens. Minimum host and admission availability
+were 16.731 and 15.910 GiB under the 28-GiB cap, with no cgroup pressure or OOM
+events. This covers one short-prompt Q2_0 cancellation cell; longer-prefix,
+long-prompt, other-window/format and quality gates remain open.
+
 The same held-out Q2_0 graph/MTP prompt received a separate full-task quality
 check across all four settings. With a 1,024-token allowance each answer ended
 naturally at 850 tokens, was byte-identical, and covered input, working memory
