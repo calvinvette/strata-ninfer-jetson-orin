@@ -1,0 +1,9 @@
+Pre-launch and harness failures (not measured evidence)
+
+The first startup used an 8,192-token context for the 15,020-token prompt and
+was stopped after four seconds before any request. The second run used the
+correct 16,384-token reservation and completed its first adaptive request, but
+the experiment script then raised TypeError while checking state-key coverage.
+The service closed cleanly and saved its resident profile. The corrected full
+sequence is retained under run-retry2/; neither failed attempt is pooled into
+its measurements.
