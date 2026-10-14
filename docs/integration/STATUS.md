@@ -1703,6 +1703,17 @@ availability, with zero cgroup pressure or OOM events. This adds one long-
 prefill correctness cell; it is not task-quality or performance evidence.
 Phase 5 remains open.
 
+The same exact 8K prompt then received a [full-task quality check](../../bench/results/2026-10-14-phase5-q2-mtp8k-quality/README.md)
+with a 512-token allowance under MTP off/2/3/4. All four fresh services
+stopped naturally at 311 tokens, returned byte-identical 264-word responses,
+and covered fetch/decode/execute, RAM, binary information, input/output and
+storage. They all failed the same explicit opening instruction to start with
+the processor. Minimum host availability was 16.618 GiB and admission
+availability 13.539 GiB, with zero cgroup pressure or OOM events. This shared
+task failure does not indicate an MTP quality difference and does not qualify
+the profile; the separate 32-token accepted-prefix parity check remains
+correctness evidence only. Phase 5 remains open.
+
 The same held-out Q2_0 graph/MTP prompt received a separate full-task quality
 check across all four settings. With a 1,024-token allowance each answer ended
 naturally at 850 tokens, was byte-identical, and covered input, working memory
