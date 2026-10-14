@@ -77,6 +77,14 @@ The 28-GiB supervisor retained 16.292 GiB minimum host availability and
 This adds one long-context task-quality point; it does not establish a broad
 Q2_0 quality score or general capacity boundary. Phase 7 remains in progress.
 
+The Q2_0 profile then passed a [30-minute sustained 8K retrieval run](../../bench/results/2026-10-14-phase7-q2-recall/sustained-8k/README.md)
+with 14 serial fresh-prefill requests and zero retrieval failures. Minimum host
+availability was 16.971 GiB and admission availability 9.546 GiB; sampled
+cgroup pressure/OOM counters stayed at zero. The tegrastats `tj` sensor ranged
+54.5–60.1 °C, with first/last five-minute means of 55.3/56.0 °C. Prompt cache
+was disabled, so this is not cache-reuse throughput evidence. Phase 7 remains
+open for broader quality, other service cases and support boundaries.
+
 After the Q2_0 context ladder, a fresh [regression refresh](../../bench/results/2026-10-14-phase7-q2-recall/post-checks/README.md)
 again passed all seven PLE numerical stages (worst relative L1 `1.148e-7`),
 the selected 15/15 accounting/ownership/PLE CTests, and integration Python

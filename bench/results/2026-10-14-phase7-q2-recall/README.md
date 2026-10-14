@@ -25,6 +25,11 @@ also returned the three codes in order and the independently checked suffix
 sum `1971`, then passed same-service recovery. This is a single task-quality
 check for the Q2_0 cohort, not a broad quality score.
 
+The profile then completed a [30-minute sustained 8K retrieval run](sustained-8k/README.md)
+with 14 repeated full-prefill requests, zero failures, and no cgroup pressure
+events. The `tj` sensor ranged from 54.5 to 60.1 °C. This adds one sustained
+service point for the Q2_0 cohort; prompt caching was disabled.
+
 All three runs passed under a 28-GiB cgroup ceiling and the six-GiB
 host-availability guard. Minimum physical host availability was 16.967, 16.797
 and 16.363 GiB at 8K, 16K and 32K; minimum effective admission availability

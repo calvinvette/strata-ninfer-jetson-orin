@@ -6,9 +6,9 @@ deliverable was an integration plan and an auditable source/evidence import.
 This remains an active integration and qualification effort, not a claim of
 combined-runtime speedup. Phases 1 and 2 are complete, and Phase 3 is closed for
 the tested Orin Q2_0 scope. Phase 4 is closed for its tested candidates; Phases
-5 and 6 remain open, and Phase 7 has initial recall and sustained-service
-evidence but remains in progress. Current admission, transfer, profiling,
-speculation and service evidence is summarized in
+5 and 6 remain open, and Phase 7 has IQ1_M and Q2_0 long-context retrieval,
+task-quality and sustained-service evidence but remains in progress. Current
+admission, transfer, profiling, speculation and service evidence is summarized in
 [status](STATUS.md). See [control reproduction](PHASE1.md) and
 [porting notes for future engines](PORTING_NOTES.md) for reproducible methods
 and lessons for a future Strata + Splash integration.
