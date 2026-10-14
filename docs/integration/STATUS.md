@@ -1923,3 +1923,16 @@ host/effective availability was 17.058/8.798 GiB for int8 and 16.977/9.068 GiB
 for q4_0 under separate 28-GiB scopes, with zero sampled cgroup pressure or
 OOM events. These are traced state-correctness checks, not quality or timing
 claims; other prompts, formats and the remaining Phase 5 gates remain open.
+
+A seven-block held-out [Q2_0 worker × expert-transfer confirmation](../../bench/results/2026-10-14-phase6-q2-worker-transfer-confirm7/README.md)
+completed all 28 trace-free cells for 4/8 workers × mapped/pread on a distinct
+512-token retrieval-plus-arithmetic task. All responses returned the exact
+three markers and sum `1768`. Pread reduced median request time 15.82% at four
+workers (paired bootstrap 95% interval −19.55% to −9.92%); at eight workers,
+its interval included no change. The worker × transfer difference-in-
+differences interval also included zero, and one four-worker/pread outlier
+remains unexplained. Minimum host/effective availability was 16.70/6.91 GiB;
+sampled cgroup pressure and OOM counters stayed zero. This supports only the
+four-worker/pread cell on this task; shared page-cache history prevents a cold-
+disk conclusion, so no default changed. Phase 6 remains open for other
+interactions and workloads.
