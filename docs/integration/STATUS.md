@@ -61,13 +61,13 @@ these results cover one opt-in profile and do not qualify defaults, higher
 image-token counts, or concurrent serving.
 
 The [Q2_0 near-limit retrieval and recovery checks](../../bench/results/2026-10-14-phase7-q2-recall/README.md)
-add a second model cohort at 8K and 16K configured contexts. Exact 7,498- and
-15,003-token prompts returned all three markers exactly once and in order; each
-same-service short request then returned `RECOVERED`. Minimum host availability
-was 16.967/16.797 GiB and minimum admission availability was 10.146/10.355 GiB,
-with zero sampled cgroup pressure/OOM events. These are two prompt/profile
-checks, not broad Q2_0 quality or capacity qualification; Phase 7 remains in
-progress.
+add a second model cohort at 8K, 16K and 32K configured contexts. Exact 7,498-,
+15,003- and 30,032-token prompts returned all three markers exactly once and in
+order; each same-service short request then returned `RECOVERED`. Minimum host
+availability was 16.967/16.797/16.363 GiB and minimum admission availability
+was 10.146/10.355/10.307 GiB, with zero sampled cgroup pressure/OOM events.
+These three prompt/profile checks do not establish broad Q2_0 task quality or a
+general capacity boundary; Phase 7 remains in progress.
 
 The accepted-only Q6 MTP4 path also passed a [three-pair MTP-off retrieval
 ablation](../../bench/results/2026-10-14-phase5-q6-mtp-recall-ablation/README.md)
