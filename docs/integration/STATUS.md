@@ -37,12 +37,13 @@ answer loss on this second bounded task, not broad quality qualification.
 
 The current Q2_0 [real-artifact CPU/GPU expert parity diagnostic](../../bench/results/2026-10-14-phase5-q2-cpu-gpu-expert-parity/README.md)
 compared expert 7 from layers 0–3, 20 and 47 on the same seeded inputs. The
-whole-expert CPU/GPU relative L1 difference was `9.85e-8` to `1.06e-7`, while
-each route differed from the floating reference by `1.13e-2` to `1.27e-2` due
-to the represented activation contract. It confirms a small nonzero route
-difference in these operator samples, but does not establish bitwise behavior
-or explain the service drift: captured service activations and the experts
-selected/evicted by the adaptive trace remain to be checked.
+whole-expert CPU/GPU relative L1 difference was `9.85e-8` to `1.06e-7`, with
+5,561–5,679 of 7,680 output words differing bitwise. Each route differed from
+the floating reference by `1.13e-2` to `1.27e-2` due to the represented
+activation contract. This demonstrates widespread small CPU/GPU rounding
+differences in these operator samples, but does not explain the service drift:
+captured service activations and the experts selected/evicted by the adaptive
+trace remain to be checked.
 
 A new [Phase 3 PLE regression refresh](../../bench/results/2026-10-14-phase3-q2-ple-rerun/README.md)
 passed all seven PLE numerical stages (worst relative L1 `1.148e-7`), selected

@@ -15,6 +15,14 @@ which the test attributes to their represented activation contract. GPU decode
 matched ggml dequantization exactly for the checked matrices, and decode-once
 matched per-entry kernels bitwise.
 
+The diagnostic was extended to count bitwise-different output words. Across the
+six samples, 5,561–5,679 of 7,680 words differed (72.4–74.0%) while relative L1
+stayed near `1e-7`. This confirms widespread low-magnitude rounding differences
+for the seeded inputs; a strict state fingerprint can observe such differences
+even when the relative operator delta is small. It remains an operator-level
+finding, not evidence that these particular differences caused the service
+state drift.
+
 These are seeded operator-level inputs, not captured service activations or the
 specific experts selected by the adaptive trace. The test reports relative L1,
 not bitwise equality; it therefore establishes a small nonzero CPU/GPU
@@ -35,3 +43,5 @@ build/integration/candidate/native_expert_parity \
 The raw stdout is in [stdout.txt](stdout.txt). Model shard checksums are
 retained in the prior [Q2_0 artifact identity manifest](../2026-10-11-phase3-q2-actual32k/artifact-identities.json).
 The executable and raw-output SHA256 values are in [SHA256SUMS](SHA256SUMS).
+The diagnostic change only reports CPU/GPU bitwise differences; it does not
+change either computation or the parity pass criterion.
