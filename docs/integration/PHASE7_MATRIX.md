@@ -22,6 +22,7 @@ noted otherwise.
 | Sustained uncached retrieval, 16K | 8 requests over 30 min | All retrieval checks passed | 16.75 / 9.77 GiB | Peak scope use 18.23 GiB; [report](../../bench/results/2026-10-14-phase7-q2-recall/sustained-16k/README.md) |
 | Sustained uncached retrieval, 32K | 4 requests over 2,298 s | All retrieval checks passed | 16.29 / 10.27 GiB | Peak scope use 17.73 GiB; [report](../../bench/results/2026-10-14-phase7-q2-recall/sustained-32k/README.md) |
 | Prompt-cache reuse, 8K | 7,498-token prompt | 653 requests; 7,491 tokens reused; all marker checks passed | 16.93 / 10.72 GiB | Median request 2.86 s, first visible token 0.390 s; [report](../../bench/results/2026-10-14-phase7-q2-recall/cache-reuse-30m/README.md) |
+| Reload and teardown, 8K | 3 fresh services; 7,498-token measured request each | All markers passed identically; listener and engine exited before reload | 16.85 / 6.90 GiB | Three sequential cycles; [report](../../bench/results/2026-10-15-phase7-q2-teardown3/README.md) |
 | Streamed concurrency, 2 slots | 8K and 16K prompts | Both exact retrieval checks passed; overlap and two active slots observed | 15.66 / 7.36 GiB | No latency benefit in this pair; swaps disabled; [report](../../bench/results/2026-10-14-phase7-q2-recall/concurrency2/README.md) |
 | Streamed concurrency, 4 slots | Four distinct 8K prompts | All four exact retrieval checks passed; four slots configured | 14.65 / 11.95 GiB | At most two active slot states observed; four-way gate failed; [report](../../bench/results/2026-10-15-phase7-q2-concurrency4/README.md) |
 

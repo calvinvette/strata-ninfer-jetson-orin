@@ -12,6 +12,8 @@ A Q2_0 [four-slot streamed API screen](../../bench/results/2026-10-15-phase7-q2-
 
 The consolidated [Phase 7 evidence matrix](PHASE7_MATRIX.md) lists tested cells and open support limits.
 
+A Q2_0 [three-cycle reload and teardown check](../../bench/results/2026-10-15-phase7-q2-teardown3/README.md) passed three 7,498-token retrievals with identical marker answers; each listener and engine exited before the next startup. Minimum host/admission availability was 16.85/6.90 GiB across 545 samples, with zero cgroup pressure/OOM events. Phase 7 remains open.
+
 Supported, failed, unsupported and untested cases are recorded. Phase 3
 graph-private allocation size remains unisolated and its
 graph-disabled native control is unsupported; these limits do not imply a general

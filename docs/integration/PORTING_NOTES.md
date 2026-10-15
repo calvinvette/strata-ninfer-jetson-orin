@@ -1538,3 +1538,12 @@ configured/admitted request count and active execution as separate observations.
 For a future Splash serving port, measure both live slot ownership and API
 queueing; a four-slot configuration alone is not evidence of four concurrent
 execution paths. See the [Orin concurrency screen](../../bench/results/2026-10-15-phase7-q2-concurrency4/README.md).
+
+The Q2_0 reload check also showed that service lifecycle runners must set
+completion caps to the task's expected stop length: the inherited 48-token cap
+was correctly stopped by the model after its 41-token answer, but the generic
+harness labelled that normal stop incomplete and halted the remaining cycles.
+With the explicit 41-token cap, three retrieval and teardown cycles passed, and
+each listener and engine exited before reload. For future engine integrations,
+separate normal task stop from incomplete output, and verify process/listener
+release on every cycle. See the [Q2_0 teardown run](../../bench/results/2026-10-15-phase7-q2-teardown3/README.md).
