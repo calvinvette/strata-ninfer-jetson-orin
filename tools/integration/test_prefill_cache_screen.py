@@ -35,6 +35,16 @@ class PrefillCacheScreenTest(unittest.TestCase):
                               Path('/tmp/requests.json'), 3)
         self.assertNotIn('--sample-clocks', command)
 
+    def test_distinct_warmup_is_passed_to_api_driver(self):
+        command = api_command(Path('/usr/bin/python3'), Path('/repo/tools/integration'),
+                              Path('/tmp/config.json'), Path('/tmp/workloads.json'),
+                              Path('/tmp/requests.json'), 1,
+                              warmup_workloads=Path('/tmp/warmup.json'))
+        separator = command.index('--')
+        self.assertEqual(command[separator + 1:].index('--warmup-workloads') + separator + 1,
+                         len(command) - 2)
+        self.assertEqual(command[-1], '/tmp/warmup.json')
+
 
 if __name__ == '__main__':
     unittest.main()

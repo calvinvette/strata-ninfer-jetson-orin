@@ -1,0 +1,113 @@
+{
+  "seed": 2026101522,
+  "expert_cache_arguments": [
+    3000
+  ],
+  "expert_cache_argument_units": "equivalents of the largest expert blob",
+  "prefill_chunk_tokens": [
+    32,
+    128
+  ],
+  "planned_cells": 2,
+  "rounds_per_service": 1,
+  "trace_enabled": false,
+  "clock_sampling": true,
+  "independent_block_confirmation": true,
+  "scope": "randomized order; independent server process per cell; one warmup and three measured requests per process; admission and screening evidence only",
+  "started_wall_time_s": 1792051227.9934795,
+  "cells": [
+    {
+      "name": "cache3000-prefill32",
+      "expert_cache_argument": 3000,
+      "prefill_chunk_tokens": 32,
+      "order": 0,
+      "status": "pass",
+      "command": [
+        "/usr/bin/python3.12",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-15-phase6-q2-prefill-long-workload/block-02/cache3000-prefill32/supervisor",
+        "--timeout",
+        "2400",
+        "--sample-clocks",
+        "--",
+        "/usr/bin/python3.12",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-15-phase6-q2-prefill-long-workload/block-02/cache3000-prefill32/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-15-phase6-q2-prefill-long-workload/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-15-phase6-q2-prefill-long-workload/block-02/cache3000-prefill32/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-15-phase6-q2-prefill-long-workload/warmup-workload.json",
+        "--no-trace"
+      ],
+      "minimum_available_bytes": 19403702272,
+      "elapsed_s": 763.065277047921,
+      "reason": "command exit; numerical/workload qualification is separate",
+      "supervisor_returncode": 0,
+      "request_summary": [
+        {
+          "cell": "heldout-fp16-mtp0-multineedle-8192",
+          "passed_samples": 1,
+          "planned_samples": 1,
+          "median_prompt_per_second": 11.3,
+          "median_predicted_per_second": 6.8
+        }
+      ],
+      "measured_samples": 1
+    },
+    {
+      "name": "cache3000-prefill128",
+      "expert_cache_argument": 3000,
+      "prefill_chunk_tokens": 128,
+      "order": 1,
+      "status": "pass",
+      "command": [
+        "/usr/bin/python3.12",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-15-phase6-q2-prefill-long-workload/block-02/cache3000-prefill128/supervisor",
+        "--timeout",
+        "2400",
+        "--sample-clocks",
+        "--",
+        "/usr/bin/python3.12",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-15-phase6-q2-prefill-long-workload/block-02/cache3000-prefill128/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-15-phase6-q2-prefill-long-workload/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-15-phase6-q2-prefill-long-workload/block-02/cache3000-prefill128/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-15-phase6-q2-prefill-long-workload/warmup-workload.json",
+        "--no-trace"
+      ],
+      "minimum_available_bytes": 19376254976,
+      "elapsed_s": 342.15678341314197,
+      "reason": "command exit; numerical/workload qualification is separate",
+      "supervisor_returncode": 0,
+      "request_summary": [
+        {
+          "cell": "heldout-fp16-mtp0-multineedle-8192",
+          "passed_samples": 1,
+          "planned_samples": 1,
+          "median_prompt_per_second": 28.2,
+          "median_predicted_per_second": 7.0
+        }
+      ],
+      "measured_samples": 1
+    }
+  ],
+  "finished_wall_time_s": 1792052333.6698813
+}

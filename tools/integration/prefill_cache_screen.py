@@ -29,6 +29,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', type=Path, required=True)
     parser.add_argument('--workloads', type=Path, required=True)
+    parser.add_argument('--warmup-workloads', type=Path,
+                        help='optional distinct workload used only to warm each service')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--cache-values', type=int, nargs='+', default=[3000, 5000])
     parser.add_argument('--prefill-values', type=int, nargs='+', default=[32, 128])
@@ -85,7 +87,8 @@ def main():
         request_path = output / 'requests.json'
         command = api_command(args.python.resolve(), tools, cfgpath, args.workloads,
                               request_path, args.rounds, timeout_s=args.timeout,
-                              no_trace=args.no_trace, sample_clocks=args.sample_clocks)
+                              no_trace=args.no_trace, sample_clocks=args.sample_clocks,
+                              warmup_workloads=args.warmup_workloads)
         row = dict(cell, order=index, status='not_run', command=command)
         campaign['cells'].append(row)
         write_result(manifest, campaign)

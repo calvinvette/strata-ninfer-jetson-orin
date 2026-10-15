@@ -822,6 +822,17 @@ during confirmation and retain task outputs with timing so run-to-run profile
 differences remain visible. See the
 [fixed-slot confirmation](../../bench/results/2026-10-15-phase6-q2-prefill-cache-fixedslots/README.md).
 
+A separate seven-block confirmation on a held-out 7,501-token Q2_0 retrieval
+prompt compared chunk 32 and 128 at fixed 3,000-slot capacity with FP16 KV and
+MTP off. The answer matched exactly in every cell, and chunk 128 reduced median
+request time by 59.56% (paired 95% interval −59.62% to −57.50%). The minimum
+effective admission availability was 6.11 GiB, only 0.11 GiB above the floor;
+that narrow margin limits this result to its measured profile. No default was
+promoted. For Splash, repeat the timing on the same long prompt only after a
+feasibility screen confirms the physical-memory and workspace reserves, use a
+distinct short warmup to control campaign cost, and retain an exact retrieval
+oracle. See the [long-prompt confirmation](../../bench/results/2026-10-15-phase6-q2-prefill-long-workload/README.md).
+
 The Oct 12 automatic-cache follow-up reconciled the engine's planned
 prefill-workspace hold with the unique requested-allocation peak of that owner
 on one real Q2_0 request: a 500 MiB hold covered a 333.8 MiB peak, while the
