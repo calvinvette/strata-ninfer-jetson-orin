@@ -1413,6 +1413,22 @@ passed. This broadens the sampled operator contract, but still does not
 reproduce route changes through the full state transaction. See the
 [across-depth report](../../bench/results/2026-10-14-phase5-moe-activation-capture/layer-samples/README.md).
 
+The later IQ1_M same-service recovery diagnostic added two independent checks
+at the adaptive-refill boundary. After each completion event, compare every
+incoming GPU slot byte-for-byte with its stable source blob before releasing
+that source; after updating host residency and uploading it, copy back the
+device table and compare the full table with the host authority. The bounded
+Orin run passed both checks for 288 blobs at three apply points, but the
+separate short/long/short output and state drift still reproduced. This rules
+out corrupt refill bytes and a stale uploaded residency table for those
+observed cells; it does not qualify other stage layouts or explain the
+arithmetic drift. For Splash, preserve the order of these checks and keep
+ownership transfer, device-table publication and operator parity as separate
+assertions. A correct weight transfer alone does not establish that the routed
+CPU/Metal computations have equivalent numerical behavior. See the retained
+[byte check](../../bench/results/2026-10-14-phase5-current-source-swap-byte-verify/README.md)
+and [residency-map check](../../bench/results/2026-10-14-phase5-current-source-residency-table-verify/README.md).
+
 For a future Strata+Splash port, preserve this seam-level capture contract and
 record the engine's own final route categories. Add a Splash-specific replay
 adapter only after its activation quantization, packed-weight geometry and
