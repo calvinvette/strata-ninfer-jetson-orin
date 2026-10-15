@@ -6,6 +6,8 @@ initial long-context recall and sustained-service evidence and remains in
 progress; Phases 5 and 6 also remain open.
 A Q2_0 [256K near-limit retrieval and recovery check](../../bench/results/2026-10-15-phase7-q2-recall-256k/README.md) passed on Orin: 240,286 prompt tokens, all three planted markers exactly once and in order, and a same-service recovery response. Across 11,096 one-second samples, minimum host/admission availability was 7.31 GiB; sampled cgroup pressure/OOM counters were zero. The engine reported 20.8 prompt tokens/s, with 11,557.8 s prompt time. This is a single functional capacity check, not a performance or broad 256K support claim. Phase 7 remains open.
 
+A held-out Q2_0 [64K retrieval-plus-arithmetic quality check](../../bench/results/2026-10-15-phase7-q2-quality-64k/README.md) returned all three 10/50/90% markers once and in order, computed the independently verified suffix sum `1971`, and returned same-service `RECOVERED`. Minimum host/admission availability was 15.13/11.50 GiB across 2,205 samples with zero cgroup pressure/OOM events. This extends one arithmetic task to 64K; it is not a broad quality score. Phase 7 remains open.
+
 Supported, failed, unsupported and untested cases are recorded. Phase 3
 graph-private allocation size remains unisolated and its
 graph-disabled native control is unsupported; these limits do not imply a general
