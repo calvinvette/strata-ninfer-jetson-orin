@@ -1,0 +1,1387 @@
+[0/2] Re-checking globbed directories...
+[1/3] Building CXX object CMakeFiles/strata.dir/src/program/generate.cpp.o
+In file included from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:35:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/core/on_device.hpp: In destructor ‘strata::core::OnDevice::~OnDevice()’:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/core/on_device.hpp:17:51: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+   17 |     ~OnDevice() { if (previous >= 0) cudaSetDevice(previous); }
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2233:12: note: in call to ‘hipError_t hipSetDevice(int)’, declared here
+ 2233 | hipError_t hipSetDevice(int deviceId);
+      |            ^~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In function ‘void {anonymous}::mem_mark(const char*)’:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:1278:19: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 1278 |     cudaMemGetInfo(&free_b, &total_b);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:5303:12: note: in call to ‘hipError_t hipMemGetInfo(size_t*, size_t*)’, declared here
+ 5303 | hipError_t hipMemGetInfo(size_t* free, size_t* total);
+      |            ^~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In function ‘double {anonymous}::probe_pcie_h2d_gbps(std::string*)’:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:1518:21: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 1518 |         cudaFreeHost(h);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:4604:12: note: in call to ‘hipError_t hipFreeHost(void*)’, declared here
+ 4604 | hipError_t hipFreeHost(void* ptr);
+      |            ^~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:1522:20: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 1522 |     cudaMemcpyAsync(d, h, kBytes, cudaMemcpyHostToDevice);   // warmup: context up, copy engine primed
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:5050:12: note: in call to ‘hipError_t hipMemcpyAsync(void*, const void*, size_t, hipMemcpyKind, hipStream_t)’, declared here
+ 5050 | hipError_t hipMemcpyAsync(void* dst, const void* src, size_t sizeBytes, hipMemcpyKind kind,
+      |            ^~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:1542:24: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 1542 |         cudaEventRecord(ev[0]);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:3436:12: note: in call to ‘hipError_t hipEventRecord(hipEvent_t, hipStream_t)’, declared here
+ 3436 | hipError_t hipEventRecord(hipEvent_t event, hipStream_t stream = NULL);
+      |            ^~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:1544:28: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 1544 |             cudaMemcpyAsync(d, h, kBytes, cudaMemcpyHostToDevice);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:5050:12: note: in call to ‘hipError_t hipMemcpyAsync(void*, const void*, size_t, hipMemcpyKind, hipStream_t)’, declared here
+ 5050 | hipError_t hipMemcpyAsync(void* dst, const void* src, size_t sizeBytes, hipMemcpyKind kind,
+      |            ^~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:1545:28: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 1545 |             cudaEventRecord(ev[b + 1]);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:3436:12: note: in call to ‘hipError_t hipEventRecord(hipEvent_t, hipStream_t)’, declared here
+ 3436 | hipError_t hipEventRecord(hipEvent_t event, hipStream_t stream = NULL);
+      |            ^~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:1550:52: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 1550 |     for (int i = 0; i < n_ev; ++i) cudaEventDestroy(ev[i]);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:3456:12: note: in call to ‘hipError_t hipEventDestroy(hipEvent_t)’, declared here
+ 3456 | hipError_t hipEventDestroy(hipEvent_t event);
+      |            ^~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:1564:13: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 1564 |     cudaFree(d);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:4592:12: note: in call to ‘hipError_t hipFree(void*)’, declared here
+ 4592 | hipError_t hipFree(void* ptr);
+      |            ^~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:1565:17: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 1565 |     cudaFreeHost(h);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:4604:12: note: in call to ‘hipError_t hipFreeHost(void*)’, declared here
+ 4604 | hipError_t hipFreeHost(void* ptr);
+      |            ^~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In function ‘int main(int, char**)’:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:2005:25: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 2005 |         cudaGetLastError();
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2708:12: note: in call to ‘hipError_t hipGetLastError()’, declared here
+ 2708 | hipError_t hipGetLastError(void);
+      |            ^~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:2111:93: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 2111 |                     if (cudaGetDeviceProperties(&prop, d) != cudaSuccess) { cudaGetLastError(); own = false; break; }
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2708:12: note: in call to ‘hipError_t hipGetLastError()’, declared here
+ 2708 | hipError_t hipGetLastError(void);
+      |            ^~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:2133:25: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 2133 |         cudaGetLastError();
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2708:12: note: in call to ‘hipError_t hipGetLastError()’, declared here
+ 2708 | hipError_t hipGetLastError(void);
+      |            ^~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:2736:25: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 2736 |         cudaGetLastError();
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2708:12: note: in call to ‘hipError_t hipGetLastError()’, declared here
+ 2708 | hipError_t hipGetLastError(void);
+      |            ^~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:2744:33: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 2744 |                 cudaGetLastError();
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2708:12: note: in call to ‘hipError_t hipGetLastError()’, declared here
+ 2708 | hipError_t hipGetLastError(void);
+      |            ^~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:2754:23: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 2754 |         cudaMemGetInfo(&free_b, &total_b);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:5303:12: note: in call to ‘hipError_t hipMemGetInfo(size_t*, size_t*)’, declared here
+ 5303 | hipError_t hipMemGetInfo(size_t* free, size_t* total);
+      |            ^~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:3067:27: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 3067 |             cudaMemGetInfo(&fb, &tb);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:5303:12: note: in call to ‘hipError_t hipMemGetInfo(size_t*, size_t*)’, declared here
+ 5303 | hipError_t hipMemGetInfo(size_t* free, size_t* total);
+      |            ^~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:3072:36: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 3072 |             cudaGetDeviceProperties(&dp, 0);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2354:12: note: in call to ‘hipError_t hipGetDevicePropertiesR0600(hipDeviceProp_tR0600*, int)’, declared here
+ 2354 | hipError_t hipGetDeviceProperties(hipDeviceProp_t* prop, int deviceId);
+      |            ^~~~~~~~~~~~~~~~~~~~~~
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In lambda function:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:3136:29: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 3136 |             cudaGetLastError();
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2708:12: note: in call to ‘hipError_t hipGetLastError()’, declared here
+ 2708 | hipError_t hipGetLastError(void);
+      |            ^~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:3138:27: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 3138 |             cudaMemGetInfo(&free_b, &total_b);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:5303:12: note: in call to ‘hipError_t hipMemGetInfo(size_t*, size_t*)’, declared here
+ 5303 | hipError_t hipMemGetInfo(size_t* free, size_t* total);
+      |            ^~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In function ‘int main(int, char**)’:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:3207:27: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 3207 |             cudaMemGetInfo(&fb, &tb);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:5303:12: note: in call to ‘hipError_t hipMemGetInfo(size_t*, size_t*)’, declared here
+ 5303 | hipError_t hipMemGetInfo(size_t* free, size_t* total);
+      |            ^~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:3386:35: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 3386 |             cudaDeviceGetAttribute(&sms, cudaDevAttrMultiProcessorCount, dev);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2283:12: note: in call to ‘hipError_t hipDeviceGetAttribute(int*, hipDeviceAttribute_t, int)’, declared here
+ 2283 | hipError_t hipDeviceGetAttribute(int* pi, hipDeviceAttribute_t attr, int deviceId);
+      |            ^~~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:3388:29: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 3388 |             cudaGetLastError();
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2708:12: note: in call to ‘hipError_t hipGetLastError()’, declared here
+ 2708 | hipError_t hipGetLastError(void);
+      |            ^~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:3846:27: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 3846 |             cudaMemGetInfo(&before, &total_b);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:5303:12: note: in call to ‘hipError_t hipMemGetInfo(size_t*, size_t*)’, declared here
+ 5303 | hipError_t hipMemGetInfo(size_t* free, size_t* total);
+      |            ^~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:3849:27: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 3849 |             cudaMemGetInfo(&fb, &tb);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:5303:12: note: in call to ‘hipError_t hipMemGetInfo(size_t*, size_t*)’, declared here
+ 5303 | hipError_t hipMemGetInfo(size_t* free, size_t* total);
+      |            ^~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:3952:23: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 3952 |         cudaMemGetInfo(&fb, &tb);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:5303:12: note: in call to ‘hipError_t hipMemGetInfo(size_t*, size_t*)’, declared here
+ 5303 | hipError_t hipMemGetInfo(size_t* free, size_t* total);
+      |            ^~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:4026:37: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4026 |                     cudaGetLastError();
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2708:12: note: in call to ‘hipError_t hipGetLastError()’, declared here
+ 2708 | hipError_t hipGetLastError(void);
+      |            ^~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:4028:35: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4028 |                     cudaMemGetInfo(&fb, &tb);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:5303:12: note: in call to ‘hipError_t hipMemGetInfo(size_t*, size_t*)’, declared here
+ 5303 | hipError_t hipMemGetInfo(size_t* free, size_t* total);
+      |            ^~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:4037:37: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4037 |                     cudaGetLastError();
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2708:12: note: in call to ‘hipError_t hipGetLastError()’, declared here
+ 2708 | hipError_t hipGetLastError(void);
+      |            ^~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:4042:35: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4042 |                     cudaMemGetInfo(&fb, &tb);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:5303:12: note: in call to ‘hipError_t hipMemGetInfo(size_t*, size_t*)’, declared here
+ 5303 | hipError_t hipMemGetInfo(size_t* free, size_t* total);
+      |            ^~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:4058:34: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4058 |             cudaDeviceSynchronize();
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2189:12: note: in call to ‘hipError_t hipDeviceSynchronize()’, declared here
+ 2189 | hipError_t hipDeviceSynchronize(void);
+      |            ^~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:4060:27: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4060 |             cudaMemGetInfo(&fb, &tb);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:5303:12: note: in call to ‘hipError_t hipMemGetInfo(size_t*, size_t*)’, declared here
+ 5303 | hipError_t hipMemGetInfo(size_t* free, size_t* total);
+      |            ^~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:4193:37: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4193 |         if (!named) cudaGetLastError();
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2708:12: note: in call to ‘hipError_t hipGetLastError()’, declared here
+ 2708 | hipError_t hipGetLastError(void);
+      |            ^~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:4763:23: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4763 |             cudaMemset(xcache.device_slot(0), 0, (size_t) xcache.bytes());
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:5061:12: note: in call to ‘hipError_t hipMemset(void*, int, size_t)’, declared here
+ 5061 | hipError_t hipMemset(void* dst, int value, size_t sizeBytes);
+      |            ^~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:4764:34: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4764 |             cudaDeviceSynchronize();
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2189:12: note: in call to ‘hipError_t hipDeviceSynchronize()’, declared here
+ 2189 | hipError_t hipDeviceSynchronize(void);
+      |            ^~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:4886:27: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4886 |             cudaMemGetInfo(&fb, &tb);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:5303:12: note: in call to ‘hipError_t hipMemGetInfo(size_t*, size_t*)’, declared here
+ 5303 | hipError_t hipMemGetInfo(size_t* free, size_t* total);
+      |            ^~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:4971:27: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4971 |             cudaMemGetInfo(&fb, &tb);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:5303:12: note: in call to ‘hipError_t hipMemGetInfo(size_t*, size_t*)’, declared here
+ 5303 | hipError_t hipMemGetInfo(size_t* free, size_t* total);
+      |            ^~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In destructor ‘main(int, char**)::LayerDumpCleanup::~LayerDumpCleanup()’:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:5420:29: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 5420 |                 cudaFreeHost(stage);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:4604:12: note: in call to ‘hipError_t hipFreeHost(void*)’, declared here
+ 4604 | hipError_t hipFreeHost(void* ptr);
+      |            ^~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In function ‘int main(int, char**)’:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:5615:17: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 5615 |         cudaFree(d_next);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:4592:12: note: in call to ‘hipError_t hipFree(void*)’, declared here
+ 4592 | hipError_t hipFree(void* ptr);
+      |            ^~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In lambda function:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:6207:32: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 6207 |                 cudaMemcpyAsync(xcache.device_slot((int32_t) s), b, (size_t) lay.blob_bytes(l), cudaMemcpyHostToDevice,
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:5050:12: note: in call to ‘hipError_t hipMemcpyAsync(void*, const void*, size_t, hipMemcpyKind, hipStream_t)’, declared here
+ 5050 | hipError_t hipMemcpyAsync(void* dst, const void* src, size_t sizeBytes, hipMemcpyKind kind,
+      |            ^~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In lambda function:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:6696:35: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 6696 |                     cudaMemGetInfo(&fb, &tb);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:5303:12: note: in call to ‘hipError_t hipMemGetInfo(size_t*, size_t*)’, declared here
+ 5303 | hipError_t hipMemGetInfo(size_t* free, size_t* total);
+      |            ^~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In function ‘int main(int, char**)’:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:6811:28: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 6811 |                     res_put(d_res);
+      |                     ~~~~~~~^~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:5732:20: note: in call to ‘main(int, char**)::<lambda(int32_t*)>’, declared here
+ 5732 |     auto res_put = [&host_res](int32_t* dst) -> cudaError_t {
+      |                    ^
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:6814:28: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 6814 |                     res_put(st->d_res);
+      |                     ~~~~~~~^~~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:5732:20: note: in call to ‘main(int, char**)::<lambda(int32_t*)>’, declared here
+ 5732 |     auto res_put = [&host_res](int32_t* dst) -> cudaError_t {
+      |                    ^
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:7053:33: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 7053 |                 cudaGetLastError();
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2708:12: note: in call to ‘hipError_t hipGetLastError()’, declared here
+ 2708 | hipError_t hipGetLastError(void);
+      |            ^~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:7061:55: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 7061 |                 if (!pl_snap_overlap) cudaGetLastError();
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2708:12: note: in call to ‘hipError_t hipGetLastError()’, declared here
+ 2708 | hipError_t hipGetLastError(void);
+      |            ^~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In lambda function:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:7116:38: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 7116 |                 cudaStreamSynchronize(PV[st][0]->stream());
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2923:12: note: in call to ‘hipError_t hipStreamSynchronize(hipStream_t)’, declared here
+ 2923 | hipError_t hipStreamSynchronize(hipStream_t stream);
+      |            ^~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:7119:34: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 7119 |             cudaStreamSynchronize(mtp.stream());
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2923:12: note: in call to ‘hipError_t hipStreamSynchronize(hipStream_t)’, declared here
+ 2923 | hipError_t hipStreamSynchronize(hipStream_t stream);
+      |            ^~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In function ‘int main(int, char**)’:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:7534:26: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 7534 |             cudaGetDevice(&main_dev);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2260:12: note: in call to ‘hipError_t hipGetDevice(int*)’, declared here
+ 2260 | hipError_t hipGetDevice(int* deviceId);
+      |            ^~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:7574:33: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 7574 |         cudaEventCreateWithFlags(&adapt_ev, cudaEventDisableTiming);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:3354:12: note: in call to ‘hipError_t hipEventCreateWithFlags(ihipEvent_t**, unsigned int)’, declared here
+ 3354 | hipError_t hipEventCreateWithFlags(hipEvent_t* event, unsigned flags);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In lambda function:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:7578:24: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 7578 |                 res_put(d_res);
+      |                 ~~~~~~~^~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:5732:20: note: in call to ‘main(int, char**)::<lambda(int32_t*)>’, declared here
+ 5732 |     auto res_put = [&host_res](int32_t* dst) -> cudaError_t {
+      |                    ^
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:7581:24: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 7581 |                 res_put(st->d_res);
+      |                 ~~~~~~~^~~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:5732:20: note: in call to ‘main(int, char**)::<lambda(int32_t*)>’, declared here
+ 5732 |     auto res_put = [&host_res](int32_t* dst) -> cudaError_t {
+      |                    ^
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In lambda function:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:7587:43: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 7587 |             if (wait) cudaEventSynchronize(adapt_ev);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:3475:12: note: in call to ‘hipError_t hipEventSynchronize(hipEvent_t)’, declared here
+ 3475 | hipError_t hipEventSynchronize(hipEvent_t event);
+      |            ^~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:7591:51: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 7591 |                     if (wait) cudaEventSynchronize(st->adapt_ev);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:3475:12: note: in call to ‘hipError_t hipEventSynchronize(hipEvent_t)’, declared here
+ 3475 | hipError_t hipEventSynchronize(hipEvent_t event);
+      |            ^~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In lambda function:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:7750:48: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 7750 |             if (!swaps.empty()) cudaEventRecord(adapt_ev, adapt_stream);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:3436:12: note: in call to ‘hipError_t hipEventRecord(hipEvent_t, hipStream_t)’, declared here
+ 3436 | hipError_t hipEventRecord(hipEvent_t event, hipStream_t stream = NULL);
+      |            ^~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:7755:36: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 7755 |                     cudaEventRecord(st->adapt_ev, st->adapt_stream);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:3436:12: note: in call to ‘hipError_t hipEventRecord(hipEvent_t, hipStream_t)’, declared here
+ 3436 | hipError_t hipEventRecord(hipEvent_t event, hipStream_t stream = NULL);
+      |            ^~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In function ‘int main(int, char**)’:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:8199:27: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 8199 |             cudaMemGetInfo(&free_b, &total_b);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:5303:12: note: in call to ‘hipError_t hipMemGetInfo(size_t*, size_t*)’, declared here
+ 5303 | hipError_t hipMemGetInfo(size_t* free, size_t* total);
+      |            ^~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:8247:27: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 8247 |             cudaMemGetInfo(&free_b, &total_b);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:5303:12: note: in call to ‘hipError_t hipMemGetInfo(size_t*, size_t*)’, declared here
+ 5303 | hipError_t hipMemGetInfo(size_t* free, size_t* total);
+      |            ^~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In lambda function:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:8411:27: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 8411 |             cudaMemGetInfo(&free_b, &total_b);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:5303:12: note: in call to ‘hipError_t hipMemGetInfo(size_t*, size_t*)’, declared here
+ 5303 | hipError_t hipMemGetInfo(size_t* free, size_t* total);
+      |            ^~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:8467:27: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 8467 |             cudaMemGetInfo(&free_b, &total_b);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:5303:12: note: in call to ‘hipError_t hipMemGetInfo(size_t*, size_t*)’, declared here
+ 5303 | hipError_t hipMemGetInfo(size_t* free, size_t* total);
+      |            ^~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In lambda function:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:8845:30: warning: unused variable ‘w’ [-Wunused-variable]
+ 8845 |                 const double w = (double) bt_windows, wall = std::chrono::duration<double, std::milli>(Clock::now() - bt_start).count();
+      |                              ^
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In lambda function:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:9111:103: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 9111 |                     if (!kvg_ensure((int64_t) image.live.ids.size() + 256, [&] { cudaDeviceSynchronize(); apply_pending(true); })) {
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2189:12: note: in call to ‘hipError_t hipDeviceSynchronize()’, declared here
+ 2189 | hipError_t hipDeviceSynchronize(void);
+      |            ^~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In function ‘int main(int, char**)’:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:9281:38: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 9281 |                 cudaDeviceSynchronize();
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2189:12: note: in call to ‘hipError_t hipDeviceSynchronize()’, declared here
+ 2189 | hipError_t hipDeviceSynchronize(void);
+      |            ^~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In lambda function:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:9289:46: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 9289 |                         cudaDeviceSynchronize();
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2189:12: note: in call to ‘hipError_t hipDeviceSynchronize()’, declared here
+ 2189 | hipError_t hipDeviceSynchronize(void);
+      |            ^~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In lambda function:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:9350:58: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 9350 |             auto kv_quiesce = [&] { cudaDeviceSynchronize(); apply_pending(true); };
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2189:12: note: in call to ‘hipError_t hipDeviceSynchronize()’, declared here
+ 2189 | hipError_t hipDeviceSynchronize(void);
+      |            ^~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In function ‘int main(int, char**)’:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:9561:38: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 9561 |                 cudaStreamSynchronize(main_stream);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2923:12: note: in call to ‘hipError_t hipStreamSynchronize(hipStream_t)’, declared here
+ 2923 | hipError_t hipStreamSynchronize(hipStream_t stream);
+      |            ^~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:9565:42: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 9565 |                     cudaStreamSynchronize(st->stream);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2923:12: note: in call to ‘hipError_t hipStreamSynchronize(hipStream_t)’, declared here
+ 2923 | hipError_t hipStreamSynchronize(hipStream_t stream);
+      |            ^~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:9580:42: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 9580 |                     cudaStreamSynchronize(main_stream);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2923:12: note: in call to ‘hipError_t hipStreamSynchronize(hipStream_t)’, declared here
+ 2923 | hipError_t hipStreamSynchronize(hipStream_t stream);
+      |            ^~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:9584:46: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 9584 |                         cudaStreamSynchronize(st->stream);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2923:12: note: in call to ‘hipError_t hipStreamSynchronize(hipStream_t)’, declared here
+ 2923 | hipError_t hipStreamSynchronize(hipStream_t stream);
+      |            ^~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In lambda function:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:9720:48: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 9720 |                             cudaStreamWaitEvent(v.stream(), pl_mtp_ev[l1 & 1], 0);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2950:12: note: in call to ‘hipError_t hipStreamWaitEvent(hipStream_t, hipEvent_t, unsigned int)’, declared here
+ 2950 | hipError_t hipStreamWaitEvent(hipStream_t stream, hipEvent_t event, unsigned int flags __dparm(0));
+      |            ^~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:9735:48: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 9735 |                                 cudaEventRecord(pl_mtp_ev[f1 & 1], mtp.stream());
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:3436:12: note: in call to ‘hipError_t hipEventRecord(hipEvent_t, hipStream_t)’, declared here
+ 3436 | hipError_t hipEventRecord(hipEvent_t event, hipStream_t stream = NULL);
+      |            ^~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In lambda function:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:10453:44: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+10453 |                            (cudaStreamQuery(pl_snap_stream), true);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2901:12: note: in call to ‘hipError_t hipStreamQuery(hipStream_t)’, declared here
+ 2901 | hipError_t hipStreamQuery(hipStream_t stream);
+      |            ^~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In function ‘int main(int, char**)’:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:10553:45: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+10553 |                     cudaEventCreateWithFlags(&fence_ev[0], cudaEventDisableTiming);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:3354:12: note: in call to ‘hipError_t hipEventCreateWithFlags(ihipEvent_t**, unsigned int)’, declared here
+ 3354 | hipError_t hipEventCreateWithFlags(hipEvent_t* event, unsigned flags);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:10554:45: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+10554 |                     cudaEventCreateWithFlags(&exch_ev[0], cudaEventDisableTiming);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:3354:12: note: in call to ‘hipError_t hipEventCreateWithFlags(ihipEvent_t**, unsigned int)’, declared here
+ 3354 | hipError_t hipEventCreateWithFlags(hipEvent_t* event, unsigned flags);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:10558:45: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+10558 |                     cudaEventCreateWithFlags(&fence_ev[1], cudaEventDisableTiming);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:3354:12: note: in call to ‘hipError_t hipEventCreateWithFlags(ihipEvent_t**, unsigned int)’, declared here
+ 3354 | hipError_t hipEventCreateWithFlags(hipEvent_t* event, unsigned flags);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:10559:45: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+10559 |                     cudaEventCreateWithFlags(&exch_ev[1], cudaEventDisableTiming);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:3354:12: note: in call to ‘hipError_t hipEventCreateWithFlags(ihipEvent_t**, unsigned int)’, declared here
+ 3354 | hipError_t hipEventCreateWithFlags(hipEvent_t* event, unsigned flags);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In lambda function:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:10564:40: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+10564 |                         cudaEventRecord(ev[0], s0);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:3436:12: note: in call to ‘hipError_t hipEventRecord(hipEvent_t, hipStream_t)’, declared here
+ 3436 | hipError_t hipEventRecord(hipEvent_t event, hipStream_t stream = NULL);
+      |            ^~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:10568:36: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+10568 |                     cudaEventRecord(ev[1], PV[1][0]->stream());
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:3436:12: note: in call to ‘hipError_t hipEventRecord(hipEvent_t, hipStream_t)’, declared here
+ 3436 | hipError_t hipEventRecord(hipEvent_t event, hipStream_t stream = NULL);
+      |            ^~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In function ‘int main(int, char**)’:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:10976:73: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+10976 |                 for (cudaEvent_t ev : fence_ev) if (ev) cudaEventDestroy(ev);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:3456:12: note: in call to ‘hipError_t hipEventDestroy(hipEvent_t)’, declared here
+ 3456 | hipError_t hipEventDestroy(hipEvent_t event);
+      |            ^~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:10977:72: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+10977 |                 for (cudaEvent_t ev : exch_ev) if (ev) cudaEventDestroy(ev);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:3456:12: note: in call to ‘hipError_t hipEventDestroy(hipEvent_t)’, declared here
+ 3456 | hipError_t hipEventDestroy(hipEvent_t event);
+      |            ^~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:11103:31: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+11103 |                     cudaMemcpy(d_hist, hist_stage.data(), (size_t) T * (size_t) hist_n * sizeof(int32_t),
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:4651:12: note: in call to ‘hipError_t hipMemcpy(void*, const void*, size_t, hipMemcpyKind)’, declared here
+ 4651 | hipError_t hipMemcpy(void* dst, const void* src, size_t sizeBytes, hipMemcpyKind kind);
+      |            ^~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In lambda function:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:11108:72: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+11108 |                     !kvg_ensure(p + T + 64, [&] { cudaDeviceSynchronize(); apply_pending(true); })) {
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2189:12: note: in call to ‘hipError_t hipDeviceSynchronize()’, declared here
+ 2189 | hipError_t hipDeviceSynchronize(void);
+      |            ^~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In lambda function:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:11536:86: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+11536 |                 if (!kvg_ensure(n_prompt + o.max_new + 64, [] { cudaDeviceSynchronize(); })) return 1;
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2189:12: note: in call to ‘hipError_t hipDeviceSynchronize()’, declared here
+ 2189 | hipError_t hipDeviceSynchronize(void);
+      |            ^~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In function ‘int main(int, char**)’:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:11542:24: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+11542 |                 res_put(d_res);
+      |                 ~~~~~~~^~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:5732:20: note: in call to ‘main(int, char**)::<lambda(int32_t*)>’, declared here
+ 5732 |     auto res_put = [&host_res](int32_t* dst) -> cudaError_t {
+      |                    ^
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In lambda function:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:11575:82: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+11575 |             if (!kvg_ensure(n_prompt + o.max_new + 64, [] { cudaDeviceSynchronize(); })) return 1;
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2189:12: note: in call to ‘hipError_t hipDeviceSynchronize()’, declared here
+ 2189 | hipError_t hipDeviceSynchronize(void);
+      |            ^~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In function ‘int main(int, char**)’:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:11603:20: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+11603 |             res_put(d_res);
+      |             ~~~~~~~^~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:5732:20: note: in call to ‘main(int, char**)::<lambda(int32_t*)>’, declared here
+ 5732 |     auto res_put = [&host_res](int32_t* dst) -> cudaError_t {
+      |                    ^
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In lambda function:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:11626:78: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+11626 |         if (!kvg_ensure(n_prompt + o.max_new + 64, [] { cudaDeviceSynchronize(); })) return 1;
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:2189:12: note: in call to ‘hipError_t hipDeviceSynchronize()’, declared here
+ 2189 | hipError_t hipDeviceSynchronize(void);
+      |            ^~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In function ‘int main(int, char**)’:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:11712:23: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+11712 |             cudaMemcpy(final_r_host.data(), ss.R, final_r_host.size() * sizeof(float), cudaMemcpyDeviceToHost);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:4651:12: note: in call to ‘hipError_t hipMemcpy(void*, const void*, size_t, hipMemcpyKind)’, declared here
+ 4651 | hipError_t hipMemcpy(void* dst, const void* src, size_t sizeBytes, hipMemcpyKind kind);
+      |            ^~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:11934:33: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+11934 |         cudaEventCreateWithFlags(&adapt_ev, cudaEventDisableTiming);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:3354:12: note: in call to ‘hipError_t hipEventCreateWithFlags(ihipEvent_t**, unsigned int)’, declared here
+ 3354 | hipError_t hipEventCreateWithFlags(hipEvent_t* event, unsigned flags);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In lambda function:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:11940:43: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+11940 |             if (wait) cudaEventSynchronize(adapt_ev);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:3475:12: note: in call to ‘hipError_t hipEventSynchronize(hipEvent_t)’, declared here
+ 3475 | hipError_t hipEventSynchronize(hipEvent_t event);
+      |            ^~~~~~~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:11958:24: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+11958 |                 res_put(d_res);
+      |                 ~~~~~~~^~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:5732:20: note: in call to ‘main(int, char**)::<lambda(int32_t*)>’, declared here
+ 5732 |     auto res_put = [&host_res](int32_t* dst) -> cudaError_t {
+      |                    ^
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In lambda function:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:12047:48: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+12047 |             if (!swaps.empty()) cudaEventRecord(adapt_ev, adapt_stream);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:3436:12: note: in call to ‘hipError_t hipEventRecord(hipEvent_t, hipStream_t)’, declared here
+ 3436 | hipError_t hipEventRecord(hipEvent_t event, hipStream_t stream = NULL);
+      |            ^~~~~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp: In function ‘int main(int, char**)’:
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:12171:27: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+12171 |                 cudaMemcpy(hash_rows.data(), ver.final_R_all(), n_floats * sizeof(float), cudaMemcpyDeviceToHost);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:4651:12: note: in call to ‘hipError_t hipMemcpy(void*, const void*, size_t, hipMemcpyKind)’, declared here
+ 4651 | hipError_t hipMemcpy(void* dst, const void* src, size_t sizeBytes, hipMemcpyKind kind);
+      |            ^~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:12352:25: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+12352 |             cudaFreeHost(layer_stage);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:4604:12: note: in call to ‘hipError_t hipFreeHost(void*)’, declared here
+ 4604 | hipError_t hipFreeHost(void* ptr);
+      |            ^~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:12360:21: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+12360 |         cudaFreeHost(half_stage);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:4604:12: note: in call to ‘hipError_t hipFreeHost(void*)’, declared here
+ 4604 | hipError_t hipFreeHost(void* ptr);
+      |            ^~~~~~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:12526:13: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+12526 |     cudaFree(d_next);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:4592:12: note: in call to ‘hipError_t hipFree(void*)’, declared here
+ 4592 | hipError_t hipFree(void* ptr);
+      |            ^~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:12527:13: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+12527 |     cudaFree(d_logits);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:4592:12: note: in call to ‘hipError_t hipFree(void*)’, declared here
+ 4592 | hipError_t hipFree(void* ptr);
+      |            ^~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:12528:13: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+12528 |     cudaFree(d_emb);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:4592:12: note: in call to ‘hipError_t hipFree(void*)’, declared here
+ 4592 | hipError_t hipFree(void* ptr);
+      |            ^~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/src/program/generate.cpp:12529:13: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+12529 |     cudaFree(d_parts);
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:4592:12: note: in call to ‘hipError_t hipFree(void*)’, declared here
+ 4592 | hipError_t hipFree(void* ptr);
+      |            ^~~~~~~
+In file included from /home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime.h:65,
+                 from /home/calvin/workspace/strata-validation/integration/mtp-reset-ee15abe/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_devel/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+[2/3] Linking HIP executable strata

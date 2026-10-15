@@ -10,6 +10,17 @@ graph-disabled native control is unsupported; these limits do not imply a genera
 capacity or cross-model result. No NInfer execution component has been promoted
 into Strata. See the [Phase 3 gate audit](PHASE3_CLOSEOUT.md).
 
+The Phase 5 [adaptive-refill byte check](../../bench/results/2026-10-14-phase5-current-source-swap-byte-verify/README.md)
+passed for every incoming expert blob in the current-source Orin short/long/short
+recovery reproduction: 1,017 blobs per MTP arm, with exact device-slot/source
+equality. The same-service output and persistent-state recovery drift remained,
+so corrupt or incomplete refill bytes do not explain this run. MTP0/MTP4 parity
+remained exact. Minimum host/admission availability was 13.29/13.19 GiB under
+the 28-GiB supervisor, with zero sampled cgroup pressure/OOM events. The
+instrumented CUDA build passed on Orin, and the changed file passed the maestro1
+HIP service build and help check (compile/link evidence only). The numerical
+cause remains unresolved; Phase 5 is open.
+
 The current-source MTP reset fix has now passed targeted HIP builds of the
 `strata` service and `native_expert_parity`, and a full 123-step SYCL `strata`
 service build on maestro1; both binaries passed `--help` load checks. These are

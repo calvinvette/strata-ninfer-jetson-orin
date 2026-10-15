@@ -7591,6 +7591,35 @@ int main(int argc, char** argv) {
                     if (wait) cudaEventSynchronize(st->adapt_ev);
                     else if (cudaEventQuery(st->adapt_ev) != cudaSuccess) return;
                 }
+            static const bool verify_adapt_swaps = [] {
+                const char* e = std::getenv("STRATA_VERIFY_ADAPT_SWAPS");
+                return e != nullptr && e[0] == '1';
+            }();
+            if (verify_adapt_swaps) {
+                size_t verified = 0;
+                std::vector<uint8_t> check;
+                for (const auto& [i, slot] : pending) {
+                    const int64_t layer = (int64_t) i / g.n_expert;
+                    const int64_t expert = (int64_t) i % g.n_expert;
+                    const size_t bytes = (size_t) strata::kernels::cpu::expert_layout().blob_bytes(layer);
+                    const uint8_t* expected = srcp->blob_stable(layer, expert);
+                    const int stn = multi_gpu ? stage_of(layer) : 0;
+                    GpuStage* gs = stn > 0 ? stages[(size_t) stn - 1].get() : nullptr;
+                    const strata::core::OnDevice on(gs ? gs->dev : -1);
+                    const uint8_t* actual = gs ? gs->cache.device_slot(slot) : xcache.device_slot(slot);
+                    check.resize(bytes);
+                    if (expected == nullptr || actual == nullptr ||
+                        cudaMemcpy(check.data(), actual, bytes, cudaMemcpyDeviceToHost) != cudaSuccess ||
+                        std::memcmp(check.data(), expected, bytes) != 0) {
+                        std::fprintf(stderr, "strata serve: adaptive swap byte verification failed (layer %lld, expert %lld, slot %d)\n",
+                                     (long long) layer, (long long) expert, (int) slot);
+                        std::fflush(stderr);
+                        std::abort();
+                    }
+                    ++verified;
+                }
+                std::fprintf(stderr, "strata serve: adaptive swap byte verification passed (%zu blobs)\n", verified);
+            }
             for (auto& st : stages) st->adapt_live = false;
             unpin_blobs(pin_live);
             src.commit_exchanges();   // the resident RAM mode: the evicted experts take their places in RAM
