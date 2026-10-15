@@ -15,7 +15,7 @@ and lessons for a future Strata + Splash integration.
 
 Start with the [development plan](PLAN.md), [architecture](ARCHITECTURE.md),
 [benchmark protocol](BENCHMARKS.md), [import map](IMPORT_MAP.md), and
-[current status](STATUS.md). Record architectural choices in [decisions](DECISIONS.md).
+[current status](STATUS.md) and the [Phase 7 evidence matrix](PHASE7_MATRIX.md). Record architectural choices in [decisions](DECISIONS.md).
 The [bootstrap validation](BOOTSTRAP_VALIDATION.md) records the checks performed.
 
 | Project input | Pinned revision | Purpose |

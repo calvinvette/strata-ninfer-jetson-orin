@@ -1,0 +1,66 @@
+# Phase 7 evidence matrix
+
+This matrix summarizes retained Orin tests for the Phase 7 plan. It records
+individual tested cells, not a general product support guarantee. Phase 6 has
+not selected a serving profile, and the Phase 7 exit gates remain open. Each
+result link contains its request artifacts, runner result and telemetry unless
+noted otherwise.
+
+## Q2_0 accepted-only MTP4
+
+| Test | Configured context / actual prompt | Functional result | Minimum host / admission availability | Boundary |
+| --- | ---: | --- | ---: | --- |
+| Near-limit recall, 8K | 8,192 / 7,498 tokens | Three markers once and ordered; same-service recovery | 16.97 / 10.15 GiB | Single request point; [report](../../bench/results/2026-10-14-phase7-q2-recall/README.md) |
+| Near-limit recall, 16K | 16,384 / 15,003 tokens | Three markers once and ordered; same-service recovery | 16.80 / 10.36 GiB | Single request point; same report |
+| Near-limit recall, 32K | 32,768 / 30,032 tokens | Three markers once and ordered; same-service recovery | 16.36 / 10.31 GiB | Single request point; same report |
+| Near-limit recall, 64K | 65,536 / 60,071 tokens | Three markers once and ordered; same-service recovery | 15.37 / 11.26 GiB | Single request point; [report](../../bench/results/2026-10-15-phase7-q2-recall-64k/README.md) |
+| Near-limit recall, 128K | 131,072 / 120,149 tokens | Three markers once and ordered; same-service recovery | 13.65 / 13.19 GiB | Single request point; [report](../../bench/results/2026-10-15-phase7-q2-recall-128k/README.md) |
+| Near-limit recall, 256K | 262,144 / 240,286 tokens | Three markers once and ordered; same-service recovery | 7.31 / 7.31 GiB | Single request point; lowest observed headroom in this matrix; [report](../../bench/results/2026-10-15-phase7-q2-recall-256k/README.md) |
+| Held-out retrieval plus arithmetic, 32K | 32,768 / 30,040 tokens | Three codes ordered; suffix sum `1971`; recovery | 16.29 / 10.27 GiB | One task; [report](../../bench/results/2026-10-14-phase7-q2-recall/quality-replication-32768/README.md) |
+| Held-out retrieval plus arithmetic, 64K | 65,536 / 60,079 tokens | Three codes ordered; suffix sum `1971`; recovery | 15.13 / 11.50 GiB | One task; [report](../../bench/results/2026-10-15-phase7-q2-quality-64k/README.md) |
+| Sustained uncached retrieval, 8K | 14 requests in 30 min | All retrieval checks passed | 16.97 / 9.55 GiB | `tj` 54.5–60.1 °C; one sustained cell; [report](../../bench/results/2026-10-14-phase7-q2-recall/sustained-8k/README.md) |
+| Sustained uncached retrieval, 16K | 8 requests over 30 min | All retrieval checks passed | 16.75 / 9.77 GiB | Peak scope use 18.23 GiB; [report](../../bench/results/2026-10-14-phase7-q2-recall/sustained-16k/README.md) |
+| Sustained uncached retrieval, 32K | 4 requests over 2,298 s | All retrieval checks passed | 16.29 / 10.27 GiB | Peak scope use 17.73 GiB; [report](../../bench/results/2026-10-14-phase7-q2-recall/sustained-32k/README.md) |
+| Prompt-cache reuse, 8K | 7,498-token prompt | 653 requests; 7,491 tokens reused; all marker checks passed | 16.93 / 10.72 GiB | Median request 2.86 s, first visible token 0.390 s; [report](../../bench/results/2026-10-14-phase7-q2-recall/cache-reuse-30m/README.md) |
+| Streamed concurrency, 2 slots | 8K and 16K prompts | Both exact retrieval checks passed; overlap and two active slots observed | 15.66 / 7.36 GiB | No latency benefit in this pair; swaps disabled; [report](../../bench/results/2026-10-14-phase7-q2-recall/concurrency2/README.md) |
+| Streamed concurrency, 4 slots | Four distinct 8K prompts | All four exact retrieval checks passed; four slots configured | 14.65 / 11.95 GiB | At most two active slot states observed; four-way gate failed; [report](../../bench/results/2026-10-15-phase7-q2-concurrency4/README.md) |
+
+The 256K test's 7.31 GiB minimum host availability cleared the required six-GiB
+floor, with zero sampled cgroup pressure/OOM events. It took 11,557.8 seconds
+for prompt processing at the engine-reported 20.8 tokens/s. It is a single
+functional check, not a 256K sustained or performance qualification. Thermal
+equilibrium, energy attribution and EMC clock readback were not established in
+that run.
+
+## IQ1_M opt-in MTP4
+
+| Test | Functional result | Minimum host availability | Boundary |
+| --- | --- | ---: | --- |
+| Near-limit recall and recovery at 8K/16K/32K | Three markers in order and same-service recovery at each context | 12.67 GiB across context tests | One IQ1_M profile; [report](../../bench/results/2026-10-14-phase7-q6-recall/README.md) |
+| 40-minute streamed cache-reuse soak | 1,579 requests, all marker checks passed | 13.34 GiB | Temperature stabilized near 76–77 °C for over 30 minutes; same report |
+| Three-cycle reload/teardown | Warmup and measured request passed each cycle; listener and engine exited before reload | 13.11 GiB | Three cycles; [report](../../bench/results/2026-10-14-phase7-iq1-teardown3/README.md) |
+| Bounded 56×56 vision smoke | HTTP 200; response described grid and gradient | 11.99 GiB host/effective | One small fixture; [report](../../bench/results/2026-10-14-phase7-iq1-vision/README.md) |
+| 2048×2048 image admission | HTTP 200 at 1,024 image tokens | 11.76 GiB host/effective | Answer truncated at 48 tokens; not a vision quality pass; same report |
+| Held-out long-context task | Three codes at 10/50/90%, correct sum, and recovery | 12.75 GiB host/effective | One 30,040-token prompt; [report](../../bench/results/2026-10-14-phase7-q6-recall/README.md) |
+
+## Exclusions and open gates
+
+- No Phase 6 serving profile is selected. The tested configurations remain
+  experimental; results do not promote defaults.
+- Q2_0 256K has one retrieval/recovery sample and one 64K arithmetic sample,
+  but no sustained 256K workload or broader task-quality suite.
+- Four-way serving is not qualified. The four-slot screen completed all four
+  requests but observed no more than two active slot states.
+- The large 2048×2048 IQ1_M image request passed admission, but its answer was
+  truncated and is excluded from quality passes.
+- IQ1_M adaptive routing can change persistent state and recovery tokens after
+  swaps. Exact refill bytes and a held-out short task passed, but the numerical
+  cause and task-level quality across workloads remain unresolved under Phase 5.
+- Cancellation, reload, cache reuse and vision results cover only their listed
+  profile, context, fixture and request points. They are not general service
+  guarantees.
+- Performance comparisons, energy attribution and cross-device conclusions
+  require their own paired measurements; none follows from this matrix alone.
+
+Phase 7 can close only after Phase 6 selects the configurations and the remaining
+quality, sustained-service and support-boundary claims are explicitly bounded.

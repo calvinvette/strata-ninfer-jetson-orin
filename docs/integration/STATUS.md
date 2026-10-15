@@ -10,6 +10,8 @@ A held-out Q2_0 [64K retrieval-plus-arithmetic quality check](../../bench/result
 
 A Q2_0 [four-slot streamed API screen](../../bench/results/2026-10-15-phase7-q2-concurrency4/README.md) completed four distinct retrieval tasks with all exact prompt and marker checks passing. Four slots were configured, but `/metrics` sampled at most two active slot states, so the four-way overlap gate failed. Minimum host/admission availability was 14.65/11.95 GiB with zero cgroup pressure/OOM events. This does not qualify four-way serving; Phase 7 remains open.
 
+The consolidated [Phase 7 evidence matrix](PHASE7_MATRIX.md) lists tested cells and open support limits.
+
 Supported, failed, unsupported and untested cases are recorded. Phase 3
 graph-private allocation size remains unisolated and its
 graph-disabled native control is unsupported; these limits do not imply a general
