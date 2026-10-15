@@ -1451,6 +1451,14 @@ each actual CPU/Metal route after confirming its expert IDs and owner changes;
 do not infer parity from weights landing correctly. See the
 [IQ1_M route capture and parity report](../../bench/results/2026-10-14-phase5-current-source-route-change-capture/README.md).
 
+A follow-up held-out short-task check returned the exact requested code before
+and after a long swap-inducing request in two fresh services, even though six
+persistent-state fingerprints changed in both. Keep task-level quality
+assertions separate from state-equality assertions in a future Splash port:
+one exact answer does not qualify a changed state, and changed state alone does
+not prove that a tested task failed. See the
+[adaptive-recovery quality check](../../bench/results/2026-10-15-phase5-iq1-route-quality/README.md).
+
 For a future Strata+Splash port, preserve this seam-level capture contract and
 record the engine's own final route categories. Add a Splash-specific replay
 adapter only after its activation quantization, packed-weight geometry and

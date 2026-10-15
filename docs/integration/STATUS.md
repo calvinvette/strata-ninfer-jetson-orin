@@ -47,6 +47,17 @@ but does not explain every changed state field. Minimum
 host/admission availability was 14.24/11.91 GiB; all 385 sampled cgroup
 pressure/OOM counters were zero. Phase 5 remains open.
 
+A separate held-out [adaptive-recovery task check](../../bench/results/2026-10-15-phase5-iq1-route-quality/README.md)
+ran two fresh IQ1_M services through a 512-token exact-code request, the same
+2,048-token swap-inducing request, and the exact-code request again. Both
+initial and recovery answers returned the expected code, and their token IDs
+matched within each service. In both services, GDN, PLE, tail, pooled, full
+pooled and KV state fingerprints changed after the long request. Minimum
+host/admission availability was 14.07/11.21 GiB across the 353-sample run, with
+zero cgroup pressure/OOM events. This supports task correctness for this one
+short retrieval task despite reproduced state drift; it does not qualify other
+tasks or resolve the state cause. Phase 5 remains open.
+
 The current-source MTP reset fix has now passed targeted HIP builds of the
 `strata` service and `native_expert_parity`, and a full 123-step SYCL `strata`
 service build on maestro1; both binaries passed `--help` load checks. These are
