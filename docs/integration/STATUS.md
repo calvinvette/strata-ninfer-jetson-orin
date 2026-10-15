@@ -225,6 +225,16 @@ Minimum host/admission availability was 16.29/10.27 GiB; peak scope use was
 establish broad task quality, cache-reuse throughput or a general capacity
 boundary. Phase 7 remains open.
 
+The same Q2_0 8K profile then passed a [30-minute streamed prompt-cache reuse
+run](../../bench/results/2026-10-14-phase7-q2-recall/cache-reuse-30m/README.md).
+All 653 repeated requests reused 7,491 of 7,498 prompt tokens and returned the
+three retrieval markers exactly once and in order. Median request time was
+2.86 seconds and median first-visible-token latency was 0.390 seconds. Minimum
+host/admission availability was 16.93/10.72 GiB; the 28-GiB cgroup reported no
+high/max/OOM events. `tj` stabilized near 68 °C during the final ten minutes.
+This adds one Q2_0 cache-reuse service point; Phase 7 remains open for broader
+quality and support boundaries.
+
 A bounded [Q2_0 streamed API concurrency-2 check](../../bench/results/2026-10-14-phase7-q2-recall/concurrency2/README.md)
 then passed on distinct 7,498- and 15,003-token prompts with swaps disabled:
 both simultaneous requests used separate active slots and passed exact prompt,

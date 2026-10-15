@@ -39,6 +39,14 @@ cgroup pressure/OOM events. These extend sustained retrieval evidence to 16K
 and 32K prompts; their single-run timing summaries are not paired performance
 comparisons or broad quality results.
 
+The Q2_0 8K profile also completed a [30-minute streamed prompt-cache reuse
+run](cache-reuse-30m/README.md). All 653 repeated requests reused 7,491 of
+7,498 prompt tokens and passed the same three-marker retrieval oracle. Median
+request time was 2.86 seconds and median first-visible-token latency was
+0.390 seconds. Minimum host/admission availability was 16.93/10.72 GiB, and
+sampled cgroup pressure/OOM counters remained zero. This is cache-reuse service
+evidence, separate from the fresh-prefill runs above.
+
 All three runs passed under a 28-GiB cgroup ceiling and the six-GiB
 host-availability guard. Minimum physical host availability was 16.967, 16.797
 and 16.363 GiB at 8K, 16K and 32K; minimum effective admission availability
