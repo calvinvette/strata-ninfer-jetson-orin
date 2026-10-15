@@ -39,9 +39,14 @@ def main():
                         help='Python executable with server dependencies installed')
     parser.add_argument('--no-trace', action='store_true',
                         help='disable STRATA_TRACE for request timing')
+    parser.add_argument('--sample-clocks', action='store_true',
+                        help='retain read-only CPU/GPU/EMC frequency samples per cell')
+    parser.add_argument('--confirmation', action='store_true',
+                        help='allow one measured request per independent cell/block')
     args = parser.parse_args()
-    if args.rounds < 3 or args.timeout < 1:
-        parser.error('screening requires at least three measured rounds and a positive timeout')
+    min_rounds = 1 if args.confirmation else 3
+    if args.rounds < min_rounds or args.timeout < 1:
+        parser.error(f'requires at least {min_rounds} measured rounds and a positive timeout')
     if (any(value <= 0 for value in args.cache_values + args.prefill_values)
             or len(set(args.cache_values)) != len(args.cache_values)
             or len(set(args.prefill_values)) != len(args.prefill_values)):
@@ -62,6 +67,8 @@ def main():
         'planned_cells': len(cells),
         'rounds_per_service': args.rounds,
         'trace_enabled': not args.no_trace,
+        'clock_sampling': args.sample_clocks,
+        'independent_block_confirmation': args.confirmation,
         'scope': 'randomized order; independent server process per cell; one warmup and three measured requests per process; admission and screening evidence only',
         'started_wall_time_s': time.time(),
         'cells': [],
@@ -78,7 +85,7 @@ def main():
         request_path = output / 'requests.json'
         command = api_command(args.python.resolve(), tools, cfgpath, args.workloads,
                               request_path, args.rounds, timeout_s=args.timeout,
-                              no_trace=args.no_trace)
+                              no_trace=args.no_trace, sample_clocks=args.sample_clocks)
         row = dict(cell, order=index, status='not_run', command=command)
         campaign['cells'].append(row)
         write_result(manifest, campaign)

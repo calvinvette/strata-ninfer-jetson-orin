@@ -809,6 +809,19 @@ and factors. On this Orin screen chunk 512 improved median client elapsed over
 chunk 64, but accepted-prefix states differed; the timing result cannot qualify
 chunk 512 as a safe default. Reproduce both checks independently for Splash.
 
+A later seven-block Q2_0 cache × prefill confirmation used 3,000 and 3,500
+actual slots after a prior 5,000-slot budget had admitted fewer slots in three
+cells. With exact capacities, chunk 128 reduced request time by about 40–42%
+at both cache sizes. A frequency-sampled seven-block repeat reproduced that
+chunk gain, but reversed the small/large cache effect; treat cache size and its
+interaction with chunk as unresolved. For a future Splash sweep, screen
+admission first, then define factors by measured resident slots/bytes as well
+as requested budgets; include both in the cell manifest so a partial
+allocation cannot silently become another factor level. Sample actual clocks
+during confirmation and retain task outputs with timing so run-to-run profile
+differences remain visible. See the
+[fixed-slot confirmation](../../bench/results/2026-10-15-phase6-q2-prefill-cache-fixedslots/README.md).
+
 The Oct 12 automatic-cache follow-up reconciled the engine's planned
 prefill-workspace hold with the unique requested-allocation peak of that owner
 on one real Q2_0 request: a 500 MiB hold covered a 333.8 MiB peak, while the

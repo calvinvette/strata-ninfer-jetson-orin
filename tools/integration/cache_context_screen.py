@@ -34,12 +34,15 @@ def cell_configs(config, cache_values, context_values):
 
 
 def api_command(runtime_python, tools, cfgpath, workloads, request_path, rounds,
-                timeout_s=1800, no_trace=False):
+                timeout_s=1800, no_trace=False, sample_clocks=False):
     command = [str(runtime_python), str(tools / 'run_control.py'), '--output',
-               str((request_path.parent / 'supervisor').resolve()), '--timeout', str(timeout_s), '--',
+               str((request_path.parent / 'supervisor').resolve()), '--timeout', str(timeout_s)]
+    if sample_clocks:
+        command.append('--sample-clocks')
+    command.extend(['--',
                str(runtime_python), str(tools / 'api_control_block.py'), '--config',
                str(cfgpath.resolve()), '--workloads', str(workloads.resolve()),
-               '--output', str(request_path.resolve()), '--variant', 'candidate', '--rounds', str(rounds)]
+               '--output', str(request_path.resolve()), '--variant', 'candidate', '--rounds', str(rounds)])
     if no_trace:
         command.append('--no-trace')
     return command
