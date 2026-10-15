@@ -2241,3 +2241,12 @@ same-service recovery passed, with MTP accepting 30/32 drafts. Minimum
 host/admission availability was 12.76 GiB across 673 samples, with no cgroup
 pressure or OOM events. This adds one current-source 16K cell; broader quality,
 independent repetitions and Phase 7's other open gates remain.
+
+The [current-source 32K Coder IQ1_M check](../../bench/results/2026-10-15-phase7-current-source-coder-iq1m-32k/README.md)
+completed the same retrieval/recovery task at 32,768 context with 30,032
+uncached prompt tokens. All three markers were exact and ordered, recovery
+passed, and MTP accepted 30/32 drafts. Minimum host/admission availability was
+12.60 GiB across 1,266 samples, with zero cgroup pressure/OOM events. Together
+these current-binary runs cover 8K/16K/32K retrieval cells for the already
+tested Coder artifact identity; broad quality, thermal soak and independent
+repetitions remain open, so Phase 7 stays in progress.
