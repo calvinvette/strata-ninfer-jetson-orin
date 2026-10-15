@@ -2109,3 +2109,12 @@ maestro1 compiled and linked the changed HIP service
 and parity target, and its CLI check passed; the existing SYCL service build
 needed no recompilation, so that is not evidence for its separate generator
 source path. Native model tests and HIP/SYCL device execution remain open.
+
+The current-source [cadence-4 short/long/short diagnostic](../../bench/results/2026-10-14-phase5-current-source-swap-recovery/README.md)
+still changed 14 of 16 recovery tokens and persistent state under both MTP-off
+and MTP4, after nine adaptive swap updates per service. A paired same-binary
+[delayed-swap control](../../bench/results/2026-10-14-phase5-current-source-swap-recovery-delayed/README.md)
+logged no updates and restored exact short-output and state equality. This
+confirms the observed swap-associated recovery sensitivity survives the new
+accepted-window code; the numerical cause and quality impact remain unresolved,
+so adaptive swapping remains unqualified for this sequence.
