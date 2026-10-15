@@ -2083,3 +2083,12 @@ idle/background load, are not process-attributed, and are retained as
 rail-specific diagnostics rather than whole-board energy claims.
 This does not support an int8/MTP3 serving win for this long-prefill workload;
 Phase 6 remains open for other interactions and workloads.
+
+The post-change [current-source Phase 8 regression](../../bench/results/2026-10-14-phase8-current-source-b99b26a2/README.md)
+rebuilt the CUDA/ARM64 tree and passed all 117 fixture-available CTests; two
+optional IQ checks skipped and the two known missing-`experts.bin` tests remain
+excluded. Host/admission availability stayed at or above 22.27 GiB with zero
+scope pressure/OOM events. maestro1 compiled and linked the changed HIP service
+and parity target, and its CLI check passed; the existing SYCL service build
+needed no recompilation, so that is not evidence for its separate generator
+source path. Native model tests and HIP/SYCL device execution remain open.
