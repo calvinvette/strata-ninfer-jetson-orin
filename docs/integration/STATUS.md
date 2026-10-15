@@ -39,8 +39,11 @@ activations and top-k IDs. Same-activation parity for switched expert 119
 measured 1.61% CPU/GPU relative L1 (all 7,680 output words differed bitwise).
 Two fresh service sequences matched each other request-by-request but both
 reproduced 14/16 recovery-token changes and seven changed state fingerprints.
-This is direct evidence that route-dependent arithmetic contributes to this
-recovery drift, but does not explain every changed state field. Minimum
+A follow-up independent oracle sweep compared all 18 switched expert calls on
+their exact captured activations: all CPU/GPU output pairs differed in all
+7,680 words, with 0.639%–1.66% relative L1 (1.29% median). This is direct
+evidence that route-dependent arithmetic contributes to this recovery drift,
+but does not explain every changed state field. Minimum
 host/admission availability was 14.24/11.91 GiB; all 385 sampled cgroup
 pressure/OOM counters were zero. Phase 5 remains open.
 

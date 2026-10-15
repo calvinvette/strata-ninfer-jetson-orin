@@ -30,6 +30,16 @@ route-dependent arithmetic as a contributor to the recovery drift; it does
 not establish that one expert or the sampled layer accounts for the entire
 persistent-state change.
 
+A follow-up oracle sweep checked every one of the 18 CPU-to-VRAM ownership
+flips in those seven aligned rows, covering six experts. Each CPU and GPU
+operator call used the exact same captured activation for its row. Every one
+of the 18 output pairs differed in all 7,680 words; CPU-to-GPU relative L1
+ranged from 0.639% to 1.66%, with a 1.29% median. The CPU/GPU differences are
+therefore present across all observed flips, not just the expert-119 example.
+This still measures isolated layer-0 operators and does not quantify their
+propagation into final logits or answer quality. Full output and the reproducible
+driver are in `all-route-flips/` and `check_all_route_flips.py`.
+
 The first service's selected-layer cursor yielded all 66 rows, so the complete
 initial/long/recovery comparison is retained in `start-0.jsonl`. The second
 replay was configured with a stream-row start beyond its observed row count and
@@ -87,6 +97,12 @@ build/integration/candidate/native_expert_parity \
   /home/calvin/models/strata-orin-validation/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf \
   --expert 119 --activation-f32 \
   bench/results/2026-10-14-phase5-current-source-route-change-capture/route-example-activation.f32 0
+
+systemd-run --user --scope --collect -p MemoryMax=28G \
+  python3 tools/integration/run_control.py \
+  --output /tmp/all-route-flips-supervisor --timeout 3600 --interval 1 -- \
+  python3 bench/results/2026-10-14-phase5-current-source-route-change-capture/check_all_route_flips.py \
+  --output /tmp/all-route-flips
 ```
 
 The complete capture, request/state results, supervisor telemetry, independent
