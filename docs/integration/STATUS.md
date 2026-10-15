@@ -14,6 +14,8 @@ The consolidated [Phase 7 evidence matrix](PHASE7_MATRIX.md) lists tested cells 
 
 A [maestro1 accelerator runtime audit](../../bench/results/2026-10-15-phase8-maestro1-device-audit/README.md) found Intel HD Graphics 500 only, no `/dev/kfd`, and zero SYCL platforms in the installed runtime. Existing HIP/SYCL build and help checks therefore remain compile/CLI evidence only. No host settings were changed. Phase 8 remains open.
 
+A fresh [current-source Orin regression retest](../../bench/results/2026-10-15-phase8-current-source-retest/README.md) rebuilt the CUDA/ARM64 tree with two jobs, passed all 117 fixture-available CTests (two optional IQ tests skipped; two pack-dependent tests excluded), and passed integration Python discovery 144/144. Minimum host/admission availability was 24.47 GiB for build, 19.07 GiB for CTest and 24.49 GiB for Python, with zero cgroup pressure/OOM counters. This is native regression evidence, not a cross-backend runtime claim; Phase 8 remains open.
+
 A Q2_0 [three-cycle reload and teardown check](../../bench/results/2026-10-15-phase7-q2-teardown3/README.md) passed three 7,498-token retrievals with identical marker answers; each listener and engine exited before the next startup. Minimum host/admission availability was 16.85/6.90 GiB across 545 samples, with zero cgroup pressure/OOM events. Phase 7 remains open.
 
 Supported, failed, unsupported and untested cases are recorded. Phase 3
