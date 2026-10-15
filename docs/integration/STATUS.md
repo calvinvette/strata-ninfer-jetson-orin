@@ -8,6 +8,8 @@ A Q2_0 [256K near-limit retrieval and recovery check](../../bench/results/2026-1
 
 A held-out Q2_0 [64K retrieval-plus-arithmetic quality check](../../bench/results/2026-10-15-phase7-q2-quality-64k/README.md) returned all three 10/50/90% markers once and in order, computed the independently verified suffix sum `1971`, and returned same-service `RECOVERED`. Minimum host/admission availability was 15.13/11.50 GiB across 2,205 samples with zero cgroup pressure/OOM events. This extends one arithmetic task to 64K; it is not a broad quality score. Phase 7 remains open.
 
+A Q2_0 [four-slot streamed API screen](../../bench/results/2026-10-15-phase7-q2-concurrency4/README.md) completed four distinct retrieval tasks with all exact prompt and marker checks passing. Four slots were configured, but `/metrics` sampled at most two active slot states, so the four-way overlap gate failed. Minimum host/admission availability was 14.65/11.95 GiB with zero cgroup pressure/OOM events. This does not qualify four-way serving; Phase 7 remains open.
+
 Supported, failed, unsupported and untested cases are recorded. Phase 3
 graph-private allocation size remains unisolated and its
 graph-disabled native control is unsupported; these limits do not imply a general

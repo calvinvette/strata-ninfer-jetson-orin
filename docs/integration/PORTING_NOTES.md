@@ -1530,3 +1530,11 @@ headroom, clocks and unavailable counters. A successful near-limit request is
 one tested point, not a general support boundary. Repeat the ladder with the
 actual Metal model/format and profile rather than transferring these CUDA
 measurements.
+
+A separate Q2_0 four-slot API screen admitted four distinct retrieval calls and
+all four returned their exact marker sets, but sampled `/metrics` exposed no
+more than two active slot states while reporting four running requests. Treat
+configured/admitted request count and active execution as separate observations.
+For a future Splash serving port, measure both live slot ownership and API
+queueing; a four-slot configuration alone is not evidence of four concurrent
+execution paths. See the [Orin concurrency screen](../../bench/results/2026-10-15-phase7-q2-concurrency4/README.md).
