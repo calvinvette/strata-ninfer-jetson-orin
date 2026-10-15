@@ -57,6 +57,7 @@ one quantization, not a comparison between quantizations or inference engines.
 | Current-source retrieval and recovery | 8,192 / 7,498 tokens | Three markers in order; same-service recovery; MTP accepted 30/32 drafts | 13.25 / 13.25 GiB | One prompt/profile; [report](../../bench/results/2026-10-15-phase7-current-source-coder-iq1m/README.md) |
 | Current-source retrieval and recovery | 16,384 / 15,003 tokens | Three markers in order; same-service recovery; MTP accepted 30/32 drafts | 12.76 / 12.76 GiB | One prompt/profile; [report](../../bench/results/2026-10-15-phase7-current-source-coder-iq1m-16k/README.md) |
 | Current-source retrieval and recovery | 32,768 / 30,032 tokens | Three markers in order; same-service recovery; MTP accepted 30/32 drafts | 12.60 / 12.60 GiB | One prompt/profile; [report](../../bench/results/2026-10-15-phase7-current-source-coder-iq1m-32k/README.md) |
+| Current-source retrieval, arithmetic and recovery | 65,536 / 60,079 tokens | Three markers in order; suffix sum `1971`; same-service recovery; MTP accepted 34/39 drafts | 11.56 / 11.56 GiB | One prompt/profile; [report](../../bench/results/2026-10-15-phase7-current-source-coder-iq1m-64k/README.md) |
 | Current-source cache-reuse soak | 8K; 1,586 streamed requests over 40 minutes | Every response passed all three marker checks and reused 7,491 prompt tokens | 13.30 / 13.30 GiB | 31 minutes at 71.1–73.3 °C; [report](../../bench/results/2026-10-15-phase7-current-source-coder-iq1m-soak/README.md) |
 
 ## Exclusions and open gates
