@@ -2221,3 +2221,15 @@ isolated expert output mismatch, but does not distinguish it from dot-product
 arithmetic or prove the persistent-state recovery cause. The
 [quantizer diagnostic](../../bench/results/2026-10-14-phase5-current-source-route-change-capture/activation-quantizers.md)
 records the method and limits. Phase 5 remains open.
+
+The [current-source Coder IQ1_M path check](../../bench/results/2026-10-15-phase7-current-source-coder-iq1m/README.md)
+used the newly downloaded `Coder-GGUF` directory. Its two shard hashes exactly
+match the Coder shards used in previous service tests. The existing pack's
+48-layer/256-expert mapping and source sidecar matched; six sampled expert
+blobs were byte-identical. On the current candidate, the 7,498-token 8K
+planted-marker request returned all three codes once and in order, followed by
+same-service `RECOVERED`; MTP accepted 30/32 drafts. Minimum host and admission
+availability was 13.25 GiB under the 28-GiB supervisor, with zero cgroup
+pressure/OOM events. This validates the downloaded directory path for an
+already-tested artifact identity; it is not a new model cohort or a Phase 7
+closeout.
