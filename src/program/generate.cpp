@@ -7630,6 +7630,23 @@ int main(int argc, char** argv) {
             pending.clear();
             pending_age = 0;
             res_upload();
+            if (verify_adapt_swaps) {
+                auto verify_table = [&](int32_t* device_table, int device, const char* owner) {
+                    if (device_table == nullptr) return;
+                    const strata::core::OnDevice on(device);
+                    std::vector<int32_t> table(host_res.size());
+                    if (cudaMemcpy(table.data(), device_table, table.size() * sizeof(int32_t), cudaMemcpyDeviceToHost) != cudaSuccess ||
+                        std::memcmp(table.data(), host_res.data(), table.size() * sizeof(int32_t)) != 0) {
+                        std::fprintf(stderr, "strata serve: adaptive residency table verification failed (%s)\n", owner);
+                        std::fflush(stderr);
+                        std::abort();
+                    }
+                };
+                verify_table(d_res, -1, "main device");
+                for (size_t si = 0; si < stages.size(); ++si)
+                    verify_table(stages[si]->d_res, stages[si]->dev, "layer stage");
+                std::fprintf(stderr, "strata serve: adaptive residency table verification passed\n");
+            }
         };
         // --pipeline-windows: set while the tier adapts beside windows in flight (see its use in adapt)
         std::function<void()> adapt_fence;

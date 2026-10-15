@@ -21,6 +21,16 @@ instrumented CUDA build passed on Orin, and the changed file passed the maestro1
 HIP service build and help check (compile/link evidence only). The numerical
 cause remains unresolved; Phase 5 is open.
 
+A follow-up [device residency-map check](../../bench/results/2026-10-14-phase5-current-source-residency-table-verify/README.md)
+passed on a bounded IQ1_M MTP-off request. At all three adaptive apply points,
+288 incoming blobs matched their stable source bytes and the complete device
+residency table matched `host_res` after upload. The request completed with
+14.27 GiB minimum host/admission availability and zero sampled cgroup pressure
+or OOM events. The current-source HIP service rebuilt and passed `--help` on
+maestro1 (compile/CLI evidence only). Correct slot contents and residency
+ownership are now checked for this route; the numerical/state recovery cause
+remains unresolved.
+
 The current-source MTP reset fix has now passed targeted HIP builds of the
 `strata` service and `native_expert_parity`, and a full 123-step SYCL `strata`
 service build on maestro1; both binaries passed `--help` load checks. These are
