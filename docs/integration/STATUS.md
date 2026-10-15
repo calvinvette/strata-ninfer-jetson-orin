@@ -2118,3 +2118,11 @@ logged no updates and restored exact short-output and state equality. This
 confirms the observed swap-associated recovery sensitivity survives the new
 accepted-window code; the numerical cause and quality impact remain unresolved,
 so adaptive swapping remains unqualified for this sequence.
+
+First-window logits captured on that same diagnostic sequence were bit-identical
+between MTP-off and MTP4 for each request, but the first and recovery short
+prompt logits differed before decoding: top-1 changed, relative L2 was 9.707%,
+and 9/10 top tokens overlapped. This narrows the swap-associated effect to
+prefill/verifier computation and excludes an MTP-only source; individual layer
+or expert attribution remains open. See the
+[first-logit analysis](../../bench/results/2026-10-14-phase5-current-source-swap-recovery-logits/README.md).
