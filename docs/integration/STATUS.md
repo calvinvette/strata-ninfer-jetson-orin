@@ -1,6 +1,6 @@
 # Integration status
 
-Updated: 2026-10-14. Phases 1 through 4 are complete for their documented tested
+Updated: 2026-10-15. Phases 1 through 4 are complete for their documented tested
 Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 has
 initial long-context recall and sustained-service evidence and remains in
 progress; Phases 5 and 6 also remain open.
@@ -30,6 +30,19 @@ or OOM events. The current-source HIP service rebuilt and passed `--help` on
 maestro1 (compile/CLI evidence only). Correct slot contents and residency
 ownership are now checked for this route; the numerical/state recovery cause
 remains unresolved.
+
+A current-source [IQ1_M route-change capture](../../bench/results/2026-10-14-phase5-current-source-route-change-capture/README.md)
+found that the first seven matched layer-0 verifier rows had identical inputs
+and expert IDs before and after the long request, while 18/70 owner assignments
+changed from CPU to primary VRAM. The next 15 aligned rows had different
+activations and top-k IDs. Same-activation parity for switched expert 119
+measured 1.61% CPU/GPU relative L1 (all 7,680 output words differed bitwise).
+Two fresh service sequences matched each other request-by-request but both
+reproduced 14/16 recovery-token changes and seven changed state fingerprints.
+This is direct evidence that route-dependent arithmetic contributes to this
+recovery drift, but does not explain every changed state field. Minimum
+host/admission availability was 14.24/11.91 GiB; all 385 sampled cgroup
+pressure/OOM counters were zero. Phase 5 remains open.
 
 The current-source MTP reset fix has now passed targeted HIP builds of the
 `strata` service and `native_expert_parity`, and a full 123-step SYCL `strata`

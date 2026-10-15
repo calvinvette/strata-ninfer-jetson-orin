@@ -1380,7 +1380,12 @@ For a CPU/GPU route comparison, sample the activation at the multi-token expert
 dispatch boundary, after residency, PCIe, peer and helper-GPU ownership have
 been resolved. `STRATA_CAPTURE_MOE_PATH` enables a bounded JSONL trace;
 `STRATA_CAPTURE_MOE_LAYER` selects a layer (default `-1`, all layers), and
-`STRATA_CAPTURE_MOE_ROWS` caps captured verifier rows (default 8, maximum 128).
+`STRATA_CAPTURE_MOE_ROWS` caps captured verifier rows (default 8, maximum 4096).
+`STRATA_CAPTURE_MOE_START_ROW` skips that many matching rows first (default 0),
+so later request windows can be sampled without retaining earlier activations.
+Each selected row carries its stream-row offset. The capture cursor advances
+only at the selected layer, independent of prompt token count; do not estimate
+its offset from formatted prompt length.
 Each record contains layer/dispatch-call/row indices, top-k expert IDs, final
 route kind (`-1` CPU, `0` primary VRAM or foresight slot, `1` PCIe, `2` peer/helper
 GPU), and the exact host FP32 activation supplied to the expert dispatcher.
@@ -1428,6 +1433,23 @@ assertions. A correct weight transfer alone does not establish that the routed
 CPU/Metal computations have equivalent numerical behavior. See the retained
 [byte check](../../bench/results/2026-10-14-phase5-current-source-swap-byte-verify/README.md)
 and [residency-map check](../../bench/results/2026-10-14-phase5-current-source-residency-table-verify/README.md).
+
+An IQ1_M MTP-off A/B/A capture then tied that distinction to an actual
+residency transition. For the first seven matched layer-0 verifier rows,
+initial and recovery activations and all ten expert IDs were identical, while
+18 of 70 owner assignments switched from CPU to primary VRAM. The next 15
+aligned rows had different activations and top-k IDs. Expert 119 in row 0 was
+one CPU-to-VRAM switch; `native_expert_parity` on that exact activation found
+1.61% CPU/GPU relative L1, with 7,680/7,680 output words differing bitwise.
+The same 512→2,048→512 sequence reproduced in two fresh services, with each
+service matching the other's outputs and persistent fields request-by-request
+while both changed 14/16 recovery tokens and seven state fingerprints within
+the service. This is direct evidence that route-dependent operator arithmetic
+contributes to the observed drift, not proof that it accounts for every
+persistent-state difference. For Splash, compare the same activation through
+each actual CPU/Metal route after confirming its expert IDs and owner changes;
+do not infer parity from weights landing correctly. See the
+[IQ1_M route capture and parity report](../../bench/results/2026-10-14-phase5-current-source-route-change-capture/README.md).
 
 For a future Strata+Splash port, preserve this seam-level capture contract and
 record the engine's own final route categories. Add a Splash-specific replay
