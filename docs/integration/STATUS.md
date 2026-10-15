@@ -2084,6 +2084,14 @@ rail-specific diagnostics rather than whole-board energy claims.
 This does not support an int8/MTP3 serving win for this long-prefill workload;
 Phase 6 remains open for other interactions and workloads.
 
+The current-source [Q2_0 accepted-prefix runtime check](../../bench/results/2026-10-14-phase5-current-source-runtime/README.md)
+reran MTP off/2/3/4 on the 2,048-token FP16-KV prompt after the accepted-window
+cap change. All token IDs and nine persistent main-state fields matched at
+final state and every shared prefix boundary (22/19/15 for MTP2/3/4). Minimum
+host/admission availability was 16.88/8.38 GiB under the 28-GiB scope, with
+zero sampled cgroup pressure/OOM events. This confirms only the tested prompt,
+cache, format and adaptation policy; it has no performance implication.
+
 The post-change [current-source Phase 8 regression](../../bench/results/2026-10-14-phase8-current-source-b99b26a2/README.md)
 rebuilt the CUDA/ARM64 tree and passed all 117 fixture-available CTests; two
 optional IQ checks skipped and the two known missing-`experts.bin` tests remain
