@@ -240,6 +240,16 @@ was 10.146/10.355/10.307 GiB, with zero sampled cgroup pressure/OOM events.
 These three prompt/profile checks do not establish broad Q2_0 task quality or a
 general capacity boundary; Phase 7 remains in progress.
 
+The Q2_0 ladder has now passed a [64K near-limit retrieval and recovery
+check](../../bench/results/2026-10-15-phase7-q2-recall-64k/README.md): a
+60,071-token prompt at 65,536 configured context returned all three planted
+markers exactly once and in order, then passed same-service recovery. Minimum
+host/admission availability was 15.369/11.255 GiB over 2,144 one-second
+samples, with zero cgroup pressure/OOM events. GPU clocks ranged 306 MHz–1.301
+GHz; EMC readback was unavailable and energy was not request-attributed. This
+adds one Q2_0 task/profile point above 32K, not a general capacity boundary or
+broad quality result; Phase 7 remains in progress.
+
 A separate Q2_0 [32K retrieval-plus-arithmetic replication](../../bench/results/2026-10-14-phase7-q2-recall/quality-replication-32768/README.md)
 used a 30,040-token prompt. It returned all three markers in order and the
 independently checked suffix sum `1971`, then passed same-service recovery.
