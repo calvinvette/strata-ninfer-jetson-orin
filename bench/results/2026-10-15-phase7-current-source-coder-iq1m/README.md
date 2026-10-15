@@ -1,10 +1,14 @@
-# Current-source Coder GGUF path smoke — Orin — 2026-10-15
+# Current-source Coder IQ1_M GGUF path smoke — Orin — 2026-10-15
 
 This is a current-source, supervised Phase 7 recall and recovery check using
-the downloaded `Coder-GGUF` directory. The two GGUF shards have the same full
-SHA256 hashes as the Coder IQ1_M shards used by earlier Strata tests, so this
-is a path/current-binary regression, not a second model cohort or independent
-repeat. The model stayed under `~/models/strata-orin-validation/`.
+the `IQ1_M` variant from the Hugging Face repository
+`ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF`, pinned locally at revision
+`5348543e0147355ac9cbcb031184a3546350988e`. The local snapshot metadata and
+tree identify that revision. The two GGUF shards have the same full SHA256
+hashes as the Coder IQ1_M shards used by earlier Strata tests, so this is a
+path/current-binary regression, not a second model cohort or independent
+repeat. It is not a comparison between quantizations or inference engines.
+The model stayed under `~/models/strata-orin-validation/`.
 
 Before starting the service, `verify_pack_compatibility.py` used the native
 pack builder's GGUF parser and expert-layout function to compare the downloaded

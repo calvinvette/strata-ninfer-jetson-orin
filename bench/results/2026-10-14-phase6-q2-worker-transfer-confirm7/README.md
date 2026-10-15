@@ -1,11 +1,13 @@
-# Q2_0 worker × expert-transfer held-out confirmation — Orin — 2026-10-14
+# Q2_0 MTP4 worker × expert-transfer held-out confirmation — Orin — 2026-10-14
 
 This seven-block randomized confirmation compared pool workers 4 and 8 with
 mapped expert reads and asynchronous pread on a held-out retrieval-plus-
 arithmetic task. Each of the 28 cells used a fresh service, a separate exact-
 length 512-token warmup, a 512-token measured prompt, 8,192 configured
-context, 3,000 requested expert-cache slots, MTP disabled, and a 48-token
-generation allowance. Each response naturally ended after 47 tokens.
+context, 3,000 requested expert-cache slots, MTP4 (`--mtp-max-t 4`), and a
+48-token generation allowance. MTP drafted 25 tokens and accepted 22 in every
+measured response, which naturally stopped after 47 output tokens. The worker
+and transfer effects are conditional on this MTP4 configuration, not MTP off.
 
 All 28 requests returned exactly
 `EARLY=AMBER-QUARTZ-618, MIDDLE=SILVER-MEADOW-243, LATE=INDIGO-LANTERN-907, SUM=1768`.
@@ -34,7 +36,7 @@ median) were:
 The 4-worker/pread condition had one 44.3-second request outlier; its cause is
 unknown. The interaction interval spans zero despite the lower pread median at
 four workers, and the 8-worker pread comparison is inconclusive. This supports
-only the measured 4-worker/pread cell on this Q2_0 prompt and setup. It does not
+only the measured 4-worker/pread cell on this Q2_0/MTP4 prompt and setup. It does not
 justify a general worker or transfer default. Page-cache history was shared
 across sequential cells, so this does not establish a cold-storage or physical
 disk-read advantage. Energy was not request-attributed.
@@ -73,6 +75,6 @@ systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes \
 ```
 
 This completes one held-out worker × transfer confirmation for the stated
-Q2_0 task, but Phase 6 remains open for other factor interactions and workload
-domains. Phase 5 state/graph limits and Phase 7 support qualification also
-remain open.
+Q2_0/MTP4 task, but Phase 6 remains open for other factor interactions,
+workload domains and MTP-off confirmation. Phase 5 state/graph limits and
+Phase 7 support qualification also remain open.
