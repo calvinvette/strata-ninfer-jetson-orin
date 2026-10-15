@@ -27,7 +27,7 @@ tokens/s and decode rate was 16.2 tokens/s. The warmup was 512 tokens and the
 whole supervised run took 384.1 seconds.
 
 The run used the current candidate binary (SHA256 in `binary-sha256.txt`),
-source commit `b99b26a2`, and the tested opt-in profile: Q6_K warp-dequant,
+source commit `c55e8475`, and the tested opt-in profile: Q6_K warp-dequant,
 accepted-only MTP4, cadence 4, FP16 KV, 3,000 requested expert slots (3,903
 actual), eight workers, prefill chunk 64, and dynamic clocks. It was supervised
 at `MemoryMax=28G` with the six-GiB host-availability guard. Across 364 memory
