@@ -1505,3 +1505,28 @@ restore with the same lifecycle boundary. Test cancellation/recovery with direct
 persistent-state checks; equal text alone would not have exposed this stale
 draft state. This result is limited to Q2_0 MTP4/8K cases under FP16 and int8 KV
 and does not prescribe how a Metal draft cache must be reset.
+
+## 2026-10-15 — Measure capacity with retrieval, quality and recovery together
+
+The Q2_0 accepted-only MTP4 profile passed a 256K near-limit retrieval check
+with 240,286 actual prompt tokens, three independently planted codes returned
+once and in order, and same-service recovery. Across 11,096 one-second samples,
+minimum Orin host/admission availability was 7.31 GiB; the six-GiB host floor
+was maintained, and sampled cgroup pressure/OOM counters were zero. A separate
+64K held-out arithmetic task returned the same markers, calculated the
+independently checked suffix sum 1,971, and recovered on the same service, with
+15.13/11.50 GiB minimum host/admission availability. These are functional
+checks for one Q2_0 profile, not broad capacity or quality claims. See the
+[256K retrieval run](../../bench/results/2026-10-15-phase7-q2-recall-256k/README.md)
+and [64K arithmetic run](../../bench/results/2026-10-15-phase7-q2-quality-64k/README.md).
+
+For a future Splash integration, preserve the distinction among configured
+context, exact formatted prompt length and generated length. At each capacity
+step, pair a multi-position retrieval oracle with a separate task-quality
+oracle and same-service recovery; retain one-second physical-memory and
+process/cgroup telemetry without combining device and host capacities. Set the
+platform's physical-memory floor before the run, and report observed minimum
+headroom, clocks and unavailable counters. A successful near-limit request is
+one tested point, not a general support boundary. Repeat the ladder with the
+actual Metal model/format and profile rather than transferring these CUDA
+measurements.
