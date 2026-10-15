@@ -2092,6 +2092,14 @@ host/admission availability was 16.88/8.38 GiB under the 28-GiB scope, with
 zero sampled cgroup pressure/OOM events. This confirms only the tested prompt,
 cache, format and adaptation policy; it has no performance implication.
 
+A follow-up [current-source near-limit state check](../../bench/results/2026-10-14-phase5-current-source-long-runtime/README.md)
+compared MTP off/window4 on a 7,498-token synthetic prompt at 8,192 context.
+The 32-token outputs and all nine persistent fields matched at final state and
+14 shared accepted-prefix boundaries; MTP4 accepted 18/30 drafts. Minimum
+host/admission availability was 16.98/13.80 GiB, with zero sampled cgroup
+pressure/OOM events. This is long-prefill state evidence, not a retrieval or
+performance result.
+
 The post-change [current-source Phase 8 regression](../../bench/results/2026-10-14-phase8-current-source-b99b26a2/README.md)
 rebuilt the CUDA/ARM64 tree and passed all 117 fixture-available CTests; two
 optional IQ checks skipped and the two known missing-`experts.bin` tests remain
