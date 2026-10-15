@@ -2212,3 +2212,12 @@ and 9/10 top tokens overlapped. This narrows the swap-associated effect to
 prefill/verifier computation and excludes an MTP-only source; individual layer
 or expert attribution remains open. See the
 [first-logit analysis](../../bench/results/2026-10-14-phase5-current-source-swap-recovery-logits/README.md).
+
+A source-based comparison of CPU Q8_K and CUDA Q8_1 activation images on the
+seven captured route-flip vectors found a median 1.15% mutual relative L1 after
+dequantization, with 2,271–2,461 of 2,560 values differing per vector. This
+supports the activation-format seam as one plausible contributor to the
+isolated expert output mismatch, but does not distinguish it from dot-product
+arithmetic or prove the persistent-state recovery cause. The
+[quantizer diagnostic](../../bench/results/2026-10-14-phase5-current-source-route-change-capture/activation-quantizers.md)
+records the method and limits. Phase 5 remains open.

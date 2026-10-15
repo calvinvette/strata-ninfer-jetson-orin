@@ -40,6 +40,15 @@ This still measures isolated layer-0 operators and does not quantify their
 propagation into final logits or answer quality. Full output and the reproducible
 driver are in `all-route-flips/` and `check_all_route_flips.py`.
 
+A source-based comparison of the CPU Q8_K and CUDA Q8_1 activation contracts
+on all seven same captured vectors found 1.15% median mutual relative L1 after
+dequantization; the CPU and CUDA activation images differed at 2,349–2,461 of
+2,560 positions per row. This makes the activation-format seam a plausible
+contributor to the operator differences, but it does not separate quantizer
+effects from dot-product arithmetic or establish the cause of recovery drift.
+The [quantizer report](activation-quantizers.md) includes the per-row values,
+scope and reproduction command.
+
 The first service's selected-layer cursor yielded all 66 rows, so the complete
 initial/long/recovery comparison is retained in `start-0.jsonl`. The second
 replay was configured with a stream-row start beyond its observed row count and
