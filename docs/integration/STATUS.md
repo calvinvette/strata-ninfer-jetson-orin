@@ -2065,3 +2065,16 @@ host/admission availability was 16.911/6.211 GiB with zero sampled cgroup
 pressure or OOM events. This confirms the tested int8/MTP3 profile on one
 held-out task only; energy was not request-attributed, and defaults remain
 unchanged. Phase 6 remains open for broader workload and interaction evidence.
+
+A second [seven-block Q2_0 int8-KV MTP3 confirmation](../../bench/results/2026-10-14-phase6-q2-int8-mtp3-8k-confirm7/README.md)
+tested a distinct 7,501-token retrieval prompt. All 14 fresh-service requests
+returned the three new keys exactly, all seven paired response strings
+matched, and MTP3 accepted 23 of 28 drafts per request. MTP3 reduced median
+prompt throughput 9.53% (paired 95% interval −12.84% to −6.93%) and decode
+throughput 4.24% (−8.45% to −0.09%); client TTFT rose 10.51% and total request
+time rose 10.20%, with all seven pairs slower end-to-end. Minimum
+host/admission availability was 16.90/10.19 GiB and sampled cgroup pressure/
+OOM counters stayed zero. One candidate-first block had a 93.64% latency
+penalty and remains included; the other six pairs were 6.62–13.89% slower.
+This does not support an int8/MTP3 serving win for this long-prefill workload;
+Phase 6 remains open for other interactions and workloads.
