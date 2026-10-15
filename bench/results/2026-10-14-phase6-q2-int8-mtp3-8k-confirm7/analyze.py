@@ -11,6 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 sys.path[:0] = [str(ROOT / "tools" / "integration")]
 from summarize_controls import interval
+from request_telemetry import rails_from_lines, window_energy
 
 HERE = Path(__file__).resolve().parent
 MIB = 1024 * 1024
@@ -74,6 +75,8 @@ def main():
               "host_swap_gib_range": [float("inf"), 0.0],
               "cgroup_event_maxima": {key: 0 for key in ("low", "high", "max", "oom", "oom_kill")},
               "observed_gpu_clock_mhz": [], "tegrastats_tj_c": [],
+              "rail_energy_scope": "named board rails integrated over each API request; rail values kept separate; includes board idle/background activity and is not process-attributed",
+              "rail_energy_pairs": {},
               "limitations": ["one held-out prompt and one KV/MTP combination",
                               "dynamic clocks; no request-attributed energy",
                               "no serving default or profile is promoted"]}
@@ -146,6 +149,11 @@ def main():
                       for sample in request_samples]
         gpu_clocks = [value / 1e6 for value in gpu_clocks if isinstance(value, int)]
         report["observed_gpu_clock_mhz"].extend(gpu_clocks)
+        wall_offset = samples[0]["wall_time_s"] - samples[0]["monotonic_s"]
+        rail_samples = rails_from_lines((directory / "tegrastats.txt").read_text().splitlines())
+        rail_energy = window_energy(rail_samples,
+            row["request_start_monotonic_s"] + wall_offset,
+            row["request_end_monotonic_s"] + wall_offset)
         prompt_ms, decode_ms = request_metrics.get("prompt_ms"), request_metrics.get("decode_ms")
         require(prompt_ms and decode_ms and request_metrics.get("prompt_read") == usage["prompt_tokens"],
                 f"missing or inconsistent high-resolution engine counters: block {block} {arm}")
@@ -164,6 +172,7 @@ def main():
                                         default=supervisor["minimum_available_bytes"]) / GIB,
             "request_gpu_clock_mhz_range": ([min(gpu_clocks), max(gpu_clocks)] if gpu_clocks else None),
             "tj_range_c": ([min(temps), max(temps)] if temps else None),
+            "rail_energy": rail_energy,
         }
         pairs[block][arm] = observation
         report["block_order"].append({"block": block, "arm": arm})
@@ -182,6 +191,21 @@ def main():
         all_content_equal &= same_text
         entry = {"block": block, "baseline": baseline, "candidate": candidate,
                  "exact_content_match": same_text}
+        if (baseline["rail_energy"].get("status") == "estimated"
+                and candidate["rail_energy"].get("status") == "estimated"):
+            base_rails = baseline["rail_energy"]["joules_by_named_rail"]
+            candidate_rails = candidate["rail_energy"]["joules_by_named_rail"]
+            if base_rails.keys() == candidate_rails.keys():
+                entry["rail_energy_ratios"] = {rail: candidate_rails[rail] / base_rails[rail]
+                                                for rail in base_rails}
+                for rail in base_rails:
+                    report["rail_energy_pairs"].setdefault(rail, []).append({
+                        "block": block, "baseline_j": base_rails[rail],
+                        "candidate_j": candidate_rails[rail],
+                        "baseline_j_per_output_token": base_rails[rail] / baseline["completion_tokens"],
+                        "candidate_j_per_output_token": candidate_rails[rail] / candidate["completion_tokens"],
+                        "candidate_over_baseline_ratio": entry["rail_energy_ratios"][rail],
+                    })
         for key in metric_pairs:
             ratio = candidate[key] / baseline[key]
             entry[key + "_ratio"] = ratio
@@ -210,6 +234,21 @@ def main():
     report["observed_gpu_clock_mhz_range"] = ([min(report["observed_gpu_clock_mhz"]),
                                                max(report["observed_gpu_clock_mhz"])]
                                               if report["observed_gpu_clock_mhz"] else None)
+    report["rail_energy_comparisons"] = {}
+    for rail, samples in report["rail_energy_pairs"].items():
+        ratios = [sample["candidate_over_baseline_ratio"] for sample in samples]
+        report["rail_energy_comparisons"][rail] = {
+            "paired_blocks": len(samples),
+            "baseline_median_j": statistics.median(x["baseline_j"] for x in samples),
+            "candidate_median_j": statistics.median(x["candidate_j"] for x in samples),
+            "baseline_median_j_per_output_token": statistics.median(
+                x["baseline_j_per_output_token"] for x in samples),
+            "candidate_median_j_per_output_token": statistics.median(
+                x["candidate_j_per_output_token"] for x in samples),
+            "median_paired_percent_change": (statistics.median(ratios) - 1) * 100,
+            "paired_bootstrap_95_interval_percent": [(x - 1) * 100
+                for x in interval(ratios, 20261018)],
+        }
     report["prompt_content_sha256"] = hashlib.sha256(workload["messages"][0]["content"].encode()).hexdigest()
     report["workload_sha256"] = hashlib.sha256((HERE / "workload/workload-8192.json").read_bytes()).hexdigest()
     report["binary_sha256"] = hashlib.sha256(Path(base_config["exe"]).read_bytes()).hexdigest()
@@ -232,7 +271,8 @@ def main():
                       "host_swap_gib_range": report["host_swap_gib_range"],
                       "cgroup_event_maxima": report["cgroup_event_maxima"],
                       "tj_range_c": report["tegrastats_tj_c_range"],
-                      "gpu_clock_mhz_range": report["observed_gpu_clock_mhz_range"]}, indent=2))
+                      "gpu_clock_mhz_range": report["observed_gpu_clock_mhz_range"],
+                      "rail_energy_comparisons": report["rail_energy_comparisons"]}, indent=2))
 
 
 if __name__ == "__main__":

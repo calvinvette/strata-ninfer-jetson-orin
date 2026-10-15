@@ -38,8 +38,20 @@ six-GiB physical-availability guard. Minimum host/admission availability was
 OOM and OOM-kill counters remained zero. Host-wide observed swap use ranged
 from 1.32 to 3.28 GiB and is not attributed to these processes. Tegrastats
 `tj` ranged from 49.9 to 57.9 °C; sampled GPU clocks ranged from 306 to
-1,300.5 MHz under dynamic policy. EMC access was denied, and energy was not
-attributed to requests.
+1,300.5 MHz under dynamic policy. EMC access was denied. Post-run integration
+of named rail readings over each
+request window estimated these median values per output token:
+
+| Named rail | MTP off | MTP3 | Paired change (95% interval) |
+| --- | ---: | ---: | ---: |
+| `VDD_GPU_SOC` | 32.39 J/token | 33.31 J/token | +2.76% (+1.93%, +3.74%) |
+| `VDD_CPU_CV` | 9.54 J/token | 11.06 J/token | +15.50% (+13.99%, +17.16%) |
+| `VIN_SYS_5V0` | 24.00 J/token | 25.81 J/token | +7.74% (+6.30%, +10.38%) |
+
+These are separate named board-rail estimates. They include board idle and
+background activity, use one-second tegrastats samples, are not process-
+attributed, and must not be summed as whole-board energy. Treat them as
+diagnostic paired evidence for this run.
 
 The first campaign attempt is retained under `campaign/`. It failed at
 preflight because the runner pre-created directories that `run_control.py`

@@ -2076,5 +2076,10 @@ time rose 10.20%, with all seven pairs slower end-to-end. Minimum
 host/admission availability was 16.90/10.19 GiB and sampled cgroup pressure/
 OOM counters stayed zero. One candidate-first block had a 93.64% latency
 penalty and remains included; the other six pairs were 6.62–13.89% slower.
+One-second request-window integrations of three named tegrastats rails also
+estimated higher candidate energy per output token (2.76% on `VDD_GPU_SOC`,
+7.74% on `VIN_SYS_5V0`, and 15.50% on `VDD_CPU_CV`). These include board
+idle/background load, are not process-attributed, and are retained as
+rail-specific diagnostics rather than whole-board energy claims.
 This does not support an int8/MTP3 serving win for this long-prefill workload;
 Phase 6 remains open for other interactions and workloads.
