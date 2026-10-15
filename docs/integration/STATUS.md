@@ -2250,3 +2250,13 @@ passed, and MTP accepted 30/32 drafts. Minimum host/admission availability was
 these current-binary runs cover 8K/16K/32K retrieval cells for the already
 tested Coder artifact identity; broad quality, thermal soak and independent
 repetitions remain open, so Phase 7 stays in progress.
+
+The [current-source 40-minute sustained Coder service check](../../bench/results/2026-10-15-phase7-current-source-coder-iq1m-soak/README.md)
+used the same binary, profile and exact shard hashes. After a cold 7,498-token
+retrieval precondition, all 1,586 streamed cache-reuse responses contained
+each planted marker exactly once; none failed, and all reused 7,491 prompt
+tokens. The 2,400-second loop had 13.30 GiB minimum host/admission availability
+and zero cgroup pressure/OOM events. `tj` stayed between 71.1 and 73.3 °C from
+14:40 through 15:11. This refreshes sustained
+service evidence for the tested profile; concurrency, broader quality and
+other model/configuration cells remain open.
