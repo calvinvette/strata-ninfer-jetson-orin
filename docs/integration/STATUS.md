@@ -4,6 +4,8 @@ Updated: 2026-10-15. Phases 1 through 4 are complete for their documented tested
 Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 has
 initial long-context recall and sustained-service evidence and remains in
 progress; Phases 5 and 6 also remain open.
+A Q2_0 [256K near-limit retrieval and recovery check](../../bench/results/2026-10-15-phase7-q2-recall-256k/README.md) passed on Orin: 240,286 prompt tokens, all three planted markers exactly once and in order, and a same-service recovery response. Across 11,096 one-second samples, minimum host/admission availability was 7.31 GiB; sampled cgroup pressure/OOM counters were zero. The engine reported 20.8 prompt tokens/s, with 11,557.8 s prompt time. This is a single functional capacity check, not a performance or broad 256K support claim. Phase 7 remains open.
+
 Supported, failed, unsupported and untested cases are recorded. Phase 3
 graph-private allocation size remains unisolated and its
 graph-disabled native control is unsupported; these limits do not imply a general
