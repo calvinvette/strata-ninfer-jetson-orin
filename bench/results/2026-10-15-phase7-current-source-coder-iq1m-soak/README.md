@@ -1,8 +1,11 @@
 # Current-source Coder IQ1_M sustained service — Orin — 2026-10-15
 
 This Phase 7 run repeats the sustained cache-reuse test on the current service
-binary (`57b2222…`, source commit `b99b26a2`) and the Coder GGUF shard hashes
-listed in `model-sha256.txt`. It used the opt-in profile from the current-source
+binary (`57b2222…`, source commit `c55e8475`) and the IQ1_M variant from
+`ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF`, pinned at snapshot revision
+`5348543e0147355ac9cbcb031184a3546350988e`; the shard hashes are listed in
+`model-sha256.txt`. This is a cache-reuse regression, not a model or inference-
+engine comparison. It used the opt-in profile from the current-source
 8K/16K/32K checks: Q6_K warp-dequant, accepted-only MTP4 at cadence 4, FP16 KV,
 3,000 requested expert-cache slots (3,903 actual), eight workers, prefill
 chunk 64 and dynamic clocks.

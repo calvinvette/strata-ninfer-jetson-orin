@@ -44,6 +44,21 @@ that run.
 | 2048×2048 image admission | HTTP 200 at 1,024 image tokens | 11.76 GiB host/effective | Answer truncated at 48 tokens; not a vision quality pass; same report |
 | Held-out long-context task | Three codes at 10/50/90%, correct sum, and recovery | 12.75 GiB host/effective | One 30,040-token prompt; [report](../../bench/results/2026-10-14-phase7-q6-recall/README.md) |
 
+## Current-source Coder IQ1_M regression
+
+These runs use the `IQ1_M` variant from the Hugging Face repository
+`ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF`, pinned to local snapshot
+revision `5348543e0147355ac9cbcb031184a3546350988e`. The model shard hashes
+match across the rows. This is a current-source path and context regression on
+one quantization, not a comparison between quantizations or inference engines.
+
+| Test | Configured context / actual prompt | Functional result | Minimum host / admission availability | Boundary |
+| --- | ---: | --- | ---: | --- |
+| Current-source retrieval and recovery | 8,192 / 7,498 tokens | Three markers in order; same-service recovery; MTP accepted 30/32 drafts | 13.25 / 13.25 GiB | One prompt/profile; [report](../../bench/results/2026-10-15-phase7-current-source-coder-iq1m/README.md) |
+| Current-source retrieval and recovery | 16,384 / 15,003 tokens | Three markers in order; same-service recovery; MTP accepted 30/32 drafts | 12.76 / 12.76 GiB | One prompt/profile; [report](../../bench/results/2026-10-15-phase7-current-source-coder-iq1m-16k/README.md) |
+| Current-source retrieval and recovery | 32,768 / 30,032 tokens | Three markers in order; same-service recovery; MTP accepted 30/32 drafts | 12.60 / 12.60 GiB | One prompt/profile; [report](../../bench/results/2026-10-15-phase7-current-source-coder-iq1m-32k/README.md) |
+| Current-source cache-reuse soak | 8K; 1,586 streamed requests over 40 minutes | Every response passed all three marker checks and reused 7,491 prompt tokens | 13.30 / 13.30 GiB | 31 minutes at 71.1–73.3 °C; [report](../../bench/results/2026-10-15-phase7-current-source-coder-iq1m-soak/README.md) |
+
 ## Exclusions and open gates
 
 - No Phase 6 serving profile is selected. The tested configurations remain

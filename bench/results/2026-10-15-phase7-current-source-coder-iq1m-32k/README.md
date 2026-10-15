@@ -1,10 +1,12 @@
-# Current-source Coder GGUF 32K retrieval — Orin — 2026-10-15
+# Current-source Coder IQ1_M 32K retrieval — Orin — 2026-10-15
 
-This supervised Phase 7 run tested the current candidate on the Coder GGUF
-directory at 32,768 configured context. The two model shard hashes are in
-`model-sha256.txt` and match the Coder IQ1_M artifacts used in earlier service
-tests. This is a current-binary/context regression, not a new model cohort or
-an independent statistical repetition.
+This supervised Phase 7 run tested the current candidate on the IQ1_M variant
+from `ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF`, pinned at snapshot
+revision `5348543e0147355ac9cbcb031184a3546350988e`, with 32,768 configured
+context. The model shard hashes in `model-sha256.txt` match the Coder IQ1_M
+artifacts used in earlier service tests. This is a current-binary/context
+regression, not a new model cohort, independent statistical repetition, or a
+quantization or inference-engine comparison.
 
 The unique formatted prompt contained 30,032 tokens and zero cached prompt
 tokens. The answer returned `MAPLE-ORBIT-731`, `COBALT-HARBOR-284` and
@@ -15,7 +17,7 @@ processing took 1,273.3 seconds and the whole supervised run took 1,339.5
 seconds, including startup, warmup and recovery.
 
 The run used the current candidate binary (SHA256 in `binary-sha256.txt`),
-source commit `b99b26a2`, and the opt-in profile documented in the 8K report:
+source commit `c55e8475`, and the opt-in profile documented in the 8K report:
 Q6_K warp-dequant, accepted-only MTP4 at cadence 4, FP16 KV, 3,000 requested
 expert slots (3,903 actual), eight workers, prefill chunk 64 and dynamic
 clocks. It ran under `MemoryMax=28G` with the six-GiB host-availability guard.

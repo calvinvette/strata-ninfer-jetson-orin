@@ -1,10 +1,12 @@
-# Current-source Coder GGUF 16K retrieval — Orin — 2026-10-15
+# Current-source Coder IQ1_M 16K retrieval — Orin — 2026-10-15
 
-This supervised Phase 7 run tested the current candidate on the Coder GGUF
-directory at 16,384 configured context. The two shard hashes are recorded in
-`model-sha256.txt` and are byte-identical to the Coder IQ1_M shards used in the
-earlier service qualification. This extends current-binary evidence to another
-context size; it is not a second model cohort or independent repetition.
+This supervised Phase 7 run tested the current candidate on the IQ1_M variant
+from `ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF`, pinned at snapshot
+revision `5348543e0147355ac9cbcb031184a3546350988e`, with 16,384 configured
+context. The shard hashes in `model-sha256.txt` match those used by the earlier
+Coder IQ1_M service qualification. This extends current-binary evidence to
+another context size; it is not a second model cohort, independent repetition,
+or a quantization or inference-engine comparison.
 
 The unique formatted retrieval prompt contained exactly 15,003 tokens and
 reported zero cached prompt tokens. The answer returned `MAPLE-ORBIT-731`,
@@ -15,7 +17,7 @@ tokens/s; the prompt took 637.0 seconds and the full supervised process took
 708.5 seconds, including startup, warmup and recovery.
 
 The run used the current candidate binary (SHA256 in `binary-sha256.txt`),
-source commit `b99b26a2`, and the same opt-in profile as the 8K check: Q6_K
+source commit `c55e8475`, and the same opt-in profile as the 8K check: Q6_K
 warp-dequant, accepted-only MTP4 at cadence 4, FP16 KV, 3,000 requested expert
 slots (3,903 actual), eight workers, prefill chunk 64 and dynamic clocks. It
 ran with `MemoryMax=28G` and a six-GiB host-availability guard. Across 673
