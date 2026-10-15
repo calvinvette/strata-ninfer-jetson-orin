@@ -12,7 +12,8 @@ their fixtures are absent. The two tests requiring `pack/full/experts.bin`
 report. Minimum physical host and admission availability were both 22.27 GiB.
 The 28-GiB cgroup recorded zero `high`, `max`, `oom` and `oom_kill` events.
 This is the available regression result, not a pass for the two excluded
-tests.
+tests. The integration Python suite also passed 141/141 tests on this
+checkout.
 
 maestro1 compiled and linked the current shared MTP/generation source for HIP
 (`strata` and `native_expert_parity`) in seven build steps. Its CLI help check

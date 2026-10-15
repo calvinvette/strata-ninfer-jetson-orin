@@ -2088,7 +2088,8 @@ The post-change [current-source Phase 8 regression](../../bench/results/2026-10-
 rebuilt the CUDA/ARM64 tree and passed all 117 fixture-available CTests; two
 optional IQ checks skipped and the two known missing-`experts.bin` tests remain
 excluded. Host/admission availability stayed at or above 22.27 GiB with zero
-scope pressure/OOM events. maestro1 compiled and linked the changed HIP service
+scope pressure/OOM events. Integration Python discovery passed 141/141.
+maestro1 compiled and linked the changed HIP service
 and parity target, and its CLI check passed; the existing SYCL service build
 needed no recompilation, so that is not evidence for its separate generator
 source path. Native model tests and HIP/SYCL device execution remain open.
