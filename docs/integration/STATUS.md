@@ -2233,3 +2233,11 @@ availability was 13.25 GiB under the 28-GiB supervisor, with zero cgroup
 pressure/OOM events. This validates the downloaded directory path for an
 already-tested artifact identity; it is not a new model cohort or a Phase 7
 closeout.
+
+The follow-up [current-source 16K Coder IQ1_M check](../../bench/results/2026-10-15-phase7-current-source-coder-iq1m-16k/README.md)
+used the same exact shard hashes and profile at 16,384 configured context. Its
+15,003-token uncached retrieval returned all three markers once and in order;
+same-service recovery passed, with MTP accepting 30/32 drafts. Minimum
+host/admission availability was 12.76 GiB across 673 samples, with no cgroup
+pressure or OOM events. This adds one current-source 16K cell; broader quality,
+independent repetitions and Phase 7's other open gates remain.
