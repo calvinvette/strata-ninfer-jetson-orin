@@ -216,6 +216,15 @@ cgroup pressure or OOM events. Tegrastats `tj` ranged 49.5–58.5 °C. This adds
 one 16K sustained retrieval point, not broad task quality, cache-reuse
 throughput, or a general capacity boundary; Phase 7 remains open.
 
+Q2_0 also passed a [30-minute sustained 32K retrieval run](../../bench/results/2026-10-14-phase7-q2-recall/sustained-32k/README.md):
+four serial requests completed over 2,298 seconds, each reading 30,032
+uncached prompt tokens and passing independent marker count/order checks.
+Minimum host/admission availability was 16.29/10.27 GiB; peak scope use was
+17.73 GiB, with zero sampled cgroup pressure/OOM events. `tj` ranged 49.2–57.5
+°C. This adds one sustained 32K retrieval point for this profile; it does not
+establish broad task quality, cache-reuse throughput or a general capacity
+boundary. Phase 7 remains open.
+
 A bounded [Q2_0 streamed API concurrency-2 check](../../bench/results/2026-10-14-phase7-q2-recall/concurrency2/README.md)
 then passed on distinct 7,498- and 15,003-token prompts with swaps disabled:
 both simultaneous requests used separate active slots and passed exact prompt,

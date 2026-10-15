@@ -30,6 +30,15 @@ with 14 repeated full-prefill requests, zero failures, and no cgroup pressure
 events. The `tj` sensor ranged from 54.5 to 60.1 °C. This adds one sustained
 service point for the Q2_0 cohort; prompt caching was disabled.
 
+Follow-on [16K](sustained-16k/README.md) and [32K](sustained-32k/README.md)
+sustained runs used the same Q2_0 profile with prompt caching disabled. The
+16K loop completed eight retrieval requests in 2,298 seconds; the 32K loop
+completed four in 2,298 seconds. Every response passed an independent marker
+count/order review. Both stayed above the six-GiB host floor with zero sampled
+cgroup pressure/OOM events. These extend sustained retrieval evidence to 16K
+and 32K prompts; their single-run timing summaries are not paired performance
+comparisons or broad quality results.
+
 All three runs passed under a 28-GiB cgroup ceiling and the six-GiB
 host-availability guard. Minimum physical host availability was 16.967, 16.797
 and 16.363 GiB at 8K, 16K and 32K; minimum effective admission availability
