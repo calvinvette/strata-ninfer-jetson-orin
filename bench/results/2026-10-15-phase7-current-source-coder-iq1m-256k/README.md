@@ -21,13 +21,13 @@ between quantizations or inference engines.
 
 ## Run status
 
-At the latest recorded check (13,159 seconds after request start), attempt 3
-was still live at 114,816 of 240,286 prompt tokens. Minimum sampled available
+At the latest recorded check (13,450 seconds after request start), attempt 3
+was still live at 117,248 of 240,286 prompt tokens. Minimum sampled available
 host memory was 7.44 GiB, above the six-GiB floor; the latest sample was 8.21
-GiB. The latest ten-minute prefill rate was about 8.45 tokens/s; linear
+GiB. The latest ten-minute prefill rate was about 8.53 tokens/s; linear
 extrapolation puts total prefill near 7.76 hours, about thirteen minutes inside
 the eight-hour cap. This estimate varies with throughput and does not include
-recovery overhead. The leaf supervisor scope used 8.18 GiB at the latest sample,
+recovery overhead. The leaf supervisor scope used 8.22 GiB at the latest sample,
 and sampled `low`, `high`, `max`, `oom` and `oom_kill` counters are all zero to
 date. Read-only clock samples so far show CPU 729.6 MHz–2,201.6 MHz and GPU
 306 MHz–816 MHz; `tj` ranged 49.0–52.9 °C. EMC readback remains unavailable.

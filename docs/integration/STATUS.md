@@ -5,7 +5,7 @@ Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 has
 initial long-context recall and sustained-service evidence and remains in
 progress; Phases 5 and 6 also remain open.
 
-The current-source Coder IQ1_M [256K retrieval/recovery check](../../bench/results/2026-10-15-phase7-current-source-coder-iq1m-256k/README.md) is still running: 114,816 of 240,286 formatted prompt tokens were processed at the latest check. Minimum sampled host availability is 7.44 GiB and cgroup pressure/OOM counters remain zero. Retrieval, same-service recovery and terminal timing are pending; this is not a support result.
+The current-source Coder IQ1_M [256K retrieval/recovery check](../../bench/results/2026-10-15-phase7-current-source-coder-iq1m-256k/README.md) is still running: 117,248 of 240,286 formatted prompt tokens were processed at the latest check. Minimum sampled host availability is 7.44 GiB and cgroup pressure/OOM counters remain zero. Retrieval, same-service recovery and terminal timing are pending; this is not a support result.
 A Q2_0 [256K near-limit retrieval and recovery check](../../bench/results/2026-10-15-phase7-q2-recall-256k/README.md) passed on Orin: 240,286 prompt tokens, all three planted markers exactly once and in order, and a same-service recovery response. Across 11,096 one-second samples, minimum host/admission availability was 7.31 GiB; sampled cgroup pressure/OOM counters were zero. The engine reported 20.8 prompt tokens/s, with 11,557.8 s prompt time. This is a single functional capacity check, not a performance or broad 256K support claim. Phase 7 remains open.
 
 A held-out Q2_0 [64K retrieval-plus-arithmetic quality check](../../bench/results/2026-10-15-phase7-q2-quality-64k/README.md) returned all three 10/50/90% markers once and in order, computed the independently verified suffix sum `1971`, and returned same-service `RECOVERED`. Minimum host/admission availability was 15.13/11.50 GiB across 2,205 samples with zero cgroup pressure/OOM events. This extends one arithmetic task to 64K; it is not a broad quality score. Phase 7 remains open.
@@ -2185,6 +2185,14 @@ idle/background load, are not process-attributed, and are retained as
 rail-specific diagnostics rather than whole-board energy claims.
 This does not support an int8/MTP3 serving win for this long-prefill workload;
 Phase 6 remains open for other interactions and workloads.
+
+These two seven-block int8-KV confirmations are not a valid combined MTP-by-
+workload interaction estimate: their recorded binary SHA256 values differ
+(`5a72dbad…` for the 512-token campaign and `e84dc9af…` for the 7,501-token
+campaign). Treat each paired result within its own campaign only. A direct
+interaction follow-up must use one pinned binary/artifact set and randomize both
+MTP arms within blocks at each workload length; Phase 6 remains open for that
+same-source comparison.
 
 The current-source [Q2_0 accepted-prefix runtime check](../../bench/results/2026-10-14-phase5-current-source-runtime/README.md)
 reran MTP off/2/3/4 on the 2,048-token FP16-KV prompt after the accepted-window
