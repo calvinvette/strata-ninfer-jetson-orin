@@ -1646,6 +1646,18 @@ separate evidence. This was one screening block only and does not quantify a
 quality or performance effect. See the
 [Coder swap/arithmetic screen](../../bench/results/2026-10-16-phase5-coder-q8_1-adaptive-swap-screen/README.md).
 
+The scalar Q8_1 CPU diagnostic also does not reproduce CUDA arithmetic. It
+dequantizes IQ2_S/Q2_0 weights to FP32 and accumulates products in double
+precision; Strata's CUDA path uses integer dot products, integer scale
+combination, then a lane-wise FP32 reduction. Captured Q8_1 scales and codes
+matched, but the scalar output still differed from CUDA by 6.36e-4 to 9.33e-4
+relative L1. A future CPU/Splash parity path must mirror the packed-weight dot
+and reduction contract, not just the activation quantizer, and compare the
+result against an independent scalar oracle before service-level recovery tests.
+This contract is specific to IQ2_S/Q2_0; other expert formats must be audited
+separately. See the [Q8_1 quantizer check](../../bench/results/2026-10-16-phase5-coder-q8_1-quantizer-check/README.md)
+and [scalar dot diagnostic](../../bench/results/2026-10-16-phase5-coder-q8_1-dot-check/README.md).
+
 A direct FP32 GDN capture after the short request sharpened that migration
 diagnostic. At accepted-prefix L=527, cadence-4 swaps changed the short-only
 GDN state by 4.6% relative L2 while preserving output IDs. After a 2,048-token

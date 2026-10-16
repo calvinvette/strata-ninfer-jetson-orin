@@ -76,6 +76,8 @@ fresh maestro1 HIP rebuild first had a device-link bus error; the single-job
 retry with `/mnt/sda2` temporaries linked and passed the usage check (compile/CLI
 evidence only). Phase 5 remains open.
 
+Source audit explains why the scalar Q8_1 route did not establish operator parity: it dequantizes IQ2_S/Q2_0 weights to FP32 and sums products in double precision, while CUDA uses integer dot products, integer scale combination, and a lane-wise FP32 reduction. Matching activation codes and scales alone are therefore insufficient. This points to the next bounded implementation task: a CPU mirror of the CUDA packed-row arithmetic, validated on captured rows against the CUDA kernel and an independent oracle before another adaptive-recovery run. It is a proposed test direction, not a claimed fix. The portability note for repeating this seam audit on Strata + Splash is in [PORTING_NOTES.md](PORTING_NOTES.md). Phase 5 remains open.
+
 An opt-in [CPU Q8_1 route screen](../../bench/results/2026-10-16-phase5-coder-q8_1-cpu-route-check/README.md)
 then ran one supervised default/candidate pair on the same Coder IQ1_M GGUF
 revision. The route was exercised for 549 of 863 shared layer-1 expert calls;
