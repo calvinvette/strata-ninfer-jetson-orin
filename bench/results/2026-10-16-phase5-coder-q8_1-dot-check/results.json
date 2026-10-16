@@ -1,0 +1,57 @@
+{
+  "scope": "scalar CPU Q8_1 expert arithmetic diagnostic versus CUDA native expert output on two captured Coder layer-1 activations; no benchmark or service test",
+  "host": "Orin1, aarch64 / CUDA",
+  "model_repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+  "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
+  "model_quantization": "IQ1_M; routed layer-1 gate/up IQ2_S, down Q2_0",
+  "model_shard_sha256": [
+    "e11083ba855e7666b48ea3f2db6a9c3a20c18751a012cc24f948de91b7087fad",
+    "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+  ],
+  "source_base_commit": "edf962ac7ba1e06426564ce887089133b0a0234c",
+  "diagnostic_source_sha256": "b5c8b01db92f21d669ed4b0921f760e74d198b10a0717946fe2d26f388e13453",
+  "diagnostic_cuda_binary_sha256": "9f09513042f32d04b7178624f5e27bd566962b75b325db310e2e73fffc85816b",
+  "environment_variable": "STRATA_DIAG_CPU_Q8_1_DOT=1",
+  "runs": [
+    {
+      "input": "bench/results/2026-10-16-phase5-coder-swap-budget-screen/route-oracle-layer1/layer1-row10.f32",
+      "input_sha256": "3881ce60e3bf35b6673aeb7a825c75f85b7b31cccff955fca7fe4cf44ef26967",
+      "output": "layer1-row10.stdout.txt",
+      "output_sha256": "b592e41f3fea5459d878299870e35940d546896eac71db4b9649835cc8146bdb",
+      "returncode": 0,
+      "candidate_vs_cuda_relative_l1": 0.0009334,
+      "candidate_vs_cuda_max_absolute": 0.00006101,
+      "bitwise_different_words": 7680,
+      "output_words": 7680
+    },
+    {
+      "input": "bench/results/2026-10-16-phase5-coder-swap-budget-screen/route-oracle-layer1/layer1-long-row0.f32",
+      "input_sha256": "de5315bb9e17f5da8521697d02d5be760b24c4cd8e2b90969ec430466fa26788",
+      "output": "layer1-long-row0.stdout.txt",
+      "output_sha256": "a86e09c6363151128d45b3de6db9835675f99387a122ab53f60baf68d4cf51a6",
+      "returncode": 0,
+      "candidate_vs_cuda_relative_l1": 0.0006356,
+      "candidate_vs_cuda_max_absolute": 0.00004608,
+      "bitwise_different_words": 7677,
+      "output_words": 7680
+    }
+  ],
+  "hip_target_build": {
+    "host": "maestro1 x86_64",
+    "target": "native_expert_parity",
+    "architecture": "gfx1100",
+    "compiler": "AMD clang 22.0.0git (ROCm LLVM commit 8e85e3138dd485c4221cc12aff9eb60ab48ed3b5 plus local patch)",
+    "cmake": "3.31.10",
+    "ninja": "1.13.2",
+    "build_jobs": 1,
+    "source_snapshot_base_commit": "e6a55b30f596ecc5173d2eb55a4087662b7ee88f",
+    "first_attempt": "HIP device-link failed: amdgcn-link terminated with bus error; see hip/hip-build.txt.gz",
+    "retry": "target linked after TMPDIR moved to /mnt/sda2; see hip/hip-retry-build.txt.gz",
+    "binary_sha256": "0eaf0f9ddc23a9e796503c18d4b4197bfea86937c0c1b12e27b4c993ad7c8468",
+    "usage_status": 2,
+    "usage_status_expected": 2,
+    "initial_loader_output": "hip/hip-initial-loader-failure.txt",
+    "usage_output": "hip/hip-usage-output.txt",
+    "accelerator_runtime_test": "not run; maestro1 is compile/CLI-only for this task"
+  }
+}

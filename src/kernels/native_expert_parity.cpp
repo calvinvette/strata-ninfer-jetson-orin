@@ -432,6 +432,59 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
         strata::kernels::native_expert_grouped(L, dptr, dstart, dn, ddst, dtok, 1, NT, dxq, dscr, dout, s);
         cudaStreamSynchronize(s);
         cudaMemcpy(got_g.data(), dout, got_g.size() * 4, cudaMemcpyDeviceToHost);
+        // Opt-in compatibility probe for a scalar CPU Q8_1 dot on the real native
+        // IQ2_S/Q2_0 expert pair. This deliberately uses ggml's independent float
+        // dequantizers for weights and Q8_1's packed codes/scales; it is an oracle,
+        // not a candidate optimized CPU kernel or a serving route.
+        if (std::getenv("STRATA_DIAG_CPU_Q8_1_DOT") != nullptr &&
+            f.gu_type == GGML_TYPE_IQ2_S && f.d_type == GGML_TYPE_Q2_0) {
+            const auto* q8_traits = ggml_get_type_traits_cpu(GGML_TYPE_Q8_1);
+            if (!q8_traits || !q8_traits->from_float) {
+                std::fprintf(stderr, "%s: GGML CPU Q8_1 quantizer unavailable\n", label.c_str());
+                ++failures;
+            } else {
+                struct Q81 { ggml_fp16_t d, s; int8_t qs[32]; };
+                static_assert(sizeof(Q81) == 36, "GGML Q8_1 packed layout");
+                const auto quant_row = [&](const float* in, int n) {
+                    std::vector<uint8_t> q(ggml_row_size(GGML_TYPE_Q8_1, n));
+                    q8_traits->from_float(in, q.data(), n);
+                    return q;
+                };
+                const auto dot_q8_1 = [](const float* w, const uint8_t* q, int n) {
+                    double acc = 0.0;
+                    for (int off = 0; off < n; off += 32) {
+                        Q81 b{};
+                        std::memcpy(&b, q + (size_t) (off / 32) * sizeof(Q81), sizeof(Q81));
+                        const float d = ggml_fp16_to_fp32(b.d);
+                        for (int j = 0; j < 32; ++j) acc += (double) w[off + j] * d * b.qs[j];
+                    }
+                    return (float) acc;
+                };
+                std::vector<float> candidate((size_t) NT * H);
+                for (int t = 0; t < NT; ++t) {
+                    const auto xq = quant_row(x.data() + (size_t) t * H, (int) H);
+                    std::vector<float> h((size_t) FF);
+                    for (int64_t r = 0; r < FF; ++r) {
+                        const float g = dot_q8_1(G.data() + (size_t) r * H, xq.data(), (int) H);
+                        const float u = dot_q8_1(U.data() + (size_t) r * H, xq.data(), (int) H);
+                        h[(size_t) r] = (g / (1.f + std::exp(-g))) * u;
+                    }
+                    const auto hq = quant_row(h.data(), (int) FF);
+                    for (int64_t r = 0; r < H; ++r)
+                        candidate[(size_t) t * H + r] = dot_q8_1(D.data() + (size_t) r * FF, hq.data(), (int) FF);
+                }
+                const double e = rel(candidate, got_g);
+                double max_abs = 0.0;
+                size_t bitwise_diffs = 0;
+                for (size_t i = 0; i < candidate.size(); ++i) {
+                    max_abs = std::max(max_abs, std::fabs((double) candidate[i] - got_g[i]));
+                    bitwise_diffs += std::memcmp(&candidate[i], &got_g[i], sizeof(float)) != 0;
+                }
+                std::printf("          scalar CPU Q8_1 dequantized-weight oracle vs CUDA: rel-L1 %.3e, max-abs %.3e, "
+                            "%zu/%zu output words differ bitwise (diagnostic only)\n",
+                            e, max_abs, bitwise_diffs, candidate.size());
+            }
+        }
         if (!dump_f32_dir.empty()) {
             std::string stem = label;
             std::replace(stem.begin(), stem.end(), ' ', '-');

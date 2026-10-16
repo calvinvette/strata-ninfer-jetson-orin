@@ -1606,3 +1606,14 @@ With the explicit 41-token cap, three retrieval and teardown cycles passed, and
 each listener and engine exited before reload. For future engine integrations,
 separate normal task stop from incomplete output, and verify process/listener
 release on every cycle. See the [Q2_0 teardown run](../../bench/results/2026-10-15-phase7-q2-teardown3/README.md).
+
+The captured Coder IQ2_S/Q2_0 expert check confirms that CPU Q8_1 activation
+codes/scales can feed a scalar host calculation close to the CUDA grouped
+operator (relative L1 9.33e-4 and 6.36e-4 on one short and one long captured
+activation). The CPU calculation uses independently dequantized GGUF weights
+and double accumulation; it is a diagnostic oracle, not a NEON kernel, speed
+result, or accepted-prefix parity. Production CPU dispatch still uses GGML's
+Q8_K contract for IQ2_S. A future Splash port should compare the exact codec
+blocks first, then implement and profile an engine-native dot, then compare
+state and continuation at the service seam. See the
+[Q8_1 dot check](../../bench/results/2026-10-16-phase5-coder-q8_1-dot-check/README.md).
