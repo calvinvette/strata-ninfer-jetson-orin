@@ -1,12 +1,13 @@
 # Direct GDN state magnitude follow-up — Orin — 2026-10-16
 
-This follow-up measures the FP32 GDN state after a short prompt, rather than
-relying only on the engine's state hash. It uses the same current Strata binary
+This follow-up measures the FP32 GDN state at accepted-prefix length L=527 in
+the short-request workload, rather than relying only on the engine's state
+hash. It uses the same current Strata binary
 (`c07cf3f634788d055316cbf345a2fa17dd66449cb5ddd8690781dbbd72403c88`) and
 the same `ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF` IQ1_M artifact
 (revision `5348543e0147355ac9cbcb031184a3546350988e`) as the parent screen.
 
-Four supervised runs captured state at L=527 after the same 512-token prompt:
+Four supervised runs captured state at L=527 for the same 512-token prompt:
 
 | Run | Sequence | Adaptive cadence | Accepted output IDs vs initial | GDN state vs initial |
 | --- | --- | ---: | ---: | --- |
@@ -16,8 +17,8 @@ Four supervised runs captured state at L=527 after the same 512-token prompt:
 | `post-long-active-default` | long 2,048, then same short 512 | 4 | 16/16 differ | 29,414,608 / 29,417,472 floats differ |
 
 The short-only active run changed 94.4082% of GDN floats (relative L2 0.04617)
-while preserving all 16 output IDs; it passed three adaptive byte and
-residency checks. After the long request, delayed adaptation reproduced the
+at this accepted prefix while preserving all 16 published output IDs; it passed
+three adaptive byte and residency checks. After the long request, delayed adaptation reproduced the
 initial short-run GDN dump byte-for-byte. Cadence-4 adaptation changed 99.9903%
 of floats. Relative L2 difference was 0.7376, maximum absolute difference
 17.7336, and mean absolute difference 0.026689. Per-layer relative L2 ranged

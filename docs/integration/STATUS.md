@@ -2396,7 +2396,8 @@ establish the full service-level persistent-state drift cause. Phase 5 remains
 open.
 
 A direct FP32 GDN-state follow-up found that cadence-4 swaps changed GDN values
-even on a short-only request (relative L2 0.0462) while preserving output IDs.
+at accepted-prefix L=527 in the short-only request (relative L2 0.0462) while
+preserving output IDs.
 After a long request, delayed adaptation reproduced the initial state
 bit-for-bit; active adaptation changed 29,414,608 of 29,417,472 floats
 (relative L2 0.7376) and all 16 output IDs. This is one diagnostic run per arm:
