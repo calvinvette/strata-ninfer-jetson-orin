@@ -29,8 +29,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--adapt-every", type=int, required=True)
     parser.add_argument("--adapt-swaps", type=int, required=True)
+    parser.add_argument("--continuations", type=int, default=0,
+                        help="extra identical short requests after short/long/short")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    if args.continuations < 0:
+        parser.error("--continuations must be non-negative")
     args.output.mkdir(parents=True, exist_ok=False)
 
     cfg = json.loads((BASE / "baseline-mtp0-config.json").read_text())
@@ -48,8 +52,10 @@ def main():
     workload = json.loads((BASE / "workloads.json").read_text())["workloads"][0]
     long_ids = tokenizer.encode(template.render(workload["messages"], enable_thinking=False), parse_special=True)
     assert len(long_ids) == 2048, len(long_ids)
-    prompts = (("short-512", long_ids[-512:]), ("long-2048", long_ids),
-               ("short-512-recovery", long_ids[-512:]))
+    prompts = [("short-512", long_ids[-512:]), ("long-2048", long_ids),
+               ("short-512-recovery", long_ids[-512:])]
+    prompts.extend((f"short-512-continuation-{index + 1}", long_ids[-512:])
+                   for index in range(args.continuations))
 
     log = args.output / "service.log"
     env = child_env(cfg)
@@ -81,7 +87,7 @@ def main():
         raise RuntimeError("missing layer-0 dispatch capture")
     rows = captured[1:]
     route = {"rows": len(rows)}
-    if len(rows) == 66:
+    if len(rows) >= 66:
         initial, long_rows, recovery = rows[:22], rows[22:44], rows[44:66]
         route.update({
             "first_seven_activation_equal": sum(a["activation"] == b["activation"]

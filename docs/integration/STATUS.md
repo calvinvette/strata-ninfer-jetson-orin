@@ -22,11 +22,14 @@ hashes and layer-0 route capture. Cap 8 exactly matched delayed-control recovery
 tokens in all three blocks, but five persistent-state fingerprints still differed
 from the control each time. Caps 1 and 96 differed at all 16 recovery-token
 positions versus control in all three blocks, with seven changed fingerprints.
-Every adaptive byte and residency verification passed. Minimum host/admission
-availability was 14.34 GiB across 2,221 one-second samples; clock ranges were
-dynamic and energy was not attributed per request. This identifies cap 8 for
-state-level follow-up; output agreement is not exact state recovery, and Phase 5
-remains open.
+Every adaptive byte and residency verification passed. A three-block
+continuation follow-up then found the same cap-8 pattern each time: the 2,048-
+token response differed at 3/16 positions, the immediate recovery response
+matched, and the next identical short response differed at 16/16 positions;
+seven state fingerprints differed. Thus the apparent recovery match conceals a
+state divergence that affects continuation. Minimum host/admission availability
+was 14.33 GiB across 1,196 continuation samples; cgroup memory-event counters
+were zero. Phase 5 remains open.
 
 Phase 6's same-binary Q2_0 int8-KV [MTP × prompt-length study](../../bench/results/2026-10-16-phase6-q2-int8-mtp3-workload-interaction/README.md) completed its 12-arm screen and corrected 28-arm held-out confirmation. The confirmation passed all 14 paired blocks with no rejected cells, including the independent short-task suffix-sum oracle. MTP3 reduced median prompt throughput 13.65% at 512 tokens and 8.56% at 7,501 tokens; client total time increased 7.60% and 8.63%. The prompt-throughput interaction estimate was +5.89% (paired-process bootstrap 95% interval 1.0009–1.0680), while decode-TPS and client-total interaction intervals included no effect. This supports only a borderline difference in the penalty between these prompts; it does not promote MTP3 or close Phase 6's other interactions.
 

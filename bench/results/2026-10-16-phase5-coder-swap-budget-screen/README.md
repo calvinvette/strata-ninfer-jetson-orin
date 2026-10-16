@@ -35,8 +35,8 @@ or later activation differences in any block. Cap 1 had no first-seven owner
 flips but had 15 later activation differences; cap 96 had 18 first-seven
 CPU-to-VRAM owner flips and 15 later activation differences. The targeted
 adaptive byte and residency checks passed at all 11 apply points in every active
-arm. These observations make cap 8 a candidate for a larger state-level follow-up;
-they do not establish state equivalence or resolve the recovery defect.
+arm. The continuation follow-up below shows that the cap-8 state mismatch is
+behaviorally observable on the next request, so cap 8 does not pass recovery.
 
 The 2,221 one-second supervisor samples showed minimum host and admission
 availability of 14.34 GiB, above the six-GiB floor. GPU clocks ranged from 306
@@ -49,7 +49,23 @@ same advisory lock that `run_control.py` needed. The lock was free afterwards;
 the harness now uses a separate campaign lock. That preflight record is retained
 in `campaign/` and excluded. The completed retry is in `campaign-retry1/`.
 
-This does not close Phase 5. The next test must compare accepted-prefix state
-against a delayed control directly, identify which of the five cap-8 state
-fingerprints diverge, and determine whether those fields affect subsequent
-continuation. The schedule was generated with seed `20261016`.
+This does not close Phase 5. The schedule was generated with seed `20261016`.
+
+## Continuation follow-up — 2026-10-16
+
+The delayed-control versus cap-8 pair was repeated in three blocks, with one
+additional identical 512-token request after the original short/long/short
+sequence. The output/state comparison is in `continuation-summary.json`; raw
+requests, accepted-prefix hashes, capture, logs, clocks and memory samples are
+under `continuation-campaign/`.
+
+All three pairs produced the same pattern: the first short output matched, the
+long output differed at three of 16 positions, the recovery short output matched,
+and the extra continuation differed at all 16 positions. At the extra request,
+all seven captured state fingerprints differed from delayed control. This
+confirms that matching the immediate recovery text concealed state divergence
+that changed the next response. All six services passed supervision; minimum
+host/admission availability was 14.33 GiB across 1,196 samples, with zero
+sampled cgroup memory events. All 15 adaptive byte and residency checks passed
+in each cap-8 service. Clock observations remained dynamic; energy was not
+attributed per request.
