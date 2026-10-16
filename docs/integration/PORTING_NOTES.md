@@ -1487,6 +1487,26 @@ weights before changing schedules; keep operator attribution separate from
 accepted-prefix and task-quality conclusions. See the
 [activation-error decomposition](../../bench/results/2026-10-15-phase5-activation-error-decomposition/README.md).
 
+A three-block all-layer Coder IQ1_M follow-up moved the first matched-input
+route changes earlier in the trace: cap-8 versus delayed control switched
+experts 26 and 95 at layer 1, row 10 of the initial 512-token request, while
+activations and expert IDs were still identical. Layer-2 activations diverged
+at row 10 with the expert IDs still equal. On the long request, four experts
+changed CPU-to-VRAM ownership at layer 1, first row; the first layer-0
+activation differences occurred later and had disjoint expert IDs, so they
+were not counted as owner changes. An independent same-input packed-kernel
+oracle reconstructed the CPU Q8_K/Q8_0 and CUDA Q8_1/Q8_1 contracts for all six
+layer-1 expert calls. Its delta residuals were 0.85%–6.03% against observed
+CPU/GPU differences of 1.11%–1.47%. This repeated result strengthens the
+activation-format mechanism for the sampled operator but still does not prove
+full-service state causality or recovery correctness. For Splash, scan from
+the earliest captured layer, match rows by activation and expert IDs, and only
+compare owner categories for the same selected expert. Reconstruct each
+backend's own activation representation before attributing numerical drift;
+the GGML Q8 labels and this NVIDIA measurement do not define Splash's Metal
+contract. See the
+[all-layer trace and operator oracle](../../bench/results/2026-10-16-phase5-coder-swap-budget-screen/README.md#all-layer-route-trace-and-operator-oracle--2026-10-16).
+
 A follow-up held-out short-task check returned the exact requested code before
 and after a long swap-inducing request in two fresh services, even though six
 persistent-state fingerprints changed in both. Keep task-level quality
