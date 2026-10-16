@@ -2397,7 +2397,10 @@ open.
 
 A direct FP32 GDN-state follow-up found that cadence-4 swaps changed GDN values
 at accepted-prefix L=527 in the short-only request (relative L2 0.0462) while
-preserving output IDs.
+preserving output IDs. In that capture, GDN slices 0 and 1 were bitwise equal
+to the control and slice 2 was the first to differ, consistent with but not
+proof of the earlier route trace's first activation divergence at transformer
+layer 2.
 After a long request, delayed adaptation reproduced the initial state
 bit-for-bit; active adaptation changed 29,414,608 of 29,417,472 floats
 (relative L2 0.7376) and all 16 output IDs. This is one diagnostic run per arm:

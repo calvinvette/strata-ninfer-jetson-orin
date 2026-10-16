@@ -18,14 +18,21 @@ Four supervised runs captured state at L=527 for the same 512-token prompt:
 
 The short-only active run changed 94.4082% of GDN floats (relative L2 0.04617)
 at this accepted prefix while preserving all 16 published output IDs; it passed
-three adaptive byte and residency checks. After the long request, delayed adaptation reproduced the
-initial short-run GDN dump byte-for-byte. Cadence-4 adaptation changed 99.9903%
+three adaptive byte and residency checks. After the long request, delayed
+adaptation reproduced the initial short-run GDN dump byte-for-byte. Cadence-4 adaptation changed 99.9903%
 of floats. Relative L2 difference was 0.7376, maximum absolute difference
 17.7336, and mean absolute difference 0.026689. Per-layer relative L2 ranged
 from 0.5835 to 0.8942. This active run passed seven adaptive byte and residency
 checks. Minimum host/admission availability was 14.41 GiB for the short-only
 active run, 14.45 GiB for post-long active and 14.24 GiB for post-long delayed.
 All ran under `MemoryMax=28G` with zero cgroup memory events.
+
+In the short-only active run, GDN slices 0 and 1 were bit-identical to the
+control; slice 2 was the first to differ (relative L2 0.000964), after which
+the difference grew across later slices. The earlier [all-layer route trace](../../2026-10-16-phase5-coder-swap-budget-screen/README.md#all-layer-route-trace-and-operator-oracle--2026-10-16)
+found its first activation drift at transformer layer 2, after owner changes at
+layer 1. The alignment narrows the follow-up, but the state-slice to transformer
+module mapping and causal path still need direct confirmation.
 
 This is direct evidence that active adaptive migration in this tested sequence
 is associated with a modest short-only GDN difference that preserves immediate
