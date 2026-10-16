@@ -31,6 +31,18 @@ state divergence that affects continuation. Minimum host/admission availability
 was 14.33 GiB across 1,196 continuation samples; cgroup memory-event counters
 were zero. Phase 5 remains open.
 
+A seven-block [fixed-residency Coder IQ1_M confirmation](../../bench/results/2026-10-16-phase5-coder-fixed-residency-confirm7/README.md)
+reproduced that continuation failure in all seven randomized pairs on the exact
+`ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF` IQ1_M snapshot. Cap-8
+matched the immediate recovery tokens but differed in five persistent-state
+fingerprints each time; the next identical short request differed at all 16
+token positions in every block. The delayed-adaptation control restored both
+the initial output and state fingerprints. All 14 services passed supervision,
+with no cgroup memory events and at least 14.07 GiB host availability. This is
+correctness/state evidence, not a performance comparison or a result for other
+Coder quantizations. Adaptive migration remains unqualified and Phase 5 remains
+open.
+
 A three-block [all-layer Coder trace and CPU/GPU operator oracle](../../bench/results/2026-10-16-phase5-coder-swap-budget-screen/README.md#all-layer-route-trace-and-operator-oracle--2026-10-16)
 reproduced the first cap-8 route changes at layer 1 on identical activations and
 expert IDs. Short request changes at row 10 preceded layer-2 activation drift;
