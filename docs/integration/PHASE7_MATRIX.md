@@ -25,6 +25,7 @@ noted otherwise.
 | Reload and teardown, 8K | 3 fresh services; 7,498-token measured request each | All markers passed identically; listener and engine exited before reload | 16.85 / 6.90 GiB | Three sequential cycles; [report](../../bench/results/2026-10-15-phase7-q2-teardown3/README.md) |
 | Streamed concurrency, 2 slots | 8K and 16K prompts | Both exact retrieval checks passed; overlap and two active slots observed | 15.66 / 7.36 GiB | No latency benefit in this pair; swaps disabled; [report](../../bench/results/2026-10-14-phase7-q2-recall/concurrency2/README.md) |
 | Streamed concurrency, 4 slots | Four distinct 8K prompts | All four exact retrieval checks passed; four slots configured | 14.65 / 11.95 GiB | At most two active slot states observed; four-way gate failed; [report](../../bench/results/2026-10-15-phase7-q2-concurrency4/README.md) |
+| Staggered streamed concurrency, 4 slots | Four distinct prompts, 256–1,024 tokens | All 12 exact prompt/marker checks passed in three fresh services; both APIs saw four active slots in 2/3 blocks | 14.66 / 10.19 GiB | Third block peaked at three active slots with one request outside; confirmation gate failed, no reliable four-way claim; [report](../../bench/results/2026-10-16-phase7-q2-concurrency4-staggered/README.md) |
 
 The 256K test's 7.31 GiB minimum host availability cleared the required six-GiB
 floor, with zero sampled cgroup pressure/OOM events. It took 11,557.8 seconds
@@ -69,7 +70,10 @@ one quantization, not a comparison between quantizations or inference engines.
 - Q2_0 256K has one retrieval/recovery sample and one 64K arithmetic sample,
   but no sustained 256K workload or broader task-quality suite.
 - Four-way serving is not qualified. The four-slot screen completed all four
-  requests but observed no more than two active slot states.
+  long retrieval requests but observed no more than two active slot states. A
+  staggered short-prompt confirmation observed four active slots in two of
+  three processes, with all answers correct, but the third process reached only
+  three; reliable four-way overlap remains unqualified.
 - The large 2048×2048 IQ1_M image request passed admission, but its answer was
   truncated and is excluded from quality passes.
 - IQ1_M adaptive routing can change persistent state and recovery tokens after

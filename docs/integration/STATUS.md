@@ -50,6 +50,15 @@ A held-out Q2_0 [64K retrieval-plus-arithmetic quality check](../../bench/result
 
 A Q2_0 [four-slot streamed API screen](../../bench/results/2026-10-15-phase7-q2-concurrency4/README.md) completed four distinct retrieval tasks with all exact prompt and marker checks passing. Four slots were configured, but `/metrics` sampled at most two active slot states, so the four-way overlap gate failed. Minimum host/admission availability was 14.65/11.95 GiB with zero cgroup pressure/OOM events. This does not qualify four-way serving; Phase 7 remains open.
 
+A three-block [staggered four-slot follow-up](../../bench/results/2026-10-16-phase7-q2-concurrency4-staggered/README.md)
+used four shorter-arriving distinct requests to exercise prefill yielding. All
+12 prompt-count and marker checks passed; both `/metrics` and `/slots` saw four
+active slots in two blocks, while the third reached three with one request
+outside the slots. The 28-GiB supervised campaign remained above the six-GiB
+floor (14.66 GiB host, 10.19 GiB admission), with no cgroup pressure/OOM events.
+Because overlap did not reproduce in every block, four-way serving remains
+unqualified and no throughput claim is made.
+
 The consolidated [Phase 7 evidence matrix](PHASE7_MATRIX.md) lists tested cells and open support limits.
 
 A [maestro1 accelerator runtime audit](../../bench/results/2026-10-15-phase8-maestro1-device-audit/README.md) found Intel HD Graphics 500 only, no `/dev/kfd`, and zero SYCL platforms in the installed runtime. Existing HIP/SYCL build and help checks therefore remain compile/CLI evidence only. No host settings were changed. Phase 8 remains open.
