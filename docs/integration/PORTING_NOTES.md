@@ -1617,3 +1617,18 @@ Q8_K contract for IQ2_S. A future Splash port should compare the exact codec
 blocks first, then implement and profile an engine-native dot, then compare
 state and continuation at the service seam. See the
 [Q8_1 dot check](../../bench/results/2026-10-16-phase5-coder-q8_1-dot-check/README.md).
+
+The subsequent [opt-in CPU Q8_1 service route screen](../../bench/results/2026-10-16-phase5-coder-q8_1-cpu-route-check/README.md)
+used the same `ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF` IQ1_M
+snapshot, not a second Coder quantization. The route replaces the CPU
+activation/dot contract only for IQ2_S gate/up plus Q2_0 down; the rest of the
+model remains on its regular paths. In the one paired short/long/short screen,
+549 of 863 shared captured assignments used CPU and owner choices did not
+change. The long answer differed at 3/16 positions across arms. Recovery
+matched each service's own initial tokens and state, but cross-arm fingerprints
+differed, so neither service quality nor migration state parity is qualified.
+The scalar route is intentionally slow and opt-in, with no default or profile
+change. For a future Splash integration, repeat codec and operator checks at
+the exact expert-format seam, then measure the engine-native Metal path and
+accepted-prefix state/continuation before making any routing decision. This
+single pair is exploratory only; see the report for raw captures and limits.

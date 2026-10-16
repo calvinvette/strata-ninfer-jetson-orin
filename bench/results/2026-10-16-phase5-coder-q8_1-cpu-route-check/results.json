@@ -1,0 +1,464 @@
+{
+  "scope": "single exploratory same-service short/long/short/recovery comparison of the default CPU IQ2_S/Q2_0 route against the opt-in Q8_1 scalar CPU route; no quality or performance qualification",
+  "host": "Orin1, aarch64, JetPack CUDA 12.6; dynamic clocks observed, not controlled",
+  "source_commit": "1829f62a Add opt-in CPU Q8_1 expert diagnostic (route candidate is uncommitted source)",
+  "source_file_sha256": "dcbbaa3b34511075fb820a352aba2a0e04dc44151a210d90beeac613d9610f74",
+  "service_binary_sha256": "c07cf3f634788d055316cbf345a2fa17dd66449cb5ddd8690781dbbd72403c88",
+  "model_repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+  "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
+  "model_quantization": "IQ1_M; layer 1 routed expert pair IQ2_S gate/up + Q2_0 down",
+  "model_shard_sha256": [
+    "e11083ba855e7666b48ea3f2db6a9c3a20c18751a012cc24f948de91b7087fad",
+    "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+  ],
+  "configuration": {
+    "profile": "fixed delayed adaptation adapt_every=100000, adapt_swaps=96",
+    "sequence": [
+      "512 prompt + 16 output",
+      "2048 prompt + 16 output",
+      "same 512 prompt + 16 output",
+      "same 512 prompt + 16 output"
+    ],
+    "supervisor": "run_control in systemd user scope, MemoryMax=28 GiB, 1 s sampling",
+    "mtp": "drafts accepted 0/0 in all requests"
+  },
+  "arms": {
+    "baseline": {
+      "env_enabled": false,
+      "supervisor_status": "pass",
+      "returncode": 0,
+      "elapsed_s": 207.0080290150363,
+      "minimum_available_gib": 14.338211059570312,
+      "minimum_admission_available_gib": 14.338211059570312,
+      "samples": 197,
+      "cgroup_memory_event_maxima": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu_clock_observed_mhz_range": [
+        729.6,
+        2201.6
+      ],
+      "gpu_clock_observed_mhz_range": [
+        306.0,
+        1300.5
+      ],
+      "emc_clock": "unavailable: permission denied",
+      "requests": [
+        {
+          "name": "short-512",
+          "prompt_tokens": 512,
+          "output_tokens": 16,
+          "token_ids": [
+            27775,
+            383,
+            279,
+            3766,
+            1433,
+            11,
+            864,
+            16661,
+            11040,
+            314,
+            264,
+            8240,
+            314,
+            359,
+            87,
+            6
+          ],
+          "state": {
+            "L": "527",
+            "gdn": "262dc62795ed2c7d",
+            "ple": "626f14e4fdf0ece8",
+            "tail": "b54fa7d6ac3b1795",
+            "dead": "48fb10575fbf3848",
+            "pooled": "8c14b9411a2080a2",
+            "pooled_full": "6042010bcb0bd39d",
+            "kv": "47a0d44cdcf5a5f9",
+            "ple_prev": "359,87"
+          }
+        },
+        {
+          "name": "long-2048",
+          "prompt_tokens": 2048,
+          "output_tokens": 16,
+          "token_ids": [
+            27775,
+            383,
+            279,
+            3766,
+            2002,
+            10142,
+            1433,
+            11,
+            567,
+            628,
+            22270,
+            264,
+            12103,
+            321,
+            12594,
+            5215
+          ],
+          "state": {
+            "L": "2063",
+            "gdn": "14a0b28586074276",
+            "ple": "0e4a8762bc0863f5",
+            "tail": "e38e31e7c9c2d757",
+            "dead": "01d30d2e242360e6",
+            "pooled": "0b797a936fa0bc90",
+            "pooled_full": "16433b131863fff5",
+            "kv": "d660de95b9289d43",
+            "ple_prev": "321,12594"
+          }
+        },
+        {
+          "name": "short-512-recovery",
+          "prompt_tokens": 512,
+          "output_tokens": 16,
+          "token_ids": [
+            27775,
+            383,
+            279,
+            3766,
+            1433,
+            11,
+            864,
+            16661,
+            11040,
+            314,
+            264,
+            8240,
+            314,
+            359,
+            87,
+            6
+          ],
+          "state": {
+            "L": "527",
+            "gdn": "262dc62795ed2c7d",
+            "ple": "626f14e4fdf0ece8",
+            "tail": "b54fa7d6ac3b1795",
+            "dead": "48fb10575fbf3848",
+            "pooled": "8c14b9411a2080a2",
+            "pooled_full": "6042010bcb0bd39d",
+            "kv": "47a0d44cdcf5a5f9",
+            "ple_prev": "359,87"
+          }
+        },
+        {
+          "name": "short-512-continuation-1",
+          "prompt_tokens": 512,
+          "output_tokens": 16,
+          "token_ids": [
+            27775,
+            383,
+            279,
+            3766,
+            1433,
+            11,
+            864,
+            16661,
+            11040,
+            314,
+            264,
+            8240,
+            314,
+            359,
+            87,
+            6
+          ],
+          "state": {
+            "L": "527",
+            "gdn": "262dc62795ed2c7d",
+            "ple": "626f14e4fdf0ece8",
+            "tail": "b54fa7d6ac3b1795",
+            "dead": "48fb10575fbf3848",
+            "pooled": "8c14b9411a2080a2",
+            "pooled_full": "6042010bcb0bd39d",
+            "kv": "47a0d44cdcf5a5f9",
+            "ple_prev": "359,87"
+          }
+        }
+      ],
+      "same_service_recovery_token_differences": 0,
+      "same_service_recovery_state_changes": [],
+      "route_internal": {
+        "rows": 88,
+        "first_seven_activation_equal": 7,
+        "first_seven_expert_ids_equal": 7,
+        "first_seven_owner_flips": 0,
+        "later_activation_differences": 0
+      },
+      "binary_sha256": "c07cf3f634788d055316cbf345a2fa17dd66449cb5ddd8690781dbbd72403c88",
+      "artifacts": {
+        "service_log_gz_sha256": "727302d8eba331d6fa723084219f9a2db5fc39fa7677f6fafe27e1bac12ddac6",
+        "layer1_capture_gz_sha256": "8fb614b19d2feb99cb6739417b22a9863988f75380b817247825148221e9514f",
+        "memory_samples_gz_sha256": "630fa13a6c9eed7f511de41ff1de61cddb621d26cce6f117f93ca1f71f296474",
+        "tegrastats_gz_sha256": "cdbb95ccece9c12027f1312035c8f2c3c0af90857dc1f55cde3b838b176ac7d0",
+        "supervisor_result_sha256": "d119ceda06b3cd050d9a6de716c1b33f888eb46231f9db3f3119b7a597c0eb0e"
+      }
+    },
+    "candidate": {
+      "env_enabled": true,
+      "supervisor_status": "pass",
+      "returncode": 0,
+      "elapsed_s": 210.11979073099792,
+      "minimum_available_gib": 14.403335571289062,
+      "minimum_admission_available_gib": 14.403335571289062,
+      "samples": 200,
+      "cgroup_memory_event_maxima": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "cpu_clock_observed_mhz_range": [
+        729.6,
+        2201.6
+      ],
+      "gpu_clock_observed_mhz_range": [
+        306.0,
+        1300.5
+      ],
+      "emc_clock": "unavailable: permission denied",
+      "requests": [
+        {
+          "name": "short-512",
+          "prompt_tokens": 512,
+          "output_tokens": 16,
+          "token_ids": [
+            27775,
+            383,
+            279,
+            3766,
+            1433,
+            11,
+            864,
+            16661,
+            11040,
+            314,
+            264,
+            8240,
+            314,
+            359,
+            87,
+            6
+          ],
+          "state": {
+            "L": "527",
+            "gdn": "911791ac0d9bdff3",
+            "ple": "626f14e4fdf0ece8",
+            "tail": "f0d169d30600df61",
+            "dead": "48fb10575fbf3848",
+            "pooled": "485d845673827d4a",
+            "pooled_full": "cd544165cac29b11",
+            "kv": "e698274fce6e7c42",
+            "ple_prev": "359,87"
+          }
+        },
+        {
+          "name": "long-2048",
+          "prompt_tokens": 2048,
+          "output_tokens": 16,
+          "token_ids": [
+            27775,
+            383,
+            279,
+            3766,
+            2002,
+            10142,
+            1433,
+            11,
+            567,
+            628,
+            22270,
+            264,
+            12103,
+            5215,
+            314,
+            4906
+          ],
+          "state": {
+            "L": "2063",
+            "gdn": "7c9175b49a5a12cb",
+            "ple": "26dd0679392b92e8",
+            "tail": "9f33ab52bfcabde6",
+            "dead": "01d30d2e242360e6",
+            "pooled": "3cef8caddee9c06d",
+            "pooled_full": "d08b0285f22899e8",
+            "kv": "09c43bd60da83a65",
+            "ple_prev": "5215,314"
+          }
+        },
+        {
+          "name": "short-512-recovery",
+          "prompt_tokens": 512,
+          "output_tokens": 16,
+          "token_ids": [
+            27775,
+            383,
+            279,
+            3766,
+            1433,
+            11,
+            864,
+            16661,
+            11040,
+            314,
+            264,
+            8240,
+            314,
+            359,
+            87,
+            6
+          ],
+          "state": {
+            "L": "527",
+            "gdn": "911791ac0d9bdff3",
+            "ple": "626f14e4fdf0ece8",
+            "tail": "f0d169d30600df61",
+            "dead": "48fb10575fbf3848",
+            "pooled": "485d845673827d4a",
+            "pooled_full": "cd544165cac29b11",
+            "kv": "e698274fce6e7c42",
+            "ple_prev": "359,87"
+          }
+        },
+        {
+          "name": "short-512-continuation-1",
+          "prompt_tokens": 512,
+          "output_tokens": 16,
+          "token_ids": [
+            27775,
+            383,
+            279,
+            3766,
+            1433,
+            11,
+            864,
+            16661,
+            11040,
+            314,
+            264,
+            8240,
+            314,
+            359,
+            87,
+            6
+          ],
+          "state": {
+            "L": "527",
+            "gdn": "911791ac0d9bdff3",
+            "ple": "626f14e4fdf0ece8",
+            "tail": "f0d169d30600df61",
+            "dead": "48fb10575fbf3848",
+            "pooled": "485d845673827d4a",
+            "pooled_full": "cd544165cac29b11",
+            "kv": "e698274fce6e7c42",
+            "ple_prev": "359,87"
+          }
+        }
+      ],
+      "same_service_recovery_token_differences": 0,
+      "same_service_recovery_state_changes": [],
+      "route_internal": {
+        "rows": 88,
+        "first_seven_activation_equal": 7,
+        "first_seven_expert_ids_equal": 7,
+        "first_seven_owner_flips": 0,
+        "later_activation_differences": 0
+      },
+      "binary_sha256": "c07cf3f634788d055316cbf345a2fa17dd66449cb5ddd8690781dbbd72403c88",
+      "artifacts": {
+        "service_log_gz_sha256": "fe27ff1bb62efc234a597de9b36934073a7c3980eb13517298b593eb071082f6",
+        "layer1_capture_gz_sha256": "2728aaa2a2bf5c6e9bd4222b8cec90e153183680f99256d2051a6c6dcbc1c652",
+        "memory_samples_gz_sha256": "491f1d3dd9d4c977719794f155db83b2fcf6478203f35e54f36b6071c5c12355",
+        "tegrastats_gz_sha256": "289b61b112ab44904660934ecee454a63d175d33242ea44a5f203380450315a5",
+        "supervisor_result_sha256": "8cd3acbb492ee9dfa98c453ce11be2b8da2682fdc853537a3b38a39576f7a9db"
+      }
+    }
+  },
+  "cross_arm_comparison": {
+    "requests": [
+      {
+        "name": "short-512",
+        "token_position_differences": 0,
+        "cross_arm_state_changed_keys": [
+          "gdn",
+          "tail",
+          "pooled",
+          "pooled_full",
+          "kv"
+        ]
+      },
+      {
+        "name": "long-2048",
+        "token_position_differences": 3,
+        "cross_arm_state_changed_keys": [
+          "gdn",
+          "ple",
+          "tail",
+          "pooled",
+          "pooled_full",
+          "kv",
+          "ple_prev"
+        ]
+      },
+      {
+        "name": "short-512-recovery",
+        "token_position_differences": 0,
+        "cross_arm_state_changed_keys": [
+          "gdn",
+          "tail",
+          "pooled",
+          "pooled_full",
+          "kv"
+        ]
+      },
+      {
+        "name": "short-512-continuation-1",
+        "token_position_differences": 0,
+        "cross_arm_state_changed_keys": [
+          "gdn",
+          "tail",
+          "pooled",
+          "pooled_full",
+          "kv"
+        ]
+      }
+    ],
+    "same_service_recovery_is_exact_in_both_arms": true,
+    "captured_layer": 1,
+    "captured_rows_per_arm": [
+      88,
+      88
+    ],
+    "shared_expert_assignments": 863,
+    "shared_assignments_CPU_owned_in_baseline": 549,
+    "owner_changes_on_shared_assignments": 0,
+    "first_captured_input_difference": {
+      "zero_based_capture_row": 42,
+      "expert_ids_equal": false,
+      "activation_equal": false
+    },
+    "route_kind_contract": {
+      "-1": "CPU",
+      "0": "primary VRAM"
+    }
+  },
+  "cuda_native_expert_parity_ctest": {
+    "passed": 16,
+    "failed": 0,
+    "output": "cuda-native-expert-parity-ctest.txt"
+  },
+  "backend_builds": {
+    "hip_configured_CPU_static_library_target": "passed; maestro1 x86_64 host compilation/link in HIP-configured build, no accelerator runtime; backend-builds/hip-cpu/target-build.txt",
+    "sycl_configured_CPU_static_library_target": "passed; maestro1 x86_64 host compilation/link in SYCL-configured build, no accelerator runtime; backend-builds/sycl-cpu/target-build.txt"
+  }
+}

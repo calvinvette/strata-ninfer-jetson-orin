@@ -1,6 +1,6 @@
 // src/kernels/cpu/native_expert.cpp - plan v0.3 P6: native (GGUF-form) experts on the CPU through ggml-cpu.
-// See the header.  Nothing here is Strata arithmetic: the activation quantizers and the row dot products are
-// ggml-cpu's, so an IQ expert computes what llama.cpp's CPU backend computes for it.
+// See the header. The default activation quantizers and row dot products are ggml-cpu's. An explicitly opt-in
+// IQ2_S/Q2_0 Q8_1 diagnostic route is implemented below for cross-backend contract experiments.
 #include "strata/kernels/cpu/native_expert.hpp"
 #include "strata/kernels/cpu/expert.hpp"
 #include "strata/platform/cpu_arch.hpp"
@@ -13,13 +13,44 @@
 #include "ggml-cpu.h"
 
 #include <cmath>
+#include <cstdio>
+#include <cstring>
 #include <cstdlib>
 #include <mutex>
+#include <vector>
 
 namespace strata::kernels::cpu {
 namespace {
 
 const ggml_type_traits_cpu* traits(int type) { return ggml_get_type_traits_cpu((ggml_type) type); }
+
+struct Q81Block { ggml_fp16_t d, s; int8_t qs[32]; };
+static_assert(sizeof(Q81Block) == 36, "GGML Q8_1 block layout");
+
+float q8_1_dot_dequantized(const float* w, const uint8_t* xq, int n) {
+    double acc = 0.0;
+    for (int off = 0; off < n; off += 32) {
+        Q81Block block{};
+        std::memcpy(&block, xq + (size_t) (off / 32) * sizeof(Q81Block), sizeof(Q81Block));
+        const float d = ggml_fp16_to_fp32(block.d);
+        for (int i = 0; i < 32; ++i) acc += (double) w[off + i] * d * block.qs[i];
+    }
+    return (float) acc;
+}
+
+void dequantize_weight_row(int type, const uint8_t* row, float* dst, int n) {
+    const auto* t = ggml_get_type_traits((ggml_type) type);
+    if (t == nullptr || t->to_float == nullptr) {
+        std::fprintf(stderr, "native Q8_1 dot: no GGUF dequantizer for weight type %d\n", type);
+        std::abort();
+    }
+    t->to_float(row, dst, n);
+}
+
+bool q8_1_scalar_dot(const NativeFmt& f) {
+    return f.gu_type == GGML_TYPE_IQ2_S && f.d_type == GGML_TYPE_Q2_0 &&
+           f.gu_act == GGML_TYPE_Q8_1 && f.d_act == GGML_TYPE_Q8_1;
+}
 
 void init_once() {
     static std::once_flag once;
@@ -67,6 +98,12 @@ bool native_fmt(int gu_type, int d_type, int64_t n_embd, int64_t n_ff, NativeFmt
     f.d_type = d_type;
     f.gu_act = (int) tg->vec_dot_type;
     f.d_act = (int) td->vec_dot_type;
+    const char* q8_1_probe = std::getenv("STRATA_NATIVE_CPU_Q8_1_DOT");
+    if (q8_1_probe != nullptr && std::atoi(q8_1_probe) != 0 &&
+        gu_type == GGML_TYPE_IQ2_S && d_type == GGML_TYPE_Q2_0) {
+        f.gu_act = GGML_TYPE_Q8_1;
+        f.d_act = GGML_TYPE_Q8_1;
+    }
     f.n_embd = n_embd;
     f.n_ff = n_ff;
     f.gu_row = ggml_row_size((ggml_type) gu_type, n_embd);
@@ -74,8 +111,8 @@ bool native_fmt(int gu_type, int d_type, int64_t n_embd, int64_t n_ff, NativeFmt
     f.up_off = f.gu_row * (size_t) n_ff;
     f.down_off = 2 * f.up_off;
     f.bytes = f.down_off + f.d_row * (size_t) n_embd;
-    f.act_bytes = ggml_row_size(tg->vec_dot_type, n_embd);
-    f.h_bytes = ggml_row_size(td->vec_dot_type, n_ff);
+    f.act_bytes = ggml_row_size((ggml_type) f.gu_act, n_embd);
+    f.h_bytes = ggml_row_size((ggml_type) f.d_act, n_ff);
     if (f.act_bytes > kNativeActBytes || f.h_bytes > kNativeHBytes) {
         err = "native experts: activation larger than the pool's buffers";
         return false;
@@ -129,6 +166,22 @@ int native_gu_mt_min(int gu_type) {
 
 void native_gu_rows(const NativeFmt& f, const uint8_t* blob, const void* const* act, int nt, float* const* ff,
                     int r0, int r1) {
+    if (q8_1_scalar_dot(f)) {
+        std::vector<float> gate((size_t) f.n_embd), up((size_t) f.n_embd);
+        for (int r = r0; r < r1; ++r) {
+            const uint8_t* gr = blob + (size_t) r * f.gu_row;
+            const uint8_t* ur = blob + f.up_off + (size_t) r * f.gu_row;
+            dequantize_weight_row(f.gu_type, gr, gate.data(), (int) f.n_embd);
+            dequantize_weight_row(f.gu_type, ur, up.data(), (int) f.n_embd);
+            for (int t = 0; t < nt; ++t) {
+                const auto* xq = (const uint8_t*) act[t];
+                const float g = q8_1_dot_dequantized(gate.data(), xq, (int) f.n_embd);
+                const float u = q8_1_dot_dequantized(up.data(), xq, (int) f.n_embd);
+                ff[t][r] = (g / (1.f + std::exp(-g))) * u;
+            }
+        }
+        return;
+    }
     // the multi-token kernels decode the weights once for all tokens: 2.0-2.4x ggml-cpu at three tokens, no faster
     // at one (all are bound by the codebook lookups, ~5 GB/s per core), measured by native_expert_parity.  AVX-512
     // first, then the AVX-2 one (Zen 2/3, Intel 12th-14th gen).  STRATA_NO_IQ512 drops an AVX-512 CPU to the
@@ -184,6 +237,16 @@ void native_gu_rows(const NativeFmt& f, const uint8_t* blob, const void* const* 
 
 void native_down_rows(const NativeFmt& f, const uint8_t* blob, const void* const* hq, int nt, float* const* out,
                       int r0, int r1) {
+    if (q8_1_scalar_dot(f)) {
+        std::vector<float> down((size_t) f.n_ff);
+        for (int r = r0; r < r1; ++r) {
+            const uint8_t* dr = blob + f.down_off + (size_t) r * f.d_row;
+            dequantize_weight_row(f.d_type, dr, down.data(), (int) f.n_ff);
+            for (int t = 0; t < nt; ++t)
+                out[t][r] = q8_1_dot_dequantized(down.data(), (const uint8_t*) hq[t], (int) f.n_ff);
+        }
+        return;
+    }
     // IQ4_NL down rows: the AVX-2 multi-token kernel decodes the nibbles and absolutises the weights once per
     // block instead of once per token; ggml-cpu's dot is single-token.  STRATA_NO_IQ4NL falls back to it.
 #if STRATA_CPU_X86
