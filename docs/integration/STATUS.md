@@ -11,7 +11,9 @@ kernel for the packed Q2_0 expert layout, while this Coder pack stores native,
 per-layer GGUF expert formats (including IQ3_XXS/IQ4_NL). The command accepted
 that incompatible combination, so its output and state results are not valid
 evidence about CPU-order arithmetic. A startup guard now rejects the option for
-native packs; Phase 5 remains open.
+native packs. The guard built on Orin CUDA and in a targeted maestro1 HIP
+service rebuild; the matching Coder config exited with status 2 before serving.
+maestro1's HIP result is compile/CLI evidence only. Phase 5 remains open.
 
 Phase 6's same-binary Q2_0 int8-KV [MTP × prompt-length study](../../bench/results/2026-10-16-phase6-q2-int8-mtp3-workload-interaction/README.md) completed its 12-arm screen and corrected 28-arm held-out confirmation. The confirmation passed all 14 paired blocks with no rejected cells, including the independent short-task suffix-sum oracle. MTP3 reduced median prompt throughput 13.65% at 512 tokens and 8.56% at 7,501 tokens; client total time increased 7.60% and 8.63%. The prompt-throughput interaction estimate was +5.89% (paired-process bootstrap 95% interval 1.0009–1.0680), while decode-TPS and client-total interaction intervals included no effect. This supports only a borderline difference in the penalty between these prompts; it does not promote MTP3 or close Phase 6's other interactions.
 
