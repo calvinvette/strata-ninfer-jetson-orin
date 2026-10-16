@@ -114,18 +114,19 @@ changed seven fields and six token positions versus its own initial short
 request. This one block does not show that Q8_1 resolves swap-dependent state
 drift; no quality or speed claim follows. Phase 5 remains open.
 
-A randomized [first-divergence trace and captured-input operator check](../../bench/results/2026-10-16-phase5-coder-q8_1-first-divergence-trace/README.md)
+A four-pair [first-divergence trace and captured-input operator check](../../bench/results/2026-10-16-phase5-coder-q8_1-first-divergence-trace/README.md)
 then localized an early route-dependent difference on the same Coder IQ1_M
-snapshot. Default and Q8_1-mirror service activations first differed at
-dispatch 1394, layer 2, while expert IDs and owners still matched. On the
-bitwise-identical preceding layer-1 activation, all four CPU-owned IQ2_S/Q2_0
-expert rows differed from CUDA under the default CPU route (all 7,680 words per
-row; relative L1 1.23e-2–1.57e-2); the CUDA-row mirror matched CUDA bitwise for
-all four. The following layer-2 activation differed by relative L1 0.00381.
-The service still differed at 3/16 long-response and 13/16 continuation token
-positions, so this identifies a plausible arithmetic contribution without
-establishing a full-service fix. This one pair is diagnostic only; it makes no
-performance or quality claim. Phase 5 remains open.
+snapshot, with the final pair running the mirror first. Every pair first
+differed at dispatch 1394, layer 2, while expert IDs and owners still matched.
+On the bitwise-identical preceding layer-1 activation, all four CPU-owned
+IQ2_S/Q2_0 expert rows differed from CUDA under the default CPU route (all
+7,680 words per row; relative L1 1.23e-2–1.57e-2); the CUDA-row mirror matched
+CUDA bitwise for all four. Layer-2 relative L1 was 0.00381 in every pair. The
+service differed at 3/16 long-response and 13/16 continuation token positions
+in all four pairs, so this identifies a repeatable arithmetic contribution
+without establishing a full-service fix. All eight arms passed with at least
+14.35 GiB availability and no cgroup memory events. This is diagnostic only;
+it makes no performance or quality claim. Phase 5 remains open.
 
 A supervised [Coder IQ1_M MTP cancellation check](../../bench/results/2026-10-16-phase5-coder-mtp-cancel-parity-current/README.md)
 canceled after eight streamed deltas and 12 committed tokens. Same-service
