@@ -61,7 +61,35 @@ short prompt SHA256 is
 `e60c2022729fa4c503ce617b82f6e90202520b97ea257e8977e5c4bf2f3482fb`; the
 near-limit prompt hash remains
 `1d5e95c1a742a7a7b1df09568017825c412c0ecdb478deb5974a1369544c69c0`. The
-campaign design tests pass 6/6, and the plan-only check lists 28 arms on the
-same binary and artifact set. Confirmation attempt 2 is prepared but not yet
-measured. No held-out interaction result is established until all pairs pass
-the independent workload oracles.
+campaign design tests pass 6/6. Attempt 2 in `confirm-2/` completed all 28
+arms, and analysis passed 14 independent pairs with no rejected cells. Every
+short response returned the exact three planted codes and `SUM=1478`; every
+near-limit response returned its three exact planted codes. The campaign kept
+the same binary and model/artifact checksums as the screen.
+
+In held-out confirmation, median prompt throughput was 36.62 tokens/s baseline
+versus 31.44 with MTP3 at 512 tokens, and 62.99 versus 57.62 at 7,501 tokens.
+That is a 13.65% and 8.56% slowdown, respectively, by the median paired
+candidate/baseline ratio. Median decode throughput changed by +6.00% at 512
+tokens (paired 95% interval −0.80% to +8.53%) and +4.82% at 7,501 tokens
+(+2.88% to +9.47%). Client total time increased by 7.60% and 8.63%.
+
+The long-over-short ratio of MTP's paired prompt-throughput effects was +5.89%
+(independent paired-process bootstrap 95% interval 1.0009–1.0680). This is
+borderline evidence that the prompt-throughput penalty is smaller at 7,501
+tokens than at 512, while both workloads remain slower with MTP3. Decode-TPS
+interaction was −1.11% (0.9480–1.0936), client-TTFT interaction was −5.41%
+(0.9376–1.0003), and client-total interaction was +0.95% (0.9784–1.0770);
+those intervals include no interaction. The evidence does not support
+promoting MTP3 as a default or a general workload recommendation.
+
+Across the 28 arms, minimum host availability was 17.03 GiB and minimum
+admission availability was 10.12 GiB, above the six-GiB floor. Cgroup `low`,
+`high`, `max`, `oom` and `oom_kill` counters stayed zero. Observed CPU clocks
+ranged 729.6–2,201.6 MHz, GPU clocks 306–1,300.5 MHz, and `tj` 49.8–57.9 °C.
+EMC readback remained unavailable. Named rail energy is retained as board-rail
+diagnostics, not request-attributed energy.
+
+This completes the MTP × prompt-length screen and held-out confirmation for
+these prompts, model and profile. Phase 6 remains open for its other planned
+interactions; these findings do not close the broader optimization phase.

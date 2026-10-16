@@ -59,8 +59,10 @@ six complete workload pairs and no rejected cells; results and the screen-only
 interaction estimates are in [README.md](README.md). Confirmation attempt 1's
 short-task responses failed the independent suffix-sum oracle because its
 prompt did not explicitly request that arithmetic; those cells are excluded.
-The prompt was corrected and a new seven-pair-per-workload confirmation is
-prepared under `confirmation/`. Run it with `run_campaign.py --suite confirm
---campaign-name confirm-2`; analyze it separately after all 28 arms finish.
-The runner checks model files while the campaign lock is idle and verifies the
-binary before and after every arm.
+The corrected seven-pair-per-workload confirmation completed all 28 arms in
+`confirm-2/`. Independent analysis passed 14 pairs with no rejected cells. Its
+workload-specific effects and bootstrap interaction intervals are in
+[README.md](README.md); the MTP × prompt-length result does not promote a
+default, and Phase 6 remains open for other interactions. Attempt 1 remains
+preserved and excluded because its short prompt did not ask for the independent
+suffix-sum task.
