@@ -107,6 +107,25 @@ it is evidence for that exact pairing and one cancellation point, not a
 Coder-specific MTP artifact or broad cancellation qualification. Phase 5
 remains open.
 
+A randomized three-block [Coder IQ1_M short-task MTP screen](../../bench/results/2026-10-16-phase5-coder-mtp-window-screen/screen-short/README.md)
+and [near-limit MTP screen](../../bench/results/2026-10-16-phase5-coder-mtp-window-screen/screen-near-limit/README.md)
+completed both a 512-token and a 7,501-token retrieval task at 8K context, with
+MTP off/2/3/4, FP16 KV and static expert residency. All 24 measured responses
+matched their independent retrieval oracle. In the short-task screen, decode
+throughput rose 7.40%, 11.84% and 13.61% for MTP2/3/4; at near-limit length,
+MTP3 was 1.62% slower and MTP4 7.65% faster by median paired decode rate.
+MTP4's median client request-time change was +0.19%, so the decode gain did not
+produce an end-to-end request win on the prompt-dominated workload. One near-
+limit MTP2 pair initially loaded 121 fewer expert slots than its control and
+was excluded from timing analysis. A separate [three-block fixed-cache
+recheck](../../bench/results/2026-10-16-phase5-coder-mtp-window-screen/screen-near-limit-mtp2-fixed-cache/README.md)
+matched 3,378 resident slots in all pairs, but one MTP2 request had a 9.92-second
+stream gap; its paired decode-rate interval remained very wide (−76.66% to
++0.35%). This leaves MTP2 near-limit timing inconclusive. Both reports retain
+model/runtime identities, raw paired measurements and memory telemetry. These
+are screens for one Coder IQ1_M task and FP16 KV, not confirmation or a profile
+recommendation. Phases 5–7 remain open.
+
 Phase 6's same-binary Q2_0 int8-KV [MTP × prompt-length study](../../bench/results/2026-10-16-phase6-q2-int8-mtp3-workload-interaction/README.md) completed its 12-arm screen and corrected 28-arm held-out confirmation. The confirmation passed all 14 paired blocks with no rejected cells, including the independent short-task suffix-sum oracle. MTP3 reduced median prompt throughput 13.65% at 512 tokens and 8.56% at 7,501 tokens; client total time increased 7.60% and 8.63%. The prompt-throughput interaction estimate was +5.89% (paired-process bootstrap 95% interval 1.0009–1.0680), while decode-TPS and client-total interaction intervals included no effect. This supports only a borderline difference in the penalty between these prompts; it does not promote MTP3 or close Phase 6's other interactions.
 
 A new seven-block Q2_0 [task-qualified graph × MTP confirmation](../../bench/results/2026-10-16-phase6-q2-graph-mtp-quality-confirm7/README.md) reran all 28 captured/eager × MTP-off/window-2 cells on the validated 2,094-token processor task. Every arm naturally stopped at 293 tokens, passed the task rubric, and produced byte-identical output. Graph/eager effects and graph × MTP interaction intervals included no change. MTP2 increased request time 4.12% captured and 3.86% eager, and reduced decode throughput 6.10% and 4.94%; those request/decode intervals exclude zero. MTP2 offered/accepted 153/97 drafts each run. Minimum host/admission availability was 16.925/11.630 GiB and all cgroup event counters remained zero. This closes the quality gap for this graph × MTP cell only; no profile is promoted and Phase 6 remains open.

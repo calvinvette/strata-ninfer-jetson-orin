@@ -1,0 +1,17 @@
+systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes \
+  python3 tools/integration/mtp_window_screen.py \
+  --config bench/results/2026-10-16-phase5-coder-mtp-window-screen/config.json \
+  --workloads bench/results/2026-10-16-phase5-coder-mtp-window-screen/workloads.json \
+  --warmup-workloads bench/results/2026-10-16-phase5-coder-mtp-window-screen/warmup-workloads.json \
+  --output bench/results/2026-10-16-phase5-coder-mtp-window-screen/screen-short \
+  --workload-cell coder-mtp-retrieval-short-512 \
+  --windows 0 2 3 4 --blocks 3 --seed 20261016 --first-port 19100
+
+systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes \
+  python3 tools/integration/mtp_window_screen.py \
+  --config bench/results/2026-10-16-phase5-coder-mtp-window-screen/config.json \
+  --workloads bench/results/2026-10-16-phase5-coder-mtp-window-screen/workloads.json \
+  --warmup-workloads bench/results/2026-10-16-phase5-coder-mtp-window-screen/warmup-workloads.json \
+  --output bench/results/2026-10-16-phase5-coder-mtp-window-screen/screen-near-limit \
+  --workload-cell coder-mtp-retrieval-near-limit-7501 \
+  --windows 0 2 3 4 --blocks 3 --seed 20261017 --first-port 19140

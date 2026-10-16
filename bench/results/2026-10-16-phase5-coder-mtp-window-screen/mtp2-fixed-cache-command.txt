@@ -1,0 +1,8 @@
+systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes \
+  python3 tools/integration/mtp_window_screen.py \
+  --config bench/results/2026-10-16-phase5-coder-mtp-window-screen/mtp2-fixed-cache-config.json \
+  --workloads bench/results/2026-10-16-phase5-coder-mtp-window-screen/workloads.json \
+  --warmup-workloads bench/results/2026-10-16-phase5-coder-mtp-window-screen/warmup-workloads.json \
+  --output bench/results/2026-10-16-phase5-coder-mtp-window-screen/screen-near-limit-mtp2-fixed-cache \
+  --workload-cell coder-mtp-retrieval-near-limit-7501 \
+  --windows 0 2 --blocks 3 --seed 20261018 --first-port 19200

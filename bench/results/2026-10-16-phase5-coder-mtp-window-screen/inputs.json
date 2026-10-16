@@ -1,0 +1,35 @@
+{
+  "repository_head": "02ca0a8d",
+  "source_code_commit_for_binary": "0464d128",
+  "service_binary_sha256": "c07cf3f634788d055316cbf345a2fa17dd66449cb5ddd8690781dbbd72403c88",
+  "target_model": {
+    "repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+    "revision": "5348543e0147355ac9cbcb031184a3546350988e",
+    "quantization": "IQ1_M",
+    "local_path": "~/models/strata-orin-validation/Coder-GGUF/IQ1_M",
+    "shard_sha256_file": "model-sha256.txt"
+  },
+  "mtp_source": {
+    "repository": "Qwen/Qwen3.8-Flash-Next",
+    "revision": "de4b8e4d43b917e7706784d8bb445c9af86a3540",
+    "local_runtime_path": "~/models/strata-orin-validation/mtp/rt",
+    "runtime_hash_file": "mtp-runtime-sha256.txt",
+    "is_coder_specific": false
+  },
+  "profile": {
+    "context_tokens": 8192,
+    "mtp_windows": [0, 2, 3, 4],
+    "prompt_tokens": [512, 7501],
+    "requested_expert_cache_slots": 3000,
+    "expert_profile": "data/expert-profile-coder.bin",
+    "kv_format": "FP16",
+    "prefill_chunk_tokens": 64,
+    "pool_workers": 8,
+    "adaptive_swaps": "disabled by the screen harness",
+    "prompt_cache": "disabled by the screen harness",
+    "supervisor_memory_max": "28G",
+    "physical_availability_floor_gib": 6
+  },
+  "workload_origin": "Q2_0 short and near-limit retrieval-plus-suffix-sum workload fixtures, reused as fixed independent quality oracles across this Coder model cohort; rendered prompt lengths were rechecked with the configured Strata tokenizer.",
+  "screen_design": "three randomized blocks per workload; one warmup and one measured API request per fresh service; no accepted-prefix tracing; same binary/model/profile except MTP window; dynamic clocks"
+}
