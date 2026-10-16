@@ -1,0 +1,64 @@
+{
+  "model_repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+  "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
+  "model_quantization": "IQ1_M",
+  "model_sha256": "e11083ba855e7666b48ea3f2db6a9c3a20c18751a012cc24f948de91b7087fad",
+  "route_evidence": {
+    "block": 0,
+    "request": "short-512",
+    "layer": 1,
+    "row": 10,
+    "activation_equal": true,
+    "expert_ids_equal": true,
+    "owner_changes": [
+      {
+        "expert": 95,
+        "delayed_control_kind": -1,
+        "swap8_kind": 0
+      },
+      {
+        "expert": 26,
+        "delayed_control_kind": 0,
+        "swap8_kind": -1
+      }
+    ],
+    "kind_contract": {
+      "-1": "CPU",
+      "0": "primary VRAM"
+    }
+  },
+  "activation_sha256": "3881ce60e3bf35b6673aeb7a825c75f85b7b31cccff955fca7fe4cf44ef26967",
+  "parity_binary_sha256": "14387113faabf64e31261f65cfa5977a3d9ef2ea946995be69d71b446baba53e",
+  "runs": [
+    {
+      "expert": 95,
+      "command": [
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/candidate/native_expert_parity",
+        "/home/calvin/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--expert",
+        "95",
+        "--activation-f32",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-16-phase5-coder-swap-budget-screen/route-oracle-layer1/layer1-row10.f32",
+        "--dump-f32-dir",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-16-phase5-coder-swap-budget-screen/route-oracle-layer1/expert-95",
+        "1"
+      ],
+      "returncode": 0
+    },
+    {
+      "expert": 26,
+      "command": [
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/candidate/native_expert_parity",
+        "/home/calvin/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--expert",
+        "26",
+        "--activation-f32",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-16-phase5-coder-swap-budget-screen/route-oracle-layer1/layer1-row10.f32",
+        "--dump-f32-dir",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-16-phase5-coder-swap-budget-screen/route-oracle-layer1/expert-26",
+        "1"
+      ],
+      "returncode": 0
+    }
+  ]
+}

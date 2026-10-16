@@ -1,0 +1,56 @@
+{
+  "status": "pass",
+  "method": "native packed CPU/GPU expert kernels plus independently reconstructed Q8_K/Q8_0 and Q8_1/Q8_1 activation oracles over GGUF-dequantized weights and CBLAS FP32 dots",
+  "limitations": [
+    "one captured activation, two layer-1 experts, one block",
+    "diagnostic isolates operator sensitivity and does not prove complete service-level causality"
+  ],
+  "route_evidence": {
+    "block": 0,
+    "request": "short-512",
+    "layer": 1,
+    "row": 10,
+    "activation_equal": true,
+    "expert_ids_equal": true,
+    "owner_changes": [
+      {
+        "expert": 95,
+        "delayed_control_kind": -1,
+        "swap8_kind": 0
+      },
+      {
+        "expert": 26,
+        "delayed_control_kind": 0,
+        "swap8_kind": -1
+      }
+    ],
+    "kind_contract": {
+      "-1": "CPU",
+      "0": "primary VRAM"
+    }
+  },
+  "records": [
+    {
+      "expert": 95,
+      "activation_sha256": "3881ce60e3bf35b6673aeb7a825c75f85b7b31cccff955fca7fe4cf44ef26967",
+      "actual_cpu_vs_gpu_relative_l1": 0.013028463891860484,
+      "shared_weight_q8k_vs_q81_oracle_relative_l1": 0.013039574919178232,
+      "actual_cpu_vs_q8k_oracle_relative_l1": 1.3235573933815152e-07,
+      "actual_gpu_vs_q81_oracle_relative_l1": 0.0006313784567417095,
+      "actual_vs_oracle_delta_residual_relative_l1": 0.04846359225003183,
+      "cpu_vs_float_weight_relative_l1": 0.01248091330663458,
+      "gpu_vs_float_weight_relative_l1": 0.010422309977512685
+    },
+    {
+      "expert": 26,
+      "activation_sha256": "3881ce60e3bf35b6673aeb7a825c75f85b7b31cccff955fca7fe4cf44ef26967",
+      "actual_cpu_vs_gpu_relative_l1": 0.014433010679089047,
+      "shared_weight_q8k_vs_q81_oracle_relative_l1": 0.014429979351079114,
+      "actual_cpu_vs_q8k_oracle_relative_l1": 1.268738002217469e-07,
+      "actual_gpu_vs_q81_oracle_relative_l1": 0.0008706270696955661,
+      "actual_vs_oracle_delta_residual_relative_l1": 0.0603230737634819,
+      "cpu_vs_float_weight_relative_l1": 0.013220185932985969,
+      "gpu_vs_float_weight_relative_l1": 0.010521705445902729
+    }
+  ]
+}

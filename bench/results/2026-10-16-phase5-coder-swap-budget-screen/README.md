@@ -69,3 +69,44 @@ host/admission availability was 14.33 GiB across 1,196 samples, with zero
 sampled cgroup memory events. All 15 adaptive byte and residency checks passed
 in each cap-8 service. Clock observations remained dynamic; energy was not
 attributed per request.
+
+## All-layer route trace and operator oracle — 2026-10-16
+
+To locate the earliest state divergence, three further randomized delayed-
+control/cap-8 blocks captured all 48 layers for the same initial 512-token and
+2,048-token requests. Each of the six services passed supervision; minimum
+host/admission availability was 13.85 GiB, above the six-GiB floor, and sampled
+cgroup pressure/OOM counters stayed zero. Raw compressed traces and the
+row-by-row comparison are under `all-layer-campaign/`.
+
+All three blocks reproduced the same first short-request owner changes at
+layer 1, row 10: expert 26 moved primary VRAM to CPU and expert 95 moved CPU to
+primary VRAM, while the activation and expert IDs were identical. At layer 2,
+row 10, activations first differed (12 rows in that layer) while selected expert
+IDs still matched. For the long request, layer 1, first row (capture row 22)
+showed experts 11, 95, 165 and 205 moving CPU to primary VRAM with identical
+activation and IDs. The first layer-0 activation differences came later, at
+capture rows 42–43, where selected expert IDs were entirely different; those
+rows are not interpreted as owner migrations.
+
+The same captured layer-1 activations were run through the packed native CPU
+and GPU kernels and an independent oracle using GGUF-dequantized weights,
+CBLAS FP32 dots, and the respective Q8_K/Q8_0 versus Q8_1/Q8_1 activation
+contracts. For short-request experts 95 and 26, observed CPU/GPU relative-L1
+differences were 1.303% and 1.443%; reconstructed differences were 1.304% and
+1.443%, with delta residuals 4.85% and 6.03%. For long-request experts 11,
+95, 165 and 205, observed differences were 1.140%, 1.471%, 1.110% and 1.275%;
+reconstructed differences were 1.142%, 1.472%, 1.107% and 1.275%, with delta
+residuals 1.23%, 3.83%, 4.72% and 0.85%. Native expert parity CTests passed
+15/15 before these targeted runs. Oracle details, inputs, outputs and commands
+are retained in `route-oracle-layer1/`; derived weight dumps were removed.
+The first long-oracle launcher stopped before kernel calls because its assertion
+assumed a fixed expert-array order; the captured expert-keyed assignments were
+correct. That preflight failure is retained in `long-supervisor/`; the corrected
+expert-keyed retry passed in `long-supervisor-retry1/`.
+
+This repeated trace plus isolated oracle is strong evidence that adaptive
+residency changes expose different CPU/GPU activation quantization and seed the
+later numerical divergence. It is not a full service-state causal proof, a
+performance comparison, or a Strata-versus-NInfer result. Persistent state and
+continuation still fail the cap-8 recovery criterion, so Phase 5 remains open.

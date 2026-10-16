@@ -1,0 +1,88 @@
+{
+  "status": "pass",
+  "method": "native packed CPU/GPU expert kernels plus independently reconstructed Q8_K/Q8_0 and Q8_1/Q8_1 activation oracles over GGUF-dequantized weights and CBLAS FP32 dots",
+  "limitations": [
+    "one captured activation per routed expert, one block",
+    "operator sensitivity does not by itself prove complete service-level causality"
+  ],
+  "route_evidence": {
+    "block": 0,
+    "request": "long-2048",
+    "layer": 1,
+    "row": 0,
+    "activation_equal": true,
+    "expert_ids_equal": true,
+    "owner_changes": [
+      {
+        "expert": 11,
+        "delayed_control_kind": -1,
+        "swap8_kind": 0
+      },
+      {
+        "expert": 95,
+        "delayed_control_kind": -1,
+        "swap8_kind": 0
+      },
+      {
+        "expert": 165,
+        "delayed_control_kind": -1,
+        "swap8_kind": 0
+      },
+      {
+        "expert": 205,
+        "delayed_control_kind": -1,
+        "swap8_kind": 0
+      }
+    ],
+    "kind_contract": {
+      "-1": "CPU",
+      "0": "primary VRAM"
+    }
+  },
+  "records": [
+    {
+      "expert": 11,
+      "activation_sha256": "de5315bb9e17f5da8521697d02d5be760b24c4cd8e2b90969ec430466fa26788",
+      "actual_cpu_vs_gpu_relative_l1": 0.011403815741208334,
+      "shared_weight_q8k_vs_q81_oracle_relative_l1": 0.011416113429859247,
+      "actual_cpu_vs_q8k_oracle_relative_l1": 1.0332875504559522e-07,
+      "actual_gpu_vs_q81_oracle_relative_l1": 0.00014017091240169433,
+      "actual_vs_oracle_delta_residual_relative_l1": 0.01229258540648897,
+      "cpu_vs_float_weight_relative_l1": 0.009641612823786198,
+      "gpu_vs_float_weight_relative_l1": 0.008146499796675808
+    },
+    {
+      "expert": 95,
+      "activation_sha256": "de5315bb9e17f5da8521697d02d5be760b24c4cd8e2b90969ec430466fa26788",
+      "actual_cpu_vs_gpu_relative_l1": 0.014714485426728445,
+      "shared_weight_q8k_vs_q81_oracle_relative_l1": 0.014718604750321202,
+      "actual_cpu_vs_q8k_oracle_relative_l1": 1.2855651963086805e-07,
+      "actual_gpu_vs_q81_oracle_relative_l1": 0.0005639764200515285,
+      "actual_vs_oracle_delta_residual_relative_l1": 0.038330630179087055,
+      "cpu_vs_float_weight_relative_l1": 0.013857069178880096,
+      "gpu_vs_float_weight_relative_l1": 0.011306545383863833
+    },
+    {
+      "expert": 165,
+      "activation_sha256": "de5315bb9e17f5da8521697d02d5be760b24c4cd8e2b90969ec430466fa26788",
+      "actual_cpu_vs_gpu_relative_l1": 0.011096333229761396,
+      "shared_weight_q8k_vs_q81_oracle_relative_l1": 0.01106935616774175,
+      "actual_cpu_vs_q8k_oracle_relative_l1": 1.1132434073522661e-07,
+      "actual_gpu_vs_q81_oracle_relative_l1": 0.0005235199099765356,
+      "actual_vs_oracle_delta_residual_relative_l1": 0.04718092095542652,
+      "cpu_vs_float_weight_relative_l1": 0.009355759947487692,
+      "gpu_vs_float_weight_relative_l1": 0.008473236576790317
+    },
+    {
+      "expert": 205,
+      "activation_sha256": "de5315bb9e17f5da8521697d02d5be760b24c4cd8e2b90969ec430466fa26788",
+      "actual_cpu_vs_gpu_relative_l1": 0.012749494016606395,
+      "shared_weight_q8k_vs_q81_oracle_relative_l1": 0.012746014604619566,
+      "actual_cpu_vs_q8k_oracle_relative_l1": 1.0433675432930523e-07,
+      "actual_gpu_vs_q81_oracle_relative_l1": 0.00010807352576501388,
+      "actual_vs_oracle_delta_residual_relative_l1": 0.00847701316159007,
+      "cpu_vs_float_weight_relative_l1": 0.01171649560763634,
+      "gpu_vs_float_weight_relative_l1": 0.009833890282372425
+    }
+  ]
+}
