@@ -10,7 +10,7 @@ import subprocess
 import sys
 import time
 
-from campaign_plan import make_schedule
+from campaign_plan import make_schedule, workload_filename
 
 ROOT = Path(__file__).resolve().parents[3]
 HERE = Path(__file__).resolve().parent
@@ -94,10 +94,8 @@ def verify_artifacts_while_idle():
 
 
 def workload_path(suite, workload):
-    if suite == "screen":
-        return HERE / ("workload-short.json" if workload == "short" else "workload-near-limit.json")
-    return HERE / "confirmation" / ("workload-short.json" if workload == "short"
-                                    else "workload-near-limit.json")
+    root = HERE if suite == "screen" else HERE / "confirmation"
+    return root / workload_filename(workload)
 
 
 def config_path(variant):

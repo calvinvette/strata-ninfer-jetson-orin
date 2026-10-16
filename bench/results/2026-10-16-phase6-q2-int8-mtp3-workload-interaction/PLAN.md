@@ -54,9 +54,12 @@ default-selection claim. Keep the screen separate from held-out confirmation.
 
 ## Current status
 
-Planning and harness preparation only; no interaction measurements have run.
-`bench/results/2026-10-15-phase7-current-source-coder-iq1m-256k/` currently owns
-the Orin campaign. Generate the confirmation prompts and start the screen only
-after that supervisor reaches a terminal state. The runner rejects a different
-binary hash, checks model files while the campaign lock is idle, and verifies
-the binary again after every cell.
+The randomized three-pair screen completed all 12 arms and passed analysis with
+six complete workload pairs and no rejected cells; results and the screen-only
+interaction estimates are in [README.md](README.md). The screen suggests a
+possible decode interaction, so distinct 512- and 7,501-token held-out prompts
+have been generated and validated. Run the seven-pair-per-workload confirmation
+with the same pinned model and binary using `run_campaign.py --suite confirm
+--campaign-name confirm-1`; analyze it separately after all 28 arms finish.
+The runner checks model files while the campaign lock is idle and verifies the
+binary before and after every arm.

@@ -9,6 +9,15 @@ from pathlib import Path
 WORKLOADS = ("short", "near_limit")
 VARIANTS = ("baseline", "candidate")
 DEFAULT_SEED = 20261016
+WORKLOAD_FILENAMES = {"short": "workload-short.json",
+                      "near_limit": "workload-near-limit.json"}
+
+
+def workload_filename(name):
+    try:
+        return WORKLOAD_FILENAMES[name]
+    except KeyError as error:
+        raise ValueError(f"unknown workload: {name}") from error
 
 
 def make_schedule(repetitions, seed=DEFAULT_SEED):

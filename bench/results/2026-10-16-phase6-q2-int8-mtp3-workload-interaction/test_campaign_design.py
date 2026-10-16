@@ -6,9 +6,9 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from campaign_plan import make_schedule
+from campaign_plan import make_schedule, workload_filename
 from analyze_interaction import interaction_interval, marker_check
-from run_campaign import config_path
+from run_campaign import config_path, workload_path
 
 
 class CampaignDesignTests(unittest.TestCase):
@@ -17,6 +17,13 @@ class CampaignDesignTests(unittest.TestCase):
         self.assertEqual(config_path("candidate").name, "config-mtp3.json")
         self.assertTrue(config_path("baseline").is_file())
         self.assertTrue(config_path("candidate").is_file())
+
+    def test_confirmation_workload_names_match_runner_paths(self):
+        for name in ("short", "near_limit"):
+            with self.subTest(name=name):
+                self.assertEqual(workload_filename(name), workload_path("confirm", name).name)
+                self.assertEqual(workload_filename(name), workload_path("screen", name).name)
+                self.assertTrue((HERE / workload_filename(name)).is_file())
 
     def test_screen_and_confirmation_are_complete_randomized_pairs(self):
         for repetitions in (3, 7):

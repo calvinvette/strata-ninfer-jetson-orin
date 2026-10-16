@@ -9,8 +9,10 @@ import sys
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from tools.conversation_cache_parity import load_tokenizer
 from serve.frontend import ChatTemplate
+from campaign_plan import workload_filename
 
 NEEDLES = {
     "short": (("10%", "CITRUS-AXLE-431"),
@@ -101,7 +103,7 @@ def main():
     generated = {}
     for name in ("short", "near_limit"):
         workload, rows, padding = exact_workload(name, encode)
-        filename = f"workload-{name}.json"
+        filename = workload_filename(name)
         generated[filename] = workload
         manifest["workloads"][name] = {
             "path": filename,
