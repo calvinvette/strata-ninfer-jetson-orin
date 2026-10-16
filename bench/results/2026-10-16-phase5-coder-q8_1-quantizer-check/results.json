@@ -1,0 +1,50 @@
+{
+  "scope": "actual GGML CPU Q8_1 and Strata CUDA native Q8_1 blocks on two captured layer-1 activations, with independent scalar block-formula check; quantizer only",
+  "host": "Orin1, aarch64 / CUDA",
+  "model_repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+  "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
+  "model_quantization": "IQ1_M",
+  "model_shard_sha256": [
+    "e11083ba855e7666b48ea3f2db6a9c3a20c18751a012cc24f948de91b7087fad",
+    "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+  ],
+  "source_commit_before_diagnostic": "d38901fc",
+  "diagnostic_source_sha256": "afbfe84c574ff990e7341097cf8f91b2eb30bef36c11b57d5a651f715e317c18",
+  "diagnostic_binary_sha256": "dc3b04b769fee033f9e5c4d54e4d4e7c69541764c5809e221a6cfe79433d4746",
+  "runs": [
+    {
+      "input": "bench/results/2026-10-16-phase5-coder-swap-budget-screen/route-oracle-layer1/layer1-row10.f32",
+      "input_sha256": "3881ce60e3bf35b6673aeb7a825c75f85b7b31cccff955fca7fe4cf44ef26967",
+      "command": "/home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/candidate/native_expert_parity --q8_1-quantizer --activation-f32 /home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-16-phase5-coder-swap-budget-screen/route-oracle-layer1/layer1-row10.f32",
+      "returncode": 0,
+      "stdout": "captured activation Q8_1 blocks=80: CPU/GPU scale mismatches=0, code mismatches=0, stored-sum mismatches=76 (GGML d*sum(q), CUDA sum(input)); independent formula block failures=0\nnative_expert_parity: 0 failures\n",
+      "stderr": ""
+    },
+    {
+      "input": "bench/results/2026-10-16-phase5-coder-swap-budget-screen/route-oracle-layer1/layer1-long-row0.f32",
+      "input_sha256": "de5315bb9e17f5da8521697d02d5be760b24c4cd8e2b90969ec430466fa26788",
+      "command": "/home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/candidate/native_expert_parity --q8_1-quantizer --activation-f32 /home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-16-phase5-coder-swap-budget-screen/route-oracle-layer1/layer1-long-row0.f32",
+      "returncode": 0,
+      "stdout": "captured activation Q8_1 blocks=80: CPU/GPU scale mismatches=0, code mismatches=0, stored-sum mismatches=78 (GGML d*sum(q), CUDA sum(input)); independent formula block failures=0\nnative_expert_parity: 0 failures\n",
+      "stderr": ""
+    }
+  ],
+  "hip_compile": {
+    "source_snapshot_base_commit": "d38901fc",
+    "diagnostic_source_sha256": "afbfe84c574ff990e7341097cf8f91b2eb30bef36c11b57d5a651f715e317c18",
+    "target": "native_expert_parity",
+    "build_result": "pass",
+    "architecture": "gfx1100 compile target; no HIP accelerator runtime test",
+    "binary_sha256": "4f7dc8b1167377969559526169f1a4644043e17cd6a317e9e5c96e033cf2193f",
+    "usage_status": 2,
+    "usage_status_expected": 2,
+    "configure_log": "hip/hip-configure.txt.gz",
+    "build_log": "hip/hip-native-expert-parity-build.txt.gz"
+  },
+  "cuda_parity_ctests": {
+    "test_regex": "^native_expert_parity_",
+    "passed": 15,
+    "failed": 0,
+    "output": "cuda-native-expert-parity-ctest.txt"
+  }
+}

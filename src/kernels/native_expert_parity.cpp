@@ -20,12 +20,14 @@
 #include "strata/kernels/cpu/expert_layout.hpp"
 #include "ggml-cpu.h"
 #include "strata/kernels/iq_kernels.hpp"
+#include "strata/kernels/native_mmvq.hpp"
 
 #include "ggml.h"
 
 #include <cuda_runtime.h>
 
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <chrono>
 #include <cmath>
@@ -49,6 +51,83 @@ static double rel(const std::vector<float>& a, const std::vector<float>& b) {
 namespace {
 constexpr int NT = 3, E = 7;
 constexpr int64_t H = 2560, FF = 640;
+
+// Compare the actual GGML CPU Q8_1 block producer with Strata's CUDA producer
+// for a captured service activation. The two implementations intentionally
+// encode different `s` values: GGML stores d*sum(q), while this CUDA path stores
+// the sum of the original FP32 inputs for weight formats whose dot needs it.
+int check_q8_1_quantizers(const std::vector<float>& x, cudaStream_t stream) {
+    if (x.size() != H) {
+        std::fprintf(stderr, "Q8_1 quantizer check needs %lld activation values, got %zu\n",
+                     (long long) H, x.size());
+        return 1;
+    }
+    const size_t bytes = ggml_row_size(GGML_TYPE_Q8_1, H);
+    std::vector<uint8_t> cpu_q(bytes), gpu_q(bytes);
+    const auto* traits = ggml_get_type_traits_cpu(GGML_TYPE_Q8_1);
+    if (!traits || !traits->from_float) {
+        std::fprintf(stderr, "GGML CPU Q8_1 quantizer is unavailable\n");
+        return 1;
+    }
+    traits->from_float(x.data(), cpu_q.data(), H);
+    const auto cuda_check = [](cudaError_t error, const char* operation) {
+        if (error != cudaSuccess) {
+            std::fprintf(stderr, "Q8_1 quantizer check: %s: %s\n", operation, cudaGetErrorString(error));
+            std::exit(1);
+        }
+    };
+    float* dx = nullptr;
+    void* dq = nullptr;
+    cuda_check(cudaMalloc(&dx, x.size() * sizeof(float)), "cudaMalloc input");
+    cuda_check(cudaMalloc(&dq, bytes), "cudaMalloc Q8_1 blocks");
+    cuda_check(cudaMemcpy(dx, x.data(), x.size() * sizeof(float), cudaMemcpyHostToDevice), "copy input");
+    strata::kernels::native_quantize_q8_1(dx, dq, (int) H, 1, stream);
+    cuda_check(cudaGetLastError(), "launch CUDA quantizer");
+    cuda_check(cudaStreamSynchronize(stream), "synchronize CUDA quantizer");
+    cuda_check(cudaMemcpy(gpu_q.data(), dq, bytes, cudaMemcpyDeviceToHost), "copy Q8_1 blocks");
+    cuda_check(cudaFree(dq), "free Q8_1 blocks");
+    cuda_check(cudaFree(dx), "free input");
+
+    size_t scale_mismatches = 0, code_mismatches = 0, sum_mismatches = 0, oracle_mismatches = 0;
+    for (int block = 0; block < H / 32; ++block) {
+        const uint8_t* c = cpu_q.data() + (size_t) block * 36;
+        const uint8_t* g = gpu_q.data() + (size_t) block * 36;
+        scale_mismatches += std::memcmp(c, g, 2) != 0;
+        sum_mismatches += std::memcmp(c + 2, g + 2, 2) != 0;
+        code_mismatches += std::memcmp(c + 4, g + 4, 32) != 0;
+
+        float amax = 0.f;
+        const float* row = x.data() + (size_t) block * 32;
+        for (int i = 0; i < 32; ++i) {
+            amax = std::max(amax, std::fabs(row[i]));
+        }
+        std::array<float, 32> sums{};
+        std::copy(row, row + 32, sums.begin());
+        // Independent host transcription of the CUDA warp XOR-sum order.
+        for (int offset = 16; offset > 0; offset >>= 1) {
+            const auto prior = sums;
+            for (int lane = 0; lane < 32; ++lane) sums[lane] = prior[lane] + prior[lane ^ offset];
+        }
+        const float d = amax / 127.f;
+        const float inv = d > 0.f ? 1.f / d : 0.f;
+        int qsum = 0;
+        bool codes_ok = true;
+        for (int i = 0; i < 32; ++i) {
+            const int q = std::clamp((int) std::round(row[i] * inv), -127, 127);
+            qsum += q;
+            codes_ok &= c[4 + i] == (uint8_t) (int8_t) q && g[4 + i] == (uint8_t) (int8_t) q;
+        }
+        const ggml_fp16_t half_d = ggml_fp32_to_fp16(d);
+        const ggml_fp16_t cpu_sum = ggml_fp32_to_fp16(d * (float) qsum);
+        const ggml_fp16_t gpu_sum = ggml_fp32_to_fp16(sums[0]);
+        oracle_mismatches += !codes_ok || std::memcmp(c, &half_d, 2) != 0 || std::memcmp(g, &half_d, 2) != 0 ||
+                             std::memcmp(c + 2, &cpu_sum, 2) != 0 || std::memcmp(g + 2, &gpu_sum, 2) != 0;
+    }
+    std::printf("captured activation Q8_1 blocks=%lld: CPU/GPU scale mismatches=%zu, code mismatches=%zu, "
+                "stored-sum mismatches=%zu (GGML d*sum(q), CUDA sum(input)); independent formula block failures=%zu\n",
+                (long long) (H / 32), scale_mismatches, code_mismatches, sum_mismatches, oracle_mismatches);
+    return scale_mismatches || code_mismatches || oracle_mismatches ? 1 : 0;
+}
 
 // The three ways and the dequantizers for one expert blob; returns the number of failed checks.
 int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int seed, const std::string& label,
@@ -590,6 +669,7 @@ int main(int argc, char** argv) {
     if (argc < 2) {
         std::fprintf(stderr, "usage: native_expert_parity <shard.gguf> [--expert E] [--activation-f32 FILE] [layer ...]\n"
                              "       [--dump-f32-dir DIR] writes dequantized weights, input and reference/operator outputs\n"
+                             "       native_expert_parity --q8_1-quantizer --activation-f32 FILE\n"
                              "       native_expert_parity --synthetic GU/DOWN ...   (ggml type names, e.g. q4_K/q5_1)\n"
                              "       native_expert_parity --q5_1-min\n"
                              "       native_expert_parity --bf16-embd\n");
@@ -611,6 +691,27 @@ int main(int argc, char** argv) {
         failures += check_q5_1_min(s);
     } else if (mode == "--bf16-embd") {
         failures += check_bf16_embd(s);
+    } else if (mode == "--q8_1-quantizer") {
+        std::string activation_path;
+        for (int i = 2; i < argc; ++i) {
+            const std::string arg = argv[i];
+            if (arg == "--activation-f32" && i + 1 < argc) activation_path = argv[++i];
+            else { std::fprintf(stderr, "unexpected Q8_1 quantizer argument: %s\n", arg.c_str()); return 2; }
+        }
+        if (activation_path.empty()) { std::fprintf(stderr, "--activation-f32 is required\n"); return 2; }
+        std::vector<float> activation((size_t) H);
+        FILE* f = std::fopen(activation_path.c_str(), "rb");
+        if (!f) { std::perror(activation_path.c_str()); return 2; }
+        const size_t got = std::fread(activation.data(), sizeof(float), activation.size(), f);
+        const int extra = std::fgetc(f);
+        std::fclose(f);
+        if (got != activation.size() || extra != EOF ||
+            std::any_of(activation.begin(), activation.end(), [](float v) { return !std::isfinite(v); })) {
+            std::fprintf(stderr, "%s: expected exactly %lld finite float32 values\n", activation_path.c_str(),
+                         (long long) H);
+            return 2;
+        }
+        failures += check_q8_1_quantizers(activation, s);
     } else if (mode == "--synthetic") {
         for (int i = 2; i < argc; ++i) {
             const std::string arg = argv[i];

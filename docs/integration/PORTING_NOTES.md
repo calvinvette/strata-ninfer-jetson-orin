@@ -1517,12 +1517,21 @@ implementation boundary is visible in `src/kernels/cpu/native_expert.cpp`:
 and `native_quant_act`/`native_quant_h` call that CPU quantizer. The native
 CUDA grouped path instead consumes Q8_1 activation rows. For the changed layer
 1 expert (IQ2_S gate/up with Q2_0 down), this means CPU Q8_K/Q8_0 versus CUDA
-Q8_1/Q8_1. The existing Orin scalar and NEON Q8_1 helper tests verify only the
-quantized Q8_1 image; they do not make GGML's IQ/Q2_0 dot kernels accept Q8_1.
-Do not change the activation pointer format alone. A route-parity candidate
-needs a separately specified host dot contract for each promoted native
-weight format, byte-level quantizer fixtures, and same-input operator oracles
-before service-level accepted-prefix and continuation retesting. The complete
+Q8_1/Q8_1. The passing `q8_1_contract_test` is for the engine-specific planar
+`ActQ` representation used by the legacy Q2_0 kernel; its source explicitly
+says that it is not a native GGML Q8_1 block. A new [captured-block comparison](../../bench/results/2026-10-16-phase5-coder-q8_1-quantizer-check/README.md)
+compared GGML CPU's actual Q8_1 producer with CUDA on two captured layer-1
+activations. All 80 scale and code blocks matched per activation, and the
+independent scale/code/sum formula had zero failures. The stored sums differed
+in 76 and 78 blocks because GGML records `d*sum(q)` and CUDA records the
+original-input sum. Those sums are not consumed by the sampled symmetric
+IQ2_S/Q2_0 CUDA dots; they may matter for other weight formats. GGML CPU's native
+IQ2_S path still selects Q8_K and has no Q8_1 dot (the CUDA path does). Thus the quantizer match
+supports a host Q8_1 IQ2_S/Q2_0 dot experiment, but does not establish operator
+or service state parity. Do not change the activation pointer format alone.
+A route-parity candidate needs a separately specified host dot contract for
+each promoted native weight format, same-input operator oracles, and then
+service-level accepted-prefix and continuation retesting. The complete
 seven-pair state evidence is in the [fixed-residency confirmation](../../bench/results/2026-10-16-phase5-coder-fixed-residency-confirm7/README.md).
 
 A follow-up held-out short-task check returned the exact requested code before
