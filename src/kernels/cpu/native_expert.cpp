@@ -12,6 +12,10 @@
 #include "ggml.h"
 #include "ggml-cpu.h"
 
+#define GGML_COMMON_DECL_CPP
+#define GGML_COMMON_IMPL_CPP
+#include "ggml-common.h"
+
 #include <cmath>
 #include <cstdio>
 #include <cstring>
@@ -27,24 +31,87 @@ const ggml_type_traits_cpu* traits(int type) { return ggml_get_type_traits_cpu((
 struct Q81Block { ggml_fp16_t d, s; int8_t qs[32]; };
 static_assert(sizeof(Q81Block) == 36, "GGML Q8_1 block layout");
 
-float q8_1_dot_dequantized(const float* w, const uint8_t* xq, int n) {
-    double acc = 0.0;
-    for (int off = 0; off < n; off += 32) {
-        Q81Block block{};
-        std::memcpy(&block, xq + (size_t) (off / 32) * sizeof(Q81Block), sizeof(Q81Block));
-        const float d = ggml_fp16_to_fp32(block.d);
-        for (int i = 0; i < 32; ++i) acc += (double) w[off + i] * d * block.qs[i];
+float q8_1_iq2_s_cuda_dot(const uint8_t* row, const uint8_t* xq, int n) {
+    constexpr int qk = QK_K;
+    static_assert(qk == 256, "IQ2_S CUDA contract assumes 256-value weight blocks");
+    if (n % qk != 0) std::abort();
+    const int nb = n / qk;
+    std::array<float, 32> lane_sum{};
+    for (int lane = 0; lane < 32; ++lane) {
+        for (int k = lane; k < nb * 8; k += 32) {
+            const int kbx = k / 8;
+            const int iqs = 2 * (k % 8);
+            const auto* bq2 = reinterpret_cast<const block_iq2_s*>(row) + kbx;
+            const auto* act = reinterpret_cast<const Q81Block*>(xq) + kbx * 8 + iqs / 2;
+            const uint8_t* qs = bq2->qs + 4 * (iqs / 2);
+            const uint8_t qh = bq2->qh[iqs / 2];
+            const uint8_t* packed_signs = bq2->qs + 32 + 4 * (iqs / 2);
+            const int ls0 = bq2->scales[iqs / 2] & 0x0f;
+            const int ls1 = bq2->scales[iqs / 2] >> 4;
+            int sumi0 = 0, sumi1 = 0;
+            for (int l0 = 0; l0 < 8; l0 += 2) {
+                const int grid_index = qs[l0 / 2] | ((qh << (8 - l0)) & 0x300);
+                const uint64_t grid = iq2s_grid[grid_index];
+                const uint8_t signs = packed_signs[l0 / 2];
+                const int q8_offset = l0 * 4;
+                for (int j = 0; j < 4; ++j) {
+                    int gl = (int) ((grid >> (8 * j)) & 0xff);
+                    int gh = (int) ((grid >> (8 * (j + 4))) & 0xff);
+                    if ((signs >> j) & 1) gl = -gl;
+                    if ((signs >> (j + 4)) & 1) gh = -gh;
+                    const int part = l0 < 4 ? 0 : 1;
+                    if (part == 0) {
+                        sumi0 += gl * act->qs[q8_offset + j] + gh * act->qs[q8_offset + 4 + j];
+                    } else {
+                        sumi1 += gl * act->qs[q8_offset + j] + gh * act->qs[q8_offset + 4 + j];
+                    }
+                }
+            }
+            const int sumi = (sumi0 * ls0 + sumi1 * ls1 + (sumi0 + sumi1) / 2) / 4;
+            const float d = ggml_fp16_to_fp32(bq2->d) * ggml_fp16_to_fp32(act->d);
+            lane_sum[(size_t) lane] += d * (float) sumi;
+        }
     }
-    return (float) acc;
+    for (int offset = 16; offset > 0; offset >>= 1) {
+        const auto previous = lane_sum;
+        for (int lane = 0; lane < 32; ++lane) lane_sum[(size_t) lane] = previous[(size_t) lane] + previous[(size_t) (lane ^ offset)];
+    }
+    return lane_sum[0];
 }
 
-void dequantize_weight_row(int type, const uint8_t* row, float* dst, int n) {
-    const auto* t = ggml_get_type_traits((ggml_type) type);
-    if (t == nullptr || t->to_float == nullptr) {
-        std::fprintf(stderr, "native Q8_1 dot: no GGUF dequantizer for weight type %d\n", type);
-        std::abort();
+float q8_1_q2_0_cuda_dot(const uint8_t* row, const uint8_t* xq, int n) {
+    constexpr int qk = QK2_0;
+    if (n % qk != 0) std::abort();
+    const int nb = n / qk;
+    constexpr int8_t lut[4] = {-1, 0, 1, 2};
+    std::array<float, 32> lane_sum{};
+    for (int lane = 0; lane < 32; ++lane) {
+        for (int k = lane; k < nb * 2; k += 32) {
+            const int kbx = k / 2;
+            const int iqs = k % 2;
+            const auto* bq2 = reinterpret_cast<const block_q2_0*>(row) + kbx;
+            const auto* act = reinterpret_cast<const Q81Block*>(xq) + kbx * 2 + iqs;
+            int sumi = 0;
+            for (int j = 0; j < 4; ++j) {
+                const uint16_t q = (uint16_t) bq2->qs[iqs * 8 + j * 2] |
+                                   ((uint16_t) bq2->qs[iqs * 8 + j * 2 + 1] << 8);
+                // CUDA byte_perm(0x5140/0x7362) interleaves even and odd 2-bit
+                // fields into the two four-byte activation chunks.
+                for (int i = 0; i < 4; ++i) {
+                    const int code0 = lut[(q >> (2 * i)) & 3];
+                    const int code1 = lut[(q >> (2 * (i + 4))) & 3];
+                    sumi += code0 * act->qs[j * 8 + i] + code1 * act->qs[j * 8 + 4 + i];
+                }
+            }
+            const float d = ggml_fp16_to_fp32(bq2->d) * ggml_fp16_to_fp32(act->d);
+            lane_sum[(size_t) lane] += d * (float) sumi;
+        }
     }
-    t->to_float(row, dst, n);
+    for (int offset = 16; offset > 0; offset >>= 1) {
+        const auto previous = lane_sum;
+        for (int lane = 0; lane < 32; ++lane) lane_sum[(size_t) lane] = previous[(size_t) lane] + previous[(size_t) (lane ^ offset)];
+    }
+    return lane_sum[0];
 }
 
 bool q8_1_scalar_dot(const NativeFmt& f) {
@@ -167,16 +234,13 @@ int native_gu_mt_min(int gu_type) {
 void native_gu_rows(const NativeFmt& f, const uint8_t* blob, const void* const* act, int nt, float* const* ff,
                     int r0, int r1) {
     if (q8_1_scalar_dot(f)) {
-        std::vector<float> gate((size_t) f.n_embd), up((size_t) f.n_embd);
         for (int r = r0; r < r1; ++r) {
             const uint8_t* gr = blob + (size_t) r * f.gu_row;
             const uint8_t* ur = blob + f.up_off + (size_t) r * f.gu_row;
-            dequantize_weight_row(f.gu_type, gr, gate.data(), (int) f.n_embd);
-            dequantize_weight_row(f.gu_type, ur, up.data(), (int) f.n_embd);
             for (int t = 0; t < nt; ++t) {
                 const auto* xq = (const uint8_t*) act[t];
-                const float g = q8_1_dot_dequantized(gate.data(), xq, (int) f.n_embd);
-                const float u = q8_1_dot_dequantized(up.data(), xq, (int) f.n_embd);
+                const float g = q8_1_iq2_s_cuda_dot(gr, xq, (int) f.n_embd);
+                const float u = q8_1_iq2_s_cuda_dot(ur, xq, (int) f.n_embd);
                 ff[t][r] = (g / (1.f + std::exp(-g))) * u;
             }
         }
@@ -238,12 +302,10 @@ void native_gu_rows(const NativeFmt& f, const uint8_t* blob, const void* const* 
 void native_down_rows(const NativeFmt& f, const uint8_t* blob, const void* const* hq, int nt, float* const* out,
                       int r0, int r1) {
     if (q8_1_scalar_dot(f)) {
-        std::vector<float> down((size_t) f.n_ff);
         for (int r = r0; r < r1; ++r) {
             const uint8_t* dr = blob + f.down_off + (size_t) r * f.d_row;
-            dequantize_weight_row(f.d_type, dr, down.data(), (int) f.n_ff);
             for (int t = 0; t < nt; ++t)
-                out[t][r] = q8_1_dot_dequantized(down.data(), (const uint8_t*) hq[t], (int) f.n_ff);
+                out[t][r] = q8_1_q2_0_cuda_dot(dr, (const uint8_t*) hq[t], (int) f.n_ff);
         }
         return;
     }

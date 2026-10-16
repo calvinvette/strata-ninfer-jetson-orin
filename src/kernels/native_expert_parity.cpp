@@ -560,6 +560,13 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
     for (size_t i = 0; i < got_c.size(); ++i)
         cpu_gpu_bitwise_diff += std::memcmp(&got_c[i], &got_g[i], sizeof(float)) != 0;
     const bool ok = ec < 3e-2 && eg < 3e-2 && std::isfinite(ec) && std::isfinite(eg);
+    const bool require_q8_1_exact = std::getenv("STRATA_NATIVE_CPU_Q8_1_DOT") != nullptr &&
+                                    f.gu_type == GGML_TYPE_IQ2_S && f.d_type == GGML_TYPE_Q2_0;
+    if (require_q8_1_exact && cpu_gpu_bitwise_diff != 0) {
+        std::fprintf(stderr, "%s: opt-in IQ2_S/Q2_0 CPU Q8_1 CUDA-mirror route differs from CUDA in %zu/%zu words\n",
+                     label.c_str(), cpu_gpu_bitwise_diff, got_c.size());
+        ++failures;
+    }
     std::printf("%-9s %-8s/%-7s blob %8zu  cpu rel %.2e  gpu rel %.2e  cpu-gpu %.2e (%zu/%zu words differ)  %s\n",
                 label.c_str(), ggml_type_name((ggml_type) f.gu_type), ggml_type_name((ggml_type) f.d_type), f.bytes,
                 ec, eg, ecg, cpu_gpu_bitwise_diff, got_c.size(), ok ? "ok" : "FAIL");

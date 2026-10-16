@@ -3,13 +3,14 @@
 import argparse
 import hashlib
 import json
+import re
 import threading
 from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path[:0] = [str(ROOT), str(ROOT / "tools"), str(ROOT / "tools/integration")]
-from tools.integration.accepted_prefix_parity import parse_hashes, STATE_KEYS
+from tools.integration.accepted_prefix_parity import STATE_KEYS
 from tools.conversation_cache_parity import load_tokenizer
 from serve.frontend import ChatTemplate
 from serve.server import StrataEngine, child_env
@@ -25,12 +26,28 @@ def replace_option(argv, name, value):
         argv.extend((name, str(value)))
 
 
+def parse_prefix_hashes(path):
+    found = []
+    for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        marker = " state={STATE_HASH "
+        if "ACCEPTED_PREFIX " not in line or marker not in line:
+            continue
+        body = line.split(marker, 1)[1].split("}", 1)[0]
+        fields = dict(re.findall(r"(\w+)=([0-9a-f,-]+)", body))
+        if not set(STATE_KEYS) <= fields.keys():
+            raise RuntimeError("incomplete accepted-prefix state fingerprint")
+        found.append({key: fields[key] for key in STATE_KEYS})
+    return found
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--adapt-every", type=int, required=True)
     parser.add_argument("--adapt-swaps", type=int, required=True)
     parser.add_argument("--continuations", type=int, default=0,
                         help="extra identical short requests after short/long/short")
+    parser.add_argument("--prompt-cache", type=int,
+                        help="override the configured prompt-cache capacity for this run")
     parser.add_argument("--cpu-q8-1-dot", action="store_true",
                         help="enable the opt-in IQ2_S/Q2_0 CPU Q8_1 scalar route")
     parser.add_argument("--output", type=Path, required=True)
@@ -43,6 +60,8 @@ def main():
     argv = list(cfg["args"])
     replace_option(argv, "--adapt-every", args.adapt_every)
     replace_option(argv, "--adapt-swaps", args.adapt_swaps)
+    if args.prompt_cache is not None:
+        replace_option(argv, "--prompt-cache", args.prompt_cache)
     if "--adapt-accepted-only" not in argv:
         argv.append("--adapt-accepted-only")
     if "--expert-cache-cpu-order" in argv:
@@ -73,13 +92,16 @@ def main():
         env["STRATA_NATIVE_CPU_Q8_1_DOT"] = "1"
     engine = StrataEngine(cfg["exe"], argv, cwd=cfg["cwd"], log=str(log), env=env)
     requests = []
+    previous_prefix_hash_count = 0
     try:
         for name, prompt in prompts:
             ids = [int(token) for token in engine.generate(prompt, 16, {"temperature": 0}, threading.Event())
                    if token is not None]
-            hashes = parse_hashes(log)
-            if len(hashes) != len(requests) + 1:
-                raise RuntimeError(f"expected {len(requests) + 1} state records, found {len(hashes)}")
+            hashes = parse_prefix_hashes(log)
+            if len(hashes) <= previous_prefix_hash_count:
+                raise RuntimeError(f"expected new accepted-prefix hashes after request {len(requests) + 1}, "
+                                   f"found {len(hashes)} total")
+            previous_prefix_hash_count = len(hashes)
             requests.append({"name": name, "prompt_tokens": len(prompt), "ids": ids,
                              "state": hashes[-1]})
             (args.output / "requests.json").write_text(json.dumps({"requests": requests}, indent=2) + "\n")
@@ -106,6 +128,8 @@ def main():
     state_changes = [key for key in STATE_KEYS if requests[0]["state"][key] != requests[2]["state"][key]]
     results = {
         "adapt_every": args.adapt_every, "adapt_swaps": args.adapt_swaps,
+        "prompt_cache": args.prompt_cache if args.prompt_cache is not None else
+            int(argv[argv.index("--prompt-cache") + 1]) if "--prompt-cache" in argv else None,
         "cpu_q8_1_dot": args.cpu_q8_1_dot,
         "prompt_sha256": {
             "short": hashlib.sha256(json.dumps(list(prompts[0][1])).encode()).hexdigest(),

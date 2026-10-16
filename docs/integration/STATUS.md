@@ -76,7 +76,22 @@ fresh maestro1 HIP rebuild first had a device-link bus error; the single-job
 retry with `/mnt/sda2` temporaries linked and passed the usage check (compile/CLI
 evidence only). Phase 5 remains open.
 
-Source audit explains why the scalar Q8_1 route did not establish operator parity: it dequantizes IQ2_S/Q2_0 weights to FP32 and sums products in double precision, while CUDA uses integer dot products, integer scale combination, and a lane-wise FP32 reduction. Matching activation codes and scales alone are therefore insufficient. This points to the next bounded implementation task: a CPU mirror of the CUDA packed-row arithmetic, validated on captured rows against the CUDA kernel and an independent oracle before another adaptive-recovery run. It is a proposed test direction, not a claimed fix. The portability note for repeating this seam audit on Strata + Splash is in [PORTING_NOTES.md](PORTING_NOTES.md). Phase 5 remains open.
+The [CPU Q8_1 CUDA-row mirror diagnostic](../../bench/results/2026-10-16-phase5-coder-q8_1-cuda-mirror-followup/README.md)
+now implements CUDA's integer IQ2_S/Q2_0 row arithmetic behind an opt-in
+environment flag. Synthetic parity and a captured Coder layer-1 expert row
+matched CUDA bitwise; all 16 Orin native-expert parity CTests passed. A
+randomized three-block active-swap screen then found a repeatable service-level
+regression: after matching the initial and recovery answers, the identical
+continuation differed at 13/16 token positions in all three mirror arms, while
+all three default arms matched at 16/16. Both routes changed the same five
+initial-to-recovery state fingerprints. All six arms passed 15/15 swap-byte
+and 15/15 residency checks; minimum host availability was 14.22 GiB and
+minimum admission availability was 9.35 GiB across 1,264 samples, with zero
+cgroup memory events. The mirror is not promoted as a
+recovery fix and no speed claim follows. Current-source HIP and SYCL service
+builds and CLI checks passed on maestro1; these are compile/link checks only.
+The follow-on method for a future Splash integration is recorded in
+[PORTING_NOTES.md](PORTING_NOTES.md). Phase 5 remains open.
 
 An opt-in [CPU Q8_1 route screen](../../bench/results/2026-10-16-phase5-coder-q8_1-cpu-route-check/README.md)
 then ran one supervised default/candidate pair on the same Coder IQ1_M GGUF

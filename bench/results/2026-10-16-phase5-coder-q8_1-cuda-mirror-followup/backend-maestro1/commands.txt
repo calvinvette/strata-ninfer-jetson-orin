@@ -1,0 +1,27 @@
+Builds were run from the isolated Phase 8 source/build roots on maestro1, with
+the nine hashed CMake/include/src overlays listed in current-source-sha256.txt.
+Both builds used one job.
+
+HIP:
+
+  cmake --build build-hip --target strata native_expert_parity --parallel 1
+  LD_LIBRARY_PATH="$ROCM_CORE/lib:$ROCM_LIBRARIES/lib:${LD_LIBRARY_PATH:-}" build-hip/strata --help
+
+Here ROCM_CORE is the pinned ROCm Python package `_rocm_sdk_core`, and
+ROCM_LIBRARIES is `_rocm_sdk_libraries_gfx110X_dgpu` under the validation
+toolchain's `lib/python3.10/site-packages` directory.
+
+SYCL environment (oneAPI 2026.1):
+
+  source "$ONEAPI/tbb/2023.1/env/vars.sh"
+  source "$ONEAPI/umf/1.1/env/vars.sh"
+  source "$ONEAPI/tcm/1.5/env/vars.sh"
+  source "$ONEAPI/compiler/2026.1/env/vars.sh"
+  source "$ONEAPI/mkl/2026.1/env/vars.sh"
+  source "$ONEAPI/dpl/2022.13/env/vars.sh"
+  export TMPDIR=/mnt/sda2/tmp/calvin/phase5-q8_1-cuda-mirror-current-source/tmp
+  cmake --build build-sycl --target strata --parallel 1
+  build-sycl/strata --help
+
+The two --help commands exited zero. These checks did not launch accelerator
+kernels or load the Coder model.

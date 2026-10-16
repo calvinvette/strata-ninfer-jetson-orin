@@ -1682,3 +1682,26 @@ tokens matched at four prefix boundaries across three references. Record the
 MTP checkpoint separately from the target model: this run paired the Coder GGUF
 with MTP weights from the upstream base Qwen3.8-Flash-Next revision, not a
 Coder-specific checkpoint. See the [cancellation report](../../bench/results/2026-10-16-phase5-coder-mtp-cancel-parity-current/README.md).
+
+## 2026-10-16 — Exact row arithmetic does not qualify ownership migration
+
+The opt-in CPU mirror for IQ2_S gate/up and Q2_0 down matched CUDA bit-for-bit
+on synthetic rows and a captured Coder layer-1 activation. This is a narrow
+format contract: preserve codebook indexing, packed signs, integer scale
+combination, Q8_1 activation codes/scales, and the CUDA lane reduction order.
+The stored Q8_1 sum field was not consumed by these symmetric dots. Other
+formats, asymmetric zero-point corrections and other activation producers need
+their own inspection and oracle.
+
+That operator result did not predict service behavior. In three randomized
+default/mirror pairs with active expert swaps, every mirror continuation
+differed at 13/16 output positions from its initial same-prompt response, while
+every default continuation matched. Both routes passed swap byte/residency
+checks and both changed the same five state fingerprints after the long request.
+For a future Strata + Splash port, carry the mathematical audit and captured-row
+oracle forward, then separately compare accepted-prefix state and a same-prompt
+continuation under the engine's own ownership routes. Retain a fixed or delayed
+ownership control, and measure the untraced native path before making a speed
+claim. Exact parity for one expert operator is not a substitute for service
+state qualification. See the
+[Coder row-mirror screen](../../bench/results/2026-10-16-phase5-coder-q8_1-cuda-mirror-followup/README.md).
