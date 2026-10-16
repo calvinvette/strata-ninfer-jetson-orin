@@ -2463,6 +2463,12 @@ int main(int argc, char** argv) {
         // anything is allocated: an unsupported down type used to exit from inside the first verify window, and
         // an unsupported dequant type left the prompt path's fp16 buffer unwritten.
         const auto& lay = strata::kernels::cpu::expert_layout();
+        const bool expert_cache_requested = o.expert_cache != 0 || !o.expert_profile.empty();
+        if (o.expert_cache_cpu_order && expert_cache_requested && lay.native) {
+            std::fprintf(stderr, "strata generate: --expert-cache-cpu-order currently requires the packed Q2_0 "
+                                 "expert layout; native GGUF expert formats are unsupported\n");
+            return 2;
+        }
         for (int64_t l = 0; lay.native && l < (int64_t) lay.fmt.size(); ++l) {
             const auto& f = lay.fmt[(size_t) l];
             if (!strata::kernels::native_expert_supported(f.gu_type, f.d_type, f.n_embd, f.n_ff)) {

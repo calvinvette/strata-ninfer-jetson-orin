@@ -5,17 +5,13 @@ Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 has
 initial long-context recall and sustained-service evidence and remains in
 progress; Phases 5 and 6 also remain open.
 
-A Phase 5 [CPU-order adaptive-recovery mechanism test](../../bench/results/2026-10-16-phase5-cpu-order-adaptive-recovery/README.md)
-repeated the same short/long/short Coder IQ1_M sequence with the opt-in
-`--expert-cache-cpu-order` path. Two fresh services matched each other on every
-request, but each reproduced 14/16 changed recovery token IDs and seven changed
-persistent-state fingerprints. The same 18/70 CPU-to-VRAM owner changes were
-present in the first seven matched layer-0 rows; refill bytes and residency
-tables verified successfully. CPU-order arithmetic alone therefore did not
-remove this sequence's state drift, without proving arithmetic is irrelevant.
-The supervised run took 405.2 seconds; minimum host/admission availability was
-14.26/9.36 GiB with zero sampled cgroup pressure or OOM events. Phase 5 remains
-open.
+An exploratory Phase 5 [Coder CPU-order recovery attempt](../../bench/results/2026-10-16-phase5-cpu-order-adaptive-recovery/README.md)
+is excluded from numerical and quality conclusions. The flag dispatches to a
+kernel for the packed Q2_0 expert layout, while this Coder pack stores native,
+per-layer GGUF expert formats (including IQ3_XXS/IQ4_NL). The command accepted
+that incompatible combination, so its output and state results are not valid
+evidence about CPU-order arithmetic. A startup guard now rejects the option for
+native packs; Phase 5 remains open.
 
 Phase 6's same-binary Q2_0 int8-KV [MTP × prompt-length study](../../bench/results/2026-10-16-phase6-q2-int8-mtp3-workload-interaction/README.md) completed its 12-arm screen and corrected 28-arm held-out confirmation. The confirmation passed all 14 paired blocks with no rejected cells, including the independent short-task suffix-sum oracle. MTP3 reduced median prompt throughput 13.65% at 512 tokens and 8.56% at 7,501 tokens; client total time increased 7.60% and 8.63%. The prompt-throughput interaction estimate was +5.89% (paired-process bootstrap 95% interval 1.0009–1.0680), while decode-TPS and client-total interaction intervals included no effect. This supports only a borderline difference in the penalty between these prompts; it does not promote MTP3 or close Phase 6's other interactions.
 

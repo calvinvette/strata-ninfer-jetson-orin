@@ -1,38 +1,33 @@
-# CPU-order expert arithmetic under adaptive swaps — Orin — 2026-10-16
+# Excluded Coder CPU-order recovery attempt — Orin — 2026-10-16
 
-This Phase 5 mechanism test repeats the accepted-only short→long→short recovery
-sequence with Strata's opt-in `--expert-cache-cpu-order` path. It asks whether
-using CPU-order arithmetic for GPU cache hits removes the previously observed
-recovery drift. The model, profile, prompts, cache size, adaptation cadence,
-service binary and capture harness were held fixed from the current-source
-route-change experiment; only the CPU-order flag was added.
+This exploratory Phase 5 run is excluded from numerical and quality
+conclusions. It repeated the accepted-only short→long→short Coder sequence with
+`--expert-cache-cpu-order`, but source inspection found that the flag dispatches
+to `moe_hit_grouped_s2_cpu_order`, which is written for the packed Q2_0 expert
+layout. The Coder pack is native, with per-layer GGUF formats such as
+IQ3_XXS/IQ4_NL. The service accepted this incompatible combination, so the run
+cannot establish whether CPU-order arithmetic affects Coder recovery drift.
 
 Two fresh services each processed the same 512-token short prompt, the same
 2,048-token swap-inducing prompt and the short prompt again, generating 16
 tokens per request with accepted-only adaptation every four tokens. Both
 independent services produced identical token IDs and all nine logged state
-fields request-by-request. Within each service, recovery still differed from
-the initial short request at 14 of 16 token IDs. The GDN, PLE, tail, pooled,
-full-pooled, KV and PLE-previous fingerprints also differed; the dead-state
-fingerprint matched. Thus CPU-order arithmetic alone did not remove the
-recovery drift in this sequence.
+fields request-by-request. Within each service, recovery differed from the
+initial short request at 14 of 16 token IDs. Seven logged fingerprints changed
+and the dead-state fingerprint matched. These observations are retained, but
+are not interpreted as a mechanism result because the option was incompatible.
 
 The captured layer-0 path retained the same route transition pattern as the
 prior run: all first seven aligned initial/recovery rows had identical
 activations and expert IDs, with 18 of 70 owner assignments changed. The next
 15 aligned rows had different activations. Adaptive refill-byte verification
-and device residency-table verification passed at every logged apply point.
-This test does not prove that expert arithmetic is irrelevant: the flag is an
-experimental GPU path, and this sequence does not establish bitwise CPU/GPU
-operator equivalence or trace every propagated numerical difference.
+and device residency-table verification passed at every logged apply point,
+but those checks do not validate arithmetic for the native Coder layout. A
+follow-up direct call to the Q2_0 helper with raw Coder IQ3_XXS/IQ4_NL weights
+produced non-finite output and is also excluded. The diagnostic misuse was
+removed and did not change the service implementation.
 
-The CPU-order path was markedly slower in this workload. Across the two
-services, the 512-token prompt took 28.2–29.2 seconds to ingest and 10.9–17.9
-seconds to generate 16 tokens; the 2,048-token prompt took 74.9–76.7 seconds to
-ingest and 16.6–22.9 seconds to generate 16 tokens. These are diagnostic
-observations from two repetitions, not a randomized paired performance
-comparison against the default path, and no performance case is made for the
-flag.
+The unsupported run's timing is not used as performance evidence.
 
 The 28-GiB supervised run returned 0 after 405.2 seconds. Across 384 memory
 samples, minimum host availability was 14.26 GiB and minimum admission
@@ -50,18 +45,25 @@ The current service binary SHA256 is
 expert profile SHA256 is `a514661124d5305effe9c1bcecff7dc069af398b2b19ff9d11628a2cad0a8915`.
 The tokenized short and long prompt hashes are recorded in `run/results.json`.
 
-Reproduce from the repository root on the same Orin setup with:
+The original attempt command is retained in `run/` and the supervisor record.
+With the current source, the same native Coder config now exits with status 2
+before serving; the exact message and current binary identity are in
+`format-guard-smoke.txt`:
 
 ```sh
-systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes \
-  python3 tools/integration/run_control.py \
-  --output /tmp/cpu-order-recovery-supervisor --timeout 1800 --interval 1 --sample-clocks -- \
-  python3 bench/results/2026-10-16-phase5-cpu-order-adaptive-recovery/capture_same_service_routes.py \
-  --output /tmp/cpu-order-recovery-run --captures 128 --recovery-start-row 2592
+python3 - <<'PY'
+import json, subprocess
+config = json.load(open("bench/results/2026-10-13-phase6-q6-warp-mtp-confirm7/baseline-mtp0-config.json"))
+command = [config["exe"], "--serve", *config["args"], "--expert-cache-cpu-order"]
+result = subprocess.run(command, text=True, capture_output=True)
+print(result.stderr, end="")
+raise SystemExit(0 if result.returncode == 2 and "native GGUF expert formats are unsupported" in result.stderr else 1)
+PY
 ```
 
 The harness adds only `--expert-cache-cpu-order` to the established route
 capture configuration. Raw outputs, state fingerprints, captured dispatches,
-service logs, supervisor telemetry and hashes are retained in this directory.
-This is a negative mechanism result, not a Phase 5 closeout; the broader state
-cause, graph lifetime gates and quality impact remain open.
+service logs, supervisor telemetry and hashes are retained for audit. The
+result is an unsupported cell, not a negative mechanism test or Phase 5
+closeout. The broader recovery cause, graph lifetime gates and quality impact
+remain open.
