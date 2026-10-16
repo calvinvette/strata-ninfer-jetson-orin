@@ -48,6 +48,12 @@ def main():
                         help="extra identical short requests after short/long/short")
     parser.add_argument("--prompt-cache", type=int,
                         help="override the configured prompt-cache capacity for this run")
+    parser.add_argument("--capture-layer", type=int, default=1,
+                        help="captured MoE layer; -1 captures every layer")
+    parser.add_argument("--capture-rows", type=int, default=128,
+                        help="maximum captured MoE activation rows")
+    parser.add_argument("--capture-start-row", type=int, default=0,
+                        help="skip this many captured rows before writing")
     parser.add_argument("--cpu-q8-1-dot", action="store_true",
                         help="enable the opt-in IQ2_S/Q2_0 CPU Q8_1 scalar route")
     parser.add_argument("--output", type=Path, required=True)
@@ -83,8 +89,9 @@ def main():
     env.update({
         "STRATA_STATE_HASH": "1", "STRATA_STATE_HASH_GDN": "1",
         "STRATA_ACCEPTED_PREFIX_TRACE": "1", "STRATA_INTEGRATION_TRACE": "1",
-        "STRATA_PREFILL_CPU_SHARE": "0", "STRATA_CAPTURE_MOE_LAYER": "1",
-        "STRATA_CAPTURE_MOE_ROWS": "128", "STRATA_CAPTURE_MOE_START_ROW": "0",
+        "STRATA_PREFILL_CPU_SHARE": "0", "STRATA_CAPTURE_MOE_LAYER": str(args.capture_layer),
+        "STRATA_CAPTURE_MOE_ROWS": str(args.capture_rows),
+        "STRATA_CAPTURE_MOE_START_ROW": str(args.capture_start_row),
         "STRATA_CAPTURE_MOE_PATH": str((args.output / "layer1.jsonl").resolve()),
         "STRATA_VERIFY_ADAPT_SWAPS": "1",
     })
@@ -113,7 +120,7 @@ def main():
         raise RuntimeError("missing layer-0 dispatch capture")
     rows = captured[1:]
     route = {"rows": len(rows)}
-    if len(rows) >= 66:
+    if args.capture_layer == 1 and len(rows) >= 66:
         initial, long_rows, recovery = rows[:22], rows[22:44], rows[44:66]
         route.update({
             "first_seven_activation_equal": sum(a["activation"] == b["activation"]
@@ -131,6 +138,9 @@ def main():
         "prompt_cache": args.prompt_cache if args.prompt_cache is not None else
             int(argv[argv.index("--prompt-cache") + 1]) if "--prompt-cache" in argv else None,
         "cpu_q8_1_dot": args.cpu_q8_1_dot,
+        "capture_layer": args.capture_layer,
+        "capture_rows": args.capture_rows,
+        "capture_start_row": args.capture_start_row,
         "prompt_sha256": {
             "short": hashlib.sha256(json.dumps(list(prompts[0][1])).encode()).hexdigest(),
             "long": hashlib.sha256(json.dumps(long_ids).encode()).hexdigest(),

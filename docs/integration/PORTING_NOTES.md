@@ -228,6 +228,18 @@ licensed outputs, output clipping and retained persistent state. Zero accepted
 drafts still consume an anchor; zero published/retained tokens is a different
 transaction. Map each engine's boundary before importing replay scenarios.
 
+The [Coder first-divergence diagnostic](../../bench/results/2026-10-16-phase5-coder-q8_1-first-divergence-trace/README.md)
+shows a useful CPU/GPU split-debugging method for a future Strata + Splash
+integration: capture the same pre-divergence activation and routing metadata
+from both execution paths, identify the first downstream layer that changes,
+then run each CPU-owned expert on that exact activation against an independent
+weight/dequantization oracle and the accelerator result. Retain bitwise output
+counts as well as numerical error. A local operator match does not establish
+matching committed recurrence/KV state or later requests; test state boundaries,
+recovery and continuation separately. For Splash, replace CUDA/Q8_1 details
+with its actual Metal/CPU activation and packed-weight contracts, established
+from source and measurements rather than assumed from Strata's implementation.
+
 The Oct 11 Strata accepted-prefix test exposed a QSA indexer transaction detail
 that also applies when integrating another speculative engine. Commit replay
 correctly rebuilt rows for the accepted prefix, but a rejected suffix could

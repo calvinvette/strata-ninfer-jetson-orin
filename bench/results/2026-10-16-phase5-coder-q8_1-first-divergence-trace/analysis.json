@@ -1,0 +1,196 @@
+{
+  "schema": 1,
+  "model": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF IQ1_M",
+  "capture_dispatch_range": [
+    1392,
+    1583
+  ],
+  "first_divergence": {
+    "dispatch": 1394,
+    "layer": 2,
+    "default_matches_mirror_activation": false,
+    "default_matches_mirror_ids": true,
+    "default_matches_mirror_owners": true
+  },
+  "preceding_cpu_route": {
+    "dispatch": 1393,
+    "layer": 1,
+    "experts_and_owners": [
+      [
+        209,
+        -1
+      ],
+      [
+        121,
+        0
+      ],
+      [
+        126,
+        0
+      ],
+      [
+        246,
+        0
+      ],
+      [
+        207,
+        -1
+      ],
+      [
+        85,
+        -1
+      ],
+      [
+        9,
+        0
+      ],
+      [
+        129,
+        0
+      ],
+      [
+        140,
+        0
+      ],
+      [
+        153,
+        -1
+      ]
+    ],
+    "activation_bitwise_equal": true
+  },
+  "first_differing_activation": {
+    "dispatch": 1394,
+    "layer": 2,
+    "max_absolute_difference": 0.009174230000000172,
+    "relative_l1": 0.0038074461194743327
+  },
+  "cross_route_tokens": [
+    {
+      "name": "short-512",
+      "token_differences": 0
+    },
+    {
+      "name": "long-2048",
+      "token_differences": 3
+    },
+    {
+      "name": "short-512-recovery",
+      "token_differences": 0
+    },
+    {
+      "name": "short-512-continuation-1",
+      "token_differences": 13
+    }
+  ],
+  "supervisors": {
+    "default": {
+      "status": "pass",
+      "minimum_available_bytes": 15506911232,
+      "minimum_admission_available_bytes": 15506911232
+    },
+    "cuda_mirror": {
+      "status": "pass",
+      "minimum_available_bytes": 15524208640,
+      "minimum_admission_available_bytes": 15524208640
+    }
+  },
+  "operator_checks": [
+    {
+      "expert": 153,
+      "route": "cuda_mirror",
+      "gate_up_type": "iq2_s",
+      "down_type": "q2_0",
+      "blob_bytes": 1510400,
+      "cpu_relative_l1": 0.0107,
+      "gpu_relative_l1": 0.0107,
+      "cpu_gpu_relative_l1": 0.0,
+      "cpu_gpu_bitwise_differences": 0,
+      "output_words": 7680
+    },
+    {
+      "expert": 153,
+      "route": "default",
+      "gate_up_type": "iq2_s",
+      "down_type": "q2_0",
+      "blob_bytes": 1510400,
+      "cpu_relative_l1": 0.0125,
+      "gpu_relative_l1": 0.0107,
+      "cpu_gpu_relative_l1": 0.0134,
+      "cpu_gpu_bitwise_differences": 7680,
+      "output_words": 7680
+    },
+    {
+      "expert": 207,
+      "route": "cuda_mirror",
+      "gate_up_type": "iq2_s",
+      "down_type": "q2_0",
+      "blob_bytes": 1510400,
+      "cpu_relative_l1": 0.0105,
+      "gpu_relative_l1": 0.0105,
+      "cpu_gpu_relative_l1": 0.0,
+      "cpu_gpu_bitwise_differences": 0,
+      "output_words": 7680
+    },
+    {
+      "expert": 207,
+      "route": "default",
+      "gate_up_type": "iq2_s",
+      "down_type": "q2_0",
+      "blob_bytes": 1510400,
+      "cpu_relative_l1": 0.0129,
+      "gpu_relative_l1": 0.0105,
+      "cpu_gpu_relative_l1": 0.0157,
+      "cpu_gpu_bitwise_differences": 7680,
+      "output_words": 7680
+    },
+    {
+      "expert": 209,
+      "route": "cuda_mirror",
+      "gate_up_type": "iq2_s",
+      "down_type": "q2_0",
+      "blob_bytes": 1510400,
+      "cpu_relative_l1": 0.011,
+      "gpu_relative_l1": 0.011,
+      "cpu_gpu_relative_l1": 0.0,
+      "cpu_gpu_bitwise_differences": 0,
+      "output_words": 7680
+    },
+    {
+      "expert": 209,
+      "route": "default",
+      "gate_up_type": "iq2_s",
+      "down_type": "q2_0",
+      "blob_bytes": 1510400,
+      "cpu_relative_l1": 0.0124,
+      "gpu_relative_l1": 0.011,
+      "cpu_gpu_relative_l1": 0.0123,
+      "cpu_gpu_bitwise_differences": 7680,
+      "output_words": 7680
+    },
+    {
+      "expert": 85,
+      "route": "cuda_mirror",
+      "gate_up_type": "iq2_s",
+      "down_type": "q2_0",
+      "blob_bytes": 1510400,
+      "cpu_relative_l1": 0.0117,
+      "gpu_relative_l1": 0.0117,
+      "cpu_gpu_relative_l1": 0.0,
+      "cpu_gpu_bitwise_differences": 0,
+      "output_words": 7680
+    },
+    {
+      "expert": 85,
+      "route": "default",
+      "gate_up_type": "iq2_s",
+      "down_type": "q2_0",
+      "blob_bytes": 1510400,
+      "cpu_relative_l1": 0.0134,
+      "gpu_relative_l1": 0.0117,
+      "cpu_gpu_relative_l1": 0.0128,
+      "cpu_gpu_bitwise_differences": 7680,
+      "output_words": 7680
+    }
+  ]
+}
