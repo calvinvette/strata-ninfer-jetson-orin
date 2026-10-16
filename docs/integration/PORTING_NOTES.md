@@ -1645,3 +1645,13 @@ same-prompt continuation after migration; preserve byte and residency checks as
 separate evidence. This was one screening block only and does not quantify a
 quality or performance effect. See the
 [Coder swap/arithmetic screen](../../bench/results/2026-10-16-phase5-coder-q8_1-adaptive-swap-screen/README.md).
+
+A direct FP32 GDN capture after the short request sharpened that migration
+diagnostic: after a 2,048-token request, delayed adaptation reproduced the
+initial 512-token GDN state bit-for-bit, while cadence-4 swaps changed
+99.9903% of its floats (relative L2 0.7376) and changed all 16 sampled output
+IDs. The one-run-per-arm diagnostic does not identify a specific mutation or
+generalize beyond this path. For a future Splash port, hash equality should be
+followed by direct numeric state comparison at the same committed prefix, with
+fixed/delayed ownership as the control and accepted-state plus continuation
+checks retained. See the [numeric GDN capture](../../bench/results/2026-10-16-phase5-coder-q8_1-adaptive-swap-screen/gdn-state/README.md).
