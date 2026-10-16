@@ -2395,12 +2395,13 @@ the sampled layer-0 operator gap to activation-format differences; it does not
 establish the full service-level persistent-state drift cause. Phase 5 remains
 open.
 
-A direct FP32 GDN-state follow-up compared the initial short prompt with a
-long-then-short sequence under delayed and active swaps. Delayed adaptation
-reproduced the initial state bit-for-bit; cadence-4 adaptation changed
-29,414,608 of 29,417,472 floats (relative L2 0.7376) and all 16 output IDs.
-This is one diagnostic run per arm: it quantifies the state drift on this path,
-but does not identify an internal cause or close Phase 5. See the
+A direct FP32 GDN-state follow-up found that cadence-4 swaps changed GDN values
+even on a short-only request (relative L2 0.0462) while preserving output IDs.
+After a long request, delayed adaptation reproduced the initial state
+bit-for-bit; active adaptation changed 29,414,608 of 29,417,472 floats
+(relative L2 0.7376) and all 16 output IDs. This is one diagnostic run per arm:
+it quantifies the state drift on this path, but does not identify an internal
+cause or close Phase 5. See the
 [numeric capture report](../../bench/results/2026-10-16-phase5-coder-q8_1-adaptive-swap-screen/gdn-state/README.md).
 
 The [current-source Coder IQ1_M path check](../../bench/results/2026-10-15-phase7-current-source-coder-iq1m/README.md)

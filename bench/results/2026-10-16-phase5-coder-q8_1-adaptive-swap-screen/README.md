@@ -51,7 +51,8 @@ The Q8_1 CPU route remains opt-in. Adaptive residency migration remains
 unqualified for this Coder workload; Phase 5 remains open.
 
 The [direct FP32 GDN-state follow-up](gdn-state/README.md) captured numerical
-state after the same short prompt. The delayed-swap long-then-short control was
-bit-identical to the initial short state; active swaps changed 99.9903% of GDN
-floats (relative L2 0.7376) and the accepted output IDs. This quantifies the
-state difference for one sequence without identifying its internal cause.
+state after the same short prompt. Cadence-4 swaps changed 4.6% relative L2
+while preserving immediate output IDs; after a long request, active swaps
+changed 73.8% relative L2 and all 16 output IDs, while delayed-swap recovery was
+bit-identical to the initial short state. This quantifies the state difference
+for one sequence without identifying its internal cause.
