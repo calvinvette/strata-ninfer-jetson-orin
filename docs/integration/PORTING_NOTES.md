@@ -1507,6 +1507,24 @@ the GGML Q8 labels and this NVIDIA measurement do not define Splash's Metal
 contract. See the
 [all-layer trace and operator oracle](../../bench/results/2026-10-16-phase5-coder-swap-budget-screen/README.md#all-layer-route-trace-and-operator-oracle--2026-10-16).
 
+A seven-pair fixed-residency confirmation repeated the Coder IQ1_M state and
+continuation pattern on the exact `Coder-GGUF/IQ1_M` snapshot: cap-8 matched
+the immediate recovery answer but changed five persistent fingerprints in
+every pair, then differed at all 16 positions on the next identical request.
+The delayed-adaptation control restored both answer and fingerprints. The
+implementation boundary is visible in `src/kernels/cpu/native_expert.cpp`:
+`NativeFmt` takes each activation type from GGML CPU's weight `vec_dot_type`,
+and `native_quant_act`/`native_quant_h` call that CPU quantizer. The native
+CUDA grouped path instead consumes Q8_1 activation rows. For the changed layer
+1 expert (IQ2_S gate/up with Q2_0 down), this means CPU Q8_K/Q8_0 versus CUDA
+Q8_1/Q8_1. The existing Orin scalar and NEON Q8_1 helper tests verify only the
+quantized Q8_1 image; they do not make GGML's IQ/Q2_0 dot kernels accept Q8_1.
+Do not change the activation pointer format alone. A route-parity candidate
+needs a separately specified host dot contract for each promoted native
+weight format, byte-level quantizer fixtures, and same-input operator oracles
+before service-level accepted-prefix and continuation retesting. The complete
+seven-pair state evidence is in the [fixed-residency confirmation](../../bench/results/2026-10-16-phase5-coder-fixed-residency-confirm7/README.md).
+
 A follow-up held-out short-task check returned the exact requested code before
 and after a long swap-inducing request in two fresh services, even though six
 persistent-state fingerprints changed in both. Keep task-level quality
