@@ -15,6 +15,19 @@ native packs. The guard built on Orin CUDA and in a targeted maestro1 HIP
 service rebuild; the matching Coder config exited with status 2 before serving.
 maestro1's HIP result is compile/CLI evidence only. Phase 5 remains open.
 
+A randomized three-block [Coder IQ1_M swap-budget recovery screen](../../bench/results/2026-10-16-phase5-coder-swap-budget-screen/README.md)
+completed all 12 arms. The active caps were 1, 8 and 96 swaps per adaptation;
+each used the same short/long/short sequence, MTP off, accepted-prefix state
+hashes and layer-0 route capture. Cap 8 exactly matched delayed-control recovery
+tokens in all three blocks, but five persistent-state fingerprints still differed
+from the control each time. Caps 1 and 96 differed at all 16 recovery-token
+positions versus control in all three blocks, with seven changed fingerprints.
+Every adaptive byte and residency verification passed. Minimum host/admission
+availability was 14.34 GiB across 2,221 one-second samples; clock ranges were
+dynamic and energy was not attributed per request. This identifies cap 8 for
+state-level follow-up; output agreement is not exact state recovery, and Phase 5
+remains open.
+
 Phase 6's same-binary Q2_0 int8-KV [MTP × prompt-length study](../../bench/results/2026-10-16-phase6-q2-int8-mtp3-workload-interaction/README.md) completed its 12-arm screen and corrected 28-arm held-out confirmation. The confirmation passed all 14 paired blocks with no rejected cells, including the independent short-task suffix-sum oracle. MTP3 reduced median prompt throughput 13.65% at 512 tokens and 8.56% at 7,501 tokens; client total time increased 7.60% and 8.63%. The prompt-throughput interaction estimate was +5.89% (paired-process bootstrap 95% interval 1.0009–1.0680), while decode-TPS and client-total interaction intervals included no effect. This supports only a borderline difference in the penalty between these prompts; it does not promote MTP3 or close Phase 6's other interactions.
 
 The current-source Coder IQ1_M [256K retrieval/recovery check](../../bench/results/2026-10-15-phase7-current-source-coder-iq1m-256k/README.md) passed: all three planted markers were returned once and in order from a 240,286-token uncached prompt, and the same service returned `RECOVERED`. Engine timing was 8.5 prompt tokens/s; minimum host/admission availability was 7.44 GiB across 27,042 one-second samples, above the six-GiB floor, with zero cgroup pressure/OOM events. This adds one functional capacity cell for the already-tested Coder IQ1_M artifact, not a quantization or engine comparison or a broad support claim. Phase 7 remains open.

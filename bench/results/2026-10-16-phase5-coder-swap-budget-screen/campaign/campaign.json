@@ -1,0 +1,127 @@
+{
+  "schema": 1,
+  "scope": "Coder IQ1_M adaptive swap-budget \u00d7 recovery stability",
+  "seed": 20261016,
+  "binary_sha256": "fd9c010cb5e126dfa1f272d6c2864830df25a67c08c5aacc69ea4c98d5c2a29b",
+  "source_commit": "e6a55b30f596ecc5173d2eb55a4087662b7ee88f",
+  "blocks": 3,
+  "schedule": [
+    {
+      "block": 0,
+      "name": "delayed-control",
+      "adapt_every": 100000,
+      "adapt_swaps": 96
+    },
+    {
+      "block": 0,
+      "name": "swap-96",
+      "adapt_every": 4,
+      "adapt_swaps": 96
+    },
+    {
+      "block": 0,
+      "name": "swap-8",
+      "adapt_every": 4,
+      "adapt_swaps": 8
+    },
+    {
+      "block": 0,
+      "name": "swap-1",
+      "adapt_every": 4,
+      "adapt_swaps": 1
+    },
+    {
+      "block": 1,
+      "name": "swap-96",
+      "adapt_every": 4,
+      "adapt_swaps": 96
+    },
+    {
+      "block": 1,
+      "name": "delayed-control",
+      "adapt_every": 100000,
+      "adapt_swaps": 96
+    },
+    {
+      "block": 1,
+      "name": "swap-1",
+      "adapt_every": 4,
+      "adapt_swaps": 1
+    },
+    {
+      "block": 1,
+      "name": "swap-8",
+      "adapt_every": 4,
+      "adapt_swaps": 8
+    },
+    {
+      "block": 2,
+      "name": "swap-1",
+      "adapt_every": 4,
+      "adapt_swaps": 1
+    },
+    {
+      "block": 2,
+      "name": "swap-96",
+      "adapt_every": 4,
+      "adapt_swaps": 96
+    },
+    {
+      "block": 2,
+      "name": "swap-8",
+      "adapt_every": 4,
+      "adapt_swaps": 8
+    },
+    {
+      "block": 2,
+      "name": "delayed-control",
+      "adapt_every": 100000,
+      "adapt_swaps": 96
+    }
+  ],
+  "status": "fail",
+  "runs": [
+    {
+      "block": 0,
+      "name": "delayed-control",
+      "adapt_every": 100000,
+      "adapt_swaps": 96,
+      "status": "fail",
+      "started_wall_time": 1792153774.4225156,
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-16-phase5-coder-swap-budget-screen/campaign/block-0-delayed-control-supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-16-phase5-coder-swap-budget-screen/run_one.py",
+        "--adapt-every",
+        "100000",
+        "--adapt-swaps",
+        "96",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-16-phase5-coder-swap-budget-screen/campaign/block-0-delayed-control"
+      ],
+      "returncode": 1,
+      "supervisor_status": "not_run",
+      "finished_wall_time": 1792153774.5055573,
+      "binary_sha256_after": "fd9c010cb5e126dfa1f272d6c2864830df25a67c08c5aacc69ea4c98d5c2a29b"
+    }
+  ],
+  "abort_reason": "stopped at block-0-delayed-control",
+  "finished_wall_time": 1792153774.5611908
+}
