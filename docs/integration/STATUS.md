@@ -2268,6 +2268,16 @@ these current-binary runs cover 8K/16K/32K retrieval cells for the already
 tested Coder artifact identity; broad quality, thermal soak and independent
 repetitions remain open, so Phase 7 stays in progress.
 
+The [current-source Coder IQ1_M near-limit 128K check](../../bench/results/2026-10-15-phase7-current-source-coder-iq1m-128k/README.md)
+used the same pinned shard hashes and candidate binary with 131,072 configured
+context. Its exact 120,149-token prompt returned all three planted markers
+once and in order, then the same service returned `RECOVERED`; MTP accepted
+28/33 drafts. Minimum host/admission availability was 10.20 GiB across 5,837
+samples, with zero cgroup pressure/OOM events. An earlier attempt was
+interrupted by supervisor signal 15 near the end of prefill and is excluded;
+the independent retry passed. This remains one functional point, not a
+quantization or engine comparison, and Phase 7 remains open.
+
 The [current-source 40-minute sustained Coder service check](../../bench/results/2026-10-15-phase7-current-source-coder-iq1m-soak/README.md)
 used the same binary, profile and exact shard hashes. After a cold 7,498-token
 retrieval precondition, all 1,586 streamed cache-reuse responses contained
