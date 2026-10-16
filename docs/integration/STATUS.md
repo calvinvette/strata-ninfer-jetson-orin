@@ -119,6 +119,16 @@ Full current-source [maestro1 HIP and SYCL builds](../../bench/results/2026-10-1
 
 A fresh [current-source Orin regression retest](../../bench/results/2026-10-15-phase8-current-source-retest/README.md) rebuilt the CUDA/ARM64 tree with two jobs, passed all 117 fixture-available CTests (two optional IQ tests skipped; two pack-dependent tests excluded), and passed integration Python discovery 144/144. Minimum host/admission availability was 24.47 GiB for build, 19.07 GiB for CTest and 24.49 GiB for Python, with zero cgroup pressure/OOM counters. This is native regression evidence, not a cross-backend runtime claim; Phase 8 remains open.
 
+After adding the opt-in CPU Q8_1 route, the [current-source fixture-available regression](../../bench/results/2026-10-16-phase8-current-source-candidate-regression/README.md)
+passed 116 CTests, with two configured IQ fixture tests skipped. The unfiltered
+120-test attempt showed that `expert_parity` and `pool_test` require the absent
+`pack/full/experts.bin`; those two cells were explicitly excluded from the
+supervised rerun. Across 272 one-second samples, minimum host/admission
+availability was 19.56 GiB and cgroup pressure/OOM event counters stayed zero.
+This validates the current native regression suite with available fixtures; it
+does not replace model-serving or backend-runtime qualification. Phase 8 remains
+open.
+
 A Q2_0 [three-cycle reload and teardown check](../../bench/results/2026-10-15-phase7-q2-teardown3/README.md) passed three 7,498-token retrievals with identical marker answers; each listener and engine exited before the next startup. Minimum host/admission availability was 16.85/6.90 GiB across 545 samples, with zero cgroup pressure/OOM events. Phase 7 remains open.
 
 Supported, failed, unsupported and untested cases are recorded. Phase 3

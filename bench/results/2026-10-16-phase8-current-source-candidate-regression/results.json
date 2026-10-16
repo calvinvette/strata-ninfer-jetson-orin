@@ -1,0 +1,65 @@
+{
+  "scope": "current-source Orin ARM64 CUDA regression suite; fixture-available cells only",
+  "source_commit": "0464d128820c7dd9c161f502151a912de2a96b66",
+  "source_file_sha256": "dcbbaa3b34511075fb820a352aba2a0e04dc44151a210d90beeac613d9610f74",
+  "native_expert_parity_binary_sha256": "518a871604ac8c4b9f51ea3498d7a61d823d4b79dff4c3f83c94a7f742e775a4",
+  "strata_binary_sha256": "c07cf3f634788d055316cbf345a2fa17dd66449cb5ddd8690781dbbd72403c88",
+  "host": "Orin1 aarch64, CUDA 12.6; dynamic clocks observed, not controlled",
+  "test_command": "ctest --test-dir build/integration/candidate --output-on-failure -E ^(expert_parity|pool_test)$",
+  "supervisor_command": "systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes python3 tools/integration/run_control.py --timeout 1800 --interval 1 --sample-clocks -- <test_command>",
+  "ctest_summary": {
+    "selected": 118,
+    "passed": 116,
+    "skipped": 2,
+    "failed": 0,
+    "elapsed_s": 285.12,
+    "skipped_tests": [
+      "iq_parity_fixtures",
+      "iq_parity"
+    ]
+  },
+  "unfiltered_attempt": {
+    "selected": 120,
+    "passed": 116,
+    "skipped": 2,
+    "failed": 2,
+    "failed_tests": {
+      "expert_parity": "missing pack/full/experts.bin",
+      "pool_test": "missing pack/full/experts.bin"
+    },
+    "interpretation": "fixture-unavailable cells; excluded from the supervised fixture-available rerun"
+  },
+  "supervisor": {
+    "status": "pass",
+    "returncode": 0,
+    "elapsed_s": 286.13670994900167,
+    "sample_count": 272,
+    "minimum_host_available_gib": 19.559505462646484,
+    "minimum_admission_available_gib": 19.559505462646484,
+    "floor_gib": 6.0,
+    "cgroup_memory_event_maxima": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0
+    },
+    "observed_cpu_clock_mhz_range": [
+      729.6,
+      2201.6
+    ],
+    "observed_gpu_clock_mhz_range": [
+      306.0,
+      1300.5
+    ],
+    "emc_clock": "unavailable: permission denied",
+    "energy": "not request-attributed"
+  },
+  "artifacts": {
+    "ctest_output": "ctest-available-suite.txt",
+    "supervisor_result": "supervisor/result.json",
+    "memory_samples_gz": "supervisor/memory.jsonl.gz",
+    "tegrastats_gz": "supervisor/tegrastats.txt.gz",
+    "supervisor_stderr": "supervisor/stderr.txt"
+  }
+}
