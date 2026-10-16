@@ -19,21 +19,32 @@ binary SHA256 is `57b2222c370c2b9b2590350f1feb206627b70c393394221fd634c53b37d314
 This is a context/retrieval test of one model quantization, not a comparison
 between quantizations or inference engines.
 
-## Run status
+## Result
 
-At the latest recorded check (24,560 seconds after request start), attempt 3
-was still live at 209,408 of 240,286 prompt tokens. Minimum sampled available
-host memory was 7.44 GiB, above the six-GiB floor; the latest memory sample was
-8.19 GiB. From the 127,616-token sample 9,854 seconds earlier, the average rate
-was about 8.31 tokens/s. Linear extrapolation puts prefill near 7 hours 51
-minutes total, roughly nine minutes inside the eight-hour cap. This estimate
-varies with throughput and excludes warmup/recovery overhead. The leaf
-supervisor scope used 8.16 GiB at the latest memory sample, and sampled `low`,
-`high`, `max`, `oom` and `oom_kill` counters are all zero to date. Read-only clock samples so far show CPU 729.6 MHz–2,201.6 MHz and GPU
-306 MHz–816 MHz; `tj` ranged 49.0–52.9 °C. EMC readback remains unavailable.
-The profile uses dynamic clocks and does not attribute energy to this request.
-The supervisor had not produced a terminal result. Retrieval markers, recovery,
-final timing and telemetry summary are therefore pending; this is not a pass.
+Attempt 3 completed within the eight-hour supervisor limit. The harness passed
+the 240,286-token retrieval request: all three planted codes were present once
+and in order (`MAPLE-ORBIT-731`, `COBALT-HARBOR-284`,
+`VELVET-COPPER-956`). The same service then returned `RECOVERED`. This is one
+successful 256K functional cell, not a broad support claim or a comparison
+between model quantizations or engines.
+
+The uncached retrieval took 28,300.1 seconds (7 h 51 min 40 s); engine timing
+reported 8.5 prompt tokens/s and 9.1 generated tokens/s. It generated 41
+tokens, with 29 of 33 MTP drafts accepted. The recovery request took 2.38 s
+and accepted all 3 of 3 drafts. Total supervisor elapsed time, including
+startup and recovery, was 28,366.7 seconds; command exit was 0. The supervisor
+status `pass` means the command completed under the memory floor, while the
+harness `pass` records the retrieval and recovery checks.
+
+Across 27,042 one-second memory samples, minimum host and admission availability
+was 7.44 GiB, above the six-GiB floor. All observed cgroup `low`, `high`, `max`,
+`oom` and `oom_kill` event counters remained zero. Read-only clock samples
+recorded CPU frequencies from 729.6 to 2,201.6 MHz and GPU frequencies from 306
+to 1,300.5 MHz; EMC frequency readback was denied. Across 28,196 tegrastats
+samples, `tj` ranged from 49.0 to 56.4 °C. Clocks remained dynamic and
+untouched. Energy was not attributed to the request; raw tegrastats power rails
+are retained. The full one-second memory sample log is compressed as
+`supervisor-attempt3/memory.jsonl.gz`.
 
 Two earlier attempts are retained but excluded from quality and capacity
 results. Attempt 1 used prefill chunk 64; its last progress sample was 1,280
@@ -52,7 +63,8 @@ bedfd651f76b67198cd87e1ce8566f42f7f7a3a07c64cd3632f115a54c9f55c2  config-262144-
 050fd0a48216aaf5fe6765993987b17c7ba8f674b3f125f1f44d175489a797aa  warmup-512.json
 ```
 
-On completion, update this report with the terminal supervisor status, exact
-marker and same-service recovery results, prompt/decode timings, actual memory
-floor and cgroup counters, clocks and thermal observations. Until then, no
-256K Coder support claim is made. Phase 7 remains open.
+The supervisor memory log, raw tegrastats observations, request artifacts,
+configuration, model hashes and binary identity are retained here. Phase 7
+remains open for independent repetitions, broader task quality, sustained
+service, concurrency and other support boundaries; this result does not
+establish those properties.
