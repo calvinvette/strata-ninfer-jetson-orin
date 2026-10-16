@@ -1662,3 +1662,11 @@ state ordinals to model blocks before comparing state; then compare numeric
 state at the same committed prefix, using fixed/delayed ownership as the control
 and retaining accepted-state plus continuation checks. See the
 [numeric GDN capture](../../bench/results/2026-10-16-phase5-coder-q8_1-adaptive-swap-screen/gdn-state/README.md).
+
+For speculative cancellation, compare every shared committed prefix against
+fresh exact-length references, including draft MTP and stale-state fingerprints;
+then check same-service recovery. In this Coder IQ1_M check, twelve committed
+tokens matched at four prefix boundaries across three references. Record the
+MTP checkpoint separately from the target model: this run paired the Coder GGUF
+with MTP weights from the upstream base Qwen3.8-Flash-Next revision, not a
+Coder-specific checkpoint. See the [cancellation report](../../bench/results/2026-10-16-phase5-coder-mtp-cancel-parity-current/README.md).
