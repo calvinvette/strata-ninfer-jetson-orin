@@ -31,8 +31,11 @@ In the short-only active run, GDN slices 0 and 1 were bit-identical to the
 control; slice 2 was the first to differ (relative L2 0.000964), after which
 the difference grew across later slices. The earlier [all-layer route trace](../../2026-10-16-phase5-coder-swap-budget-screen/README.md#all-layer-route-trace-and-operator-oracle--2026-10-16)
 found its first activation drift at transformer layer 2, after owner changes at
-layer 1. The alignment narrows the follow-up, but the state-slice to transformer
-module mapping and causal path still need direct confirmation.
+layer 1. The mapping is explicit in Strata: full-model GDN rows are compacted
+over non-QSA layers (`qsa_interval=4`, with QSA at layers 3, 7, ...), so GDN
+slice 2 is transformer block 2. The first state drift therefore aligns with the
+first activation drift. Owner changes at layer 1 are one block upstream; this
+localizes propagation but does not alone prove the arithmetic cause.
 
 This is direct evidence that active adaptive migration in this tested sequence
 is associated with a modest short-only GDN difference that preserves immediate

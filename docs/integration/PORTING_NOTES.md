@@ -1654,8 +1654,11 @@ bit-for-bit, while
 cadence-4 swaps changed 99.9903% of its floats (relative L2 0.7376) and all 16
 sampled output IDs. Numeric differences began in GDN slice 2; an earlier route
 trace first observed activation drift at transformer layer 2 after ownership
-changes at layer 1. That alignment still needs direct state-slice/module mapping
-and causality checks. For a future Splash port, hash equality should be followed
-by direct numeric state comparison at the same committed prefix, with
-fixed/delayed ownership as the control and accepted-state plus continuation
-checks retained. See the [numeric GDN capture](../../bench/results/2026-10-16-phase5-coder-q8_1-adaptive-swap-screen/gdn-state/README.md).
+changes at layer 1. Strata's full-model state compacts GDN rows over non-QSA
+layers, so slice 2 maps to transformer block 2 and the observed boundaries
+align. This localizes propagation one block after the owner changes without
+proving arithmetic causality. For a future Splash port, map engine-specific
+state ordinals to model blocks before comparing state; then compare numeric
+state at the same committed prefix, using fixed/delayed ownership as the control
+and retaining accepted-state plus continuation checks. See the
+[numeric GDN capture](../../bench/results/2026-10-16-phase5-coder-q8_1-adaptive-swap-screen/gdn-state/README.md).
