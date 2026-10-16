@@ -100,6 +100,14 @@ def workload_path(suite, workload):
                                     else "workload-near-limit.json")
 
 
+def config_path(variant):
+    if variant == "baseline":
+        return HERE / "config-mtp-off.json"
+    if variant == "candidate":
+        return HERE / "config-mtp3.json"
+    raise ValueError(f"unknown campaign variant: {variant}")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--suite", choices=("screen", "confirm"), required=True)
@@ -114,8 +122,8 @@ def main():
         raise ValueError("campaign name must stay below this experiment directory")
     repetitions = 3 if args.suite == "screen" else 7
     schedule = make_schedule(repetitions, args.seed)
-    configs = {"baseline": json.loads((HERE / "config-mtp-off.json").read_text()),
-               "candidate": json.loads((HERE / "config-mtp3.json").read_text())}
+    configs = {variant: json.loads(config_path(variant).read_text())
+               for variant in ("baseline", "candidate")}
     binary_sha = verify_config_pair(configs)
     workloads = {name: workload_path(args.suite, name) for name in ("short", "near_limit")}
     if any(not path.is_file() for path in workloads.values()):
@@ -144,8 +152,8 @@ def main():
         "schedule": schedule,
         "binary_source_commit": SOURCE_COMMIT,
         "binary_sha256": binary_sha,
-        "config_sha256": {name: sha256(HERE / f"config-mtp-{suffix}.json")
-                          for name, suffix in (("baseline", "off"), ("candidate", "3"))},
+        "config_sha256": {name: sha256(config_path(name))
+                          for name in ("baseline", "candidate")},
         "model_checksums_file_sha256": sha256(HERE / "model-checksums.txt"),
         "model_checksums": [line for line in (HERE / "model-checksums.txt").read_text().splitlines()
                             if line.strip() and not line.lstrip().startswith("#")],
@@ -177,7 +185,7 @@ def main():
                 "--output", str(output), "--timeout", "1800", "--interval", "1",
                 "--sample-clocks", "--", sys.executable,
                 str(ROOT / "tools/integration/api_control_block.py"),
-                "--config", str(HERE / f"config-mtp-{'off' if variant == 'baseline' else '3'}.json"),
+                "--config", str(config_path(variant)),
                 "--workloads", str(workloads[item["workload"]]),
                 "--output", str(output / "requests.json"), "--variant", variant,
                 "--warmup-workloads", str(HERE / "warmup-workloads.json"), "--no-trace",

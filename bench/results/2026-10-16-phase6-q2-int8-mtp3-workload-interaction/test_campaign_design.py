@@ -8,9 +8,16 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from campaign_plan import make_schedule
 from analyze_interaction import interaction_interval, marker_check
+from run_campaign import config_path
 
 
 class CampaignDesignTests(unittest.TestCase):
+    def test_each_campaign_arm_uses_an_existing_configuration(self):
+        self.assertEqual(config_path("baseline").name, "config-mtp-off.json")
+        self.assertEqual(config_path("candidate").name, "config-mtp3.json")
+        self.assertTrue(config_path("baseline").is_file())
+        self.assertTrue(config_path("candidate").is_file())
+
     def test_screen_and_confirmation_are_complete_randomized_pairs(self):
         for repetitions in (3, 7):
             with self.subTest(repetitions=repetitions):
