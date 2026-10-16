@@ -46,12 +46,22 @@ passes 5/5 tests.
 
 ## Held-out confirmation
 
-Because the screen suggests a possible decode interaction, new exact-length
-held-out prompts were generated after reviewing it. `confirmation/prepared.json`
-records tokenizer/template identity and prompt hashes. The short and
-near-limit prompts contain distinct planted markers and are exactly 512 and
-7,501 formatted tokens. The confirmation runner plan has seven independent
-pairs per workload (28 arms) and uses the same binary and model checksums as the
-screen. These prompts have been prepared but not yet measured. The screen and
-confirmation remain separate; no MTP-by-workload effect is established until
-the held-out stage completes and is analyzed.
+Confirmation attempt 1 ran all 28 arms, and the generic workload harness
+reported success for each. Independent analysis accepted the seven near-limit
+pairs but rejected all seven short pairs: the short prompt requested a response
+template with `SUM=...` without explicitly asking for suffix arithmetic, so
+the model did not return the expected numeric sum. This attempt is excluded
+from interaction estimates. Its raw campaign, analysis and original prompt
+inputs are preserved in `confirm-1/` and `confirmation-attempt1/`.
+
+The prompt generator now explicitly asks for the sum of the three numbers at
+the ends of the retrieved codes. The corrected short prompt is still exactly
+512 formatted tokens; the near-limit prompt remains 7,501 tokens. The updated
+short prompt SHA256 is
+`e60c2022729fa4c503ce617b82f6e90202520b97ea257e8977e5c4bf2f3482fb`; the
+near-limit prompt hash remains
+`1d5e95c1a742a7a7b1df09568017825c412c0ecdb478deb5974a1369544c69c0`. The
+campaign design tests pass 6/6, and the plan-only check lists 28 arms on the
+same binary and artifact set. Confirmation attempt 2 is prepared but not yet
+measured. No held-out interaction result is established until all pairs pass
+the independent workload oracles.

@@ -39,7 +39,7 @@ def make_body(rows, markers, padding_words, workload):
     if padding_words:
         parts.append("\nAdditional ordinary record: " + "routine " * padding_words + "\n")
     if workload == "short":
-        parts.append("\nReturn exactly EARLY=..., MIDDLE=..., LATE=..., SUM=... in that order.")
+        parts.append("\nReturn the three marker codes in order. Also add the three numbers at the ends of those codes. Output exactly: EARLY=<first full code>, MIDDLE=<second full code>, LATE=<third full code>, SUM=<sum of the three ending numbers>.")
     else:
         parts.append("\nReturn the three keys in order as EARLY=..., MIDDLE=..., LATE=... with no other text.")
     return "".join(parts)

@@ -9,6 +9,7 @@ sys.path.insert(0, str(HERE))
 from campaign_plan import make_schedule, workload_filename
 from analyze_interaction import interaction_interval, marker_check
 from run_campaign import config_path, workload_path
+from prepare_confirmation import make_body, NEEDLES
 
 
 class CampaignDesignTests(unittest.TestCase):
@@ -24,6 +25,16 @@ class CampaignDesignTests(unittest.TestCase):
                 self.assertEqual(workload_filename(name), workload_path("confirm", name).name)
                 self.assertEqual(workload_filename(name), workload_path("screen", name).name)
                 self.assertTrue((HERE / workload_filename(name)).is_file())
+
+    def test_short_confirmation_prompt_explains_suffix_sum_oracle(self):
+        prompt = make_body(26, NEEDLES["short"], 6, "short")
+        self.assertIn("add the three numbers at the ends of those codes", prompt)
+        self.assertIn("SUM=<sum of the three ending numbers>", prompt)
+        expected = {"expected_codes": [code for _, code in NEEDLES["short"]],
+                    "expected_suffix_sum": 1478}
+        self.assertTrue(marker_check(
+            "EARLY=CITRUS-AXLE-431, MIDDLE=MARBLE-THICKET-782, "
+            "LATE=OXIDE-KITE-265, SUM=1478", expected)[0])
 
     def test_screen_and_confirmation_are_complete_randomized_pairs(self):
         for repetitions in (3, 7):
