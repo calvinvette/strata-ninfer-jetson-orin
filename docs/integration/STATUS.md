@@ -87,6 +87,16 @@ claim, and the default remains unchanged. All 16 CUDA native-expert parity tests
 passed; maestro1 HIP/SYCL results are host compile/link evidence only. Phase 5
 remains open.
 
+A randomized one-block [CPU arithmetic × swap-cadence screen](../../bench/results/2026-10-16-phase5-coder-q8_1-adaptive-swap-screen/README.md)
+then exercised actual cadence-4 accepted-only swaps with and without the scalar
+Q8_1 route, alongside delayed-swap controls. All 15 swap byte/residency checks
+passed in both active arms. Delayed controls matched initial/recovery tokens and
+state exactly. Both active routes differed from recovery on all 16 continuation
+tokens; the default route changed five recovery-state fields, and the Q8_1 route
+changed seven fields and six token positions versus its own initial short
+request. This one block does not show that Q8_1 resolves swap-dependent state
+drift; no quality or speed claim follows. Phase 5 remains open.
+
 Phase 6's same-binary Q2_0 int8-KV [MTP × prompt-length study](../../bench/results/2026-10-16-phase6-q2-int8-mtp3-workload-interaction/README.md) completed its 12-arm screen and corrected 28-arm held-out confirmation. The confirmation passed all 14 paired blocks with no rejected cells, including the independent short-task suffix-sum oracle. MTP3 reduced median prompt throughput 13.65% at 512 tokens and 8.56% at 7,501 tokens; client total time increased 7.60% and 8.63%. The prompt-throughput interaction estimate was +5.89% (paired-process bootstrap 95% interval 1.0009–1.0680), while decode-TPS and client-total interaction intervals included no effect. This supports only a borderline difference in the penalty between these prompts; it does not promote MTP3 or close Phase 6's other interactions.
 
 A new seven-block Q2_0 [task-qualified graph × MTP confirmation](../../bench/results/2026-10-16-phase6-q2-graph-mtp-quality-confirm7/README.md) reran all 28 captured/eager × MTP-off/window-2 cells on the validated 2,094-token processor task. Every arm naturally stopped at 293 tokens, passed the task rubric, and produced byte-identical output. Graph/eager effects and graph × MTP interaction intervals included no change. MTP2 increased request time 4.12% captured and 3.86% eager, and reduced decode throughput 6.10% and 4.94%; those request/decode intervals exclude zero. MTP2 offered/accepted 153/97 drafts each run. Minimum host/admission availability was 16.925/11.630 GiB and all cgroup event counters remained zero. This closes the quality gap for this graph × MTP cell only; no profile is promoted and Phase 6 remains open.

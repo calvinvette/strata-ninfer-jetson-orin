@@ -1,0 +1,33 @@
+{
+  "scope": "one randomized 2x2 Phase 5 screen of CPU arithmetic route by adaptive swap cadence on the Coder IQ1_M artifact",
+  "seed": 20261016,
+  "model_repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+  "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
+  "model_quantization": "IQ1_M",
+  "sequence": [
+    "512-token prompt, 16 generated tokens",
+    "2048-token prompt, 16 generated tokens",
+    "same 512-token prompt, 16 generated tokens",
+    "same 512-token prompt, 16 generated tokens"
+  ],
+  "fixed_factors": {
+    "swap_cap": 8,
+    "adaptation_policy": "accepted-only",
+    "mtp": "off",
+    "pool_workers": 8,
+    "prefill_cpu_share": false,
+    "context_tokens": 8192,
+    "host_supervisor": "MemoryMax=28G, 1-second sampling, 6-GiB host availability floor"
+  },
+  "factorial": {
+    "cpu_route": ["default GGML format-selected", "opt-in scalar Q8_1 for IQ2_S/Q2_0"],
+    "adapt_every": [100000, 4]
+  },
+  "randomized_arm_order": [
+    "delayed-default",
+    "active-q81",
+    "delayed-q81",
+    "active-default"
+  ],
+  "planned_scope_limit": "one screening block; extend only if the candidate restores short-request committed-state and continuation parity under active swaps"
+}

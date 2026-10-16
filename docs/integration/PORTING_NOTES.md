@@ -1632,3 +1632,16 @@ change. For a future Splash integration, repeat codec and operator checks at
 the exact expert-format seam, then measure the engine-native Metal path and
 accepted-prefix state/continuation before making any routing decision. This
 single pair is exploratory only; see the report for raw captures and limits.
+
+A follow-up 2×2 screen activated swaps at cadence 4, with and without that
+Q8_1 route, and retained delayed-swap controls. Both delayed controls reproduced
+the short request's accepted state exactly. Both active routes still changed
+persistent state, and the continuation differed at all 16 token positions;
+the Q8_1 arm also differed at six initial/recovery token positions. Thus close
+operator agreement on a fixed activation does not establish state parity when
+ownership changes across a service request. For Splash, include a delayed or
+fixed-owner control in each route experiment and compare committed state plus a
+same-prompt continuation after migration; preserve byte and residency checks as
+separate evidence. This was one screening block only and does not quantify a
+quality or performance effect. See the
+[Coder swap/arithmetic screen](../../bench/results/2026-10-16-phase5-coder-q8_1-adaptive-swap-screen/README.md).
