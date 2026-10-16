@@ -32,6 +32,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
 #include <random>
 #include <string>
 #include <vector>
@@ -51,7 +52,8 @@ constexpr int64_t H = 2560, FF = 640;
 
 // The three ways and the dequantizers for one expert blob; returns the number of failed checks.
 int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int seed, const std::string& label,
-               cudaStream_t s, const std::vector<float>* service_activation = nullptr) {
+               cudaStream_t s, const std::vector<float>* service_activation = nullptr,
+               const std::string& dump_f32_dir = {}) {
     int failures = 0;
     // (a) the float reference
     const auto* tg = ggml_get_type_traits((ggml_type) f.gu_type);
@@ -75,6 +77,21 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
             std::copy(service_activation->begin(), service_activation->end(), x.begin() + (size_t) k * H);
     } else {
         for (auto& v : x) v = nd(rng);
+    }
+    if (!dump_f32_dir.empty()) {
+        std::string stem = label;
+        std::replace(stem.begin(), stem.end(), ' ', '-');
+        const auto write = [&](const std::string& suffix, const float* values, size_t count) {
+            const std::string path = dump_f32_dir + "/" + stem + "-" + suffix + ".f32";
+            std::ofstream out(path, std::ios::binary);
+            if (!out || !out.write(reinterpret_cast<const char*>(values), (std::streamsize) (count * sizeof(float)))) {
+                std::fprintf(stderr, "%s: cannot write parity dump %s\n", label.c_str(), path.c_str());
+                return false;
+            }
+            return true;
+        };
+        if (!write("gate", G.data(), G.size()) || !write("up", U.data(), U.size()) ||
+            !write("down", D.data(), D.size()) || !write("activation", x.data(), (size_t) H)) return 1;
     }
     std::vector<float> ref((size_t) NT * H), got_c((size_t) NT * H), got_g((size_t) NT * H);
     for (int k = 0; k < NT; ++k) {
@@ -168,6 +185,19 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
             op[k] = got_c.data() + k * H;
         }
         cpu::native_down_rows(f, blob.data(), hp, NT, op, 0, (int) H);
+        if (!dump_f32_dir.empty()) {
+            std::string stem = label;
+            std::replace(stem.begin(), stem.end(), ' ', '-');
+            for (const auto& item : {std::pair<const char*, const std::vector<float>*>("cpu-output", &got_c),
+                                     std::pair<const char*, const std::vector<float>*>("float-output", &ref)}) {
+                const std::string path = dump_f32_dir + "/" + stem + "-" + item.first + ".f32";
+                std::ofstream out(path, std::ios::binary);
+                if (!out || !out.write(reinterpret_cast<const char*>(item.second->data()), H * sizeof(float))) {
+                    std::fprintf(stderr, "%s: cannot write parity dump %s\n", label.c_str(), path.c_str());
+                    return 1;
+                }
+            }
+        }
         {   // #152: a token's rows must not depend on how many tokens share the call - each token alone (nt = 1)
             // against its row of the NT-token call above, bit for bit, gate/up and down
             size_t gu_diff = 0, dn_diff = 0;
@@ -323,6 +353,16 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
         strata::kernels::native_expert_grouped(L, dptr, dstart, dn, ddst, dtok, 1, NT, dxq, dscr, dout, s);
         cudaStreamSynchronize(s);
         cudaMemcpy(got_g.data(), dout, got_g.size() * 4, cudaMemcpyDeviceToHost);
+        if (!dump_f32_dir.empty()) {
+            std::string stem = label;
+            std::replace(stem.begin(), stem.end(), ' ', '-');
+            const std::string path = dump_f32_dir + "/" + stem + "-gpu-output.f32";
+            std::ofstream out(path, std::ios::binary);
+            if (!out || !out.write(reinterpret_cast<const char*>(got_g.data()), H * sizeof(float))) {
+                std::fprintf(stderr, "%s: cannot write parity dump %s\n", label.c_str(), path.c_str());
+                return 1;
+            }
+        }
         {   // the kernels that decode a weight part once for the NT entries, bitwise vs the per-entry ones (#242;
             // the formats without a decode-once split take the per-entry kernels either way)
             std::vector<float> old_g(got_g.size());
@@ -549,6 +589,7 @@ int main(int argc, char** argv) {
     setvbuf(stdout, nullptr, _IONBF, 0);   // keep the trail on a crash
     if (argc < 2) {
         std::fprintf(stderr, "usage: native_expert_parity <shard.gguf> [--expert E] [--activation-f32 FILE] [layer ...]\n"
+                             "       [--dump-f32-dir DIR] writes dequantized weights, input and reference/operator outputs\n"
                              "       native_expert_parity --synthetic GU/DOWN ...   (ggml type names, e.g. q4_K/q5_1)\n"
                              "       native_expert_parity --q5_1-min\n"
                              "       native_expert_parity --bf16-embd\n");
@@ -591,10 +632,12 @@ int main(int argc, char** argv) {
         std::vector<int> layers;
         int expert = E;
         std::string activation_path;
+        std::string dump_f32_dir;
         for (int i = 2; i < argc; ++i) {
             const std::string arg = argv[i];
             if (arg == "--expert" && i + 1 < argc) expert = std::atoi(argv[++i]);
             else if (arg == "--activation-f32" && i + 1 < argc) activation_path = argv[++i];
+            else if (arg == "--dump-f32-dir" && i + 1 < argc) dump_f32_dir = argv[++i];
             else layers.push_back(std::atoi(argv[i]));
         }
         if (expert < 0 || expert >= cpu::NE) {
@@ -639,7 +682,7 @@ int main(int argc, char** argv) {
                         f.bytes - f.down_off);
             const std::string label = "layer " + std::to_string(l) + " expert " + std::to_string(expert);
             failures += check_blob(f, blob, l, label, s,
-                                   service_activation.empty() ? nullptr : &service_activation);
+                                   service_activation.empty() ? nullptr : &service_activation, dump_f32_dir);
         }
     }
     std::printf("native_expert_parity: %d failures\n", failures);

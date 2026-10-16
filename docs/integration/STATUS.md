@@ -2236,6 +2236,19 @@ arithmetic or prove the persistent-state recovery cause. The
 [quantizer diagnostic](../../bench/results/2026-10-14-phase5-current-source-route-change-capture/activation-quantizers.md)
 records the method and limits. Phase 5 remains open.
 
+A follow-up [shared-weight activation-error decomposition](../../bench/results/2026-10-15-phase5-activation-error-decomposition/README.md)
+ran the six observed layer-0 route-flip experts on the first captured input.
+The CBLAS FP32 expert oracle used GGML-dequantized weights and independently
+reconstructed CPU Q8_K/Q8_0 and GPU Q8_1/Q8_1 activations. The median measured
+CPU/GPU output difference was 1.57402%; the quantizer-only oracle produced
+1.57424%. The median residual vector was 0.40533% of the measured difference,
+and actual CPU/GPU outputs stayed within 0.000014%/0.083511% of their
+respective quantizer oracles at worst. Across seven captured inputs, the 42
+quantizer-only pairs had 1.50755% median relative L1. This strongly attributes
+the sampled layer-0 operator gap to activation-format differences; it does not
+establish the full service-level persistent-state drift cause. Phase 5 remains
+open.
+
 The [current-source Coder IQ1_M path check](../../bench/results/2026-10-15-phase7-current-source-coder-iq1m/README.md)
 used the `IQ1_M` variant from `ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF`,
 pinned by the local Hugging Face snapshot at revision
