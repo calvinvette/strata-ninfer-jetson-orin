@@ -1475,6 +1475,18 @@ each actual CPU/Metal route after confirming its expert IDs and owner changes;
 do not infer parity from weights landing correctly. See the
 [IQ1_M route capture and parity report](../../bench/results/2026-10-14-phase5-current-source-route-change-capture/README.md).
 
+A follow-up on six observed layer-0 route flips used the same dequantized expert
+weights and captured input with independent CPU and GPU activation quantizers.
+Across 42 input/expert pairs, the median measured CPU/GPU output difference was
+1.57402%; the quantizer-only oracle difference was 1.57424%, and the median
+residual vector was 0.40533% of the measured difference. This attributes nearly
+all of the sampled operator gap to the activation-format seam, but does not
+establish that it causes the service-level recurrence drift. For a Splash port,
+reconstruct each route's actual activation codes and scales against shared
+weights before changing schedules; keep operator attribution separate from
+accepted-prefix and task-quality conclusions. See the
+[activation-error decomposition](../../bench/results/2026-10-15-phase5-activation-error-decomposition/README.md).
+
 A follow-up held-out short-task check returned the exact requested code before
 and after a long swap-inducing request in two fresh services, even though six
 persistent-state fingerprints changed in both. Keep task-level quality
