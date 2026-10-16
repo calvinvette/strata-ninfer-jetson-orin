@@ -18,7 +18,7 @@ checkout were not included. The source and build stayed under
 maestro1. No model or build products were copied into Git.
 
 The toolchain was ROCm SDK `7.10.0a20251120`, AMD clang `22.0.0git`, CMake
-`3.22.1`, Ninja `1.13.2`, targeting `gfx1100`. HIP was enabled and CUDA
+`3.31.10`, Ninja `1.13.2`, targeting `gfx1100`. HIP was enabled and CUDA
 disabled. Configure and build used one job. The HIP target completed with
 exit status zero; the retained log ends with successful linking at step 93/94
 (the unused final Ninja step was not emitted). Compiler warnings were present;

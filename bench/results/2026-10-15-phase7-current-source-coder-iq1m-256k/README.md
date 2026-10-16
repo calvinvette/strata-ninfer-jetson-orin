@@ -21,14 +21,14 @@ between quantizations or inference engines.
 
 ## Run status
 
-At the latest recorded check (16,162 seconds after request start), attempt 3
-was still live at 139,776 of 240,286 prompt tokens. Minimum sampled available
+At the latest recorded check (23,056 seconds after request start), attempt 3
+was still live at 196,992 of 240,286 prompt tokens. Minimum sampled available
 host memory was 7.44 GiB, above the six-GiB floor; the latest memory sample was
-8.21 GiB. From the 127,616-token sample 1,456 seconds earlier, the average rate
-was about 8.35 tokens/s. Linear extrapolation puts prefill near 7 hours 48
-minutes total, roughly twelve minutes inside the eight-hour cap. This estimate
+8.13 GiB. From the 127,616-token sample 8,350 seconds earlier, the average rate
+was about 8.31 tokens/s. Linear extrapolation puts prefill near 7 hours 51
+minutes total, roughly nine minutes inside the eight-hour cap. This estimate
 varies with throughput and excludes warmup/recovery overhead. The leaf
-supervisor scope used 8.17 GiB at the latest memory sample, and sampled `low`,
+supervisor scope used 8.07 GiB at the latest memory sample, and sampled `low`,
 `high`, `max`, `oom` and `oom_kill` counters are all zero to date. Read-only clock samples so far show CPU 729.6 MHz–2,201.6 MHz and GPU
 306 MHz–816 MHz; `tj` ranged 49.0–52.9 °C. EMC readback remains unavailable.
 The profile uses dynamic clocks and does not attribute energy to this request.
