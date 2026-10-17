@@ -2679,3 +2679,16 @@ attempt and two conservative pressure aborts are retained but excluded; the
 isolated per-cell retry completed all blocks. This confirms the result for
 this Q2_0 long-prompt task and runtime profile only. No default changed, and
 Phase 6 remains open.
+
+A same-day [current-source Q2_0 cache × prefill confirmation](../../bench/results/2026-10-17-phase6-q2-prefill-cache-current-source/README.md)
+crossed exact 3,000/3,500 expert slots with chunks 32/128 in seven randomized
+blocks on the 512-token held-out retrieval task. All 28 measured responses
+matched the exact 47-token answer and all services admitted their requested
+cache capacity. Chunk 128 reduced median request time 45.85% at 3,000 slots
+(paired 95% interval −47.07% to −45.08%) and 45.38% at 3,500 slots
+(−47.98% to −43.68%). The cache × chunk interaction interval includes zero;
+the cache-size effect at chunk128 also includes zero. One 3,500-slot/chunk32
+cell took 70.25 seconds while its in-request median GPU clock was 612 MHz; the
+exact-answer cell remains included and no causal claim is made. Minimum
+host/effective admission availability was 17.38/13.49 GiB with zero cgroup
+pressure/OOM events. No profile changed; Phase 6 remains open.

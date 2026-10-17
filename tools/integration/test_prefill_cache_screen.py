@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 
 from cache_context_screen import api_command
-from prefill_cache_screen import prefill_cache_configs, scoped_command
+from prefill_cache_screen import prefill_cache_configs, scope_description, scoped_command
 
 
 class PrefillCacheScreenTest(unittest.TestCase):
@@ -55,6 +55,10 @@ class PrefillCacheScreenTest(unittest.TestCase):
     def test_per_cell_memory_scope_rejects_invalid_limit(self):
         with self.assertRaises(ValueError):
             scoped_command(['python3', 'runner.py'], 0)
+
+    def test_campaign_scope_matches_measured_round_count(self):
+        self.assertIn('one measured request per process', scope_description(1))
+        self.assertIn('3 measured requests per process', scope_description(3))
 
 
 if __name__ == '__main__':

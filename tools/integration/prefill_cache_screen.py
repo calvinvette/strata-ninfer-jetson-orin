@@ -36,6 +36,13 @@ def scoped_command(command, memory_max_gib=None):
             '--', *command]
 
 
+def scope_description(rounds):
+    requests = ('one measured request' if rounds == 1 else
+                f'{rounds} measured requests')
+    return ('randomized order; independent server process per cell; one separate '
+            f'warmup and {requests} per process; admission and screening evidence only')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', type=Path, required=True)
@@ -85,7 +92,7 @@ def main():
         'clock_sampling': args.sample_clocks,
         'cell_memory_max_gib': args.cell_memory_max_gib,
         'independent_block_confirmation': args.confirmation,
-        'scope': 'randomized order; independent server process per cell; one warmup and three measured requests per process; admission and screening evidence only',
+        'scope': scope_description(args.rounds),
         'started_wall_time_s': time.time(),
         'cells': [],
     }
