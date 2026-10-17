@@ -26,6 +26,15 @@ cycles with independent response and process-exit review; see the
 Broader quality checks remain open. Process-energy attribution and broader
 Phase 6 interactions also remain open.
 
+The selected Q2_0 MTP-off profile also passed a [16K near-limit retrieval and
+recovery cell](../../bench/results/2026-10-17-phase7-q2-prefill128-16k-selected-profile/README.md):
+all three planted markers were returned once and in order from 15,003 uncached
+prompt tokens, followed by same-service `RECOVERED`. Minimum host/admission
+availability was 17.72/10.15 GiB across 611 supervised samples, with zero
+cgroup memory events. This extends the exact selected profile from 8K to one
+16K capacity point; quality breadth, repetitions and larger selected-profile
+contexts remain open. Phase 7 remains in progress.
+
 A same-day [Coder GGUF quantization comparison](../../bench/results/2026-10-17-phase6-coder-quant-comparison/README.md)
 then compared Q2_0 and IQ1_M from the same pinned Hugging Face repository
 revision. After correcting an exploratory screen's cache-size mismatch, a
