@@ -57,6 +57,21 @@ class AuditMtpKvScreenTests(unittest.TestCase):
                          if x['block'] == 1 and x['kv'] == 'int8' and x['workload'] == 'short')
         self.assertIn('same-local-day', exclusion['reason'])
 
+    def test_single_workload_audits_mtp_and_kv_without_inventing_other_interactions(self):
+        campaign = sample_campaign()
+        campaign['workloads'] = ['short']
+        campaign['runs'] = [row for row in campaign['runs']
+                            if row['block'] == 1 and row['workload'] == 'short']
+        for row in campaign['runs']:
+            row['block'] = 0
+        result = audit(campaign)
+        self.assertEqual(len(result['qualified_cell_pairs']), 2)
+        self.assertEqual(len(result['excluded_cell_pairs']), 0)
+        self.assertEqual(len(result['mtp_by_kv_interactions']), 1)
+        self.assertTrue(result['mtp_by_kv_interactions'][0]['qualified'])
+        self.assertEqual(result['mtp_by_workload_interactions'], [])
+        self.assertEqual(result['three_way_interactions'], [])
+
 
 if __name__ == '__main__':
     unittest.main()

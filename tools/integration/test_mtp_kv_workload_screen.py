@@ -77,6 +77,22 @@ class MtpKvWorkloadScreenTests(unittest.TestCase):
             result['three_way_summary']['decode_tps']['paired_bootstrap_95_interval_percent'],
             [None, None])
 
+    def test_single_workload_screen_reports_only_estimable_interactions(self):
+        rows = []
+        for kv in ('fp16', 'int8'):
+            for window, factor in ((0, 1.0), (4, 1.1)):
+                value = 100.0 * factor
+                rows.append({'block': 0, 'kv': kv, 'workload': 'heldout',
+                             'window': window,
+                             'metrics': {'prompt_tps': value, 'decode_tps': value,
+                                         'client_ttft_s': 1 / value,
+                                         'client_total_s': 1 / value}})
+        result = summarize_factorial(rows, ['heldout'], ['fp16', 'int8'], [0, 4], 11)
+        self.assertEqual(len(result['cell_effects']), 2)
+        self.assertEqual(len(result['mtp_by_kv_interactions']), 1)
+        self.assertEqual(result['mtp_by_workload_interactions'], [])
+        self.assertEqual(result['three_way_interactions'], [])
+
     def test_bootstrap_interval_is_finite_for_three_paired_blocks(self):
         interval = bootstrap_interval([0.1, 0.2, 0.3], 7)
         self.assertLessEqual(interval[0], interval[1])

@@ -106,40 +106,41 @@ def summarize_factorial(rows, workloads, kvs, windows, seed):
             item[metric + '_paired_values_percent'] = values
         result['mtp_by_kv_interactions'].append(item)
 
-    for kv in kvs:
-        paired_rows = []
-        for block in range(max(r['block'] for r in rows) + 1):
-            row = {'block': block}
+    if len(workloads) >= 2:
+        for kv in kvs:
+            paired_rows = []
+            for block in range(max(r['block'] for r in rows) + 1):
+                row = {'block': block}
+                for metric in metrics_names:
+                    short = effects[(kv, workloads[0])][block][metric + '_ratio']
+                    long = effects[(kv, workloads[1])][block][metric + '_ratio']
+                    row[metric + '_long_vs_short_interaction_percent'] = (long / short - 1) * 100
+                paired_rows.append(row)
+            item = {'kv_format': kv, 'workloads': [workloads[0], workloads[1]], 'paired_blocks': len(paired_rows)}
             for metric in metrics_names:
-                short = effects[(kv, workloads[0])][block][metric + '_ratio']
-                long = effects[(kv, workloads[1])][block][metric + '_ratio']
-                row[metric + '_long_vs_short_interaction_percent'] = (long / short - 1) * 100
-            paired_rows.append(row)
-        item = {'kv_format': kv, 'workloads': [workloads[0], workloads[1]], 'paired_blocks': len(paired_rows)}
-        for metric in metrics_names:
-            values = [r[metric + '_long_vs_short_interaction_percent'] for r in paired_rows]
-            item[metric + '_median_interaction_percent'] = statistics.median(values)
-            item[metric + '_paired_bootstrap_95_interval_percent'] = bootstrap_interval(values, seed + 5000 + len(item) + len(metric))
-            item[metric + '_paired_values_percent'] = values
-        result['mtp_by_workload_interactions'].append(item)
+                values = [r[metric + '_long_vs_short_interaction_percent'] for r in paired_rows]
+                item[metric + '_median_interaction_percent'] = statistics.median(values)
+                item[metric + '_paired_bootstrap_95_interval_percent'] = bootstrap_interval(values, seed + 5000 + len(item) + len(metric))
+                item[metric + '_paired_values_percent'] = values
+            result['mtp_by_workload_interactions'].append(item)
 
-    for block in range(max(r['block'] for r in rows) + 1):
-        item = {'block': block}
+        for block in range(max(r['block'] for r in rows) + 1):
+            item = {'block': block}
+            for metric in metrics_names:
+                def ratio(kv, workload):
+                    return effects[(kv, workload)][block][metric + '_ratio']
+                short_kv = ratio('int8', workloads[0]) / ratio('fp16', workloads[0])
+                long_kv = ratio('int8', workloads[1]) / ratio('fp16', workloads[1])
+                item[metric + '_three_way_interaction_percent'] = (long_kv / short_kv - 1) * 100
+            result['three_way_interactions'].append(item)
         for metric in metrics_names:
-            def ratio(kv, workload):
-                return effects[(kv, workload)][block][metric + '_ratio']
-            short_kv = ratio('int8', workloads[0]) / ratio('fp16', workloads[0])
-            long_kv = ratio('int8', workloads[1]) / ratio('fp16', workloads[1])
-            item[metric + '_three_way_interaction_percent'] = (long_kv / short_kv - 1) * 100
-        result['three_way_interactions'].append(item)
-    for metric in metrics_names:
-        values = [row[metric + '_three_way_interaction_percent'] for row in result['three_way_interactions']]
-        result['three_way_summary'] = result.get('three_way_summary', {})
-        result['three_way_summary'][metric] = {
-            'median_percent': statistics.median(values),
-            'paired_bootstrap_95_interval_percent': bootstrap_interval(values, seed + 6000 + len(metric)),
-            'paired_values_percent': values,
-        }
+            values = [row[metric + '_three_way_interaction_percent'] for row in result['three_way_interactions']]
+            result['three_way_summary'] = result.get('three_way_summary', {})
+            result['three_way_summary'][metric] = {
+                'median_percent': statistics.median(values),
+                'paired_bootstrap_95_interval_percent': bootstrap_interval(values, seed + 6000 + len(metric)),
+                'paired_values_percent': values,
+            }
     return result
 
 

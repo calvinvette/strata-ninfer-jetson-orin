@@ -117,33 +117,34 @@ def audit(campaign, seed=20261023, run_root=None):
             else:
                 item['reason'] = 'missing residency-matched MTP pair or KV capacities differ'
             kv_interactions.append(item)
-        for kv in kvs:
-            a, b = (by_cell[(block, kv, workload)] for workload in workloads)
-            item = {'block': block, 'kv': kv, 'qualified': False}
-            if (a and b and a['local_run_date'] == b['local_run_date'] and
-                    (a['expert_slots'], a['expert_cache_mib']) == (b['expert_slots'], b['expert_cache_mib'])):
-                item['qualified'] = True
-                item['expert_slots'] = a['expert_slots']
+        if len(workloads) >= 2:
+            for kv in kvs:
+                a, b = (by_cell[(block, kv, workload)] for workload in workloads)
+                item = {'block': block, 'kv': kv, 'qualified': False}
+                if (a and b and a['local_run_date'] == b['local_run_date'] and
+                        (a['expert_slots'], a['expert_cache_mib']) == (b['expert_slots'], b['expert_cache_mib'])):
+                    item['qualified'] = True
+                    item['expert_slots'] = a['expert_slots']
+                    for metric in METRICS:
+                        item[metric + '_long_vs_short_interaction_percent'] = (b[metric + '_ratio'] / a[metric + '_ratio'] - 1) * 100
+                else:
+                    item['reason'] = 'missing residency-matched MTP pair or prompt-cell capacities differ'
+                workload_interactions.append(item)
+            all_cells = [by_cell[(block, kv, workload)] for kv in kvs for workload in workloads]
+            qualified = (all(p is not None for p in all_cells) and
+                         len({(p['expert_slots'], p['expert_cache_mib']) for p in all_cells}) == 1 and
+                         len({p['local_run_date'] for p in all_cells}) == 1)
+            item = {'block': block, 'qualified': qualified}
+            if qualified:
                 for metric in METRICS:
-                    item[metric + '_long_vs_short_interaction_percent'] = (b[metric + '_ratio'] / a[metric + '_ratio'] - 1) * 100
+                    fp_short = by_cell[(block, kvs[0], workloads[0])][metric + '_ratio']
+                    fp_long = by_cell[(block, kvs[0], workloads[1])][metric + '_ratio']
+                    int_short = by_cell[(block, kvs[1], workloads[0])][metric + '_ratio']
+                    int_long = by_cell[(block, kvs[1], workloads[1])][metric + '_ratio']
+                    item[metric + '_three_way_interaction_percent'] = ((int_long / fp_long) / (int_short / fp_short) - 1) * 100
             else:
-                item['reason'] = 'missing residency-matched MTP pair or prompt-cell capacities differ'
-            workload_interactions.append(item)
-        all_cells = [by_cell[(block, kv, workload)] for kv in kvs for workload in workloads]
-        qualified = (all(p is not None for p in all_cells) and
-                     len({(p['expert_slots'], p['expert_cache_mib']) for p in all_cells}) == 1 and
-                     len({p['local_run_date'] for p in all_cells}) == 1)
-        item = {'block': block, 'qualified': qualified}
-        if qualified:
-            for metric in METRICS:
-                fp_short = by_cell[(block, kvs[0], workloads[0])][metric + '_ratio']
-                fp_long = by_cell[(block, kvs[0], workloads[1])][metric + '_ratio']
-                int_short = by_cell[(block, kvs[1], workloads[0])][metric + '_ratio']
-                int_long = by_cell[(block, kvs[1], workloads[1])][metric + '_ratio']
-                item[metric + '_three_way_interaction_percent'] = ((int_long / fp_long) / (int_short / fp_short) - 1) * 100
-        else:
-            item['reason'] = 'not all eight arms passed at identical expert residency'
-        three_way.append(item)
+                item['reason'] = 'not all eight arms passed at identical expert residency'
+            three_way.append(item)
 
     return {'schema': 2, 'source_campaign': str(campaign.get('source_commit')),
             'qualification_rule': 'timing pairs require passing arms from the same local calendar day, matching KV, actual prompt token count, and identical expert slots/cache MiB; higher interactions require matching residency and date across all contributing cells',
