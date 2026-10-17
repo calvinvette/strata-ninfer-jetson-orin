@@ -42,6 +42,31 @@ def stable_arm_name(block, kv, workload, window):
     return f"block-{block:02d}-kv-{kv}-workload-{workload}-mtp-{window}"
 
 
+def arm_key(row):
+    return row['block'], row['kv'], row['workload'], row['window']
+
+
+def attempt_name(cell, runs, output):
+    """Return a non-overwriting directory name for a new or pressure-retried arm."""
+    key = arm_key(cell)
+    previous = [run for run in runs if arm_key(run) == key]
+    if any(run.get('status') == 'pass' for run in previous):
+        return None
+    for run in previous:
+        if (run.get('status') != 'fail' or
+                run.get('supervisor_status') != 'pressure_abort'):
+            raise ValueError(f"cannot resume {key}: prior attempt did not end in a pressure abort")
+    base = stable_arm_name(*key)
+    if not previous and not (output / base).exists():
+        return base
+    retry = len(previous)
+    while True:
+        name = f'{base}-retry-{retry:02d}'
+        if not (output / name).exists():
+            return name
+        retry += 1
+
+
 def make_design(kvs, workloads, windows, blocks, seed):
     cells = [(kv, workload, window)
              for kv in kvs for workload in workloads for window in windows]
@@ -182,11 +207,15 @@ def main():
     parser.add_argument('--first-port', type=int, default=19400)
     parser.add_argument('--expert-cache-budget', type=int,
                         help='override the configured --expert-cache budget for this screen')
+    parser.add_argument('--resume', action='store_true',
+                        help='continue a failed campaign, preserving completed and aborted attempts')
+    parser.add_argument('--per-arm-memory-max',
+                        help='place each arm in a fresh systemd scope with this MemoryMax (for example 28G)')
     parser.add_argument('--followup-block', action='store_true',
                         help='permit exactly one explicitly labelled randomized block for a screened-cell follow-up')
     args = parser.parse_args()
-    if args.output.exists():
-        parser.error('output path must not already exist')
+    if args.output.exists() != args.resume:
+        parser.error('use --resume only with an existing campaign output directory')
     if args.expert_cache_budget is not None and args.expert_cache_budget <= 0:
         parser.error('--expert-cache-budget must be positive')
     if (args.blocks < 3 and not (args.followup_block and args.blocks == 1)) or (args.followup_block and args.blocks != 1):
@@ -211,7 +240,6 @@ def main():
         if workload['generate_tokens'] <= 0:
             parser.error('selected workload must request generated tokens')
 
-    args.output.mkdir(parents=True)
     design = make_design(args.kvs, args.workload_cells, args.windows, args.blocks, args.seed)
     binary_path = Path(cfg['exe'])
     binary_sha = hashlib.sha256(binary_path.read_bytes()).hexdigest()
@@ -223,22 +251,65 @@ def main():
         scope = 'randomized blocked 2×2 MTP-window × KV-format screen on one held-out workload'
     else:
         scope = 'randomized blocked 2×2×2 MTP-window × KV-format × prompt-length screen'
-    campaign = {'schema': 1, 'scope': scope,
-                'source_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
-                'binary': str(binary_path), 'binary_sha256': binary_sha,
-                'model_name': cfg.get('model_name'), 'workloads': args.workload_cells,
-                'prompt_tokens_requested': {cell: workloads[cell]['prompt_tokens'] for cell in args.workload_cells},
-                'kv_formats': args.kvs, 'mtp_windows': args.windows, 'blocks': args.blocks,
-                'expert_cache_budget_override': args.expert_cache_budget,
-                'seed': args.seed, 'floor_gib': 6, 'supervisor_memory_max': '28G',
-                'randomized_design': design, 'runs': [], 'status': 'running'}
-    write_result(args.output / 'campaign.json', campaign)
-    (args.output / 'config-source.json').write_text(json.dumps(cfg, indent=2) + '\n')
-    (args.output / 'selected-workloads.json').write_text(json.dumps({'workloads': selected}, indent=2) + '\n')
+    source_commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
+    if args.resume:
+        campaign_path = args.output / 'campaign.json'
+        if not campaign_path.exists():
+            parser.error('--resume requires campaign.json')
+        campaign = json.loads(campaign_path.read_text())
+        expected = {'binary_sha256': binary_sha, 'workloads': args.workload_cells,
+                    'kv_formats': args.kvs, 'mtp_windows': args.windows, 'blocks': args.blocks,
+                    'expert_cache_budget_override': args.expert_cache_budget, 'seed': args.seed,
+                    'randomized_design': design, 'model_name': cfg.get('model_name'),
+                    'prompt_tokens_requested': {cell: workloads[cell]['prompt_tokens']
+                                                for cell in args.workload_cells}}
+        mismatches = [key for key, value in expected.items() if campaign.get(key) != value]
+        selected_path = args.output / 'selected-workloads.json'
+        if selected_path.exists():
+            prior_workloads = json.loads(selected_path.read_text()).get('workloads')
+            if prior_workloads != selected:
+                mismatches.append('selected-workloads')
+        else:
+            mismatches.append('selected-workloads')
+        if mismatches:
+            parser.error('--resume campaign does not match: ' + ', '.join(mismatches))
+        if campaign.get('status') == 'pass':
+            parser.error('campaign is already complete')
+        if args.per_arm_memory_max:
+            campaign.setdefault('resume_memory_scopes', []).append({
+                'wall_time_s': time.time(), 'mode': 'per-arm',
+                'memory_max': args.per_arm_memory_max,
+                'runner_source_commit': source_commit})
+        campaign['status'] = 'running'
+        write_result(campaign_path, campaign)
+    else:
+        args.output.mkdir(parents=True)
+        campaign = {'schema': 1, 'scope': scope, 'source_commit': source_commit,
+                    'binary': str(binary_path), 'binary_sha256': binary_sha,
+                    'model_name': cfg.get('model_name'), 'workloads': args.workload_cells,
+                    'prompt_tokens_requested': {cell: workloads[cell]['prompt_tokens'] for cell in args.workload_cells},
+                    'kv_formats': args.kvs, 'mtp_windows': args.windows, 'blocks': args.blocks,
+                    'expert_cache_budget_override': args.expert_cache_budget,
+                    'seed': args.seed, 'floor_gib': 6, 'supervisor_memory_max': '28G',
+                    'randomized_design': design, 'runs': [], 'status': 'running'}
+        if args.per_arm_memory_max:
+            campaign['memory_scope_mode'] = 'per-arm'
+            campaign['supervisor_memory_max'] = args.per_arm_memory_max
+        write_result(args.output / 'campaign.json', campaign)
+        (args.output / 'config-source.json').write_text(json.dumps(cfg, indent=2) + '\n')
+        (args.output / 'selected-workloads.json').write_text(json.dumps({'workloads': selected}, indent=2) + '\n')
 
     for index, cell in enumerate(design):
         block, kv, workload_cell, window = cell['block'], cell['kv'], cell['workload'], cell['window']
-        run_name = stable_arm_name(block, kv, workload_cell, window)
+        try:
+            run_name = attempt_name(cell, campaign['runs'], args.output)
+        except ValueError as exc:
+            campaign['status'] = 'failed'
+            campaign['failure_reason'] = str(exc)
+            write_result(args.output / 'campaign.json', campaign)
+            return 1
+        if run_name is None:
+            continue
         run_dir = args.output / run_name
         run_dir.mkdir()
         arm_args = args_for(cfg, window, kv_format=kv, disable_adaptive_swaps=True)
@@ -259,7 +330,13 @@ def main():
                    '--config', str(config_path.resolve()), '--workloads', str(one_workload.resolve()),
                    '--output', str((run_dir / 'requests.json').resolve()), '--variant', 'candidate',
                    '--rounds', '1', '--no-trace', '--warmup-workloads', str(args.warmup_workloads.resolve())]
+        if args.per_arm_memory_max:
+            command = ['systemd-run', '--user', '--scope', '--collect',
+                       '-p', f'MemoryMax={args.per_arm_memory_max}', '-p', 'IOAccounting=yes',
+                       '--', *command]
         record = dict(cell, name=run_name, directory=run_name, command=command, status='started')
+        if args.per_arm_memory_max:
+            record['supervisor_memory_max'] = args.per_arm_memory_max
         campaign['runs'].append(record)
         write_result(args.output / 'campaign.json', campaign)
         with (run_dir / 'launch.txt').open('w') as log:

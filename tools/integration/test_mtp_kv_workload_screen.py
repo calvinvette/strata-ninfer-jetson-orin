@@ -99,6 +99,35 @@ class MtpKvWorkloadScreenTests(unittest.TestCase):
         self.assertGreaterEqual(interval[0], 0.1)
         self.assertLessEqual(interval[1], 0.3)
 
+    def test_resume_skips_passed_arm_and_retries_pressure_abort_without_overwrite(self):
+        from tempfile import TemporaryDirectory
+        from mtp_kv_workload_screen import attempt_name
+
+        cell = {'block': 2, 'kv': 'fp16', 'workload': 'long', 'window': 4}
+        with TemporaryDirectory() as temporary:
+            output = Path(temporary)
+            base = 'block-02-kv-fp16-workload-long-mtp-4'
+            self.assertEqual(attempt_name(cell, [], output), base)
+            passed = [dict(cell, status='pass', directory=base)]
+            self.assertIsNone(attempt_name(cell, passed, output))
+
+            aborted = [dict(cell, status='fail', supervisor_status='pressure_abort',
+                            directory=base)]
+            self.assertEqual(attempt_name(cell, aborted, output), base + '-retry-01')
+            (output / (base + '-retry-01')).mkdir()
+            self.assertEqual(attempt_name(cell, aborted, output), base + '-retry-02')
+
+    def test_resume_refuses_to_silently_retry_non_pressure_failure(self):
+        from tempfile import TemporaryDirectory
+        from mtp_kv_workload_screen import attempt_name
+
+        cell = {'block': 0, 'kv': 'int8', 'workload': 'short', 'window': 4}
+        prior = [dict(cell, status='fail', supervisor_status='pass',
+                      directory='failed-quality-check')]
+        with TemporaryDirectory() as temporary:
+            with self.assertRaisesRegex(ValueError, 'did not end in a pressure abort'):
+                attempt_name(cell, prior, Path(temporary))
+
 
 if __name__ == '__main__':
     unittest.main()
