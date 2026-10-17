@@ -15,12 +15,16 @@ RUNNER = ROOT / "bench/results/2026-10-16-phase5-coder-q8_1-cpu-route-check/run_
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--seed", type=int, default=20261020)
+    ap.add_argument("--adapt-every", type=int, default=4)
+    ap.add_argument("--adapt-swaps", type=int, default=8)
     ap.add_argument("--capture-cpu-outputs", action="store_true",
                     help="capture actual CPU-owned expert rows at dispatch 1393/layer 1")
     ap.add_argument("--capture-combined-moe", action="store_true",
                     help="capture verifier layer-1 weighted-combine outputs")
     ap.add_argument("--output", type=Path, required=True)
     args = ap.parse_args()
+    if args.adapt_every < 0 or args.adapt_swaps < 0 or ((args.adapt_every == 0) != (args.adapt_swaps == 0)):
+        ap.error("disable adaptation with both --adapt-every 0 and --adapt-swaps 0, or set both positive")
     if args.output.exists():
         ap.error("choose a new output directory")
     args.output.mkdir(parents=True)
@@ -31,12 +35,13 @@ def main() -> int:
         "seed": args.seed,
         "order": order,
         "factors": {"route": ["default GGML", "CUDA-mirror Q8_1"],
-                    "adapt_every": 4, "adapt_swaps": 8, "prompt_cache": 0},
+                    "adapt_every": args.adapt_every, "adapt_swaps": args.adapt_swaps,
+                    "prompt_cache": 0},
         "capture": {"layer": -1, "start_row": 1392, "rows": 192,
-                    "reason": "cover dispatch 1393/layer 1 before the repeated first divergence at dispatch 1394/layer 2"},
+                    "reason": "bounded dispatch window around the selected layer-1 route point"},
         "capture_cpu_outputs": args.capture_cpu_outputs,
         "capture_combined_moe": args.capture_combined_moe,
-        "scope": "one paired diagnostic; bounded all-layer activations around the first known long-response divergence; no timing claim",
+        "scope": "one paired diagnostic; bounded all-layer activations around a selected route point; no timing claim",
         "runs": [],
         "started_wall_time_s": time.time(),
     }
@@ -45,8 +50,8 @@ def main() -> int:
     for route in order:
         out = args.output / route
         out.mkdir()
-        runner_args = [sys.executable, str(RUNNER), "--adapt-every", "4",
-                       "--adapt-swaps", "8", "--continuations", "1",
+        runner_args = [sys.executable, str(RUNNER), "--adapt-every", str(args.adapt_every),
+                       "--adapt-swaps", str(args.adapt_swaps), "--continuations", "1",
                        "--prompt-cache", "0", "--capture-layer", "-1",
                        "--capture-start-row", "1392", "--capture-rows", "192"]
         if args.capture_cpu_outputs:

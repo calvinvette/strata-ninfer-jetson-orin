@@ -152,6 +152,21 @@ across arms. Both services passed above the six-GiB floor with no cgroup memory
 events. This is correctness evidence only, not a quality fix or performance
 claim; Phase 5 remains open.
 
+A follow-up [no-swap CPU-route pair](../../bench/results/2026-10-16-phase5-coder-q8_1-fixed-owner-no-swaps/README.md)
+disabled adaptation in both arms (`--adapt-every 0 --adapt-swaps 0`) while
+retaining the same cache profile. It reproduced the first activation difference
+at dispatch 1394/layer 2 with expert IDs and owners still equal; expert-ID and
+owner differences appeared later at dispatch 1400/layer 8. Layer-1 combined
+outputs differed across all 62 shared position/token rows, although the
+separate captures still do not join a particular CPU dispatch directly to an
+`ffn_y` row. The long answer differed at 3/16 positions, while initial,
+recovery and continuation token IDs matched; cross-route persistent-state
+fingerprints still differed. This demonstrates a route-dependent numeric/state
+effect without adaptive swaps, but later router choices do change owner
+selection against the static cache. Both supervised arms remained above 14.45
+GiB availability with no cgroup memory events. It is diagnostic only; the
+mirror is not promoted and Phase 5 remains open.
+
 A supervised [Coder IQ1_M MTP cancellation check](../../bench/results/2026-10-16-phase5-coder-mtp-cancel-parity-current/README.md)
 canceled after eight streamed deltas and 12 committed tokens. Same-service
 recovery returned `Hello Orin!`; three fresh exact-length references matched

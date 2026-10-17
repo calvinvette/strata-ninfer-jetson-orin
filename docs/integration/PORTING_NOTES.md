@@ -1734,3 +1734,12 @@ combined-output delta. Then capture the weighted parts, router weights, shared
 output and combined result for that exact key; this separates arithmetic
 propagation from unrelated state or route changes. See the
 [combined-output capture](../../bench/results/2026-10-16-phase5-coder-q8_1-combined-moe-capture/README.md).
+
+Also repeat the pair with migration disabled. The Coder IQ1_M no-swap screen
+still diverged at layer 2 before expert IDs or owners changed, then made
+different router selections at layer 8 against the same static cache profile.
+For Splash, a fixed cache placement alone does not guarantee fixed owners when
+earlier arithmetic changes router logits. Record the first activation, expert
+ID and owner divergence separately, and keep migration disabled until that
+arithmetic path is understood. See the
+[no-swap route comparison](../../bench/results/2026-10-16-phase5-coder-q8_1-fixed-owner-no-swaps/README.md).

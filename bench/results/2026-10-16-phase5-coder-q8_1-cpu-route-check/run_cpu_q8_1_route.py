@@ -74,8 +74,11 @@ def main():
     replace_option(argv, "--adapt-swaps", args.adapt_swaps)
     if args.prompt_cache is not None:
         replace_option(argv, "--prompt-cache", args.prompt_cache)
-    if "--adapt-accepted-only" not in argv:
+    adaptation_on = args.adapt_every > 0 and args.adapt_swaps > 0
+    if adaptation_on and "--adapt-accepted-only" not in argv:
         argv.append("--adapt-accepted-only")
+    elif not adaptation_on and "--adapt-accepted-only" in argv:
+        del argv[argv.index("--adapt-accepted-only")]
     combined_dump = args.output / "combined-moe.bin" if args.capture_combined_moe else None
     if "--expert-cache-cpu-order" in argv:
         raise RuntimeError("CPU-order option is incompatible with the native Coder pack")

@@ -41,6 +41,31 @@ def read_jsonl(path):
     return rows[1:]
 
 
+def compare_route_traces(default_dir, mirror_dir):
+    default = read_jsonl(default_dir / "layer1.jsonl")
+    mirror = read_jsonl(mirror_dir / "layer1.jsonl")
+    if len(default) != len(mirror):
+        raise ValueError("paired route traces have different row counts")
+    counts = {"rows": len(default), "key_mismatches": 0,
+              "activation_mismatches": 0, "expert_id_mismatches": 0,
+              "owner_mismatches": 0}
+    first = {}
+    for index, (a, b) in enumerate(zip(default, mirror)):
+        key = (a.get("dispatch"), a.get("layer"), a.get("row"))
+        other = (b.get("dispatch"), b.get("layer"), b.get("row"))
+        if key != other:
+            counts["key_mismatches"] += 1
+            continue
+        for field, name in (("activation", "activation_mismatches"),
+                            ("ids", "expert_id_mismatches"),
+                            ("route_kind", "owner_mismatches")):
+            if a[field] != b[field]:
+                counts[name] += 1
+                if name not in first:
+                    first[name] = {"row": index, "dispatch": key[0], "layer": key[1]}
+    return {"counts": counts, "first_mismatch": first}
+
+
 def route_and_cpu_comparison(default_dir, mirror_dir):
     default_trace = read_jsonl(default_dir / "layer1.jsonl")
     mirror_trace = read_jsonl(mirror_dir / "layer1.jsonl")
@@ -142,6 +167,7 @@ def main():
         "first_combined_output_difference": first,
     }
     if args.default_service and args.mirror_service:
+        report["route_trace_comparison"] = compare_route_traces(args.default_service, args.mirror_service)
         report["actual_service_route_and_cpu_rows"] = route_and_cpu_comparison(args.default_service,
                                                                                 args.mirror_service)
         report["request_outcomes"] = service_outcomes(args.default_service, args.mirror_service)
