@@ -1,0 +1,44 @@
+{
+  "checkout_commit": "eb1976ff3916fb2361e5830e9a83d095e191b96a",
+  "candidate_build_source_commit": "53d7c7a419f214b4133a2319bdcdf127f23ba1c4",
+  "candidate_binary_sha256": "dfc6394251bbe2713f6039d442e290109513447a770884b58657f7e162d2ed60",
+  "host": "NVIDIA Jetson AGX Orin, aarch64, CUDA 12.6 / driver 540.4.0",
+  "model": {
+    "repo": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+    "revision": "5348543e0147355ac9cbcb031184a3546350988e",
+    "format": "Q2_0 GGUF, two shards",
+    "shards": [
+      {"file": "Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf", "sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720"},
+      {"file": "Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf", "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"}
+    ],
+    "ple_pack_dense_sha256": "a43d7d0b69525335f4b000d5197a1d3aefcd3c0014fc3e12b3455e0a5d827ba2",
+    "expert_profile_sha256": "b3e62120218cd96d175a0547530158869177dd2164b22b40f32bea7d7e85fb8c"
+  },
+  "profile": "Q2_0, FP16 KV, MTP off, 16,384 context, 3,000 exact expert slots, prefill 128, eight workers, prompt cache/adaptive swaps off, 3,072 MiB workspace reserve; candidate arm adds two batch slots",
+  "inputs": {
+    "config_sha256": "aea9b06f9601c110a252e501e28d41d27da804677c3f1e57a17ed68af56fc651",
+    "workload_8k_sha256": "566fa526c26a7306c600a627e1726b3fc8c9477c87aab869566ce458d8d01f5b",
+    "workload_16k_sha256": "4a09e4c804fcbbaf555f1f69a1c93e50ca7a37a4c0b8a845f9a46c5f71e5dd41",
+    "warmup_workload_sha256": "050fd0a48216aaf5fe6765993987b17c7ba8f674b3f125f1f44d175489a797aa"
+  },
+  "result": {
+    "review": "pass",
+    "serial_requests": 2,
+    "two_slot_requests": 2,
+    "max_running_observed": 2,
+    "max_active_slots_observed": 2,
+    "all_prompt_counts_and_markers_passed": true,
+    "minimum_host_gib": 16.858036041259766,
+    "minimum_admission_gib": 8.318897247314453,
+    "peak_cgroup_gib": 19.681102752685547,
+    "memory_samples": 1927,
+    "cgroup_memory_events": {"low": 0, "high": 0, "max": 0, "oom": 0, "oom_kill": 0},
+    "serial_elapsed_seconds": {"8k": 286.85758842295036, "16k": 525.8778245400172},
+    "parallel_elapsed_seconds": {"8k": 592.5234759061132, "16k": 1128.8251852809917},
+    "cpu_clock_mhz_range": [729.6, 2201.6],
+    "gpu_clock_mhz_range": [306, 1300.5],
+    "tj_celsius_range": [48.812, 56.75],
+    "energy": "raw rails retained; not process-attributed"
+  },
+  "artifact_location": "Model, pack and tokenizer files remained under ~/models/strata-orin-validation; no model files are in Git."
+}

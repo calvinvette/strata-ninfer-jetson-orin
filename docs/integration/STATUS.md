@@ -53,6 +53,16 @@ the same service returned `RECOVERED`. Minimum host/admission availability was
 profile-specific replication, not a new held-out prompt or broad quality score;
 Phase 7 remains open.
 
+The selected profile also passed one [two-slot streamed API overlap
+check](../../bench/results/2026-10-17-phase7-q2-prefill128-concurrency2-selected-profile/README.md)
+with distinct 7,498- and 15,003-token retrievals. Serial and candidate answers
+passed exact prompt-count and marker checks; metrics observed two requests in
+two active slots. Minimum host/admission availability was 16.86/8.32 GiB over
+1,927 samples, with zero cgroup events. The two-slot requests took longer than
+the serial controls in this single sequence, so it provides functional overlap
+evidence and no latency benefit. Repeated concurrency and broader quality
+checks remain open; Phase 7 remains in progress.
+
 A same-day [Coder GGUF quantization comparison](../../bench/results/2026-10-17-phase6-coder-quant-comparison/README.md)
 then compared Q2_0 and IQ1_M from the same pinned Hugging Face repository
 revision. After correcting an exploratory screen's cache-size mismatch, a
