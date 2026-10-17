@@ -128,6 +128,15 @@ without establishing a full-service fix. All eight arms passed with at least
 14.35 GiB availability and no cgroup memory events. This is diagnostic only;
 it makes no performance or quality claim. Phase 5 remains open.
 
+A fifth [service CPU-row capture](../../bench/results/2026-10-16-phase5-coder-q8_1-first-divergence-trace/README.md#actual-service-cpu-row-capture)
+at dispatch 1393/layer 1 confirmed that the arithmetic change is present in
+the actual service output buffer before weighted combine. For identical input
+activations, the default and mirror rows differed in all 2,560 values for each
+CPU-owned expert; their relative L1 deltas (0.012306–0.015658) match the
+standalone CPU/CUDA diagnostic. This localizes the first tested route change
+to the CPU expert outputs. The weighted combined MoE result and later state
+remain unmeasured, so this does not qualify a fix or close Phase 5.
+
 A supervised [Coder IQ1_M MTP cancellation check](../../bench/results/2026-10-16-phase5-coder-mtp-cancel-parity-current/README.md)
 canceled after eight streamed deltas and 12 committed tokens. Same-service
 recovery returned `Hello Orin!`; three fresh exact-length references matched

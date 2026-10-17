@@ -54,6 +54,10 @@ def main():
                         help="maximum captured MoE activation rows")
     parser.add_argument("--capture-start-row", type=int, default=0,
                         help="skip this many captured rows before writing")
+    parser.add_argument("--capture-cpu-output", action="store_true",
+                        help="dump CPU-owned expert outputs from one service dispatch")
+    parser.add_argument("--capture-output-layer", type=int, default=1)
+    parser.add_argument("--capture-dispatch", type=int, default=1393)
     parser.add_argument("--cpu-q8-1-dot", action="store_true",
                         help="enable the opt-in IQ2_S/Q2_0 CPU Q8_1 scalar route")
     parser.add_argument("--output", type=Path, required=True)
@@ -95,6 +99,12 @@ def main():
         "STRATA_CAPTURE_MOE_PATH": str((args.output / "layer1.jsonl").resolve()),
         "STRATA_VERIFY_ADAPT_SWAPS": "1",
     })
+    if args.capture_cpu_output:
+        env.update({
+            "STRATA_CAPTURE_MOE_OUTPUT_PATH": str((args.output / "cpu-outputs.jsonl").resolve()),
+            "STRATA_CAPTURE_MOE_OUTPUT_LAYER": str(args.capture_output_layer),
+            "STRATA_CAPTURE_MOE_OUTPUT_DISPATCH": str(args.capture_dispatch),
+        })
     if args.cpu_q8_1_dot:
         env["STRATA_NATIVE_CPU_Q8_1_DOT"] = "1"
     engine = StrataEngine(cfg["exe"], argv, cwd=cfg["cwd"], log=str(log), env=env)
@@ -119,6 +129,17 @@ def main():
     if not captured or captured[0].get("format") != "strata-moe-dispatch-v2":
         raise RuntimeError("missing layer-0 dispatch capture")
     rows = captured[1:]
+    cpu_output_rows = 0
+    if args.capture_cpu_output:
+        output_capture = args.output / "cpu-outputs.jsonl"
+        if not output_capture.exists():
+            raise RuntimeError("requested CPU expert output capture was not produced")
+        cpu_output_lines = output_capture.read_text().splitlines()
+        if not cpu_output_lines or json.loads(cpu_output_lines[0]).get("format") != "strata-moe-cpu-output-v1":
+            raise RuntimeError("CPU expert output capture has an invalid header")
+        cpu_output_rows = len(cpu_output_lines) - 1
+        if cpu_output_rows == 0:
+            raise RuntimeError("requested dispatch had no CPU-owned expert outputs")
     route = {"rows": len(rows)}
     if args.capture_layer == 1 and len(rows) >= 66:
         initial, long_rows, recovery = rows[:22], rows[22:44], rows[44:66]
@@ -141,6 +162,10 @@ def main():
         "capture_layer": args.capture_layer,
         "capture_rows": args.capture_rows,
         "capture_start_row": args.capture_start_row,
+        "capture_cpu_output": args.capture_cpu_output,
+        "capture_output_layer": args.capture_output_layer if args.capture_cpu_output else None,
+        "capture_dispatch": args.capture_dispatch if args.capture_cpu_output else None,
+        "captured_cpu_output_rows": cpu_output_rows,
         "prompt_sha256": {
             "short": hashlib.sha256(json.dumps(list(prompts[0][1])).encode()).hexdigest(),
             "long": hashlib.sha256(json.dumps(long_ids).encode()).hexdigest(),

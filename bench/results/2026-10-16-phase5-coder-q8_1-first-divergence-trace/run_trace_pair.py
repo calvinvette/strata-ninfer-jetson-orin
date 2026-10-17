@@ -15,6 +15,8 @@ RUNNER = ROOT / "bench/results/2026-10-16-phase5-coder-q8_1-cpu-route-check/run_
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--seed", type=int, default=20261020)
+    ap.add_argument("--capture-cpu-outputs", action="store_true",
+                    help="capture actual CPU-owned expert rows at dispatch 1393/layer 1")
     ap.add_argument("--output", type=Path, required=True)
     args = ap.parse_args()
     if args.output.exists():
@@ -29,7 +31,8 @@ def main() -> int:
         "factors": {"route": ["default GGML", "CUDA-mirror Q8_1"],
                     "adapt_every": 4, "adapt_swaps": 8, "prompt_cache": 0},
         "capture": {"layer": -1, "start_row": 1392, "rows": 192,
-                    "reason": "center on the first repeated layer-1 activation divergence at dispatch 1441"},
+                    "reason": "cover dispatch 1393/layer 1 before the repeated first divergence at dispatch 1394/layer 2"},
+        "capture_cpu_outputs": args.capture_cpu_outputs,
         "scope": "one paired diagnostic; bounded all-layer activations around the first known long-response divergence; no timing claim",
         "runs": [],
         "started_wall_time_s": time.time(),
@@ -43,6 +46,9 @@ def main() -> int:
                        "--adapt-swaps", "8", "--continuations", "1",
                        "--prompt-cache", "0", "--capture-layer", "-1",
                        "--capture-start-row", "1392", "--capture-rows", "192"]
+        if args.capture_cpu_outputs:
+            runner_args += ["--capture-cpu-output", "--capture-output-layer", "1",
+                            "--capture-dispatch", "1393"]
         if route == "cuda_mirror":
             runner_args.append("--cpu-q8-1-dot")
         runner_args += ["--output", str((out / "result").resolve())]

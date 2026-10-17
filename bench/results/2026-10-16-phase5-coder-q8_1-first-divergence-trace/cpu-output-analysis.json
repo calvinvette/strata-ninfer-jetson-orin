@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "model": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF IQ1_M",
+  "dispatch": 1393,
+  "layer": 1,
+  "activation_bitwise_equal": true,
+  "expert_ids_and_owners_equal": true,
+  "cpu_owned_experts": [
+    209,
+    207,
+    85,
+    153
+  ],
+  "actual_service_cpu_outputs_default_vs_cuda_mirror": [
+    {
+      "expert": 209,
+      "elements": 2560,
+      "bitwise_differences": 2560,
+      "max_absolute_difference": 0.0009062700000000007,
+      "relative_l1": 0.0123055712827791
+    },
+    {
+      "expert": 207,
+      "elements": 2560,
+      "bitwise_differences": 2560,
+      "max_absolute_difference": 0.0009239674499999999,
+      "relative_l1": 0.015657946893128532
+    },
+    {
+      "expert": 85,
+      "elements": 2560,
+      "bitwise_differences": 2560,
+      "max_absolute_difference": 0.0008629578999999991,
+      "relative_l1": 0.01273797668153899
+    },
+    {
+      "expert": 153,
+      "elements": 2560,
+      "bitwise_differences": 2560,
+      "max_absolute_difference": 0.0007876287999999988,
+      "relative_l1": 0.013443788198861507
+    }
+  ],
+  "service_token_differences_default_vs_cuda_mirror": [
+    {
+      "name": "short-512",
+      "different_positions": 0
+    },
+    {
+      "name": "long-2048",
+      "different_positions": 3
+    },
+    {
+      "name": "short-512-recovery",
+      "different_positions": 0
+    },
+    {
+      "name": "short-512-continuation-1",
+      "different_positions": 13
+    }
+  ],
+  "supervisors": {
+    "default": "pass",
+    "cuda_mirror": "pass"
+  },
+  "interpretation": "The row delta is observed in the service's actual CPU output buffer. It localizes a real dispatch difference before the weighted combine; it does not alone prove the combined MoE output or later state is correct."
+}

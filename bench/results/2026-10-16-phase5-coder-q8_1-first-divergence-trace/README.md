@@ -65,6 +65,51 @@ python3 bench/results/2026-10-16-phase5-coder-q8_1-first-divergence-trace/analyz
 
 `analyze_trace.py` reproduces the detailed pair-1 operator report.
 
+## Actual service CPU-row capture
+
+The four-pair traces established that dispatch 1393/layer 1 had identical
+inputs, expert IDs and owners in both routes; the standalone operator test
+then showed the CPU mirror's expert output matches CUDA. To verify that the
+service itself produced the same row-level change, a fifth supervised pair
+captured the CPU output buffer immediately after expert-pool execution at
+dispatch 1393/layer 1. It used the same model, prompts and Q8_1 opt-in. The
+mirror ran first. Both arms passed; minimum availability was 14.474 GiB over
+385 one-second samples, with no cgroup memory events.
+
+The actual service outputs for experts 209, 207, 85 and 153 differed across
+all 2,560 values per row. Relative L1 deltas were 0.012306, 0.015658, 0.012738
+and 0.013444, matching the standalone default CPU-versus-CUDA deltas to
+reported precision. This establishes that the route arithmetic difference is
+present in the actual service CPU rows before the weighted MoE combine. It
+does not establish that the combined output or downstream recurrence matches
+the accelerator path. The per-row capture is opt-in and adds no default-path
+behavior; the targeted service still showed the same 3/16 long and 13/16
+continuation token differences.
+
+The actual-service row comparison is reproduced from retained data with:
+
+```sh
+python3 bench/results/2026-10-16-phase5-coder-q8_1-first-divergence-trace/analyze_cpu_outputs.py
+```
+
+The pair used for this output capture can be reproduced with:
+
+```sh
+python3 bench/results/2026-10-16-phase5-coder-q8_1-first-divergence-trace/run_trace_pair.py \
+  --seed 20261026 --capture-cpu-outputs \
+  --output bench/results/2026-10-16-phase5-coder-q8_1-first-divergence-trace/reproduction-cpu-outputs
+```
+
+The updated CUDA binary SHA256 was
+`dfc6394251bbe2713f6039d442e290109513447a770884b58657f7e162d2ed60`.
+Orin's 16 native-expert parity CTests passed after the rebuild. On maestro1,
+the shared `src/core/expert_source.cpp` overlay compiled and linked into the
+HIP service and its CLI help check passed; the raw build log and binary hash
+are retained under `backend-checks/`. SYCL selects its separate migrated
+`sycl/src/core/expert_source.cpp`, which this diagnostic did not modify; its
+current-source service build required no work. Neither maestro1 check is
+accelerator runtime evidence.
+
 Model payloads remain under `~/models/`; only provenance and captured numerical
 evidence are in this repository. `SHA256SUMS.txt` covers the artifacts,
 excluding itself.

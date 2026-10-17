@@ -239,6 +239,9 @@ matching committed recurrence/KV state or later requests; test state boundaries,
 recovery and continuation separately. For Splash, replace CUDA/Q8_1 details
 with its actual Metal/CPU activation and packed-weight contracts, established
 from source and measurements rather than assumed from Strata's implementation.
+Also capture the service's actual CPU-owned expert rows immediately before its
+weighted combine; a standalone operator harness proves its own path, not that
+the integrated scheduler dispatches the same math and writes the expected row.
 
 The Oct 11 Strata accepted-prefix test exposed a QSA indexer transaction detail
 that also applies when integrating another speculative engine. Commit replay

@@ -3116,10 +3116,10 @@ static_assert(strata::kernels::cpu::MAXT * 10 <= kMaxWindowEntries, "a verify wi
 // Opt-in diagnostic for reproducing expert CPU/GPU differences on an actual verifier activation.
 // Each JSONL row contains one verifier-row activation plus every routed expert and its final owner:
 // -1 CPU, 0 primary VRAM/foresight, 1 PCIe, 2 peer/helper GPU. No token text is recorded.
-void capture_moe_window(int64_t layer, const float* x, const int32_t* ids, const int32_t* kind,
-                        int64_t n_tok, int64_t k, int64_t n_embd) {
+uint64_t capture_moe_window(int64_t layer, const float* x, const int32_t* ids, const int32_t* kind,
+                            int64_t n_tok, int64_t k, int64_t n_embd) {
     static const char* const path = std::getenv("STRATA_CAPTURE_MOE_PATH");
-    if (path == nullptr || *path == '\0') return;
+    if (path == nullptr || *path == '\0') return 0;
     static const int64_t selected_layer = [] {
         const char* p = std::getenv("STRATA_CAPTURE_MOE_LAYER");
         return p == nullptr ? (int64_t) -1 : (int64_t) std::strtoll(p, nullptr, 10);
@@ -3145,7 +3145,7 @@ void capture_moe_window(int64_t layer, const float* x, const int32_t* ids, const
     static State capture;
     std::lock_guard<std::mutex> lock(capture.mutex);
     const uint64_t dispatch = capture.dispatch++;
-    if (capture.failed || capture.rows >= limit || (selected_layer >= 0 && layer != selected_layer)) return;
+    if (capture.failed || capture.rows >= limit || (selected_layer >= 0 && layer != selected_layer)) return dispatch;
     for (int64_t t = 0; t < n_tok && capture.rows < limit; ++t) {
         const int64_t stream_row = capture.seen_rows++;
         if (stream_row < start_row) continue;
@@ -3154,7 +3154,7 @@ void capture_moe_window(int64_t layer, const float* x, const int32_t* ids, const
             if (capture.file == nullptr) {
                 capture.failed = true;
                 std::fprintf(stderr, "strata: cannot open MoE capture path '%s': %s\n", path, std::strerror(errno));
-                return;
+                return dispatch;
             }
             std::fprintf(capture.file, "{\"format\":\"strata-moe-dispatch-v2\",\"n_embd\":%lld}\n", (long long) n_embd);
         }
@@ -3171,6 +3171,47 @@ void capture_moe_window(int64_t layer, const float* x, const int32_t* ids, const
         ++capture.rows;
     }
     if (capture.file != nullptr) std::fflush(capture.file);
+    return dispatch;
+}
+
+// Opt-in companion capture of the rows the CPU expert pool actually produced.
+// It shares the dispatch sequence with capture_moe_window so the tensor rows
+// can be joined to the exact activation, expert IDs and owners above.
+void capture_moe_cpu_outputs(uint64_t dispatch, int64_t layer, const int32_t* ids, const int32_t* kind,
+                             int64_t n_tok, int64_t k, int64_t n_embd, const float* out) {
+    static const char* const path = std::getenv("STRATA_CAPTURE_MOE_OUTPUT_PATH");
+    if (path == nullptr || *path == '\0') return;
+    static const int64_t selected_layer = [] {
+        const char* p = std::getenv("STRATA_CAPTURE_MOE_OUTPUT_LAYER");
+        return p == nullptr ? (int64_t) -1 : (int64_t) std::strtoll(p, nullptr, 10);
+    }();
+    static const uint64_t selected_dispatch = [] {
+        const char* p = std::getenv("STRATA_CAPTURE_MOE_OUTPUT_DISPATCH");
+        return p == nullptr ? UINT64_MAX : (uint64_t) std::strtoull(p, nullptr, 10);
+    }();
+    if ((selected_layer >= 0 && layer != selected_layer) || dispatch != selected_dispatch) return;
+    static FILE* file = nullptr;
+    if (file == nullptr) {
+        file = std::fopen(path, "wb");
+        if (file == nullptr) {
+            std::fprintf(stderr, "strata: cannot open CPU MoE output capture '%s': %s\n", path, std::strerror(errno));
+            return;
+        }
+        std::fprintf(file, "{\"format\":\"strata-moe-cpu-output-v1\",\"n_embd\":%lld}\n", (long long) n_embd);
+    }
+    for (int64_t t = 0; t < n_tok; ++t) {
+        for (int64_t j = 0; j < k; ++j) {
+            const int64_t row = t * k + j;
+            if (kind[row] >= 0) continue;
+            const float* values = out + (size_t) row * (size_t) n_embd;
+            std::fprintf(file, "{\"dispatch\":%llu,\"layer\":%lld,\"token\":%lld,\"row\":%lld,\"expert\":%d,\"output\":[",
+                         (unsigned long long) dispatch, (long long) layer, (long long) t, (long long) row, ids[row]);
+            for (int64_t i = 0; i < n_embd; ++i)
+                std::fprintf(file, "%s%.9g", i ? "," : "", (double) values[i]);
+            std::fputs("]}\n", file);
+        }
+    }
+    std::fflush(file);
 }
 }  // namespace
 
@@ -3356,7 +3397,7 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
             for (int64_t i = 0; i < n; ++i) if (d.remote[r]->owns(i)) kind[i] = 2;
         }
     }
-    capture_moe_window(d.layers, x_f, ids, kind, n_tok, k, H);
+    const uint64_t capture_dispatch = capture_moe_window(d.layers, x_f, ids, kind, n_tok, k, H);
     static const bool dec_batch = [] { const char* v = std::getenv("STRATA_DEC_BATCH"); return v == nullptr || std::atoi(v) != 0; }();
     // the GPU's copy_rows_from_mapped zeroes the rows it computed itself (dec_batch); STRATA_VERIFY_DEVICE_PLAN's
     // copy_or_zero_from_mapped copies every row, so there the host still zeroes them
@@ -3460,6 +3501,7 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
             return;
         }
     }
+    capture_moe_cpu_outputs(capture_dispatch, d.layers, ids, kind, n_tok, k, H, out);
     const auto c4 = std::chrono::steady_clock::now();
     pt("ran");
     auto ms = [](auto a, auto b) { return std::chrono::duration<double, std::milli>(b - a).count(); };
