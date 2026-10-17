@@ -17,6 +17,8 @@ def main() -> int:
     ap.add_argument("--seed", type=int, default=20261020)
     ap.add_argument("--capture-cpu-outputs", action="store_true",
                     help="capture actual CPU-owned expert rows at dispatch 1393/layer 1")
+    ap.add_argument("--capture-combined-moe", action="store_true",
+                    help="capture verifier layer-1 weighted-combine outputs")
     ap.add_argument("--output", type=Path, required=True)
     args = ap.parse_args()
     if args.output.exists():
@@ -33,6 +35,7 @@ def main() -> int:
         "capture": {"layer": -1, "start_row": 1392, "rows": 192,
                     "reason": "cover dispatch 1393/layer 1 before the repeated first divergence at dispatch 1394/layer 2"},
         "capture_cpu_outputs": args.capture_cpu_outputs,
+        "capture_combined_moe": args.capture_combined_moe,
         "scope": "one paired diagnostic; bounded all-layer activations around the first known long-response divergence; no timing claim",
         "runs": [],
         "started_wall_time_s": time.time(),
@@ -49,6 +52,8 @@ def main() -> int:
         if args.capture_cpu_outputs:
             runner_args += ["--capture-cpu-output", "--capture-output-layer", "1",
                             "--capture-dispatch", "1393"]
+        if args.capture_combined_moe:
+            runner_args.append("--capture-combined-moe")
         if route == "cuda_mirror":
             runner_args.append("--cpu-q8-1-dot")
         runner_args += ["--output", str((out / "result").resolve())]

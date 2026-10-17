@@ -1720,3 +1720,17 @@ ownership control, and measure the untraced native path before making a speed
 claim. Exact parity for one expert operator is not a substitute for service
 state qualification. See the
 [Coder row-mirror screen](../../bench/results/2026-10-16-phase5-coder-q8_1-cuda-mirror-followup/README.md).
+
+The next diagnostic reused Strata's verifier `STGDIAG4` capture instead of
+adding a D2H copy inside a captured graph. Its layer-1 `ffn_y` field is the
+combined expert output after router weighting and shared-expert addition. In
+one paired Coder IQ1_M service run, the first shared position/token output
+differed in all 2,560 values between default CPU and CUDA-mirror CPU routes.
+The same run also retained the actual CPU rows and the route trace, but their
+dispatch identifiers do not directly join to the verifier's output records.
+For future Strata + Splash work, add a shared event/row key at the dispatch and
+combine boundary before claiming that a specific expert-row change caused a
+combined-output delta. Then capture the weighted parts, router weights, shared
+output and combined result for that exact key; this separates arithmetic
+propagation from unrelated state or route changes. See the
+[combined-output capture](../../bench/results/2026-10-16-phase5-coder-q8_1-combined-moe-capture/README.md).

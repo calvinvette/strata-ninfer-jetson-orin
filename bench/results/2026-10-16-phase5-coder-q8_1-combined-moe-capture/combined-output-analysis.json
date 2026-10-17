@@ -1,0 +1,149 @@
+{
+  "model": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF IQ1_M",
+  "layer": 1,
+  "capture": "STGDIAG4 ffn_y, after expert weighted combine plus shared expert",
+  "default_rows": 64,
+  "mirror_rows": 64,
+  "position_token_matched_rows": 50,
+  "exact_combined_output_rows": 0,
+  "mismatched_input_rows": 14,
+  "first_mismatched_position_token": {
+    "row": 30,
+    "default": [
+      2061,
+      5215
+    ],
+    "mirror": [
+      2061,
+      41916
+    ]
+  },
+  "first_combined_output_difference": {
+    "row": 0,
+    "position": 511,
+    "token": 271,
+    "different_values": 2560,
+    "elements": 2560,
+    "max_abs": 0.00021168310195207596,
+    "relative_l1": 0.004017079673421032
+  },
+  "actual_service_route_and_cpu_rows": {
+    "route_pair": {
+      "dispatch": 1393,
+      "layer": 1,
+      "activation_bitwise_equal": true,
+      "expert_ids_equal": true,
+      "owners_equal": true,
+      "expert_ids": [
+        209,
+        121,
+        126,
+        246,
+        207,
+        85,
+        9,
+        129,
+        140,
+        153
+      ],
+      "route_kind": [
+        -1,
+        0,
+        0,
+        0,
+        -1,
+        -1,
+        0,
+        0,
+        0,
+        -1
+      ],
+      "n_tok": 1,
+      "k": 10
+    },
+    "cpu_output_deltas": [
+      {
+        "expert": 85,
+        "different_values": 2560,
+        "elements": 2560,
+        "relative_l1": 0.01273797668153899
+      },
+      {
+        "expert": 153,
+        "different_values": 2560,
+        "elements": 2560,
+        "relative_l1": 0.013443788198861507
+      },
+      {
+        "expert": 207,
+        "different_values": 2560,
+        "elements": 2560,
+        "relative_l1": 0.015657946893128532
+      },
+      {
+        "expert": 209,
+        "different_values": 2560,
+        "elements": 2560,
+        "relative_l1": 0.0123055712827791
+      }
+    ]
+  },
+  "request_outcomes": [
+    {
+      "name": "short-512",
+      "default_tokens": 16,
+      "mirror_tokens": 16,
+      "different_token_positions": 0,
+      "persistent_state_equal": false
+    },
+    {
+      "name": "long-2048",
+      "default_tokens": 16,
+      "mirror_tokens": 16,
+      "different_token_positions": 3,
+      "persistent_state_equal": false
+    },
+    {
+      "name": "short-512-recovery",
+      "default_tokens": 16,
+      "mirror_tokens": 16,
+      "different_token_positions": 0,
+      "persistent_state_equal": false
+    },
+    {
+      "name": "short-512-continuation-1",
+      "default_tokens": 16,
+      "mirror_tokens": 16,
+      "different_token_positions": 13,
+      "persistent_state_equal": false
+    }
+  ],
+  "supervision": {
+    "default": {
+      "status": "pass",
+      "memory_samples": 193,
+      "minimum_host_available_gib": 14.4334716796875,
+      "minimum_admission_available_gib": 14.4334716796875,
+      "maximum_cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      }
+    },
+    "cuda_mirror": {
+      "status": "pass",
+      "memory_samples": 194,
+      "minimum_host_available_gib": 14.228912353515625,
+      "minimum_admission_available_gib": 14.228912353515625,
+      "maximum_cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      }
+    }
+  }
+}

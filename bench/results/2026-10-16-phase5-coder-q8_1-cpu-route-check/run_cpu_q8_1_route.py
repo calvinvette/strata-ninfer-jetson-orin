@@ -58,6 +58,8 @@ def main():
                         help="dump CPU-owned expert outputs from one service dispatch")
     parser.add_argument("--capture-output-layer", type=int, default=1)
     parser.add_argument("--capture-dispatch", type=int, default=1393)
+    parser.add_argument("--capture-combined-moe", action="store_true",
+                        help="capture the verifier's combined layer-1 FFN/MoE output")
     parser.add_argument("--cpu-q8-1-dot", action="store_true",
                         help="enable the opt-in IQ2_S/Q2_0 CPU Q8_1 scalar route")
     parser.add_argument("--output", type=Path, required=True)
@@ -74,6 +76,7 @@ def main():
         replace_option(argv, "--prompt-cache", args.prompt_cache)
     if "--adapt-accepted-only" not in argv:
         argv.append("--adapt-accepted-only")
+    combined_dump = args.output / "combined-moe.bin" if args.capture_combined_moe else None
     if "--expert-cache-cpu-order" in argv:
         raise RuntimeError("CPU-order option is incompatible with the native Coder pack")
 
@@ -105,6 +108,9 @@ def main():
             "STRATA_CAPTURE_MOE_OUTPUT_LAYER": str(args.capture_output_layer),
             "STRATA_CAPTURE_MOE_OUTPUT_DISPATCH": str(args.capture_dispatch),
         })
+    if combined_dump is not None:
+        env.update({"STRATA_VERIFY_DUMP_GDN_LAYER": "1",
+                    "STRATA_VERIFY_DUMP_GDN_PATH": str(combined_dump.resolve())})
     if args.cpu_q8_1_dot:
         env["STRATA_NATIVE_CPU_Q8_1_DOT"] = "1"
     engine = StrataEngine(cfg["exe"], argv, cwd=cfg["cwd"], log=str(log), env=env)
@@ -140,6 +146,8 @@ def main():
         cpu_output_rows = len(cpu_output_lines) - 1
         if cpu_output_rows == 0:
             raise RuntimeError("requested dispatch had no CPU-owned expert outputs")
+    if combined_dump is not None and (not combined_dump.exists() or combined_dump.stat().st_size == 0):
+        raise RuntimeError("requested verifier layer-1 combined-output capture was not produced")
     route = {"rows": len(rows)}
     if args.capture_layer == 1 and len(rows) >= 66:
         initial, long_rows, recovery = rows[:22], rows[22:44], rows[44:66]
@@ -166,6 +174,8 @@ def main():
         "capture_output_layer": args.capture_output_layer if args.capture_cpu_output else None,
         "capture_dispatch": args.capture_dispatch if args.capture_cpu_output else None,
         "captured_cpu_output_rows": cpu_output_rows,
+        "capture_combined_moe": args.capture_combined_moe,
+        "combined_moe_dump_bytes": combined_dump.stat().st_size if combined_dump is not None else 0,
         "prompt_sha256": {
             "short": hashlib.sha256(json.dumps(list(prompts[0][1])).encode()).hexdigest(),
             "long": hashlib.sha256(json.dumps(long_ids).encode()).hexdigest(),

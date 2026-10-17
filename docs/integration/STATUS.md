@@ -134,8 +134,23 @@ the actual service output buffer before weighted combine. For identical input
 activations, the default and mirror rows differed in all 2,560 values for each
 CPU-owned expert; their relative L1 deltas (0.012306–0.015658) match the
 standalone CPU/CUDA diagnostic. This localizes the first tested route change
-to the CPU expert outputs. The weighted combined MoE result and later state
-remain unmeasured, so this does not qualify a fix or close Phase 5.
+to the CPU expert outputs.
+
+A randomized [weighted-combine capture](../../bench/results/2026-10-16-phase5-coder-q8_1-combined-moe-capture/README.md)
+then recorded the layer-1 verifier's `ffn_y` after expert weighting and shared
+expert addition. Among 50 rows with matching positions and input tokens, no
+combined output matched bitwise; the first shared row (position 511/token 271)
+differed in all 2,560 values, with relative L1 0.004017. In the same pair,
+dispatch 1393/layer 1 had matching input activations, expert IDs and owners,
+while all four CPU-owned rows differed in all 2,560 values. The separate trace
+formats do not yet prove a direct join from that dispatch to the first combined
+row, so this confirms a post-combine numerical difference without attributing
+it to that one dispatch alone. Default and mirror answers matched on the
+initial short and immediate recovery requests, then differed at 3/16 long and
+13/16 continuation token positions; persistent-state fingerprints differed
+across arms. Both services passed above the six-GiB floor with no cgroup memory
+events. This is correctness evidence only, not a quality fix or performance
+claim; Phase 5 remains open.
 
 A supervised [Coder IQ1_M MTP cancellation check](../../bench/results/2026-10-16-phase5-coder-mtp-cancel-parity-current/README.md)
 canceled after eight streamed deltas and 12 committed tokens. Same-service
