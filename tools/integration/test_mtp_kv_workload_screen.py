@@ -58,6 +58,25 @@ class MtpKvWorkloadScreenTests(unittest.TestCase):
         for value in interaction['paired_values_percent']:
             self.assertAlmostEqual(value, 10.0, places=9)
 
+    def test_single_followup_block_keeps_unavailable_bootstrap_interval_null(self):
+        rows = []
+        for kv in ('fp16', 'int8'):
+            for workload in ('short', 'long'):
+                for window, factor in ((0, 1.0), (4, 1.1)):
+                    value = 100.0 * factor
+                    rows.append({'block': 0, 'kv': kv, 'workload': workload,
+                                 'window': window,
+                                 'metrics': {'prompt_tps': value, 'decode_tps': value,
+                                             'client_ttft_s': 1 / value,
+                                             'client_total_s': 1 / value}})
+        result = summarize_factorial(rows, ['short', 'long'], ['fp16', 'int8'], [0, 4], 9)
+        self.assertEqual(
+            result['cell_effects'][0]['prompt_tps_paired_bootstrap_95_interval_percent'],
+            [None, None])
+        self.assertEqual(
+            result['three_way_summary']['decode_tps']['paired_bootstrap_95_interval_percent'],
+            [None, None])
+
     def test_bootstrap_interval_is_finite_for_three_paired_blocks(self):
         interval = bootstrap_interval([0.1, 0.2, 0.3], 7)
         self.assertLessEqual(interval[0], interval[1])

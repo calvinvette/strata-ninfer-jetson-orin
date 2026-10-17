@@ -82,8 +82,10 @@ def summarize_factorial(rows, workloads, kvs, windows, seed):
             for name in metrics_names:
                 ratios = [p[name + '_ratio'] for p in paired]
                 summary[name + '_mtp4_effect_percent'] = (statistics.median(ratios) - 1) * 100
+                interval = bootstrap_interval(
+                    ratios, seed + len(result['cell_effects']) * 101 + len(name))
                 summary[name + '_paired_bootstrap_95_interval_percent'] = [
-                    (x - 1) * 100 for x in bootstrap_interval(ratios, seed + len(result['cell_effects']) * 101 + len(name))]
+                    (x - 1) * 100 if x is not None else None for x in interval]
                 summary[name + '_paired_ratios'] = ratios
             result['cell_effects'].append(summary)
 

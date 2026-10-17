@@ -1,6 +1,6 @@
 # Integration status
 
-Updated: 2026-10-16. Phases 1 through 4 are complete for their documented tested
+Updated: 2026-10-17. Phases 1 through 4 are complete for their documented tested
 Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 has
 initial long-context recall and sustained-service evidence and remains in
 progress; Phases 5 and 6 also remain open.
@@ -2592,6 +2592,26 @@ to three paired blocks; no block had all eight factorial arms at identical
 residency, and only two long-prompt MTP × KV interaction blocks qualified.
 Minimum host/admission availability was 13.33/8.94 GiB across 4,887 samples,
 with zero cgroup pressure/OOM events; clocks were dynamic and energy was not
-request-attributed. This screen does not select or promote a profile. A
-residency-matched repeat and seven-block held-out confirmation remain necessary;
-Phase 6 remains open.
+request-attributed. This screen does not select or promote a profile. Its
+1,500 MiB residency-matched repeat and follow-up below restore three fully
+qualified screening blocks; seven-block held-out confirmation and other Phase
+6 interactions remain necessary.
+
+The randomized three-block [Coder IQ1_M cache-bounded MTP × KV × prompt-length
+screen](../../bench/results/2026-10-16-phase6-coder-mtp-kv-workload-screen-cache1500/README.md)
+used a 1,500 MiB expert-cache budget. All 24 answers passed; 10/12 MTP pairs
+qualified by same-day and exact-residency rules, with two exclusions. The
+randomized one-block [follow-up](../../bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/README.md)
+then passed all eight arms with the same 1,934 slots / 3,807 MiB and produced
+four same-day qualified pairs. The combined audit retains original blocks 0
+and 2 plus the follow-up block; all 12 cell pairs and all three full factorial
+blocks qualify. Median MTP4 decode changes were +11.91%/+4.34% for FP16
+short/near-limit and +14.02%/+6.90% for INT8. Client total-time changes were
+−2.04%, −0.09%, −1.18% and +0.35%, respectively. Three-way interaction values
+varied across blocks; these remain screening estimates, not held-out
+confirmation or a profile recommendation. Follow-up minimum host/admission
+availability was 17.08/7.79 GiB across 1,709 samples, with zero cgroup
+pressure/OOM events. The initial post-collection summary hit a one-block
+bootstrap serialization bug; the raw arms passed, the summary was regenerated
+after fixing and testing the analysis path, and no arms were rerun. Phase 6
+remains open.

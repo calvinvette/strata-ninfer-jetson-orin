@@ -1,0 +1,1334 @@
+{
+  "schema": 1,
+  "scope": "single randomized 2\u00d72\u00d72 follow-up block; not a standalone screen",
+  "source_commit": "04cbcabf1bc460e016b265d4b1d60acb94cc0aea",
+  "binary": "/home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/candidate/strata",
+  "binary_sha256": "dfc6394251bbe2713f6039d442e290109513447a770884b58657f7e162d2ed60",
+  "model_name": "Coder IQ1_M with upstream base-checkpoint MTP; static-residency window screen",
+  "workloads": [
+    "coder-mtp-retrieval-short-512",
+    "coder-mtp-retrieval-near-limit-7501"
+  ],
+  "prompt_tokens_requested": {
+    "coder-mtp-retrieval-short-512": 512,
+    "coder-mtp-retrieval-near-limit-7501": 7501
+  },
+  "kv_formats": [
+    "fp16",
+    "int8"
+  ],
+  "mtp_windows": [
+    0,
+    4
+  ],
+  "blocks": 1,
+  "expert_cache_budget_override": 1500,
+  "seed": 20261025,
+  "floor_gib": 6,
+  "supervisor_memory_max": "28G",
+  "randomized_design": [
+    {
+      "block": 0,
+      "order": 0,
+      "kv": "int8",
+      "workload": "coder-mtp-retrieval-near-limit-7501",
+      "window": 0
+    },
+    {
+      "block": 0,
+      "order": 1,
+      "kv": "fp16",
+      "workload": "coder-mtp-retrieval-near-limit-7501",
+      "window": 4
+    },
+    {
+      "block": 0,
+      "order": 2,
+      "kv": "fp16",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 4
+    },
+    {
+      "block": 0,
+      "order": 3,
+      "kv": "int8",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 4
+    },
+    {
+      "block": 0,
+      "order": 4,
+      "kv": "int8",
+      "workload": "coder-mtp-retrieval-near-limit-7501",
+      "window": 4
+    },
+    {
+      "block": 0,
+      "order": 5,
+      "kv": "fp16",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 0
+    },
+    {
+      "block": 0,
+      "order": 6,
+      "kv": "int8",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 0
+    },
+    {
+      "block": 0,
+      "order": 7,
+      "kv": "fp16",
+      "workload": "coder-mtp-retrieval-near-limit-7501",
+      "window": 0
+    }
+  ],
+  "runs": [
+    {
+      "block": 0,
+      "order": 0,
+      "kv": "int8",
+      "workload": "coder-mtp-retrieval-near-limit-7501",
+      "window": 0,
+      "name": "block-00-kv-int8-workload-coder-mtp-retrieval-near-limit-7501-mtp-0",
+      "directory": "block-00-kv-int8-workload-coder-mtp-retrieval-near-limit-7501-mtp-0",
+      "command": [
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-int8-workload-coder-mtp-retrieval-near-limit-7501-mtp-0/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-int8-workload-coder-mtp-retrieval-near-limit-7501-mtp-0/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-int8-workload-coder-mtp-retrieval-near-limit-7501-mtp-0/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-int8-workload-coder-mtp-retrieval-near-limit-7501-mtp-0/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-16-phase5-coder-mtp-window-screen/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 370.0856078120414,
+      "minimum_available_bytes": 19483856896,
+      "minimum_admission_available_bytes": 19075342336,
+      "request_status": "pass",
+      "answer": "EARLY=PLUM-STATIC-614, MIDDLE=GLACIER-KEY-203, LATE=FENNEL-ORBIT-589",
+      "metrics": {
+        "prompt_tps": 22.899467643091906,
+        "decode_tps": 11.96247560284581,
+        "client_total_s": 330.7523896449711,
+        "client_ttft_s": 327.6575315659866,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.191,
+        "logical_file_mb": 30096.5,
+        "prompt_tokens": 7501,
+        "completion_tokens": 38
+      },
+      "engine": {
+        "kv": "int8",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 0,
+        "spec": 2
+      },
+      "clock_window": {
+        "sample_count": 313,
+        "gpu": {
+          "samples": 313,
+          "min_mhz": 408.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 0,
+      "order": 1,
+      "kv": "fp16",
+      "workload": "coder-mtp-retrieval-near-limit-7501",
+      "window": 4,
+      "name": "block-00-kv-fp16-workload-coder-mtp-retrieval-near-limit-7501-mtp-4",
+      "directory": "block-00-kv-fp16-workload-coder-mtp-retrieval-near-limit-7501-mtp-4",
+      "command": [
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-fp16-workload-coder-mtp-retrieval-near-limit-7501-mtp-4/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-fp16-workload-coder-mtp-retrieval-near-limit-7501-mtp-4/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-fp16-workload-coder-mtp-retrieval-near-limit-7501-mtp-4/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-fp16-workload-coder-mtp-retrieval-near-limit-7501-mtp-4/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-16-phase5-coder-mtp-window-screen/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 380.022901769029,
+      "minimum_available_bytes": 18337042432,
+      "minimum_admission_available_bytes": 15929450496,
+      "request_status": "pass",
+      "answer": "EARLY=PLUM-STATIC-614, MIDDLE=GLACIER-KEY-203, LATE=FENNEL-ORBIT-589",
+      "metrics": {
+        "prompt_tps": 22.67972038121039,
+        "decode_tps": 12.587366259233495,
+        "client_total_s": 333.769315619953,
+        "client_ttft_s": 330.85280444589444,
+        "drafted": 30,
+        "accepted": 27,
+        "cache_hit_rate": 0.187,
+        "logical_file_mb": 22207.8,
+        "prompt_tokens": 7501,
+        "completion_tokens": 38
+      },
+      "engine": {
+        "kv": "fp16",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 4,
+        "spec": 4
+      },
+      "clock_window": {
+        "sample_count": 315,
+        "gpu": {
+          "samples": 315,
+          "min_mhz": 408.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 0,
+      "order": 2,
+      "kv": "fp16",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 4,
+      "name": "block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-4",
+      "directory": "block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-4",
+      "command": [
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-4/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-4/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-4/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-4/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-16-phase5-coder-mtp-window-screen/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 75.44748988794163,
+      "minimum_available_bytes": 18387574784,
+      "minimum_admission_available_bytes": 12647424000,
+      "request_status": "pass",
+      "answer": "EARLY=CITRUS-AXLE-431, MIDDLE=MARBLE-THICKET-782, LATE=OXIDE-KITE-265, SUM=1478",
+      "metrics": {
+        "prompt_tps": 19.91931122756646,
+        "decode_tps": 13.370885607806322,
+        "client_total_s": 29.226256642956287,
+        "client_ttft_s": 25.85185160092078,
+        "drafted": 39,
+        "accepted": 34,
+        "cache_hit_rate": 0.174,
+        "logical_file_mb": 28764.7,
+        "prompt_tokens": 512,
+        "completion_tokens": 47
+      },
+      "engine": {
+        "kv": "fp16",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 4,
+        "spec": 4
+      },
+      "clock_window": {
+        "sample_count": 28,
+        "gpu": {
+          "samples": 28,
+          "min_mhz": 408.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 0,
+      "order": 3,
+      "kv": "int8",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 4,
+      "name": "block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-4",
+      "directory": "block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-4",
+      "command": [
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-4/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-4/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-4/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-4/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-16-phase5-coder-mtp-window-screen/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 73.29202975309454,
+      "minimum_available_bytes": 18503352320,
+      "minimum_admission_available_bytes": 11140206592,
+      "request_status": "pass",
+      "answer": "EARLY=CITRUS-AXLE-431, MIDDLE=MARBLE-THICKET-782, LATE=OXIDE-KITE-265, SUM=1478",
+      "metrics": {
+        "prompt_tps": 19.333449132638034,
+        "decode_tps": 13.66358509215652,
+        "client_total_s": 29.931436287937686,
+        "client_ttft_s": 26.580916343024,
+        "drafted": 39,
+        "accepted": 34,
+        "cache_hit_rate": 0.178,
+        "logical_file_mb": 28749.2,
+        "prompt_tokens": 512,
+        "completion_tokens": 47
+      },
+      "engine": {
+        "kv": "int8",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 4,
+        "spec": 4
+      },
+      "clock_window": {
+        "sample_count": 28,
+        "gpu": {
+          "samples": 28,
+          "min_mhz": 306.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 0,
+      "order": 4,
+      "kv": "int8",
+      "workload": "coder-mtp-retrieval-near-limit-7501",
+      "window": 4,
+      "name": "block-00-kv-int8-workload-coder-mtp-retrieval-near-limit-7501-mtp-4",
+      "directory": "block-00-kv-int8-workload-coder-mtp-retrieval-near-limit-7501-mtp-4",
+      "command": [
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-int8-workload-coder-mtp-retrieval-near-limit-7501-mtp-4/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-int8-workload-coder-mtp-retrieval-near-limit-7501-mtp-4/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-int8-workload-coder-mtp-retrieval-near-limit-7501-mtp-4/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-int8-workload-coder-mtp-retrieval-near-limit-7501-mtp-4/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-16-phase5-coder-mtp-window-screen/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 374.29431709693745,
+      "minimum_available_bytes": 18498580480,
+      "minimum_admission_available_bytes": 10267303936,
+      "request_status": "pass",
+      "answer": "EARLY=PLUM-STATIC-614, MIDDLE=GLACIER-KEY-203, LATE=FENNEL-ORBIT-589",
+      "metrics": {
+        "prompt_tps": 22.79369713706788,
+        "decode_tps": 13.491443584463537,
+        "client_total_s": 331.9127145719249,
+        "client_ttft_s": 329.1854288438335,
+        "drafted": 30,
+        "accepted": 27,
+        "cache_hit_rate": 0.188,
+        "logical_file_mb": 22210.7,
+        "prompt_tokens": 7501,
+        "completion_tokens": 38
+      },
+      "engine": {
+        "kv": "int8",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 4,
+        "spec": 4
+      },
+      "clock_window": {
+        "sample_count": 313,
+        "gpu": {
+          "samples": 313,
+          "min_mhz": 408.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 0,
+      "order": 5,
+      "kv": "fp16",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 0,
+      "name": "block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0",
+      "directory": "block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0",
+      "command": [
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-16-phase5-coder-mtp-window-screen/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 72.7776596751064,
+      "minimum_available_bytes": 19480068096,
+      "minimum_admission_available_bytes": 9307611136,
+      "request_status": "pass",
+      "answer": "EARLY=CITRUS-AXLE-431, MIDDLE=MARBLE-THICKET-782, LATE=OXIDE-KITE-265, SUM=1478",
+      "metrics": {
+        "prompt_tps": 19.983841190912035,
+        "decode_tps": 12.10248487189391,
+        "client_total_s": 29.509934775996953,
+        "client_ttft_s": 25.725951707921922,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.177,
+        "logical_file_mb": 37930.3,
+        "prompt_tokens": 512,
+        "completion_tokens": 47
+      },
+      "engine": {
+        "kv": "fp16",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 0,
+        "spec": 2
+      },
+      "clock_window": {
+        "sample_count": 29,
+        "gpu": {
+          "samples": 29,
+          "min_mhz": 408.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 0,
+      "order": 6,
+      "kv": "int8",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 0,
+      "name": "block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0",
+      "directory": "block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0",
+      "command": [
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-16-phase5-coder-mtp-window-screen/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 72.47278933995403,
+      "minimum_available_bytes": 19526369280,
+      "minimum_admission_available_bytes": 9059360768,
+      "request_status": "pass",
+      "answer": "EARLY=CITRUS-AXLE-431, MIDDLE=MARBLE-THICKET-782, LATE=OXIDE-KITE-265, SUM=1478",
+      "metrics": {
+        "prompt_tps": 19.217199393457143,
+        "decode_tps": 12.037701055219753,
+        "client_total_s": 30.55286597390659,
+        "client_ttft_s": 26.748559843050316,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.177,
+        "logical_file_mb": 37931.3,
+        "prompt_tokens": 512,
+        "completion_tokens": 47
+      },
+      "engine": {
+        "kv": "int8",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 0,
+        "spec": 2
+      },
+      "clock_window": {
+        "sample_count": 29,
+        "gpu": {
+          "samples": 29,
+          "min_mhz": 408.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 0,
+      "order": 7,
+      "kv": "fp16",
+      "workload": "coder-mtp-retrieval-near-limit-7501",
+      "window": 0,
+      "name": "block-00-kv-fp16-workload-coder-mtp-retrieval-near-limit-7501-mtp-0",
+      "directory": "block-00-kv-fp16-workload-coder-mtp-retrieval-near-limit-7501-mtp-0",
+      "command": [
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-fp16-workload-coder-mtp-retrieval-near-limit-7501-mtp-0/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-fp16-workload-coder-mtp-retrieval-near-limit-7501-mtp-0/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-fp16-workload-coder-mtp-retrieval-near-limit-7501-mtp-0/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-followup-budget1500/campaign/block-00-kv-fp16-workload-coder-mtp-retrieval-near-limit-7501-mtp-0/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-16-phase5-coder-mtp-window-screen/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 376.88803765084594,
+      "minimum_available_bytes": 19504721920,
+      "minimum_admission_available_bytes": 8368492544,
+      "request_status": "pass",
+      "answer": "EARLY=PLUM-STATIC-614, MIDDLE=GLACIER-KEY-203, LATE=FENNEL-ORBIT-589",
+      "metrics": {
+        "prompt_tps": 22.66764416663997,
+        "decode_tps": 12.06425804813004,
+        "client_total_s": 334.0744464341551,
+        "client_ttft_s": 331.01746182492934,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.19,
+        "logical_file_mb": 30146.6,
+        "prompt_tokens": 7501,
+        "completion_tokens": 38
+      },
+      "engine": {
+        "kv": "fp16",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 0,
+        "spec": 2
+      },
+      "clock_window": {
+        "sample_count": 316,
+        "gpu": {
+          "samples": 316,
+          "min_mhz": 408.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    }
+  ],
+  "status": "pass",
+  "unfiltered_comparisons_do_not_account_for_residency": {
+    "cell_effects": [
+      {
+        "kv_format": "fp16",
+        "workload": "coder-mtp-retrieval-short-512",
+        "paired_blocks": 1,
+        "prompt_tps_mtp4_effect_percent": -0.32291070935311916,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_ratios": [
+          0.9967708929064688
+        ],
+        "decode_tps_mtp4_effect_percent": 10.48049842109755,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_ratios": [
+          1.1048049842109755
+        ],
+        "client_ttft_s_mtp4_effect_percent": 0.4893886703522421,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_ratios": [
+          1.0048938867035224
+        ],
+        "client_total_s_mtp4_effect_percent": -0.9612970519724984,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_ratios": [
+          0.990387029480275
+        ]
+      },
+      {
+        "kv_format": "int8",
+        "workload": "coder-mtp-retrieval-short-512",
+        "paired_blocks": 1,
+        "prompt_tps_mtp4_effect_percent": 0.604925498251685,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_ratios": [
+          1.0060492549825168
+        ],
+        "decode_tps_mtp4_effect_percent": 13.50659922088493,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_ratios": [
+          1.1350659922088493
+        ],
+        "client_ttft_s_mtp4_effect_percent": -0.6267384151146027,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_ratios": [
+          0.993732615848854
+        ],
+        "client_total_s_mtp4_effect_percent": -2.0339489149712953,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_ratios": [
+          0.979660510850287
+        ]
+      },
+      {
+        "kv_format": "fp16",
+        "workload": "coder-mtp-retrieval-near-limit-7501",
+        "paired_blocks": 1,
+        "prompt_tps_mtp4_effect_percent": 0.05327511973296506,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_ratios": [
+          1.0005327511973297
+        ],
+        "decode_tps_mtp4_effect_percent": 4.33601642982544,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_ratios": [
+          1.0433601642982544
+        ],
+        "client_ttft_s_mtp4_effect_percent": -0.04974280756282479,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_ratios": [
+          0.9995025719243718
+        ],
+        "client_total_s_mtp4_effect_percent": -0.09133617295756791,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_ratios": [
+          0.9990866382704243
+        ]
+      },
+      {
+        "kv_format": "int8",
+        "workload": "coder-mtp-retrieval-near-limit-7501",
+        "paired_blocks": 1,
+        "prompt_tps_mtp4_effect_percent": -0.4618906765543662,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_ratios": [
+          0.9953810932344563
+        ],
+        "decode_tps_mtp4_effect_percent": 12.781367606333882,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_ratios": [
+          1.1278136760633388
+        ],
+        "client_ttft_s_mtp4_effect_percent": 0.46630921942938386,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_ratios": [
+          1.0046630921942938
+        ],
+        "client_total_s_mtp4_effect_percent": 0.3508137698413183,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_ratios": [
+          1.0035081376984132
+        ]
+      }
+    ],
+    "mtp_by_kv_interactions": [
+      {
+        "workload": "coder-mtp-retrieval-short-512",
+        "paired_blocks": 1,
+        "prompt_tps_median_interaction_percent": 0.9308419960973646,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_values_percent": [
+          0.9308419960973646
+        ],
+        "decode_tps_median_interaction_percent": 2.7390361584479495,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_values_percent": [
+          2.7390361584479495
+        ],
+        "client_ttft_s_median_interaction_percent": -1.1106914871660822,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_values_percent": [
+          -1.1106914871660822
+        ],
+        "client_total_s_median_interaction_percent": -1.0830633187529637,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_values_percent": [
+          -1.0830633187529637
+        ]
+      },
+      {
+        "workload": "coder-mtp-retrieval-near-limit-7501",
+        "paired_blocks": 1,
+        "prompt_tps_median_interaction_percent": -0.5148914872310173,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_values_percent": [
+          -0.5148914872310173
+        ],
+        "decode_tps_median_interaction_percent": 8.094377632472316,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_values_percent": [
+          8.094377632472316
+        ],
+        "client_ttft_s_median_interaction_percent": 0.5163088535116378,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_values_percent": [
+          0.5163088535116378
+        ],
+        "client_total_s_median_interaction_percent": 0.4425541548271683,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_values_percent": [
+          0.4425541548271683
+        ]
+      }
+    ],
+    "mtp_by_workload_interactions": [
+      {
+        "kv_format": "fp16",
+        "workloads": [
+          "coder-mtp-retrieval-short-512",
+          "coder-mtp-retrieval-near-limit-7501"
+        ],
+        "paired_blocks": 1,
+        "prompt_tps_median_interaction_percent": 0.37740450866212694,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_values_percent": [
+          0.37740450866212694
+        ],
+        "decode_tps_median_interaction_percent": -5.561598724738149,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_values_percent": [
+          -5.561598724738149
+        ],
+        "client_ttft_s_median_interaction_percent": -0.5365058789278176,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_values_percent": [
+          -0.5365058789278176
+        ],
+        "client_total_s_median_interaction_percent": 0.878404959999779,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_values_percent": [
+          0.878404959999779
+        ]
+      },
+      {
+        "kv_format": "int8",
+        "workloads": [
+          "coder-mtp-retrieval-short-512",
+          "coder-mtp-retrieval-near-limit-7501"
+        ],
+        "paired_blocks": 1,
+        "prompt_tps_median_interaction_percent": -1.0604015355337504,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_values_percent": [
+          -1.0604015355337504
+        ],
+        "decode_tps_median_interaction_percent": -0.6389334360548893,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_values_percent": [
+          -0.6389334360548893
+        ],
+        "client_ttft_s_median_interaction_percent": 1.0999413897774701,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_values_percent": [
+          1.0999413897774701
+        ],
+        "client_total_s_median_interaction_percent": 2.4342745863490833,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_values_percent": [
+          2.4342745863490833
+        ]
+      }
+    ],
+    "three_way_interactions": [
+      {
+        "block": 0,
+        "prompt_tps_three_way_interaction_percent": -1.4324001016302712,
+        "decode_tps_three_way_interaction_percent": 5.212567369003884,
+        "client_ttft_s_three_way_interaction_percent": 1.6452742618445537,
+        "client_total_s_three_way_interaction_percent": 1.5423217952010848
+      }
+    ],
+    "three_way_summary": {
+      "prompt_tps": {
+        "median_percent": -1.4324001016302712,
+        "paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "paired_values_percent": [
+          -1.4324001016302712
+        ]
+      },
+      "decode_tps": {
+        "median_percent": 5.212567369003884,
+        "paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "paired_values_percent": [
+          5.212567369003884
+        ]
+      },
+      "client_ttft_s": {
+        "median_percent": 1.6452742618445537,
+        "paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "paired_values_percent": [
+          1.6452742618445537
+        ]
+      },
+      "client_total_s": {
+        "median_percent": 1.5423217952010848,
+        "paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "paired_values_percent": [
+          1.5423217952010848
+        ]
+      }
+    }
+  },
+  "comparisons": {
+    "schema": 2,
+    "source_campaign": "04cbcabf1bc460e016b265d4b1d60acb94cc0aea",
+    "qualification_rule": "timing pairs require passing arms from the same local calendar day, matching KV, actual prompt token count, and identical expert slots/cache MiB; higher interactions require matching residency and date across all contributing cells",
+    "cell_effects": [
+      {
+        "kv": "fp16",
+        "workload": "coder-mtp-retrieval-short-512",
+        "paired_blocks": 1,
+        "paired_block_ids": [
+          0
+        ],
+        "prompt_tps_effect_percent": -0.32291070935311916,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_ratios": [
+          0.9967708929064688
+        ],
+        "decode_tps_effect_percent": 10.48049842109755,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_ratios": [
+          1.1048049842109755
+        ],
+        "client_ttft_s_effect_percent": 0.4893886703522421,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_ratios": [
+          1.0048938867035224
+        ],
+        "client_total_s_effect_percent": -0.9612970519724984,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_ratios": [
+          0.990387029480275
+        ]
+      },
+      {
+        "kv": "fp16",
+        "workload": "coder-mtp-retrieval-near-limit-7501",
+        "paired_blocks": 1,
+        "paired_block_ids": [
+          0
+        ],
+        "prompt_tps_effect_percent": 0.05327511973296506,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_ratios": [
+          1.0005327511973297
+        ],
+        "decode_tps_effect_percent": 4.33601642982544,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_ratios": [
+          1.0433601642982544
+        ],
+        "client_ttft_s_effect_percent": -0.04974280756282479,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_ratios": [
+          0.9995025719243718
+        ],
+        "client_total_s_effect_percent": -0.09133617295756791,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_ratios": [
+          0.9990866382704243
+        ]
+      },
+      {
+        "kv": "int8",
+        "workload": "coder-mtp-retrieval-short-512",
+        "paired_blocks": 1,
+        "paired_block_ids": [
+          0
+        ],
+        "prompt_tps_effect_percent": 0.604925498251685,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_ratios": [
+          1.0060492549825168
+        ],
+        "decode_tps_effect_percent": 13.50659922088493,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_ratios": [
+          1.1350659922088493
+        ],
+        "client_ttft_s_effect_percent": -0.6267384151146027,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_ratios": [
+          0.993732615848854
+        ],
+        "client_total_s_effect_percent": -2.0339489149712953,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_ratios": [
+          0.979660510850287
+        ]
+      },
+      {
+        "kv": "int8",
+        "workload": "coder-mtp-retrieval-near-limit-7501",
+        "paired_blocks": 1,
+        "paired_block_ids": [
+          0
+        ],
+        "prompt_tps_effect_percent": -0.4618906765543662,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_ratios": [
+          0.9953810932344563
+        ],
+        "decode_tps_effect_percent": 12.781367606333882,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_ratios": [
+          1.1278136760633388
+        ],
+        "client_ttft_s_effect_percent": 0.46630921942938386,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_ratios": [
+          1.0046630921942938
+        ],
+        "client_total_s_effect_percent": 0.3508137698413183,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_ratios": [
+          1.0035081376984132
+        ]
+      }
+    ],
+    "qualified_cell_pairs": [
+      {
+        "block": 0,
+        "kv": "fp16",
+        "workload": "coder-mtp-retrieval-short-512",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "local_run_date": "2026-10-17",
+        "prompt_tps_ratio": 0.9967708929064688,
+        "decode_tps_ratio": 1.1048049842109755,
+        "client_ttft_s_ratio": 1.0048938867035224,
+        "client_total_s_ratio": 0.990387029480275,
+        "qualified": true
+      },
+      {
+        "block": 0,
+        "kv": "fp16",
+        "workload": "coder-mtp-retrieval-near-limit-7501",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "local_run_date": "2026-10-17",
+        "prompt_tps_ratio": 1.0005327511973297,
+        "decode_tps_ratio": 1.0433601642982544,
+        "client_ttft_s_ratio": 0.9995025719243718,
+        "client_total_s_ratio": 0.9990866382704243,
+        "qualified": true
+      },
+      {
+        "block": 0,
+        "kv": "int8",
+        "workload": "coder-mtp-retrieval-short-512",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "local_run_date": "2026-10-17",
+        "prompt_tps_ratio": 1.0060492549825168,
+        "decode_tps_ratio": 1.1350659922088493,
+        "client_ttft_s_ratio": 0.993732615848854,
+        "client_total_s_ratio": 0.979660510850287,
+        "qualified": true
+      },
+      {
+        "block": 0,
+        "kv": "int8",
+        "workload": "coder-mtp-retrieval-near-limit-7501",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "local_run_date": "2026-10-17",
+        "prompt_tps_ratio": 0.9953810932344563,
+        "decode_tps_ratio": 1.1278136760633388,
+        "client_ttft_s_ratio": 1.0046630921942938,
+        "client_total_s_ratio": 1.0035081376984132,
+        "qualified": true
+      }
+    ],
+    "excluded_cell_pairs": [],
+    "mtp_by_kv_interactions": [
+      {
+        "block": 0,
+        "workload": "coder-mtp-retrieval-short-512",
+        "qualified": true,
+        "expert_slots": 1934,
+        "prompt_tps_int8_vs_fp16_interaction_percent": 0.9308419960973646,
+        "decode_tps_int8_vs_fp16_interaction_percent": 2.7390361584479495,
+        "client_ttft_s_int8_vs_fp16_interaction_percent": -1.1106914871660822,
+        "client_total_s_int8_vs_fp16_interaction_percent": -1.0830633187529637
+      },
+      {
+        "block": 0,
+        "workload": "coder-mtp-retrieval-near-limit-7501",
+        "qualified": true,
+        "expert_slots": 1934,
+        "prompt_tps_int8_vs_fp16_interaction_percent": -0.5148914872310173,
+        "decode_tps_int8_vs_fp16_interaction_percent": 8.094377632472316,
+        "client_ttft_s_int8_vs_fp16_interaction_percent": 0.5163088535116378,
+        "client_total_s_int8_vs_fp16_interaction_percent": 0.4425541548271683
+      }
+    ],
+    "mtp_by_workload_interactions": [
+      {
+        "block": 0,
+        "kv": "fp16",
+        "qualified": true,
+        "expert_slots": 1934,
+        "prompt_tps_long_vs_short_interaction_percent": 0.37740450866212694,
+        "decode_tps_long_vs_short_interaction_percent": -5.561598724738149,
+        "client_ttft_s_long_vs_short_interaction_percent": -0.5365058789278176,
+        "client_total_s_long_vs_short_interaction_percent": 0.878404959999779
+      },
+      {
+        "block": 0,
+        "kv": "int8",
+        "qualified": true,
+        "expert_slots": 1934,
+        "prompt_tps_long_vs_short_interaction_percent": -1.0604015355337504,
+        "decode_tps_long_vs_short_interaction_percent": -0.6389334360548893,
+        "client_ttft_s_long_vs_short_interaction_percent": 1.0999413897774701,
+        "client_total_s_long_vs_short_interaction_percent": 2.4342745863490833
+      }
+    ],
+    "three_way_interactions": [
+      {
+        "block": 0,
+        "qualified": true,
+        "prompt_tps_three_way_interaction_percent": -1.4324001016302712,
+        "decode_tps_three_way_interaction_percent": 5.212567369003884,
+        "client_ttft_s_three_way_interaction_percent": 1.6452742618445537,
+        "client_total_s_three_way_interaction_percent": 1.5423217952010848
+      }
+    ]
+  },
+  "finished_wall_time_s": 1792215086.4036252
+}
