@@ -15,9 +15,9 @@ disabled. The [Phase 6 profile decision](PHASE6_PROFILES.md) records the paired
 latency evidence, exact-answer checks, headroom, rail-energy limits and the
 selection boundary. The 8K supported-service matrix below mostly predates this
 profile selection and uses different MTP settings; those rows do not by
-themselves qualify the selected profile. The two rows below qualify only their
-listed workload cells. Cancellation, teardown and broader quality checks on
-the selected profile remain necessary before making a support claim.
+themselves qualify the selected profile. The three rows below qualify only
+their listed workload cells. Teardown and broader quality checks on the
+selected profile remain necessary before making a support claim.
 
 ## Q2_0 selected MTP-off profile
 
@@ -25,6 +25,7 @@ the selected profile remain necessary before making a support claim.
 | --- | ---: | --- | ---: | --- |
 | Sustained uncached retrieval plus arithmetic, 8K | 8,192 / 512 tokens | 101/101 exact responses over 1,802 s; independent exact-answer review passed | 17.73 / 8.51 GiB | Thermal median stabilized near 55.2 °C in the final 10 minutes; dynamic clocks; raw rails only; [report](../../bench/results/2026-10-17-phase7-q2-prefill128/sustained-512/README.md) |
 | Near-limit retrieval and same-service recovery, 8K | 8,192 / 7,498 tokens | Three markers once and ordered; `RECOVERED` on the same service; independent review passed | 17.96 / 11.75 GiB | One prompt/profile; [report](../../bench/results/2026-10-17-phase7-q2-prefill128/near-limit-8k-recovery/README.md) |
+| API protocols and disconnect/recovery | 8,192 / short protocol prompts; separate 7,498-token prefill cancel | Seven protocol scenarios passed; decode and progress-confirmed prefill cancellation logged; both recovered on the same service | 17.87 / 16.78 GiB | Short disconnect plus a separate cancel at 256/7,498 prompt tokens; [protocol report](../../bench/results/2026-10-17-phase7-q2-prefill128/api-cancel-recovery/README.md), [active-prefill report](../../bench/results/2026-10-17-phase7-q2-prefill128/api-prefill-cancel/README.md) |
 
 ## Q2_0 accepted-only MTP4
 

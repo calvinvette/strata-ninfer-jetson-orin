@@ -15,9 +15,13 @@ profile 7,498-token 8K recall and same-service recovery check also passed, with
 17.96 / 11.75 GiB minimum host/admission availability. The retained [soak
 report](../../bench/results/2026-10-17-phase7-q2-prefill128/sustained-512/README.md)
 and [recall report](../../bench/results/2026-10-17-phase7-q2-prefill128/near-limit-8k-recovery/README.md)
-include independent review and raw telemetry. Selected-profile cancellation,
-teardown and broader quality checks remain open. Process energy attribution and
-broader Phase 6 interactions also remain open.
+include independent review and raw telemetry. The selected-profile seven-case
+API suite passed, and separate checks confirmed decode cancellation and active
+prefill cancellation at 256 of 7,498 tokens, each followed by same-service
+recovery. See the [protocol report](../../bench/results/2026-10-17-phase7-q2-prefill128/api-cancel-recovery/README.md)
+and [active-prefill report](../../bench/results/2026-10-17-phase7-q2-prefill128/api-prefill-cancel/README.md).
+Selected-profile teardown and broader quality checks remain open. Process
+energy attribution and broader Phase 6 interactions also remain open.
 
 An exploratory Phase 5 [Coder CPU-order recovery attempt](../../bench/results/2026-10-16-phase5-cpu-order-adaptive-recovery/README.md)
 is excluded from numerical and quality conclusions. The flag dispatches to a

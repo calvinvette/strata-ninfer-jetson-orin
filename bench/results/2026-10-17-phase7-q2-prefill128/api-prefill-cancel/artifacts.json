@@ -1,0 +1,37 @@
+{
+  "checkout_commit": "d94c4dec72e12e0813903a36665e3fcac0f8b063",
+  "candidate_build_source_commit": "53d7c7a419f214b4133a2319bdcdf127f23ba1c4",
+  "candidate_binary_sha256": "dfc6394251bbe2713f6039d442e290109513447a770884b58657f7e162d2ed60",
+  "model": {
+    "repo": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+    "revision": "5348543e0147355ac9cbcb031184a3546350988e",
+    "format": "Q2_0 GGUF, two shards",
+    "shards": [
+      {
+        "file": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+        "sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720"
+      },
+      {
+        "file": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+        "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+      }
+    ],
+    "ple_pack_dense_sha256": "a43d7d0b69525335f4b000d5197a1d3aefcd3c0014fc3e12b3455e0a5d827ba2",
+    "expert_profile_sha256": "b3e62120218cd96d175a0547530158869177dd2164b22b40f32bea7d7e85fb8c"
+  },
+  "host": "NVIDIA Jetson AGX Orin, aarch64, CUDA 12.6 / driver 540.4.0",
+  "profile": "Q2_0, FP16 KV, no MTP (spec2 verifier setting), 8192 context, 3000 exact expert slots, prefill 128, 8 workers, prompt cache and adaptive swaps off, 3072 MiB workspace reserve",
+  "inputs": {
+    "config_sha256": "cdddf3287a776e1ab3f96ad35ea3fbc4f67e0405fb2f0842a1505ab00b9b0283",
+    "workload_sha256": "566fa526c26a7306c600a627e1726b3fc8c9477c87aab869566ce458d8d01f5b"
+  },
+  "runtime_scope": "active 7498-token prefill disconnect after engine logged progress at 256 tokens; same-service exact recovery; 28-GiB MemoryMax; six-GiB host-availability guard",
+  "attempts": {
+    "first": "Failed: observed the engine log instead of server stdout; full prompt completed without cancellation.",
+    "second": "Interrupted through runner cleanup: HTTP client waited for streamed response headers until prefill had completed.",
+    "third": "Passed: raw HTTP socket closed on observed incomplete-prompt progress; engine logged cancel=True and same-service recovery passed."
+  },
+  "runner_sha256": "bdd0bab2415e0ab52f8eeb71283235709ecb873f2ed0dba9e5285b6a39ffb767",
+  "reviewer_sha256": "9fa2d1ffed6125d3050b1220db47ddd0c8b67fd36beefa505670779609fe286f",
+  "artifact_location": "Model, pack and tokenizer remained under ~/models/strata-orin-validation; no model artifacts in Git."
+}
