@@ -26,14 +26,17 @@ cycles with independent response and process-exit review; see the
 Broader quality checks remain open. Process-energy attribution and broader
 Phase 6 interactions also remain open.
 
-The selected Q2_0 MTP-off profile also passed [16K](../../bench/results/2026-10-17-phase7-q2-prefill128-16k-selected-profile/README.md)
-and [32K](../../bench/results/2026-10-17-phase7-q2-prefill128-32k-selected-profile/README.md)
-near-limit retrieval and same-service recovery cells. The 15,003- and
-30,032-token prompts each returned all three planted markers once and in order,
-followed by `RECOVERED`. Minimum host/admission availability was 17.72/10.15
-GiB at 16K and 17.52/11.89 GiB at 32K across 611 and 1,106 supervised samples;
-both runs had zero cgroup memory events. This extends the exact selected profile
-from 8K through one 32K capacity point. The selected profile also passed a
+The selected Q2_0 MTP-off profile also passed [16K](../../bench/results/2026-10-17-phase7-q2-prefill128-16k-selected-profile/README.md),
+[32K](../../bench/results/2026-10-17-phase7-q2-prefill128-32k-selected-profile/README.md),
+and [64K](../../bench/results/2026-10-17-phase7-q2-prefill128-64k-selected-profile/README.md)
+near-limit retrieval and same-service recovery cells. The 15,003-, 30,032-,
+and 60,071-token prompts each returned all three planted markers once and in
+order, followed by `RECOVERED`. Minimum host/admission availability was
+17.72/10.15 GiB at 16K, 17.52/11.89 GiB at 32K, and 16.68/11.32 GiB at 64K
+across 611, 1,106 and 2,186 supervised samples; all three runs had zero cgroup
+memory events. This extends the exact selected profile from 8K through one 64K
+capacity point. The 64K prompt took 2,251.7 seconds at 26.7 tokens/s for
+prefill; the full client request took 2,260.6 seconds. The selected profile also passed a
 held-out [32K retrieval-plus-arithmetic task](../../bench/results/2026-10-17-phase7-q2-prefill128-32k-quality-mtp-off/README.md):
 all three markers appeared once and in order, the independent suffix oracle
 returned `1971`, and same-service recovery passed. That run retained 17.42/11.48
