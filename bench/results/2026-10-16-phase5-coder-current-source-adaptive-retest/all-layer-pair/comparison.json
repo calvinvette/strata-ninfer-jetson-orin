@@ -1,0 +1,425 @@
+{
+  "campaign_status": "pass",
+  "seed": 20261031,
+  "order": [
+    "delayed-control",
+    "adaptive-cap8"
+  ],
+  "binary_sha256": "dfc6394251bbe2713f6039d442e290109513447a770884b58657f7e162d2ed60",
+  "repository_head": "a1fbb96c4368b2a3815ef7a5fdb5fb3221770ebd",
+  "model_repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+  "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
+  "quantization": "IQ1_M",
+  "cross_arm_token_differences": {
+    "short-512": 0,
+    "long-2048": 3,
+    "short-512-recovery": 0,
+    "short-512-continuation-1": 16
+  },
+  "cross_arm_state_differing_fields": {
+    "short-512": [
+      "gdn",
+      "tail",
+      "pooled",
+      "pooled_full",
+      "kv"
+    ],
+    "long-2048": [
+      "gdn",
+      "ple",
+      "tail",
+      "pooled",
+      "pooled_full",
+      "kv",
+      "ple_prev"
+    ],
+    "short-512-recovery": [
+      "gdn",
+      "tail",
+      "pooled",
+      "pooled_full",
+      "kv"
+    ],
+    "short-512-continuation-1": [
+      "gdn",
+      "ple",
+      "tail",
+      "pooled",
+      "pooled_full",
+      "kv",
+      "ple_prev"
+    ]
+  },
+  "within_arm": {
+    "delayed-control": {
+      "recovery_token_differences_vs_initial": 0,
+      "recovery_state_changed_fields_vs_initial": [],
+      "continuation_token_differences_vs_initial": 0,
+      "first_initial_vs_recovery_owner_difference": null,
+      "first_initial_vs_recovery_activation_difference": null,
+      "first_initial_vs_recovery_expert_id_difference": null
+    },
+    "adaptive-cap8": {
+      "recovery_token_differences_vs_initial": 0,
+      "recovery_state_changed_fields_vs_initial": [
+        "gdn",
+        "tail",
+        "pooled",
+        "pooled_full",
+        "kv"
+      ],
+      "continuation_token_differences_vs_initial": 16,
+      "first_initial_vs_recovery_owner_difference": {
+        "dispatch": 1,
+        "layer": 1,
+        "row": 0,
+        "capture_row_index": 0,
+        "activation_different_values": 0,
+        "expert_ids_equal": true,
+        "owner_changes": [
+          {
+            "expert": 11,
+            "control": -1,
+            "candidate": 0
+          },
+          {
+            "expert": 95,
+            "control": -1,
+            "candidate": 0
+          },
+          {
+            "expert": 101,
+            "control": -1,
+            "candidate": 0
+          },
+          {
+            "expert": 165,
+            "control": -1,
+            "candidate": 0
+          },
+          {
+            "expert": 205,
+            "control": -1,
+            "candidate": 0
+          }
+        ]
+      },
+      "first_initial_vs_recovery_activation_difference": {
+        "dispatch": 2,
+        "layer": 2,
+        "row": 0,
+        "capture_row_index": 0,
+        "activation_different_values": 2560,
+        "expert_ids_equal": true,
+        "owner_changes": [
+          {
+            "expert": 62,
+            "control": -1,
+            "candidate": 0
+          }
+        ]
+      },
+      "first_initial_vs_recovery_expert_id_difference": {
+        "dispatch": 11,
+        "layer": 11,
+        "row": 0,
+        "capture_row_index": 0,
+        "activation_different_values": 2560,
+        "expert_ids_equal": false,
+        "owner_changes": [
+          {
+            "expert": 201,
+            "control": -1,
+            "candidate": 0
+          },
+          {
+            "expert": 208,
+            "control": -1,
+            "candidate": 0
+          }
+        ]
+      }
+    }
+  },
+  "all_layer_rows_by_request": {
+    "initial-short-512": 1056,
+    "long-2048": 1056,
+    "recovery-short-512": 1056,
+    "continuation-short-512": 912
+  },
+  "all_layer_comparisons": {
+    "initial-short-512": {
+      "first_owner_difference": {
+        "dispatch": 337,
+        "layer": 1,
+        "row": 0,
+        "capture_row_index": 10,
+        "activation_different_values": 0,
+        "expert_ids_equal": true,
+        "owner_changes": [
+          {
+            "expert": 26,
+            "control": 0,
+            "candidate": -1
+          },
+          {
+            "expert": 95,
+            "control": -1,
+            "candidate": 0
+          }
+        ]
+      },
+      "first_activation_difference": {
+        "dispatch": 338,
+        "layer": 2,
+        "row": 0,
+        "capture_row_index": 10,
+        "activation_different_values": 2560,
+        "expert_ids_equal": true,
+        "owner_changes": []
+      },
+      "first_expert_id_difference": {
+        "dispatch": 347,
+        "layer": 11,
+        "row": 0,
+        "capture_row_index": 10,
+        "activation_different_values": 2560,
+        "expert_ids_equal": false,
+        "owner_changes": []
+      },
+      "paired_rows": 1056,
+      "rows_with_activation_differences": 552,
+      "rows_with_expert_id_differences": 332,
+      "same_expert_owner_change_count": 76
+    },
+    "long-2048": {
+      "first_owner_difference": {
+        "dispatch": 913,
+        "layer": 1,
+        "row": 0,
+        "capture_row_index": 22,
+        "activation_different_values": 0,
+        "expert_ids_equal": true,
+        "owner_changes": [
+          {
+            "expert": 11,
+            "control": -1,
+            "candidate": 0
+          },
+          {
+            "expert": 95,
+            "control": -1,
+            "candidate": 0
+          },
+          {
+            "expert": 165,
+            "control": -1,
+            "candidate": 0
+          },
+          {
+            "expert": 205,
+            "control": -1,
+            "candidate": 0
+          }
+        ]
+      },
+      "first_activation_difference": {
+        "dispatch": 914,
+        "layer": 2,
+        "row": 0,
+        "capture_row_index": 22,
+        "activation_different_values": 2560,
+        "expert_ids_equal": true,
+        "owner_changes": []
+      },
+      "first_expert_id_difference": {
+        "dispatch": 922,
+        "layer": 10,
+        "row": 0,
+        "capture_row_index": 22,
+        "activation_different_values": 2560,
+        "expert_ids_equal": false,
+        "owner_changes": [
+          {
+            "expert": 77,
+            "control": -1,
+            "candidate": 0
+          }
+        ]
+      },
+      "paired_rows": 1056,
+      "rows_with_activation_differences": 1016,
+      "rows_with_expert_id_differences": 527,
+      "same_expert_owner_change_count": 258
+    },
+    "recovery-short-512": {
+      "first_owner_difference": {
+        "dispatch": 1825,
+        "layer": 1,
+        "row": 0,
+        "capture_row_index": 44,
+        "activation_different_values": 0,
+        "expert_ids_equal": true,
+        "owner_changes": [
+          {
+            "expert": 11,
+            "control": -1,
+            "candidate": 0
+          },
+          {
+            "expert": 95,
+            "control": -1,
+            "candidate": 0
+          },
+          {
+            "expert": 101,
+            "control": -1,
+            "candidate": 0
+          },
+          {
+            "expert": 165,
+            "control": -1,
+            "candidate": 0
+          },
+          {
+            "expert": 205,
+            "control": -1,
+            "candidate": 0
+          }
+        ]
+      },
+      "first_activation_difference": {
+        "dispatch": 1826,
+        "layer": 2,
+        "row": 0,
+        "capture_row_index": 44,
+        "activation_different_values": 2560,
+        "expert_ids_equal": true,
+        "owner_changes": [
+          {
+            "expert": 62,
+            "control": -1,
+            "candidate": 0
+          }
+        ]
+      },
+      "first_expert_id_difference": {
+        "dispatch": 1835,
+        "layer": 11,
+        "row": 0,
+        "capture_row_index": 44,
+        "activation_different_values": 2560,
+        "expert_ids_equal": false,
+        "owner_changes": [
+          {
+            "expert": 201,
+            "control": -1,
+            "candidate": 0
+          },
+          {
+            "expert": 208,
+            "control": -1,
+            "candidate": 0
+          }
+        ]
+      },
+      "paired_rows": 1056,
+      "rows_with_activation_differences": 1012,
+      "rows_with_expert_id_differences": 655,
+      "same_expert_owner_change_count": 611
+    },
+    "continuation-short-512": {
+      "first_owner_difference": {
+        "dispatch": 2737,
+        "layer": 1,
+        "row": 0,
+        "capture_row_index": 66,
+        "activation_different_values": 0,
+        "expert_ids_equal": true,
+        "owner_changes": [
+          {
+            "expert": 11,
+            "control": -1,
+            "candidate": 0
+          },
+          {
+            "expert": 95,
+            "control": -1,
+            "candidate": 0
+          },
+          {
+            "expert": 101,
+            "control": -1,
+            "candidate": 0
+          },
+          {
+            "expert": 165,
+            "control": -1,
+            "candidate": 0
+          },
+          {
+            "expert": 205,
+            "control": -1,
+            "candidate": 0
+          }
+        ]
+      },
+      "first_activation_difference": {
+        "dispatch": 2738,
+        "layer": 2,
+        "row": 0,
+        "capture_row_index": 66,
+        "activation_different_values": 2560,
+        "expert_ids_equal": true,
+        "owner_changes": [
+          {
+            "expert": 28,
+            "control": -1,
+            "candidate": 0
+          },
+          {
+            "expert": 62,
+            "control": -1,
+            "candidate": 0
+          }
+        ]
+      },
+      "first_expert_id_difference": {
+        "dispatch": 2747,
+        "layer": 11,
+        "row": 0,
+        "capture_row_index": 66,
+        "activation_different_values": 2560,
+        "expert_ids_equal": false,
+        "owner_changes": [
+          {
+            "expert": 45,
+            "control": -1,
+            "candidate": 0
+          },
+          {
+            "expert": 201,
+            "control": -1,
+            "candidate": 0
+          },
+          {
+            "expert": 208,
+            "control": -1,
+            "candidate": 0
+          }
+        ]
+      },
+      "paired_rows": 912,
+      "rows_with_activation_differences": 898,
+      "rows_with_expert_id_differences": 744,
+      "same_expert_owner_change_count": 519
+    }
+  },
+  "capture_limit": "4096 rows; first three 22-row request groups complete at all 48 layers; continuation group has first 19 rows per layer (20 on layers 0-15)",
+  "physical_memory_floor_and_cgroup_events_checked": true,
+  "limits": [
+    "diagnostic activations are formatted to %.9g",
+    "route ownership changes and later activation differences support a mechanism but do not alone prove the complete service-level causal path",
+    "no performance, energy or task-quality claim"
+  ]
+}

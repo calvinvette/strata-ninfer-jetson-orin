@@ -52,3 +52,39 @@ python3 bench/results/2026-10-16-phase5-coder-current-source-adaptive-retest/run
 This one-pair current-binary retest corroborates the seven-pair adaptive
 recovery finding; it does not replace that confirmation. Adaptive cap-8 remains
 unqualified for state recovery, and Phase 5 remains open.
+
+## Current-binary all-layer follow-up
+
+A second randomized pair captured dispatch inputs, expert IDs and route owners
+across all 48 layers for the same short/long/short/continuation sequence. It
+used seed 20261031, with delayed control first, and the same binary
+(`dfc6394251bbe2713f6039d442e290109513447a770884b58657f7e162d2ed60`), model,
+KV and swap settings as the preceding current-source pair. The capture limit
+was 4,096 rows per service: the first three 22-row request groups are complete
+at all layers, and the continuation group covers its first 19 rows per layer
+(20 on layers 0–15). The recorded continuation token and state comparisons
+still cover all 16 generated tokens.
+
+In the initial short request, the first owner difference was at layer 1,
+capture row 10, while the activation and expert IDs matched. Experts 26 and 95
+changed between primary VRAM and CPU ownership. At the next layer's same row,
+all 2,560 activation values differed while expert IDs still matched. On the
+long request, four experts changed CPU-to-primary-VRAM ownership at layer 1,
+capture row 22, again on matching activation and IDs; the next layer's
+activation differed. The short recovery repeated the same pattern at layer 1,
+capture row 44, before the next-layer activation difference.
+
+Within the cap-8 service, initial and recovery short requests returned the same
+16 tokens but had different state fingerprints and different layer-1 owners at
+the first captured row; layer-2 activation already differed there. The delayed
+control had matching state, tokens, activations, expert IDs and owners between
+those short requests. Cap-8 still passed all 15 swap-byte and all 15 residency
+checks. These captures strengthen the route/state mechanism evidence on the
+current binary. They do not establish that ownership changes are the only
+cause, and they do not constitute a numerical fix or performance result. The
+row-level analysis is `all-layer-pair/comparison.json`; `analyze_all_layers.py`
+validates the alignment and reproduces its summary.
+
+Both all-layer services passed supervision. Minimum host/admission availability
+was 14.41 GiB for delayed control and 14.45 GiB for cap-8, with zero cgroup
+memory events. The trace adds correctness evidence only; Phase 5 remains open.
