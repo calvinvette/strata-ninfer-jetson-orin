@@ -1,0 +1,52 @@
+{
+  "checkout_commit": "4981af3c1e6d921cf08f53531046831e6629ec24",
+  "candidate_build_source_commit": "53d7c7a419f214b4133a2319bdcdf127f23ba1c4",
+  "candidate_binary_sha256": "dfc6394251bbe2713f6039d442e290109513447a770884b58657f7e162d2ed60",
+  "host": "NVIDIA Jetson AGX Orin, aarch64, CUDA 12.6 / driver 540.4.0",
+  "model": {
+    "repo": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+    "revision": "5348543e0147355ac9cbcb031184a3546350988e",
+    "format": "Q2_0 GGUF, two shards",
+    "shard_sha256": [
+      "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720",
+      "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+    ],
+    "ple_pack_dense_sha256": "a43d7d0b69525335f4b000d5197a1d3aefcd3c0014fc3e12b3455e0a5d827ba2",
+    "expert_profile_sha256": "b3e62120218cd96d175a0547530158869177dd2164b22b40f32bea7d7e85fb8c"
+  },
+  "profile": "Q2_0, FP16 KV, no MTP model (spec2 verifier setting), 8192 context, 3000 exact expert slots, prefill 128, 8 workers, prompt cache and adaptive swaps off, 3072 MiB workspace reserve",
+  "input_sha256": {
+    "config.json": "1f5789aec00b9b895d11bf0f722ab08efabf7ead4752fc0f40f76159bec4cdda",
+    "workloads.json": "53d9588fbea2334d9da2bed472c70fd0275c092109bfefd9ab326e25c0a4e16f",
+    "warmup-workloads.json": "050fd0a48216aaf5fe6765993987b17c7ba8f674b3f125f1f44d175489a797aa"
+  },
+  "runtime_scope": "Three sequential fresh loopback services; each had one distinct 512-token warmup and one uncached 7498-token retrieval request with 41 generated tokens; each service was checked stopped before the next; 28-GiB MemoryMax and six-GiB physical-host availability guard",
+  "observations": {
+    "status": "pass",
+    "elapsed_seconds": 996.15,
+    "minimum_host_availability_gib": 18.04,
+    "minimum_admission_availability_gib": 8.46,
+    "scope_peak_gib": 19.54,
+    "cgroup_memory_events": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0
+    },
+    "temperature_tj_celsius_range": [
+      48.312,
+      56.531
+    ],
+    "cpu_clock_mhz_range": [
+      729.6,
+      2201.6
+    ],
+    "gpu_clock_mhz_range": [
+      306.0,
+      1300.5
+    ],
+    "energy_scope": "Raw rail telemetry retained; no process-attributed energy measurement"
+  },
+  "artifact_location": "Models, packs and tokenizer remained under ~/models/strata-orin-validation; no model artifacts in Git."
+}

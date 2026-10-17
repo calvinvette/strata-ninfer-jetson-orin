@@ -20,8 +20,11 @@ API suite passed, and separate checks confirmed decode cancellation and active
 prefill cancellation at 256 of 7,498 tokens, each followed by same-service
 recovery. See the [protocol report](../../bench/results/2026-10-17-phase7-q2-prefill128/api-cancel-recovery/README.md)
 and [active-prefill report](../../bench/results/2026-10-17-phase7-q2-prefill128/api-prefill-cancel/README.md).
-Selected-profile teardown and broader quality checks remain open. Process
-energy attribution and broader Phase 6 interactions also remain open.
+The selected profile also passed three sequential fresh-service teardown
+cycles with independent response and process-exit review; see the
+[teardown report](../../bench/results/2026-10-17-phase7-q2-prefill128/teardown-3cycle/README.md).
+Broader quality checks remain open. Process-energy attribution and broader
+Phase 6 interactions also remain open.
 
 An exploratory Phase 5 [Coder CPU-order recovery attempt](../../bench/results/2026-10-16-phase5-cpu-order-adaptive-recovery/README.md)
 is excluded from numerical and quality conclusions. The flag dispatches to a

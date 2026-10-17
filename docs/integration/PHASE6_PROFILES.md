@@ -68,8 +68,10 @@ physical-headroom guard; see the [sustained-service report](../../bench/results/
 It also passed one 7,498-token 8K near-limit retrieval and same-service
 recovery check; see the [recall report](../../bench/results/2026-10-17-phase7-q2-prefill128/near-limit-8k-recovery/README.md).
 These results now also include passing selected-profile decode cancellation,
-progress-confirmed active-prefill cancellation, and same-service recovery.
-They do not cover teardown, other task types or other context sizes on the
-selected profile. Do not promote a default until those checks, process-relevant
-energy evidence and the broader Phase 6 interaction gates are complete. Phase 6
-and Phase 7 remain open.
+progress-confirmed active-prefill cancellation, same-service recovery, and
+three-cycle fresh-service teardown with listener and process-exit checks. See
+the [teardown report](../../bench/results/2026-10-17-phase7-q2-prefill128/teardown-3cycle/README.md).
+They do not cover other task types or other context sizes on the selected
+profile. Do not promote a default until those checks, process-relevant energy
+evidence and the broader Phase 6 interaction gates are complete. Phase 6 and
+Phase 7 remain open.
