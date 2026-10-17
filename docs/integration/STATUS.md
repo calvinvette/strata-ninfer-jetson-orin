@@ -2615,3 +2615,17 @@ pressure/OOM events. The initial post-collection summary hit a one-block
 bootstrap serialization bug; the raw arms passed, the summary was regenerated
 after fixing and testing the analysis path, and no arms were rerun. Phase 6
 remains open.
+
+A seven-block [held-out Coder IQ1_M MTP × KV confirmation](../../bench/results/2026-10-17-phase6-coder-mtp-kv-heldout-confirm7-cache1500/README.md)
+then crossed MTP off/MTP4 and FP16/INT8 KV on the retrieval-plus-arithmetic
+512-token task at the same 1,500 MiB cache budget. All 28 arms returned the
+exact answer; all 14 MTP pairs qualified at 1,934 slots / 3,807 MiB, and all
+seven blocks ran on Oct 17. MTP4 decode-throughput effects were +0.59% FP16
+(paired 95% interval +0.15% to +2.39%) and +1.47% INT8 (+0.87% to +2.70%).
+Client total-time intervals included zero for both formats. The held-out MTP ×
+KV decode and client-time interaction intervals also included zero. Minimum
+host/admission availability was 17.09/6.14 GiB across 1,984 samples, with no
+cgroup pressure/OOM events; admission headroom came within 0.14 GiB of the
+required floor. This confirms only this one task, cache cap, model quantization
+and MTP/KV interaction; no profile changed, and Phase 6 remains open for its
+other supported interactions and configurations.

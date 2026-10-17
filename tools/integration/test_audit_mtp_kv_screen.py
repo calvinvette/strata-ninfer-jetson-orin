@@ -69,8 +69,20 @@ class AuditMtpKvScreenTests(unittest.TestCase):
         self.assertEqual(len(result['excluded_cell_pairs']), 0)
         self.assertEqual(len(result['mtp_by_kv_interactions']), 1)
         self.assertTrue(result['mtp_by_kv_interactions'][0]['qualified'])
+        summary = result['mtp_by_kv_interaction_summaries'][0]
+        self.assertEqual(summary['paired_blocks'], 1)
+        self.assertEqual(summary['decode_tps_paired_bootstrap_95_interval_percent'], [None, None])
         self.assertEqual(result['mtp_by_workload_interactions'], [])
         self.assertEqual(result['three_way_interactions'], [])
+
+    def test_interaction_summaries_use_only_qualified_blocks(self):
+        result = audit(sample_campaign())
+        summary = next(row for row in result['mtp_by_kv_interaction_summaries']
+                       if row['workload'] == 'short')
+        self.assertEqual(summary['paired_blocks'], 1)
+        self.assertEqual(summary['paired_block_ids'], [1])
+        self.assertEqual(
+            result['three_way_interaction_summary']['decode_tps']['paired_blocks'], 1)
 
 
 if __name__ == '__main__':

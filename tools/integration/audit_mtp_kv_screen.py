@@ -146,13 +146,56 @@ def audit(campaign, seed=20261023, run_root=None):
                 item['reason'] = 'not all eight arms passed at identical expert residency'
             three_way.append(item)
 
+    mtp_by_kv_summaries = []
+    for workload in workloads:
+        selected = [row for row in kv_interactions
+                    if row['workload'] == workload and row.get('qualified')]
+        item = {'workload': workload, 'paired_blocks': len(selected),
+                'paired_block_ids': [row['block'] for row in selected]}
+        for metric in METRICS:
+            values = [row[metric + '_int8_vs_fp16_interaction_percent'] for row in selected]
+            item[metric + '_median_interaction_percent'] = statistics.median(values) if values else None
+            item[metric + '_paired_bootstrap_95_interval_percent'] = bootstrap_interval(
+                values, seed + 7000 + len(mtp_by_kv_summaries) * 101 + len(metric))
+            item[metric + '_paired_values_percent'] = values
+        mtp_by_kv_summaries.append(item)
+
+    mtp_by_workload_summaries = []
+    for kv in kvs:
+        selected = [row for row in workload_interactions
+                    if row['kv'] == kv and row.get('qualified')]
+        item = {'kv': kv, 'paired_blocks': len(selected),
+                'paired_block_ids': [row['block'] for row in selected]}
+        for metric in METRICS:
+            values = [row[metric + '_long_vs_short_interaction_percent'] for row in selected]
+            item[metric + '_median_interaction_percent'] = statistics.median(values) if values else None
+            item[metric + '_paired_bootstrap_95_interval_percent'] = bootstrap_interval(
+                values, seed + 8000 + len(mtp_by_workload_summaries) * 101 + len(metric))
+            item[metric + '_paired_values_percent'] = values
+        mtp_by_workload_summaries.append(item)
+
+    three_way_summary = {}
+    for metric in METRICS:
+        values = [row[metric + '_three_way_interaction_percent']
+                  for row in three_way if row.get('qualified')]
+        three_way_summary[metric] = {
+            'paired_blocks': len(values),
+            'median_interaction_percent': statistics.median(values) if values else None,
+            'paired_bootstrap_95_interval_percent': bootstrap_interval(
+                values, seed + 9000 + len(metric)),
+            'paired_values_percent': values,
+        }
+
     return {'schema': 2, 'source_campaign': str(campaign.get('source_commit')),
             'qualification_rule': 'timing pairs require passing arms from the same local calendar day, matching KV, actual prompt token count, and identical expert slots/cache MiB; higher interactions require matching residency and date across all contributing cells',
             'cell_effects': cell_effects, 'qualified_cell_pairs': pairs,
             'excluded_cell_pairs': exclusions,
             'mtp_by_kv_interactions': kv_interactions,
+            'mtp_by_kv_interaction_summaries': mtp_by_kv_summaries,
             'mtp_by_workload_interactions': workload_interactions,
-            'three_way_interactions': three_way}
+            'mtp_by_workload_interaction_summaries': mtp_by_workload_summaries,
+            'three_way_interactions': three_way,
+            'three_way_interaction_summary': three_way_summary}
 
 
 def main():
