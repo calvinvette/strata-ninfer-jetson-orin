@@ -167,6 +167,8 @@ selection against the static cache. Both supervised arms remained above 14.45
 GiB availability with no cgroup memory events. It is diagnostic only; the
 mirror is not promoted and Phase 5 remains open.
 
+A supervised [Coder IQ1_M accepted-prefix comparison](../../bench/results/2026-10-16-phase5-coder-accepted-prefix-adaptive/README.md) then compared MTP off and MTP4 while retaining cadence-4 accepted-only adaptive updates on 512- and 2,048-token prompts. Both arms produced the same 32 tokens and matched final persistent-state fields on both prompts, including all 17 and 15 shared commit boundaries. MTP4 offered/accepted 27/15 and 30/17 drafts. The 28-GiB supervisors retained 13.15 and 13.35 GiB minimum host/admission availability, respectively, with zero cgroup memory events. This supports the accepted-prefix transaction for these two prompts/configuration only; it does not qualify task quality, performance, the experimental CPU Q8_1 route or adaptive updates generally. Phase 5 remains open.
+
 A supervised [Coder IQ1_M MTP cancellation check](../../bench/results/2026-10-16-phase5-coder-mtp-cancel-parity-current/README.md)
 canceled after eight streamed deltas and 12 committed tokens. Same-service
 recovery returned `Hello Orin!`; three fresh exact-length references matched
