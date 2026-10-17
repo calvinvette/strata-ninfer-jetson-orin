@@ -11,6 +11,16 @@ All 28 measured responses used 512 prompt tokens and 47 completion tokens and ex
 | 3,500 | 32 | 39.19 s | 14.8 tok/s |
 | 3,500 | 128 | 21.33 s | 30.0 tok/s |
 
+For the input rail `VIN_SYS_5V0`, request-window energy per 47 output tokens
+had medians of 5.59, 3.12, 5.67 and 3.16 J in the same table order. The paired
+chunk128 change was −44.23% at 3,000 slots (six supported pairs; 95% interval
+−45.23% to −39.54%) and −44.29% at 3,500 slots (seven pairs; −46.42% to
+−42.90%). The cache × chunk rail-energy interaction interval included zero.
+The block-4 3,000-slot/chunk32 window is unsupported because its tegrastats
+sample gap exceeded 2.5 seconds; all other 27 windows were integrated. These
+are request-window rail estimates that include board idle/background activity,
+not process-attributed energy, and no rails are summed.
+
 | Contrast | Median paired change | Paired block bootstrap 95% interval |
 | --- | ---: | ---: |
 | Chunk 128 vs 32 at 3,000 slots | −45.85% request time | −47.07% to −45.08% |
@@ -21,11 +31,12 @@ All 28 measured responses used 512 prompt tokens and 47 completion tokens and ex
 
 Chunk 128 reduced request time at both cache sizes in all seven blocks. The cache-size effect differed by chunk: the 3,500-slot cache was slower at chunk32, while its chunk128 interval included no change. The interaction interval also includes zero, so this run does not establish a cache × chunk effect. One block had a 70.25-second `cache3500-prefill32` request; the other six values ranged from 38.73 to 39.43 seconds; that cell passed the exact answer and all memory checks and is retained. Its in-request median GPU clock was 612 MHz, below the 714 MHz or higher observed in most other cells. This dynamic-clock outlier is a likely contributor, but these data do not prove causation. No result justifies changing a default.
 
-`analysis.json` contains every per-cell request, clock, temperature and memory observation summary and the paired intervals. `artifacts.json` pins source, candidate binary, model and workload identity. `block-01/` through `block-07/` retain raw requests and telemetry; `SHA256SUMS.txt` covers the report artifacts. Reproduce from the repository root with:
+`analysis.json` contains every per-cell request, clock, temperature and memory observation summary and the paired intervals. `rail-energy.json` and `rail-energy-pairs.csv` retain the request-window integrations and named-rail paired estimates. `artifacts.json` pins source, candidate binary, model and workload identity. `block-01/` through `block-07/` retain raw requests and telemetry; `SHA256SUMS.txt` covers the report artifacts. Reproduce from the repository root with:
 
 ```sh
 bench/results/2026-10-17-phase6-q2-prefill-cache-current-source/run_confirm7.sh /tmp/q2-prefill-cache-current-source
 python3 bench/results/2026-10-17-phase6-q2-prefill-cache-current-source/analyze.py
+python3 bench/results/2026-10-17-phase6-q2-prefill-cache-current-source/analyze_rail_energy.py
 ```
 
 This is evidence for the tested 512-token Q2_0 workload and MTP-off profile. It does not resolve the earlier cache-size reversal for other workloads or configurations. Phase 6 remains open.

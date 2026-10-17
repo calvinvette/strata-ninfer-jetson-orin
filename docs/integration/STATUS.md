@@ -2691,4 +2691,8 @@ the cache-size effect at chunk128 also includes zero. One 3,500-slot/chunk32
 cell took 70.25 seconds while its in-request median GPU clock was 612 MHz; the
 exact-answer cell remains included and no causal claim is made. Minimum
 host/effective admission availability was 17.38/13.49 GiB with zero cgroup
-pressure/OOM events. No profile changed; Phase 6 remains open.
+pressure/OOM events. The separate `VIN_SYS_5V0` request-window integral fell
+44.23% at chunk128 with 3,000 slots (six complete pairs) and 44.29% at 3,500
+slots (seven pairs); one window is unsupported due to a telemetry gap. These
+estimates include board idle/background activity and are not process-attributed.
+No profile changed; Phase 6 remains open.
