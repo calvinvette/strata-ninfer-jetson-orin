@@ -2645,3 +2645,13 @@ were zero. This is workload-specific evidence for the same Coder IQ1_M artifact,
 not a quantization or engine comparison; no profile changed. Phase 6 remains
 open for other supported interactions, Pareto/energy work and remaining
 configuration domains.
+
+Follow-up integration of the retained tegrastats samples brackets all 56
+passing API request windows. `VIN_SYS_5V0` energy per 45 output tokens changed
+with MTP4 by −0.95% (paired 95% interval −2.03% to +0.18%) at short FP16,
+−1.47% (−4.36% to +0.86%) at short INT8, +0.67% (+0.45% to +0.94%) at long
+FP16 and +0.85% (−0.01% to +1.53%) at long INT8. Separate CPU/GPU rail values
+and all paired rows are retained in the report. These request-window rail
+integrals include board idle/background activity and are not process-attributed
+or summed into whole-device energy; they remain supporting diagnostics rather
+than a standalone Pareto energy measure.

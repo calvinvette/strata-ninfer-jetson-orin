@@ -50,15 +50,26 @@ scope and passed; the passing-arm minimum host/admission availability was
 `oom` and `oom_kill` were zero. Swap was already in use (1.11–2.28 GiB), so
 these are not zero-swap results. GPU clocks varied from 306 to 1,300.5 MHz;
 CPU clocks from 729.6 to 2,201.6 MHz. EMC clock readback was denied and `tj`
-ranged from 48.75 to 58.5 °C. Energy is not request-attributed; retained
-tegrastats rail samples include board idle/background activity and are not
-whole-device or process-energy measurements.
+ranged from 48.75 to 58.5 °C.
+
+The retained tegrastats samples bracket all 56 passing request windows. We
+integrated each named rail separately; the `VIN_SYS_5V0` input-rail diagnostic
+per 45-token completion was 4.61/4.55 J for MTP off/MTP4 at short FP16, 4.73/
+4.61 J at short INT8, 53.52/54.03 J at long FP16 and 53.19/53.66 J at long
+INT8. Paired MTP4 changes were −0.95% [−2.03, +0.18], −1.47% [−4.36, +0.86],
++0.67% [+0.45, +0.94] and +0.85% [−0.01, +1.53], respectively. Other named
+rails are retained separately. These request-window integrals include board
+idle and background activity and are not process-attributed; rails are not
+summed and do not support a whole-device energy claim. Treat them as supporting
+diagnostics, not a standalone energy/token Pareto result.
 
 The raw per-arm requests, engine logs and supervisor telemetry are retained in
 `campaign/`. The machine-readable campaign summary and independently rerunnable
 residency audit are `campaign/campaign.json` and `residency-audit.json`.
 `cell-effects.csv` contains the paired cell estimates and intervals; the
-[decode-rate plot](decode-effects.png) is also available as SVG. The preceding
+[decode-rate plot](decode-effects.png) is also available as SVG. The
+[request-window rail analysis](analyze_rail_energy.py) generates
+`rail-energy.json` and `rail-energy-pairs.csv`. The preceding
 [512-token-only held-out confirmation](../2026-10-17-phase6-coder-mtp-kv-heldout-confirm7-cache1500/README.md)
 is not a separate cohort; this report adds the long workload and full
 factorial interaction.
