@@ -173,8 +173,8 @@ def main():
     parser.add_argument('--workloads', type=Path, required=True)
     parser.add_argument('--warmup-workloads', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--workload-cells', nargs=2, required=True,
-                        help='short then long workload cell names, in matched order')
+    parser.add_argument('--workload-cells', nargs='+', required=True,
+                        help='one held-out workload or short then long workload cells')
     parser.add_argument('--kvs', nargs=2, default=['fp16', 'int8'], choices=['fp16', 'int8'])
     parser.add_argument('--windows', nargs=2, type=int, default=[0, 4])
     parser.add_argument('--blocks', type=int, default=3)
@@ -193,6 +193,8 @@ def main():
         parser.error('use at least three blocks for a screen; --followup-block permits exactly one block')
     if args.windows != [0, 4] or args.kvs != ['fp16', 'int8']:
         parser.error('this screen requires MTP windows 0/4 and KV formats fp16/int8')
+    if len(args.workload_cells) not in (1, 2):
+        parser.error('select one held-out workload or a short/long workload pair')
     cfg = json.loads(args.config.read_text())
     workload_rows = json.loads(args.workloads.read_text()).get('workloads', [])
     workload_by_cell = {row.get('cell'): row for row in workload_rows}
@@ -201,7 +203,7 @@ def main():
     if any(row is None for row in selected):
         parser.error('one or more selected workload cells are absent')
     workloads = {row['cell']: row for row in selected}
-    if selected[0]['prompt_tokens'] >= selected[1]['prompt_tokens']:
+    if len(selected) == 2 and selected[0]['prompt_tokens'] >= selected[1]['prompt_tokens']:
         parser.error('workload-cells must be ordered from short to long prompt')
     for row in selected:
         expected_answer(row)
@@ -213,8 +215,14 @@ def main():
     design = make_design(args.kvs, args.workload_cells, args.windows, args.blocks, args.seed)
     binary_path = Path(cfg['exe'])
     binary_sha = hashlib.sha256(binary_path.read_bytes()).hexdigest()
-    scope = ('single randomized 2×2×2 follow-up block; not a standalone screen' if args.followup_block
-             else 'randomized blocked 2×2×2 MTP-window × KV-format × prompt-length screen')
+    if args.followup_block:
+        scope = ('single randomized 2×2×2 follow-up block; not a standalone screen'
+                 if len(args.workload_cells) == 2 else
+                 'single randomized 2×2 MTP-window × KV-format follow-up block; not a standalone screen')
+    elif len(args.workload_cells) == 1:
+        scope = 'randomized blocked 2×2 MTP-window × KV-format screen on one held-out workload'
+    else:
+        scope = 'randomized blocked 2×2×2 MTP-window × KV-format × prompt-length screen'
     campaign = {'schema': 1, 'scope': scope,
                 'source_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                 'binary': str(binary_path), 'binary_sha256': binary_sha,
