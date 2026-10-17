@@ -2,9 +2,28 @@
 
 This matrix summarizes retained Orin tests for the Phase 7 plan. It records
 individual tested cells, not a general product support guarantee. Phase 6 has
-not selected a serving profile, and the Phase 7 exit gates remain open. Each
+selected one bounded Q2_0 profile for Phase 7 qualification; that selection is
+not product support or a default. The Phase 7 exit gates remain open. Each
 result link contains its request artifacts, runner result and telemetry unless
 noted otherwise.
+
+## Profile selected for qualification
+
+Q2_0, FP16 KV, 8,192 context, drafting off, 3,000 expert slots, 128-token
+prefill chunks, eight workers, prompt cache disabled and adaptive swaps
+disabled. The [Phase 6 profile decision](PHASE6_PROFILES.md) records the paired
+latency evidence, exact-answer checks, headroom, rail-energy limits and the
+selection boundary. The 8K supported-service matrix below mostly predates this
+profile selection and uses different MTP settings; those rows do not by
+themselves qualify the selected profile. The short-prompt soak below qualifies
+only its listed cell. Near-limit quality, cancellation and teardown checks on
+the selected profile remain necessary before making a support claim.
+
+## Q2_0 selected MTP-off profile
+
+| Test | Configured context / actual prompt | Functional result | Minimum host / admission availability | Boundary |
+| --- | ---: | --- | ---: | --- |
+| Sustained uncached retrieval plus arithmetic, 8K | 8,192 / 512 tokens | 101/101 exact responses over 1,802 s; independent exact-answer review passed | 17.73 / 8.51 GiB | Thermal median stabilized near 55.2 °C in the final 10 minutes; dynamic clocks; raw rails only; [report](../../bench/results/2026-10-17-phase7-q2-prefill128/sustained-512/README.md) |
 
 ## Q2_0 accepted-only MTP4
 
@@ -66,8 +85,9 @@ one quantization, not a comparison between quantizations or inference engines.
 
 ## Exclusions and open gates
 
-- No Phase 6 serving profile is selected. The tested configurations remain
-  experimental; results do not promote defaults.
+- The selected Q2_0 profile is qualified only for its listed 8K-context test
+  cells. The tested configurations remain experimental; results do not
+  promote defaults.
 - Q2_0 256K has one retrieval/recovery sample and one 64K arithmetic sample,
   but no sustained 256K workload or broader task-quality suite.
 - Four-way serving is not qualified. The four-slot screen completed all four
@@ -86,5 +106,6 @@ one quantization, not a comparison between quantizations or inference engines.
 - Performance comparisons, energy attribution and cross-device conclusions
   require their own paired measurements; none follows from this matrix alone.
 
-Phase 7 can close only after Phase 6 selects the configurations and the remaining
-quality, sustained-service and support-boundary claims are explicitly bounded.
+Phase 7 can close only after Phase 6 completes profile-selection work and the
+remaining quality, sustained-service and support-boundary claims are explicitly
+bounded.

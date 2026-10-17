@@ -5,6 +5,17 @@ Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 has
 initial long-context recall and sustained-service evidence and remains in
 progress; Phases 5 and 6 also remain open.
 
+Phase 6 has selected one bounded Q2_0 test profile for Phase 7 qualification:
+FP16 KV, 8K context, MTP off, 3,000 expert slots, prefill chunk 128, eight
+workers and prompt cache/adaptive swaps disabled. This is not a default or
+general support claim. A supervised 30-minute 512-token retrieval-plus-sum
+soak on that exact profile passed 101/101 exact-answer checks, with 17.73 GiB
+minimum host and 8.51 GiB minimum admission availability; the independently
+reviewed [report](../../bench/results/2026-10-17-phase7-q2-prefill128/sustained-512/README.md)
+retains raw memory, clock and thermal telemetry. Selected-profile
+near-limit/recovery, cancellation and teardown checks remain open. Process
+energy attribution and broader Phase 6 interactions also remain open.
+
 An exploratory Phase 5 [Coder CPU-order recovery attempt](../../bench/results/2026-10-16-phase5-cpu-order-adaptive-recovery/README.md)
 is excluded from numerical and quality conclusions. The flag dispatches to a
 kernel for the packed Q2_0 expert layout, while this Coder pack stores native,
