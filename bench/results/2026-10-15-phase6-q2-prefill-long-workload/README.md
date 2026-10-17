@@ -11,7 +11,28 @@ All 14 measured responses used exactly 7,501 prompt tokens and 36 completion tok
 
 Across the seven paired blocks, chunk 128 reduced total request time by a median 59.56% (paired block bootstrap 95% interval −59.62% to −57.50%). Prompt rate increased by a median 149.6%. All seven blocks favored chunk 128. This independently confirms the direction on this near-limit prompt and exact profile; it does not establish a general default. No setting changed.
 
-Minimum host availability was 17.85 GiB and minimum effective admission availability was 6.11 GiB, above the six-GiB floor by 0.11 GiB. Cgroup high/max/OOM/OOM-kill counters remained zero. Dynamic GPU frequency ranged from 306 MHz to 1,300.5 MHz and CPU frequency from 729.6 MHz to 2,201.6 MHz. EMC readback was unsupported/permission denied. Energy was not request-attributed. The narrow admission margin limits this result to the tested cell and retained conditions.
+Minimum host availability was 17.85 GiB and minimum effective admission availability was 6.11 GiB, above the six-GiB floor by 0.11 GiB. Cgroup high/max/OOM/OOM-kill counters remained zero. Dynamic GPU frequency ranged from 306 MHz to 1,300.5 MHz and CPU frequency from 729.6 MHz to 2,201.6 MHz. EMC readback was unsupported/permission denied. The narrow admission margin limits this result to the tested cell and retained conditions.
+
+The retained tegrastats data supports rail integration for 13 of 14 request
+windows. Six same-day pairs had complete named-rail windows; block 5's chunk
+128 arm is unsupported for energy analysis because a sample gap exceeded 2.5
+seconds. Within those six pairs, chunk 128 changed the separate named rail
+integrals per 36-token completion as follows:
+
+| Named rail | Chunk 32 median J / output token | Chunk 128 median J / output token | Paired median change (95% interval) |
+| --- | ---: | ---: | ---: |
+| `VIN_SYS_5V0` | 124.81 | 50.60 | −59.47% [−59.58%, −57.48%] |
+| `VDD_GPU_SOC` | 147.95 | 62.32 | −57.92% [−58.07%, −56.55%] |
+| `VDD_CPU_CV` | 13.98 | 10.52 | −24.83% [−26.80%, −16.98%] |
+
+These one-second-granularity request-window estimates include the long prompt
+prefill and board idle/background activity; they are not process-attributed,
+must not be summed, and do not measure generation-only energy. The paired
+values corroborate lower request-window rail use for this exact 7,501/36 task,
+but do not establish a general energy-efficiency claim. See the
+[rail-effect plot](rail-energy-effects.png) (also SVG), `rail-energy.json`,
+`rail-energy-pairs.csv` and `analyze_rail_energy.py` for raw paired estimates
+and the integration method.
 
 `analysis.json` contains all per-block request timings, paired effects, telemetry minima and clock ranges. `artifacts.json` pins the service binary, source, model, tokenizer, input files and workload identities. `screen/` contains the two-cell one-request feasibility run. `block-01/` through `block-07/` contain the independent confirmation, including fresh-service telemetry and API outputs. Reproduce from the repository root under the same 28-GiB ceiling with:
 

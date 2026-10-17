@@ -2664,3 +2664,18 @@ latency and input-rail energy; MTP4 dominates on short INT8; short FP16 retains
 a latency/rail tradeoff. This is scoped diagnostic evidence because the rail
 includes board idle/background activity, not a process-energy Pareto frontier
 or a cross-workload ranking. No profile is selected.
+
+A current-source seven-block [Q2_0 prefill-chunk confirmation](../../bench/results/2026-10-17-phase6-q2-prefill-long-workload-current-source/README.md)
+repeated the held-out 7,501-token retrieval workload with prefill chunks 32
+and 128 at exactly 3,000 resident expert slots. All 14 fresh-service requests
+returned the exact 36-token retrieval answer. Chunk 128 reduced median request
+time 59.71% (paired 95% interval −59.82% to −59.52%) and raised median prompt
+rate 151.33%; all seven pairs favored it. Minimum host/effective admission
+availability was 18.07/11.39 GiB, above the six-GiB floor, with no cgroup
+pressure or OOM events. Complete request-window rail estimates also favored
+chunk 128 on the three separate named rails; they include board idle/background
+activity and are not process-attributed or summed. The initial shared-scope
+attempt and two conservative pressure aborts are retained but excluded; the
+isolated per-cell retry completed all blocks. This confirms the result for
+this Q2_0 long-prompt task and runtime profile only. No default changed, and
+Phase 6 remains open.
