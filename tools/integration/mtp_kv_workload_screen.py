@@ -179,13 +179,17 @@ def main():
     parser.add_argument('--first-port', type=int, default=19400)
     parser.add_argument('--expert-cache-budget', type=int,
                         help='override the configured --expert-cache budget for this screen')
+    parser.add_argument('--followup-block', action='store_true',
+                        help='permit exactly one explicitly labelled randomized block for a screened-cell follow-up')
     args = parser.parse_args()
     if args.output.exists():
         parser.error('output path must not already exist')
     if args.expert_cache_budget is not None and args.expert_cache_budget <= 0:
         parser.error('--expert-cache-budget must be positive')
-    if args.blocks < 3 or args.windows != [0, 4] or args.kvs != ['fp16', 'int8']:
-        parser.error('this screen requires at least three blocks, MTP windows 0/4, and KV formats fp16/int8')
+    if (args.blocks < 3 and not (args.followup_block and args.blocks == 1)) or (args.followup_block and args.blocks != 1):
+        parser.error('use at least three blocks for a screen; --followup-block permits exactly one block')
+    if args.windows != [0, 4] or args.kvs != ['fp16', 'int8']:
+        parser.error('this screen requires MTP windows 0/4 and KV formats fp16/int8')
     cfg = json.loads(args.config.read_text())
     workload_rows = json.loads(args.workloads.read_text()).get('workloads', [])
     workload_by_cell = {row.get('cell'): row for row in workload_rows}
@@ -206,7 +210,9 @@ def main():
     design = make_design(args.kvs, args.workload_cells, args.windows, args.blocks, args.seed)
     binary_path = Path(cfg['exe'])
     binary_sha = hashlib.sha256(binary_path.read_bytes()).hexdigest()
-    campaign = {'schema': 1, 'scope': 'randomized blocked 2×2×2 MTP-window × KV-format × prompt-length screen',
+    scope = ('single randomized 2×2×2 follow-up block; not a standalone screen' if args.followup_block
+             else 'randomized blocked 2×2×2 MTP-window × KV-format × prompt-length screen')
+    campaign = {'schema': 1, 'scope': scope,
                 'source_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                 'binary': str(binary_path), 'binary_sha256': binary_sha,
                 'model_name': cfg.get('model_name'), 'workloads': args.workload_cells,
@@ -291,7 +297,7 @@ def main():
     campaign['unfiltered_comparisons_do_not_account_for_residency'] = summarize_factorial(
         campaign['runs'], args.workload_cells, args.kvs, args.windows, args.seed)
     from audit_mtp_kv_screen import audit
-    campaign['comparisons'] = audit(campaign, args.seed)
+    campaign['comparisons'] = audit(campaign, args.seed, args.output)
     campaign['status'] = 'pass'
     campaign['finished_wall_time_s'] = time.time()
     write_result(args.output / 'campaign.json', campaign)

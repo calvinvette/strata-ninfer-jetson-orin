@@ -18,7 +18,7 @@ def sample_campaign():
                         slots = 3803
                     runs.append({
                         'block': block, 'kv': kv, 'workload': workload,
-                        'window': window, 'status': 'pass',
+                        'window': window, 'status': 'pass', 'local_run_date': '2026-10-16',
                         'engine': {'kv': kv, 'expert_slots': slots, 'expert_cache_mib': 7615},
                         'metrics': {'prompt_tokens': 512 if workload == 'short' else 7501,
                                     'prompt_tps': 10 + window, 'decode_tps': 20 + window,
@@ -46,6 +46,16 @@ class AuditMtpKvScreenTests(unittest.TestCase):
                     if x['block'] == 1 and x['kv'] == 'int8' and x['workload'] == 'long')
         self.assertEqual(pair['expert_slots'], 3903)
         self.assertAlmostEqual(pair['decode_tps_ratio'], 24 / 20)
+
+    def test_cross_day_pair_is_not_timing_qualified(self):
+        campaign = sample_campaign()
+        next(row for row in campaign['runs']
+             if row['block'] == 1 and row['kv'] == 'int8' and
+             row['workload'] == 'short' and row['window'] == 4)['local_run_date'] = '2026-10-17'
+        result = audit(campaign)
+        exclusion = next(x for x in result['excluded_cell_pairs']
+                         if x['block'] == 1 and x['kv'] == 'int8' and x['workload'] == 'short')
+        self.assertIn('same-local-day', exclusion['reason'])
 
 
 if __name__ == '__main__':

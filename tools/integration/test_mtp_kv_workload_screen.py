@@ -32,6 +32,13 @@ class MtpKvWorkloadScreenTests(unittest.TestCase):
             self.assertEqual(sorted(r['order'] for r in arms), list(range(8)))
         self.assertEqual(cells, make_design(['fp16', 'int8'], ['short', 'long'], [0, 4], 3, 19))
 
+    def test_single_followup_block_contains_each_factorial_arm_once(self):
+        cells = make_design(['fp16', 'int8'], ['short', 'long'], [0, 4], 1, 20261025)
+        self.assertEqual(len(cells), 8)
+        self.assertEqual({(x['kv'], x['workload'], x['window']) for x in cells},
+                         {(kv, work, window) for kv in ('fp16', 'int8')
+                          for work in ('short', 'long') for window in (0, 4)})
+
     def test_three_way_interaction_uses_within_block_ratios(self):
         rows = []
         for block in range(3):

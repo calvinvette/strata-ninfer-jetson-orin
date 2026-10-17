@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime
 import json
 from pathlib import Path
 import statistics
@@ -28,13 +29,19 @@ def make_pair(rows, block, kv, workload, window):
         return None, 'arm did not pass'
     if residency(control) != residency(candidate):
         return None, f'residency mismatch {residency(control)} != {residency(candidate)}'
+    control_day, candidate_day = control.get('local_run_date'), candidate.get('local_run_date')
+    if not control_day or not candidate_day:
+        return None, 'arm local start date unavailable'
+    if control_day != candidate_day:
+        return None, f'not a same-local-day pair: {control_day} != {candidate_day}'
     cm, tm = control.get('metrics', {}), candidate.get('metrics', {})
     if cm.get('prompt_tokens') != tm.get('prompt_tokens'):
         return None, 'actual prompt-token count mismatch'
     if control.get('engine', {}).get('kv') != kv or candidate.get('engine', {}).get('kv') != kv:
         return None, 'engine KV format mismatch'
     pair = {'block': block, 'kv': kv, 'workload': workload,
-            'expert_slots': residency(control)[0], 'expert_cache_mib': residency(control)[1]}
+            'expert_slots': residency(control)[0], 'expert_cache_mib': residency(control)[1],
+            'local_run_date': control_day}
     for metric in METRICS:
         a, b = cm.get(metric), tm.get(metric)
         if not isinstance(a, (int, float)) or not isinstance(b, (int, float)) or a <= 0 or b <= 0:
@@ -43,10 +50,22 @@ def make_pair(rows, block, kv, workload, window):
     return pair, None
 
 
-def audit(campaign, seed=20261023):
+def audit(campaign, seed=20261023, run_root=None):
+    enriched = []
+    for record in campaign['runs']:
+        row = dict(record)
+        if run_root is not None and 'directory' in row:
+            result_path = Path(run_root) / row['directory'] / 'supervisor/result.json'
+            if result_path.exists():
+                supervisor = json.loads(result_path.read_text())
+                started = supervisor.get('started_wall_s')
+                if isinstance(started, (int, float)):
+                    row['local_run_date'] = datetime.fromtimestamp(started).date().isoformat()
+                    row['supervisor_started_wall_s'] = started
+        enriched.append(row)
     rows = {(r['block'], r['kv'], r['workload'], r['window']): r
-            for r in campaign['runs'] if 'block' in r}
-    blocks = sorted({r['block'] for r in campaign['runs'] if 'block' in r})
+            for r in enriched if 'block' in r}
+    blocks = sorted({r['block'] for r in enriched if 'block' in r})
     kvs = campaign['kv_formats']
     workloads = campaign['workloads']
     window = max(campaign['mtp_windows'])
@@ -89,7 +108,8 @@ def audit(campaign, seed=20261023):
         for workload in workloads:
             a, b = (by_cell[(block, kv, workload)] for kv in kvs)
             item = {'block': block, 'workload': workload, 'qualified': False}
-            if a and b and (a['expert_slots'], a['expert_cache_mib']) == (b['expert_slots'], b['expert_cache_mib']):
+            if (a and b and a['local_run_date'] == b['local_run_date'] and
+                    (a['expert_slots'], a['expert_cache_mib']) == (b['expert_slots'], b['expert_cache_mib'])):
                 item['qualified'] = True
                 item['expert_slots'] = a['expert_slots']
                 for metric in METRICS:
@@ -100,7 +120,8 @@ def audit(campaign, seed=20261023):
         for kv in kvs:
             a, b = (by_cell[(block, kv, workload)] for workload in workloads)
             item = {'block': block, 'kv': kv, 'qualified': False}
-            if a and b and (a['expert_slots'], a['expert_cache_mib']) == (b['expert_slots'], b['expert_cache_mib']):
+            if (a and b and a['local_run_date'] == b['local_run_date'] and
+                    (a['expert_slots'], a['expert_cache_mib']) == (b['expert_slots'], b['expert_cache_mib'])):
                 item['qualified'] = True
                 item['expert_slots'] = a['expert_slots']
                 for metric in METRICS:
@@ -109,7 +130,9 @@ def audit(campaign, seed=20261023):
                 item['reason'] = 'missing residency-matched MTP pair or prompt-cell capacities differ'
             workload_interactions.append(item)
         all_cells = [by_cell[(block, kv, workload)] for kv in kvs for workload in workloads]
-        qualified = all(p is not None for p in all_cells) and len({(p['expert_slots'], p['expert_cache_mib']) for p in all_cells}) == 1
+        qualified = (all(p is not None for p in all_cells) and
+                     len({(p['expert_slots'], p['expert_cache_mib']) for p in all_cells}) == 1 and
+                     len({p['local_run_date'] for p in all_cells}) == 1)
         item = {'block': block, 'qualified': qualified}
         if qualified:
             for metric in METRICS:
@@ -122,8 +145,8 @@ def audit(campaign, seed=20261023):
             item['reason'] = 'not all eight arms passed at identical expert residency'
         three_way.append(item)
 
-    return {'schema': 1, 'source_campaign': str(campaign.get('source_commit')),
-            'qualification_rule': 'timing pairs require passing arms, matching KV, actual prompt token count, and identical expert slots/cache MiB; higher interactions require matching residency across all contributing cells',
+    return {'schema': 2, 'source_campaign': str(campaign.get('source_commit')),
+            'qualification_rule': 'timing pairs require passing arms from the same local calendar day, matching KV, actual prompt token count, and identical expert slots/cache MiB; higher interactions require matching residency and date across all contributing cells',
             'cell_effects': cell_effects, 'qualified_cell_pairs': pairs,
             'excluded_cell_pairs': exclusions,
             'mtp_by_kv_interactions': kv_interactions,
@@ -135,9 +158,11 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('campaign', type=Path)
     parser.add_argument('--output', type=Path)
+    parser.add_argument('--run-root', type=Path,
+                        help='campaign directory containing per-arm supervisor results; required to check paired dates')
     args = parser.parse_args()
     campaign = json.loads(args.campaign.read_text())
-    result = audit(campaign, campaign.get('seed', 0))
+    result = audit(campaign, campaign.get('seed', 0), args.run_root or args.campaign.parent)
     encoded = json.dumps(result, indent=2) + '\n'
     if args.output:
         args.output.write_text(encoded)

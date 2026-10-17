@@ -20,9 +20,10 @@ prompt cache disabled, static expert residency, and dynamic clocks. Per KV
 format across its three MTP4 blocks, the 7,501-token arms drafted/accepted
 90/81 tokens total and the 512-token arms drafted/accepted 117/102 tokens total.
 
-Timing was qualified only when both MTP arms passed with equal actual expert
-slots and cache MiB, matching KV format, and the same actual prompt-token
-count. Eight of the 12 within-cell MTP pairs met that rule. Four pairs were
+Timing was qualified only when both MTP arms passed on the same local calendar
+day, with equal actual expert slots and cache MiB, matching KV format, and the
+same actual prompt-token count. All eight qualified pairs were same-day on
+2026-10-16. Eight of the 12 within-cell MTP pairs met that rule. Four pairs were
 excluded because residency differed:
 
 | Block | KV | Prompt | MTP off slots / MiB | MTP4 slots / MiB |
