@@ -2629,3 +2629,19 @@ cgroup pressure/OOM events; admission headroom came within 0.14 GiB of the
 required floor. This confirms only this one task, cache cap, model quantization
 and MTP/KV interaction; no profile changed, and Phase 6 remains open for its
 other supported interactions and configurations.
+
+A seven-block held-out [Coder IQ1_M MTP × KV × prompt-length confirmation](../../bench/results/2026-10-17-phase6-coder-mtp-kv-heldout-workload-confirm7-cache1500/README.md)
+extended that task to the 7,501-token retrieval-plus-arithmetic prompt, crossing
+short/long workload with FP16/INT8 KV and MTP off/MTP4. All 56 measured arms
+returned exact answers, with seven qualified paired blocks per cell at 1,934
+resident expert slots / 3,807 MiB. Long-prompt MTP4 decode throughput was
+10.16% lower with FP16 KV (paired 95% interval −11.76% to −8.07%) and 7.95%
+lower with INT8 KV (−9.70% to −7.46%); short-prompt decode effects were small
+(+0.20% FP16 and +1.77% INT8). The three-way interaction intervals include
+zero. One pressure-aborted attempt reached 5.71 GiB effective admission while
+host availability remained above 22 GiB; its isolated retry passed. Passing
+arms stayed above 6.279 GiB effective admission and cgroup pressure/OOM counts
+were zero. This is workload-specific evidence for the same Coder IQ1_M artifact,
+not a quantization or engine comparison; no profile changed. Phase 6 remains
+open for other supported interactions, Pareto/energy work and remaining
+configuration domains.
