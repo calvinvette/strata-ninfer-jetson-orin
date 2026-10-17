@@ -44,6 +44,15 @@ GiB minimum host/admission availability over 1,081 samples with zero cgroup
 events. Broader quality coverage, repetitions and larger selected-profile
 contexts remain open. Phase 7 remains in progress.
 
+The selected Q2_0 MTP-off profile also passed one [64K retrieval-plus-arithmetic
+replication](../../bench/results/2026-10-17-phase7-q2-prefill128-64k-quality-mtp-off/README.md)
+of the task previously run under MTP4. The 60,079-token uncached prompt returned
+the three codes in order and the independently checked suffix sum `1971`, then
+the same service returned `RECOVERED`. Minimum host/admission availability was
+16.71/10.74 GiB across 2,224 samples, with zero cgroup events. This is one
+profile-specific replication, not a new held-out prompt or broad quality score;
+Phase 7 remains open.
+
 A same-day [Coder GGUF quantization comparison](../../bench/results/2026-10-17-phase6-coder-quant-comparison/README.md)
 then compared Q2_0 and IQ1_M from the same pinned Hugging Face repository
 revision. After correcting an exploratory screen's cache-size mismatch, a
