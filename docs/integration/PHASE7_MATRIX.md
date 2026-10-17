@@ -42,6 +42,7 @@ that run.
 | 40-minute streamed cache-reuse soak | 1,579 requests, all marker checks passed | 13.34 GiB | Temperature stabilized near 76–77 °C for over 30 minutes; same report |
 | Three-cycle reload/teardown | Warmup and measured request passed each cycle; listener and engine exited before reload | 13.11 GiB | Three cycles; [report](../../bench/results/2026-10-14-phase7-iq1-teardown3/README.md) |
 | Bounded 56×56 vision smoke | HTTP 200; response described grid and gradient | 11.99 GiB host/effective | One small fixture; [report](../../bench/results/2026-10-14-phase7-iq1-vision/README.md) |
+| Current-source exact image grounding, 224×224 | Exact quadrant counts and sum on all 3 fresh services | 11.76 GiB host/effective | One synthetic task at 16 vision tokens; not broad vision quality; [report](../../bench/results/2026-10-17-phase7-current-source-coder-iq1m-vision-count/README.md) |
 | 2048×2048 image admission | HTTP 200 at 1,024 image tokens | 11.76 GiB host/effective | Answer truncated at 48 tokens; not a vision quality pass; same report |
 | Held-out long-context task | Three codes at 10/50/90%, correct sum, and recovery | 12.75 GiB host/effective | One 30,040-token prompt; [report](../../bench/results/2026-10-14-phase7-q6-recall/README.md) |
 

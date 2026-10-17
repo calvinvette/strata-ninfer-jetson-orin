@@ -2583,6 +2583,15 @@ and zero cgroup pressure/OOM events. `tj` stayed between 71.1 and 73.3 °C from
 service evidence for the tested profile; concurrency, broader quality and
 other model/configuration cells remain open.
 
+A current-source [Coder IQ1_M image-grounding check](../../bench/results/2026-10-17-phase7-current-source-coder-iq1m-vision-count/README.md)
+repeated an exact quadrant-circle count on a synthetic 224×224 image in three
+fresh services. All three responses returned the independently pixel-oracle
+answer exactly; each API returned HTTP 200, stopped naturally and shut down
+cleanly. The CUDA encoder used 16 image tokens. Minimum host/admission
+availability was 11.76 GiB, with zero cgroup pressure/OOM events. This is one
+bounded visual-counting task, not broad vision quality or high-resolution
+support. Phase 7 remains open.
+
 A three-block [Coder IQ1_M MTP × KV × prompt-length screen](../../bench/results/2026-10-16-phase6-coder-mtp-kv-workload-screen/README.md)
 crossed MTP off/MTP4, FP16/INT8 KV and 512/7,501-token retrieval prompts.
 All 24 arms passed the exact answer oracle and six-GiB guard. Four of 12 MTP

@@ -1,0 +1,79 @@
+{
+  "scope": "Three fresh-service exact image-grounding repetitions on the current Coder IQ1_M profile; one 224x224 synthetic image; one request per service.",
+  "fixture_sha256": "0c6cf27a7edeadec93e7ebb1d2e57baa0555e28a81b64fe739287bd269225e9c",
+  "expected_exact_response": "TL=1 TR=2 BL=3 BR=4 SUM=10",
+  "independent_oracle": "Four-connected component count of black pixels in the generated raster, classified by quadrant centroid; the counts are independently checked against the drawing specification.",
+  "all_three_exact": true,
+  "all_three_http_200_and_image_enabled": true,
+  "all_three_clean_teardown": true,
+  "median_request_elapsed_s": 15.4603782359045,
+  "minimum_host_available_gib": 11.764808654785156,
+  "minimum_admission_available_gib": 11.764808654785156,
+  "max_cgroup_events": {
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0
+  },
+  "runs": [
+    {
+      "run": "run",
+      "status": "pass",
+      "response": "TL=1 TR=2 BL=3 BR=4 SUM=10",
+      "prompt_tokens": 80,
+      "completion_tokens": 17,
+      "request_elapsed_s": 15.4603782359045,
+      "minimum_host_available_gib": 12.02341079711914,
+      "minimum_admission_available_gib": 12.02341079711914,
+      "memory_samples": 41,
+      "cgroup_event_maxima": {
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "server_exit_code": 0
+    },
+    {
+      "run": "run-02",
+      "status": "pass",
+      "response": "TL=1 TR=2 BL=3 BR=4 SUM=10",
+      "prompt_tokens": 80,
+      "completion_tokens": 17,
+      "request_elapsed_s": 14.364676361903548,
+      "minimum_host_available_gib": 11.77065658569336,
+      "minimum_admission_available_gib": 11.77065658569336,
+      "memory_samples": 36,
+      "cgroup_event_maxima": {
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "server_exit_code": 0
+    },
+    {
+      "run": "run-03",
+      "status": "pass",
+      "response": "TL=1 TR=2 BL=3 BR=4 SUM=10",
+      "prompt_tokens": 80,
+      "completion_tokens": 17,
+      "request_elapsed_s": 17.8173013208434,
+      "minimum_host_available_gib": 11.764808654785156,
+      "minimum_admission_available_gib": 11.764808654785156,
+      "memory_samples": 39,
+      "cgroup_event_maxima": {
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "server_exit_code": 0
+    }
+  ],
+  "limits": [
+    "One synthetic visual counting task only; this is not broad vision quality or high-resolution support.",
+    "The 16-token image-encoder setting was held fixed; no resolution/token sweep was run.",
+    "Energy is not process-attributed; no energy claim is made."
+  ]
+}
