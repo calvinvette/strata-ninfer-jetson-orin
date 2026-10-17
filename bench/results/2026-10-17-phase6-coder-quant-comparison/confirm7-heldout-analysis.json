@@ -1,0 +1,544 @@
+{
+  "status": "pass",
+  "independent_review": true,
+  "scope": "randomized paired seven-block quantization confirmation on held-out 7,501-token retrieval workload; each arm has its own 28-GiB memory scope",
+  "confirmation": true,
+  "quantization_mapping": {
+    "baseline": "Q2_0",
+    "candidate": "IQ1_M"
+  },
+  "expected_prompt_tokens": 7501,
+  "expected_codes": [
+    "COPPER-FERN-482",
+    "NORTH-EMBER-619",
+    "SILVER-OTTER-357"
+  ],
+  "runtime_checks": [
+    {
+      "block": 0,
+      "variant": "baseline",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 0,
+      "variant": "candidate",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 1,
+      "variant": "baseline",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 1,
+      "variant": "candidate",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 2,
+      "variant": "baseline",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 2,
+      "variant": "candidate",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 3,
+      "variant": "candidate",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 3,
+      "variant": "baseline",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 4,
+      "variant": "candidate",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 4,
+      "variant": "baseline",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 5,
+      "variant": "candidate",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 5,
+      "variant": "baseline",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 6,
+      "variant": "candidate",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 6,
+      "variant": "baseline",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    }
+  ],
+  "effective_cache_match_by_block": {
+    "0": {
+      "q2_0_mib": 3955,
+      "iq1_m_mib": 3955,
+      "difference_mib": 0,
+      "within_2_mib": true
+    },
+    "1": {
+      "q2_0_mib": 3955,
+      "iq1_m_mib": 3955,
+      "difference_mib": 0,
+      "within_2_mib": true
+    },
+    "2": {
+      "q2_0_mib": 3955,
+      "iq1_m_mib": 3955,
+      "difference_mib": 0,
+      "within_2_mib": true
+    },
+    "3": {
+      "q2_0_mib": 3955,
+      "iq1_m_mib": 3955,
+      "difference_mib": 0,
+      "within_2_mib": true
+    },
+    "4": {
+      "q2_0_mib": 3955,
+      "iq1_m_mib": 3955,
+      "difference_mib": 0,
+      "within_2_mib": true
+    },
+    "5": {
+      "q2_0_mib": 3955,
+      "iq1_m_mib": 3955,
+      "difference_mib": 0,
+      "within_2_mib": true
+    },
+    "6": {
+      "q2_0_mib": 3955,
+      "iq1_m_mib": 3955,
+      "difference_mib": 0,
+      "within_2_mib": true
+    }
+  },
+  "paired_metrics": {
+    "prompt_seconds": {
+      "iq1_m_vs_q2_0_paired_percent_changes": [
+        -30.93557427449761,
+        -31.12349710704936,
+        -30.427296179218555,
+        -32.76704823118413,
+        -29.981454994766278,
+        -30.486877550012714,
+        -30.83189012774642
+      ],
+      "median_paired_percent_change": -30.83189012774642,
+      "paired_block_bootstrap_95_interval_percent": [
+        -31.12349710704936,
+        -30.427296179218555
+      ],
+      "interval_method": "20,000 resamples of paired-block deltas; median and percentile interval",
+      "interpretation": "held-out confirmation"
+    },
+    "decode_tokens_per_second": {
+      "iq1_m_vs_q2_0_paired_percent_changes": [
+        148.0,
+        143.1372549019608,
+        148.0,
+        155.10204081632654,
+        141.17647058823533,
+        145.0980392156863,
+        148.0
+      ],
+      "median_paired_percent_change": 148.0,
+      "paired_block_bootstrap_95_interval_percent": [
+        143.1372549019608,
+        148.0
+      ],
+      "interval_method": "20,000 resamples of paired-block deltas; median and percentile interval",
+      "interpretation": "held-out confirmation"
+    },
+    "client_total_seconds": {
+      "iq1_m_vs_q2_0_paired_percent_changes": [
+        -31.6597642291941,
+        -31.80839458141522,
+        -31.15392263146166,
+        -33.491535241545925,
+        -30.680648364440078,
+        -31.209137598115632,
+        -31.54865911221244
+      ],
+      "median_paired_percent_change": -31.54865911221244,
+      "paired_block_bootstrap_95_interval_percent": [
+        -31.80839458141522,
+        -31.15392263146166
+      ],
+      "interval_method": "20,000 resamples of paired-block deltas; median and percentile interval",
+      "interpretation": "held-out confirmation"
+    },
+    "first_visible_delta_seconds": {
+      "iq1_m_vs_q2_0_paired_percent_changes": [
+        -31.04381324323716,
+        -31.243107228301813,
+        -30.537539348953548,
+        -32.89479562230652,
+        -30.10175527520309,
+        -30.607115496027358,
+        -30.95250663929142
+      ],
+      "median_paired_percent_change": -30.95250663929142,
+      "paired_block_bootstrap_95_interval_percent": [
+        -31.243107228301813,
+        -30.537539348953548
+      ],
+      "interval_method": "20,000 resamples of paired-block deltas; median and percentile interval",
+      "interpretation": "held-out confirmation"
+    }
+  },
+  "per_block": {
+    "0": {
+      "baseline": {
+        "prompt_seconds": 275.0749,
+        "decode_tokens_per_second": 5.0,
+        "client_total_seconds": 282.28658888605423,
+        "first_visible_delta_seconds": 275.75349898287095,
+        "prompt_tokens": 7501,
+        "completion_tokens": 36,
+        "answer": "EARLY=COPPER-FERN-482, MIDDLE=NORTH-EMBER-619, LATE=SILVER-OTTER-357",
+        "minimum_host_gib": 18.161373138427734,
+        "minimum_admission_gib": 8.47805404663086,
+        "scope_peak_gib": 19.52194595336914,
+        "actual_expert_slots": 3000,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      },
+      "candidate": {
+        "prompt_seconds": 189.97889999999998,
+        "decode_tokens_per_second": 12.4,
+        "client_total_seconds": 192.91532039409503,
+        "first_visible_delta_seconds": 190.1490977469366,
+        "prompt_tokens": 7501,
+        "completion_tokens": 36,
+        "answer": "EARLY=COPPER-FERN-482, MIDDLE=NORTH-EMBER-619, LATE=SILVER-OTTER-357",
+        "minimum_host_gib": 17.99285888671875,
+        "minimum_admission_gib": 9.533393859863281,
+        "scope_peak_gib": 18.46660614013672,
+        "actual_expert_slots": 2008,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      }
+    },
+    "1": {
+      "baseline": {
+        "prompt_seconds": 274.7368,
+        "decode_tokens_per_second": 5.1,
+        "client_total_seconds": 281.78361474187113,
+        "first_visible_delta_seconds": 275.41166690411046,
+        "prompt_tokens": 7501,
+        "completion_tokens": 36,
+        "answer": "EARLY=COPPER-FERN-482, MIDDLE=NORTH-EMBER-619, LATE=SILVER-OTTER-357",
+        "minimum_host_gib": 18.146583557128906,
+        "minimum_admission_gib": 8.505115509033203,
+        "scope_peak_gib": 19.494884490966797,
+        "actual_expert_slots": 3000,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      },
+      "candidate": {
+        "prompt_seconds": 189.22910000000002,
+        "decode_tokens_per_second": 12.4,
+        "client_total_seconds": 192.15277069900185,
+        "first_visible_delta_seconds": 189.3645044940058,
+        "prompt_tokens": 7501,
+        "completion_tokens": 36,
+        "answer": "EARLY=COPPER-FERN-482, MIDDLE=NORTH-EMBER-619, LATE=SILVER-OTTER-357",
+        "minimum_host_gib": 18.000228881835938,
+        "minimum_admission_gib": 9.512828826904297,
+        "scope_peak_gib": 18.487171173095703,
+        "actual_expert_slots": 2008,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      }
+    },
+    "2": {
+      "baseline": {
+        "prompt_seconds": 273.8288,
+        "decode_tokens_per_second": 5.0,
+        "client_total_seconds": 280.9772741890047,
+        "first_visible_delta_seconds": 274.5000865170732,
+        "prompt_tokens": 7501,
+        "completion_tokens": 36,
+        "answer": "EARLY=COPPER-FERN-482, MIDDLE=NORTH-EMBER-619, LATE=SILVER-OTTER-357",
+        "minimum_host_gib": 18.142284393310547,
+        "minimum_admission_gib": 8.463096618652344,
+        "scope_peak_gib": 19.536903381347656,
+        "actual_expert_slots": 3000,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      },
+      "candidate": {
+        "prompt_seconds": 190.5101,
+        "decode_tokens_per_second": 12.4,
+        "client_total_seconds": 193.44183157617226,
+        "first_visible_delta_seconds": 190.67451458401047,
+        "prompt_tokens": 7501,
+        "completion_tokens": 36,
+        "answer": "EARLY=COPPER-FERN-482, MIDDLE=NORTH-EMBER-619, LATE=SILVER-OTTER-357",
+        "minimum_host_gib": 17.97909164428711,
+        "minimum_admission_gib": 9.525733947753906,
+        "scope_peak_gib": 18.474266052246094,
+        "actual_expert_slots": 2008,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      }
+    },
+    "3": {
+      "candidate": {
+        "prompt_seconds": 185.0429,
+        "decode_tokens_per_second": 12.5,
+        "client_total_seconds": 187.93890106794424,
+        "first_visible_delta_seconds": 185.15692073199898,
+        "prompt_tokens": 7501,
+        "completion_tokens": 36,
+        "answer": "EARLY=COPPER-FERN-482, MIDDLE=NORTH-EMBER-619, LATE=SILVER-OTTER-357",
+        "minimum_host_gib": 17.966049194335938,
+        "minimum_admission_gib": 17.328819274902344,
+        "scope_peak_gib": 10.671180725097656,
+        "actual_expert_slots": 2008,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      },
+      "baseline": {
+        "prompt_seconds": 275.2265,
+        "decode_tokens_per_second": 4.9,
+        "client_total_seconds": 282.57891946611926,
+        "first_visible_delta_seconds": 275.9203588590026,
+        "prompt_tokens": 7501,
+        "completion_tokens": 36,
+        "answer": "EARLY=COPPER-FERN-482, MIDDLE=NORTH-EMBER-619, LATE=SILVER-OTTER-357",
+        "minimum_host_gib": 18.142662048339844,
+        "minimum_admission_gib": 8.447471618652344,
+        "scope_peak_gib": 19.552528381347656,
+        "actual_expert_slots": 3000,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      }
+    },
+    "4": {
+      "candidate": {
+        "prompt_seconds": 192.78220000000002,
+        "decode_tokens_per_second": 12.3,
+        "client_total_seconds": 195.73140941606835,
+        "first_visible_delta_seconds": 192.9126256890595,
+        "prompt_tokens": 7501,
+        "completion_tokens": 36,
+        "answer": "EARLY=COPPER-FERN-482, MIDDLE=NORTH-EMBER-619, LATE=SILVER-OTTER-357",
+        "minimum_host_gib": 17.871692657470703,
+        "minimum_admission_gib": 9.579864501953125,
+        "scope_peak_gib": 18.420135498046875,
+        "actual_expert_slots": 2008,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      },
+      "baseline": {
+        "prompt_seconds": 275.3302,
+        "decode_tokens_per_second": 5.1,
+        "client_total_seconds": 282.3618582659401,
+        "first_visible_delta_seconds": 275.9906582040712,
+        "prompt_tokens": 7501,
+        "completion_tokens": 36,
+        "answer": "EARLY=COPPER-FERN-482, MIDDLE=NORTH-EMBER-619, LATE=SILVER-OTTER-357",
+        "minimum_host_gib": 18.158966064453125,
+        "minimum_admission_gib": 8.509204864501953,
+        "scope_peak_gib": 19.490795135498047,
+        "actual_expert_slots": 3000,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      }
+    },
+    "5": {
+      "candidate": {
+        "prompt_seconds": 190.05270000000002,
+        "decode_tokens_per_second": 12.5,
+        "client_total_seconds": 192.95774156902917,
+        "first_visible_delta_seconds": 190.18925700616091,
+        "prompt_tokens": 7501,
+        "completion_tokens": 36,
+        "answer": "EARLY=COPPER-FERN-482, MIDDLE=NORTH-EMBER-619, LATE=SILVER-OTTER-357",
+        "minimum_host_gib": 17.946441650390625,
+        "minimum_admission_gib": 9.53628921508789,
+        "scope_peak_gib": 18.46371078491211,
+        "actual_expert_slots": 2008,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      },
+      "baseline": {
+        "prompt_seconds": 273.4055,
+        "decode_tokens_per_second": 5.1,
+        "client_total_seconds": 280.4990878610406,
+        "first_visible_delta_seconds": 274.0760214331094,
+        "prompt_tokens": 7501,
+        "completion_tokens": 36,
+        "answer": "EARLY=COPPER-FERN-482, MIDDLE=NORTH-EMBER-619, LATE=SILVER-OTTER-357",
+        "minimum_host_gib": 18.14855194091797,
+        "minimum_admission_gib": 8.489654541015625,
+        "scope_peak_gib": 19.510345458984375,
+        "actual_expert_slots": 3000,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      }
+    },
+    "6": {
+      "candidate": {
+        "prompt_seconds": 190.1892,
+        "decode_tokens_per_second": 12.4,
+        "client_total_seconds": 193.13826136104763,
+        "first_visible_delta_seconds": 190.34085313300602,
+        "prompt_tokens": 7501,
+        "completion_tokens": 36,
+        "answer": "EARLY=COPPER-FERN-482, MIDDLE=NORTH-EMBER-619, LATE=SILVER-OTTER-357",
+        "minimum_host_gib": 17.978012084960938,
+        "minimum_admission_gib": 9.52789306640625,
+        "scope_peak_gib": 18.47210693359375,
+        "actual_expert_slots": 2008,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      },
+      "baseline": {
+        "prompt_seconds": 274.96659999999997,
+        "decode_tokens_per_second": 5.0,
+        "client_total_seconds": 282.15409494703636,
+        "first_visible_delta_seconds": 275.66656495211646,
+        "prompt_tokens": 7501,
+        "completion_tokens": 36,
+        "answer": "EARLY=COPPER-FERN-482, MIDDLE=NORTH-EMBER-619, LATE=SILVER-OTTER-357",
+        "minimum_host_gib": 18.117488861083984,
+        "minimum_admission_gib": 8.477005004882812,
+        "scope_peak_gib": 19.522994995117188,
+        "actual_expert_slots": 3000,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      }
+    }
+  }
+}

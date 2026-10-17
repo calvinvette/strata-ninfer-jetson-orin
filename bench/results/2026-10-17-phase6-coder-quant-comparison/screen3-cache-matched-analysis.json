@@ -1,0 +1,272 @@
+{
+  "status": "pass",
+  "independent_review": true,
+  "scope": "randomized paired model-quantization screen; each independent arm has its own 28-GiB memory scope",
+  "confirmation": false,
+  "quantization_mapping": {
+    "baseline": "Q2_0",
+    "candidate": "IQ1_M"
+  },
+  "expected_prompt_tokens": 7498,
+  "expected_codes": [
+    "MAPLE-ORBIT-731",
+    "COBALT-HARBOR-284",
+    "VELVET-COPPER-956"
+  ],
+  "runtime_checks": [
+    {
+      "block": 0,
+      "variant": "candidate",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 0,
+      "variant": "baseline",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 1,
+      "variant": "baseline",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 1,
+      "variant": "candidate",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 2,
+      "variant": "candidate",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 2,
+      "variant": "baseline",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    }
+  ],
+  "effective_cache_match_by_block": {
+    "0": {
+      "q2_0_mib": 3955,
+      "iq1_m_mib": 3955,
+      "difference_mib": 0,
+      "within_2_mib": true
+    },
+    "1": {
+      "q2_0_mib": 3955,
+      "iq1_m_mib": 3955,
+      "difference_mib": 0,
+      "within_2_mib": true
+    },
+    "2": {
+      "q2_0_mib": 3955,
+      "iq1_m_mib": 3955,
+      "difference_mib": 0,
+      "within_2_mib": true
+    }
+  },
+  "paired_metrics": {
+    "prompt_seconds": {
+      "iq1_m_vs_q2_0_paired_percent_changes": [
+        -32.355011133042176,
+        -36.66384751338199,
+        -32.3138202395711
+      ],
+      "median_paired_percent_change": -32.355011133042176,
+      "paired_block_bootstrap_95_interval_percent": [
+        -36.66384751338199,
+        -32.3138202395711
+      ],
+      "interval_method": "20,000 resamples of paired-block deltas; median and percentile interval",
+      "interpretation": "screen only"
+    },
+    "decode_tokens_per_second": {
+      "iq1_m_vs_q2_0_paired_percent_changes": [
+        150.9803921568628,
+        141.50943396226418,
+        568.421052631579
+      ],
+      "median_paired_percent_change": 150.9803921568628,
+      "paired_block_bootstrap_95_interval_percent": [
+        141.50943396226418,
+        568.421052631579
+      ],
+      "interval_method": "20,000 resamples of paired-block deltas; median and percentile interval",
+      "interpretation": "screen only"
+    },
+    "client_total_seconds": {
+      "iq1_m_vs_q2_0_paired_percent_changes": [
+        -33.17808790007572,
+        -37.226192585879915,
+        -36.1870136409985
+      ],
+      "median_paired_percent_change": -36.1870136409985,
+      "paired_block_bootstrap_95_interval_percent": [
+        -37.226192585879915,
+        -33.17808790007572
+      ],
+      "interval_method": "20,000 resamples of paired-block deltas; median and percentile interval",
+      "interpretation": "screen only"
+    },
+    "first_visible_delta_seconds": {
+      "iq1_m_vs_q2_0_paired_percent_changes": [
+        -32.49063437816172,
+        -36.76408299132069,
+        -32.444421804124545
+      ],
+      "median_paired_percent_change": -32.49063437816172,
+      "paired_block_bootstrap_95_interval_percent": [
+        -36.76408299132069,
+        -32.444421804124545
+      ],
+      "interval_method": "20,000 resamples of paired-block deltas; median and percentile interval",
+      "interpretation": "screen only"
+    }
+  },
+  "per_block": {
+    "0": {
+      "candidate": {
+        "prompt_seconds": 181.9475,
+        "decode_tokens_per_second": 12.8,
+        "client_total_seconds": 185.1537927989848,
+        "first_visible_delta_seconds": 182.05309543618932,
+        "prompt_tokens": 7498,
+        "completion_tokens": 41,
+        "answer": "EARLY=MAPLE-ORBIT-731, MIDDLE=COBALT-HARBOR-284, LATE=VELVET-COPPER-956",
+        "minimum_host_gib": 18.001659393310547,
+        "minimum_admission_gib": 17.78006362915039,
+        "scope_peak_gib": 10.21993637084961,
+        "actual_expert_slots": 2008,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      },
+      "baseline": {
+        "prompt_seconds": 268.97409999999996,
+        "decode_tokens_per_second": 5.1,
+        "client_total_seconds": 277.0854454480577,
+        "first_visible_delta_seconds": 269.67087271413766,
+        "prompt_tokens": 7498,
+        "completion_tokens": 41,
+        "answer": "EARLY=MAPLE-ORBIT-731, MIDDLE=COBALT-HARBOR-284, LATE=VELVET-COPPER-956",
+        "minimum_host_gib": 18.168975830078125,
+        "minimum_admission_gib": 8.436126708984375,
+        "scope_peak_gib": 19.563873291015625,
+        "actual_expert_slots": 3000,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      }
+    },
+    "1": {
+      "baseline": {
+        "prompt_seconds": 296.42470000000003,
+        "decode_tokens_per_second": 5.3,
+        "client_total_seconds": 304.22770107002,
+        "first_visible_delta_seconds": 297.0793881982099,
+        "prompt_tokens": 7498,
+        "completion_tokens": 41,
+        "answer": "EARLY=MAPLE-ORBIT-731, MIDDLE=COBALT-HARBOR-284, LATE=VELVET-COPPER-956",
+        "minimum_host_gib": 18.156471252441406,
+        "minimum_admission_gib": 13.011672973632812,
+        "scope_peak_gib": 14.988327026367188,
+        "actual_expert_slots": 3000,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      },
+      "candidate": {
+        "prompt_seconds": 187.744,
+        "decode_tokens_per_second": 12.8,
+        "client_total_seconds": 190.9753111700993,
+        "first_visible_delta_seconds": 187.86087537091225,
+        "prompt_tokens": 7498,
+        "completion_tokens": 41,
+        "answer": "EARLY=MAPLE-ORBIT-731, MIDDLE=COBALT-HARBOR-284, LATE=VELVET-COPPER-956",
+        "minimum_host_gib": 17.98422622680664,
+        "minimum_admission_gib": 9.598358154296875,
+        "scope_peak_gib": 18.401641845703125,
+        "actual_expert_slots": 2008,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      }
+    },
+    "2": {
+      "candidate": {
+        "prompt_seconds": 183.8314,
+        "decode_tokens_per_second": 12.7,
+        "client_total_seconds": 187.07580181607045,
+        "first_visible_delta_seconds": 183.94896102091298,
+        "prompt_tokens": 7498,
+        "completion_tokens": 41,
+        "answer": "EARLY=MAPLE-ORBIT-731, MIDDLE=COBALT-HARBOR-284, LATE=VELVET-COPPER-956",
+        "minimum_host_gib": 17.900409698486328,
+        "minimum_admission_gib": 17.546615600585938,
+        "scope_peak_gib": 10.453384399414062,
+        "actual_expert_slots": 2008,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      },
+      "baseline": {
+        "prompt_seconds": 271.5937,
+        "decode_tokens_per_second": 1.9,
+        "client_total_seconds": 293.16258725710213,
+        "first_visible_delta_seconds": 272.29277867707424,
+        "prompt_tokens": 7498,
+        "completion_tokens": 41,
+        "answer": "EARLY=MAPLE-ORBIT-731, MIDDLE=COBALT-HARBOR-284, LATE=VELVET-COPPER-956",
+        "minimum_host_gib": 18.158302307128906,
+        "minimum_admission_gib": 8.465385437011719,
+        "scope_peak_gib": 19.53461456298828,
+        "actual_expert_slots": 3000,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      }
+    }
+  }
+}

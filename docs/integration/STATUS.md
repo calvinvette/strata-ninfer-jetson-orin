@@ -26,6 +26,18 @@ cycles with independent response and process-exit review; see the
 Broader quality checks remain open. Process-energy attribution and broader
 Phase 6 interactions also remain open.
 
+A same-day [Coder GGUF quantization comparison](../../bench/results/2026-10-17-phase6-coder-quant-comparison/README.md)
+then compared Q2_0 and IQ1_M from the same pinned Hugging Face repository
+revision. After correcting an exploratory screen's cache-size mismatch, a
+randomized three-pair cache-matched screen and seven-pair held-out confirmation
+used 3,955 MiB of actual expert cache in every arm. All 14 held-out arms returned
+the three planted retrieval markers exactly once and in order. IQ1_M median
+prompt time was 30.83% lower (paired-block bootstrap 95% interval −31.12% to
+−30.43%); client total time was 31.55% lower (−31.81% to −31.15%). Short
+36-token completions make decode throughput less informative. This qualifies
+only the tested prompts and Orin configuration; it is not broad answer-quality
+evidence or a profile promotion. Phase 6 remains open.
+
 An exploratory Phase 5 [Coder CPU-order recovery attempt](../../bench/results/2026-10-16-phase5-cpu-order-adaptive-recovery/README.md)
 is excluded from numerical and quality conclusions. The flag dispatches to a
 kernel for the packed Q2_0 expert layout, while this Coder pack stores native,

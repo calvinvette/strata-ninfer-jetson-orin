@@ -1,0 +1,264 @@
+{
+  "status": "pass",
+  "independent_review": true,
+  "scope": "randomized paired model-quantization screen; each independent arm has its own 28-GiB memory scope",
+  "confirmation": false,
+  "quantization_mapping": {
+    "baseline": "Q2_0",
+    "candidate": "IQ1_M"
+  },
+  "expected_prompt_tokens": 7498,
+  "expected_codes": [
+    "MAPLE-ORBIT-731",
+    "COBALT-HARBOR-284",
+    "VELVET-COPPER-956"
+  ],
+  "runtime_checks": [
+    {
+      "block": 0,
+      "variant": "candidate",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 0,
+      "variant": "baseline",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 1,
+      "variant": "candidate",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 1,
+      "variant": "baseline",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 2,
+      "variant": "baseline",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    },
+    {
+      "block": 2,
+      "variant": "candidate",
+      "marker_oracle": "pass",
+      "request_status": "pass",
+      "memory_guard": "pass"
+    }
+  ],
+  "effective_cache_match_by_block": {
+    "0": {
+      "q2_0_mib": 3955,
+      "iq1_m_mib": 7615,
+      "difference_mib": 3660,
+      "within_2_mib": false
+    },
+    "1": {
+      "q2_0_mib": 3955,
+      "iq1_m_mib": 7615,
+      "difference_mib": 3660,
+      "within_2_mib": false
+    },
+    "2": {
+      "q2_0_mib": 3955,
+      "iq1_m_mib": 7615,
+      "difference_mib": 3660,
+      "within_2_mib": false
+    }
+  },
+  "paired_metrics": {
+    "prompt_seconds": {
+      "iq1_m_vs_q2_0_paired_percent_changes": [
+        -37.58359424927136,
+        -37.38650209064718,
+        -37.21753628656808
+      ],
+      "median_paired_percent_change": -37.38650209064718,
+      "paired_block_bootstrap_95_interval_percent_screen_only": [
+        -37.58359424927136,
+        -37.21753628656808
+      ]
+    },
+    "decode_tokens_per_second": {
+      "iq1_m_vs_q2_0_paired_percent_changes": [
+        143.39622641509436,
+        147.16981132075472,
+        170.00000000000003
+      ],
+      "median_paired_percent_change": 147.16981132075472,
+      "paired_block_bootstrap_95_interval_percent_screen_only": [
+        143.39622641509436,
+        170.00000000000003
+      ]
+    },
+    "client_total_seconds": {
+      "iq1_m_vs_q2_0_paired_percent_changes": [
+        -38.181259016373325,
+        -38.00633861877881,
+        -37.97301909764676
+      ],
+      "median_paired_percent_change": -38.00633861877881,
+      "paired_block_bootstrap_95_interval_percent_screen_only": [
+        -38.181259016373325,
+        -37.97301909764676
+      ]
+    },
+    "first_visible_delta_seconds": {
+      "iq1_m_vs_q2_0_paired_percent_changes": [
+        -37.683802470621394,
+        -37.49774460275326,
+        -37.32497549414775
+      ],
+      "median_paired_percent_change": -37.49774460275326,
+      "paired_block_bootstrap_95_interval_percent_screen_only": [
+        -37.683802470621394,
+        -37.32497549414775
+      ]
+    }
+  },
+  "per_block": {
+    "0": {
+      "candidate": {
+        "prompt_seconds": 170.7236,
+        "decode_tokens_per_second": 12.9,
+        "client_total_seconds": 173.90910709905438,
+        "first_visible_delta_seconds": 170.86203144304454,
+        "prompt_tokens": 7498,
+        "completion_tokens": 41,
+        "answer": "EARLY=MAPLE-ORBIT-731, MIDDLE=COBALT-HARBOR-284, LATE=VELVET-COPPER-956",
+        "minimum_host_gib": 14.367725372314453,
+        "minimum_admission_gib": 12.977371215820312,
+        "scope_peak_gib": 15.022628784179688,
+        "actual_expert_slots": 3903,
+        "actual_expert_cache_mib": 7615,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      },
+      "baseline": {
+        "prompt_seconds": 273.5236,
+        "decode_tokens_per_second": 5.3,
+        "client_total_seconds": 281.3210109618958,
+        "first_visible_delta_seconds": 274.18558611907065,
+        "prompt_tokens": 7498,
+        "completion_tokens": 41,
+        "answer": "EARLY=MAPLE-ORBIT-731, MIDDLE=COBALT-HARBOR-284, LATE=VELVET-COPPER-956",
+        "minimum_host_gib": 17.91019058227539,
+        "minimum_admission_gib": 8.376800537109375,
+        "scope_peak_gib": 19.623199462890625,
+        "actual_expert_slots": 3000,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      }
+    },
+    "1": {
+      "candidate": {
+        "prompt_seconds": 170.66629999999998,
+        "decode_tokens_per_second": 13.1,
+        "client_total_seconds": 173.82363546593115,
+        "first_visible_delta_seconds": 170.78399794595316,
+        "prompt_tokens": 7498,
+        "completion_tokens": 41,
+        "answer": "EARLY=MAPLE-ORBIT-731, MIDDLE=COBALT-HARBOR-284, LATE=VELVET-COPPER-956",
+        "minimum_host_gib": 14.31594467163086,
+        "minimum_admission_gib": 12.96512222290039,
+        "scope_peak_gib": 15.03487777709961,
+        "actual_expert_slots": 3903,
+        "actual_expert_cache_mib": 7615,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      },
+      "baseline": {
+        "prompt_seconds": 272.5711,
+        "decode_tokens_per_second": 5.3,
+        "client_total_seconds": 280.3893681920599,
+        "first_visible_delta_seconds": 273.2445363139268,
+        "prompt_tokens": 7498,
+        "completion_tokens": 41,
+        "answer": "EARLY=MAPLE-ORBIT-731, MIDDLE=COBALT-HARBOR-284, LATE=VELVET-COPPER-956",
+        "minimum_host_gib": 17.972675323486328,
+        "minimum_admission_gib": 8.575267791748047,
+        "scope_peak_gib": 19.424732208251953,
+        "actual_expert_slots": 3000,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      }
+    },
+    "2": {
+      "baseline": {
+        "prompt_seconds": 270.8578,
+        "decode_tokens_per_second": 5.0,
+        "client_total_seconds": 279.0928879198618,
+        "first_visible_delta_seconds": 271.52004550909624,
+        "prompt_tokens": 7498,
+        "completion_tokens": 41,
+        "answer": "EARLY=MAPLE-ORBIT-731, MIDDLE=COBALT-HARBOR-284, LATE=VELVET-COPPER-956",
+        "minimum_host_gib": 18.131099700927734,
+        "minimum_admission_gib": 12.524589538574219,
+        "scope_peak_gib": 15.475410461425781,
+        "actual_expert_slots": 3000,
+        "actual_expert_cache_mib": 3955,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      },
+      "candidate": {
+        "prompt_seconds": 170.05120000000002,
+        "decode_tokens_per_second": 13.5,
+        "client_total_seconds": 173.1128922898788,
+        "first_visible_delta_seconds": 170.17525506112725,
+        "prompt_tokens": 7498,
+        "completion_tokens": 41,
+        "answer": "EARLY=MAPLE-ORBIT-731, MIDDLE=COBALT-HARBOR-284, LATE=VELVET-COPPER-956",
+        "minimum_host_gib": 14.440319061279297,
+        "minimum_admission_gib": 12.96673583984375,
+        "scope_peak_gib": 15.03326416015625,
+        "actual_expert_slots": 3903,
+        "actual_expert_cache_mib": 7615,
+        "memory_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        }
+      }
+    }
+  }
+}
