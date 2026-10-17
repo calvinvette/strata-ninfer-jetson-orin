@@ -2696,3 +2696,19 @@ pressure/OOM events. The separate `VIN_SYS_5V0` request-window integral fell
 slots (seven pairs); one window is unsupported due to a telemetry gap. These
 estimates include board idle/background activity and are not process-attributed.
 No profile changed; Phase 6 remains open.
+
+A current-source seven-block [Q2_0 graph × MTP2 confirmation](../../bench/results/2026-10-17-phase6-q2-graph-mtp-current-source/README.md)
+repeated captured/eager CUDA graph × MTP-off/window2 on the task-quality-
+validated 2,094-token processor explanation. All 28 responses stopped at 293
+tokens, passed the rubric and were byte-identical; MTP2 offered/accepted 153/97
+drafts per request. Captured versus eager request-time effects included zero
+for both MTP settings. MTP2 raised request time 5.46% captured (paired 95%
+interval +4.46% to +7.07%) and 3.39% eager (+2.17% to +5.54%), with decode
+throughput down 6.10% and 3.75%, respectively. One captured/MTP2 cell had a
+95.80-second request and remains included. Minimum host/admission availability
+was 16.95/11.58 GiB with zero cgroup pressure/OOM events. All 28
+`VIN_SYS_5V0` request windows were integrated; the values include board
+idle/background activity and are not process-attributed. This Q2_0 variant
+comes from the same pinned ISTA Coder-GGUF repository as the IQ1_M Coder tests,
+but it is not an IQ1_M or cross-quantization comparison. No profile changed;
+Phase 6 remains open.
