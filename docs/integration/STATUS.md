@@ -2655,3 +2655,12 @@ and all paired rows are retained in the report. These request-window rail
 integrals include board idle/background activity and are not process-attributed
 or summed into whole-device energy; they remain supporting diagnostics rather
 than a standalone Pareto energy measure.
+
+A cell-scoped [latency / input-rail plot](../../bench/results/2026-10-17-phase6-coder-mtp-kv-heldout-workload-confirm7-cache1500/pareto-latency-energy.png)
+uses the same seven-block medians, with decode rate and minimum admission as
+annotations and exact-answer success as a feasibility constraint. Within the
+identical workload/KV cells, MTP off dominates MTP4 on both long-prompt
+latency and input-rail energy; MTP4 dominates on short INT8; short FP16 retains
+a latency/rail tradeoff. This is scoped diagnostic evidence because the rail
+includes board idle/background activity, not a process-energy Pareto frontier
+or a cross-workload ranking. No profile is selected.

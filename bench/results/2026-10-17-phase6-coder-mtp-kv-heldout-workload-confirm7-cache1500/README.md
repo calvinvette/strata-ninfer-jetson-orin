@@ -63,6 +63,17 @@ idle and background activity and are not process-attributed; rails are not
 summed and do not support a whole-device energy claim. Treat them as supporting
 diagnostics, not a standalone energy/token Pareto result.
 
+The cell-scoped [latency/rail diagnostic](pareto-latency-energy.png) compares
+the seven-block median client total and `VIN_SYS_5V0` joules per fixed 45-token
+completion within each identical KV/workload cell. Decode rate and the lowest
+observed admission availability are labels; all cells passed the exact-answer
+check. This limited two-axis view marks MTP off as dominating MTP4 at both long
+prompts, MTP4 as dominating MTP off at short INT8, and a latency/rail tradeoff
+at short FP16. It does not rank unlike prompts or establish process energy.
+Cell medians and the within-cell dominance calculation are reproducible from
+`analyze_pareto.py`, `pareto-cells.csv` and `pareto-cells.json`; the plot is
+also retained as SVG.
+
 The raw per-arm requests, engine logs and supervisor telemetry are retained in
 `campaign/`. The machine-readable campaign summary and independently rerunnable
 residency audit are `campaign/campaign.json` and `residency-audit.json`.
