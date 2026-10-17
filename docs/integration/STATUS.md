@@ -186,13 +186,14 @@ Coder-specific MTP artifact or broad cancellation qualification. Phase 5
 remains open.
 
 A supervised [Coder IQ1_M long-prefill cancellation check](../../bench/results/2026-10-16-phase5-coder-prefill-cancel-recovery/README.md)
-closed the stream during prefill of the 7,501-token, 8K-context retrieval task.
-The engine had read 64 tokens and generated none; same-service recovery returned
-`Hello Orin!`, and all 11 final persistent-state fields matched a fresh-service
-reference at `L=24`. Across 71 supervisor samples, minimum host/admission
-availability was 13.29 GiB and cgroup pressure/OOM counters remained zero.
-This is one early-prefill cancellation point; later prefill positions and
-repeatability remain open. Phase 5 remains open.
+repeated stream cancellation during the 7,501-token, 8K-context retrieval
+prefill at four client delays. The engine had read 64, 64, 512 and 576 tokens,
+and generated none; each same-service recovery returned `Hello Orin!`, and all
+11 final persistent-state fields matched a fresh-service reference at `L=24`.
+Across the four 28-GiB-supervised runs, minimum host/admission availability
+ranged from 13.15 to 13.41 GiB and cgroup pressure/OOM counters remained zero.
+This covers early and mid-prefill cancellation points, not every prefill
+boundary; Phase 5 remains open.
 
 A randomized three-block [Coder IQ1_M short-task MTP screen](../../bench/results/2026-10-16-phase5-coder-mtp-window-screen/screen-short/README.md)
 and [near-limit MTP screen](../../bench/results/2026-10-16-phase5-coder-mtp-window-screen/screen-near-limit/README.md)

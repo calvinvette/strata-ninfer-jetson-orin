@@ -16,25 +16,35 @@ SHA256 `dfc6394251bbe2713f6039d442e290109513447a770884b58657f7e162d2ed60`.
 The workload was the existing 7,501-token retrieval prompt at 8,192 context,
 with the established Coder IQ1_M profile, FP16 KV, MTP4, cadence-4 accepted-only
 adaptation and 3,000 requested expert-cache slots (3,903 actual slots). The
-client closed the stream one second after response headers. The engine recorded
-64 of 7,501 prompt tokens read in 8.50 seconds, zero generated tokens and zero
-checkpoints, then reported cancellation. The delay between client close and
-engine cancellation means this tests an early-prefill cancellation point, not
-arbitrary positions throughout prefill.
+Four supervised runs closed the stream 1, 8, 30 and 30 seconds after response
+headers. The engine actually canceled after reading 64, 64, 512 and 576 of the
+7,501 prompt tokens, respectively. It generated zero tokens and recorded zero
+checkpoints in every run. The 8-second delay still landed within the first
+64-token prefill chunk; actual engine read counts are the cancellation-position
+measure, not the requested client delays.
 
-The same service stayed alive and returned exactly `Hello Orin!`. A fresh
-service returned the same text and matched all 11 recorded persistent-state
-fields at accepted prefix `L=24` (GDN, PLE, tail, pooled, pooled-full, KV, MTP,
-stale, dead, and PLE predecessor state). This is one functional cancellation
-and recovery point, not repeated cancellation qualification or a performance
+| Run | Client delay | Prompt tokens read at cancel | Wall time | Minimum host/admission availability |
+| --- | ---: | ---: | ---: | ---: |
+| root run | 1 s | 64 | 73.6 s | 13.29 / 13.29 GiB |
+| [`cancel-at-8s`](cancel-at-8s/result.json) | 8 s | 64 | 57.9 s | 13.15 / 13.15 GiB |
+| [`cancel-at-30s`](cancel-at-30s/result.json) | 30 s | 512 | 71.4 s | 13.30 / 13.30 GiB |
+| [`cancel-at-30s-repeat2`](cancel-at-30s-repeat2/result.json) | 30 s | 576 | 74.9 s | 13.41 / 13.41 GiB |
+
+In all four runs, the same service stayed alive and returned exactly
+`Hello Orin!`. A fresh service returned the same text and matched all 11
+recorded persistent-state fields at accepted prefix `L=24` (GDN, PLE, tail,
+pooled, pooled-full, KV, MTP, stale, dead, and PLE predecessor state).
+Cancellation and recovery passed at these four observed positions; this is
+not broad qualification across every prefill boundary or a performance
 measurement.
 
-The run lasted 73.6 seconds under a 28-GiB systemd scope. Across 71 one-second
-samples, minimum host and admission availability was 13.29 GiB; cgroup
-`low`/`high`/`max`/`oom`/`oom_kill` counters remained zero. Dynamic observed
-GPU clocks ranged from 306 MHz to 1,300.5 MHz and CPU clocks from 729.6 MHz to
-2,201.6 MHz. EMC clock readback was denied, and energy was not attributed to the
-requests. Raw telemetry and both service logs are retained here.
+Each run used a 28-GiB systemd scope. Across 58–75 one-second samples per run,
+minimum host and admission availability ranged from 13.15 to 13.41 GiB; cgroup
+`low`/`high`/`max`/`oom`/`oom_kill` counters remained zero. In the first run,
+dynamic observed GPU clocks ranged from 306 MHz to 1,300.5 MHz and CPU clocks
+from 729.6 MHz to 2,201.6 MHz. EMC clock readback was denied, and energy was
+not attributed to the requests. Raw telemetry and all service logs are retained
+here.
 
 Reproduce on Orin1 from the repository root:
 
@@ -50,5 +60,5 @@ systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes \
   --cancel-after-s 1 --compare-recovery-state
 ```
 
-The focused harness tests passed 4/4. This adds Coder IQ1_M early-prefill
-cancellation evidence; Phase 5 remains open.
+The focused harness tests passed 4/4. This adds repeated Coder IQ1_M
+early/mid-prefill cancellation and recovery evidence; Phase 5 remains open.
