@@ -177,9 +177,13 @@ def main():
     parser.add_argument('--blocks', type=int, default=3)
     parser.add_argument('--seed', type=int, default=20261023)
     parser.add_argument('--first-port', type=int, default=19400)
+    parser.add_argument('--expert-cache-budget', type=int,
+                        help='override the configured --expert-cache budget for this screen')
     args = parser.parse_args()
     if args.output.exists():
         parser.error('output path must not already exist')
+    if args.expert_cache_budget is not None and args.expert_cache_budget <= 0:
+        parser.error('--expert-cache-budget must be positive')
     if args.blocks < 3 or args.windows != [0, 4] or args.kvs != ['fp16', 'int8']:
         parser.error('this screen requires at least three blocks, MTP windows 0/4, and KV formats fp16/int8')
     cfg = json.loads(args.config.read_text())
@@ -208,6 +212,7 @@ def main():
                 'model_name': cfg.get('model_name'), 'workloads': args.workload_cells,
                 'prompt_tokens_requested': {cell: workloads[cell]['prompt_tokens'] for cell in args.workload_cells},
                 'kv_formats': args.kvs, 'mtp_windows': args.windows, 'blocks': args.blocks,
+                'expert_cache_budget_override': args.expert_cache_budget,
                 'seed': args.seed, 'floor_gib': 6, 'supervisor_memory_max': '28G',
                 'randomized_design': design, 'runs': [], 'status': 'running'}
     write_result(args.output / 'campaign.json', campaign)
@@ -220,6 +225,8 @@ def main():
         run_dir = args.output / run_name
         run_dir.mkdir()
         arm_args = args_for(cfg, window, kv_format=kv, disable_adaptive_swaps=True)
+        if args.expert_cache_budget is not None:
+            arm_args = replace_option(arm_args, '--expert-cache', args.expert_cache_budget)
         arm_args = replace_option(arm_args, '--prompt-cache', 0)
         port = args.first_port + index
         run_cfg = dict(cfg, args=arm_args, port=port,
@@ -281,8 +288,10 @@ def main():
             return 1
         write_result(args.output / 'campaign.json', campaign)
 
-    campaign['comparisons'] = summarize_factorial(
+    campaign['unfiltered_comparisons_do_not_account_for_residency'] = summarize_factorial(
         campaign['runs'], args.workload_cells, args.kvs, args.windows, args.seed)
+    from audit_mtp_kv_screen import audit
+    campaign['comparisons'] = audit(campaign, args.seed)
     campaign['status'] = 'pass'
     campaign['finished_wall_time_s'] = time.time()
     write_result(args.output / 'campaign.json', campaign)

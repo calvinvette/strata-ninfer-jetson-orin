@@ -2582,3 +2582,16 @@ and zero cgroup pressure/OOM events. `tj` stayed between 71.1 and 73.3 °C from
 14:40 through 15:11. This refreshes sustained
 service evidence for the tested profile; concurrency, broader quality and
 other model/configuration cells remain open.
+
+A three-block [Coder IQ1_M MTP × KV × prompt-length screen](../../bench/results/2026-10-16-phase6-coder-mtp-kv-workload-screen/README.md)
+crossed MTP off/MTP4, FP16/INT8 KV and 512/7,501-token retrieval prompts.
+All 24 arms passed the exact answer oracle and six-GiB guard. Four of 12 MTP
+pairs had different actual expert residency and were excluded from timing
+effects. The remaining per-cell decode effects are descriptive with only one
+to three paired blocks; no block had all eight factorial arms at identical
+residency, and only two long-prompt MTP × KV interaction blocks qualified.
+Minimum host/admission availability was 13.33/8.94 GiB across 4,887 samples,
+with zero cgroup pressure/OOM events; clocks were dynamic and energy was not
+request-attributed. This screen does not select or promote a profile. A
+residency-matched repeat and seven-block held-out confirmation remain necessary;
+Phase 6 remains open.
