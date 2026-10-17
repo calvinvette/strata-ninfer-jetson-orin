@@ -33,8 +33,13 @@ near-limit retrieval and same-service recovery cells. The 15,003- and
 followed by `RECOVERED`. Minimum host/admission availability was 17.72/10.15
 GiB at 16K and 17.52/11.89 GiB at 32K across 611 and 1,106 supervised samples;
 both runs had zero cgroup memory events. This extends the exact selected profile
-from 8K through one 32K capacity point; quality breadth, repetitions and larger
-selected-profile contexts remain open. Phase 7 remains in progress.
+from 8K through one 32K capacity point. The selected profile also passed a
+held-out [32K retrieval-plus-arithmetic task](../../bench/results/2026-10-17-phase7-q2-prefill128-32k-quality-mtp-off/README.md):
+all three markers appeared once and in order, the independent suffix oracle
+returned `1971`, and same-service recovery passed. That run retained 17.42/11.48
+GiB minimum host/admission availability over 1,081 samples with zero cgroup
+events. Broader quality coverage, repetitions and larger selected-profile
+contexts remain open. Phase 7 remains in progress.
 
 A same-day [Coder GGUF quantization comparison](../../bench/results/2026-10-17-phase6-coder-quant-comparison/README.md)
 then compared Q2_0 and IQ1_M from the same pinned Hugging Face repository
