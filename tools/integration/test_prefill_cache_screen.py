@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 
 from cache_context_screen import api_command
-from prefill_cache_screen import prefill_cache_configs
+from prefill_cache_screen import prefill_cache_configs, scoped_command
 
 
 class PrefillCacheScreenTest(unittest.TestCase):
@@ -44,6 +44,17 @@ class PrefillCacheScreenTest(unittest.TestCase):
         self.assertEqual(command[separator + 1:].index('--warmup-workloads') + separator + 1,
                          len(command) - 2)
         self.assertEqual(command[-1], '/tmp/warmup.json')
+
+    def test_per_cell_memory_scope_wraps_one_arm(self):
+        command = ['python3', 'tools/integration/run_control.py', '--output', '/tmp/cell']
+        self.assertEqual(scoped_command(command, 28), [
+            'systemd-run', '--user', '--scope', '--collect',
+            '-p', 'MemoryMax=28G', '-p', 'IOAccounting=yes', '--', *command])
+        self.assertEqual(scoped_command(command), command)
+
+    def test_per_cell_memory_scope_rejects_invalid_limit(self):
+        with self.assertRaises(ValueError):
+            scoped_command(['python3', 'runner.py'], 0)
 
 
 if __name__ == '__main__':

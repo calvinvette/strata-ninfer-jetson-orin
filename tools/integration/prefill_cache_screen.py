@@ -25,6 +25,17 @@ def prefill_cache_configs(config, cache_values, prefill_values):
     return cells
 
 
+def scoped_command(command, memory_max_gib=None):
+    """Run one cell in its own cgroup so cache charges do not accumulate."""
+    if memory_max_gib is None:
+        return command
+    if not isinstance(memory_max_gib, int) or memory_max_gib < 1:
+        raise ValueError('cell memory maximum must be a positive integer GiB')
+    return ['systemd-run', '--user', '--scope', '--collect',
+            '-p', f'MemoryMax={memory_max_gib}G', '-p', 'IOAccounting=yes',
+            '--', *command]
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', type=Path, required=True)
@@ -45,6 +56,8 @@ def main():
                         help='retain read-only CPU/GPU/EMC frequency samples per cell')
     parser.add_argument('--confirmation', action='store_true',
                         help='allow one measured request per independent cell/block')
+    parser.add_argument('--cell-memory-max-gib', type=int,
+                        help='run each cell in its own systemd scope with this MemoryMax')
     args = parser.parse_args()
     min_rounds = 1 if args.confirmation else 3
     if args.rounds < min_rounds or args.timeout < 1:
@@ -70,6 +83,7 @@ def main():
         'rounds_per_service': args.rounds,
         'trace_enabled': not args.no_trace,
         'clock_sampling': args.sample_clocks,
+        'cell_memory_max_gib': args.cell_memory_max_gib,
         'independent_block_confirmation': args.confirmation,
         'scope': 'randomized order; independent server process per cell; one warmup and three measured requests per process; admission and screening evidence only',
         'started_wall_time_s': time.time(),
@@ -89,6 +103,7 @@ def main():
                               request_path, args.rounds, timeout_s=args.timeout,
                               no_trace=args.no_trace, sample_clocks=args.sample_clocks,
                               warmup_workloads=args.warmup_workloads)
+        command = scoped_command(command, args.cell_memory_max_gib)
         row = dict(cell, order=index, status='not_run', command=command)
         campaign['cells'].append(row)
         write_result(manifest, campaign)
