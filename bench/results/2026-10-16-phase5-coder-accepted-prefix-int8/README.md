@@ -1,8 +1,8 @@
 # Coder IQ1_M accepted-prefix state parity with INT8 KV — Orin — 2026-10-16
 
-This supervised correctness check compared MTP off with MTP4 on the same exact
-512-token prompt and cadence-4 accepted-only adaptive update policy as the
-FP16-KV short-prompt cell in
+This supervised correctness check compared MTP off with MTP4 on exact 512-
+and 2,048-token prompts and the same cadence-4 accepted-only adaptive update
+policy as the FP16-KV cells in
 [the paired state report](../2026-10-16-phase5-coder-accepted-prefix-adaptive/README.md).
 INT8 KV was the only changed profile factor. Each arm used a fresh sequential
 engine and generated 32 tokens; prompt-cache capacity was configured, but no
@@ -12,9 +12,10 @@ The output token IDs were identical. Final persistent-state fingerprints
 matched in every recorded field, and the accepted-prefix trace matched at all
 17 shared commit boundaries (generated lengths 1, 3, 4, 7, 8, 11, 12, 16, 18,
 20, 23, 24, 28, 29, 30, 31 and 32). MTP4 offered 27 drafts and accepted 15.
-This adds one direct state-parity cell for INT8 KV. It is not a task-quality or
-performance result, and does not qualify other prompts, contexts or adaptive
-migration behavior.
+On the 2,048-token prompt, all 16 shared commit boundaries also matched; MTP4
+offered 31 drafts and accepted 16. This adds INT8-KV state parity at both
+prompt lengths. It is not a task-quality or performance result, and does not
+qualify other prompts, contexts or adaptive migration behavior.
 
 The model is `ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF`, IQ1_M,
 pinned at revision `5348543e0147355ac9cbcb031184a3546350988e`. Shard hashes are
@@ -30,10 +31,12 @@ repository HEAD at run time was `78d03268191546cddf29fa69588f21c5583fd928`.
 The configuration and binary identity are retained in `config.json` and
 `run/results.json`.
 
-The 28-GiB supervisor passed in 108.64 seconds. Minimum host and effective
-admission availability were both 13.48 GiB, above the six-GiB floor. Sampled
-cgroup `low`, `high`, `max`, `oom` and `oom_kill` events remained zero. Clocks
-remained dynamic; energy was not attributed to the request.
+The 512-token comparison passed its 28-GiB supervisor in 108.64 seconds, with
+13.48 GiB minimum host/admission availability. The 2,048-token comparison
+passed in 222.33 seconds, with 13.35 GiB minimum host/admission availability.
+Both stayed above the six-GiB floor; sampled cgroup `low`, `high`, `max`, `oom`
+and `oom_kill` events remained zero. Clocks remained dynamic; energy was not
+attributed to the requests.
 
 Reproduce from the repository root on Orin with:
 
@@ -50,5 +53,6 @@ systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes \
   --use-config-adaptive-swaps --run
 ```
 
-Raw token/state traces and supervisor samples are under `run/` and
-`supervisor/`. Phase 5 remains open.
+Repeat with distinct output paths and `--prompt-tokens 2048` for the longer
+prompt. Raw token/state traces and supervisor samples are under `run/`,
+`run-2048/`, `supervisor/` and `supervisor-2048/`. Phase 5 remains open.
