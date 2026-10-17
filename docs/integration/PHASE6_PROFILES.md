@@ -62,10 +62,12 @@ quantizations, larger context, concurrency or other hardware. IQ1_M remains
 unselected because its MTP × KV effect changes with prompt length and its
 adaptive routing has a persistent-state divergence under tested swaps.
 
-The selected profile has now passed a supervised 30-minute, 512-token
+The selected profile has passed a supervised 30-minute, 512-token
 retrieval-plus-arithmetic streaming soak with exact answers and the six-GiB
 physical-headroom guard; see the [sustained-service report](../../bench/results/2026-10-17-phase7-q2-prefill128/sustained-512/README.md).
-This does not cover near-limit recall/recovery, cancellation or teardown on the
-selected profile. Do not promote a default until those checks, process-relevant
-energy evidence and the broader Phase 6 interaction gates are complete. Phase 6
-and Phase 7 remain open.
+It also passed one 7,498-token 8K near-limit retrieval and same-service
+recovery check; see the [recall report](../../bench/results/2026-10-17-phase7-q2-prefill128/near-limit-8k-recovery/README.md).
+These results do not cover cancellation, teardown, other task types or other
+context sizes on the selected profile. Do not promote a default until those
+checks, process-relevant energy evidence and the broader Phase 6 interaction
+gates are complete. Phase 6 and Phase 7 remain open.

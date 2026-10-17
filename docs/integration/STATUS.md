@@ -10,11 +10,14 @@ FP16 KV, 8K context, MTP off, 3,000 expert slots, prefill chunk 128, eight
 workers and prompt cache/adaptive swaps disabled. This is not a default or
 general support claim. A supervised 30-minute 512-token retrieval-plus-sum
 soak on that exact profile passed 101/101 exact-answer checks, with 17.73 GiB
-minimum host and 8.51 GiB minimum admission availability; the independently
-reviewed [report](../../bench/results/2026-10-17-phase7-q2-prefill128/sustained-512/README.md)
-retains raw memory, clock and thermal telemetry. Selected-profile
-near-limit/recovery, cancellation and teardown checks remain open. Process
-energy attribution and broader Phase 6 interactions also remain open.
+minimum host and 8.51 GiB minimum admission availability. A separate selected-
+profile 7,498-token 8K recall and same-service recovery check also passed, with
+17.96 / 11.75 GiB minimum host/admission availability. The retained [soak
+report](../../bench/results/2026-10-17-phase7-q2-prefill128/sustained-512/README.md)
+and [recall report](../../bench/results/2026-10-17-phase7-q2-prefill128/near-limit-8k-recovery/README.md)
+include independent review and raw telemetry. Selected-profile cancellation,
+teardown and broader quality checks remain open. Process energy attribution and
+broader Phase 6 interactions also remain open.
 
 An exploratory Phase 5 [Coder CPU-order recovery attempt](../../bench/results/2026-10-16-phase5-cpu-order-adaptive-recovery/README.md)
 is excluded from numerical and quality conclusions. The flag dispatches to a
