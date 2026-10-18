@@ -1032,6 +1032,8 @@ A same-binary [Q2_0 prefill-chunk × cgroup admission screen](../../bench/result
 
 The current Q2_0 binary also passed one-token configured-context admission checks at 4K/8K/16K/32K/64K with 3,000 actual cache slots. Session requested backing scaled from 235,034,112 to 1,856,067,072 bytes; all five owner ledgers balanced 278/278 and the minimum host availability was 17.12 GiB. See the [context screen](../../bench/results/2026-10-11-phase3-q2-context-admission-current/README.md). These are startup/admission checks only; long-context ingestion, quality, concurrency and graph-pool pricing remain open.
 
+A fresh [current-source Orin regression](../../bench/results/2026-10-18-phase8-current-source-regression/README.md) rebuilt the candidate and passed all 116 runnable tests in the 118-test fixture-available CTest selection; two optional IQ fixture tests were skipped and the two tests requiring the absent `pack/full/experts.bin` were excluded. The 161-test integration Python suite also passed. Minimum host/admission availability was 19.73 GiB during CTest and 24.55 GiB during Python tests, with zero cgroup memory events. This is native regression evidence only; Phase 8 release packaging and Phases 5/6 remain open.
+
 | Phase | State | Evidence / next gate |
 | --- | --- | --- |
 | 0 — Repository and import | Complete | Pinned source/evidence manifest, source mapping, plan, offline planner checks |
