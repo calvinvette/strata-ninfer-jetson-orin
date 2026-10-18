@@ -2829,5 +2829,17 @@ uncertain at chunk 32 and nominally favored 3,500 at chunk 128. These three-bloc
 intervals are exploratory, and no profile changed. Minimum host/admission
 availability was 17.42/10.59 GiB; cgroup pressure/OOM events were zero. Dynamic
 GPU clocks ranged 306 MHz–1,300.5 MHz; EMC readback was unsupported, and energy
-was not request-attributed. A separate held-out seven-block confirmation is
-underway; Phase 6 remains open.
+was not request-attributed.
+
+The separate [seven-block held-out Q2_0 long-retrieval confirmation](../../bench/results/2026-10-18-phase6-q2-cache-prefill-heldout-confirm7/README.md)
+completed the same cache × prefill grid on a distinct 7,506-token prompt. All
+28 fresh-service responses returned the exact expected answer; all supervisors,
+exact-slot checks and memory guards passed. Chunk 128 reduced paired median
+request time 59.54% at 3,000 slots (95% bootstrap interval −59.80% to −54.93%)
+and 59.74% at 3,500 (−60.82% to −59.59%). The cache-size effect was small or
+uncertain, and the cache × prefill interaction interval included zero. Minimum
+host/admission availability was 17.47/11.45 GiB across 14,411 memory samples,
+with zero cgroup events. Dynamic GPU clocks ranged 306 MHz–1,300.5 MHz; EMC
+readback was unsupported, and energy was not analyzed. This confirms the strong
+chunk effect for the tested held-out retrieval workload only; no profile changed
+and Phase 6 remains open.
