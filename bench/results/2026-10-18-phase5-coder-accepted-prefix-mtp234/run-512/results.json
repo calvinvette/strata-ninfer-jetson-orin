@@ -1,0 +1,1628 @@
+{
+  "prompt_sha256": "ca13a79c83650d0bda01e8db5cc641308e496ff8342cb17471916c8d0a502729",
+  "max_new": 16,
+  "kv_format": "fp16",
+  "state_fields": [
+    "L",
+    "gdn",
+    "ple",
+    "tail",
+    "dead",
+    "pooled",
+    "pooled_full",
+    "kv",
+    "ple_prev"
+  ],
+  "arms": [
+    {
+      "name": "mtp-off",
+      "spec": 0,
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "64",
+        "--spec",
+        "2",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55",
+        "--pool-workers",
+        "8",
+        "--suffix-draft",
+        "0",
+        "--spec-min-p",
+        "0",
+        "--adapt-every",
+        "4",
+        "--adapt-accepted-only"
+      ],
+      "info": {
+        "version": "0.1.41",
+        "context": 8192,
+        "kv": "fp16",
+        "kv_resident": 0,
+        "expert_slots": 3903,
+        "expert_cache_mib": 7615,
+        "expert_slots_primary": 3903,
+        "expert_cache_primary_mib": 7615,
+        "spec": 2,
+        "mtp_max": 0,
+        "lookup": 0,
+        "vram_free_mib": 14754,
+        "cvec": 0,
+        "arena_mib": 0,
+        "pool_workers": 8,
+        "pcie_frac": "0.55",
+        "spec_min_p": "0.00",
+        "conversation_cache_mib": 0,
+        "conversation_cache_slots": 4,
+        "conversation_cache_min_free_mib": 2560,
+        "tail_role_token": -1,
+        "vram_elastic": 0,
+        "engine": "0.1.41"
+      },
+      "records": [
+        {
+          "ids": [
+            32,
+            6165,
+            11036,
+            1928,
+            1472,
+            264,
+            25924,
+            11,
+            7072,
+            48470,
+            14855,
+            421,
+            11690,
+            440,
+            279,
+            17128
+          ],
+          "text": "A computer processes information through a sophisticated, multi-stage pipeline that begins with the processor",
+          "generated": 16,
+          "prompt_tokens": 512,
+          "prompt_ms": 26316.1,
+          "decode_ms": 7345.1,
+          "finish": "length",
+          "drafts_accepted": 0,
+          "drafts_offered": 0,
+          "reused": 0,
+          "hits": 4726,
+          "lookups": 7680,
+          "ram_blobs": 0,
+          "file_blobs": 0,
+          "file_mb": 6754.6,
+          "prompt_read": 512,
+          "offloaded": 0,
+          "state": {
+            "L": "527",
+            "gdn": "cca7f3dcdccd8b14",
+            "ple": "86cf91e9d8e9fef3",
+            "tail": "b080d058f454ecfa",
+            "dead": "9e9ef4b497c72990",
+            "pooled": "ece37e86d39920a4",
+            "pooled_full": "3650a9e7ad77318b",
+            "kv": "e55efff1d97b8f13",
+            "ple_prev": "440,279"
+          },
+          "accepted_prefix_trace": [
+            {
+              "position": 511,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                32
+              ],
+              "state": {
+                "L": "512",
+                "gdn": "b400692e3507268e",
+                "ple": "5c8b368d5cf2c7ee",
+                "tail": "28eb8bc4934f1256",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "e19b8a2aaccde237",
+                "pooled_full": "783e4efac43109f8",
+                "kv": "590503db37d0d91b",
+                "mtp": "14650fb0739d0383",
+                "stale": "14650fb0739d0383",
+                "ple_prev": "248069,271"
+              }
+            },
+            {
+              "position": 512,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                6165
+              ],
+              "state": {
+                "L": "513",
+                "gdn": "c2d663d79cb30573",
+                "ple": "7d0c9ba4549cd422",
+                "tail": "d3169a2200590896",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "e19b8a2aaccde237",
+                "pooled_full": "783e4efac43109f8",
+                "kv": "7f2c2fb60a36d911",
+                "mtp": "14650fb0739d0383",
+                "stale": "3452ac1b08ca8383",
+                "ple_prev": "271,32"
+              }
+            },
+            {
+              "position": 513,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                11036
+              ],
+              "state": {
+                "L": "514",
+                "gdn": "ce74a506c8e36b7a",
+                "ple": "f4bfaca6d069b8c2",
+                "tail": "92724e439848635d",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "e19b8a2aaccde237",
+                "pooled_full": "783e4efac43109f8",
+                "kv": "879fde1da1b5e3a7",
+                "mtp": "14650fb0739d0383",
+                "stale": "b1c3695b6c660383",
+                "ple_prev": "32,6165"
+              }
+            },
+            {
+              "position": 514,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                1928
+              ],
+              "state": {
+                "L": "515",
+                "gdn": "fa3d3ca0c1296841",
+                "ple": "c0457d6e5b898898",
+                "tail": "e1801ec0584b965e",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "e19b8a2aaccde237",
+                "pooled_full": "783e4efac43109f8",
+                "kv": "cf930db3c8be1a6a",
+                "mtp": "14650fb0739d0383",
+                "stale": "011a3fe290018383",
+                "ple_prev": "6165,11036"
+              }
+            },
+            {
+              "position": 515,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                1472
+              ],
+              "state": {
+                "L": "516",
+                "gdn": "5a1216d65c39525c",
+                "ple": "e71a2280679ac706",
+                "tail": "e1801ec0584b965e",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "1be77b6cad4e88bd",
+                "pooled_full": "fe3732b46b59b07e",
+                "kv": "08ff754a71fbec1a",
+                "mtp": "14650fb0739d0383",
+                "stale": "14650fb0739d0383",
+                "ple_prev": "11036,1928"
+              }
+            },
+            {
+              "position": 516,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                264
+              ],
+              "state": {
+                "L": "517",
+                "gdn": "dcbc8bdfdc4e2478",
+                "ple": "60e85fadcffa2f10",
+                "tail": "f3a3b8439a64c820",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "1be77b6cad4e88bd",
+                "pooled_full": "fe3732b46b59b07e",
+                "kv": "a47d7801f4c6a4db",
+                "mtp": "14650fb0739d0383",
+                "stale": "3452ac1b08ca8383",
+                "ple_prev": "1928,1472"
+              }
+            },
+            {
+              "position": 517,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                25924
+              ],
+              "state": {
+                "L": "518",
+                "gdn": "dd38bfd7486c78c2",
+                "ple": "c9dfd6aba9bb584c",
+                "tail": "0f4a919a5af262b6",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "1be77b6cad4e88bd",
+                "pooled_full": "fe3732b46b59b07e",
+                "kv": "cbb590d60482aab5",
+                "mtp": "14650fb0739d0383",
+                "stale": "b1c3695b6c660383",
+                "ple_prev": "1472,264"
+              }
+            },
+            {
+              "position": 518,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                11
+              ],
+              "state": {
+                "L": "519",
+                "gdn": "c39442b763b5c40d",
+                "ple": "db4c2391cf071586",
+                "tail": "03ebca708b498252",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "1be77b6cad4e88bd",
+                "pooled_full": "fe3732b46b59b07e",
+                "kv": "dcefad1b6252c6a6",
+                "mtp": "14650fb0739d0383",
+                "stale": "011a3fe290018383",
+                "ple_prev": "264,25924"
+              }
+            },
+            {
+              "position": 519,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                7072
+              ],
+              "state": {
+                "L": "520",
+                "gdn": "5a6ffa92adaa58b3",
+                "ple": "bbb1086ccced16f1",
+                "tail": "03ebca708b498252",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "56eb46ad7a5a5066",
+                "pooled_full": "d3a24db9d93797f5",
+                "kv": "368827d1cacc643a",
+                "mtp": "14650fb0739d0383",
+                "stale": "14650fb0739d0383",
+                "ple_prev": "25924,11"
+              }
+            },
+            {
+              "position": 520,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                48470
+              ],
+              "state": {
+                "L": "521",
+                "gdn": "511494f8f538ba41",
+                "ple": "299d948f1a1e222c",
+                "tail": "fd553f46207649b4",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "56eb46ad7a5a5066",
+                "pooled_full": "d3a24db9d93797f5",
+                "kv": "5e2b1b250dec6761",
+                "mtp": "14650fb0739d0383",
+                "stale": "3452ac1b08ca8383",
+                "ple_prev": "11,7072"
+              }
+            },
+            {
+              "position": 521,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                14855
+              ],
+              "state": {
+                "L": "522",
+                "gdn": "c96d56225bf4695f",
+                "ple": "5d7812398dead930",
+                "tail": "51368536dfc3fbc5",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "56eb46ad7a5a5066",
+                "pooled_full": "d3a24db9d93797f5",
+                "kv": "e795b78244f58db1",
+                "mtp": "14650fb0739d0383",
+                "stale": "b1c3695b6c660383",
+                "ple_prev": "7072,48470"
+              }
+            },
+            {
+              "position": 522,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                421
+              ],
+              "state": {
+                "L": "523",
+                "gdn": "9dbecddae2a42444",
+                "ple": "8317bfc51783c22b",
+                "tail": "b1303139661442f6",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "56eb46ad7a5a5066",
+                "pooled_full": "d3a24db9d93797f5",
+                "kv": "07f5b7a722f316f6",
+                "mtp": "14650fb0739d0383",
+                "stale": "011a3fe290018383",
+                "ple_prev": "48470,14855"
+              }
+            },
+            {
+              "position": 523,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                11690
+              ],
+              "state": {
+                "L": "524",
+                "gdn": "71545a3682ff3d83",
+                "ple": "97b4829487930e19",
+                "tail": "b1303139661442f6",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "ece37e86d39920a4",
+                "pooled_full": "3650a9e7ad77318b",
+                "kv": "9e0127ca153f0f28",
+                "mtp": "14650fb0739d0383",
+                "stale": "14650fb0739d0383",
+                "ple_prev": "14855,421"
+              }
+            },
+            {
+              "position": 524,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                440
+              ],
+              "state": {
+                "L": "525",
+                "gdn": "93949cc83a0fc029",
+                "ple": "6ef6d21a3e04e9b7",
+                "tail": "bf831faf200a2c9a",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "ece37e86d39920a4",
+                "pooled_full": "3650a9e7ad77318b",
+                "kv": "ac8c8403410d606b",
+                "mtp": "14650fb0739d0383",
+                "stale": "3452ac1b08ca8383",
+                "ple_prev": "421,11690"
+              }
+            },
+            {
+              "position": 525,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                279
+              ],
+              "state": {
+                "L": "526",
+                "gdn": "1b7fb0fc6079f95f",
+                "ple": "0d23ec4c60d6ffa4",
+                "tail": "16e67f279e81be19",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "ece37e86d39920a4",
+                "pooled_full": "3650a9e7ad77318b",
+                "kv": "1b099414c978aff1",
+                "mtp": "14650fb0739d0383",
+                "stale": "b1c3695b6c660383",
+                "ple_prev": "11690,440"
+              }
+            },
+            {
+              "position": 526,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                17128
+              ],
+              "state": {
+                "L": "527",
+                "gdn": "cca7f3dcdccd8b14",
+                "ple": "86cf91e9d8e9fef3",
+                "tail": "b080d058f454ecfa",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "ece37e86d39920a4",
+                "pooled_full": "3650a9e7ad77318b",
+                "kv": "e55efff1d97b8f13",
+                "mtp": "14650fb0739d0383",
+                "stale": "011a3fe290018383",
+                "ple_prev": "440,279"
+              }
+            }
+          ]
+        }
+      ],
+      "engine_sha256": "dfc6394251bbe2713f6039d442e290109513447a770884b58657f7e162d2ed60"
+    },
+    {
+      "name": "mtp-window2",
+      "spec": 2,
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "64",
+        "--spec",
+        "2",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55",
+        "--pool-workers",
+        "8",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--mtp-max-t",
+        "2",
+        "--suffix-draft",
+        "0",
+        "--spec-min-p",
+        "0",
+        "--adapt-every",
+        "4",
+        "--adapt-accepted-only"
+      ],
+      "info": {
+        "version": "0.1.41",
+        "context": 8192,
+        "kv": "fp16",
+        "kv_resident": 0,
+        "expert_slots": 3903,
+        "expert_cache_mib": 7615,
+        "expert_slots_primary": 3903,
+        "expert_cache_primary_mib": 7615,
+        "spec": 2,
+        "mtp_max": 2,
+        "lookup": 0,
+        "vram_free_mib": 14025,
+        "cvec": 0,
+        "arena_mib": 0,
+        "pool_workers": 8,
+        "pcie_frac": "0.55",
+        "spec_min_p": "0.00",
+        "conversation_cache_mib": 0,
+        "conversation_cache_slots": 4,
+        "conversation_cache_min_free_mib": 2560,
+        "tail_role_token": -1,
+        "vram_elastic": 0,
+        "engine": "0.1.41"
+      },
+      "records": [
+        {
+          "ids": [
+            32,
+            6165,
+            11036,
+            1928,
+            1472,
+            264,
+            25924,
+            11,
+            7072,
+            48470,
+            14855,
+            421,
+            11690,
+            440,
+            279,
+            17128
+          ],
+          "text": "A computer processes information through a sophisticated, multi-stage pipeline that begins with the processor",
+          "generated": 16,
+          "prompt_tokens": 512,
+          "prompt_ms": 24279.6,
+          "decode_ms": 5231.6,
+          "finish": "length",
+          "drafts_accepted": 6,
+          "drafts_offered": 7,
+          "reused": 0,
+          "hits": 4985,
+          "lookups": 8160,
+          "ram_blobs": 0,
+          "file_blobs": 0,
+          "file_mb": 6492.3,
+          "prompt_read": 512,
+          "offloaded": 0,
+          "state": {
+            "L": "527",
+            "gdn": "cca7f3dcdccd8b14",
+            "ple": "86cf91e9d8e9fef3",
+            "tail": "b080d058f454ecfa",
+            "dead": "9e9ef4b497c72990",
+            "pooled": "ece37e86d39920a4",
+            "pooled_full": "3650a9e7ad77318b",
+            "kv": "e55efff1d97b8f13",
+            "ple_prev": "440,279"
+          },
+          "accepted_prefix_trace": [
+            {
+              "position": 511,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                32
+              ],
+              "state": {
+                "L": "512",
+                "gdn": "b400692e3507268e",
+                "ple": "5c8b368d5cf2c7ee",
+                "tail": "28eb8bc4934f1256",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "e19b8a2aaccde237",
+                "pooled_full": "783e4efac43109f8",
+                "kv": "590503db37d0d91b",
+                "mtp": "e483159485493ffb",
+                "stale": "14650fb0739d0383",
+                "ple_prev": "248069,271"
+              }
+            },
+            {
+              "position": 512,
+              "window": 2,
+              "accepted_drafts": 1,
+              "committed": 2,
+              "token_ids": [
+                6165,
+                11036
+              ],
+              "state": {
+                "L": "514",
+                "gdn": "ce74a506c8e36b7a",
+                "ple": "f4bfaca6d069b8c2",
+                "tail": "92724e439848635d",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "e19b8a2aaccde237",
+                "pooled_full": "783e4efac43109f8",
+                "kv": "879fde1da1b5e3a7",
+                "mtp": "d993c6069ad9bc34",
+                "stale": "b1c3695b6c660383",
+                "ple_prev": "32,6165"
+              }
+            },
+            {
+              "position": 514,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                1928
+              ],
+              "state": {
+                "L": "515",
+                "gdn": "fa3d3ca0c1296841",
+                "ple": "c0457d6e5b898898",
+                "tail": "e1801ec0584b965e",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "e19b8a2aaccde237",
+                "pooled_full": "783e4efac43109f8",
+                "kv": "cf930db3c8be1a6a",
+                "mtp": "975d74186f6457fc",
+                "stale": "011a3fe290018383",
+                "ple_prev": "6165,11036"
+              }
+            },
+            {
+              "position": 515,
+              "window": 2,
+              "accepted_drafts": 1,
+              "committed": 2,
+              "token_ids": [
+                1472,
+                264
+              ],
+              "state": {
+                "L": "517",
+                "gdn": "dcbc8bdfdc4e2478",
+                "ple": "60e85fadcffa2f10",
+                "tail": "f3a3b8439a64c820",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "1be77b6cad4e88bd",
+                "pooled_full": "fe3732b46b59b07e",
+                "kv": "a47d7801f4c6a4db",
+                "mtp": "7ab6c994b66e75dc",
+                "stale": "3452ac1b08ca8383",
+                "ple_prev": "1928,1472"
+              }
+            },
+            {
+              "position": 517,
+              "window": 2,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                25924
+              ],
+              "state": {
+                "L": "518",
+                "gdn": "dd38bfd7486c78c2",
+                "ple": "c9dfd6aba9bb584c",
+                "tail": "0f4a919a5af262b6",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "1be77b6cad4e88bd",
+                "pooled_full": "fe3732b46b59b07e",
+                "kv": "cbb590d60482aab5",
+                "mtp": "d47bd31a224f3db9",
+                "stale": "9c7314818f395a36",
+                "ple_prev": "1472,264"
+              }
+            },
+            {
+              "position": 518,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                11
+              ],
+              "state": {
+                "L": "519",
+                "gdn": "c39442b763b5c40d",
+                "ple": "db4c2391cf071586",
+                "tail": "03ebca708b498252",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "1be77b6cad4e88bd",
+                "pooled_full": "fe3732b46b59b07e",
+                "kv": "dcefad1b6252c6a6",
+                "mtp": "a91e3eda2b6fab12",
+                "stale": "011a3fe290018383",
+                "ple_prev": "264,25924"
+              }
+            },
+            {
+              "position": 519,
+              "window": 2,
+              "accepted_drafts": 1,
+              "committed": 2,
+              "token_ids": [
+                7072,
+                48470
+              ],
+              "state": {
+                "L": "521",
+                "gdn": "511494f8f538ba41",
+                "ple": "299d948f1a1e222c",
+                "tail": "fd553f46207649b4",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "56eb46ad7a5a5066",
+                "pooled_full": "d3a24db9d93797f5",
+                "kv": "5e2b1b250dec6761",
+                "mtp": "da98cc7c7056e57c",
+                "stale": "3452ac1b08ca8383",
+                "ple_prev": "11,7072"
+              }
+            },
+            {
+              "position": 521,
+              "window": 2,
+              "accepted_drafts": 1,
+              "committed": 2,
+              "token_ids": [
+                14855,
+                421
+              ],
+              "state": {
+                "L": "523",
+                "gdn": "9dbecddae2a42444",
+                "ple": "8317bfc51783c22b",
+                "tail": "b1303139661442f6",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "56eb46ad7a5a5066",
+                "pooled_full": "d3a24db9d93797f5",
+                "kv": "07f5b7a722f316f6",
+                "mtp": "d9b543873daa8c9f",
+                "stale": "011a3fe290018383",
+                "ple_prev": "48470,14855"
+              }
+            },
+            {
+              "position": 523,
+              "window": 2,
+              "accepted_drafts": 1,
+              "committed": 2,
+              "token_ids": [
+                11690,
+                440
+              ],
+              "state": {
+                "L": "525",
+                "gdn": "93949cc83a0fc029",
+                "ple": "6ef6d21a3e04e9b7",
+                "tail": "bf831faf200a2c9a",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "ece37e86d39920a4",
+                "pooled_full": "3650a9e7ad77318b",
+                "kv": "ac8c8403410d606b",
+                "mtp": "1474efa6cbc16a32",
+                "stale": "3452ac1b08ca8383",
+                "ple_prev": "421,11690"
+              }
+            },
+            {
+              "position": 525,
+              "window": 2,
+              "accepted_drafts": 1,
+              "committed": 2,
+              "token_ids": [
+                279,
+                17128
+              ],
+              "state": {
+                "L": "527",
+                "gdn": "cca7f3dcdccd8b14",
+                "ple": "86cf91e9d8e9fef3",
+                "tail": "b080d058f454ecfa",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "ece37e86d39920a4",
+                "pooled_full": "3650a9e7ad77318b",
+                "kv": "e55efff1d97b8f13",
+                "mtp": "c6593f7e71b3e092",
+                "stale": "011a3fe290018383",
+                "ple_prev": "440,279"
+              }
+            }
+          ]
+        }
+      ],
+      "engine_sha256": "dfc6394251bbe2713f6039d442e290109513447a770884b58657f7e162d2ed60"
+    },
+    {
+      "name": "mtp-window3",
+      "spec": 3,
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "64",
+        "--spec",
+        "3",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55",
+        "--pool-workers",
+        "8",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--mtp-max-t",
+        "3",
+        "--suffix-draft",
+        "0",
+        "--spec-min-p",
+        "0",
+        "--adapt-every",
+        "4",
+        "--adapt-accepted-only"
+      ],
+      "info": {
+        "version": "0.1.41",
+        "context": 8192,
+        "kv": "fp16",
+        "kv_resident": 0,
+        "expert_slots": 3903,
+        "expert_cache_mib": 7615,
+        "expert_slots_primary": 3903,
+        "expert_cache_primary_mib": 7615,
+        "spec": 3,
+        "mtp_max": 3,
+        "lookup": 0,
+        "vram_free_mib": 13983,
+        "cvec": 0,
+        "arena_mib": 0,
+        "pool_workers": 8,
+        "pcie_frac": "0.55",
+        "spec_min_p": "0.00",
+        "conversation_cache_mib": 0,
+        "conversation_cache_slots": 4,
+        "conversation_cache_min_free_mib": 2560,
+        "tail_role_token": -1,
+        "vram_elastic": 0,
+        "engine": "0.1.41"
+      },
+      "records": [
+        {
+          "ids": [
+            32,
+            6165,
+            11036,
+            1928,
+            1472,
+            264,
+            25924,
+            11,
+            7072,
+            48470,
+            14855,
+            421,
+            11690,
+            440,
+            279,
+            17128
+          ],
+          "text": "A computer processes information through a sophisticated, multi-stage pipeline that begins with the processor",
+          "generated": 16,
+          "prompt_tokens": 512,
+          "prompt_ms": 25374.5,
+          "decode_ms": 4591.5,
+          "finish": "length",
+          "drafts_accepted": 7,
+          "drafts_offered": 8,
+          "reused": 0,
+          "hits": 5010,
+          "lookups": 8160,
+          "ram_blobs": 0,
+          "file_blobs": 0,
+          "file_mb": 6157.9,
+          "prompt_read": 512,
+          "offloaded": 0,
+          "state": {
+            "L": "527",
+            "gdn": "cca7f3dcdccd8b14",
+            "ple": "86cf91e9d8e9fef3",
+            "tail": "b080d058f454ecfa",
+            "dead": "9e9ef4b497c72990",
+            "pooled": "ece37e86d39920a4",
+            "pooled_full": "3650a9e7ad77318b",
+            "kv": "e55efff1d97b8f13",
+            "ple_prev": "440,279"
+          },
+          "accepted_prefix_trace": [
+            {
+              "position": 511,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                32
+              ],
+              "state": {
+                "L": "512",
+                "gdn": "b400692e3507268e",
+                "ple": "5c8b368d5cf2c7ee",
+                "tail": "28eb8bc4934f1256",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "e19b8a2aaccde237",
+                "pooled_full": "783e4efac43109f8",
+                "kv": "590503db37d0d91b",
+                "mtp": "e483159485493ffb",
+                "stale": "14650fb0739d0383",
+                "ple_prev": "248069,271"
+              }
+            },
+            {
+              "position": 512,
+              "window": 3,
+              "accepted_drafts": 1,
+              "committed": 2,
+              "token_ids": [
+                6165,
+                11036
+              ],
+              "state": {
+                "L": "514",
+                "gdn": "ce74a506c8e36b7a",
+                "ple": "f4bfaca6d069b8c2",
+                "tail": "92724e439848635d",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "e19b8a2aaccde237",
+                "pooled_full": "783e4efac43109f8",
+                "kv": "879fde1da1b5e3a7",
+                "mtp": "7ede31b0050427a8",
+                "stale": "f84472c6d6c63fb8",
+                "ple_prev": "32,6165"
+              }
+            },
+            {
+              "position": 514,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                1928
+              ],
+              "state": {
+                "L": "515",
+                "gdn": "fa3d3ca0c1296841",
+                "ple": "c0457d6e5b898898",
+                "tail": "e1801ec0584b965e",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "e19b8a2aaccde237",
+                "pooled_full": "783e4efac43109f8",
+                "kv": "cf930db3c8be1a6a",
+                "mtp": "9017c597205aaccf",
+                "stale": "011a3fe290018383",
+                "ple_prev": "6165,11036"
+              }
+            },
+            {
+              "position": 515,
+              "window": 3,
+              "accepted_drafts": 2,
+              "committed": 3,
+              "token_ids": [
+                1472,
+                264,
+                25924
+              ],
+              "state": {
+                "L": "518",
+                "gdn": "dd38bfd7486c78c2",
+                "ple": "c9dfd6aba9bb584c",
+                "tail": "0f4a919a5af262b6",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "1be77b6cad4e88bd",
+                "pooled_full": "fe3732b46b59b07e",
+                "kv": "cbb590d60482aab5",
+                "mtp": "d42cb2d16828a3a3",
+                "stale": "b1c3695b6c660383",
+                "ple_prev": "1472,264"
+              }
+            },
+            {
+              "position": 518,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                11
+              ],
+              "state": {
+                "L": "519",
+                "gdn": "c39442b763b5c40d",
+                "ple": "db4c2391cf071586",
+                "tail": "03ebca708b498252",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "1be77b6cad4e88bd",
+                "pooled_full": "fe3732b46b59b07e",
+                "kv": "dcefad1b6252c6a6",
+                "mtp": "5c0c484c0fd24b48",
+                "stale": "011a3fe290018383",
+                "ple_prev": "264,25924"
+              }
+            },
+            {
+              "position": 519,
+              "window": 3,
+              "accepted_drafts": 2,
+              "committed": 3,
+              "token_ids": [
+                7072,
+                48470,
+                14855
+              ],
+              "state": {
+                "L": "522",
+                "gdn": "c96d56225bf4695f",
+                "ple": "5d7812398dead930",
+                "tail": "51368536dfc3fbc5",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "56eb46ad7a5a5066",
+                "pooled_full": "d3a24db9d93797f5",
+                "kv": "e795b78244f58db1",
+                "mtp": "01dc1712a01ed564",
+                "stale": "b1c3695b6c660383",
+                "ple_prev": "7072,48470"
+              }
+            },
+            {
+              "position": 522,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                421
+              ],
+              "state": {
+                "L": "523",
+                "gdn": "9dbecddae2a42444",
+                "ple": "8317bfc51783c22b",
+                "tail": "b1303139661442f6",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "56eb46ad7a5a5066",
+                "pooled_full": "d3a24db9d93797f5",
+                "kv": "07f5b7a722f316f6",
+                "mtp": "633d64532b987682",
+                "stale": "011a3fe290018383",
+                "ple_prev": "48470,14855"
+              }
+            },
+            {
+              "position": 523,
+              "window": 3,
+              "accepted_drafts": 2,
+              "committed": 3,
+              "token_ids": [
+                11690,
+                440,
+                279
+              ],
+              "state": {
+                "L": "526",
+                "gdn": "1b7fb0fc6079f95f",
+                "ple": "0d23ec4c60d6ffa4",
+                "tail": "16e67f279e81be19",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "ece37e86d39920a4",
+                "pooled_full": "3650a9e7ad77318b",
+                "kv": "1b099414c978aff1",
+                "mtp": "915220977d07e4ec",
+                "stale": "b1c3695b6c660383",
+                "ple_prev": "11690,440"
+              }
+            },
+            {
+              "position": 526,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                17128
+              ],
+              "state": {
+                "L": "527",
+                "gdn": "cca7f3dcdccd8b14",
+                "ple": "86cf91e9d8e9fef3",
+                "tail": "b080d058f454ecfa",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "ece37e86d39920a4",
+                "pooled_full": "3650a9e7ad77318b",
+                "kv": "e55efff1d97b8f13",
+                "mtp": "652c7bc6c6eebc80",
+                "stale": "011a3fe290018383",
+                "ple_prev": "440,279"
+              }
+            }
+          ]
+        }
+      ],
+      "engine_sha256": "dfc6394251bbe2713f6039d442e290109513447a770884b58657f7e162d2ed60"
+    },
+    {
+      "name": "mtp-window4",
+      "spec": 4,
+      "args": [
+        "--pack",
+        "/home/calvin/models/strata-orin-validation/pack",
+        "--native",
+        "/home/calvin/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "--ple-gguf",
+        "/home/calvin/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "--expert-profile",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin",
+        "--expert-cache",
+        "3000",
+        "--prefill",
+        "64",
+        "--spec",
+        "4",
+        "--max-context",
+        "8192",
+        "--mmap-experts",
+        "--prompt-cache",
+        "6",
+        "--vram-reserve-mib",
+        "3072",
+        "--pcie-frac",
+        "0.55",
+        "--pool-workers",
+        "8",
+        "--mtp",
+        "/home/calvin/models/strata-orin-validation/mtp/rt",
+        "--mtp-max-t",
+        "4",
+        "--suffix-draft",
+        "0",
+        "--spec-min-p",
+        "0",
+        "--adapt-every",
+        "4",
+        "--adapt-accepted-only"
+      ],
+      "info": {
+        "version": "0.1.41",
+        "context": 8192,
+        "kv": "fp16",
+        "kv_resident": 0,
+        "expert_slots": 3903,
+        "expert_cache_mib": 7615,
+        "expert_slots_primary": 3903,
+        "expert_cache_primary_mib": 7615,
+        "spec": 4,
+        "mtp_max": 4,
+        "lookup": 0,
+        "vram_free_mib": 13998,
+        "cvec": 0,
+        "arena_mib": 0,
+        "pool_workers": 8,
+        "pcie_frac": "0.55",
+        "spec_min_p": "0.00",
+        "conversation_cache_mib": 0,
+        "conversation_cache_slots": 4,
+        "conversation_cache_min_free_mib": 2560,
+        "tail_role_token": -1,
+        "vram_elastic": 0,
+        "engine": "0.1.41"
+      },
+      "records": [
+        {
+          "ids": [
+            32,
+            6165,
+            11036,
+            1928,
+            1472,
+            264,
+            25924,
+            11,
+            7072,
+            48470,
+            14855,
+            421,
+            11690,
+            440,
+            279,
+            17128
+          ],
+          "text": "A computer processes information through a sophisticated, multi-stage pipeline that begins with the processor",
+          "generated": 16,
+          "prompt_tokens": 512,
+          "prompt_ms": 24045.0,
+          "decode_ms": 4257.0,
+          "finish": "length",
+          "drafts_accepted": 8,
+          "drafts_offered": 11,
+          "reused": 0,
+          "hits": 5586,
+          "lookups": 9120,
+          "ram_blobs": 0,
+          "file_blobs": 0,
+          "file_mb": 6430.5,
+          "prompt_read": 512,
+          "offloaded": 0,
+          "state": {
+            "L": "527",
+            "gdn": "cca7f3dcdccd8b14",
+            "ple": "86cf91e9d8e9fef3",
+            "tail": "b080d058f454ecfa",
+            "dead": "9e9ef4b497c72990",
+            "pooled": "ece37e86d39920a4",
+            "pooled_full": "3650a9e7ad77318b",
+            "kv": "e55efff1d97b8f13",
+            "ple_prev": "440,279"
+          },
+          "accepted_prefix_trace": [
+            {
+              "position": 511,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                32
+              ],
+              "state": {
+                "L": "512",
+                "gdn": "b400692e3507268e",
+                "ple": "5c8b368d5cf2c7ee",
+                "tail": "28eb8bc4934f1256",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "e19b8a2aaccde237",
+                "pooled_full": "783e4efac43109f8",
+                "kv": "590503db37d0d91b",
+                "mtp": "e483159485493ffb",
+                "stale": "14650fb0739d0383",
+                "ple_prev": "248069,271"
+              }
+            },
+            {
+              "position": 512,
+              "window": 3,
+              "accepted_drafts": 1,
+              "committed": 2,
+              "token_ids": [
+                6165,
+                11036
+              ],
+              "state": {
+                "L": "514",
+                "gdn": "ce74a506c8e36b7a",
+                "ple": "f4bfaca6d069b8c2",
+                "tail": "92724e439848635d",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "e19b8a2aaccde237",
+                "pooled_full": "783e4efac43109f8",
+                "kv": "879fde1da1b5e3a7",
+                "mtp": "9f7d9435e4e0d166",
+                "stale": "f84472c6d6c63fb8",
+                "ple_prev": "32,6165"
+              }
+            },
+            {
+              "position": 514,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                1928
+              ],
+              "state": {
+                "L": "515",
+                "gdn": "fa3d3ca0c1296841",
+                "ple": "c0457d6e5b898898",
+                "tail": "e1801ec0584b965e",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "e19b8a2aaccde237",
+                "pooled_full": "783e4efac43109f8",
+                "kv": "cf930db3c8be1a6a",
+                "mtp": "9017c597205aaccf",
+                "stale": "011a3fe290018383",
+                "ple_prev": "6165,11036"
+              }
+            },
+            {
+              "position": 515,
+              "window": 4,
+              "accepted_drafts": 2,
+              "committed": 3,
+              "token_ids": [
+                1472,
+                264,
+                25924
+              ],
+              "state": {
+                "L": "518",
+                "gdn": "dd38bfd7486c78c2",
+                "ple": "c9dfd6aba9bb584c",
+                "tail": "0f4a919a5af262b6",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "1be77b6cad4e88bd",
+                "pooled_full": "fe3732b46b59b07e",
+                "kv": "cbb590d60482aab5",
+                "mtp": "033649fb6c4bc36f",
+                "stale": "6e3bd4cc268d6014",
+                "ple_prev": "1472,264"
+              }
+            },
+            {
+              "position": 518,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                11
+              ],
+              "state": {
+                "L": "519",
+                "gdn": "c39442b763b5c40d",
+                "ple": "db4c2391cf071586",
+                "tail": "03ebca708b498252",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "1be77b6cad4e88bd",
+                "pooled_full": "fe3732b46b59b07e",
+                "kv": "dcefad1b6252c6a6",
+                "mtp": "5c0c484c0fd24b48",
+                "stale": "011a3fe290018383",
+                "ple_prev": "264,25924"
+              }
+            },
+            {
+              "position": 519,
+              "window": 4,
+              "accepted_drafts": 2,
+              "committed": 3,
+              "token_ids": [
+                7072,
+                48470,
+                14855
+              ],
+              "state": {
+                "L": "522",
+                "gdn": "c96d56225bf4695f",
+                "ple": "5d7812398dead930",
+                "tail": "51368536dfc3fbc5",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "56eb46ad7a5a5066",
+                "pooled_full": "d3a24db9d93797f5",
+                "kv": "e795b78244f58db1",
+                "mtp": "3a7458c4193e30aa",
+                "stale": "bcc47c0b6f6eb420",
+                "ple_prev": "7072,48470"
+              }
+            },
+            {
+              "position": 522,
+              "window": 1,
+              "accepted_drafts": 0,
+              "committed": 1,
+              "token_ids": [
+                421
+              ],
+              "state": {
+                "L": "523",
+                "gdn": "9dbecddae2a42444",
+                "ple": "8317bfc51783c22b",
+                "tail": "b1303139661442f6",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "56eb46ad7a5a5066",
+                "pooled_full": "d3a24db9d93797f5",
+                "kv": "07f5b7a722f316f6",
+                "mtp": "633d64532b987682",
+                "stale": "011a3fe290018383",
+                "ple_prev": "48470,14855"
+              }
+            },
+            {
+              "position": 523,
+              "window": 4,
+              "accepted_drafts": 3,
+              "committed": 4,
+              "token_ids": [
+                11690,
+                440,
+                279,
+                17128
+              ],
+              "state": {
+                "L": "527",
+                "gdn": "cca7f3dcdccd8b14",
+                "ple": "86cf91e9d8e9fef3",
+                "tail": "b080d058f454ecfa",
+                "dead": "9e9ef4b497c72990",
+                "pooled": "ece37e86d39920a4",
+                "pooled_full": "3650a9e7ad77318b",
+                "kv": "e55efff1d97b8f13",
+                "mtp": "59083f1facd8cbb5",
+                "stale": "011a3fe290018383",
+                "ple_prev": "440,279"
+              }
+            }
+          ]
+        }
+      ],
+      "engine_sha256": "dfc6394251bbe2713f6039d442e290109513447a770884b58657f7e162d2ed60"
+    }
+  ],
+  "comparisons": [
+    {
+      "candidate": "mtp-window2",
+      "token_ids_equal": true,
+      "final_state_equal": true,
+      "final_state_differing_fields": [],
+      "drafts_offered": 7,
+      "drafts_accepted": 6,
+      "matched_commit_boundaries": [
+        {
+          "generated_prefix_tokens": 1,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 3,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 4,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 6,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 7,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 8,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 10,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 12,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 14,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 16,
+          "equal": true,
+          "differing_state_fields": []
+        }
+      ],
+      "failures": []
+    },
+    {
+      "candidate": "mtp-window3",
+      "token_ids_equal": true,
+      "final_state_equal": true,
+      "final_state_differing_fields": [],
+      "drafts_offered": 8,
+      "drafts_accepted": 7,
+      "matched_commit_boundaries": [
+        {
+          "generated_prefix_tokens": 1,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 3,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 4,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 7,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 8,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 11,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 12,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 15,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 16,
+          "equal": true,
+          "differing_state_fields": []
+        }
+      ],
+      "failures": []
+    },
+    {
+      "candidate": "mtp-window4",
+      "token_ids_equal": true,
+      "final_state_equal": true,
+      "final_state_differing_fields": [],
+      "drafts_offered": 11,
+      "drafts_accepted": 8,
+      "matched_commit_boundaries": [
+        {
+          "generated_prefix_tokens": 1,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 3,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 4,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 7,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 8,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 11,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 12,
+          "equal": true,
+          "differing_state_fields": []
+        },
+        {
+          "generated_prefix_tokens": 16,
+          "equal": true,
+          "differing_state_fields": []
+        }
+      ],
+      "failures": []
+    }
+  ],
+  "passed": true
+}
