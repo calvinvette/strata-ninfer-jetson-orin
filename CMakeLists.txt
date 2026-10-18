@@ -1041,6 +1041,10 @@ if(STRATA_ENABLE_CUDA OR STRATA_ENABLE_HIP)
     add_test(NAME captured_graph_trace_test COMMAND captured_graph_trace_test)
     set_tests_properties(captured_graph_trace_test PROPERTIES ENVIRONMENT "STRATA_INTEGRATION_TRACE=1")
 
+    add_executable(graph_registry_lifecycle_test tests/core/graph_registry_lifecycle_test.cu)
+    target_link_libraries(graph_registry_lifecycle_test PRIVATE strata_engine ${_strata_gpu_runtime_target})
+    add_test(NAME graph_registry_lifecycle_test COMMAND graph_registry_lifecycle_test)
+
     add_executable(session_loop_scratch_trace_test tests/core/session_loop_scratch_trace_test.cpp)
     target_link_libraries(session_loop_scratch_trace_test PRIVATE strata_engine ${_strata_gpu_runtime_target})
     add_test(NAME session_loop_scratch_trace_test COMMAND session_loop_scratch_trace_test)
