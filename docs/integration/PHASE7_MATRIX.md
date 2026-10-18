@@ -3,9 +3,10 @@
 This matrix summarizes retained Orin tests for the Phase 7 plan. It records
 individual tested cells, not a general product support guarantee. Phase 6 has
 selected one bounded Q2_0 profile for Phase 7 qualification; that selection is
-not product support or a default. The Phase 7 exit gates remain open. Each
-result link contains its request artifacts, runner result and telemetry unless
-noted otherwise.
+not product support or a default. Phase 7 is complete for the bounded cells in
+this matrix; see the [closeout](PHASE7_CLOSEOUT.md). This is not a general
+support guarantee. Each result link contains request artifacts, runner result
+and telemetry unless noted otherwise.
 
 ## Profile selected for qualification
 
@@ -117,6 +118,5 @@ one quantization, not a comparison between quantizations or inference engines.
 - Performance comparisons, energy attribution and cross-device conclusions
   require their own paired measurements; none follows from this matrix alone.
 
-Phase 7 can close only after Phase 6 completes profile-selection work and the
-remaining quality, sustained-service and support-boundary claims are explicitly
-bounded.
+Phase 7 closes for the bounded matrix in [its closeout](PHASE7_CLOSEOUT.md).
+Reopen it if model, profile, supported features or hardware scope changes.

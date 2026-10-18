@@ -193,8 +193,10 @@ exclusions recorded. Phase 3 is closed for the tested Orin Q2_0 scope under
 [its closeout](PHASE3_CLOSEOUT.md); reopen it if allocation lifetimes, transfer
 defaults, graph-disable support or model/backend scope changes. Phase 4 is
 closed for the tested opt-in kernel and CPU candidates under
-[its closeout](PHASE4_CLOSEOUT.md); no performance default was promoted. Continue
-Phase 5 state/graph qualification and Phase 6 interaction testing before
-selecting any serving profile. Do not change kernels, quantization, model,
-toolchain and clocks simultaneously; select each candidate from measured
-bottlenecks and qualify its contract first.
+[its closeout](PHASE4_CLOSEOUT.md); no performance default was promoted. Phase 7
+is closed for its bounded Orin matrix under [its closeout](PHASE7_CLOSEOUT.md);
+reopen it if the model, profile, feature or hardware scope changes. Phases 5 and
+6 remain open, so Phase 8 must state those exclusions for any release feature
+that depends on them. Do not change kernels, quantization, model, toolchain and
+clocks simultaneously; select each candidate from measured bottlenecks and
+qualify its contract first.

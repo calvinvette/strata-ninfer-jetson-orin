@@ -6,8 +6,9 @@ deliverable was an integration plan and an auditable source/evidence import.
 This remains an active integration and qualification effort, not a claim of
 combined-runtime speedup. Phases 1 and 2 are complete, and Phase 3 is closed for
 the tested Orin Q2_0 scope. Phase 4 is closed for its tested candidates; Phases
-5 and 6 remain open, and Phase 7 has IQ1_M and Q2_0 long-context retrieval,
-task-quality and sustained-service evidence but remains in progress. Phase 8
+5 and 6 remain open. Phase 7 is complete for its bounded Orin qualification
+matrix under the [closeout](PHASE7_CLOSEOUT.md); that is not a general product
+support claim. Phase 8
 backend builds are recorded; runtime and release gates remain open. Current
 admission, transfer, profiling, speculation and service evidence is summarized in
 [status](STATUS.md). See [control reproduction](PHASE1.md) and
@@ -16,7 +17,9 @@ and lessons for a future Strata + Splash integration.
 
 Start with the [development plan](PLAN.md), [architecture](ARCHITECTURE.md),
 [benchmark protocol](BENCHMARKS.md), [import map](IMPORT_MAP.md), and
-[current status](STATUS.md) and the [Phase 7 evidence matrix](PHASE7_MATRIX.md). Record architectural choices in [decisions](DECISIONS.md).
+[current status](STATUS.md), [Phase 7 evidence matrix](PHASE7_MATRIX.md) and
+[Phase 7 closeout](PHASE7_CLOSEOUT.md). Record architectural choices in
+[decisions](DECISIONS.md).
 The [bootstrap validation](BOOTSTRAP_VALIDATION.md) records the checks performed.
 
 | Project input | Pinned revision | Purpose |

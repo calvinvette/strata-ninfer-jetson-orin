@@ -1,9 +1,10 @@
 # Integration status
 
 Updated: 2026-10-18. Phases 1 through 4 are complete for their documented tested
-Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 has
-initial long-context recall and sustained-service evidence and remains in
-progress; Phases 5 and 6 also remain open.
+Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 is
+complete for its bounded Orin qualification matrix under [its closeout]
+(PHASE7_CLOSEOUT.md); Phases 5 and 6 remain open. This records tested cells,
+not general product support.
 
 Phase 6 has selected one bounded Q2_0 test profile for Phase 7 qualification:
 FP16 KV, 8K context, MTP off, 3,000 expert slots, prefill chunk 128, eight
@@ -23,8 +24,8 @@ and [active-prefill report](../../bench/results/2026-10-17-phase7-q2-prefill128/
 The selected profile also passed three sequential fresh-service teardown
 cycles with independent response and process-exit review; see the
 [teardown report](../../bench/results/2026-10-17-phase7-q2-prefill128/teardown-3cycle/README.md).
-Broader quality checks remain open. Process-energy attribution and broader
-Phase 6 interactions also remain open.
+The bounded Phase 7 matrix is now complete. Process-energy attribution and
+broader Phase 6 interactions remain open.
 
 The selected Q2_0 MTP-off profile also passed [16K](../../bench/results/2026-10-17-phase7-q2-prefill128-16k-selected-profile/README.md),
 [32K](../../bench/results/2026-10-17-phase7-q2-prefill128-32k-selected-profile/README.md),
@@ -43,8 +44,8 @@ held-out [32K retrieval-plus-arithmetic task](../../bench/results/2026-10-17-pha
 all three markers appeared once and in order, the independent suffix oracle
 returned `1971`, and same-service recovery passed. That run retained 17.42/11.48
 GiB minimum host/admission availability over 1,081 samples with zero cgroup
-events. Broader quality coverage, repetitions and larger selected-profile
-contexts remain open. Phase 7 remains in progress.
+events. The separately tested contexts and quality cells are not a general
+support claim; see the Phase 7 closeout for boundaries and exclusions.
 
 The selected Q2_0 MTP-off profile also passed one [256K retrieval and recovery
 cell](../../bench/results/2026-10-17-phase7-q2-prefill128-256k-selected-profile/README.md):
@@ -53,8 +54,8 @@ prompt, followed by same-service `RECOVERED`. Independent review passed. Across
 31,442 samples, minimum host/admission availability was 11.64/11.64 GiB and
 cgroup memory events remained zero. Engine prefill took 32,851.9 seconds
 (7.3 tokens/s). This is one functional capacity point with no energy
-attribution, not repeated quality or sustained-service evidence; Phase 7 remains
-open.
+attribution, not repeated quality or sustained 256K evidence; Phase 7 remains
+closed for the bounded matrix.
 
 The selected profile also passed one [128K held-out retrieval, arithmetic and
 recovery task](../../bench/results/2026-10-18-phase7-q2-prefill128-128k-heldout-quality/README.md).
@@ -64,7 +65,7 @@ independent suffix oracle verified `417 + 638 + 925 = 1980`. Same-service
 recovery returned `RECOVERED`. Across 5,528 samples, minimum host/admission
 availability was 14.64/11.41 GiB with zero cgroup events. Prefill took 5,751.5
 seconds at 20.9 tokens/s. This is one synthetic quality cell, not a broad score
-or performance comparison; Phase 7 remains open.
+or performance comparison; see the Phase 7 closeout for scope.
 
 The selected Q2_0 MTP-off profile also passed one [64K retrieval-plus-arithmetic
 replication](../../bench/results/2026-10-17-phase7-q2-prefill128-64k-quality-mtp-off/README.md)
@@ -73,7 +74,7 @@ the three codes in order and the independently checked suffix sum `1971`, then
 the same service returned `RECOVERED`. Minimum host/admission availability was
 16.71/10.74 GiB across 2,224 samples, with zero cgroup events. This is one
 profile-specific replication, not a new held-out prompt or broad quality score;
-Phase 7 remains open.
+broader quality is outside the bounded Phase 7 closeout.
 
 The selected profile also passed one [two-slot streamed API overlap
 check](../../bench/results/2026-10-17-phase7-q2-prefill128-concurrency2-selected-profile/README.md)
@@ -82,8 +83,8 @@ passed exact prompt-count and marker checks; metrics observed two requests in
 two active slots. Minimum host/admission availability was 16.86/8.32 GiB over
 1,927 samples, with zero cgroup events. The two-slot requests took longer than
 the serial controls in this single sequence, so it provides functional overlap
-evidence and no latency benefit. Repeated concurrency and broader quality
-checks remain open; Phase 7 remains in progress.
+evidence and no latency benefit. Repeated concurrency and broader quality are
+not claimed; see the Phase 7 closeout for exclusions.
 
 A same-day [Coder GGUF quantization comparison](../../bench/results/2026-10-17-phase6-coder-quant-comparison/README.md)
 then compared Q2_0 and IQ1_M from the same pinned Hugging Face repository
