@@ -65,6 +65,8 @@ def main():
                         help='Python executable with the server dependencies installed')
     parser.add_argument('--no-trace', action='store_true',
                         help='disable STRATA_TRACE for request timing')
+    parser.add_argument('--sample-clocks', action='store_true',
+                        help='record read-only CPU/GPU/EMC clock observations')
     args = parser.parse_args()
     if args.rounds < 3 or args.timeout < 1:
         parser.error('screening requires at least three measured rounds and a positive timeout')
@@ -97,7 +99,7 @@ def main():
         runtime_python = str(args.python.resolve())
         command = api_command(args.python.resolve(), tools, cfgpath, args.workloads,
                               request_path, args.rounds, timeout_s=args.timeout,
-                              no_trace=args.no_trace)
+                              no_trace=args.no_trace, sample_clocks=args.sample_clocks)
         row = dict(cell, order=index, status='not_run', command=command)
         campaign['cells'].append(row)
         write_result(manifest, campaign)

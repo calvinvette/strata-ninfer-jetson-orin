@@ -40,6 +40,14 @@ class CacheContextScreenTest(unittest.TestCase):
         self.assertEqual(untraced[-1], '--no-trace')
         self.assertEqual(untraced[untraced.index('--timeout') + 1], '1800')
 
+    def test_clock_sampling_is_opt_in_and_reaches_supervisor(self):
+        root = Path('/tmp/cache-context-test')
+        command = api_command(Path('/usr/bin/python3'), root / 'tools', root / 'config.json',
+                              root / 'workloads.json', root / 'cell' / 'requests.json', 3,
+                              sample_clocks=True)
+        self.assertIn('--sample-clocks', command)
+        self.assertLess(command.index('--sample-clocks'), command.index('--'))
+
 
 if __name__ == '__main__':
     unittest.main()
