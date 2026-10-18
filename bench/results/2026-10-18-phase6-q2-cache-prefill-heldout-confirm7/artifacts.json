@@ -1,0 +1,55 @@
+{
+  "campaign_driver_commit": "926e010c57e9cecbdff4edf935677e2f31ee082f",
+  "candidate_source_commit": "c1eb609d73f6ef4a1f596a6d7984e8e9522208dd",
+  "candidate_service_sha256": "dfc6394251bbe2713f6039d442e290109513447a770884b58657f7e162d2ed60",
+  "model": {
+    "repo": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+    "revision": "5348543e0147355ac9cbcb031184a3546350988e",
+    "format": "Q2_0 GGUF, two shards",
+    "shards": [
+      {
+        "file": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+        "sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720"
+      },
+      {
+        "file": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+        "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+      }
+    ],
+    "ple_pack_dense_sha256": "a43d7d0b69525335f4b000d5197a1d3aefcd3c0014fc3e12b3455e0a5d827ba2",
+    "expert_profile_sha256": "b3e62120218cd96d175a0547530158869177dd2164b22b40f32bea7d7e85fb8c"
+  },
+  "profile": "Q2_0, FP16 KV, MTP off, 8192 context, exact expert cache slots 3000/3500, 8 workers, prompt cache disabled, adaptive swaps disabled; prefill chunks 32/128.",
+  "host": "NVIDIA Jetson AGX Orin, aarch64, CUDA 12.6 / driver 540.4.0",
+  "workload": {
+    "file": "workload.json",
+    "sha256": "91a7189a9e10e127d8350786657c508abaef615ffd1b7277b3d56f182591b294",
+    "actual_prompt_tokens": 7506,
+    "max_generation_tokens": 48,
+    "expected_codes": [
+      "BRONZE-PINE-582",
+      "VIOLET-CANYON-146",
+      "CRIMSON-HARBOR-839"
+    ]
+  },
+  "config_sha256": "24430ee0fb2753c5cb3824a13c7c5a685f442446aaa77e597b233a95dc8bf891",
+  "warmup_workload_sha256": "b58a24f9037303d34a7f1fa3b30cd808edbeec2be3badaa4453c9fee0dd15d9c",
+  "confirmation_design": {
+    "blocks": 7,
+    "cells_per_block": 4,
+    "cache_slots": [
+      3000,
+      3500
+    ],
+    "prefill_chunks": [
+      32,
+      128
+    ],
+    "randomized_within_block": true,
+    "fresh_service_per_cell": true,
+    "MemoryMax_GiB": 28,
+    "host_headroom_floor_GiB": 6
+  },
+  "artifact_location": "Model GGUF, pack, expert profile and tokenizer remain under ~/models/strata-orin-validation.",
+  "status": "running; outcome not yet analyzed"
+}
