@@ -1,6 +1,6 @@
 # Integration status
 
-Updated: 2026-10-17. Phases 1 through 4 are complete for their documented tested
+Updated: 2026-10-18. Phases 1 through 4 are complete for their documented tested
 Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 has
 initial long-context recall and sustained-service evidence and remains in
 progress; Phases 5 and 6 also remain open.
@@ -45,6 +45,17 @@ returned `1971`, and same-service recovery passed. That run retained 17.42/11.48
 GiB minimum host/admission availability over 1,081 samples with zero cgroup
 events. Broader quality coverage, repetitions and larger selected-profile
 contexts remain open. Phase 7 remains in progress.
+
+The selected Q2_0 MTP-off profile also passed one [256K retrieval and recovery
+cell](../../bench/results/2026-10-17-phase7-q2-prefill128-256k-selected-profile/README.md):
+all three markers were returned once and in order from a 240,286-token uncached
+prompt, followed by same-service `RECOVERED`. Independent review passed. Across
+31,442 samples, minimum host/admission availability was 11.64/11.64 GiB and
+cgroup memory events remained zero. Engine prefill took 32,851.9 seconds
+(7.3 tokens/s). This is one functional capacity point with no energy
+attribution, not repeated quality or sustained-service evidence; Phase 7 remains
+open.
+
 
 The selected Q2_0 MTP-off profile also passed one [64K retrieval-plus-arithmetic
 replication](../../bench/results/2026-10-17-phase7-q2-prefill128-64k-quality-mtp-off/README.md)

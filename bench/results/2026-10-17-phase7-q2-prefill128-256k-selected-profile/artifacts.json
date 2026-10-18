@@ -1,0 +1,38 @@
+{
+  "checkout_commit": "7f930d9fb3b3896b8f29cf3f97501f8e35cc51cf",
+  "candidate_build_source_commit": "53d7c7a419f214b4133a2319bdcdf127f23ba1c4",
+  "candidate_binary_sha256": "dfc6394251bbe2713f6039d442e290109513447a770884b58657f7e162d2ed60",
+  "host": "NVIDIA Jetson AGX Orin, aarch64, CUDA 12.6 / driver 540.4.0",
+  "model": {
+    "repo": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+    "revision": "5348543e0147355ac9cbcb031184a3546350988e",
+    "format": "Q2_0 GGUF, two shards",
+    "shards": [
+      {"file": "Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf", "sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720"},
+      {"file": "Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf", "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"}
+    ],
+    "ple_pack_dense_sha256": "a43d7d0b69525335f4b000d5197a1d3aefcd3c0014fc3e12b3455e0a5d827ba2",
+    "expert_profile_sha256": "b3e62120218cd96d175a0547530158869177dd2164b22b40f32bea7d7e85fb8c"
+  },
+  "profile": "Q2_0, FP16 KV, MTP off, 262144 context, 3000 exact expert slots, prefill 128, eight workers, prompt cache and adaptive swaps off, 3072 MiB workspace reserve",
+  "inputs": {
+    "config_sha256": "ea8e489a9fbd35e7efdad737464ceb6f52528ce303fabb3128088b7e5e760455",
+    "workload_sha256": "359807f5b2712ed4b11b0a3c42f6d2649a58c130fcd5972999c32ace560cfbaf",
+    "warmup_workload_sha256": "050fd0a48216aaf5fe6765993987b17c7ba8f674b3f125f1f44d175489a797aa"
+  },
+  "runtime_scope": "one uncached 240286-token near-limit retrieval request and same-service recovery under 28-GiB MemoryMax and six-GiB host/admission guard",
+  "result": {
+    "independent_review": "pass",
+    "minimum_host_gib": 11.640869140625,
+    "minimum_admission_gib": 11.640869140625,
+    "memory_samples": 31442,
+    "cgroup_memory_events": {"low": 0, "high": 0, "max": 0, "oom": 0, "oom_kill": 0},
+    "engine_prompt_seconds": 32851.8769,
+    "engine_prompt_tokens_per_second": 7.3,
+    "client_elapsed_seconds": 32861.94792987616,
+    "recovery_seconds": 4.315790242981166,
+    "markers_once_in_order": true,
+    "recovery_answer": "RECOVERED"
+  },
+  "artifact_location": "Model, PLE pack, expert profile and tokenizer remained under ~/models/strata-orin-validation; no model files are in Git."
+}

@@ -28,6 +28,7 @@ listed workload cells.
 | Near-limit retrieval and same-service recovery, 32K | 32,768 / 30,032 tokens | Three markers once and ordered; 41 output tokens; `RECOVERED`; independent review passed | 17.52 / 11.89 GiB | One selected-profile request; 1,106 supervised samples; [report](../../bench/results/2026-10-17-phase7-q2-prefill128-32k-selected-profile/README.md) |
 | Near-limit retrieval and same-service recovery, 64K | 65,536 / 60,071 tokens | Three markers once and ordered; 41 output tokens; `RECOVERED`; independent review passed | 16.68 / 11.32 GiB | One selected-profile request; 2,186 supervised samples; [report](../../bench/results/2026-10-17-phase7-q2-prefill128-64k-selected-profile/README.md) |
 | Near-limit retrieval and same-service recovery, 128K | 131,072 / 120,149 tokens | Three markers once and ordered; 41 output tokens; `RECOVERED`; independent review passed | 15.02 / 11.73 GiB | One selected-profile request; 5,092 supervised samples; [report](../../bench/results/2026-10-17-phase7-q2-prefill128-128k-selected-profile/README.md) |
+| Near-limit retrieval and same-service recovery, 256K | 262,144 / 240,286 tokens | Three markers once and ordered; 41 output tokens; `RECOVERED`; independent review passed | 11.64 / 11.64 GiB | One selected-profile request; 31,442 supervised samples; 32,851.9 s engine prefill (7.3 tok/s); no process-energy attribution; [report](../../bench/results/2026-10-17-phase7-q2-prefill128-256k-selected-profile/README.md) |
 | Held-out retrieval plus arithmetic and recovery, 32K | 32,768 / 30,040 tokens | Three markers once and ordered; suffix sum `1971`; `RECOVERED`; independent marker, arithmetic and runtime reviews passed | 17.42 / 11.48 GiB | One selected-profile task; 1,081 supervised samples; [report](../../bench/results/2026-10-17-phase7-q2-prefill128-32k-quality-mtp-off/README.md) |
 | Retrieval plus arithmetic and recovery, 64K | 65,536 / 60,079 tokens | Three markers once and ordered; suffix sum `1971`; `RECOVERED`; independent arithmetic and runtime reviews passed | 16.71 / 10.74 GiB | One selected-profile replication of the task previously run under MTP4, not a new held-out prompt; 2,224 supervised samples; [report](../../bench/results/2026-10-17-phase7-q2-prefill128-64k-quality-mtp-off/README.md) |
 | Serial control and two-slot streamed API overlap | 16,384 / 7,498 + 15,003 tokens | Both serial and two-slot arms passed prompt-count and marker checks; two requests and two slots overlapped | 16.86 / 8.32 GiB | One functional sequence; two-slot requests were slower than serial; no performance claim; [report](../../bench/results/2026-10-17-phase7-q2-prefill128-concurrency2-selected-profile/README.md) |
@@ -94,9 +95,9 @@ one quantization, not a comparison between quantizations or inference engines.
 
 ## Exclusions and open gates
 
-- The selected Q2_0 profile is qualified only for its listed 8K-context test
-  cells. The tested configurations remain experimental; results do not
-  promote defaults.
+- The selected Q2_0 profile is qualified only for its individually listed
+  context/workload cells. The tested configurations remain experimental; these
+  points do not establish interpolation between contexts or promote defaults.
 - Q2_0 256K has one retrieval/recovery sample and one 64K arithmetic sample,
   but no sustained 256K workload or broader task-quality suite.
 - Four-way serving is not qualified. The four-slot screen completed all four
