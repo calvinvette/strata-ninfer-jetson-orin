@@ -15,4 +15,10 @@ python3 bench/results/2026-10-18-phase5-coder-dispatch-combine-audit/audit_align
 sha256sum -c bench/results/2026-10-18-phase5-coder-dispatch-combine-audit/input-sha256.txt
 ```
 
-The corrected model capture will remain separate until the harness records or independently verifies a shared absolute row key. Phase 5 remains open.
+The historical capture above remains unjoinable. The diagnostic was subsequently
+extended with absolute position/token keys, and a fresh [position-keyed
+three-arm run](../2026-10-18-phase5-coder-layer1-route-isolation/README.md)
+directly joined route dispatch 1/layer 1 to combined position 511/token 271.
+That follow-up resolves alignment for its new short-prompt run only; it does not
+retroactively supply the missing prefix for these Oct 16 captures. Phase 5
+remains open.

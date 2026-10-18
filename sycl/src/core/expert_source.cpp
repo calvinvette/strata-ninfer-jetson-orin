@@ -2545,7 +2545,8 @@ static_assert(strata::kernels::cpu::MAXT * 10 <= kMaxWindowEntries, "a verify wi
 }  // namespace
 
 void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32_t* ids, int64_t n_tok, int64_t k,
-                                float* out) {
+                                float* out, const int32_t* /*row_tokens*/, const int64_t* /*row_positions*/,
+                                int64_t /*position0*/) {
     using namespace strata::kernels::cpu;
     if (d.failed) return;
     if (n_tok < 1 || n_tok > MAXT) {

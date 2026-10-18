@@ -43,7 +43,9 @@ class NativeHead;
 class RemoteExpertOpt;
 
 /// The CPU pool for a window: x_f (n_tok, n_embd), ids (n_tok, k) -> out (n_tok * k, n_embd), hit rows zeroed.
+/// Row keys identify the input token; row_positions may be null for consecutive positions starting at position0.
 using PoolMultiFn = void (*)(void* user, const float* x_f, const int32_t* ids, int64_t n_tok, int64_t k, float* out,
+                             const int32_t* row_tokens, const int64_t* row_positions, int64_t position0,
                              int64_t layer);
 
 struct VerifyHits {

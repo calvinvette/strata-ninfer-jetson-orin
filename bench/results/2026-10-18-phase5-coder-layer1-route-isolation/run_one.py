@@ -93,11 +93,18 @@ def main():
     route = [json.loads(line) for line in route_lines[1:]]
     if len(route) != 192:
         raise RuntimeError(f"expected 192 capture rows, got {len(route)}")
+    if json.loads(route_lines[0]).get("format") != "strata-moe-dispatch-v3":
+        raise RuntimeError("route capture is missing the position-keyed format")
+    if any(row.get("position", -1) < 0 or row.get("token_id", -1) < 0 for row in route):
+        raise RuntimeError("route capture has an invalid absolute token key")
     if a.arm in ("cpu_default", "cpu_mirror"):
         cpu_lines = (a.output / "cpu-outputs.jsonl").read_text().splitlines()
-        if not cpu_lines or json.loads(cpu_lines[0]).get("format") != "strata-moe-cpu-output-v1":
+        if not cpu_lines or json.loads(cpu_lines[0]).get("format") != "strata-moe-cpu-output-v2":
             raise RuntimeError("missing CPU output capture")
         cpu_count = len(cpu_lines) - 1
+        if any("position" not in json.loads(line) or "token_id" not in json.loads(line)
+               for line in cpu_lines[1:]):
+            raise RuntimeError("CPU output capture lacks an absolute token key")
     else:
         cpu_count = 0
     (a.output / "requests.json").write_text(json.dumps({

@@ -999,11 +999,12 @@ void drive_pool(void* user, const float* x_f, const int32_t* ids, const float* w
 
 /// Plan v0.3 P6: the pool for a verify window.
 void drive_pool_multi(void* user, const float* x_f, const int32_t* ids, int64_t n_tok, int64_t k, float* out,
+                      const int32_t* row_tokens, const int64_t* row_positions, int64_t position0,
                       int64_t layer) {
     Drive* t = (Drive*) user;
     t->d.layers = layer;
     const Clock::time_point a = Clock::now();
-    strata::core::expert_pool_dispatch_multi(t->d, x_f, ids, n_tok, k, out);
+    strata::core::expert_pool_dispatch_multi(t->d, x_f, ids, n_tok, k, out, row_tokens, row_positions, position0);
     t->cpu_ms += std::chrono::duration<double, std::milli>(Clock::now() - a).count();
     ++t->calls;
     // the routing trace for the serve path: the same record format drive_pool writes (layer, k, ids, weights),
@@ -1034,6 +1035,7 @@ struct SplitDrive {
     int pcie_num[kMax] = {};
 };
 void drive_pool_split(void* user, const float* x_f, const int32_t* ids, int64_t n_tok, int64_t k, float* out,
+                      const int32_t* row_tokens, const int64_t* row_positions, int64_t position0,
                       int64_t layer) {
     SplitDrive* s = (SplitDrive*) user;
     int st = 0;
@@ -1043,7 +1045,7 @@ void drive_pool_split(void* user, const float* x_f, const int32_t* ids, int64_t 
     d.d.cache_base = s->cache_base[st];
     d.d.cache_slot_off = s->cache_slot_off[st];
     d.d.pcie_num = s->pcie_num[st];
-    drive_pool_multi(s->base, x_f, ids, n_tok, k, out, layer);
+    drive_pool_multi(s->base, x_f, ids, n_tok, k, out, row_tokens, row_positions, position0, layer);
 }
 
 /// Layer split across GPUs: a later stage on its own device, with its own copy of the dense weights, a session, an

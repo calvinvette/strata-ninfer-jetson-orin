@@ -64,3 +64,82 @@ Recompute the checks from the repository root with:
 The machine-readable summary is `analysis.json`. Failed and superseded cells
 remain present for audit and are explicitly excluded above. Phase 5 remains
 open.
+
+## Position-keyed current-source rerun
+
+The route diagnostic was then extended to record each row's absolute position
+and input token ID, and the CPU output diagnostic now records the same key. The
+new format versions are dispatch v3 and CPU output v2. A supervised fresh
+three-arm rerun used the resulting binary (SHA256
+`320963c6572a13065e7704b3f98d477c8e29119ea45a96114f532008134e9932`) in
+randomized order `cpu_default`, `cpu_mirror`, `gpu_layer1`. It used the same
+model revision, prompt and profile intervention. All three cells passed the
+request and capture checks, returned the same 16 token IDs, and matched the
+same route row to exactly one combined-output row at position 511/token 271.
+Each CPU-owned expert output row also matched its route slot and absolute key.
+
+This establishes the row join that the earlier capture lacked. At that joined
+row, CPU default and CPU mirror had bitwise-identical input activations and
+routes, yet all 2,560 combined-output values differed (maximum absolute
+difference `0.00021168`, relative L1 `0.00402`). The GPU-profile arm routed all
+ten experts to GPU and its joined combined output matched CPU mirror bitwise;
+however, its layer-1 input activation differed from the CPU controls. Thus the
+CPU default/mirror comparison is a direct same-activation numerical difference
+for this one row. Each of the seven captured CPU expert vectors also differed
+at all 2,560 elements between default and mirror; their per-expert relative L1
+deltas ranged from `0.00804` to `0.01757`. The GPU-owner comparison remains
+confounded by upstream activation change. Final persistent-state fingerprints
+still differed among arms despite identical completion IDs. These findings
+narrow the unresolved path; they do not establish a quality conclusion or a
+performance result.
+
+Minimum host/admission availability was 14.22/14.22 GiB (CPU default),
+14.40/14.40 GiB (CPU mirror) and 14.44/14.44 GiB (GPU profile), above the
+six-GiB floor. Per-arm telemetry, exact artifacts and the source-diff digest
+are under `position-keyed-three-arm/`. Reproduce the join and comparisons with:
+
+```sh
+/home/calvin/models/strata-orin-validation/pack-venv/bin/python \
+  bench/results/2026-10-18-phase5-coder-layer1-route-isolation/analyze_position_keyed.py
+```
+
+## Captured expert numerical oracle
+
+The same saved activation and the seven IQ2_S/Q2_0 expert blobs were checked
+with the CUDA `native_expert_parity` tool. It compares the service CPU paths
+against GGML's float dequantized reference, and with
+`STRATA_NATIVE_CPU_Q8_1_DOT=1` it requires the Q8_1 CPU output to match the
+CUDA output bitwise. For every expert, the service default vector matched the
+tool's default CPU vector exactly; the service mirror vector matched the
+tool's Q8_1 CPU vector exactly; and the Q8_1 CPU vector matched CUDA bitwise.
+The Q8_1 relative L1 error against the float reference was lower for all seven
+experts: default ranged from `0.01077` to `0.01463`, while Q8_1 ranged from
+`0.00953` to `0.01198`. These are single-activation operator comparisons, not
+full-service quality or performance evidence. The GPU-profile service arm
+still has a different captured input activation at this layer.
+
+The oracle run used a 28-GiB supervisor and retained its stdout summaries,
+activation bytes and memory/clock log. A first wrapper attempt stopped before
+running the parity tool because it compared parsed decimal JSON values with
+float32 values without rounding the JSON inputs to float32; that harness check
+was corrected, and the supervised retry passed all seven experts. Reproduce
+the oracle check on Orin with:
+
+```sh
+systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes \
+  python3 tools/integration/run_control.py \
+  --output bench/results/2026-10-18-phase5-coder-layer1-route-isolation/position-keyed-three-arm/oracle/supervisor-retry \
+  --timeout 900 --interval 1 --sample-clocks -- \
+  /home/calvin/.local/python/bin/python3 \
+  bench/results/2026-10-18-phase5-coder-layer1-route-isolation/run_native_expert_oracle.py
+```
+
+The native Release CUDA service and parity utility rebuilt with one job. The
+21-test accepted-prefix, verifier, KV, GDN, draft and graph CTest selection
+passed 21/21 on the updated binary under a 28-GiB scope; minimum host/admission
+availability was 24.57/24.57 GiB and sampled cgroup `high`, `max`, `oom` and
+`oom_kill` counters were zero. The direct service runs and oracle retry also
+passed under 28-GiB scopes, with minimum availability above 14 GiB and 24.52
+GiB, respectively. This validates the keyed diagnostic in ordinary and batch
+verifier builds; the tests do not close other Phase 5 state, graph-pool or
+performance gates.

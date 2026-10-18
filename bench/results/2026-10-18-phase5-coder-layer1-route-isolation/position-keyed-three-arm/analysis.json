@@ -1,0 +1,182 @@
+{
+  "scope": "randomized three-arm current-source correctness/diagnostic run; one 512-token prompt and 16 output tokens",
+  "campaign_order": [
+    "cpu_default",
+    "cpu_mirror",
+    "gpu_layer1"
+  ],
+  "binary_sha256": "320963c6572a13065e7704b3f98d477c8e29119ea45a96114f532008134e9932",
+  "same_prompt_hash": true,
+  "same_completion_ids": true,
+  "completion_tokens": 16,
+  "route_to_combined_key": {
+    "position": 511,
+    "token_id": 271,
+    "matches_per_arm": 1
+  },
+  "per_arm": {
+    "cpu_default": {
+      "route_owners": [
+        0,
+        -1,
+        -1,
+        -1,
+        0,
+        -1,
+        -1,
+        0,
+        -1,
+        -1
+      ],
+      "cpu_output_rows": 7,
+      "cpu_output_rows_match_owners_and_key": true,
+      "minimum_host_available_gib": 14.21548080444336,
+      "minimum_admission_available_gib": 14.21548080444336
+    },
+    "cpu_mirror": {
+      "route_owners": [
+        0,
+        -1,
+        -1,
+        -1,
+        0,
+        -1,
+        -1,
+        0,
+        -1,
+        -1
+      ],
+      "cpu_output_rows": 7,
+      "cpu_output_rows_match_owners_and_key": true,
+      "minimum_host_available_gib": 14.403331756591797,
+      "minimum_admission_available_gib": 14.403331756591797
+    },
+    "gpu_layer1": {
+      "route_owners": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "cpu_output_rows": 0,
+      "cpu_output_rows_match_owners_and_key": true,
+      "minimum_host_available_gib": 14.4364013671875,
+      "minimum_admission_available_gib": 14.4364013671875
+    }
+  },
+  "joined_row_ffn_y": {
+    "cpu_default_vs_cpu_mirror": {
+      "exact": false,
+      "different_values": 2560,
+      "elements": 2560,
+      "max_abs": 0.00021168310195207596,
+      "relative_l1": 0.004017079673421032
+    },
+    "cpu_default_vs_gpu_layer1": {
+      "exact": false,
+      "different_values": 2560,
+      "elements": 2560,
+      "max_abs": 0.00021168310195207596,
+      "relative_l1": 0.004017079673421032
+    },
+    "cpu_mirror_vs_gpu_layer1": {
+      "exact": true,
+      "different_values": 0,
+      "elements": 2560,
+      "max_abs": 0.0,
+      "relative_l1": 0.0
+    }
+  },
+  "cpu_expert_output_default_vs_mirror": {
+    "205": {
+      "exact": false,
+      "different_values": 2560,
+      "elements": 2560,
+      "max_abs": 0.0009467052599999998,
+      "relative_l1": 0.01558380435461113
+    },
+    "101": {
+      "exact": false,
+      "different_values": 2560,
+      "elements": 2560,
+      "max_abs": 0.001196652699999995,
+      "relative_l1": 0.008035442418794822
+    },
+    "32": {
+      "exact": false,
+      "different_values": 2560,
+      "elements": 2560,
+      "max_abs": 0.0008093044000000004,
+      "relative_l1": 0.014284454076715877
+    },
+    "11": {
+      "exact": false,
+      "different_values": 2560,
+      "elements": 2560,
+      "max_abs": 0.000724602500000001,
+      "relative_l1": 0.01572667302355726
+    },
+    "95": {
+      "exact": false,
+      "different_values": 2560,
+      "elements": 2560,
+      "max_abs": 0.0012479992600000003,
+      "relative_l1": 0.015079311459710117
+    },
+    "18": {
+      "exact": false,
+      "different_values": 2560,
+      "elements": 2560,
+      "max_abs": 0.0008997749000000006,
+      "relative_l1": 0.014030747060819223
+    },
+    "165": {
+      "exact": false,
+      "different_values": 2560,
+      "elements": 2560,
+      "max_abs": 0.00083239144,
+      "relative_l1": 0.017569687218385185
+    }
+  },
+  "pairwise_combined_ffn_y": {
+    "cpu_default_vs_cpu_mirror": {
+      "exact": false,
+      "different_values": 40960,
+      "elements": 40960,
+      "max_abs": 0.0007246192544698715,
+      "relative_l1": 0.006391393128896672
+    },
+    "cpu_default_vs_gpu_layer1": {
+      "exact": false,
+      "different_values": 10240,
+      "elements": 40960,
+      "max_abs": 0.00021168310195207596,
+      "relative_l1": 0.0007275366161413457
+    },
+    "cpu_mirror_vs_gpu_layer1": {
+      "exact": false,
+      "different_values": 35840,
+      "elements": 40960,
+      "max_abs": 0.0007246192544698715,
+      "relative_l1": 0.005735906276191906
+    }
+  },
+  "route_input_activation_matches_default": {
+    "cpu_default": true,
+    "cpu_mirror": true,
+    "gpu_layer1": false
+  },
+  "persistent_state_matches_default": {
+    "cpu_default": true,
+    "cpu_mirror": false,
+    "gpu_layer1": false
+  },
+  "causal_isolation_proven": false,
+  "causal_limit": "A shared absolute row key proves alignment, but if changing profile membership changes the activation supplied to the routed layer, this intervention still does not isolate execution-owner arithmetic."
+}

@@ -2175,7 +2175,7 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
         if (remote_opt_) remote_opt_->begin(h_w_ + (size_t) tb * ss.k, tb, n);
         if (pool != nullptr)
             pool(user, h_x_ + (size_t) tb * g.n_embd, h_ids_ + (size_t) tb * ss.k, n, ss.k,
-                 h_ymiss_ + (size_t) tb * ss.k * g.n_embd, l);
+                 h_ymiss_ + (size_t) tb * ss.k * g.n_embd, tokens + tb, nullptr, pos0 + tb, l);
         if (remote_opt_) remote_opt_->end();
         VDBG("layer %lld served\n", (long long) l);
         if (g_trace) trace_ev(*(volatile uint32_t*) h_flagA_ == want ? "SERVED" : "SERVED-NO-PLAN-YET", k, l,
@@ -2899,7 +2899,7 @@ bool Verifier::run_slot_rows(const int* rows, int S, const int32_t* tokens, cons
         cur_layer_ = want - 1;
         set_plan_slot(0);
         progress_at("verify batch: the CPU experts of layer", l);
-        if (pool != nullptr) pool(user, h_x_, h_ids_, S, ss_->k, h_ymiss_, l);
+        if (pool != nullptr) pool(user, h_x_, h_ids_, S, ss_->k, h_ymiss_, tokens, pos, 0, l);
         progress_tick();
         std::atomic_thread_fence(std::memory_order_seq_cst);
         strata::platform::mapped_memory_release();
@@ -3054,7 +3054,8 @@ int Verifier::batch_poll(PoolMultiFn pool, void* user, std::string& err) {
         const Clock::time_point b = Clock::now();
         cur_layer_ = want - 1;
         set_plan_slot(0);
-        if (pool != nullptr) pool(user, h_x_, h_ids_, S, ss_->k, h_ymiss_, lb_ + b_k_);
+        if (pool != nullptr) pool(user, h_x_, h_ids_, S, ss_->k, h_ymiss_, last_tokens_, last_pos_b_, 0,
+                                  lb_ + b_k_);
         progress_tick();
         std::atomic_thread_fence(std::memory_order_seq_cst);
         strata::platform::mapped_memory_release();
@@ -3279,7 +3280,7 @@ int Verifier::service(PoolMultiFn pool, void* user, std::string& err) {
         progress_at("verify window (pipelined): the CPU experts of layer", l);
         if (pool != nullptr)
             pool(user, h_x_ + (size_t) tb * g.n_embd, h_ids_ + (size_t) tb * ss.k, n, ss.k,
-                 h_ymiss_ + (size_t) tb * ss.k * g.n_embd, l);
+                 h_ymiss_ + (size_t) tb * ss.k * g.n_embd, last_tokens_ + tb, nullptr, last_pos0_ + tb, l);
         if (g_trace) trace_ev(*(volatile uint32_t*) h_flagA_ == want ? "SERVED" : "SERVED-NO-PLAN-YET", fl_k_, l,
                               (int64_t) ms_since(b));
         progress_tick();

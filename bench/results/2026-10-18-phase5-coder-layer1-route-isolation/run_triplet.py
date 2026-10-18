@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Run randomized Coder CPU/mirror/one-layer-GPU route controls in fresh services."""
 import json
+import argparse
+import hashlib
 import random
 import subprocess
 import sys
@@ -9,14 +11,23 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
 HERE = Path(__file__).resolve().parent
+ap = argparse.ArgumentParser(description=__doc__)
+ap.add_argument("--output", type=Path, required=True, help="new directory for this campaign")
+ap.add_argument("--seed", type=int, default=20261019)
+args = ap.parse_args()
 ARMS = ("cpu_default", "cpu_mirror", "gpu_layer1")
-SEED = 20261018
+SEED = args.seed
 order = list(ARMS)
 random.Random(SEED).shuffle(order)
 campaign = {"schema": 1, "seed": SEED, "order": order,
             "design": "same 512-token prompt; MTP2; FP16 KV; no adaptive swaps; prompt cache off; same 3,000-slot capacity",
+            "model_repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+            "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
+            "model_quantization": "IQ1_M",
+            "binary_sha256": hashlib.sha256(Path("/home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/candidate/strata").read_bytes()).hexdigest(),
+            "profile_sha256": hashlib.sha256((HERE / "layer1-gpu-profile.bin").read_bytes()).hexdigest(),
             "status": "running", "runs": [], "started_wall_time_s": time.time()}
-OUT = HERE / "retry-start0"
+OUT = args.output if args.output.is_absolute() else ROOT / args.output
 OUT.mkdir(exist_ok=False)
 path = OUT / "campaign.json"
 path.write_text(json.dumps(campaign, indent=2) + "\n")

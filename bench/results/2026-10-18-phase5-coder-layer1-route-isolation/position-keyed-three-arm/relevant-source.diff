@@ -1,0 +1,320 @@
+diff --git a/include/strata/core/expert_source.hpp b/include/strata/core/expert_source.hpp
+index 547e5c22..8f940bec 100644
+--- a/include/strata/core/expert_source.hpp
++++ b/include/strata/core/expert_source.hpp
+@@ -448,7 +448,8 @@ void expert_pool_dispatch(void* user, const float* x_f, const int32_t* ids, cons
+ /// `out` (n_tok * k, n_embd).  Each distinct missed expert is computed once for all the tokens routed to it;
+ /// resident experts' rows are zeroed (the GPU adds them).  Requires `host_res` (the token-graph residency).
+ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32_t* ids, int64_t n_tok, int64_t k,
+-                                float* out);
++                                float* out, const int32_t* row_tokens, const int64_t* row_positions,
++                                int64_t position0);
+ 
+ /// **THE HITS, LAUNCHED AFTER THE MISSES ARE STAGED AND BEFORE `post[l]`.**  Same shape as `PoolFn` and for the
+ /// same reason: `session_loop` owns the ORDER and this owns the work, so the loop needs to know nothing about
+diff --git a/include/strata/core/verify.hpp b/include/strata/core/verify.hpp
+index 548cafb3..474e6115 100644
+--- a/include/strata/core/verify.hpp
++++ b/include/strata/core/verify.hpp
+@@ -43,7 +43,9 @@ class NativeHead;
+ class RemoteExpertOpt;
+ 
+ /// The CPU pool for a window: x_f (n_tok, n_embd), ids (n_tok, k) -> out (n_tok * k, n_embd), hit rows zeroed.
++/// Row keys identify the input token; row_positions may be null for consecutive positions starting at position0.
+ using PoolMultiFn = void (*)(void* user, const float* x_f, const int32_t* ids, int64_t n_tok, int64_t k, float* out,
++                             const int32_t* row_tokens, const int64_t* row_positions, int64_t position0,
+                              int64_t layer);
+ 
+ struct VerifyHits {
+diff --git a/src/core/expert_source.cpp b/src/core/expert_source.cpp
+index 54b13633..2052c820 100644
+--- a/src/core/expert_source.cpp
++++ b/src/core/expert_source.cpp
+@@ -3114,10 +3114,11 @@ constexpr int64_t kMaxCaptureRows = 4096;
+ static_assert(strata::kernels::cpu::MAXT * 10 <= kMaxWindowEntries, "a verify window's entries overflow the tables");
+ 
+ // Opt-in diagnostic for reproducing expert CPU/GPU differences on an actual verifier activation.
+-// Each JSONL row contains one verifier-row activation plus every routed expert and its final owner:
+-// -1 CPU, 0 primary VRAM/foresight, 1 PCIe, 2 peer/helper GPU. No token text is recorded.
++// Each JSONL row contains one verifier-row activation, its absolute input token key, and every routed expert and its
++// final owner: -1 CPU, 0 primary VRAM/foresight, 1 PCIe, 2 peer/helper GPU. No token text is recorded.
+ uint64_t capture_moe_window(int64_t layer, const float* x, const int32_t* ids, const int32_t* kind,
+-                            int64_t n_tok, int64_t k, int64_t n_embd) {
++                            int64_t n_tok, int64_t k, int64_t n_embd, const int32_t* row_tokens,
++                            const int64_t* row_positions, int64_t position0) {
+     static const char* const path = std::getenv("STRATA_CAPTURE_MOE_PATH");
+     if (path == nullptr || *path == '\0') return 0;
+     static const int64_t selected_layer = [] {
+@@ -3156,11 +3157,13 @@ uint64_t capture_moe_window(int64_t layer, const float* x, const int32_t* ids, c
+                 std::fprintf(stderr, "strata: cannot open MoE capture path '%s': %s\n", path, std::strerror(errno));
+                 return dispatch;
+             }
+-            std::fprintf(capture.file, "{\"format\":\"strata-moe-dispatch-v2\",\"n_embd\":%lld}\n", (long long) n_embd);
++            std::fprintf(capture.file, "{\"format\":\"strata-moe-dispatch-v3\",\"n_embd\":%lld}\n", (long long) n_embd);
+         }
+-        std::fprintf(capture.file, "{\"layer\":%lld,\"dispatch\":%llu,\"row\":%lld,\"stream_row\":%lld,\"n_tok\":%lld,\"k\":%lld,\"ids\":[",
++        const int64_t position = row_positions != nullptr ? row_positions[t] : position0 + t;
++        const int32_t token_id = row_tokens != nullptr ? row_tokens[t] : -1;
++        std::fprintf(capture.file, "{\"layer\":%lld,\"dispatch\":%llu,\"row\":%lld,\"stream_row\":%lld,\"n_tok\":%lld,\"position\":%lld,\"token_id\":%d,\"k\":%lld,\"ids\":[",
+                      (long long) layer, (unsigned long long) dispatch, (long long) t, (long long) stream_row,
+-                     (long long) n_tok, (long long) k);
++                     (long long) n_tok, (long long) position, (int) token_id, (long long) k);
+         for (int64_t j = 0; j < k; ++j) std::fprintf(capture.file, "%s%d", j ? "," : "", ids[t * k + j]);
+         std::fputs("],\"route_kind\":[", capture.file);
+         for (int64_t j = 0; j < k; ++j) std::fprintf(capture.file, "%s%d", j ? "," : "", kind[t * k + j]);
+@@ -3178,7 +3181,8 @@ uint64_t capture_moe_window(int64_t layer, const float* x, const int32_t* ids, c
+ // It shares the dispatch sequence with capture_moe_window so the tensor rows
+ // can be joined to the exact activation, expert IDs and owners above.
+ void capture_moe_cpu_outputs(uint64_t dispatch, int64_t layer, const int32_t* ids, const int32_t* kind,
+-                             int64_t n_tok, int64_t k, int64_t n_embd, const float* out) {
++                             int64_t n_tok, int64_t k, int64_t n_embd, const float* out,
++                             const int32_t* row_tokens, const int64_t* row_positions, int64_t position0) {
+     static const char* const path = std::getenv("STRATA_CAPTURE_MOE_OUTPUT_PATH");
+     if (path == nullptr || *path == '\0') return;
+     static const int64_t selected_layer = [] {
+@@ -3197,15 +3201,18 @@ void capture_moe_cpu_outputs(uint64_t dispatch, int64_t layer, const int32_t* id
+             std::fprintf(stderr, "strata: cannot open CPU MoE output capture '%s': %s\n", path, std::strerror(errno));
+             return;
+         }
+-        std::fprintf(file, "{\"format\":\"strata-moe-cpu-output-v1\",\"n_embd\":%lld}\n", (long long) n_embd);
++        std::fprintf(file, "{\"format\":\"strata-moe-cpu-output-v2\",\"n_embd\":%lld}\n", (long long) n_embd);
+     }
+     for (int64_t t = 0; t < n_tok; ++t) {
+         for (int64_t j = 0; j < k; ++j) {
+             const int64_t row = t * k + j;
+             if (kind[row] >= 0) continue;
+             const float* values = out + (size_t) row * (size_t) n_embd;
+-            std::fprintf(file, "{\"dispatch\":%llu,\"layer\":%lld,\"token\":%lld,\"row\":%lld,\"expert\":%d,\"output\":[",
+-                         (unsigned long long) dispatch, (long long) layer, (long long) t, (long long) row, ids[row]);
++            const int64_t position = row_positions != nullptr ? row_positions[t] : position0 + t;
++            const int32_t token_id = row_tokens != nullptr ? row_tokens[t] : -1;
++            std::fprintf(file, "{\"dispatch\":%llu,\"layer\":%lld,\"token\":%lld,\"position\":%lld,\"token_id\":%d,\"row\":%lld,\"expert\":%d,\"output\":[",
++                         (unsigned long long) dispatch, (long long) layer, (long long) t, (long long) position,
++                         (int) token_id, (long long) row, ids[row]);
+             for (int64_t i = 0; i < n_embd; ++i)
+                 std::fprintf(file, "%s%.9g", i ? "," : "", (double) values[i]);
+             std::fputs("]}\n", file);
+@@ -3216,7 +3223,8 @@ void capture_moe_cpu_outputs(uint64_t dispatch, int64_t layer, const int32_t* id
+ }  // namespace
+ 
+ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32_t* ids, int64_t n_tok, int64_t k,
+-                                float* out) {
++                                float* out, const int32_t* row_tokens, const int64_t* row_positions,
++                                int64_t position0) {
+     using namespace strata::kernels::cpu;
+     if (d.failed) return;
+     if (n_tok < 1 || n_tok > MAXT) {
+@@ -3397,7 +3405,8 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
+             for (int64_t i = 0; i < n; ++i) if (d.remote[r]->owns(i)) kind[i] = 2;
+         }
+     }
+-    const uint64_t capture_dispatch = capture_moe_window(d.layers, x_f, ids, kind, n_tok, k, H);
++    const uint64_t capture_dispatch = capture_moe_window(d.layers, x_f, ids, kind, n_tok, k, H,
++                                                          row_tokens, row_positions, position0);
+     static const bool dec_batch = [] { const char* v = std::getenv("STRATA_DEC_BATCH"); return v == nullptr || std::atoi(v) != 0; }();
+     // the GPU's copy_rows_from_mapped zeroes the rows it computed itself (dec_batch); STRATA_VERIFY_DEVICE_PLAN's
+     // copy_or_zero_from_mapped copies every row, so there the host still zeroes them
+@@ -3501,7 +3510,8 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
+             return;
+         }
+     }
+-    capture_moe_cpu_outputs(capture_dispatch, d.layers, ids, kind, n_tok, k, H, out);
++    capture_moe_cpu_outputs(capture_dispatch, d.layers, ids, kind, n_tok, k, H, out,
++                            row_tokens, row_positions, position0);
+     const auto c4 = std::chrono::steady_clock::now();
+     pt("ran");
+     auto ms = [](auto a, auto b) { return std::chrono::duration<double, std::milli>(b - a).count(); };
+diff --git a/src/core/verify.cpp b/src/core/verify.cpp
+index 48ba3b2c..b3e21e55 100644
+--- a/src/core/verify.cpp
++++ b/src/core/verify.cpp
+@@ -2175,7 +2175,7 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
+         if (remote_opt_) remote_opt_->begin(h_w_ + (size_t) tb * ss.k, tb, n);
+         if (pool != nullptr)
+             pool(user, h_x_ + (size_t) tb * g.n_embd, h_ids_ + (size_t) tb * ss.k, n, ss.k,
+-                 h_ymiss_ + (size_t) tb * ss.k * g.n_embd, l);
++                 h_ymiss_ + (size_t) tb * ss.k * g.n_embd, tokens + tb, nullptr, pos0 + tb, l);
+         if (remote_opt_) remote_opt_->end();
+         VDBG("layer %lld served\n", (long long) l);
+         if (g_trace) trace_ev(*(volatile uint32_t*) h_flagA_ == want ? "SERVED" : "SERVED-NO-PLAN-YET", k, l,
+@@ -2899,7 +2899,7 @@ bool Verifier::run_slot_rows(const int* rows, int S, const int32_t* tokens, cons
+         cur_layer_ = want - 1;
+         set_plan_slot(0);
+         progress_at("verify batch: the CPU experts of layer", l);
+-        if (pool != nullptr) pool(user, h_x_, h_ids_, S, ss_->k, h_ymiss_, l);
++        if (pool != nullptr) pool(user, h_x_, h_ids_, S, ss_->k, h_ymiss_, tokens, pos, 0, l);
+         progress_tick();
+         std::atomic_thread_fence(std::memory_order_seq_cst);
+         strata::platform::mapped_memory_release();
+@@ -3054,7 +3054,8 @@ int Verifier::batch_poll(PoolMultiFn pool, void* user, std::string& err) {
+         const Clock::time_point b = Clock::now();
+         cur_layer_ = want - 1;
+         set_plan_slot(0);
+-        if (pool != nullptr) pool(user, h_x_, h_ids_, S, ss_->k, h_ymiss_, lb_ + b_k_);
++        if (pool != nullptr) pool(user, h_x_, h_ids_, S, ss_->k, h_ymiss_, last_tokens_, last_pos_b_, 0,
++                                  lb_ + b_k_);
+         progress_tick();
+         std::atomic_thread_fence(std::memory_order_seq_cst);
+         strata::platform::mapped_memory_release();
+@@ -3279,7 +3280,7 @@ int Verifier::service(PoolMultiFn pool, void* user, std::string& err) {
+         progress_at("verify window (pipelined): the CPU experts of layer", l);
+         if (pool != nullptr)
+             pool(user, h_x_ + (size_t) tb * g.n_embd, h_ids_ + (size_t) tb * ss.k, n, ss.k,
+-                 h_ymiss_ + (size_t) tb * ss.k * g.n_embd, l);
++                 h_ymiss_ + (size_t) tb * ss.k * g.n_embd, last_tokens_ + tb, nullptr, last_pos0_ + tb, l);
+         if (g_trace) trace_ev(*(volatile uint32_t*) h_flagA_ == want ? "SERVED" : "SERVED-NO-PLAN-YET", fl_k_, l,
+                               (int64_t) ms_since(b));
+         progress_tick();
+diff --git a/src/program/generate.cpp b/src/program/generate.cpp
+index 6efc15be..01b6cd86 100644
+--- a/src/program/generate.cpp
++++ b/src/program/generate.cpp
+@@ -961,11 +961,12 @@ void drive_pool(void* user, const float* x_f, const int32_t* ids, const float* w
+ 
+ /// Plan v0.3 P6: the pool for a verify window.
+ void drive_pool_multi(void* user, const float* x_f, const int32_t* ids, int64_t n_tok, int64_t k, float* out,
++                      const int32_t* row_tokens, const int64_t* row_positions, int64_t position0,
+                       int64_t layer) {
+     Drive* t = (Drive*) user;
+     t->d.layers = layer;
+     const Clock::time_point a = Clock::now();
+-    strata::core::expert_pool_dispatch_multi(t->d, x_f, ids, n_tok, k, out);
++    strata::core::expert_pool_dispatch_multi(t->d, x_f, ids, n_tok, k, out, row_tokens, row_positions, position0);
+     t->cpu_ms += std::chrono::duration<double, std::milli>(Clock::now() - a).count();
+     ++t->calls;
+     // the routing trace for the serve path: the same record format drive_pool writes (layer, k, ids, weights),
+@@ -996,6 +997,7 @@ struct SplitDrive {
+     int pcie_num[kMax] = {};
+ };
+ void drive_pool_split(void* user, const float* x_f, const int32_t* ids, int64_t n_tok, int64_t k, float* out,
++                      const int32_t* row_tokens, const int64_t* row_positions, int64_t position0,
+                       int64_t layer) {
+     SplitDrive* s = (SplitDrive*) user;
+     int st = 0;
+@@ -1005,7 +1007,7 @@ void drive_pool_split(void* user, const float* x_f, const int32_t* ids, int64_t
+     d.d.cache_base = s->cache_base[st];
+     d.d.cache_slot_off = s->cache_slot_off[st];
+     d.d.pcie_num = s->pcie_num[st];
+-    drive_pool_multi(s->base, x_f, ids, n_tok, k, out, layer);
++    drive_pool_multi(s->base, x_f, ids, n_tok, k, out, row_tokens, row_positions, position0, layer);
+ }
+ 
+ /// Layer split across GPUs: a later stage on its own device, with its own copy of the dense weights, a session, an
+diff --git a/sycl/include/strata/core/expert_source.hpp b/sycl/include/strata/core/expert_source.hpp
+index 2a8731ae..7759a71a 100644
+--- a/sycl/include/strata/core/expert_source.hpp
++++ b/sycl/include/strata/core/expert_source.hpp
+@@ -409,7 +409,8 @@ void expert_pool_dispatch(void* user, const float* x_f, const int32_t* ids, cons
+ /// `out` (n_tok * k, n_embd).  Each distinct missed expert is computed once for all the tokens routed to it;
+ /// resident experts' rows are zeroed (the GPU adds them).  Requires `host_res` (the token-graph residency).
+ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32_t* ids, int64_t n_tok, int64_t k,
+-                                float* out);
++                                float* out, const int32_t* row_tokens, const int64_t* row_positions,
++                                int64_t position0);
+ 
+ /// **THE HITS, LAUNCHED AFTER THE MISSES ARE STAGED AND BEFORE `post[l]`.**  Same shape as `PoolFn` and for the
+ /// same reason: `session_loop` owns the ORDER and this owns the work, so the loop needs to know nothing about
+diff --git a/sycl/include/strata/core/verify.hpp b/sycl/include/strata/core/verify.hpp
+index 2501122d..6eeed410 100644
+--- a/sycl/include/strata/core/verify.hpp
++++ b/sycl/include/strata/core/verify.hpp
+@@ -44,7 +44,9 @@ class NativeHead;
+ class RemoteExpertOpt;
+ 
+ /// The CPU pool for a window: x_f (n_tok, n_embd), ids (n_tok, k) -> out (n_tok * k, n_embd), hit rows zeroed.
++/// Row keys identify the input token; row_positions may be null for consecutive positions starting at position0.
+ using PoolMultiFn = void (*)(void* user, const float* x_f, const int32_t* ids, int64_t n_tok, int64_t k, float* out,
++                             const int32_t* row_tokens, const int64_t* row_positions, int64_t position0,
+                              int64_t layer);
+ 
+ struct VerifyHits {
+diff --git a/sycl/src/core/expert_source.cpp b/sycl/src/core/expert_source.cpp
+index e0bb0f20..31884c39 100644
+--- a/sycl/src/core/expert_source.cpp
++++ b/sycl/src/core/expert_source.cpp
+@@ -2545,7 +2545,8 @@ static_assert(strata::kernels::cpu::MAXT * 10 <= kMaxWindowEntries, "a verify wi
+ }  // namespace
+ 
+ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32_t* ids, int64_t n_tok, int64_t k,
+-                                float* out) {
++                                float* out, const int32_t* /*row_tokens*/, const int64_t* /*row_positions*/,
++                                int64_t /*position0*/) {
+     using namespace strata::kernels::cpu;
+     if (d.failed) return;
+     if (n_tok < 1 || n_tok > MAXT) {
+diff --git a/sycl/src/core/verify.cpp b/sycl/src/core/verify.cpp
+index d733c717..018c72ea 100644
+--- a/sycl/src/core/verify.cpp
++++ b/sycl/src/core/verify.cpp
+@@ -2023,7 +2023,7 @@ bool Verifier::run(int T, const int32_t *tokens, int64_t pos0, PoolMultiFn pool,
+         if (remote_opt_) remote_opt_->begin(h_w_ + (size_t) tb * ss.k, tb, n);
+         if (pool != nullptr)
+             pool(user, h_x_ + (size_t) tb * g.n_embd, h_ids_ + (size_t) tb * ss.k, n, ss.k,
+-                 h_ymiss_ + (size_t) tb * ss.k * g.n_embd, l);
++                 h_ymiss_ + (size_t) tb * ss.k * g.n_embd, tokens + tb, nullptr, pos0 + tb, l);
+         if (remote_opt_) remote_opt_->end();
+         VDBG("layer %lld served\n", (long long) l);
+         if (g_trace) trace_ev(*(volatile uint32_t*) h_flagA_ == want ? "SERVED" : "SERVED-NO-PLAN-YET", k, l,
+@@ -2965,7 +2965,7 @@ bool Verifier::run_slot_rows(const int *rows, int S, const int32_t *tokens,
+         cur_layer_ = want - 1;
+         set_plan_slot(0);
+         progress_at("verify batch: the CPU experts of layer", l);
+-        if (pool != nullptr) pool(user, h_x_, h_ids_, S, ss_->k, h_ymiss_, l);
++        if (pool != nullptr) pool(user, h_x_, h_ids_, S, ss_->k, h_ymiss_, tokens, pos, 0, l);
+         progress_tick();
+         std::atomic_thread_fence(std::memory_order_seq_cst);
+         _mm_sfence();
+@@ -3211,7 +3211,8 @@ int Verifier::batch_poll(PoolMultiFn pool, void *user, std::string &err) try {
+         const Clock::time_point b = Clock::now();
+         cur_layer_ = want - 1;
+         set_plan_slot(0);
+-        if (pool != nullptr) pool(user, h_x_, h_ids_, S, ss_->k, h_ymiss_, lb_ + b_k_);
++        if (pool != nullptr) pool(user, h_x_, h_ids_, S, ss_->k, h_ymiss_, last_tokens_, last_pos_b_, 0,
++                                  lb_ + b_k_);
+         progress_tick();
+         std::atomic_thread_fence(std::memory_order_seq_cst);
+         _mm_sfence();
+@@ -3534,7 +3535,7 @@ int Verifier::service(PoolMultiFn pool, void *user, std::string &err) try {
+         progress_at("verify window (pipelined): the CPU experts of layer", l);
+         if (pool != nullptr)
+             pool(user, h_x_ + (size_t) tb * g.n_embd, h_ids_ + (size_t) tb * ss.k, n, ss.k,
+-                 h_ymiss_ + (size_t) tb * ss.k * g.n_embd, l);
++                 h_ymiss_ + (size_t) tb * ss.k * g.n_embd, last_tokens_ + tb, nullptr, last_pos0_ + tb, l);
+         if (g_trace) trace_ev(*(volatile uint32_t*) h_flagA_ == want ? "SERVED" : "SERVED-NO-PLAN-YET", fl_k_, l,
+                               (int64_t) ms_since(b));
+         progress_tick();
+diff --git a/sycl/src/program/generate.cpp b/sycl/src/program/generate.cpp
+index 35c1c431..9e71facf 100644
+--- a/sycl/src/program/generate.cpp
++++ b/sycl/src/program/generate.cpp
+@@ -999,11 +999,12 @@ void drive_pool(void* user, const float* x_f, const int32_t* ids, const float* w
+ 
+ /// Plan v0.3 P6: the pool for a verify window.
+ void drive_pool_multi(void* user, const float* x_f, const int32_t* ids, int64_t n_tok, int64_t k, float* out,
++                      const int32_t* row_tokens, const int64_t* row_positions, int64_t position0,
+                       int64_t layer) {
+     Drive* t = (Drive*) user;
+     t->d.layers = layer;
+     const Clock::time_point a = Clock::now();
+-    strata::core::expert_pool_dispatch_multi(t->d, x_f, ids, n_tok, k, out);
++    strata::core::expert_pool_dispatch_multi(t->d, x_f, ids, n_tok, k, out, row_tokens, row_positions, position0);
+     t->cpu_ms += std::chrono::duration<double, std::milli>(Clock::now() - a).count();
+     ++t->calls;
+     // the routing trace for the serve path: the same record format drive_pool writes (layer, k, ids, weights),
+@@ -1034,6 +1035,7 @@ struct SplitDrive {
+     int pcie_num[kMax] = {};
+ };
+ void drive_pool_split(void* user, const float* x_f, const int32_t* ids, int64_t n_tok, int64_t k, float* out,
++                      const int32_t* row_tokens, const int64_t* row_positions, int64_t position0,
+                       int64_t layer) {
+     SplitDrive* s = (SplitDrive*) user;
+     int st = 0;
+@@ -1043,7 +1045,7 @@ void drive_pool_split(void* user, const float* x_f, const int32_t* ids, int64_t
+     d.d.cache_base = s->cache_base[st];
+     d.d.cache_slot_off = s->cache_slot_off[st];
+     d.d.pcie_num = s->pcie_num[st];
+-    drive_pool_multi(s->base, x_f, ids, n_tok, k, out, layer);
++    drive_pool_multi(s->base, x_f, ids, n_tok, k, out, row_tokens, row_positions, position0, layer);
+ }
+ 
+ /// Layer split across GPUs: a later stage on its own device, with its own copy of the dense weights, a session, an
