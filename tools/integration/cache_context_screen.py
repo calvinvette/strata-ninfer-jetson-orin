@@ -35,7 +35,7 @@ def cell_configs(config, cache_values, context_values):
 
 def api_command(runtime_python, tools, cfgpath, workloads, request_path, rounds,
                 timeout_s=1800, no_trace=False, sample_clocks=False,
-                warmup_workloads=None):
+                warmup_workloads=None, scope_memory_gib=0):
     command = [str(runtime_python), str(tools / 'run_control.py'), '--output',
                str((request_path.parent / 'supervisor').resolve()), '--timeout', str(timeout_s)]
     if sample_clocks:
@@ -48,6 +48,9 @@ def api_command(runtime_python, tools, cfgpath, workloads, request_path, rounds,
         command.extend(['--warmup-workloads', str(warmup_workloads.resolve())])
     if no_trace:
         command.append('--no-trace')
+    if scope_memory_gib:
+        command = ['systemd-run', '--user', '--scope', '--collect',
+                   '-p', f'MemoryMax={scope_memory_gib}G', '-p', 'IOAccounting=yes', *command]
     return command
 
 
@@ -67,9 +70,13 @@ def main():
                         help='disable STRATA_TRACE for request timing')
     parser.add_argument('--sample-clocks', action='store_true',
                         help='record read-only CPU/GPU/EMC clock observations')
+    parser.add_argument('--scope-memory-gib', type=int, default=0,
+                        help='run every independent cell in its own systemd MemoryMax scope')
     args = parser.parse_args()
     if args.rounds < 3 or args.timeout < 1:
         parser.error('screening requires at least three measured rounds and a positive timeout')
+    if args.scope_memory_gib < 0:
+        parser.error('--scope-memory-gib must be zero or positive')
     if len(set(args.cache_values)) != len(args.cache_values) or len(set(args.context_values)) != len(args.context_values):
         parser.error('cache and context values must be unique')
     base = json.loads(args.config.read_text())
@@ -99,7 +106,8 @@ def main():
         runtime_python = str(args.python.resolve())
         command = api_command(args.python.resolve(), tools, cfgpath, args.workloads,
                               request_path, args.rounds, timeout_s=args.timeout,
-                              no_trace=args.no_trace, sample_clocks=args.sample_clocks)
+                              no_trace=args.no_trace, sample_clocks=args.sample_clocks,
+                              scope_memory_gib=args.scope_memory_gib)
         row = dict(cell, order=index, status='not_run', command=command)
         campaign['cells'].append(row)
         write_result(manifest, campaign)

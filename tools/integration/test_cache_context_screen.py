@@ -48,6 +48,15 @@ class CacheContextScreenTest(unittest.TestCase):
         self.assertIn('--sample-clocks', command)
         self.assertLess(command.index('--sample-clocks'), command.index('--'))
 
+    def test_per_cell_memory_scope_wraps_supervisor_command(self):
+        root = Path('/tmp/cache-context-test')
+        command = api_command(Path('/usr/bin/python3'), root / 'tools', root / 'config.json',
+                              root / 'workloads.json', root / 'cell' / 'requests.json', 3,
+                              scope_memory_gib=28)
+        self.assertEqual(command[:8], ['systemd-run', '--user', '--scope', '--collect',
+                                       '-p', 'MemoryMax=28G', '-p', 'IOAccounting=yes'])
+        self.assertIn('run_control.py', command[9])
+
 
 if __name__ == '__main__':
     unittest.main()
