@@ -1,0 +1,26 @@
+{
+  "purpose": "Seven-block second-workload confirmation of the Q2_0 cache x prefill interaction screened on a near-limit retrieval prompt.",
+  "heldout_prompt": "Fresh exact 512-token prompt with new retrieval marker values and independently computed suffix sum.",
+  "prompt_tokens": 512,
+  "expected_codes": ["TUNDRA-ORBIT-593", "COBALT-MAPLE-248", "GRANITE-COMET-761"],
+  "expected_suffix_sum": 1602,
+  "sum_oracle": "593 + 248 + 761 = 1602",
+  "design": {
+    "blocks": 7,
+    "cells_per_block": 4,
+    "cache_slots": [3000, 3500],
+    "prefill_chunks": [32, 128],
+    "randomized_within_block": true,
+    "fresh_service_per_cell": true
+  },
+  "runtime": {
+    "context": 8192,
+    "kv": "FP16",
+    "mtp": "off",
+    "workers": 8,
+    "prompt_cache": "disabled",
+    "memory_max_gib": 28,
+    "headroom_floor_gib": 6,
+    "clock_policy": "dynamic, read-only sampled"
+  }
+}

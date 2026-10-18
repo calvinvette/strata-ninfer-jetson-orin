@@ -1,0 +1,295 @@
+{
+  "scope": "Q2_0 FP16 KV, MTP off, 8K context, eight workers, prompt cache/adaptive swaps disabled; exact 3,000/3,500 expert slots and chunks 32/128.",
+  "short_workload": {
+    "prompt_tokens": 512,
+    "answer": "EARLY=TUNDRA-ORBIT-593, MIDDLE=COBALT-MAPLE-248, LATE=GRANITE-COMET-761, SUM=1602",
+    "independent_oracle": "593 + 248 + 761 = 1602",
+    "blocks": 7,
+    "cells": 28
+  },
+  "near_limit_workload": {
+    "prompt_tokens": 7506,
+    "answer": [
+      "BRONZE-PINE-582",
+      "VIOLET-CANYON-146",
+      "CRIMSON-HARBOR-839"
+    ],
+    "blocks": 7,
+    "cells": 28
+  },
+  "short_task_chunk_effects": [
+    {
+      "metric": "prompt_ms",
+      "cache_slots": 3000,
+      "contrast": "chunk 128 vs 32",
+      "block_effects_percent": [
+        -53.193727417201956,
+        -51.818446972246534,
+        -52.36550927048478,
+        -51.8363140198829,
+        -50.99984754024731,
+        -50.53535994108381,
+        -51.806416281101896
+      ],
+      "median_effect_percent": -51.818446972246534,
+      "paired_block_bootstrap_95pct_percent": [
+        -52.36550927048478,
+        -50.99984754024731
+      ]
+    },
+    {
+      "metric": "prompt_ms",
+      "cache_slots": 3500,
+      "contrast": "chunk 128 vs 32",
+      "block_effects_percent": [
+        -51.514938095405796,
+        -70.9848043221247,
+        -50.62210839391936,
+        -51.54922136509784,
+        -51.67636544416001,
+        -49.97645624435055,
+        -52.31937440708445
+      ],
+      "median_effect_percent": -51.54922136509784,
+      "paired_block_bootstrap_95pct_percent": [
+        -52.31937440708445,
+        -50.62210839391936
+      ]
+    },
+    {
+      "metric": "request_ms",
+      "cache_slots": 3000,
+      "contrast": "chunk 128 vs 32",
+      "block_effects_percent": [
+        -48.557070652721634,
+        -46.78889611909813,
+        -47.26717037866193,
+        -47.85898421922179,
+        -45.90016547878093,
+        -45.3424695485146,
+        -46.728493379354084
+      ],
+      "median_effect_percent": -46.78889611909813,
+      "paired_block_bootstrap_95pct_percent": [
+        -47.85898421922179,
+        -45.90016547878093
+      ]
+    },
+    {
+      "metric": "request_ms",
+      "cache_slots": 3500,
+      "contrast": "chunk 128 vs 32",
+      "block_effects_percent": [
+        -46.532928011740346,
+        -66.63175266701975,
+        -45.522862830479795,
+        -46.57009567014767,
+        -46.481450766773705,
+        -45.04808513059808,
+        -47.22977612965252
+      ],
+      "median_effect_percent": -46.532928011740346,
+      "paired_block_bootstrap_95pct_percent": [
+        -47.22977612965252,
+        -45.522862830479795
+      ]
+    }
+  ],
+  "near_limit_chunk_effects": [
+    {
+      "metric": "prompt_ms",
+      "cache_slots": 3000,
+      "contrast": "chunk 128 vs 32",
+      "block_effects_percent": [
+        -55.40453678749551,
+        -60.270781406460685,
+        -55.356298136690874,
+        -60.02720905071561,
+        -60.06463768403096,
+        -60.166004947423325,
+        -61.5592576323903
+      ],
+      "median_effect_percent": -60.06463768403096,
+      "paired_block_bootstrap_95pct_percent": [
+        -60.270781406460685,
+        -55.40453678749551
+      ]
+    },
+    {
+      "metric": "prompt_ms",
+      "cache_slots": 3500,
+      "contrast": "chunk 128 vs 32",
+      "block_effects_percent": [
+        -60.25553526727175,
+        -60.265329971260925,
+        -60.11868939899618,
+        -61.75111681491221,
+        -60.13211636654869,
+        -60.387006416760755,
+        -55.25148356096072
+      ],
+      "median_effect_percent": -60.25553526727175,
+      "paired_block_bootstrap_95pct_percent": [
+        -60.387006416760755,
+        -60.11868939899618
+      ]
+    },
+    {
+      "metric": "request_ms",
+      "cache_slots": 3000,
+      "contrast": "chunk 128 vs 32",
+      "block_effects_percent": [
+        -54.93240184961354,
+        -59.79549147979613,
+        -54.88259448685584,
+        -58.78284055337441,
+        -59.53704223228673,
+        -59.645119196668084,
+        -61.062318697034236
+      ],
+      "median_effect_percent": -59.53704223228673,
+      "paired_block_bootstrap_95pct_percent": [
+        -59.79549147979613,
+        -54.93240184961354
+      ]
+    },
+    {
+      "metric": "request_ms",
+      "cache_slots": 3500,
+      "contrast": "chunk 128 vs 32",
+      "block_effects_percent": [
+        -59.740906189020336,
+        -59.75247860614687,
+        -59.587267926580665,
+        -61.23499494411351,
+        -59.616639498907674,
+        -60.82357955438691,
+        -54.77567453512289
+      ],
+      "median_effect_percent": -59.740906189020336,
+      "paired_block_bootstrap_95pct_percent": [
+        -60.82357955438691,
+        -59.587267926580665
+      ]
+    }
+  ],
+  "workload_interactions": [
+    {
+      "metric": "prompt_ms",
+      "cache_slots": 3000,
+      "contrast": "near-limit chunk effect minus short-task chunk effect",
+      "short_block_effects_percent": [
+        -53.193727417201956,
+        -51.818446972246534,
+        -52.36550927048478,
+        -51.8363140198829,
+        -50.99984754024731,
+        -50.53535994108381,
+        -51.806416281101896
+      ],
+      "near_limit_block_effects_percent": [
+        -55.40453678749551,
+        -60.270781406460685,
+        -55.356298136690874,
+        -60.02720905071561,
+        -60.06463768403096,
+        -60.166004947423325,
+        -61.5592576323903
+      ],
+      "median_interaction_percentage_points": -8.246190711784429,
+      "independent_block_bootstrap_95pct_percentage_points": [
+        -9.270933866213376,
+        -3.5682227676126104
+      ],
+      "resampling_unit": "independent process/block within each seven-block campaign"
+    },
+    {
+      "metric": "prompt_ms",
+      "cache_slots": 3500,
+      "contrast": "near-limit chunk effect minus short-task chunk effect",
+      "short_block_effects_percent": [
+        -51.514938095405796,
+        -70.9848043221247,
+        -50.62210839391936,
+        -51.54922136509784,
+        -51.67636544416001,
+        -49.97645624435055,
+        -52.31937440708445
+      ],
+      "near_limit_block_effects_percent": [
+        -60.25553526727175,
+        -60.265329971260925,
+        -60.11868939899618,
+        -61.75111681491221,
+        -60.13211636654869,
+        -60.387006416760755,
+        -55.25148356096072
+      ],
+      "median_interaction_percentage_points": -8.70631390217391,
+      "independent_block_bootstrap_95pct_percentage_points": [
+        -9.764898022841393,
+        -7.799314991911729
+      ],
+      "resampling_unit": "independent process/block within each seven-block campaign"
+    },
+    {
+      "metric": "request_ms",
+      "cache_slots": 3000,
+      "contrast": "near-limit chunk effect minus short-task chunk effect",
+      "short_block_effects_percent": [
+        -48.557070652721634,
+        -46.78889611909813,
+        -47.26717037866193,
+        -47.85898421922179,
+        -45.90016547878093,
+        -45.3424695485146,
+        -46.728493379354084
+      ],
+      "near_limit_block_effects_percent": [
+        -54.93240184961354,
+        -59.79549147979613,
+        -54.88259448685584,
+        -58.78284055337441,
+        -59.53704223228673,
+        -59.645119196668084,
+        -61.062318697034236
+      ],
+      "median_interaction_percentage_points": -12.748146113188596,
+      "independent_block_bootstrap_95pct_percentage_points": [
+        -13.795148318372306,
+        -7.6652314709516105
+      ],
+      "resampling_unit": "independent process/block within each seven-block campaign"
+    },
+    {
+      "metric": "request_ms",
+      "cache_slots": 3500,
+      "contrast": "near-limit chunk effect minus short-task chunk effect",
+      "short_block_effects_percent": [
+        -46.532928011740346,
+        -66.63175266701975,
+        -45.522862830479795,
+        -46.57009567014767,
+        -46.481450766773705,
+        -45.04808513059808,
+        -47.22977612965252
+      ],
+      "near_limit_block_effects_percent": [
+        -59.740906189020336,
+        -59.75247860614687,
+        -59.587267926580665,
+        -61.23499494411351,
+        -59.616639498907674,
+        -60.82357955438691,
+        -54.77567453512289
+      ],
+      "median_interaction_percentage_points": -13.20797817727999,
+      "independent_block_bootstrap_95pct_percentage_points": [
+        -14.568554368309591,
+        -12.357491796928144
+      ],
+      "resampling_unit": "independent process/block within each seven-block campaign"
+    }
+  ],
+  "interpretation": "The interaction contrasts do not imply equal prompt content or output lengths; they test whether the chunk effect changes between these two qualified retrieval tasks. No setting is promoted by this analysis."
+}

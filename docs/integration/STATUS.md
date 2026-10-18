@@ -2845,3 +2845,17 @@ with zero cgroup events. Dynamic GPU clocks ranged 306 MHz–1,300.5 MHz; EMC
 readback was unsupported, and energy was not analyzed. This confirms the strong
 chunk effect for the tested held-out retrieval workload only; no profile changed
 and Phase 6 remains open.
+
+A second seven-block [Q2_0 cache × prefill confirmation](../../bench/results/2026-10-18-phase6-q2-cache-prefill-short-confirm7/README.md)
+tested a fresh exact-512-token retrieval-plus-sum task, with all 28 measured
+answers matching the three markers and independent suffix sum `1602`. Chunk
+128 reduced median request time 46.79% at 3,000 slots (paired 95% interval
+−47.86% to −45.90%) and 46.53% at 3,500 (−47.23% to −45.52%). The cache ×
+prefill interaction interval included zero. A separate-block comparison with
+the 7,506-token campaign found the near-limit prompt's chunk benefit larger by
+12.75/13.21 percentage points for request time at 3,000/3,500 slots; prompt-
+time differences were 8.25/8.71 points. All independent-block intervals
+excluded zero, showing a workload interaction between these two tasks while
+not isolating prompt length from their differing content/output. The short
+campaign retained 17.39/9.33 GiB minimum host/admission availability over 3,002
+samples with zero cgroup events. No profile changed; Phase 6 remains open.
