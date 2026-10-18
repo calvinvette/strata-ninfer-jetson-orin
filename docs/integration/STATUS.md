@@ -2818,3 +2818,16 @@ idle/background activity and are not process-attributed. This Q2_0 variant
 comes from the same pinned ISTA Coder-GGUF repository as the IQ1_M Coder tests,
 but it is not an IQ1_M or cross-quantization comparison. No profile changed;
 Phase 6 remains open.
+
+A three-block [current-source Q2_0 long-retrieval cache × prefill screen](../../bench/results/2026-10-18-phase6-q2-cache-prefill-long-screen3/README.md)
+crossed exact 3,000/3,500 expert slots with chunks 32/128 on a 7,501-token
+retrieval prompt. All 12 fresh-service cells passed the exact answer and token
+count checks. Chunk 128 reduced median request time 59.56% at 3,000 slots and
+61.38% at 3,500. The screen's cache × chunk estimate was −2.93 percentage
+points (three-block paired bootstrap interval −3.79 to −1.75); cache size was
+uncertain at chunk 32 and nominally favored 3,500 at chunk 128. These three-block
+intervals are exploratory, and no profile changed. Minimum host/admission
+availability was 17.42/10.59 GiB; cgroup pressure/OOM events were zero. Dynamic
+GPU clocks ranged 306 MHz–1,300.5 MHz; EMC readback was unsupported, and energy
+was not request-attributed. A separate held-out seven-block confirmation is
+underway; Phase 6 remains open.
