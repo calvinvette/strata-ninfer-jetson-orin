@@ -1,0 +1,116 @@
+{
+  "source": "bench/results/2026-10-16-phase5-coder-q8_1-combined-moe-capture",
+  "arms": {
+    "default": {
+      "route_capture_start_row": 1392,
+      "first_saved_route_record": {
+        "dispatch": 1392,
+        "layer": 0,
+        "row": 0,
+        "stream_row": 1392,
+        "n_tok": 1
+      },
+      "selected_dispatch": {
+        "dispatch": 1393,
+        "layer": 1,
+        "row": 0,
+        "stream_row": 1393,
+        "n_tok": 1,
+        "ids": [
+          209,
+          121,
+          126,
+          246,
+          207,
+          85,
+          9,
+          129,
+          140,
+          153
+        ],
+        "route_kind": [
+          -1,
+          0,
+          0,
+          0,
+          -1,
+          -1,
+          0,
+          0,
+          0,
+          -1
+        ]
+      },
+      "cpu_output_rows_match_selected_route": true,
+      "route_records_have_position_or_token_id": false,
+      "combined_first_record": {
+        "position": 511,
+        "token": 271
+      },
+      "combined_rows": 64,
+      "request_order": [
+        "short-512",
+        "long-2048",
+        "short-512-recovery",
+        "short-512-continuation-1"
+      ]
+    },
+    "cuda_mirror": {
+      "route_capture_start_row": 1392,
+      "first_saved_route_record": {
+        "dispatch": 1392,
+        "layer": 0,
+        "row": 0,
+        "stream_row": 1392,
+        "n_tok": 1
+      },
+      "selected_dispatch": {
+        "dispatch": 1393,
+        "layer": 1,
+        "row": 0,
+        "stream_row": 1393,
+        "n_tok": 1,
+        "ids": [
+          209,
+          121,
+          126,
+          246,
+          207,
+          85,
+          9,
+          129,
+          140,
+          153
+        ],
+        "route_kind": [
+          -1,
+          0,
+          0,
+          0,
+          -1,
+          -1,
+          0,
+          0,
+          0,
+          -1
+        ]
+      },
+      "cpu_output_rows_match_selected_route": true,
+      "route_records_have_position_or_token_id": false,
+      "combined_first_record": {
+        "position": 511,
+        "token": 271
+      },
+      "combined_rows": 64,
+      "request_order": [
+        "short-512",
+        "long-2048",
+        "short-512-recovery",
+        "short-512-continuation-1"
+      ]
+    }
+  },
+  "same_verifier_row_join_proven": false,
+  "reason": "The route capture starts after 1,392 rows and records dispatch/row/stream_row but no absolute position or token ID. The STGDIAG4 capture starts at position 511/token 271. The retained raw records do not provide a shared row key, and the skipped route prefix needed to map the dispatch counter to an absolute verifier position is absent.",
+  "withdrawal": "The 2026-10-18 report at the former *-dispatch-combine-join path incorrectly equated dispatch 1393/layer 1 with the first STGDIAG4 row. That assertion is withdrawn. The existing paired captures remain separate diagnostics until a new run records shared position/token metadata."
+}

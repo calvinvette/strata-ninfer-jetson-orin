@@ -235,16 +235,16 @@ expert addition. Among 50 rows with matching positions and input tokens, no
 combined output matched bitwise; the first shared row (position 511/token 271)
 differed in all 2,560 values, with relative L1 0.004017. In the same pair,
 dispatch 1393/layer 1 had matching input activations, expert IDs and owners,
-while all four CPU-owned rows differed in all 2,560 values. The later ordered
-[capture join](../../bench/results/2026-10-18-phase5-coder-dispatch-combine-join/README.md)
-established that dispatch 1393/layer 1 is the first verifier row at position
-511/token 271: its four CPU-owned expert output rows match the exact IDs and
-owner slots, and the combined-output capture records the same verifier window.
-The activation, IDs and owners match across arms, while all four CPU expert
-outputs and all 2,560 post-combine `ffn_y` values differ. This links route-
-dependent arithmetic to a post-combine difference on the same row, but does
-not isolate each expert's weighted contribution or prove it is the sole cause
-of later state/continuation divergence. Default and mirror answers matched on the
+while all four CPU-owned rows differed in all 2,560 values. The route and
+combined-output captures were initially retained as separate observations.
+A later [alignment audit](../../bench/results/2026-10-18-phase5-coder-dispatch-combine-audit/README.md)
+found that the route trace begins after 1,392 skipped rows and has no absolute
+position or token ID, while the combined capture starts at position 511/token
+271. It therefore cannot join dispatch 1393 to the first combined row; the
+previous contrary assertion was withdrawn. The CPU-output rows match the
+dispatch's own expert IDs and CPU owners, and the paired services separately
+show both CPU-route and post-combine differences, but their direct link remains
+unproven. Default and mirror answers matched on the
 initial short and immediate recovery requests, then differed at 3/16 long and
 13/16 continuation token positions; persistent-state fingerprints differed
 across arms. Both services passed above the six-GiB floor with no cgroup memory
