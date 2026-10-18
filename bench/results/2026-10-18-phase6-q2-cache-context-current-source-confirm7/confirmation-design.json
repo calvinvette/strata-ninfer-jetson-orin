@@ -1,0 +1,9 @@
+{
+  "purpose": "Current-source, held-out Q2_0 expert-cache x context confirmation.",
+  "factors": {"expert_cache_argument": [3000, 5000], "configured_context_tokens": [8192, 16384]},
+  "design": {"blocks": 7, "randomized_within_block": true, "fresh_service_per_cell": true, "measured_requests_per_cell": 3, "warmup_requests_per_cell": 1},
+  "fixed_profile": {"prefill_chunk_tokens": 128, "kv": "FP16", "mtp": "off", "pool_workers": 8, "prompt_cache": "disabled", "adaptive_swaps": "disabled", "clock_policy": "dynamic, read-only sampled"},
+  "guards": {"memory_max_gib": 28, "host_headroom_floor_gib": 6},
+  "workload": {"prompt_tokens": 512, "expected_codes": ["TUNDRA-ORBIT-593", "COBALT-MAPLE-248", "GRANITE-COMET-761"], "expected_suffix_sum": 1602, "oracle": "593 + 248 + 761 = 1602"},
+  "interpretation": "Three requests within one process are summarized per cell; seven randomized independent block effects support paired confirmation. This single workload does not establish general context/cache behavior or justify default changes."
+}

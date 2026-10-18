@@ -1,0 +1,17 @@
+{
+  "attempts": [
+    {
+      "attempt": 1,
+      "command": "systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes python3 tools/integration/run_control.py --output .../campaign-supervisor --timeout 28800 --interval 1 --sample-clocks -- ./run_confirm7.sh",
+      "result": "No model cell launched. The outer run_control acquired /tmp/strata-integration-1000.lock; the nested per-cell run_control then returned not_run with reason 'another integration command holds the board lock'.",
+      "supervisor": "campaign-supervisor/result.json",
+      "resource_note": "No model process started; memory remained above the six-GiB floor."
+    },
+    {
+      "attempt": 2,
+      "command": "systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes ./run_confirm7.sh",
+      "result": "No model cell launched. The cache/context runner refused to overwrite the retained block-01 directory from attempt 1 (FileExistsError).",
+      "resource_note": "No request or model process started. The successful rerun uses the distinct retry-lockfix/ output root."
+    }
+  ]
+}
