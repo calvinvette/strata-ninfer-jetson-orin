@@ -56,6 +56,15 @@ cgroup memory events remained zero. Engine prefill took 32,851.9 seconds
 attribution, not repeated quality or sustained-service evidence; Phase 7 remains
 open.
 
+The selected profile also passed one [128K held-out retrieval, arithmetic and
+recovery task](../../bench/results/2026-10-18-phase7-q2-prefill128-128k-heldout-quality/README.md).
+The independent input review confirmed a 120,141-token uncached prompt with new
+markers near 10/50/90%; the service returned all three in order and the
+independent suffix oracle verified `417 + 638 + 925 = 1980`. Same-service
+recovery returned `RECOVERED`. Across 5,528 samples, minimum host/admission
+availability was 14.64/11.41 GiB with zero cgroup events. Prefill took 5,751.5
+seconds at 20.9 tokens/s. This is one synthetic quality cell, not a broad score
+or performance comparison; Phase 7 remains open.
 
 The selected Q2_0 MTP-off profile also passed one [64K retrieval-plus-arithmetic
 replication](../../bench/results/2026-10-17-phase7-q2-prefill128-64k-quality-mtp-off/README.md)
