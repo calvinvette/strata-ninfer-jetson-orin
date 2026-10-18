@@ -1,0 +1,125 @@
+{
+  "scope": "three-arm, one 512-token prompt, one 16-token completion; correctness and diagnostic capture only",
+  "model_repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+  "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
+  "quantization": "IQ1_M",
+  "binary_sha256": "dfc6394251bbe2713f6039d442e290109513447a770884b58657f7e162d2ed60",
+  "profile_sha256": "0a15591f591178c406b3eab021e5f23541d795f6a058d42603c56f6b8d7e4154",
+  "same_prompt_hash": true,
+  "same_completion_token_ids": true,
+  "completion_tokens": 16,
+  "route_observation": {
+    "dispatch": 1,
+    "layer": 1,
+    "row": 0,
+    "n_tok": 1,
+    "expert_ids": [
+      198,
+      205,
+      101,
+      32,
+      35,
+      11,
+      95,
+      65,
+      18,
+      165
+    ],
+    "cpu_default_and_mirror_owners": [
+      0,
+      -1,
+      -1,
+      -1,
+      0,
+      -1,
+      -1,
+      0,
+      -1,
+      -1
+    ],
+    "gpu_profile_owners": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cpu_owned_target_pairs": [
+      [
+        1,
+        205
+      ],
+      [
+        1,
+        101
+      ],
+      [
+        1,
+        32
+      ],
+      [
+        1,
+        11
+      ],
+      [
+        1,
+        95
+      ],
+      [
+        1,
+        18
+      ],
+      [
+        1,
+        165
+      ]
+    ],
+    "layer0_activation_matches_all_arms": true,
+    "layer1_activation_matches_default_mirror": true,
+    "layer1_activation_matches_gpu_profile": false,
+    "absolute_position_or_token_key_in_route_record": false
+  },
+  "combined_capture": {
+    "rows": 16,
+    "all_arms_have_same_position_token_keys": true,
+    "first_position_token": [
+      511,
+      271
+    ],
+    "pairwise_ffn_y": {
+      "cpu_default_vs_cpu_mirror": {
+        "exact": false,
+        "different_values": 40960,
+        "elements": 40960,
+        "max_abs": 0.0007246192544698715,
+        "relative_l1": 0.006391393128896672
+      },
+      "cpu_default_vs_gpu_layer1": {
+        "exact": false,
+        "different_values": 10240,
+        "elements": 40960,
+        "max_abs": 0.00021168310195207596,
+        "relative_l1": 0.0007275366161413457
+      },
+      "cpu_mirror_vs_gpu_layer1": {
+        "exact": false,
+        "different_values": 35840,
+        "elements": 40960,
+        "max_abs": 0.0007246192544698715,
+        "relative_l1": 0.005735906276191906
+      }
+    }
+  },
+  "persistent_state_fingerprints_equal": {
+    "cpu_default_vs_cpu_mirror": false,
+    "cpu_default_vs_gpu_profile": false,
+    "cpu_mirror_vs_gpu_profile": false
+  },
+  "causal_isolation_proven": false,
+  "limitation": "The GPU-profile arm changes the captured layer-1 input activation while the layer-0 route capture matches. The route records have no absolute position/token key. Combined output rows can be paired across arms, but cannot be joined to the selected route row; the intervention therefore does not isolate only the CPU/GPU execution of that layer-1 expert set."
+}
