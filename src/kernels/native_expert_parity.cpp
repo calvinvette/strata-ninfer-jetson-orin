@@ -735,6 +735,8 @@ int main(int argc, char** argv) {
                              "       native_expert_parity --q8_1-quantizer --activation-f32 FILE\n"
                              "       native_expert_parity --synthetic GU/DOWN ...   (ggml type names, e.g. q4_K/q5_1)\n"
                              "       native_expert_parity --synthetic-windows iq2_s/q2_0  (Q8_1 CPU/CUDA, widths 1..8)\n"
+                             "       <shard.gguf> --expert E --activation-f32 FILE --windows-1-through-8\n"
+                             "           (real IQ2_S/Q2_0 weights and captured activation, Q8_1 CPU/CUDA)\n"
                              "       native_expert_parity --q5_1-min\n"
                              "       native_expert_parity --bf16-embd\n");
         return 2;
@@ -821,12 +823,23 @@ int main(int argc, char** argv) {
         int expert = E;
         std::string activation_path;
         std::string dump_f32_dir;
+        bool all_windows = false;
         for (int i = 2; i < argc; ++i) {
             const std::string arg = argv[i];
             if (arg == "--expert" && i + 1 < argc) expert = std::atoi(argv[++i]);
             else if (arg == "--activation-f32" && i + 1 < argc) activation_path = argv[++i];
             else if (arg == "--dump-f32-dir" && i + 1 < argc) dump_f32_dir = argv[++i];
+            else if (arg == "--windows-1-through-8") all_windows = true;
             else layers.push_back(std::atoi(argv[i]));
+        }
+        const char* q8_1_env = std::getenv("STRATA_NATIVE_CPU_Q8_1_DOT");
+        if (all_windows && (q8_1_env == nullptr || std::atoi(q8_1_env) == 0)) {
+            std::fprintf(stderr, "--windows-1-through-8 requires STRATA_NATIVE_CPU_Q8_1_DOT=1\n");
+            return 2;
+        }
+        if (all_windows && activation_path.empty()) {
+            std::fprintf(stderr, "--windows-1-through-8 requires --activation-f32 FILE\n");
+            return 2;
         }
         if (expert < 0 || expert >= cpu::NE) {
             std::fprintf(stderr, "expert id %d is outside the model's %d experts\n", expert, cpu::NE);
@@ -846,6 +859,10 @@ int main(int argc, char** argv) {
                 return 2;
             }
             std::printf("using captured service activation: %s (%lld float32 values)\n", activation_path.c_str(), (long long) H);
+        }
+        if (all_windows && layers.size() != 1) {
+            std::fprintf(stderr, "--windows-1-through-8 requires exactly one explicit layer\n");
+            return 2;
         }
         if (layers.empty()) layers = {0, 1, 2, 3, 20, 47};
         for (int l : layers) {
@@ -869,8 +886,25 @@ int main(int argc, char** argv) {
             std::memcpy(blob.data() + f.down_off, data[2] + (size_t) expert * (f.bytes - f.down_off),
                         f.bytes - f.down_off);
             const std::string label = "layer " + std::to_string(l) + " expert " + std::to_string(expert);
-            failures += check_blob<NT>(f, blob, l, label, s,
-                                   service_activation.empty() ? nullptr : &service_activation, dump_f32_dir);
+            if (all_windows) {
+                if (f.gu_type != GGML_TYPE_IQ2_S || f.d_type != GGML_TYPE_Q2_0 ||
+                    f.gu_act != GGML_TYPE_Q8_1 || f.d_act != GGML_TYPE_Q8_1) {
+                    std::fprintf(stderr, "%s: widths 1..8 require IQ2_S/Q2_0 weights and Q8_1 activations\n",
+                                 label.c_str());
+                    return 2;
+                }
+                failures += check_blob<1>(f, blob, l, label + " nt=1", s, &service_activation);
+                failures += check_blob<2>(f, blob, l, label + " nt=2", s, &service_activation);
+                failures += check_blob<3>(f, blob, l, label + " nt=3", s, &service_activation);
+                failures += check_blob<4>(f, blob, l, label + " nt=4", s, &service_activation);
+                failures += check_blob<5>(f, blob, l, label + " nt=5", s, &service_activation);
+                failures += check_blob<6>(f, blob, l, label + " nt=6", s, &service_activation);
+                failures += check_blob<7>(f, blob, l, label + " nt=7", s, &service_activation);
+                failures += check_blob<8>(f, blob, l, label + " nt=8", s, &service_activation);
+            } else {
+                failures += check_blob<NT>(f, blob, l, label, s,
+                                           service_activation.empty() ? nullptr : &service_activation, dump_f32_dir);
+            }
         }
     }
     std::printf("native_expert_parity: %d failures\n", failures);

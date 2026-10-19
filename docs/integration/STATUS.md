@@ -2920,3 +2920,13 @@ The changed shared files also passed current-source maestro1 HIP and SYCL
 rebuilds from commit `58be4d54`; the HIP and SYCL service `--help` checks
 passed. These are x86_64 compile/CLI checks only, with no accelerator runtime
 qualification. See the [complete report](../../bench/results/2026-10-18-phase5-coder-q8-1-windows-ctest/README.md).
+
+A six-case [Coder Q8_1 verifier-window check](../../bench/results/2026-10-19-phase5-coder-q8-1-real-windows/README.md)
+used the pinned IQ1_M GGUF, actual IQ2_S/Q2_0 expert tensors and captured
+service activations for routed layer 1 experts. Across widths 1–8, all 48
+CPU/CUDA outputs were bitwise equal and all 48 width-invariance checks had
+zero differing rows. The focused CTests passed, and the updated diagnostic
+built for CUDA on Orin and HIP on maestro1. This confirms operator parity for
+these cases only; it does not prove persistent state or end-to-end service
+parity and does not resolve adaptive-residency divergence. Phase 5 remains
+open.
