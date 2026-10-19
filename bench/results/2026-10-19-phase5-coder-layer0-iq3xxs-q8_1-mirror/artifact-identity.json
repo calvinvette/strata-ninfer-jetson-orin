@@ -1,0 +1,34 @@
+{
+  "source_commit": "9d3f86aad362772239a69971d7bdccdc11d17a17",
+  "source_overlay_sha256": "3e48ff0cff0c7b5077f9e904552a7d126b8692974e8c6ff06e6fe69386f32eb0",
+  "source_files": [
+    "CMakeLists.txt",
+    "include/strata/kernels/cpu/native_expert.hpp",
+    "src/kernels/cpu/native_expert.cpp",
+    "src/kernels/native_expert_parity.cpp"
+  ],
+  "service_binary_sha256": "09650043afc845d99a834fa7531008bd2023ef9cce6c6ca17bba42daa1c22ba6",
+  "native_expert_parity_sha256": "9f948c82ae79c7595ff641119d817a9dee1e4e5c91ee83c722695ab29c3f3824",
+  "model": {
+    "repo": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+    "revision": "5348543e0147355ac9cbcb031184a3546350988e",
+    "format": "IQ1_M, two shards",
+    "sha256": {
+      "Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf": "e11083ba855e7666b48ea3f2db6a9c3a20c18751a012cc24f948de91b7087fad",
+      "Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+    }
+  },
+  "activation_matrix_sha256": "189ac8fb6c10caf9b98785f83a3f4d2544ff752603791bc777a2e52a111d93fc",
+  "activation_row0_sha256": "607553ddddee20523c8259ba171eedc35fb01239dca19d1124114cf574515391",
+  "host": "NVIDIA Jetson AGX Orin, aarch64; CUDA 12.6/driver 540.4.0",
+  "maestro1_backend_validation": {
+    "source_overlay_sha256": "7bb1baa2abb94ed9b2889938beaa295d45d425fea556777609954e7f5f9f8087",
+    "hip_strata_sha256": "fa9230495834cfaeff3cc43978a004f4830c0a0f35e8ec1d9e0733230dfd095a",
+    "hip_native_expert_parity_sha256": "af9198922251f2777d07eddaff794c6dacecbf35d66c66eefa0c585adee38c4b",
+    "sycl_strata_sha256": "d0d57e0bf2b6fb77095a28e49eedb5a4ca410ef8aa56c5b7de4c0afdde3e1a1b",
+    "builds": "Exact-source HIP and SYCL compile/link passed with two jobs.",
+    "cli": "strata --help passed for HIP and SYCL; HIP native_expert_parity does not implement --help (exit 134 while trying to open that path).",
+    "runtime": "No HIP or SYCL accelerator runtime available or tested on maestro1."
+  },
+  "backend_validation": "Orin CUDA build and focused runtime tests passed; maestro1 exact-source HIP/SYCL compile-link passed, with runtime unavailable"
+}

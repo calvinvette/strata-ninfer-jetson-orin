@@ -1536,6 +1536,14 @@ if(STRATA_NATIVE_EXPERTS)
                COMMAND ${CMAKE_COMMAND} -E env STRATA_NATIVE_CPU_Q8_1_DOT=1
                        $<TARGET_FILE:native_expert_parity> --synthetic-windows iq2_s/iq4_nl)
       set_tests_properties(native_expert_parity_iq2_s_iq4_nl_cpu_q8_1_windows PROPERTIES TIMEOUT 300)
+      add_test(NAME native_expert_parity_iq3_xxs_iq4_nl_cpu_q8_1_dot
+               COMMAND ${CMAKE_COMMAND} -E env STRATA_NATIVE_CPU_Q8_1_DOT=1
+                       $<TARGET_FILE:native_expert_parity> --synthetic iq3_xxs/iq4_nl)
+      set_tests_properties(native_expert_parity_iq3_xxs_iq4_nl_cpu_q8_1_dot PROPERTIES TIMEOUT 120)
+      add_test(NAME native_expert_parity_iq3_xxs_iq4_nl_cpu_q8_1_windows
+               COMMAND ${CMAKE_COMMAND} -E env STRATA_NATIVE_CPU_Q8_1_DOT=1
+                       $<TARGET_FILE:native_expert_parity> --synthetic-windows iq3_xxs/iq4_nl)
+      set_tests_properties(native_expert_parity_iq3_xxs_iq4_nl_cpu_q8_1_windows PROPERTIES TIMEOUT 300)
       add_test(NAME native_expert_parity_q5_1_min COMMAND native_expert_parity --q5_1-min)
       # #290: the BF16 token embedding (--embd-gguf) gathered and dequantized bit for bit
       add_test(NAME native_expert_parity_bf16_embd COMMAND native_expert_parity --bf16-embd)

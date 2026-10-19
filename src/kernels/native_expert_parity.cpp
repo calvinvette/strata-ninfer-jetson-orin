@@ -628,7 +628,7 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
         cpu_gpu_bitwise_diff += std::memcmp(&got_c[i], &got_g[i], sizeof(float)) != 0;
     const bool ok = ec < 3e-2 && eg < 3e-2 && std::isfinite(ec) && std::isfinite(eg);
     if (std::getenv("STRATA_NATIVE_CPU_Q8_1_DOT") != nullptr &&
-        f.gu_type == GGML_TYPE_IQ2_S && f.d_type == GGML_TYPE_IQ4_NL) {
+        (f.gu_type == GGML_TYPE_IQ2_S || f.gu_type == GGML_TYPE_IQ3_XXS) && f.d_type == GGML_TYPE_IQ4_NL) {
         // Full expert output also includes backend-specific expf/SwiGLU rounding.
         // Isolate the changed down dot and require exact quantizer-code and output parity.
         failures += check_iq4_nl_down_q8_1(f, blob, seed, s);
@@ -797,9 +797,9 @@ int main(int argc, char** argv) {
                              "       [--dump-f32-dir DIR] writes dequantized weights, input and reference/operator outputs\n"
                              "       native_expert_parity --q8_1-quantizer --activation-f32 FILE\n"
                              "       native_expert_parity --synthetic GU/DOWN ...   (ggml type names, e.g. q4_K/q5_1)\n"
-                             "       native_expert_parity --synthetic-windows iq2_s/q2_0|iq2_s/iq4_nl  (Q8_1, widths 1..8)\n"
+                             "       native_expert_parity --synthetic-windows iq2_s/q2_0|iq2_s/iq4_nl|iq3_xxs/iq4_nl  (Q8_1, widths 1..8)\n"
                              "       <shard.gguf> --expert E --activation-f32 FILE --windows-1-through-8\n"
-                             "           (real IQ2_S/Q2_0 or IQ2_S/IQ4_NL weights and captured activation, Q8_1)\n"
+                             "           (real IQ2_S/Q2_0, IQ2_S/IQ4_NL or IQ3_XXS/IQ4_NL weights and captured activation, Q8_1)\n"
                              "       <shard.gguf> --expert E --activation-f32 MATRIX --activation-rows N --token-width N\n"
                              "           (run distinct captured rows together, N=1..8)\n"
                              "       native_expert_parity --q5_1-min\n"
@@ -865,9 +865,10 @@ int main(int argc, char** argv) {
             }
             const auto blob = synthetic_blob(f, i);
             if (all_windows) {
-                if (gu != GGML_TYPE_IQ2_S || (dn != GGML_TYPE_Q2_0 && dn != GGML_TYPE_IQ4_NL) ||
+                if ((gu != GGML_TYPE_IQ2_S && gu != GGML_TYPE_IQ3_XXS) ||
+                    (dn != GGML_TYPE_Q2_0 && dn != GGML_TYPE_IQ4_NL) ||
                     f.gu_act != GGML_TYPE_Q8_1 || f.d_act != GGML_TYPE_Q8_1) {
-                    std::fprintf(stderr, "--synthetic-windows supports iq2_s/q2_0 or iq2_s/iq4_nl with Q8_1 activations\n");
+                    std::fprintf(stderr, "--synthetic-windows supports iq2_s/q2_0, iq2_s/iq4_nl or iq3_xxs/iq4_nl with Q8_1 activations\n");
                     return 2;
                 }
                 failures += check_blob<1>(f, blob, i, "synthetic nt=1", s);
@@ -975,10 +976,10 @@ int main(int argc, char** argv) {
                     case 8: failures += check_blob<8>(f, blob, l, label + " nt=8", s, &service_activation, dump_f32_dir); break;
                 }
             } else if (all_windows) {
-                if (f.gu_type != GGML_TYPE_IQ2_S ||
+                if ((f.gu_type != GGML_TYPE_IQ2_S && f.gu_type != GGML_TYPE_IQ3_XXS) ||
                     (f.d_type != GGML_TYPE_Q2_0 && f.d_type != GGML_TYPE_IQ4_NL) ||
                     f.gu_act != GGML_TYPE_Q8_1 || f.d_act != GGML_TYPE_Q8_1) {
-                    std::fprintf(stderr, "%s: widths 1..8 require IQ2_S/Q2_0 or IQ2_S/IQ4_NL weights and Q8_1 activations\n",
+                    std::fprintf(stderr, "%s: widths 1..8 require IQ2_S/Q2_0, IQ2_S/IQ4_NL or IQ3_XXS/IQ4_NL weights and Q8_1 activations\n",
                                  label.c_str());
                     return 2;
                 }

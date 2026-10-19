@@ -39,6 +39,22 @@ HIP/SYCL compile/link and CLI-help checks passed, with no accelerator runtime
 claim; see the [backend report](../../bench/results/2026-10-19-phase5-coder-layer2-q8_1-mirror/backend/maestro1/README.md).
 Phase 5 remains open.
 
+An opt-in [IQ3_XXS/IQ4_NL Q8_1 CPU mirror diagnostic](../../bench/results/2026-10-19-phase5-coder-layer0-iq3xxs-q8_1-mirror/README.md)
+extended the CUDA-lane-order CPU dot to a captured layer-0 Coder expert. On the
+two-row service activation, CPU-vs-CUDA expert relative L1 fell from 1.52% on
+the default CPU path to `2.46e-8`; the IQ4_NL down projection matched exactly.
+All six Q8_1 operator CTests passed. A same-binary fixed/adaptive service pair
+still had persistent-state hash differences on every request; output IDs
+differed by 10/16 on adaptive short/recovery and 3/16 on the fixed long request.
+Thus this arithmetic match does not qualify CPU/GPU migration or accepted-prefix
+state parity. The route remains opt-in and Phase 5 remains open.
+
+The exact-source [maestro1 HIP/SYCL rebuilds](../../bench/results/2026-10-19-phase5-coder-layer0-iq3xxs-q8_1-mirror/backend/maestro1/README.md)
+also passed compile/link with two jobs. Both Strata help commands exited 0;
+the HIP parity utility does not implement `--help`, so that invocation is not
+a runtime check. This is x86_64 build/CLI evidence only, not accelerator
+execution or Orin performance.
+
 A new supervised [Q2_0 short→long→short check](../../bench/results/2026-10-18-phase5-q2-short-long-short/README.md)
 on the selected MTP-off, fixed-residency profile returned the same exact
 512-token retrieval-and-sum answer before and after an uncached 7,498-token

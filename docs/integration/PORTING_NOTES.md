@@ -138,6 +138,15 @@ CUDA lane assignments and an isolated dot match do not transfer to Metal or
 prove continuation equivalence. This is an adapter lesson, not a NInfer source
 promotion.
 
+A follow-up captured IQ3_XXS/IQ4_NL expert check shows why format coverage must
+be per tensor pair: a CUDA-order Q8_1 IQ3_XXS dot reduced the tested CPU/CUDA
+whole-expert relative-L1 delta from 1.52% to `2.46e-8`, and the down projection
+was exact. Yet paired fixed/adaptive service runs still changed persistent
+state hashes and some token IDs. The scalar mirror is therefore useful for
+causal isolation, not evidence that layer arithmetic alone restores request
+state. For Splash, test each actual Metal-supported expert pair and then follow
+the numerical change through committed state and continuation.
+
 A first campaign preserved one completed process and five failed starts because
 the harness's port precheck did not allow TCP TIME_WAIT reuse. The corrected
 precheck matches HTTPServer's SO_REUSEADDR behavior while rejecting a live

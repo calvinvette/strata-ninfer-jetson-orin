@@ -61,7 +61,7 @@ def main():
     parser.add_argument("--capture-combined-moe", action="store_true",
                         help="capture the verifier's combined layer-1 FFN/MoE output")
     parser.add_argument("--cpu-q8-1-dot", action="store_true",
-                        help="enable the opt-in IQ2_S/Q2_0 and IQ4_NL CPU Q8_1 scalar routes")
+                        help="enable opt-in IQ2_S/Q2_0, IQ2_S/IQ4_NL and IQ3_XXS/IQ4_NL CPU Q8_1 scalar routes")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.continuations < 0:
