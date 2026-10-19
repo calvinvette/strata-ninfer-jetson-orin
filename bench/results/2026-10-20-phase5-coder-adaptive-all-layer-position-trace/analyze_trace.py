@@ -39,6 +39,53 @@ def accepted_prefixes(path, api_requests):
     return requests
 
 
+def accepted_prefix_gdn_hashes(path, api_requests):
+    """Read per-GDN-layer hashes emitted immediately before each accepted-prefix row."""
+    pending = None
+    rows = []
+    for line in path.read_text().splitlines():
+        if "STATE_HASH_GDN " in line:
+            pending = [value.lower() for value in line.split("STATE_HASH_GDN ", 1)[1].split()]
+            continue
+        if "ACCEPTED_PREFIX position=" not in line:
+            if pending is not None:
+                pending = None
+            continue
+        if pending is None:
+            raise ValueError("accepted-prefix record has no preceding per-layer GDN state hash")
+        match = re.search(r"tokens=([0-9,]+)", line)
+        if match is None:
+            raise ValueError(f"malformed accepted-prefix token record: {line[:160]}")
+        tokens = match.group(1).split(",")
+        if len(tokens) != 1:
+            raise ValueError("per-layer GDN trace requires one accepted token per verifier round")
+        rows.append(pending)
+        pending = None
+    expected = sum(len(request["ids"]) for request in api_requests)
+    if len(rows) != expected:
+        raise ValueError(f"per-layer GDN hash count mismatch: got {len(rows)}, expected {expected}")
+    counts = {len(row) for row in rows}
+    if len(counts) != 1:
+        raise ValueError("per-layer GDN hash rows have inconsistent layer counts")
+    requests, at = [], 0
+    for request in api_requests:
+        count = len(request["ids"])
+        requests.append({"name": request["name"], "prefixes": rows[at:at + count]})
+        at += count
+    return requests
+
+
+def compare_gdn_prefixes(before, after):
+    differing = [i for i, (a, b) in enumerate(zip(before, after)) if a != b]
+    first = differing[0] if differing else None
+    ordinals = ([i for i, (a, b) in enumerate(zip(before[first], after[first])) if a != b]
+                if first is not None else [])
+    return {"different_state_prefix_count": len(differing),
+            "different_prefix_indices": differing,
+            "first_different_prefix": first,
+            "first_different_gdn_ordinals": ordinals}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run", type=Path, default=RUN)
@@ -62,6 +109,7 @@ def main():
 
     arms = {}
     prefix_records = {}
+    gdn_prefix_records = {}
     for arm in ARM_NAMES:
         path = run / arm / "result/all-layer-position511.jsonl"
         records = [json.loads(line) for line in path.read_text().splitlines()]
@@ -87,7 +135,10 @@ def main():
         arm_analysis = json.loads((run / arm / "result/analysis.json").read_text())
         api_requests = json.loads((run / arm / "result/requests.json").read_text())["requests"]
         prefix_records[arm] = accepted_prefixes(run / arm / "result/service.log", api_requests)
+        gdn_prefix_records[arm] = accepted_prefix_gdn_hashes(run / arm / "result/service.log", api_requests)
         first, recovery = prefix_records[arm][0], prefix_records[arm][2]
+        gdn_initial, gdn_recovery = gdn_prefix_records[arm][0], gdn_prefix_records[arm][2]
+        recovery_gdn_comparison = compare_gdn_prefixes(gdn_initial["prefixes"], gdn_recovery["prefixes"])
         arms[arm] = {"recovery_token_differences": arm_analysis["recovery_token_differences"],
                      "changed_final_state_fields": arm_analysis["changed_state_keys"],
                      "adaptive_byte_checks": arm_analysis["adaptive_byte_verification_passes"],
@@ -97,6 +148,7 @@ def main():
                          "different_state_prefixes": sum(a["state"] != b["state"] for a, b in zip(first["prefixes"], recovery["prefixes"])),
                          "different_final_state_fields": [key for key in STATE_KEYS if first["prefixes"][-1]["state"][key] != recovery["prefixes"][-1]["state"][key]],
                      },
+                     "within_service_short_recovery_gdn_state": recovery_gdn_comparison,
                      "within_service": {
                          "first_activation_difference_layer": min(differing_activations) if differing_activations else None,
                          "activation_difference_layers": differing_activations,
@@ -123,6 +175,10 @@ def main():
                 "different_final_state_fields": [key for key in STATE_KEYS if request_a["prefixes"][-1]["state"][key] != request_b["prefixes"][-1]["state"][key]],
             }
             for request_a, request_b in zip(prefix_records["adaptive-cap8"], prefix_records["delayed-control"])
+        },
+        "cross_arm_accepted_prefix_gdn_state": {
+            request_a["name"]: compare_gdn_prefixes(request_a["prefixes"], request_b["prefixes"])
+            for request_a, request_b in zip(gdn_prefix_records["adaptive-cap8"], gdn_prefix_records["delayed-control"])
         },
         "adaptive_first_downstream_activation_difference": {
             "layer": first_activation, "preceding_layer": prior_layer,

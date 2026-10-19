@@ -37,6 +37,74 @@ activation moved to layer 26; layer 25 had the same activation and expert IDs
 and no owner changes. The trace does not identify the remaining upstream state
 or operator cause. The selector remains opt-in and is not a migration fix.
 
+Per-layer GDN hashes narrow the state boundary further. At the first accepted
+token of the adaptive recovery, GDN ordinals 20–35 differ from the initial
+short request; ordinals 0–19 match. With this model's QSA interval of four,
+ordinal 20 is GDN model layer 26. The delayed control matches all 36 GDN hashes
+at all 16 accepted prefixes. This agrees with the first changed captured
+expert input at layer 26, but hashes do not identify the operation that first
+changed the GDN state. At layer 24, the only owner-flipped expert in this row
+(expert 173, IQ2_S/IQ4_NL) independently matched CPU and CUDA output bit-for-bit
+on both captured activations (0/7,680 F32 words differed in either run). The
+separate standalone-MMVQ subdiagnostic still reports its documented schedule
+difference. This single-expert result does not establish aggregate-layer or
+full-model parity.
+
+## Raw accepted-prefix GDN state follow-up
+
+To measure the state delta without committing large state files, I captured the
+initial short request at occurrence 1 and the recovery short request at
+occurrence 2 in separate supervised reruns of the same adaptive sequence. Both
+runs used the same candidate binary (`89b1f96e…`), config, model revision and
+token IDs. The first request's per-GDN hashes matched exactly across the two
+runs, and the recovery dump's per-layer hashes matched the service log at the
+second position-511 accepted prefix. `compare_gdn_dumps.py` verifies each raw
+dump against its logged FNV1a hashes and checks the initial hashes across runs.
+
+At `L=512`, GDN ordinals 0–19 were bit-identical. Ordinals 20–35 differed in
+12,921,960 of 13,074,432 float values (98.83% of those layers; 43.92% of all
+GDN values). Overall relative L2 was 1.686%, with maximum absolute difference
+1.403. Ordinal 20 (model layer 26) had a much smaller 1.15e-5 relative-L2
+difference; subsequent changed GDN layers ranged from 0.80% to 3.49%. The
+state change starts at the same model layer as the first changed captured
+expert input and grows in later recurrent layers. These values describe the
+two states; they do not establish which state is more accurate or identify the
+operation that caused the first difference.
+
+The two raw 113 MiB dumps remain outside Git under
+`~/models/strata-orin-validation/experiments/phase5-gdn-state/`; their full
+SHA256 values and per-layer comparison are in `gdn-state-delta.json`. The
+supervisor samples, service logs and matching route captures are retained in
+`gdn-state-capture/`. Reproduce from the repository root with:
+
+```sh
+systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes \
+  python3 tools/integration/run_control.py \
+  --output /tmp/gdn-initial/supervisor --timeout 1800 --interval 1 --sample-clocks -- \
+  python3 bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/run_one.py \
+  --adapt-every 4 --adapt-swaps 8 --dump-gdn-occurrence 1 --output /tmp/gdn-initial/run
+
+systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes \
+  python3 tools/integration/run_control.py \
+  --output /tmp/gdn-recovery/supervisor --timeout 1800 --interval 1 --sample-clocks -- \
+  python3 bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/run_one.py \
+  --adapt-every 4 --adapt-swaps 8 --dump-gdn-occurrence 2 --output /tmp/gdn-recovery/run
+
+mkdir -p "$HOME/models/strata-orin-validation/experiments/phase5-gdn-state"
+cp /tmp/gdn-initial/run/gdn-state-L512.bin \
+  "$HOME/models/strata-orin-validation/experiments/phase5-gdn-state/coder-iq1m-adaptive-cap8-initial-L512.bin"
+cp /tmp/gdn-recovery/run/gdn-state-L512.bin \
+  "$HOME/models/strata-orin-validation/experiments/phase5-gdn-state/coder-iq1m-adaptive-cap8-recovery-L512.bin"
+
+python3 bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/compare_gdn_dumps.py \
+  --reference "$HOME/models/strata-orin-validation/experiments/phase5-gdn-state/coder-iq1m-adaptive-cap8-initial-L512.bin" \
+  --candidate "$HOME/models/strata-orin-validation/experiments/phase5-gdn-state/coder-iq1m-adaptive-cap8-recovery-L512.bin" \
+  --reference-log bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/gdn-state-capture/initial/run/service.log \
+  --candidate-log bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/gdn-state-capture/recovery/run/service.log \
+  --reference-occurrence 1 --candidate-occurrence 2 \
+  --output /tmp/gdn-state-delta.json
+```
+
 | Arm | Run time | Minimum host/admission availability | Swap byte/residency checks | Result |
 | --- | ---: | ---: | ---: | --- |
 | Delayed control | 320.1 s | 14.00 / 14.00 GiB | 0 / 0 | Recovery output and all 16 states matched initial short |
@@ -47,18 +115,24 @@ The all-layer captures and complete memory/clock samples are retained under
 `run/` (the original selector) and `run-with-iq3xxs-q2_0/` (the expanded
 selector). `all-layer-analysis-before-iq3xxs-q2_0.json` and
 `all-layer-analysis-after-iq3xxs-q2_0.json` independently compare all route
-rows and accepted-prefix states. Real-weight operator output and CTest logs
-are under `operator-checks/`.
+rows, accepted-prefix states, and per-GDN-layer state hashes. Real-weight
+operator output and CTest logs are under `operator-checks/`.
 
 The source patch was built on Orin CUDA/SM87. `file_expert_source_test` passed
-1/1, and the new Q8_1 selector/single-row/multi-token CTests passed 3/3. The
-full CTest suite was not rerun. maestro1 HIP/SYCL rebuilds could not start:
-its root filesystem reported zero available bytes. No files were removed from
-that host to make space; these backend checks remain outstanding. This change
-does not alter default dispatch. `source-overlay.patch` records the uncommitted
-selector changes relative to source commit `76eec469`; `SHA256SUMS` covers the
-retained report, source overlay, operator checks and raw paired captures. Phase
-5 remains open.
+1/1, and the Q8_1 selector/single-row/multi-token CTests passed 3/3; together,
+the four focused CTests passed. The full CTest suite was not rerun. The current
+source also passed the full 163-test integration Python suite. Current-source
+HIP and SYCL builds on maestro1 passed compile/link and `strata --help` with
+two jobs. The SYCL build consumed its `sycl/src/program/generate.cpp` overlay;
+the GDN dump diagnostic was ported to that overlay and rebuilt, including its
+per-kernel device-link step. Exact source hashes, binary hashes and logs are
+under `backend/maestro1-current-source-2026-10-19/`; the SYCL overlay patch is
+`sycl-gdn-state-capture.patch`. Maestro1 is x86_64, so these are build/CLI
+checks only. This change does not alter default dispatch.
+`source-overlay.patch` records the selector changes relative to source commit
+`76eec469`; `gdn-state-capture.patch` records the state-dump diagnostic change
+relative to `25daf34d`. `SHA256SUMS` covers the report, source overlays, paired
+captures, state analysis and retained supervision data. Phase 5 remains open.
 
 Reproduce the extended service pair on Orin with the current source and local
 model artifacts:

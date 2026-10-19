@@ -11255,6 +11255,60 @@ int main(int argc, char **argv) try {
                     return h;
                 };
                 const ConvStateSizes z = conv_state_sizes(g, ss);
+                // Keep the accepted-prefix GDN snapshot diagnostic available in
+                // the SYCL migration overlay as well as the CUDA source.
+                const char* gdn_dump_path = std::getenv("STRATA_STATE_DUMP_GDN");
+                const char* gdn_dump_at_s = std::getenv("STRATA_STATE_DUMP_GDN_AT");
+                static const int64_t gdn_dump_occurrence = [] {
+                    const char* value = std::getenv("STRATA_STATE_DUMP_GDN_OCCURRENCE");
+                    if (value == nullptr) return int64_t{1};
+                    char* end = nullptr;
+                    errno = 0;
+                    const long long parsed = std::strtoll(value, &end, 10);
+                    return errno == 0 && end != value && *end == '\0' && parsed > 0
+                        ? (int64_t) parsed : int64_t{1};
+                }();
+                static int64_t gdn_dump_matches = 0;
+                if (gdn_dump_path && gdn_dump_at_s && ss.gdn_alloc > 0 &&
+                    std::strtoll(gdn_dump_at_s, nullptr, 10) == L &&
+                    ++gdn_dump_matches == gdn_dump_occurrence) {
+                    FILE* dump = std::fopen(gdn_dump_path, "wb");
+                    if (!dump) {
+                        std::fprintf(stderr, "strata serve: cannot open GDN state dump %s\n", gdn_dump_path);
+                        return 1;
+                    }
+                    struct GdnDumpHeader {
+                        char magic[8];
+                        uint64_t cells;
+                        uint64_t layers;
+                        uint64_t floats_per_layer;
+                    } header{{'S','T','G','D','N','0','1','\0'}, (uint64_t) L,
+                             (uint64_t) ss.gdn_alloc, (uint64_t) (z.gdn / (size_t) ss.gdn_alloc / sizeof(float))};
+                    bool dump_ok = std::fwrite(&header, sizeof(header), 1, dump) == 1;
+                    for (size_t offset = 0; dump_ok && offset < z.gdn;) {
+                        const size_t n = std::min(hash_buffer.size(), z.gdn - offset);
+                        if (DPCT_CHECK_ERROR(
+                                dpct::get_in_order_queue()
+                                    .memcpy(hash_buffer.data(),
+                                            reinterpret_cast<const uint8_t*>(ss.gdn_state) + offset,
+                                            n)
+                                    .wait()) != 0 ||
+                            std::fwrite(hash_buffer.data(), 1, n, dump) != n) {
+                            dump_ok = false;
+                            break;
+                        }
+                        offset += n;
+                    }
+                    if (std::fclose(dump) != 0) dump_ok = false;
+                    if (!dump_ok) {
+                        std::fprintf(stderr, "strata serve: failed writing GDN state dump %s\n", gdn_dump_path);
+                        return 1;
+                    }
+                    std::fprintf(stderr, "strata serve: STATE_DUMP_GDN path=%s cells=%lld layers=%lld occurrence=%lld floats_per_layer=%llu\n",
+                                 gdn_dump_path, (long long) L, (long long) ss.gdn_alloc,
+                                 (long long) gdn_dump_occurrence,
+                                 (unsigned long long) header.floats_per_layer);
+                }
                 uint64_t h_gdn = hash_dev(ss.gdn_state, z.gdn, 1469598103934665603ull);
                 if (std::getenv("STRATA_STATE_HASH_GDN") != nullptr && ss.gdn_alloc > 0) {   // per GDN layer: which one differs first
                     const size_t per = z.gdn / (size_t) ss.gdn_alloc;

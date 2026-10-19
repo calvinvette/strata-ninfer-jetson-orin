@@ -10286,9 +10286,19 @@ int main(int argc, char** argv) {
                 // gated on an exact accepted-prefix length so warmup requests can be shorter.
                 const char* gdn_dump_path = std::getenv("STRATA_STATE_DUMP_GDN");
                 const char* gdn_dump_at_s = std::getenv("STRATA_STATE_DUMP_GDN_AT");
-                static bool gdn_state_dumped = false;
-                if (gdn_dump_path && gdn_dump_at_s && !gdn_state_dumped && ss.gdn_alloc > 0 &&
-                    std::strtoll(gdn_dump_at_s, nullptr, 10) == L) {
+                static const int64_t gdn_dump_occurrence = [] {
+                    const char* value = std::getenv("STRATA_STATE_DUMP_GDN_OCCURRENCE");
+                    if (value == nullptr) return int64_t{1};
+                    char* end = nullptr;
+                    errno = 0;
+                    const long long parsed = std::strtoll(value, &end, 10);
+                    return errno == 0 && end != value && *end == '\0' && parsed > 0
+                        ? (int64_t) parsed : int64_t{1};
+                }();
+                static int64_t gdn_dump_matches = 0;
+                if (gdn_dump_path && gdn_dump_at_s && ss.gdn_alloc > 0 &&
+                    std::strtoll(gdn_dump_at_s, nullptr, 10) == L &&
+                    ++gdn_dump_matches == gdn_dump_occurrence) {
                     FILE* dump = std::fopen(gdn_dump_path, "wb");
                     if (!dump) {
                         std::fprintf(stderr, "strata serve: cannot open GDN state dump %s\n", gdn_dump_path);
@@ -10317,9 +10327,9 @@ int main(int argc, char** argv) {
                         std::fprintf(stderr, "strata serve: failed writing GDN state dump %s\n", gdn_dump_path);
                         return false;
                     }
-                    gdn_state_dumped = true;
-                    std::fprintf(stderr, "strata serve: STATE_DUMP_GDN path=%s cells=%lld layers=%lld floats_per_layer=%llu\n",
+                    std::fprintf(stderr, "strata serve: STATE_DUMP_GDN path=%s cells=%lld layers=%lld occurrence=%lld floats_per_layer=%llu\n",
                                  gdn_dump_path, (long long) L, (long long) ss.gdn_alloc,
+                                 (long long) gdn_dump_occurrence,
                                  (unsigned long long) header.floats_per_layer);
                 }
                 uint64_t h_gdn = hash_dev(ss.gdn_state, z.gdn, 1469598103934665603ull);

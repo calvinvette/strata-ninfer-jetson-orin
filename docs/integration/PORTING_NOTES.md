@@ -573,7 +573,10 @@ supports an explicitly requested one-time float32 GDN dump at a selected
 accepted length (`STRATA_STATE_DUMP_GDN` plus `STRATA_STATE_DUMP_GDN_AT`). Use a
 distinct shorter warmup so the selected length identifies the measured request,
 retain the binary checksum and a compact numeric summary, and keep the large
-dump itself outside Git. At `L=1069`, chunk 32 versus 128 changed 98.37% of GDN
+dump itself outside Git. The optional `STRATA_STATE_DUMP_GDN_OCCURRENCE` selects
+which matching accepted-length occurrence to dump; it defaults to 1 and lets a
+same-service recovery request be distinguished from the initial request. At
+`L=1069`, chunk 32 versus 128 changed 98.37% of GDN
 values with 3.138% relative L2 despite matching output IDs. This establishes a
 state difference, not which state is more accurate. A future Strata + Splash
 effort should adapt the dump to the actual recurrent-state layout and use an
@@ -1472,6 +1475,22 @@ format inventories against implemented CPU routes, capture a common absolute
 position across layers, and keep operator equality, output equality and
 persistent-state parity as separate gates.
 
+When accepted-prefix hashes differ, compare per-layer recurrent-state hashes at
+the same committed prefix as well as the aggregate state fingerprint. In the
+expanded Coder trace, adaptive recovery first differed at GDN ordinal 20 (model
+layer 26 with QSA interval 4), while delayed recovery matched all 36 GDN layers.
+This aligned with the first changed captured expert-dispatch input at layer 26.
+An isolated expert match at an earlier owner flip did not explain the later
+state boundary. A future Splash port should keep state-layer localization and
+operator-output oracles as distinct evidence.
+
+For a same-prefix raw-state comparison, the adaptive Coder initial and recovery
+GDN snapshots changed 12.92 million of 29.42 million float values (43.92%),
+with 1.686% relative L2. The first differing GDN layer had only 1.15e-5
+relative L2; later recurrent layers amplified the difference. Keep dumps outside
+Git, hash-verify them against their accepted-prefix logs, and treat numeric
+deltas as descriptive until an independent state oracle identifies accuracy.
+
 `native_expert_parity` accepts `--expert E --activation-f32 FILE` for a raw
 little-endian vector of 2,560 float32 values. It reuses the chosen model shard
 to run the same captured activation through CPU and GPU expert implementations.
@@ -1945,3 +1964,17 @@ residual, even though later completion IDs diverged. For future Splash work,
 test selector contracts through both the service planner and the independent
 operator harness, then join exact route weights and combined output before
 attributing state changes to an operator or owner.
+
+The SYCL project resolves each source through `strata_resolve`: a file under
+`sycl/` takes precedence, and the top-level source is used only when the
+migrated copy is absent. In this validation, SYCL compiled the top-level CPU
+expert implementation and header, but `src/program/generate.cpp` came from the
+separate `sycl/src/program/generate.cpp` overlay. A successful backend build is
+not proof that a changed shared file was consumed. For future backend ports,
+inspect the build's source resolver, record hashes for the actual inputs, and
+carry a narrow diagnostic or behavior change into the overlay when the
+underlying semantics match; do not replace a migrated file wholesale just to
+make hashes identical. The GDN snapshot diagnostic is now represented in both
+source paths, with queue-based SYCL copies and backend-specific error returns.
+maestro1 checks compile/link and CLI behavior only; runtime state comparison
+still needs the target accelerator.

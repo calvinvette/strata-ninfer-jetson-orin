@@ -23,9 +23,35 @@ short/long/short comparison. The delayed control had no captured activation
 divergence. Adaptive recovery tokens matched the initial short request and the
 delayed control, but all 16 accepted-prefix state records still differed from
 the adaptive initial short state; the remaining divergence is unresolved. The
-four targeted Orin tests passed. This is correctness localization, not a
-migration fix or performance result. Phase 5 remains open. The maestro1
-HIP/SYCL rebuild is pending because its root filesystem has no free space.
+four targeted Orin tests passed, the full integration Python suite passed
+163/163, and a fresh GDN dump comparison reproduced the report's numeric delta
+while validating both dumps against their logged per-layer hashes. This is
+correctness localization, not a migration fix or performance result. Phase 5
+remains open. Current-source maestro1 HIP and SYCL compile/link plus `strata
+--help` checks passed with two jobs; the SYCL build consumed its own migrated
+`generate.cpp` overlay, so the diagnostic was ported there and rebuilt. This
+is x86_64 build evidence only, with no accelerator runtime claim. See the
+backend report in the linked result bundle.
+
+The trace's per-layer accepted-prefix hashes now localize the adaptive state's
+first mismatch: at the first recovery token, GDN ordinals 20–35 differed from
+the initial short request, while ordinals 0–19 matched. Ordinal 20 maps to
+model layer 26 with QSA interval 4, matching the first changed dispatch input;
+delayed recovery matched all GDN hashes. The switched layer-24 expert 173 also
+passed a captured-activation CPU/CUDA output oracle, so that isolated operator
+does not explain the later state boundary. See the report's updated analysis
+and `operator-checks/`. This narrows the follow-up target but does not identify
+or fix the migration cause.
+
+Two raw GDN state dumps at the same `L=512` accepted prefix now quantify this
+boundary. Initial-state hashes were identical across the separate supervised
+runs, and the recovery dump matched all per-layer hashes in its accepted-prefix
+log. GDN ordinals 0–19 remained bit-identical; ordinals 20–35 differed in
+12.92 million of 13.07 million float values. Overall relative L2 was 1.686%
+with a 1.403 maximum absolute difference. Raw dumps remain outside Git under
+`~/models/strata-orin-validation/experiments/phase5-gdn-state/`; the exact
+comparison and supervisor records are linked in the report. This is a state
+delta measurement, not an accuracy oracle or a cause/fix claim.
 
 A corrected [layer-2 grouped IQ4_NL Q8_1 mapping](../../bench/results/2026-10-19-phase5-coder-layer2-hidden-q8_1/README.md)
 now mirrors the grouped CUDA service reduction schedule. Three randomized,

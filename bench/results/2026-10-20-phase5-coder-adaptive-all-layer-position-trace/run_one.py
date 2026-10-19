@@ -31,10 +31,16 @@ def main():
     parser.add_argument("--adapt-swaps", type=int, required=True)
     parser.add_argument("--continuations", type=int, default=0,
                         help="extra identical short requests after short/long/short")
+    parser.add_argument("--dump-gdn-occurrence", type=int,
+                        help="optionally dump GDN state at L=512 on this matching request occurrence")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.continuations < 0:
         parser.error("--continuations must be non-negative")
+    if args.dump_gdn_occurrence is not None and args.dump_gdn_occurrence < 1:
+        parser.error("--dump-gdn-occurrence must be positive")
+    if args.dump_gdn_occurrence is not None and args.dump_gdn_occurrence > 2 + args.continuations:
+        parser.error("dump occurrence exceeds the number of 512-token requests; add continuations or lower the occurrence")
     args.output.mkdir(parents=True, exist_ok=False)
 
     cfg = json.loads((BASE / "config.json").read_text())
@@ -69,6 +75,12 @@ def main():
         "STRATA_VERIFY_ADAPT_SWAPS": "1",
         "STRATA_NATIVE_CPU_Q8_1_DOT": "all",
     })
+    if args.dump_gdn_occurrence is not None:
+        env.update({
+            "STRATA_STATE_DUMP_GDN": str((args.output / "gdn-state-L512.bin").resolve()),
+            "STRATA_STATE_DUMP_GDN_AT": "512",
+            "STRATA_STATE_DUMP_GDN_OCCURRENCE": str(args.dump_gdn_occurrence),
+        })
     engine = StrataEngine(cfg["exe"], argv, cwd=cfg["cwd"], log=str(log), env=env)
     requests = []
     try:
