@@ -3163,3 +3163,16 @@ matched through that common prefix. Minimum host/admission availability was
 15.879 GiB, with zero cgroup events. This counterexample limits the prior
 layer-1 owner-equivalence result to IQ2_S/Q2_0; it is correctness evidence only,
 not a task-quality or performance result. Phase 5 remains open.
+
+A current-source, serial [full CUDA/CPU CTest run](../../bench/results/2026-10-19-phase5-current-source-full-ctest/README.md)
+completed 124/128 tests successfully. `iq_parity_fixtures` and `iq_parity`
+were explicitly skipped because their fixture is absent. `expert_parity` and
+`pool_test` failed because the legacy `pack/full/experts.bin` input is absent;
+that pack format is incompatible with the available Coder pack, and the former
+also requires AVX-512 not present on Orin. The focused accepted-window/usage,
+GDN, speculative-sampling, verifier-batch, KV, PLE, graph-lifecycle and native
+expert/Q8_1 tests all passed. The supervised run retained at least 20.70 GiB
+host/admission availability with zero observed cgroup pressure/OOM events.
+This records current-source regression coverage and explicit unsupported
+legacy test cells; it does not resolve the layer-2 persistent-state divergence
+or close Phase 5.
