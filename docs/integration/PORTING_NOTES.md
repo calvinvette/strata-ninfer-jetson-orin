@@ -1837,3 +1837,13 @@ draft counts from one current-source Orin request. For Splash, keep this cost
 trace aligned to each accepted prefix and report target correction/bonus tokens
 separately from rejected proposals. Use these synchronized diagnostic timings
 to explain a path, then measure the untraced serving path for performance.
+
+The follow-up [layer-2 same-activation oracle](../../bench/results/2026-10-19-phase5-coder-layer2-operator-oracle/README.md)
+evaluated every CPU-owned expert at one captured row with both the production
+CPU path and CUDA grouped kernel, checked against dequantized weights. All seven
+IQ2_S/IQ4_NL experts differed in every output value. Its FP64 accumulation
+uses GGML's pinned codec decoders, so it checks the dot paths but is not an
+independent codec oracle. For a future Splash port,
+repeat this per-format operator comparison at the next boundary, but do not
+infer a combined layer or recurrent-state cause until device router weights,
+all expert outputs and the weighted combine are joined for that same input.

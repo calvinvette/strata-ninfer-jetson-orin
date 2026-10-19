@@ -13,6 +13,17 @@ exclusions. This is an experimental profile for the measured Orin cell, not a
 general support claim. Phase 8 remains open pending broader release gates and
 the remaining Phase 5/6 work.
 
+A [layer-2 Coder expert oracle check](../../bench/results/2026-10-19-phase5-coder-layer2-operator-oracle/README.md)
+reused the same captured position-511 activation for all seven CPU-owned
+experts. Each uses IQ2_S gate/up and IQ4_NL down weights. CPU and CUDA expert
+outputs differed in all 7,680 F32 values per expert, with relative-L1 deltas
+of 1.38%–1.67%; both routes were compared against an FP64 accumulation using
+GGML-decoded weights. This confirms a second same-input operator mismatch
+downstream of layer 1, but it is not a router-weighted layer reconstruction or
+service-level state-causality result. The 28-GiB scopes retained 24.51 GiB
+minimum host/admission availability and zero cgroup events. Adaptive migration
+and Phase 5 remain unqualified.
+
 A new supervised [Q2_0 short→long→short check](../../bench/results/2026-10-18-phase5-q2-short-long-short/README.md)
 on the selected MTP-off, fixed-residency profile returned the same exact
 512-token retrieval-and-sum answer before and after an uncached 7,498-token

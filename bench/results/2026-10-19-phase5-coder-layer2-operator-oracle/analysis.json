@@ -1,0 +1,210 @@
+{
+  "schema": 1,
+  "model_repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+  "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
+  "quantization": "IQ1_M",
+  "route": {
+    "position": 511,
+    "token_id": 271,
+    "dispatch": 2,
+    "layer": 2,
+    "cpu_owned_experts": [
+      174,
+      62,
+      69,
+      130,
+      143,
+      151,
+      28
+    ],
+    "activation_sha256": "863084edc13c3a66e8b6827d0df22bbe1fb18917617fa61d1e026665f628acec"
+  },
+  "source_route_capture": "bench/results/2026-10-18-phase5-coder-layer1-route-isolation/all-16-positions-three-arm-wildcard/cpu_default/result/routes-all-layers.jsonl",
+  "source_route_capture_sha256": "90b3e6c17b2f4f87371c1eec92f5c9582583a111d14c210ba0762e95dd9ef79c",
+  "activation_bytes": 10240,
+  "activation_sha256_verified": true,
+  "parity_binary_sha256": "f923fc18404b0263082eeb2e63ce6954de3ed7e6c89231969ac12d77bb30ca21",
+  "all_cpu_owned_experts_tested": true,
+  "interpretation": "For each captured expert, the same layer-2 input activation was evaluated by the current native CPU path and CUDA expert kernel. The reference uses pinned GGML to_float weight decoding followed by an independent FP64 accumulation; it is independent of both production dot paths but does not independently validate codec decoding. This isolates one expert output calculation, not a router-weighted layer result or service-level causal proof.",
+  "summary": {
+    "cpu_cuda_all_values_differ": true,
+    "cpu_relative_l1_range": [
+      0.0118,
+      0.0141
+    ],
+    "cuda_relative_l1_range": [
+      0.00933,
+      0.0111
+    ],
+    "cpu_cuda_relative_l1_range": [
+      0.0138,
+      0.0167
+    ],
+    "minimum_host_gib": 24.509830474853516,
+    "minimum_admission_gib": 24.509830474853516,
+    "all_cgroup_memory_events_zero": true
+  },
+  "experts": [
+    {
+      "expert": 174,
+      "gate_up_type": "iq2_s",
+      "down_type": "iq4_nl",
+      "blob_bytes": 1971200,
+      "cpu_relative_l1_vs_fp64_reference": 0.0122,
+      "cuda_relative_l1_vs_fp64_reference": 0.0104,
+      "cpu_cuda_relative_l1": 0.0156,
+      "cpu_cuda_differing_f32_words": 7680,
+      "cpu_cuda_total_f32_words": 7680,
+      "oracle_status": "ok",
+      "supervisor_dir": "bench/results/2026-10-19-phase5-coder-layer2-operator-oracle/supervisor-e174-retry1",
+      "samples": 2,
+      "minimum_host_gib": 24.509830474853516,
+      "minimum_admission_gib": 24.509830474853516,
+      "cgroup_memory_events_max": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      }
+    },
+    {
+      "expert": 62,
+      "gate_up_type": "iq2_s",
+      "down_type": "iq4_nl",
+      "blob_bytes": 1971200,
+      "cpu_relative_l1_vs_fp64_reference": 0.0118,
+      "cuda_relative_l1_vs_fp64_reference": 0.0108,
+      "cpu_cuda_relative_l1": 0.0139,
+      "cpu_cuda_differing_f32_words": 7680,
+      "cpu_cuda_total_f32_words": 7680,
+      "oracle_status": "ok",
+      "supervisor_dir": "bench/results/2026-10-19-phase5-coder-layer2-operator-oracle/supervisor-e62-pair1",
+      "samples": 2,
+      "minimum_host_gib": 24.511550903320312,
+      "minimum_admission_gib": 24.511550903320312,
+      "cgroup_memory_events_max": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      }
+    },
+    {
+      "expert": 69,
+      "gate_up_type": "iq2_s",
+      "down_type": "iq4_nl",
+      "blob_bytes": 1971200,
+      "cpu_relative_l1_vs_fp64_reference": 0.0126,
+      "cuda_relative_l1_vs_fp64_reference": 0.0109,
+      "cpu_cuda_relative_l1": 0.014,
+      "cpu_cuda_differing_f32_words": 7680,
+      "cpu_cuda_total_f32_words": 7680,
+      "oracle_status": "ok",
+      "supervisor_dir": "bench/results/2026-10-19-phase5-coder-layer2-operator-oracle/supervisor-e69-pair1",
+      "samples": 2,
+      "minimum_host_gib": 24.51110076904297,
+      "minimum_admission_gib": 24.51110076904297,
+      "cgroup_memory_events_max": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      }
+    },
+    {
+      "expert": 130,
+      "gate_up_type": "iq2_s",
+      "down_type": "iq4_nl",
+      "blob_bytes": 1971200,
+      "cpu_relative_l1_vs_fp64_reference": 0.0124,
+      "cuda_relative_l1_vs_fp64_reference": 0.00933,
+      "cpu_cuda_relative_l1": 0.0138,
+      "cpu_cuda_differing_f32_words": 7680,
+      "cpu_cuda_total_f32_words": 7680,
+      "oracle_status": "ok",
+      "supervisor_dir": "bench/results/2026-10-19-phase5-coder-layer2-operator-oracle/supervisor-e130-pair1",
+      "samples": 2,
+      "minimum_host_gib": 24.511856079101562,
+      "minimum_admission_gib": 24.511856079101562,
+      "cgroup_memory_events_max": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      }
+    },
+    {
+      "expert": 143,
+      "gate_up_type": "iq2_s",
+      "down_type": "iq4_nl",
+      "blob_bytes": 1971200,
+      "cpu_relative_l1_vs_fp64_reference": 0.0141,
+      "cuda_relative_l1_vs_fp64_reference": 0.0105,
+      "cpu_cuda_relative_l1": 0.0159,
+      "cpu_cuda_differing_f32_words": 7680,
+      "cpu_cuda_total_f32_words": 7680,
+      "oracle_status": "ok",
+      "supervisor_dir": "bench/results/2026-10-19-phase5-coder-layer2-operator-oracle/supervisor-e143-pair1",
+      "samples": 2,
+      "minimum_host_gib": 24.512165069580078,
+      "minimum_admission_gib": 24.512165069580078,
+      "cgroup_memory_events_max": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      }
+    },
+    {
+      "expert": 151,
+      "gate_up_type": "iq2_s",
+      "down_type": "iq4_nl",
+      "blob_bytes": 1971200,
+      "cpu_relative_l1_vs_fp64_reference": 0.0137,
+      "cuda_relative_l1_vs_fp64_reference": 0.0109,
+      "cpu_cuda_relative_l1": 0.0167,
+      "cpu_cuda_differing_f32_words": 7680,
+      "cpu_cuda_total_f32_words": 7680,
+      "oracle_status": "ok",
+      "supervisor_dir": "bench/results/2026-10-19-phase5-coder-layer2-operator-oracle/supervisor-e151-pair1",
+      "samples": 2,
+      "minimum_host_gib": 24.51158905029297,
+      "minimum_admission_gib": 24.51158905029297,
+      "cgroup_memory_events_max": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      }
+    },
+    {
+      "expert": 28,
+      "gate_up_type": "iq2_s",
+      "down_type": "iq4_nl",
+      "blob_bytes": 1971200,
+      "cpu_relative_l1_vs_fp64_reference": 0.0121,
+      "cuda_relative_l1_vs_fp64_reference": 0.0111,
+      "cpu_cuda_relative_l1": 0.015,
+      "cpu_cuda_differing_f32_words": 7680,
+      "cpu_cuda_total_f32_words": 7680,
+      "oracle_status": "ok",
+      "supervisor_dir": "bench/results/2026-10-19-phase5-coder-layer2-operator-oracle/supervisor-e28-pair1",
+      "samples": 2,
+      "minimum_host_gib": 24.511913299560547,
+      "minimum_admission_gib": 24.511913299560547,
+      "cgroup_memory_events_max": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      }
+    }
+  ]
+}
