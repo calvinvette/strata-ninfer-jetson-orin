@@ -1894,11 +1894,13 @@ repeat this per-format operator comparison at the next boundary, but do not
 infer a combined layer or recurrent-state cause until device router weights,
 all expert outputs and the weighted combine are joined for that same input.
 
-The layer-2 [owner-placement counterexample](../../bench/results/2026-10-19-phase5-coder-layer2-q8_1-owner-equivalence/README.md)
-sets a boundary for that method: matching routes through the shared output prefix
-and a matched cache do not guarantee state parity when CPU and GPU expert
-arithmetic retain a residual. Compare the earliest committed state fields and
-exact device routes; classify later route changes after token divergence as
-consequences, not causes. For Splash, first establish the per-format numerical
-contract for the entire expert, including gate/up and activation rounding,
-before treating an owner change as a pure placement experiment.
+The pre-fix layer-2 [owner-placement counterexample](../../bench/results/2026-10-19-phase5-coder-layer2-q8_1-owner-equivalence/README.md)
+matched routes through the common output prefix but compared CPU's standalone
+four-warp IQ4_NL reduction with CUDA's grouped service lane-strided reduction.
+The [follow-up mapping check](../../bench/results/2026-10-19-phase5-coder-layer2-hidden-q8_1/README.md)
+matches the actual service schedule and produced identical accepted-prefix state,
+output IDs and device routes in three randomized pairs, with a byte-identical
+first-commit GDN capture. For Splash, derive lane ownership and reduction order
+from the actual grouped serving kernel, not a similarly named standalone
+operator; compare actual inputs and codec contracts before attributing an
+owner-placement divergence to migration or state handling.

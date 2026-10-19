@@ -179,15 +179,21 @@ int check_iq4_nl_down_q8_1(const cpu::NativeFmt& f, const std::vector<uint8_t>& 
     size_t value_mismatches = 0;
     for (size_t i = 0; i < cpu_y.size(); ++i)
         value_mismatches += std::memcmp(&cpu_y[i], &gpu_y[i], sizeof(float)) != 0;
-    std::printf("          IQ4_NL down Q8_1 oracle: quantizer scale/code blocks %d/%zu differ; "
-                "CPU/CUDA output words %zu/%zu differ\n",
+    std::printf("          IQ4_NL down Q8_1 standalone-MMVQ diagnostic: quantizer scale/code blocks %d/%zu differ; "
+                "CPU/grouped-service vs standalone-CUDA output words %zu/%zu differ (schedule differs)\n",
                 q8_mismatch_blocks, qbytes / 36, value_mismatches, cpu_y.size());
 
     check(cudaFree(d_y), "free output");
     check(cudaFree(d_w), "free weights");
     check(cudaFree(d_q), "free Q8_1");
     check(cudaFree(d_h), "free activation");
-    return q8_mismatch_blocks == 0 && value_mismatches == 0 ? 0 : 1;
+    // native_mmvq uses native_small_mmvq's four-warp schedule. The service's
+    // grouped native_down_multi_kernel uses row_dot_multi's lane-strided
+    // schedule, which q8_1_iq4_nl_cuda_dot mirrors. The full grouped expert
+    // check below is the relevant arithmetic oracle; this standalone result is
+    // retained only to make the schedule distinction visible. Q8_1 consumed
+    // scale and code bytes must still match independently.
+    return q8_mismatch_blocks == 0 ? 0 : 1;
 }
 
 // The three ways and the dequantizers for one expert blob and token-group width; returns failed checks.
@@ -238,6 +244,8 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
             !write("down", D.data(), D.size()) || !write("activation", x.data(), x.size())) return 1;
     }
     std::vector<float> ref((size_t) N * H), got_c((size_t) N * H), got_g((size_t) N * H);
+    std::vector<uint8_t> cpu_hq_snapshot;
+    const bool compare_hidden_q8_1 = std::getenv("STRATA_PARITY_COMPARE_HIDDEN_Q8_1") != nullptr;
     for (int k = 0; k < N; ++k) {
         std::vector<float> h(FF);
         for (int64_t r = 0; r < FF; ++r) {
@@ -327,6 +335,10 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
             cpu::native_quant_h(f, ff[k].data(), hq[k].data());
             hp[k] = hq[k].data();
             op[k] = got_c.data() + k * H;
+            if (compare_hidden_q8_1 && f.d_act == GGML_TYPE_Q8_1) {
+                const size_t row_bytes = ggml_row_size(GGML_TYPE_Q8_1, (int64_t) FF);
+                cpu_hq_snapshot.insert(cpu_hq_snapshot.end(), hq[k].begin(), hq[k].begin() + row_bytes);
+            }
         }
         cpu::native_down_rows(f, blob.data(), hp, N, op, 0, (int) H);
         if (!dump_f32_dir.empty()) {
@@ -499,6 +511,53 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
         strata::kernels::native_expert_grouped(L, dptr, dstart, dn, ddst, dtok, 1, N, dxq, dscr, dout, s);
         cudaStreamSynchronize(s);
         cudaMemcpy(got_g.data(), dout, got_g.size() * 4, cudaMemcpyDeviceToHost);
+        if (compare_hidden_q8_1) {
+            if (f.d_act != GGML_TYPE_Q8_1) {
+                std::fprintf(stderr, "%s: hidden Q8_1 comparison requires Q8_1 down activations\n", label.c_str());
+                ++failures;
+            } else {
+                const size_t row_bytes = ggml_row_size(GGML_TYPE_Q8_1, (int64_t) FF);
+                const size_t nbytes = (size_t) N * row_bytes;
+                const size_t fbytes = (size_t) N * (size_t) FF * sizeof(float);
+                const size_t fa = (fbytes + 255) & ~(size_t) 255;
+                const size_t hq_offset = 3 * fa;
+                std::vector<uint8_t> gpu_hq(nbytes);
+                if (cpu_hq_snapshot.size() != nbytes) {
+                    std::fprintf(stderr, "%s: CPU hidden Q8_1 snapshot size %zu, expected %zu\n",
+                                 label.c_str(), cpu_hq_snapshot.size(), nbytes);
+                    ++failures;
+                } else {
+                    cudaMemcpy(gpu_hq.data(), (const uint8_t*) dscr + hq_offset, nbytes, cudaMemcpyDeviceToHost);
+                    const size_t blocks = nbytes / 36;
+                    size_t blocks_differ = 0, d_bytes_differ = 0, sum_bytes_differ = 0, code_bytes_differ = 0;
+                    for (size_t b = 0; b < blocks; ++b) {
+                        const uint8_t* c = cpu_hq_snapshot.data() + b * 36;
+                        const uint8_t* g = gpu_hq.data() + b * 36;
+                        blocks_differ += std::memcmp(c, g, 36) != 0;
+                        for (size_t j = 0; j < 2; ++j) d_bytes_differ += c[j] != g[j];
+                        for (size_t j = 2; j < 4; ++j) sum_bytes_differ += c[j] != g[j];
+                        for (size_t j = 4; j < 36; ++j) code_bytes_differ += c[j] != g[j];
+                    }
+                    std::printf("          CPU vs CUDA hidden Q8_1 after SwiGLU: %zu/%zu blocks differ, "
+                                "%zu d-scale bytes, %zu sum-scale bytes and %zu code bytes differ\n",
+                                blocks_differ, blocks, d_bytes_differ, sum_bytes_differ, code_bytes_differ);
+                    std::vector<float> cpu_down_from_gpu_hq((size_t) N * H);
+                    const void* gpu_hq_rows[N];
+                    float* cpu_down_rows[N];
+                    for (int k = 0; k < N; ++k) {
+                        gpu_hq_rows[k] = gpu_hq.data() + (size_t) k * row_bytes;
+                        cpu_down_rows[k] = cpu_down_from_gpu_hq.data() + (size_t) k * H;
+                    }
+                    cpu::native_down_rows(f, blob.data(), gpu_hq_rows, N, cpu_down_rows, 0, (int) H);
+                    size_t down_words_differ = 0;
+                    for (size_t i = 0; i < cpu_down_from_gpu_hq.size(); ++i)
+                        down_words_differ += std::memcmp(&cpu_down_from_gpu_hq[i], &got_g[i], sizeof(float)) != 0;
+                    std::printf("          CPU IQ4_NL down on CUDA hidden Q8_1 vs grouped CUDA output: "
+                                "%zu/%zu words differ\n", down_words_differ, cpu_down_from_gpu_hq.size());
+                    if (down_words_differ != 0) ++failures;
+                }
+            }
+        }
         // Opt-in compatibility probe for a scalar CPU Q8_1 dot on the real native
         // IQ2_S/Q2_0 expert pair. This deliberately uses ggml's independent float
         // dequantizers for weights and Q8_1's packed codes/scales; it is an oracle,

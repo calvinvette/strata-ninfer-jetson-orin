@@ -213,42 +213,32 @@ float q8_1_iq4_nl_cuda_dot(const uint8_t* row, const uint8_t* xq, int n) {
     const auto* weights = reinterpret_cast<const block_iq4_nl*>(row);
     const auto* acts = reinterpret_cast<const Q81Block*>(xq);
 
-    // Match native_small_mmvq_kernel's IQ4NLBlock, Qi=4, WARPS=4 mapping:
-    // each thread accumulates one block in one of four warps, then shared warp
-    // partials are added in order before the CUDA XOR reduction.
-    std::array<std::array<float, 32>, 4> warp_lanes{};
-    for (int warp = 0; warp < 4; ++warp) {
-        for (int lane = 0; lane < 32; ++lane) {
-            const int tid = warp * 32 + lane;
-            for (int block = tid / 2; block < blocks; block += 64) {
-                const int iqs = 2 * (tid % 2);
-                const auto* w = weights + block;
-                const auto* x = acts + block;
-                int sumi = 0;
-                for (int i = 0; i < 2; ++i) {
-                    const int group = iqs + i;
-                    const uint8_t* packed = w->qs + 4 * group;
-                    int dot_low = 0;
-                    int dot_high = 0;
-                    for (int j = 0; j < 4; ++j) {
-                        dot_low += (int) kvalues_iq4nl[packed[j] & 0x0f] * (int) x->qs[4 * group + j];
-                        dot_high += (int) kvalues_iq4nl[packed[j] >> 4] * (int) x->qs[16 + 4 * group + j];
-                    }
-                    sumi += dot_low;
-                    sumi += dot_high;
-                }
-                const float d = ggml_fp16_to_fp32(w->d) * ggml_fp16_to_fp32(x->d);
-                warp_lanes[(size_t) warp][(size_t) lane] += d * (float) sumi;
-            }
-        }
-    }
-
+    // Match native_down_multi_kernel's IQ4_NL row_dot_multi path, which is the
+    // grouped expert kernel used by the service. Each output row uses one warp;
+    // each lane walks k = lane, lane + 32, ... across the 2 sub-blocks per
+    // Q8_1 block, then the warp reduces with the CUDA XOR tree. This differs
+    // from standalone native_small_mmvq's four-warp mapping.
     std::array<float, 32> lane_sum{};
     for (int lane = 0; lane < 32; ++lane) {
-        lane_sum[(size_t) lane] = warp_lanes[0][(size_t) lane];
-        for (int warp = 1; warp < 4; ++warp) {
-            lane_sum[(size_t) lane] += warp_lanes[(size_t) warp][(size_t) lane];
+        float acc = 0.0f;
+        for (int k = lane; k < blocks * 2; k += 32) {
+            const int block = k / 2;
+            const int iqs = 2 * (k % 2);
+            const auto* w = weights + block;
+            const auto* x = acts + block;
+            int sumi = 0;
+            for (int i = 0; i < 2; ++i) {
+                const int group = iqs + i;
+                const uint8_t* packed = w->qs + 4 * group;
+                for (int j = 0; j < 4; ++j) {
+                    sumi += (int) kvalues_iq4nl[packed[j] & 0x0f] * (int) x->qs[4 * group + j];
+                    sumi += (int) kvalues_iq4nl[packed[j] >> 4] * (int) x->qs[16 + 4 * group + j];
+                }
+            }
+            const float d = ggml_fp16_to_fp32(w->d) * ggml_fp16_to_fp32(x->d);
+            acc += d * (float) sumi;
         }
+        lane_sum[(size_t) lane] = acc;
     }
     for (int offset = 16; offset > 0; offset >>= 1) {
         const auto previous = lane_sum;
