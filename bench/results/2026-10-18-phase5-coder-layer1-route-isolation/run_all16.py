@@ -52,6 +52,8 @@ def main():
                     help="log per-QSA-layer state fingerprints at each accepted prefix")
     ap.add_argument("--dump-moe-route-layer", type=int,
                     help="capture exact verifier device top-k IDs/weights for one layer (0-47)")
+    ap.add_argument("--cpu-q8-1-selector", default="1",
+                    help="CPU Q8_1 format-pair selector for cpu_mirror (default: 1)")
     a = ap.parse_args()
     if not 0 <= a.device_layer < 48:
         ap.error("--device-layer must be in [0, 47]")
@@ -88,7 +90,12 @@ def main():
         env["STRATA_VERIFY_DUMP_MOE_ROUTE_LAYER"] = str(a.dump_moe_route_layer)
         env["STRATA_VERIFY_DUMP_MOE_ROUTE_PATH"] = str((a.output / "device-moe-routes.jsonl").resolve())
     if a.arm == "cpu_mirror":
-        env["STRATA_NATIVE_CPU_Q8_1_DOT"] = "1"
+        if not re.fullmatch(r"(?:1|all|iq2_s/q2_0|iq2_s/iq4_nl|iq3_xxs/iq4_nl)(?:@layer=[0-9]+)?",
+                            a.cpu_q8_1_selector):
+            ap.error("invalid --cpu-q8-1-selector")
+        env["STRATA_NATIVE_CPU_Q8_1_DOT"] = a.cpu_q8_1_selector
+    elif a.cpu_q8_1_selector != "1":
+        ap.error("--cpu-q8-1-selector applies only to cpu_mirror")
     tok_dir = Path(cfg["tokenizer"])
     tokenizer = load_tokenizer(tok_dir)
     template = ChatTemplate(tok_dir / "chat_template.jinja")

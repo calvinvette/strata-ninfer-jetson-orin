@@ -63,11 +63,25 @@ the fixed short, recovery and continuation requests. This does not isolate one
 layer or qualify migration/state parity. The selector remains opt-in and
 Phase 5 remains open.
 
-The exact-source [maestro1 HIP/SYCL rebuilds](../../bench/results/2026-10-19-phase5-coder-layer0-iq3xxs-q8_1-mirror/backend/maestro1/README.md)
-also passed compile/link with two jobs. Both Strata help commands exited 0;
-the HIP parity utility does not implement `--help`, so that invocation is not
-a runtime check. This is x86_64 build/CLI evidence only, not accelerator
-execution or Orin performance.
+The [layer-0 IQ3_XXS/IQ4_NL follow-up](../../bench/results/2026-10-19-phase5-coder-layer2-hidden-q8_1/iq3xxs-layer0-service-followup/README.md)
+corrected a parity-harness omission: `native_expert_parity` had not passed the
+requested layer into `native_fmt`, so its layer-scoped selector was not active
+in those replays. With that fixed, seven CPU-owned experts from a live layer-0
+service dispatch matched the service CPU outputs and grouped CUDA outputs
+bit-for-bit on the captured activation. A paired layer-0 capture also found
+identical verifier input, IDs, weights and owners at position 511; the seven
+weighted CPU expert-output deltas reconstructed the combined `ffn_y` delta
+with `1.116e-5` relative-L1 residual. Later completion IDs differed at 10/16
+positions and all 16 accepted-prefix fingerprints differed, so the selector's
+state and output effect remains real. This localizes the first combined layer
+change to the opt-in activation-format arithmetic for that row; it does not
+qualify the route as a default or establish broad quality. Phase 5 remains open.
+
+The current-source [maestro1 HIP/SYCL rebuilds](../../bench/results/2026-10-19-phase5-coder-layer2-hidden-q8_1/backend/maestro1/README.md)
+passed compile/link with two jobs. HIP `strata --help` exited 0. SYCL
+`strata --help` could not run because maestro1 had no SYCL device available;
+that is recorded separately from the successful build. These are x86_64 build
+checks only, not accelerator execution or Orin performance.
 
 A new supervised [Q2_0 short→long→short check](../../bench/results/2026-10-18-phase5-q2-short-long-short/README.md)
 on the selected MTP-off, fixed-residency profile returned the same exact

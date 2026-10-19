@@ -1099,7 +1099,7 @@ int main(int argc, char** argv) {
             if (!t[0] || !t[1] || !t[2]) { std::printf("layer %d: no expert tensors\n", l); ++failures; continue; }
             cpu::NativeFmt f;
             std::string err;
-            if (!cpu::native_fmt((int) t[0]->type, (int) t[2]->type, H, FF, f, err)) {
+            if (!cpu::native_fmt((int) t[0]->type, (int) t[2]->type, H, FF, f, err, l)) {
                 std::printf("layer %d: %s\n", l, err.c_str()); ++failures; continue;
             }
             std::vector<uint8_t> blob(f.bytes);

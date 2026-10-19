@@ -1904,3 +1904,16 @@ first-commit GDN capture. For Splash, derive lane ownership and reduction order
 from the actual grouped serving kernel, not a similarly named standalone
 operator; compare actual inputs and codec contracts before attributing an
 owner-placement divergence to migration or state handling.
+
+A layer-scoped `native_expert_parity` replay must pass its selected layer to
+`native_fmt`; otherwise a selector like `pair@layer=0` is evaluated with the
+sentinel layer and silently tests the baseline activation path. The corrected
+layer-0 Coder check matched seven actual service CPU expert outputs and the
+CUDA grouped outputs bit-for-bit for one captured input, while default CPU and
+Q8_1 outputs differed. A paired layer-0 capture then joined exact device
+weights and the combined output: the seven weighted CPU row deltas explained
+the combined `ffn_y` change at the selected position with `1.116e-5` relative-L1
+residual, even though later completion IDs diverged. For future Splash work,
+test selector contracts through both the service planner and the independent
+operator harness, then join exact route weights and combined output before
+attributing state changes to an operator or owner.

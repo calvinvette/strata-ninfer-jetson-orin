@@ -154,7 +154,8 @@ def main():
         if not output_capture.exists():
             raise RuntimeError("requested CPU expert output capture was not produced")
         cpu_output_lines = output_capture.read_text().splitlines()
-        if not cpu_output_lines or json.loads(cpu_output_lines[0]).get("format") != "strata-moe-cpu-output-v1":
+        if not cpu_output_lines or json.loads(cpu_output_lines[0]).get("format") not in (
+                "strata-moe-cpu-output-v1", "strata-moe-cpu-output-v2"):
             raise RuntimeError("CPU expert output capture has an invalid header")
         cpu_output_rows = len(cpu_output_lines) - 1
         if cpu_output_rows == 0:

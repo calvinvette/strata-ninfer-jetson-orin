@@ -16,6 +16,8 @@ parser.add_argument("--right-arm", default="cpu_mirror")
 parser.add_argument("--position", type=int, default=511)
 parser.add_argument("--token-id", type=int, default=271)
 parser.add_argument("--output", type=Path)
+parser.add_argument("--allow-completion-divergence", action="store_true",
+                    help="permit later output IDs to diverge while retaining strict selected-row identity checks")
 a = parser.parse_args()
 campaign = a.campaign.resolve()
 if not 0 <= a.layer < 48 or a.left_arm == a.right_arm:
@@ -98,7 +100,8 @@ for arm in (a.left_arm, a.right_arm):
 left, right = arms[a.left_arm], arms[a.right_arm]
 if left["request"]["prompt_sha256"] != right["request"]["prompt_sha256"]:
     raise ValueError("prompt hashes differ across arms")
-if left["request"]["completion_ids"] != right["request"]["completion_ids"]:
+completion_ids_equal = left["request"]["completion_ids"] == right["request"]["completion_ids"]
+if not completion_ids_equal and not a.allow_completion_divergence:
     raise ValueError("completion IDs differ across arms")
 for arm in (left, right):
     if arm["device"][a.position]["token_id"] != a.token_id:
@@ -147,6 +150,9 @@ result = {
     "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
     "quantization": "IQ1_M", "layer": a.layer, "position": a.position, "token_id": a.token_id,
     "arms": [a.left_arm, a.right_arm], "device_input_bitwise_equal": True,
+    "completion_ids_equal": completion_ids_equal,
+    "completion_id_differences": sum(x != y for x, y in zip(left["request"]["completion_ids"],
+                                                               right["request"]["completion_ids"])),
     "device_topk_ids_bitwise_equal": True, "device_router_weights_bitwise_equal": True,
     "owner_vectors_equal": True, "cpu_owned_experts": cpu_experts,
     "cpu_expert_output_deltas": expert_output_changes,
