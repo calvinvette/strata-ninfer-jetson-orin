@@ -1743,3 +1743,33 @@ earlier arithmetic changes router logits. Record the first activation, expert
 ID and owner divergence separately, and keep migration disabled until that
 arithmetic path is understood. See the
 [no-swap route comparison](../../bench/results/2026-10-16-phase5-coder-q8_1-fixed-owner-no-swaps/README.md).
+
+## 2026-10-19 — Join every verifier row to its owners and CPU outputs
+
+The follow-up diagnostic captures all 16 generated positions across 48 layers,
+keying each route and CPU-owned expert output by dispatch, absolute position,
+token ID and expert. It cross-checks the host route activation against
+device-side verifier `ffn_x`; the GPU-profile host callback is stale at two
+all-GPU rows even though the graph-side activation is bitwise the same across
+all arms. Future Strata + Splash route experiments should include an engine-side
+activation capture at the actual Metal command boundary, and prove the CPU
+callback buffer still describes that same committed row before joining output
+deltas to routes. Do not infer device inputs from a host-side callback alone.
+
+This full trace found 98/98 captured CPU expert outputs changed between the
+default activation arithmetic and Q8_1, while the 83 output rows that stayed
+CPU-owned in both default and GPU-profile runs matched exactly. Device-side
+combined output then matched CPU mirror only where all CPU owners moved to GPU;
+other rows differed while graph inputs remained bitwise identical. This
+strongly supports the activation-format path as a source of numerical output
+deltas, but it does not reconstruct all weighted expert and shared-expert
+contributions or explain the subsequent persistent-state divergence. For
+Splash, keep exact single-operator parity, full weighted-combine parity,
+accepted-prefix state parity and continuation recovery as separate gates.
+
+The capture change touched native `src/core/expert_source.cpp`, which CUDA and
+HIP compile. SYCL uses its migrated `sycl/src/core/expert_source.cpp`; confirm
+the active source route before assuming a similarly named file is shared. The
+updated CUDA and HIP service targets rebuilt, while the SYCL target had no
+changed input to rebuild. See the [full-row experiment](../../bench/results/2026-10-18-phase5-coder-layer1-route-isolation/README.md#all-16-generated-positions--2026-10-19)
+and its [raw captures and build records](../../bench/results/2026-10-18-phase5-coder-layer1-route-isolation/all-16-positions-three-arm-wildcard/).

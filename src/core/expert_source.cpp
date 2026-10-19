@@ -3193,7 +3193,9 @@ void capture_moe_cpu_outputs(uint64_t dispatch, int64_t layer, const int32_t* id
         const char* p = std::getenv("STRATA_CAPTURE_MOE_OUTPUT_DISPATCH");
         return p == nullptr ? UINT64_MAX : (uint64_t) std::strtoull(p, nullptr, 10);
     }();
-    if ((selected_layer >= 0 && layer != selected_layer) || dispatch != selected_dispatch) return;
+    // UINT64_MAX (the default) captures every dispatch at the selected layer.
+    if ((selected_layer >= 0 && layer != selected_layer) ||
+        (selected_dispatch != UINT64_MAX && dispatch != selected_dispatch)) return;
     static FILE* file = nullptr;
     if (file == nullptr) {
         file = std::fopen(path, "wb");

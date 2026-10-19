@@ -2952,3 +2952,18 @@ Q8_1 by 1.37–1.69% on the tested rows. This strongly supports activation-forma
 arithmetic as a cause of the observed row-level combined-output changes, while
 full weighted-sum reconstruction and later persistent-state attribution remain
 open. See the updated [Phase 5 report](../../bench/results/2026-10-19-phase5-coder-q8-1-real-windows/README.md).
+
+A full 16-position [current-source route/output capture](../../bench/results/2026-10-18-phase5-coder-layer1-route-isolation/README.md#all-16-generated-positions--2026-10-19)
+now records all 48 layers and every layer-1 CPU-owned output. Device-side
+`ffn_x` stayed bitwise identical across the three arms for all 16 rows. Default
+and Q8_1 mirror input rows also match bitwise; all 98 CPU expert output vectors
+differ (median relative L1 1.372%, range 0.485%–1.757%). The 83 CPU outputs
+still owned by CPU in both default and GPU-profile runs match bitwise. Combined
+`ffn_y` differs between default and mirror at all positions; mirror and
+GPU-profile agree only at 511 and 513, where the GPU profile moves every CPU
+owner. This strengthens the activation-format attribution but does not
+reconstruct the full weighted sum or resolve the distinct persistent-state
+fingerprints after the request. All arms passed 28-GiB supervision with zero
+cgroup memory events and at least 14.14 GiB host/admission availability. Phase
+5 remains open. The changed final fingerprints are `gdn`, `kv`, `pooled`,
+`pooled_full` and `tail`; PLE fingerprints match.

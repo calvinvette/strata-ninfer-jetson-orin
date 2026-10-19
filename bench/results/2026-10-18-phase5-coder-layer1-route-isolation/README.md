@@ -143,3 +143,53 @@ passed under 28-GiB scopes, with minimum availability above 14 GiB and 24.52
 GiB, respectively. This validates the keyed diagnostic in ordinary and batch
 verifier builds; the tests do not close other Phase 5 state, graph-pool or
 performance gates.
+
+## All 16 generated positions — 2026-10-19
+
+A further current-source rerun extended the capture to all 16
+generated positions on all 48 layers. It used the same Coder IQ1_M revision,
+512-token prompt, MTP2, FP16 KV, 3,000-slot profile capacity, and three arms:
+default CPU, CPU Q8_1 mirror, and the layer-1 GPU placement profile. The
+capture records absolute position, token ID, dispatch, expert IDs, owners,
+activations, and every CPU-owned layer-1 output. All three supervised arms
+passed and returned identical 16-token IDs. The detailed commands, raw files,
+source/binary identities, backend build logs and row-level comparisons are in
+[`all-16-positions-three-arm-wildcard/`](all-16-positions-three-arm-wildcard/).
+
+The device-side graph `ffn_x` inputs are bitwise identical across all three
+arms for all 16 rows. The host route activation capture agrees with device
+`ffn_x` within `1e-7` for all 16 default and mirror rows and 14/16 GPU-profile
+rows; the GPU-profile host capture is stale at positions 511 and 513, which are
+all-GPU rows. This confirms that the device-side graph capture is needed to
+validate host callback buffers when GPU work can advance asynchronously.
+
+Default and mirror route activations match bitwise on all 16 rows. Every one
+of the 98 captured CPU expert output vectors differs between the default
+activation path and Q8_1 (median relative L1 1.372%, range 0.485%–1.757%). The
+83 CPU output vectors whose expert remains CPU-owned in both the default and
+GPU-profile arms match bitwise, confirming that the GPU-profile's unchanged
+CPU owners still use default CPU arithmetic. The combined graph `ffn_y` differs
+between default and mirror at all 16 positions. Mirror and GPU-profile `ffn_y`
+match at positions 511 and 513, where all CPU owners are moved to GPU, and
+differ at 512 and 514–526, where CPU-default owners remain. Existing direct
+operator oracles cover the seven actual owners at 511 and the selected experts
+at 512/514, but this does not reconstruct every router-weighted and shared
+contribution for all rows.
+
+Final accepted-prefix state fingerprints still differ among all arms despite
+identical completion IDs. Therefore the broader row capture strengthens the
+activation-format explanation for combined-output deltas but does not close
+service-level persistent-state attribution, task-quality impact, or Phase 5.
+The changed final fields are `gdn`, `kv`, `pooled`, `pooled_full` and `tail`;
+PLE fingerprints match. The GPU placement profile changes 15 CPU-owner entries
+across positions 511–513 and 515.
+Each arm ran in a separate 28-GiB scope with dynamic clocks; minimum host and
+admission availability was 14.14–14.43 GiB, scope peak was 10.87–11.32 GiB,
+and `high`, `max`, `oom` and `oom_kill` counters were zero. Energy was not
+measured and EMC readback remained unavailable.
+
+The initial two all-16 harness attempts are retained beside the successful
+retry. They completed service requests and captured route/device data but are
+excluded because the CPU-output dispatch selector was configured incorrectly.
+The opt-in capture now treats the default `UINT64_MAX` selector as “all
+dispatches”; explicit dispatch values still select one dispatch.
