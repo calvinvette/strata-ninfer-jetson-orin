@@ -1,0 +1,5 @@
+Initial full HIP snapshot build attempt on 2026-10-18 exited 1 at Ninja step 76/315. The source transfer had omitted the tracked Strata file third_party/ggml/ggml-common.h, so src/kernels/cuda/iq_kernels.cu failed with:
+
+fatal error: 'ggml-common.h' file not found
+
+This was an incomplete build snapshot, not a compiler rejection of the changed source. The tracked GGML header and its LICENSE/VERSION files were then added; the expanded 801-file manifest passed sha256sum -c on maestro1. The HIP build was resumed incrementally and completed successfully. Final HIP and SYCL build logs and binary hashes are recorded separately.
