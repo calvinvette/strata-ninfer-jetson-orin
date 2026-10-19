@@ -9,8 +9,9 @@ run_arm() {
   local name="$1" every="$2" swaps="$3" optin="$4"
   local -a prefix=() route_args=()
   if [[ "$optin" == yes ]]; then
-    prefix=(env STRATA_NATIVE_CPU_Q8_1_DOT=1)
-    route_args=(--cpu-q8-1-dot)
+    local selector="${Q8_1_SELECTOR:-all}"
+    prefix=(env "STRATA_NATIVE_CPU_Q8_1_DOT=$selector")
+    route_args=(--cpu-q8-1-pair "$selector")
   fi
   systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes \
     "${prefix[@]}" python3 tools/integration/run_control.py \

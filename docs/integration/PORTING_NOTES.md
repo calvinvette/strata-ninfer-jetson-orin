@@ -141,11 +141,14 @@ promotion.
 A follow-up captured IQ3_XXS/IQ4_NL expert check shows why format coverage must
 be per tensor pair: a CUDA-order Q8_1 IQ3_XXS dot reduced the tested CPU/CUDA
 whole-expert relative-L1 delta from 1.52% to `2.46e-8`, and the down projection
-was exact. Yet paired fixed/adaptive service runs still changed persistent
-state hashes and some token IDs. The scalar mirror is therefore useful for
-causal isolation, not evidence that layer arithmetic alone restores request
-state. For Splash, test each actual Metal-supported expert pair and then follow
-the numerical change through committed state and continuation.
+was exact. The first paired fixed/adaptive service diagnostic enabled all
+supported Q8_1 pairs. A new pair selector then isolated IQ3_XXS/IQ4_NL across
+eligible CPU-owned experts; with no accepted speculative drafts, that route
+still changed committed-state fingerprints on all requests and token IDs in
+some requests. The scalar mirror is useful for causal isolation, not evidence
+that layer arithmetic alone restores request state. For Splash, test each
+actual Metal-supported expert pair, then follow the numerical change through
+committed state and continuation.
 
 A first campaign preserved one completed process and five failed starts because
 the harness's port precheck did not allow TCP TIME_WAIT reuse. The corrected

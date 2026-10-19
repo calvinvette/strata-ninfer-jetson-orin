@@ -44,10 +44,16 @@ extended the CUDA-lane-order CPU dot to a captured layer-0 Coder expert. On the
 two-row service activation, CPU-vs-CUDA expert relative L1 fell from 1.52% on
 the default CPU path to `2.46e-8`; the IQ4_NL down projection matched exactly.
 All six Q8_1 operator CTests passed. A same-binary fixed/adaptive service pair
-still had persistent-state hash differences on every request; output IDs
-differed by 10/16 on adaptive short/recovery and 3/16 on the fixed long request.
-Thus this arithmetic match does not qualify CPU/GPU migration or accepted-prefix
-state parity. The route remains opt-in and Phase 5 remains open.
+enabled all supported Q8_1 CPU pairs, so it did not isolate IQ3_XXS. Its
+persistent-state hashes differed on every request; output IDs differed by
+10/16 on adaptive short/recovery and 3/16 on the fixed long request. The
+format-specific [IQ3_XXS/IQ4_NL-only service diagnostic](../../bench/results/2026-10-19-phase5-coder-layer0-iq3xxs-only-service/README.md)
+then enabled only that expert pair. With no accepted speculative drafts, it
+still changed 6–7 of 9 persistent-state fields on every request, and changed
+token IDs by 10/16 and 3/16 in the adaptive short/long requests and by 10/16 in
+the fixed short, recovery and continuation requests. This does not isolate one
+layer or qualify migration/state parity. The selector remains opt-in and
+Phase 5 remains open.
 
 The exact-source [maestro1 HIP/SYCL rebuilds](../../bench/results/2026-10-19-phase5-coder-layer0-iq3xxs-q8_1-mirror/backend/maestro1/README.md)
 also passed compile/link with two jobs. Both Strata help commands exited 0;

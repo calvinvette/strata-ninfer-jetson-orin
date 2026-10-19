@@ -627,7 +627,7 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
     for (size_t i = 0; i < got_c.size(); ++i)
         cpu_gpu_bitwise_diff += std::memcmp(&got_c[i], &got_g[i], sizeof(float)) != 0;
     const bool ok = ec < 3e-2 && eg < 3e-2 && std::isfinite(ec) && std::isfinite(eg);
-    if (std::getenv("STRATA_NATIVE_CPU_Q8_1_DOT") != nullptr &&
+    if (f.gu_act == GGML_TYPE_Q8_1 && f.d_act == GGML_TYPE_Q8_1 &&
         (f.gu_type == GGML_TYPE_IQ2_S || f.gu_type == GGML_TYPE_IQ3_XXS) && f.d_type == GGML_TYPE_IQ4_NL) {
         // Full expert output also includes backend-specific expf/SwiGLU rounding.
         // Isolate the changed down dot and require exact quantizer-code and output parity.
@@ -649,6 +649,65 @@ int type_of(std::string name) {
         if (m == name) return t;
     }
     return -1;
+}
+
+int check_q8_1_selector_contract() {
+    struct Pair { int gu; int down; const char* selector; };
+    const Pair pairs[] = {
+        {GGML_TYPE_IQ2_S, GGML_TYPE_Q2_0, "iq2_s/q2_0"},
+        {GGML_TYPE_IQ2_S, GGML_TYPE_IQ4_NL, "iq2_s/iq4_nl"},
+        {GGML_TYPE_IQ3_XXS, GGML_TYPE_IQ4_NL, "iq3_xxs/iq4_nl"},
+    };
+    auto set_selector = [](const char* value) {
+#ifdef _WIN32
+        _putenv_s("STRATA_NATIVE_CPU_Q8_1_DOT", value);
+#else
+        setenv("STRATA_NATIVE_CPU_Q8_1_DOT", value, 1);
+#endif
+    };
+    cpu::NativeFmt baseline[std::size(pairs)];
+    int failures = 0;
+    set_selector("0");
+    for (size_t i = 0; i < std::size(pairs); ++i) {
+        std::string err;
+        if (!cpu::native_fmt(pairs[i].gu, pairs[i].down, H, FF, baseline[i], err)) {
+            std::fprintf(stderr, "selector baseline %s: %s\n", pairs[i].selector, err.c_str());
+            ++failures;
+        }
+    }
+    const char* selectors[] = {"1", "all", "iq2_s/q2_0", "iq2_s/iq4_nl", "iq3_xxs/iq4_nl"};
+    for (const char* selector : selectors) {
+        set_selector(selector);
+        for (size_t i = 0; i < std::size(pairs); ++i) {
+            cpu::NativeFmt got;
+            std::string err;
+            if (!cpu::native_fmt(pairs[i].gu, pairs[i].down, H, FF, got, err)) {
+                std::fprintf(stderr, "selector %s on %s: %s\n", selector, pairs[i].selector, err.c_str());
+                ++failures;
+                continue;
+            }
+            const bool selected = std::strcmp(selector, "1") == 0 || std::strcmp(selector, "all") == 0 ||
+                                  std::strcmp(selector, pairs[i].selector) == 0;
+            const int expected_gu = selected ? GGML_TYPE_Q8_1 : baseline[i].gu_act;
+            const int expected_down = selected ? GGML_TYPE_Q8_1 : baseline[i].d_act;
+            if (got.gu_act != expected_gu || got.d_act != expected_down) {
+                std::fprintf(stderr, "selector %s unexpectedly routes %s: got %s/%s\n", selector,
+                             pairs[i].selector, ggml_type_name((ggml_type) got.gu_act),
+                             ggml_type_name((ggml_type) got.d_act));
+                ++failures;
+            }
+        }
+    }
+    set_selector("not-a-pair");
+    cpu::NativeFmt invalid;
+    std::string err;
+    if (cpu::native_fmt(pairs[0].gu, pairs[0].down, H, FF, invalid, err) ||
+        err.find("STRATA_NATIVE_CPU_Q8_1_DOT") == std::string::npos) {
+        std::fprintf(stderr, "invalid selector was not rejected clearly: %s\n", err.c_str());
+        ++failures;
+    }
+    std::printf("Q8_1 selector contract: %s (%d failures)\n", failures ? "FAIL" : "PASS", failures);
+    return failures;
 }
 
 // Random weights (rows of different magnitudes) quantized by ggml into the blob layout.
@@ -796,6 +855,8 @@ int main(int argc, char** argv) {
         std::fprintf(stderr, "usage: native_expert_parity <shard.gguf> [--expert E] [--activation-f32 FILE] [layer ...]\n"
                              "       [--dump-f32-dir DIR] writes dequantized weights, input and reference/operator outputs\n"
                              "       native_expert_parity --q8_1-quantizer --activation-f32 FILE\n"
+                             "       native_expert_parity --q8_1-selector-contract\n"
+                             "       STRATA_NATIVE_CPU_Q8_1_DOT=1|all|GU/DOWN selects all or one supported expert pair\n"
                              "       native_expert_parity --synthetic GU/DOWN ...   (ggml type names, e.g. q4_K/q5_1)\n"
                              "       native_expert_parity --synthetic-windows iq2_s/q2_0|iq2_s/iq4_nl|iq3_xxs/iq4_nl  (Q8_1, widths 1..8)\n"
                              "       <shard.gguf> --expert E --activation-f32 FILE --windows-1-through-8\n"
@@ -806,6 +867,8 @@ int main(int argc, char** argv) {
                              "       native_expert_parity --bf16-embd\n");
         return 2;
     }
+    const std::string mode = argv[1];
+    if (mode == "--q8_1-selector-contract") return check_q8_1_selector_contract() ? 1 : 0;
     // #152's width check tests the opt-in rule (the multi-token kernels from one token on)
     if (std::getenv("STRATA_IQ_MT_MIN") == nullptr) {
 #ifdef _WIN32
@@ -817,7 +880,6 @@ int main(int argc, char** argv) {
     int failures = 0;
     cudaStream_t s;
     cudaStreamCreate(&s);
-    const std::string mode = argv[1];
     if (mode == "--q5_1-min") {
         failures += check_q5_1_min(s);
     } else if (mode == "--bf16-embd") {
@@ -846,8 +908,8 @@ int main(int argc, char** argv) {
     } else if (mode == "--synthetic" || mode == "--synthetic-windows") {
         const bool all_windows = mode == "--synthetic-windows";
         const char* q8_1_env = std::getenv("STRATA_NATIVE_CPU_Q8_1_DOT");
-        if (all_windows && (q8_1_env == nullptr || std::atoi(q8_1_env) == 0)) {
-            std::fprintf(stderr, "--synthetic-windows requires STRATA_NATIVE_CPU_Q8_1_DOT=1\n");
+        if (all_windows && (q8_1_env == nullptr || std::strcmp(q8_1_env, "0") == 0)) {
+            std::fprintf(stderr, "--synthetic-windows requires a nonzero STRATA_NATIVE_CPU_Q8_1_DOT selector\n");
             return 2;
         }
         for (int i = 2; i < argc; ++i) {
@@ -901,11 +963,6 @@ int main(int argc, char** argv) {
             else if (arg == "--dump-f32-dir" && i + 1 < argc) dump_f32_dir = argv[++i];
             else if (arg == "--windows-1-through-8") all_windows = true;
             else layers.push_back(std::atoi(argv[i]));
-        }
-        const char* q8_1_env = std::getenv("STRATA_NATIVE_CPU_Q8_1_DOT");
-        if (all_windows && (q8_1_env == nullptr || std::atoi(q8_1_env) == 0)) {
-            std::fprintf(stderr, "--windows-1-through-8 requires STRATA_NATIVE_CPU_Q8_1_DOT=1\n");
-            return 2;
         }
         if (all_windows && activation_path.empty()) {
             std::fprintf(stderr, "--windows-1-through-8 requires --activation-f32 FILE\n");

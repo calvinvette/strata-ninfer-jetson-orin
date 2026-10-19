@@ -62,6 +62,8 @@ def main():
                         help="capture the verifier's combined layer-1 FFN/MoE output")
     parser.add_argument("--cpu-q8-1-dot", action="store_true",
                         help="enable opt-in IQ2_S/Q2_0, IQ2_S/IQ4_NL and IQ3_XXS/IQ4_NL CPU Q8_1 scalar routes")
+    parser.add_argument("--cpu-q8-1-pair", choices=("all", "iq2_s/q2_0", "iq2_s/iq4_nl", "iq3_xxs/iq4_nl"),
+                        help="enable one Q8_1 CPU expert pair, or all supported pairs")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.continuations < 0:
@@ -114,8 +116,12 @@ def main():
     if combined_dump is not None:
         env.update({"STRATA_VERIFY_DUMP_GDN_LAYER": "1",
                     "STRATA_VERIFY_DUMP_GDN_PATH": str(combined_dump.resolve())})
+    if args.cpu_q8_1_dot and args.cpu_q8_1_pair is not None:
+        parser.error("choose either --cpu-q8-1-dot or --cpu-q8-1-pair")
     if args.cpu_q8_1_dot:
         env["STRATA_NATIVE_CPU_Q8_1_DOT"] = "1"
+    elif args.cpu_q8_1_pair is not None:
+        env["STRATA_NATIVE_CPU_Q8_1_DOT"] = args.cpu_q8_1_pair
     engine = StrataEngine(cfg["exe"], argv, cwd=cfg["cwd"], log=str(log), env=env)
     requests = []
     previous_prefix_hash_count = 0

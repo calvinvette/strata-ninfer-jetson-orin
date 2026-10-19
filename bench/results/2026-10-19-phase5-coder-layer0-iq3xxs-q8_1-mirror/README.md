@@ -26,7 +26,10 @@ requests per arm: 512-token short, 2,048-token long, 512-token recovery and a
 short continuation; each generated 16 tokens. The adaptive pair used cadence 4,
 swap budget 8 and accepted-only updates. The fixed pair disabled adaptive swaps.
 Both used prompt cache 0, spec 2, 8K maximum context, dynamic clocks and a
-28-GiB `MemoryMax` scope.
+28-GiB `MemoryMax` scope. That service comparison set
+`STRATA_NATIVE_CPU_Q8_1_DOT=1`, so it enabled all supported pairs and does not
+attribute its state changes to IQ3_XXS alone. The format-specific follow-up is
+recorded in [the IQ3-only service diagnostic](../2026-10-19-phase5-coder-layer0-iq3xxs-only-service/README.md).
 
 | Residency | Requests with differing token IDs (default vs Q8_1) | Persistent-state fields differing | Minimum host/admission availability across pair |
 | --- | --- | --- | ---: |

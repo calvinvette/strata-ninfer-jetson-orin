@@ -1,0 +1,30 @@
+{
+  "source_commit": "20810357f17dd5e467e737121ef2c68f2d9546c0",
+  "source_overlay_sha256": "38d00c26fb480553669efa63bda5afeaae13a74445a3b407608b32fdc4fe052a",
+  "source_files": [
+    "CMakeLists.txt",
+    "include/strata/kernels/cpu/native_expert.hpp",
+    "src/kernels/cpu/native_expert.cpp",
+    "src/kernels/native_expert_parity.cpp",
+    "bench/results/2026-10-19-phase5-coder-layer2-q8_1-mirror/service-test/run_service.py",
+    "bench/results/2026-10-19-phase5-coder-layer2-q8_1-mirror/service-test/run_pair.sh"
+  ],
+  "service_binary_sha256": "1d0f7fc3002ffbeb02dcef0323c5b03389f5d2e857b965313cb11ce1f7b8225d",
+  "route_selector": "STRATA_NATIVE_CPU_Q8_1_DOT=iq3_xxs/iq4_nl",
+  "route_scope": "Only CPU-owned experts with IQ3_XXS gate/up and IQ4_NL down use the CUDA-order Q8_1 route. Other expert format pairs retain their defaults.",
+  "model": {
+    "repo": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+    "revision": "5348543e0147355ac9cbcb031184a3546350988e",
+    "format": "IQ1_M, two shards",
+    "sha256_file": "source/model-sha256.txt"
+  },
+  "host": "NVIDIA Jetson AGX Orin, aarch64; CUDA 12.6/driver 540.4.0",
+  "profile": "prompt-cache=0, spec=2, suffix-draft=0, 8K context, 28-GiB MemoryMax, dynamic clocks",
+  "runs": [
+    "supervised/control-v2",
+    "supervised/mirror",
+    "supervised/fixed-control",
+    "supervised/fixed-mirror"
+  ],
+  "interpretation": "Correctness and state diagnostic only. All arms recorded zero accepted drafts; dynamic clocks and timing differences are not treated as performance results."
+}
