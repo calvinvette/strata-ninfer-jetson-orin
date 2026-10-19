@@ -2908,3 +2908,15 @@ excluded zero, showing a workload interaction between these two tasks while
 not isolating prompt length from their differing content/output. The short
 campaign retained 17.39/9.33 GiB minimum host/admission availability over 3,002
 samples with zero cgroup events. No profile changed; Phase 6 remains open.
+
+The [Q8_1 verifier-window parity check](../../bench/results/2026-10-18-phase5-coder-q8-1-windows-ctest/README.md)
+extends the synthetic IQ2_S/Q2_0 expert oracle across verifier widths 1–8.
+CPU and CUDA results matched bitwise at every width, and CPU single-token
+versus grouped gate/up/down rows had zero differences. The default operator,
+existing Q8_1 dot, and new window CTests passed 3/3; the Python integration
+suite passed 163/163. This narrows the tested operator contract but does not
+resolve the service-level adaptive-residency state divergence or close Phase 5.
+The changed shared files also passed current-source maestro1 HIP and SYCL
+rebuilds from commit `58be4d54`; the HIP and SYCL service `--help` checks
+passed. These are x86_64 compile/CLI checks only, with no accelerator runtime
+qualification. See the [complete report](../../bench/results/2026-10-18-phase5-coder-q8-1-windows-ctest/README.md).
