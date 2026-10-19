@@ -3029,3 +3029,18 @@ persistent-state continuation divergence. The opt-in verifier route capture
 built and passed focused CUDA tests 6/6; the full HIP service also compiled
 and linked on maestro1, and its `--help` check passed. maestro1 is build/CLI
 evidence only. No performance claim follows and Phase 5 remains open.
+
+A fixed-residency [layer-1 weighted-output reconstruction](../../bench/results/2026-10-19-phase5-coder-layer1-weighted-output-pair/README.md)
+now checks the first implicated MoE boundary. At position 511/token 271,
+default CPU and Q8_1 mirror had bitwise-identical device inputs, expert IDs,
+router weights and owners. All seven CPU expert outputs changed; their weighted
+delta reconstructs the combined layer-1 output delta with relative-L1 residual
+`1.952e-5`. A same-prompt layer-2 capture found its device input already
+different in all 2,560 values and all ten router weights changed, so the
+layer-2 weighted analyzer rejected that cell's same-input precondition. This
+directly attributes the layer-1 combined-output change to CPU arithmetic and
+confirms a downstream activation change, but does not prove the complete
+persistent-state or quality consequence. Both pairs passed 28-GiB supervision
+with zero observed memory events and at least 14.37 GiB host/admission
+availability. Adaptive migration remains unqualified and Phase 5 remains
+open.

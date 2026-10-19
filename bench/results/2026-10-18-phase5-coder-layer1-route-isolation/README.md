@@ -248,3 +248,18 @@ are set. CUDA tests passed 6/6; the full HIP service compiled and linked on
 maestro1, and its `--help` check passed. maestro1 provides build and CLI
 evidence only. Full backend build records and artifact checksums are in the
 weighted campaign directory.
+
+## Weighted layer-1 output reconstruction — 2026-10-19
+
+The follow-up [layer-1 weighted-output pair](../2026-10-19-phase5-coder-layer1-weighted-output-pair/README.md)
+measured the earliest implicated MoE boundary. At position 511/token 271,
+default CPU and Q8_1 mirror had bitwise-identical device inputs, top-10 expert
+IDs, router weights and owners. All seven CPU expert rows changed in all 2,560
+values; weighting their deltas reconstructs the combined layer-1 `ffn_y` delta
+with maximum absolute residual `1.233e-8` and relative-L1 residual `1.952e-5`.
+A separate layer-2 capture found all 2,560 `ffn_x` values and all ten router
+weights already differed, while expert IDs and completion IDs still matched.
+The layer-2 weighted analyzer correctly rejected its same-input precondition.
+This is direct numerical attribution at layer 1 and a downstream consistency
+check, not a full recurrent-state causal proof, quality result or performance
+claim. See the retained [layer-2 failed weighted cell](../2026-10-19-phase5-coder-layer2-weighted-output-pair/README.md).

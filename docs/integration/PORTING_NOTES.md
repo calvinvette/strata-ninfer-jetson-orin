@@ -1819,3 +1819,14 @@ the verifier stream completes. At one matched layer-8 row, the seven weighted
 CPU deltas explain the device combined delta within `2.266e-5` relative L1.
 This confirms the method for that single CUDA case; it is not evidence for a
 Metal implementation or broad model behavior.
+
+The follow-up [layer-1 reconstruction](../../bench/results/2026-10-19-phase5-coder-layer1-weighted-output-pair/README.md)
+uses that method at the earliest observed arithmetic boundary. Matching the
+actual device input, IDs, weights and owners allowed the seven CPU row deltas
+to reconstruct the combined output change within `1.952e-5` relative L1. The
+separate layer-2 capture already had different inputs and router weights, so
+the weighted-combine comparison was rejected there. For a future Splash port,
+capture the earliest boundary first and have the analyzer fail closed whenever
+input, route, weight, owner, prompt or token identities differ. A downstream
+layer is useful for locating propagation, but cannot isolate its own arithmetic
+once its input has diverged.

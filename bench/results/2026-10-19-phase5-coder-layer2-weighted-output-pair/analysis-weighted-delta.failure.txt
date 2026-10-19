@@ -1,0 +1,12 @@
+Command:
+  python3 bench/results/2026-10-18-phase5-coder-layer1-route-isolation/analyze_layer_weighted_delta.py --campaign bench/results/2026-10-19-phase5-coder-layer2-weighted-output-pair --layer 2 --left-arm cpu_default --right-arm cpu_mirror --position 511 --token-id 271
+
+Result:
+  exit status 1
+  ValueError: device top-k IDs or router weights differ across arms
+
+The analyzer intentionally requires bitwise-identical layer input, top-k IDs,
+router weights and owners before reconstructing an output delta. The separate
+analyze_layer2_route_mismatch.py report records the actual input and router
+differences. This cell is retained as a failed weighted-attribution attempt;
+no weighted delta was inferred.
