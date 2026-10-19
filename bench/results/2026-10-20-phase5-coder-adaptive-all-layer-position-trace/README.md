@@ -286,6 +286,11 @@ from that shared initial state in 786,389/786,432 recurrent values and
 10,240/30,720 convolution-history values. This confirms the adaptive-only
 endpoint divergence without identifying the operation that introduced it.
 
+A wider [positions 500–506 request](layer26-gdn-prompt-tail-dispatch/window-500-506-pair/README.md)
+was accepted by the harness, but the runtime trace still emitted only verifier
+positions 505 and 506. Positions 500–504 remain unsupported at this capture
+boundary; the matching 505/506 results reproduced byte-for-byte.
+
 Reproduce the extended service pair on Orin with the current source and local
 model artifacts:
 

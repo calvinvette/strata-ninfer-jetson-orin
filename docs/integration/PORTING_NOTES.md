@@ -1993,6 +1993,9 @@ absolute token positions. Pair the same position across initial and recovery
 requests, then compare owner assignments, expert IDs and activation vectors
 separately: owner changes can precede any captured numerical difference. Keep
 the capture bounded and off by default, and treat decimal activation dumps as
-diagnostic inputs with documented round-trip precision. For Splash, use its
-actual service position semantics and retain recurrent/KV state checks; matching
-routes or output text alone does not prove continuation parity.
+diagnostic inputs with documented round-trip precision. Check requested versus
+observed positions explicitly; a valid filter argument does not mean the
+capture boundary visits every selected location. Record absent positions as
+unsupported cells, not matches. For Splash, use its actual service position
+semantics and retain recurrent/KV state checks; matching routes or output text
+alone does not prove continuation parity.
