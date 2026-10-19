@@ -183,6 +183,14 @@ service-level persistent-state attribution, task-quality impact, or Phase 5.
 The changed final fields are `gdn`, `kv`, `pooled`, `pooled_full` and `tail`;
 PLE fingerprints match. The GPU placement profile changes 15 CPU-owner entries
 across positions 511–513 and 515.
+The [accepted-prefix alignment](all-16-positions-three-arm-wildcard/prefix-state-alignment.json)
+shows that the first full-width GDN slice difference matches the first host
+route activation difference at all 16 positions in both arm pairs: layer 2 for
+default versus mirror CPU, and layer 9 at position 511 then layer 2 for
+positions 512–526 in mirror versus GPU profile. The 36 prefill checksums match,
+but are only 16-bit checks and cannot establish exact prefill-state identity.
+This localizes the first observed accepted-state divergence without proving
+the full causal state-update path.
 Each arm ran in a separate 28-GiB scope with dynamic clocks; minimum host and
 admission availability was 14.14–14.43 GiB, scope peak was 10.87–11.32 GiB,
 and `high`, `max`, `oom` and `oom_kill` counters were zero. Energy was not

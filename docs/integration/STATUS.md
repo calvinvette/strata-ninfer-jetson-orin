@@ -2967,3 +2967,14 @@ fingerprints after the request. All arms passed 28-GiB supervision with zero
 cgroup memory events and at least 14.14 GiB host/admission availability. Phase
 5 remains open. The changed final fingerprints are `gdn`, `kv`, `pooled`,
 `pooled_full` and `tail`; PLE fingerprints match.
+
+The [accepted-prefix join](../../bench/results/2026-10-18-phase5-coder-layer1-route-isolation/all-16-positions-three-arm-wildcard/prefix-state-alignment.json)
+aligns all 16 committed-prefix GDN hashes with the 48-layer route trace. For
+both default-versus-mirror and mirror-versus-GPU-profile pairs, the first GDN
+slice that differs maps to the same model layer as the first valid host route
+activation difference at every position. This is layer 2 for all default/
+mirror positions; for mirror/GPU it is layer 9 at position 511 and layer 2 at
+positions 512–526. All 36 prefill GDN checksums match per pair, but they are
+16-bit checks and do not establish exact prefill state equality. This narrows
+the first observed state divergence but does not prove the full causal path or
+close Phase 5.

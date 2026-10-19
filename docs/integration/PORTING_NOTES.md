@@ -1767,6 +1767,18 @@ contributions or explain the subsequent persistent-state divergence. For
 Splash, keep exact single-operator parity, full weighted-combine parity,
 accepted-prefix state parity and continuation recovery as separate gates.
 
+The subsequent accepted-prefix join aligned each committed-prefix GDN hash
+with the all-layer route trace. The first differing GDN slice mapped to the
+first differing host route activation for all 16 generated positions in each
+arm pair: layer 2 for default CPU versus mirror CPU, and layer 9 at the first
+position then layer 2 for the rest of mirror CPU versus GPU profile. Prompt
+prefill GDN checksums matched, but are 16-bit and cannot prove exact state
+identity. For a future Strata + Splash integration, capture wider prefill-state
+evidence before claiming that decode is the only source of divergence, and
+retain the same per-prefix join through the engine's own command boundary. The
+layer alignment is localization evidence, not proof that one route activation
+alone caused every downstream state difference.
+
 The capture change touched native `src/core/expert_source.cpp`, which CUDA and
 HIP compile. SYCL uses its migrated `sycl/src/core/expert_source.cpp`; confirm
 the active source route before assuming a similarly named file is shared. The

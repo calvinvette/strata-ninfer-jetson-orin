@@ -50,6 +50,22 @@ format path as a cause of combined-output differences, but does not establish
 the full state-divergence path, answer quality, or performance. Phase 5 remains
 open.
 
+The accepted-prefix GDN hashes and all-layer route rows were then joined for
+each generated position. The prefill path's 36 per-slice GDN checksums match
+across both arm pairs; these checksums are only 16 bits, so they do not prove
+prefill state identity. After the first generated token, the first differing
+full-width GDN slice maps to model layer 2 for default CPU versus mirror CPU,
+and model layer 9 for the mirror CPU versus GPU-profile arm. For the remaining
+15 positions in the latter pair, it maps to layer 2. In both pairings, this
+first GDN difference matches the earliest host route activation difference at
+all 16 positions. The GPU-profile route capture at layer 1/positions 511 and
+513 remains excluded because its host callback is stale there; the comparison
+uses the first later differing valid route row. This alignment narrows where
+the accepted state starts to diverge, but hashes and route observations do not
+prove the causal path through all state updates. The machine-readable join is
+`prefix-state-alignment.json`, reproducible with
+`python3 bench/results/2026-10-18-phase5-coder-layer1-route-isolation/analyze_prefix_state_all16.py`.
+
 The output-capture dispatch filter now treats the default `UINT64_MAX` as a
 wildcard and explicit dispatch values as exact filters. The changed native
 source rebuilt for the Orin CUDA and maestro1 HIP `strata` targets. The full
