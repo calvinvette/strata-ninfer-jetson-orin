@@ -10,7 +10,8 @@ the tested Orin Q2_0 scope. Phase 4 is closed for its tested candidates; Phases
 matrix under the [closeout](PHASE7_CLOSEOUT.md); that is not a general product
 support claim. Phase 8
 backend builds, including the latest current-source HIP/SYCL compile and CLI
-checks, are recorded; runtime and release gates remain open. Current
+checks and the pinned-control Orin rollback smoke, are recorded; supported
+release packaging and broader runtime gates remain open. Current
 admission, transfer, profiling, speculation and service evidence is summarized in
 [status](STATUS.md). See [control reproduction](PHASE1.md) and
 [porting notes for future engines](PORTING_NOTES.md) for reproducible methods
