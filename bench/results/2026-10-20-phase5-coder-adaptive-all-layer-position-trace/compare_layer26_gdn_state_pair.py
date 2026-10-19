@@ -19,7 +19,7 @@ def read_records(path):
             raise ValueError(f'truncated state header in {path} at {offset}')
         magic, version, layer, position, recurrent_floats, state_floats, token, reserved = HEADER.unpack_from(data, offset)
         offset += HEADER.size
-        if magic != b'STGSTAT1' or version != 1 or layer != 26 or position != 511 or reserved != 0:
+        if magic != b'STGSTAT1' or version != 1 or layer != 26 or position < 0 or reserved != 0:
             raise ValueError(f'invalid state record header: {magic, version, layer, position, recurrent_floats, state_floats, token, reserved}')
         if not 0 < recurrent_floats <= state_floats:
             raise ValueError(f'invalid recurrent/total state sizes: {recurrent_floats}/{state_floats}')
@@ -35,8 +35,8 @@ def read_records(path):
         records.append({'layer': layer, 'position': position, 'token': token,
                         'recurrent_floats': recurrent_floats, 'state_floats': state_floats,
                         'pre': pre, 'post': post})
-    if len(records) != 2:
-        raise ValueError(f'expected initial and recovery state records, found {len(records)}')
+    if len(records) < 2 or len(records) % 2:
+        raise ValueError(f'expected initial/recovery record pairs, found {len(records)} records')
     return records
 
 
@@ -70,30 +70,52 @@ def main():
                         help='raw pre/post records retained outside the repository')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
-    initial, recovery = read_records(args.state_dump)
-    for key in ('layer', 'position', 'token', 'recurrent_floats', 'state_floats'):
-        if initial[key] != recovery[key]:
-            raise ValueError(f'initial/recovery state record metadata differs for {key}')
-    recurrent = initial['recurrent_floats']
+    records = read_records(args.state_dump)
+    grouped = {}
+    for record in records:
+        grouped.setdefault(record['position'], []).append(record)
+    if any(len(pair) != 2 for pair in grouped.values()):
+        raise ValueError('each selected position must have exactly initial and recovery records')
+    comparisons = {}
+    for position, pair in sorted(grouped.items()):
+        initial, recovery = pair
+        for key in ('layer', 'position', 'token', 'recurrent_floats', 'state_floats'):
+            if initial[key] != recovery[key]:
+                raise ValueError(f'initial/recovery state record metadata differs for {key} at position {position}')
+        recurrent = initial['recurrent_floats']
+        comparisons[str(position)] = {
+            'token_id': initial['token'],
+            'initial_vs_recovery_pre_state': split_summary(initial['pre'], recovery['pre'], recurrent),
+            'initial_vs_recovery_post_state': split_summary(initial['post'], recovery['post'], recurrent),
+        }
+    if len(comparisons) == 1:
+        only = next(iter(comparisons.values()))
+    else:
+        only = {}
+    recurrent = records[0]['recurrent_floats']
     result = {
-        'scope': 'same-service layer-26 GDN state immediately before and after verifier position 511',
-        'token_id': initial['token'],
-        'state_floats': initial['state_floats'],
+        'scope': 'same-service layer-26 GDN verifier state immediately before and after selected token positions',
+        'positions': [int(position) for position in sorted(comparisons, key=int)],
+        'token_id': only.get('token_id'),
+        'state_floats': records[0]['state_floats'],
         'recurrent_floats': recurrent,
-        'convolution_history_floats': initial['state_floats'] - recurrent,
+        'convolution_history_floats': records[0]['state_floats'] - recurrent,
         'raw_state_dump_bytes': args.state_dump.stat().st_size,
         'raw_state_dump_sha256': hashlib.sha256(args.state_dump.read_bytes()).hexdigest(),
-        'initial_vs_recovery_pre_state': split_summary(initial['pre'], recovery['pre'], recurrent),
-        'initial_vs_recovery_post_state': split_summary(initial['post'], recovery['post'], recurrent),
-        'initial_request_pre_to_post': split_summary(initial['pre'], initial['post'], recurrent),
-        'recovery_request_pre_to_post': split_summary(recovery['pre'], recovery['post'], recurrent),
-        'interpretation_limit': 'two paired states at one position establish this boundary only; they do not identify when earlier tokens first changed the persistent state',
+        'position_comparisons': comparisons,
+        'interpretation_limit': 'selected positions localize a boundary only; they do not establish the cause or values at unselected positions',
     }
+    if only:
+        initial, recovery = grouped[int(next(iter(comparisons)))]
+        result['initial_vs_recovery_pre_state'] = only['initial_vs_recovery_pre_state']
+        result['initial_vs_recovery_post_state'] = only['initial_vs_recovery_post_state']
+        result['initial_request_pre_to_post'] = split_summary(initial['pre'], initial['post'], recurrent)
+        result['recovery_request_pre_to_post'] = split_summary(recovery['pre'], recovery['post'], recurrent)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + '\n')
-    print(json.dumps({key: result[key] for key in ('token_id', 'state_floats', 'recurrent_floats',
+    print(json.dumps({key: result[key] for key in ('positions', 'state_floats', 'recurrent_floats',
                                                     'raw_state_dump_bytes', 'raw_state_dump_sha256',
-                                                    'initial_vs_recovery_pre_state', 'initial_vs_recovery_post_state')}, indent=2))
+                                                    'position_comparisons')}, indent=2))
 
 
 if __name__ == '__main__':

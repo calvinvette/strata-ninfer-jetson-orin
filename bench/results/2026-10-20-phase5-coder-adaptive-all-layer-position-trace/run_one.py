@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import struct
 import threading
 from pathlib import Path
 import sys
@@ -42,9 +43,15 @@ def main():
     parser.add_argument("--capture-verify-gdn-layer", type=int,
                         help="capture verifier GDN intermediates at position 511 for this layer")
     parser.add_argument("--capture-verify-gdn-state-layer", type=int,
-                        help="capture the GDN pre/post persistent state at position 511 for this layer")
+                        help="capture the GDN pre/post state at selected positions for this layer")
     parser.add_argument("--gdn-state-output", type=Path,
                         help="external output path for the raw pre/post GDN state records")
+    parser.add_argument("--gdn-state-positions", default="511",
+                        help="comma-separated increasing token positions to capture (default: 511)")
+    parser.add_argument("--trace-prefill-gdn-state-layer", type=int,
+                        help="emit full GDN-state hashes after each prefill chunk for this model layer")
+    parser.add_argument("--prefill-gdn-state-output", type=Path,
+                        help="optional external raw end-of-prompt GDN snapshots for the traced layer")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.continuations < 0:
@@ -64,8 +71,18 @@ def main():
         parser.error("verifier GDN capture layer must be non-negative")
     if args.capture_verify_gdn_state_layer is not None and args.capture_verify_gdn_state_layer < 0:
         parser.error("verifier GDN state capture layer must be non-negative")
+    if args.trace_prefill_gdn_state_layer is not None and args.trace_prefill_gdn_state_layer < 0:
+        parser.error("prefill GDN state trace layer must be non-negative")
+    if args.prefill_gdn_state_output is not None and args.trace_prefill_gdn_state_layer is None:
+        parser.error("prefill GDN state output requires --trace-prefill-gdn-state-layer")
     if (args.capture_verify_gdn_state_layer is None) != (args.gdn_state_output is None):
         parser.error("GDN state capture requires both --capture-verify-gdn-state-layer and --gdn-state-output")
+    try:
+        state_positions = [int(value) for value in args.gdn_state_positions.split(",")]
+    except ValueError:
+        parser.error("--gdn-state-positions must be comma-separated non-negative integers")
+    if not state_positions or any(value < 0 for value in state_positions) or state_positions != sorted(set(state_positions)):
+        parser.error("--gdn-state-positions must be strictly increasing non-negative integers")
     args.output.mkdir(parents=True, exist_ok=False)
 
     cfg = json.loads((BASE / "config.json").read_text())
@@ -139,8 +156,17 @@ def main():
         env.update({
             "STRATA_VERIFY_DUMP_GDN_STATE_LAYER": str(args.capture_verify_gdn_state_layer),
             "STRATA_VERIFY_DUMP_GDN_STATE_PATH": str(gdn_state_output),
-            "STRATA_VERIFY_DUMP_GDN_STATE_POSITION": "511",
+            "STRATA_VERIFY_DUMP_GDN_STATE_POSITIONS": ",".join(map(str, state_positions)),
         })
+    if args.trace_prefill_gdn_state_layer is not None:
+        env["STRATA_PREFILL_GDN_STATE_TRACE_LAYER"] = str(args.trace_prefill_gdn_state_layer)
+    prefill_state_output = None
+    if args.prefill_gdn_state_output is not None:
+        prefill_state_output = args.prefill_gdn_state_output.expanduser().resolve()
+        if prefill_state_output.exists():
+            parser.error(f"prefill GDN state output already exists: {prefill_state_output}")
+        prefill_state_output.parent.mkdir(parents=True, exist_ok=True)
+        env["STRATA_PREFILL_GDN_STATE_TRACE_PATH"] = str(prefill_state_output)
     engine = StrataEngine(cfg["exe"], argv, cwd=cfg["cwd"], log=str(log), env=env)
     requests = []
     try:
@@ -155,6 +181,26 @@ def main():
             (args.output / "requests.json").write_text(json.dumps({"requests": requests}, indent=2) + "\n")
     finally:
         engine.close()
+
+    if gdn_state_output is not None:
+        header = struct.Struct("<8sIiqQQii")
+        raw = gdn_state_output.read_bytes()
+        offset = 0
+        observed = {}
+        while offset < len(raw):
+            if len(raw) - offset < header.size:
+                raise RuntimeError("truncated verifier GDN state diagnostic header")
+            magic, version, layer, position, recurrent, total, token, reserved = header.unpack_from(raw, offset)
+            offset += header.size
+            if magic != b"STGSTAT1" or version != 1 or layer != args.capture_verify_gdn_state_layer or reserved != 0:
+                raise RuntimeError("invalid verifier GDN state diagnostic record")
+            if total < recurrent or len(raw) - offset < 2 * total * 4:
+                raise RuntimeError("truncated verifier GDN state diagnostic payload")
+            offset += 2 * total * 4
+            observed[position] = observed.get(position, 0) + 1
+        expected = {position: 2 for position in state_positions}
+        if observed != expected:
+            raise RuntimeError(f"verifier GDN state positions not observed twice in initial/recovery: {observed}; expected {expected}")
 
     captured = [json.loads(line) for line in (args.output / "all-layer-position511.jsonl").read_text().splitlines()]
     if not captured or captured[0].get("format") != "strata-moe-dispatch-v3":

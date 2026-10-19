@@ -66,6 +66,18 @@ maestro1 HIP recompiled the verifier for each diagnostic increment and for the
 state capture, and passed `strata --help`; the SYCL overlay reported no work
 and passed help. These are x86 compile/CLI checks only. Phase 5 remains open.
 
+The follow-up [prefill-boundary capture](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/layer26-gdn-prefill-state-comparison/README.md)
+found bit-identical layer-26 state at all eight captured ends of the initial and
+recovery short-request prefill chunks, including exact raw-state equality at
+boundary 505. The verifier pre-state at position 511 still differed in the
+recurrent matrix while its convolution history matched. This places the observed
+change after the captured prefill and before verifier capture, without naming a
+specific transition because the samples are at different boundaries. The
+28-GiB run passed with 14.33 GiB minimum availability and zero cgroup events.
+Current-source maestro1 HIP rebuilt and linked; SYCL had no source work. Both
+CLI help checks passed. This remains a diagnostic, not a correction or
+performance result; Phase 5 remains open.
+
 The trace's per-layer accepted-prefix hashes now localize the adaptive state's
 first mismatch: at the first recovery token, GDN ordinals 20–35 differed from
 the initial short request, while ordinals 0–19 matched. Ordinal 20 maps to

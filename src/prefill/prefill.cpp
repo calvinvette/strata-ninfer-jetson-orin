@@ -38,9 +38,11 @@
 #include <cuda_runtime.h>
 
 #include <algorithm>
+#include <cerrno>
 #include <chrono>
 #include <cmath>
 #include <cstdio>
+#include <cstdlib>
 #include <map>
 #include <string>
 #include <atomic>
@@ -2018,6 +2020,41 @@ bool Prefill::run_impl(const int64_t* tokens, int64_t n, int64_t pos0, std::stri
     int64_t kv_prefetches = 0;
     const uint64_t gdn_floats = (uint64_t) g.ssm_state_size * g.ssm_v_heads * g.ssm_state_size +
                                 (uint64_t) g.ssm_conv_channels * (g.ssm_d_conv - 1);
+    int64_t gdn_trace_layer = -1, gdn_trace_ordinal = -1;
+    std::vector<uint8_t> gdn_trace_state;
+    const char* gdn_trace_dump_path = std::getenv("STRATA_PREFILL_GDN_STATE_TRACE_PATH");
+    if (gdn_trace_dump_path != nullptr && !*gdn_trace_dump_path) {
+        err = "prefill: empty STRATA_PREFILL_GDN_STATE_TRACE_PATH";
+        return false;
+    }
+    if (const char* value = std::getenv("STRATA_PREFILL_GDN_STATE_TRACE_LAYER")) {
+        char* end = nullptr;
+        errno = 0;
+        const long parsed = std::strtol(value, &end, 10);
+        if (errno != 0 || end == value || *end != '\0' || parsed < 0 || parsed >= g.n_layers ||
+            core::is_qsa_layer(g, parsed)) {
+            err = "prefill: invalid STRATA_PREFILL_GDN_STATE_TRACE_LAYER";
+            return false;
+        }
+        gdn_trace_layer = parsed;
+        gdn_trace_ordinal = 0;
+        for (int64_t layer = 0; layer < gdn_trace_layer; ++layer)
+            if (!core::is_qsa_layer(g, layer)) ++gdn_trace_ordinal;
+        if (gdn_trace_layer >= LB && gdn_trace_layer < LE) {
+            if (gdn_trace_ordinal < ss.gdn_ord0 || gdn_trace_ordinal >= ss.gdn_ord0 + ss.gdn_alloc ||
+                gdn_floats > SIZE_MAX / sizeof(float)) {
+                err = "prefill: selected GDN state trace layer is outside this session stage";
+                return false;
+            }
+            gdn_trace_state.resize((size_t) gdn_floats * sizeof(float));
+            std::fprintf(stderr, "strata prefill: GDN state trace enabled for layer %lld\n",
+                         (long long) gdn_trace_layer);
+        }
+    }
+    if (gdn_trace_dump_path != nullptr && gdn_trace_layer < 0) {
+        err = "prefill: GDN state snapshot output requires the opt-in GDN state trace layer";
+        return false;
+    }
     int32_t prev[2] = {ss.ple_prev[0], ss.ple_prev[1]};
     // layer split: a prompt of one chunk runs the stages one after the other, so the next stage's GPU idles while
     // this one reads; it streams and computes a share of this stage's experts then (set_stage_helper), in the
@@ -3966,6 +4003,57 @@ bool Prefill::run_impl(const int64_t* tokens, int64_t n, int64_t pos0, std::stri
                     std::fwrite(out.data(), 2, (size_t) (nr * D), f);
                 }
                 std::fclose(f);
+            }
+        }
+        if (gdn_trace_layer >= LB && gdn_trace_layer < LE) {
+            if (cudaStreamSynchronize(m.cs) != cudaSuccess) {
+                err = std::string("prefill: GDN state trace sync: ") + cudaGetErrorString(cudaGetLastError());
+                return false;
+            }
+            const float* const state = ss.gdn_state + (size_t) (gdn_trace_ordinal - ss.gdn_ord0) * gdn_floats;
+            if (cudaMemcpy(gdn_trace_state.data(), state, gdn_trace_state.size(), cudaMemcpyDeviceToHost) != cudaSuccess) {
+                err = std::string("prefill: GDN state trace copy: ") + cudaGetErrorString(cudaGetLastError());
+                return false;
+            }
+            uint64_t hash = 1469598103934665603ull;
+            for (uint8_t byte : gdn_trace_state) hash = (hash ^ byte) * 1099511628211ull;
+            std::fprintf(stderr, "strata prefill: GDN_STATE_TRACE layer=%lld prompt=%lld boundary=%lld hash=%016llx\n",
+                         (long long) gdn_trace_layer, (long long) n, (long long) (p0 + T),
+                         (unsigned long long) hash);
+            if (gdn_trace_dump_path != nullptr && p0 + T == n) {
+                struct PrefillGdnStateHeader {
+                    char magic[8];
+                    uint32_t version;
+                    int32_t layer;
+                    int64_t boundary;
+                    uint64_t recurrent_floats;
+                    uint64_t state_floats;
+                    int32_t prompt_tokens;
+                    int32_t reserved;
+                } header{};
+                static_assert(sizeof(PrefillGdnStateHeader) == 48, "prefill GDN trace header layout changed");
+                std::memcpy(header.magic, "STPFGS1", sizeof(header.magic));
+                header.version = 1;
+                header.layer = (int32_t) gdn_trace_layer;
+                header.boundary = p0 + T;
+                header.recurrent_floats = (uint64_t) g.ssm_state_size * g.ssm_v_heads * g.ssm_state_size;
+                header.state_floats = gdn_floats;
+                header.prompt_tokens = (int32_t) n;
+                static std::mutex state_dump_mutex;
+                std::lock_guard<std::mutex> lock(state_dump_mutex);
+                std::FILE* dump = std::fopen(gdn_trace_dump_path, "ab");
+                bool written = dump != nullptr;
+                if (written) {
+                    written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
+                              std::fwrite(gdn_trace_state.data(), 1, gdn_trace_state.size(), dump) ==
+                                  gdn_trace_state.size();
+                    if (std::fflush(dump) != 0) written = false;
+                    if (std::fclose(dump) != 0) written = false;
+                }
+                if (!written) {
+                    err = "prefill: could not write opt-in GDN end-of-prompt state";
+                    return false;
+                }
             }
         }
         if (on_chunk || on_stage_chunk) {

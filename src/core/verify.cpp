@@ -581,31 +581,45 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
     {
         const char* layer = std::getenv("STRATA_VERIFY_DUMP_GDN_STATE_LAYER");
         const char* path = std::getenv("STRATA_VERIFY_DUMP_GDN_STATE_PATH");
-        const char* position = std::getenv("STRATA_VERIFY_DUMP_GDN_STATE_POSITION");
+        const char* positions = std::getenv("STRATA_VERIFY_DUMP_GDN_STATE_POSITIONS");
         if ((layer != nullptr) != (path != nullptr)) {
             err = "verify: STRATA_VERIFY_DUMP_GDN_STATE_LAYER and STRATA_VERIFY_DUMP_GDN_STATE_PATH must be set together";
             return false;
         }
-        if (position != nullptr && layer == nullptr) {
-            err = "verify: STRATA_VERIFY_DUMP_GDN_STATE_POSITION needs the state layer and path";
+        if (positions != nullptr && layer == nullptr) {
+            err = "verify: STRATA_VERIFY_DUMP_GDN_STATE_POSITIONS needs the state layer and path";
             return false;
         }
         if (layer != nullptr) {
             char* end = nullptr;
             const long parsed = std::strtol(layer, &end, 10);
             if (end == layer || *end != '\0' || parsed < 0 || parsed >= g.n_layers || is_qsa_layer(g, parsed) ||
-                !*path || position == nullptr) {
-                err = "verify: GDN state capture needs a valid GDN layer, path, and exact token position";
+                !*path || positions == nullptr || !*positions) {
+                err = "verify: GDN state capture needs a valid GDN layer, path, and token positions";
                 return false;
             }
-            char* pos_end = nullptr;
-            const long long selected = std::strtoll(position, &pos_end, 10);
-            if (pos_end == position || *pos_end != '\0' || selected < 0) {
-                err = "verify: invalid opt-in GDN state position";
-                return false;
+            const char* cursor = positions;
+            while (*cursor) {
+                char* pos_end = nullptr;
+                errno = 0;
+                const long long selected = std::strtoll(cursor, &pos_end, 10);
+                if (errno != 0 || pos_end == cursor || selected < 0 || (*pos_end != '\0' && *pos_end != ',') ||
+                    (!gdn_state_diag_positions_.empty() && selected <= gdn_state_diag_positions_.back())) {
+                    err = "verify: GDN state positions must be strictly increasing non-negative integers";
+                    return false;
+                }
+                gdn_state_diag_positions_.push_back((int64_t) selected);
+                if (*pos_end == ',') {
+                    cursor = pos_end + 1;
+                    if (*cursor == '\0') {
+                        err = "verify: invalid trailing separator in GDN state positions";
+                        return false;
+                    }
+                } else {
+                    cursor = pos_end;
+                }
             }
             gdn_state_diag_layer_ = (int) parsed;
-            gdn_state_diag_position_ = (int64_t) selected;
             gdn_state_diag_path_ = path;
             const uint64_t state_floats = (uint64_t) g.ssm_state_size * (uint64_t) g.ssm_v_heads *
                                               (uint64_t) g.ssm_state_size +
@@ -623,8 +637,8 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
             }
             strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "allocate", this,
                                                         gdn_state_diag_h_, gdn_state_diag_capacity_, -1);
-            std::fprintf(stderr, "strata verify: opt-in GDN pre/post state dump at layer %d, position %lld -> %s (%zu bytes)\n",
-                         gdn_state_diag_layer_, (long long) gdn_state_diag_position_, gdn_state_diag_path_.c_str(),
+            std::fprintf(stderr, "strata verify: opt-in GDN pre/post state dump at layer %d for %zu positions -> %s (%zu bytes)\n",
+                         gdn_state_diag_layer_, gdn_state_diag_positions_.size(), gdn_state_diag_path_.c_str(),
                          gdn_state_diag_capacity_);
         }
     }
@@ -2546,7 +2560,8 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
             return false;
         }
     }
-    if (gdn_state_diag_captured_ && T == 1 && pos0 == gdn_state_diag_position_) {
+    if (gdn_state_diag_captured_ && T == 1 &&
+        std::binary_search(gdn_state_diag_positions_.begin(), gdn_state_diag_positions_.end(), pos0)) {
         struct GdnStateHeader {
             char magic[8];
             uint32_t version;

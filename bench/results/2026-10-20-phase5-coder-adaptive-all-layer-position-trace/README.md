@@ -148,6 +148,28 @@ session's accepted-prefix state. See `layer26-gdn-state-pair/` and
 `layer25-to-layer26-gdn-followup/`. The GDN position-filter change also rebuilt
 on maestro1 HIP; SYCL remains on its unaffected overlay. Phase 5 remains open.
 
+A further opt-in trace captured layer-26 GDN state at every prefill chunk end
+and wrote raw end-of-prompt state for the initial and recovery short requests.
+The two 505-token internal prompt batches had identical full-state hashes at
+boundaries 64, 128, 192, 256, 320, 384, 448 and 505. Their final FP32 states
+were bit-identical across all 817,152 recurrent and convolution values. The
+trace's low 16 bits also matched the existing per-layer prefill fingerprint on
+both requests. At verifier position 511, however, the captured pre-verification
+recurrent matrices differed in 688,243/786,432 values (maximum absolute delta
+1.78e-4, relative L2 4.65e-4), while convolution history matched exactly.
+This narrows the observed change to after the matching prefill snapshots and
+before the verifier capture, but does not identify a specific token or
+transition: the internal prefill batch ends at 505 while the verifier capture
+is at absolute position 511, and these are different execution boundaries.
+Cross-path raw arrays are retained as diagnostic data, not treated as
+same-time state parity. The run passed its 28-GiB supervisor in 183.8 s, with
+14.33 GiB minimum host/admission availability, 10.77 GiB peak scope use and
+zero cgroup events. Clocks remained dynamic and energy was not request-
+attributed. The capture and analysis are in
+`layer26-gdn-prefill-state-comparison/`; raw state files remain outside Git
+under `~/models/strata-orin-validation/experiments/phase5-gdn-state/`.
+Phase 5 remains open.
+
 The two raw 113 MiB dumps remain outside Git under
 `~/models/strata-orin-validation/experiments/phase5-gdn-state/`; their full
 SHA256 values and per-layer comparison are in `gdn-state-delta.json`. The
