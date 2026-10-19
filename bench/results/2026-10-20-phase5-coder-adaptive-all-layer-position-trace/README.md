@@ -279,6 +279,13 @@ The adaptive run again returned matching token IDs while its persistent-state
 fingerprints differed. This associates the captured change with the tested
 adaptive configuration, but does not isolate its underlying operation.
 
+A follow-up [full GDN state comparison at accepted position 506](layer26-gdn-prompt-tail-dispatch/commit-state-pair/README.md)
+shows that delayed initial and recovery states are bit-identical, and the
+delayed initial state also matches adaptive initial. Adaptive recovery differs
+from that shared initial state in 786,389/786,432 recurrent values and
+10,240/30,720 convolution-history values. This confirms the adaptive-only
+endpoint divergence without identifying the operation that introduced it.
+
 Reproduce the extended service pair on Orin with the current source and local
 model artifacts:
 
