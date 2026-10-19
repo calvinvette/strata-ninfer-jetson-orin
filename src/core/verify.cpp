@@ -445,6 +445,9 @@ Verifier::~Verifier() {
     if (gdn_diag_h_ && cudaFreeHost(gdn_diag_h_) == cudaSuccess)
         strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
                                                     gdn_diag_h_, 0, -1);
+    if (moe_route_diag_h_ && cudaFreeHost(moe_route_diag_h_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
+                                                    moe_route_diag_h_, 0, -1);
     if (ev_fork_) cudaEventDestroy(ev_fork_);
     if (ev_join_) cudaEventDestroy(ev_join_);
     for (cudaStream_t s : df_side_)
@@ -550,6 +553,35 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
                                                     gdn_diag_h_, gdn_diag_capacity_, -1);
         std::fprintf(stderr, "strata verify: opt-in GDN activation dump at layer %d -> %s (%zu bytes)\n",
                      gdn_diag_layer_, gdn_diag_path_.c_str(), gdn_diag_capacity_);
+    }
+    {
+        const char* layer = std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_LAYER");
+        const char* path = std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_PATH");
+        if ((layer != nullptr) != (path != nullptr)) {
+            err = "verify: STRATA_VERIFY_DUMP_MOE_ROUTE_LAYER and STRATA_VERIFY_DUMP_MOE_ROUTE_PATH must be set together";
+            return false;
+        }
+        if (layer != nullptr) {
+            char* end = nullptr;
+            const long parsed = std::strtol(layer, &end, 10);
+            if (end == layer || *end != '\0' || parsed < 0 || parsed >= g.n_layers || !*path) {
+                err = "verify: invalid opt-in MoE route layer or output path";
+                return false;
+            }
+            moe_route_diag_layer_ = (int) parsed;
+            moe_route_diag_path_ = path;
+            const size_t ids_bytes = (size_t) max_t * (size_t) ss.k * sizeof(int32_t);
+            moe_route_diag_capacity_ = ids_bytes + (size_t) max_t * (size_t) ss.k * sizeof(float);
+            if (cudaHostAlloc((void**) &moe_route_diag_h_, moe_route_diag_capacity_, cudaHostAllocPortable) != cudaSuccess) {
+                moe_route_diag_h_ = nullptr;
+                err = "verify: could not allocate the opt-in MoE route diagnostic buffer";
+                return false;
+            }
+            strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "allocate", this,
+                                                        moe_route_diag_h_, moe_route_diag_capacity_, -1);
+            std::fprintf(stderr, "strata verify: opt-in MoE route-weight dump at layer %d -> %s (%zu bytes)\n",
+                         moe_route_diag_layer_, moe_route_diag_path_.c_str(), moe_route_diag_capacity_);
+        }
     }
 
     // ---- mapped staging
@@ -1477,6 +1509,23 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                                       route_resident_cfg().stats() + (n <= 8 ? 4 : 0), cs);
             } catch (const std::exception& e) { err = "verify route-resident: " + std::string(e.what()); return false; }
         }
+        // Capture after optional route-resident rewrites so these are the exact IDs and weights
+        // consumed by the expert plan and combine below.
+        if (moe_route_diag_h_ != nullptr && l == moe_route_diag_layer_ && !batch_rec_) {
+            const size_t ids_bytes = (size_t) max_t_ * (size_t) K * sizeof(int32_t);
+            int32_t* host_ids = (int32_t*) moe_route_diag_h_;
+            float* host_weights = (float*) (moe_route_diag_h_ + ids_bytes);
+            const size_t count = (size_t) n * (size_t) K;
+            const size_t offset = (size_t) tb * (size_t) K;
+            if (cudaMemcpyAsync(host_ids + offset, ids_ + offset, count * sizeof(int32_t),
+                                cudaMemcpyDeviceToHost, cs) != cudaSuccess ||
+                cudaMemcpyAsync(host_weights + offset, w_ + offset, count * sizeof(float),
+                                cudaMemcpyDeviceToHost, cs) != cudaSuccess) {
+                err = "verify: could not enqueue opt-in device MoE route capture";
+                return false;
+            }
+            moe_route_diag_captured_ = true;
+        }
         if (ar_on()) {
             resident_plan(ids_ + tb * K, n * (int) K, (int) K, hits_.d_res + l * g.n_expert, (int) g.n_expert,
                           hits_.cache_base, slot_off_d_, (long long) hits_.blob,
@@ -2247,6 +2296,42 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
         }
         if (!written) {
             err = "verify: could not write opt-in GDN layer diagnostic";
+            return false;
+        }
+    }
+    if (moe_route_diag_captured_) {
+        static std::mutex route_dump_mutex;
+        std::lock_guard<std::mutex> lock(route_dump_mutex);
+        std::FILE* dump = std::fopen(moe_route_diag_path_.c_str(), "ab");
+        bool written = dump != nullptr;
+        if (written) {
+            if (std::fseek(dump, 0, SEEK_END) != 0) written = false;
+            const long end = written ? std::ftell(dump) : -1;
+            if (end < 0) written = false;
+            else if (end == 0)
+                written = std::fprintf(dump, "{\"format\":\"strata-verify-moe-route-v1\",\"k\":%lld}\n",
+                                       (long long) ss.k) >= 0;
+        }
+        const size_t ids_bytes = (size_t) max_t_ * (size_t) ss.k * sizeof(int32_t);
+        const int32_t* ids = (const int32_t*) moe_route_diag_h_;
+        const float* weights = (const float*) (moe_route_diag_h_ + ids_bytes);
+        for (int row = 0; row < T && written; ++row) {
+            const size_t off = (size_t) row * (size_t) ss.k;
+            written = std::fprintf(dump, "{\"layer\":%d,\"position\":%lld,\"token_id\":%d,\"ids\":[",
+                                   moe_route_diag_layer_, (long long) (pos0 + row), (int) tokens[row]) >= 0;
+            for (int j = 0; j < ss.k && written; ++j)
+                written = std::fprintf(dump, "%s%d", j ? "," : "", ids[off + (size_t) j]) >= 0;
+            if (written) written = std::fputs("],\"weights\":[", dump) != EOF;
+            for (int j = 0; j < ss.k && written; ++j)
+                written = std::fprintf(dump, "%s%.9g", j ? "," : "", (double) weights[off + (size_t) j]) >= 0;
+            if (written) written = std::fputs("]}\n", dump) != EOF;
+        }
+        if (dump != nullptr) {
+            if (std::fflush(dump) != 0) written = false;
+            if (std::fclose(dump) != 0) written = false;
+        }
+        if (!written) {
+            err = "verify: could not write opt-in device MoE route capture";
             return false;
         }
     }

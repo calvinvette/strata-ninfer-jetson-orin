@@ -50,11 +50,15 @@ def main():
                     help="MoE layer whose CPU-owned expert outputs to capture (0-47; default: 1)")
     ap.add_argument("--hash-qsa-layers", action="store_true",
                     help="log per-QSA-layer state fingerprints at each accepted prefix")
+    ap.add_argument("--dump-moe-route-layer", type=int,
+                    help="capture exact verifier device top-k IDs/weights for one layer (0-47)")
     a = ap.parse_args()
     if not 0 <= a.device_layer < 48:
         ap.error("--device-layer must be in [0, 47]")
     if not 0 <= a.output_layer < 48:
         ap.error("--output-layer must be in [0, 47]")
+    if a.dump_moe_route_layer is not None and not 0 <= a.dump_moe_route_layer < 48:
+        ap.error("--dump-moe-route-layer must be in [0, 47]")
     a.output.mkdir(parents=True, exist_ok=False)
     cfg = json.loads((HERE / "config.json").read_text())
     argv = list(cfg["args"])
@@ -80,6 +84,9 @@ def main():
         env["STRATA_PREFILL_DUMP_GDN"] = str((a.output / "prefill-gdn.bin").resolve())
     if a.hash_qsa_layers:
         env["STRATA_STATE_HASH_QSA_LAYERS"] = "1"
+    if a.dump_moe_route_layer is not None:
+        env["STRATA_VERIFY_DUMP_MOE_ROUTE_LAYER"] = str(a.dump_moe_route_layer)
+        env["STRATA_VERIFY_DUMP_MOE_ROUTE_PATH"] = str((a.output / "device-moe-routes.jsonl").resolve())
     if a.arm == "cpu_mirror":
         env["STRATA_NATIVE_CPU_Q8_1_DOT"] = "1"
     tok_dir = Path(cfg["tokenizer"])

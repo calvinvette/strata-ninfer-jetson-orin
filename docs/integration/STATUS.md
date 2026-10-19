@@ -3012,3 +3012,18 @@ bitwise Q8_1 CPU/CUDA agreement for all seven IQ2_S/Q2_0 experts. This is
 single-row operator evidence and does not resolve full weighted combination,
 quality impact or the persistent-state continuation divergence. Phase 5
 remains open.
+
+A final-source [layer-8 weighted output reconstruction](../../bench/results/2026-10-18-phase5-coder-layer1-route-isolation/layer8-weighted-output-pair-final/README.md)
+now captures exact verifier device router weights as well as the layer input,
+routes, CPU expert rows and combined output. At position 511/token 271, the
+Q8_1-mirror and default-CPU paths have identical device inputs, top-10 IDs,
+router weights and expert owners. The weighted sum of seven CPU expert-output
+deltas reconstructs the combined device-output delta across all 2,560 values;
+relative-L1 residual is `2.266e-5`, with maximum absolute residual `5.63e-9`.
+Both arms retained at least 14.38 GiB host/admission availability and had zero
+observed cgroup memory events. This closes the numeric weighted-combine
+attribution for one row, but does not prove answer-quality impact or resolve
+persistent-state continuation divergence. The opt-in verifier route capture
+built and passed focused CUDA tests 6/6; the full HIP service also compiled
+and linked on maestro1, and its `--help` check passed. maestro1 is build/CLI
+evidence only. No performance claim follows and Phase 5 remains open.

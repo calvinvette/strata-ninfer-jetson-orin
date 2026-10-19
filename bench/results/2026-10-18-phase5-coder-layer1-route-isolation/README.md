@@ -230,3 +230,21 @@ values; combined device output differed in all 2,560 values (relative L1
 experts: service CPU outputs matched their parity outputs bitwise, and Q8_1 CPU
 matched CUDA bitwise. This is a single-row operator result, not a full weighted
 combine reconstruction or quality result. Neither addition closes Phase 5.
+
+## Weighted layer-8 output reconstruction — 2026-10-19
+
+The final-source [weighted-output pair](layer8-weighted-output-pair-final/README.md)
+adds device-side verifier router weights to the same-input layer-8 capture.
+At position 511/token 271, device inputs, top-10 IDs, router weights and owners
+match bitwise across Q8_1 mirror and default CPU arithmetic. Weighting the seven
+matched CPU expert output deltas reconstructs the measured combined device
+output delta across 2,560 values with maximum absolute residual `5.63e-9` and
+relative-L1 residual `2.266e-5`. The residual is consistent with float32 combine
+rounding. This is direct arithmetic attribution for one row, not a quality or
+persistent-state conclusion. The diagnostic capture is opt-in and uses a small
+pinned host buffer plus graph-captured device-to-host copies only when both
+`STRATA_VERIFY_DUMP_MOE_ROUTE_LAYER` and `STRATA_VERIFY_DUMP_MOE_ROUTE_PATH`
+are set. CUDA tests passed 6/6; the full HIP service compiled and linked on
+maestro1, and its `--help` check passed. maestro1 provides build and CLI
+evidence only. Full backend build records and artifact checksums are in the
+weighted campaign directory.

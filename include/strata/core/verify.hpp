@@ -381,6 +381,11 @@ private:
     size_t gdn_diag_capacity_ = 0;
     std::string gdn_diag_path_;
     bool gdn_diag_captured_ = false;
+    int moe_route_diag_layer_ = -1;
+    uint8_t* moe_route_diag_h_ = nullptr;  ///< opt-in pinned capture of device top-k IDs and weights
+    size_t moe_route_diag_capacity_ = 0;
+    std::string moe_route_diag_path_;
+    bool moe_route_diag_captured_ = false;
     static constexpr int kProfPer = 33;              // stamps per layer (32 left the hc-read second
                                       // half's up-stamp at slot 32 = the next layer's slot 0: D8)
     bool prof_on_ = false;

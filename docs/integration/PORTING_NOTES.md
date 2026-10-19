@@ -1808,3 +1808,14 @@ continuation. The Orin layer-8 result demonstrates that matching input and
 routing plus CPU/CUDA operator agreement can localize a numeric change, but it
 does not replace reconstructing all routed and shared contributions or proving
 service-level causality.
+
+For a future Splash comparison, capture the router's exact device top-k weights
+at the same command boundary as expert IDs, owners, inputs and weighted outputs.
+Join CPU rows to those weights and test whether their weighted sum explains the
+combined-output delta, while separately checking shared-expert output and
+persistent state. In this Strata run the opt-in verifier capture writes exact
+IDs/weights to pinned memory through graph-captured copies, then logs them after
+the verifier stream completes. At one matched layer-8 row, the seven weighted
+CPU deltas explain the device combined delta within `2.266e-5` relative L1.
+This confirms the method for that single CUDA case; it is not evidence for a
+Metal implementation or broad model behavior.
