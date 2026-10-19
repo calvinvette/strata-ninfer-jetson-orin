@@ -6,6 +6,13 @@ complete for its bounded Orin qualification matrix under [its closeout]
 (PHASE7_CLOSEOUT.md); Phases 5 and 6 remain open. This records tested cells,
 not general product support.
 
+Phase 8 now has a consolidated [bounded Orin integration profile]
+(RELEASE_PROFILE.md), including the current-source Q2_0 profile, reproduction
+command, default regression and pinned-control rollback evidence, and explicit
+exclusions. This is an experimental profile for the measured Orin cell, not a
+general support claim. Phase 8 remains open pending broader release gates and
+the remaining Phase 5/6 work.
+
 Phase 6 has selected one bounded Q2_0 test profile for Phase 7 qualification:
 FP16 KV, 8K context, MTP off, 3,000 expert slots, prefill chunk 128, eight
 workers and prompt cache/adaptive swaps disabled. This is not a default or
