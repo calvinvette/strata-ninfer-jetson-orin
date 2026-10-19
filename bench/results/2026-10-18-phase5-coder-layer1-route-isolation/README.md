@@ -209,3 +209,24 @@ retry. They completed service requests and captured route/device data but are
 excluded because the CPU-output dispatch selector was configured incorrectly.
 The opt-in capture now treats the default `UINT64_MAX` selector as “all
 dispatches”; explicit dispatch values still select one dispatch.
+
+## Per-QSA state fingerprints and layer-8 arithmetic pair — 2026-10-19
+
+The follow-up [`qsa-state-three-arm/`](qsa-state-three-arm/README.md) records a
+64-bit fingerprint for each QSA persistent state at every accepted prefix. The
+first QSA difference is model layer 3 for all 16 default-versus-mirror rows;
+for mirror-versus-GPU placement it is layer 11 at position 511 and layer 3 at
+positions 512–526. The corresponding route activation first differs at layer 2
+for default/mirror, and layer 9 at position 511 then layer 2 for mirror/GPU.
+This localizes observed differences but is a hash-based diagnostic, not exact
+state comparison or causal proof.
+
+The focused [`layer8-output-pair/`](layer8-output-pair/README.md) then compared
+the CPU output arithmetic immediately before the layer-9 boundary. At position
+511/token 271, layer-8 device inputs, routes and owners were identical across
+arithmetic modes. Each of seven CPU expert outputs differed in all 2,560
+values; combined device output differed in all 2,560 values (relative L1
+0.334%). An independent native expert oracle checked all seven IQ2_S/Q2_0
+experts: service CPU outputs matched their parity outputs bitwise, and Q8_1 CPU
+matched CUDA bitwise. This is a single-row operator result, not a full weighted
+combine reconstruction or quality result. Neither addition closes Phase 5.

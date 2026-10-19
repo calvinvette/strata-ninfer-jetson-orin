@@ -46,9 +46,15 @@ def main():
                     help="retain the exact prompt-end GDN state bytes (diagnostic build only)")
     ap.add_argument("--device-layer", type=int, default=1,
                     help="verifier layer to capture on device (0-47; default: 1)")
+    ap.add_argument("--output-layer", type=int, default=1,
+                    help="MoE layer whose CPU-owned expert outputs to capture (0-47; default: 1)")
+    ap.add_argument("--hash-qsa-layers", action="store_true",
+                    help="log per-QSA-layer state fingerprints at each accepted prefix")
     a = ap.parse_args()
     if not 0 <= a.device_layer < 48:
         ap.error("--device-layer must be in [0, 47]")
+    if not 0 <= a.output_layer < 48:
+        ap.error("--output-layer must be in [0, 47]")
     a.output.mkdir(parents=True, exist_ok=False)
     cfg = json.loads((HERE / "config.json").read_text())
     argv = list(cfg["args"])
@@ -66,12 +72,14 @@ def main():
                 "STRATA_CAPTURE_MOE_LAYER": "-1", "STRATA_CAPTURE_MOE_ROWS": "768",
                 "STRATA_CAPTURE_MOE_START_ROW": "0",
                 "STRATA_CAPTURE_MOE_PATH": str((a.output / "routes-all-layers.jsonl").resolve()),
-                "STRATA_CAPTURE_MOE_OUTPUT_PATH": str((a.output / "cpu-outputs-layer1.jsonl").resolve()),
-                "STRATA_CAPTURE_MOE_OUTPUT_LAYER": "1",
+                "STRATA_CAPTURE_MOE_OUTPUT_PATH": str((a.output / f"cpu-outputs-layer{a.output_layer}.jsonl").resolve()),
+                "STRATA_CAPTURE_MOE_OUTPUT_LAYER": str(a.output_layer),
                 "STRATA_VERIFY_DUMP_GDN_LAYER": str(a.device_layer),
                 "STRATA_VERIFY_DUMP_GDN_PATH": str((a.output / "combined-moe.bin").resolve())})
     if a.dump_prefill_gdn:
         env["STRATA_PREFILL_DUMP_GDN"] = str((a.output / "prefill-gdn.bin").resolve())
+    if a.hash_qsa_layers:
+        env["STRATA_STATE_HASH_QSA_LAYERS"] = "1"
     if a.arm == "cpu_mirror":
         env["STRATA_NATIVE_CPU_Q8_1_DOT"] = "1"
     tok_dir = Path(cfg["tokenizer"])
@@ -107,20 +115,21 @@ def main():
             raise RuntimeError("route capture has an invalid absolute token key")
     if len(per_layer) != 48 or any(len(positions) != 16 for positions in per_layer.values()):
         raise RuntimeError(f"capture did not span 16 positions on 48 layers: {[(k, len(v)) for k,v in per_layer.items()]}")
-    cpu_lines = (a.output / "cpu-outputs-layer1.jsonl").read_text().splitlines()
+    cpu_lines = (a.output / f"cpu-outputs-layer{a.output_layer}.jsonl").read_text().splitlines()
     if not cpu_lines or json.loads(cpu_lines[0]).get("format") != "strata-moe-cpu-output-v2":
         raise RuntimeError("missing CPU output capture")
     cpu_rows = [json.loads(line) for line in cpu_lines[1:]]
-    if any(row.get("layer") != 1 for row in cpu_rows):
-        raise RuntimeError("CPU output capture included a non-layer-1 row")
+    if any(row.get("layer") != a.output_layer for row in cpu_rows):
+        raise RuntimeError(f"CPU output capture included a row outside layer {a.output_layer}")
     (a.output / "requests.json").write_text(json.dumps({
         "arm": a.arm, "prompt_tokens": len(prompt), "prompt_sha256": hashlib.sha256(
             b"".join(int(x).to_bytes(4, "little", signed=True) for x in prompt)).hexdigest(),
         "completion_ids": ids, "state": hashes[-1], "accepted_prefix_records": len(hashes),
-        "cpu_output_records": len(cpu_rows), "captured_positions_per_layer": 16,
+        "cpu_output_records": len(cpu_rows), "cpu_output_layer": a.output_layer,
+        "captured_positions_per_layer": 16,
         "captured_layers": 48, "profile": str(profile),
         "profile_sha256": hashlib.sha256(profile.read_bytes()).hexdigest()}, indent=2) + "\n")
-    print(f"{a.arm}: passed; route rows={len(route)}, layer-1 CPU outputs={len(cpu_rows)}")
+    print(f"{a.arm}: passed; route rows={len(route)}, layer-{a.output_layer} CPU outputs={len(cpu_rows)}")
     return 0
 
 

@@ -2994,3 +2994,21 @@ matches verifier `ffn_x` bitwise on all 16 rows. At position 511, layer-9 device
 validates the first GDN divergence layer for that token and places its change
 in the activation values before layer-9 routing. It does not localize the
 earlier decode operation that changed those values or close Phase 5.
+
+A [per-QSA accepted-prefix fingerprint campaign](../../bench/results/2026-10-18-phase5-coder-layer1-route-isolation/qsa-state-three-arm/README.md)
+now shows the first differing persistent QSA hash at model layer 3 for all 16
+default-CPU versus Q8_1-mirror positions, following the first differing route
+activation at layer 2. For mirror versus GPU placement, the first position
+shows QSA layer 11 after route activation layer 9; the remaining positions show
+QSA layer 3 after route activation layer 2. These are 64-bit fingerprints,
+which localize changes but do not prove state identity or causality.
+
+A focused [layer-8 same-input CPU arithmetic comparison](../../bench/results/2026-10-18-phase5-coder-layer1-route-isolation/layer8-output-pair/README.md)
+found identical device inputs, routes and owners at position 511/token 271,
+while all seven CPU expert outputs and all 2,560 combined device output values
+differed between default arithmetic and Q8_1. An independent native expert
+oracle confirmed service-to-tool output identity in each arithmetic mode and
+bitwise Q8_1 CPU/CUDA agreement for all seven IQ2_S/Q2_0 experts. This is
+single-row operator evidence and does not resolve full weighted combination,
+quality impact or the persistent-state continuation divergence. Phase 5
+remains open.

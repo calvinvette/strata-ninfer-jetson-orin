@@ -1795,3 +1795,16 @@ the active source route before assuming a similarly named file is shared. The
 updated CUDA and HIP service targets rebuilt, while the SYCL target had no
 changed input to rebuild. See the [full-row experiment](../../bench/results/2026-10-18-phase5-coder-layer1-route-isolation/README.md#all-16-generated-positions--2026-10-19)
 and its [raw captures and build records](../../bench/results/2026-10-18-phase5-coder-layer1-route-isolation/all-16-positions-three-arm-wildcard/).
+
+The per-QSA and layer-8 follow-ups add two useful comparison points for a future
+Strata + Splash port. Fingerprint each accepted-prefix persistent state
+independently and map the state index to the model layer; use a strong digest
+or direct bytes for identity claims, and treat a short hash only as a locator.
+At the first divergence boundary, capture the engine-side input, expert IDs,
+owners, each CPU-owned output and the final weighted device output under the
+same absolute-position/token key. Compare operator output against an
+independent format-aware oracle and separately test committed state and
+continuation. The Orin layer-8 result demonstrates that matching input and
+routing plus CPU/CUDA operator agreement can localize a numeric change, but it
+does not replace reconstructing all routed and shared contributions or proving
+service-level causality.

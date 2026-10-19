@@ -10340,6 +10340,8 @@ int main(int argc, char** argv) {
                 // conversation restore writes back; dead= is the spare key itself
                 uint64_t h_dead = h_tail, h_pool_full = h_tail;
                 const int64_t kvb = qs.head_dim, scb = (qs.head_dim / 64) * 2;
+                const bool hash_qsa_layers = std::getenv("STRATA_STATE_HASH_QSA_LAYERS") != nullptr;
+                std::string qsa_layer_hashes;
                 // a state's K/V arrays and their bytes per (cell, head) row: the host copy when it has one
                 auto kv_arrays = [&](const strata::core::QsaState& st) {
                     const bool h = st.kv_mode != 0;
@@ -10364,15 +10366,32 @@ int main(int argc, char** argv) {
                                                            ss.max_cells);   // = the primary state's max_cells
                 for (int64_t j = 0; j < ss.qsa_alloc; ++j) {   // this session's owned QSA ordinals only
                     const strata::core::QsaState& st = ss.qsa_states[ss.qsa_ord0 + j];
+                    uint64_t h_qsa = 1469598103934665603ull;
                     h_tail = hash_dev(st.idx_tail, z.tail, h_tail);
                     h_dead = hash_dev(st.idx_dead, z.dead, h_dead);
                     h_pool = hash_dev(st.idx_pooled, (size_t) (L / qs.idx_block) * qs.idx_dim * 4, h_pool);
                     h_pool_full = hash_dev(st.idx_pooled, (size_t) (L > 0 ? L / qs.idx_block + 1 : 0) * qs.idx_dim * 4,
                                            h_pool_full);
+                    if (hash_qsa_layers) {
+                        h_qsa = hash_dev(st.idx_tail, z.tail, h_qsa);
+                        h_qsa = hash_dev(st.idx_dead, z.dead, h_qsa);
+                        h_qsa = hash_dev(st.idx_pooled,
+                                         (size_t) (L > 0 ? L / qs.idx_block + 1 : 0) * qs.idx_dim * 4, h_qsa);
+                    }
                     // KV streaming: the host copy is the identity layout and holds every cell
                     for (const auto& [pool, w] : kv_arrays(st)) {
                         h_kv = hash_cells(pool, w, 0, L, h_kv);
                         h_stale = hash_cells(pool, w, L, end_cell, h_stale);
+                        if (hash_qsa_layers) h_qsa = hash_cells(pool, w, 0, L, h_qsa);
+                    }
+                    if (hash_qsa_layers) {
+                        const int64_t qsa_ordinal = ss.qsa_ord0 + j;
+                        const int64_t model_layer = (qsa_ordinal + 1) * g.qsa_interval - 1;
+                        char b[80];
+                        std::snprintf(b, sizeof(b), "qsa=%lld layer=%lld hash=%016llx ",
+                                      (long long) qsa_ordinal, (long long) model_layer,
+                                      (unsigned long long) h_qsa);
+                        qsa_layer_hashes += b;
                     }
                 }
                 uint64_t h_mtp = 1469598103934665603ull;
@@ -10386,6 +10405,9 @@ int main(int argc, char** argv) {
                     std::fprintf(stderr, "strata serve: ERR reading state fingerprint\n");
                     return false;
                 }
+                if (hash_qsa_layers)
+                    std::fprintf(stderr, "strata serve: STATE_HASH_QSA_LAYERS L=%lld %s\n",
+                                 (long long) L, qsa_layer_hashes.c_str());
                 char fingerprint[512];
                 std::snprintf(fingerprint, sizeof(fingerprint),
                               "STATE_HASH L=%lld gdn=%016llx ple=%016llx tail=%016llx pooled=%016llx "
