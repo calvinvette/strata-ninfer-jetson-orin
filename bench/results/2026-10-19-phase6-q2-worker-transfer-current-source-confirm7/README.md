@@ -72,3 +72,17 @@ This confirms the worker × transfer cells only for this Q2_0 workload and
 current binary. The interaction is inconclusive, and it does not qualify cold
 disk behavior, other prompts or serving profiles. Phase 6 remains open for
 other supported interactions and process-attributed energy/Pareto work.
+
+The retained one-second tegrastats samples were also integrated over each
+request window in `rail-energy.json` (reproduce with
+`python3 bench/results/2026-10-19-phase6-q2-worker-transfer-current-source-confirm7/analyze_rails.py`).
+All 28 windows were bracketed and estimated. These are separate named board
+rails, include idle/background activity, are not process-attributed, and must
+not be summed. Median `VIN_SYS_5V0` estimates were 3.823, 3.730, 3.584 and
+3.550 J/output token for 4/mapped, 8/mapped, 4/`pread` and 8/`pread`,
+respectively. The paired 4-vs-8 worker effects were +1.10% (mapped; 95%
+interval −19.49% to +4.91%) and +3.25% (`pread`; −15.50% to +8.94%). The
+`pread`-vs-mapped effects were −4.61% at 4 workers (−8.10% to +100.04%) and
+−6.83% at 8 workers (−8.43% to +7.72%). These broad intervals and background
+load make the rail estimates descriptive only; they do not establish an energy
+winner or close process-energy attribution.
