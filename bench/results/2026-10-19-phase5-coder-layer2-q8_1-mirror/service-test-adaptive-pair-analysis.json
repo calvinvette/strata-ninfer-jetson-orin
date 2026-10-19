@@ -1,0 +1,717 @@
+{
+  "experiment": "single paired adaptive-state service sequence; diagnostic only",
+  "source_commit": "0ddbf031",
+  "model": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF IQ1_M",
+  "profile": "adapt-every=4, adapt-swaps=8, accepted-only; prompt-cache=0; spec=2; 8K max context",
+  "paired_arms": {
+    "control": {
+      "binary_sha256": "4d6a14c5299670edd6c7a86f8c2345a3a63e91d325b294b320845c4f79270f47",
+      "opt_in": false,
+      "adaptive_byte_verification_passes": 15,
+      "adaptive_residency_verification_passes": 15,
+      "elapsed_s": 200.73148030485027,
+      "minimum_host_available_gib": 14.430419921875,
+      "minimum_admission_available_gib": 14.430419921875,
+      "peak_supervised_cgroup_gib": 10.314643859863281,
+      "maximum_observed_cgroup_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "requests": [
+        {
+          "name": "short-512",
+          "prompt_tokens": 512,
+          "ids": [
+            760,
+            3766,
+            1433,
+            16661,
+            11040,
+            314,
+            819,
+            5639,
+            27718,
+            59,
+            87,
+            15,
+            15,
+            63,
+            681,
+            864
+          ],
+          "state": {
+            "L": "527",
+            "gdn": "0e01bff1ed6a5322",
+            "ple": "88cdf75745ceda18",
+            "tail": "7b31b82a8c3ea27e",
+            "dead": "48fb10575fbf3848",
+            "pooled": "4fb304e6e04d4a30",
+            "pooled_full": "60fc5f4dc2f79c27",
+            "kv": "64a29dbd3229bc59",
+            "ple_prev": "63,681"
+          }
+        },
+        {
+          "name": "long-2048",
+          "prompt_tokens": 2048,
+          "ids": [
+            27775,
+            383,
+            279,
+            3766,
+            2002,
+            10142,
+            1433,
+            11,
+            567,
+            628,
+            22270,
+            264,
+            12103,
+            5215,
+            314,
+            4906
+          ],
+          "state": {
+            "L": "2063",
+            "gdn": "3981831fbbdc0cfd",
+            "ple": "9b261b1724e52ce2",
+            "tail": "5887d9c808ba40ed",
+            "dead": "01d30d2e242360e6",
+            "pooled": "fcbb237accca8c3a",
+            "pooled_full": "08a948a0093ef03b",
+            "kv": "874de884b42d35e4",
+            "ple_prev": "5215,314"
+          }
+        },
+        {
+          "name": "short-512-recovery",
+          "prompt_tokens": 512,
+          "ids": [
+            760,
+            3766,
+            1433,
+            16661,
+            11040,
+            314,
+            819,
+            5639,
+            27718,
+            59,
+            87,
+            15,
+            15,
+            63,
+            681,
+            864
+          ],
+          "state": {
+            "L": "527",
+            "gdn": "cb91785b783e3b57",
+            "ple": "88cdf75745ceda18",
+            "tail": "a9d831889a6242c4",
+            "dead": "48fb10575fbf3848",
+            "pooled": "abd127af31311602",
+            "pooled_full": "e3d21be8c8e44a99",
+            "kv": "140bcb20f6f51cfe",
+            "ple_prev": "63,681"
+          }
+        },
+        {
+          "name": "short-512-continuation-1",
+          "prompt_tokens": 512,
+          "ids": [
+            760,
+            3766,
+            1433,
+            16661,
+            11040,
+            314,
+            819,
+            5639,
+            27718,
+            59,
+            87,
+            15,
+            15,
+            63,
+            681,
+            864
+          ],
+          "state": {
+            "L": "527",
+            "gdn": "7d5f69c3715dad00",
+            "ple": "88cdf75745ceda18",
+            "tail": "b17b04d2b3c76546",
+            "dead": "48fb10575fbf3848",
+            "pooled": "dd6fea922dbb9e1e",
+            "pooled_full": "a5b4f9634f227dd5",
+            "kv": "d09cc9914d56b064",
+            "ple_prev": "63,681"
+          }
+        }
+      ],
+      "analysis": {
+        "adapt_every": 4,
+        "adapt_swaps": 8,
+        "prompt_cache": 0,
+        "cpu_q8_1_dot": false,
+        "capture_layer": 1,
+        "capture_rows": 128,
+        "capture_start_row": 0,
+        "capture_cpu_output": false,
+        "capture_output_layer": null,
+        "capture_dispatch": null,
+        "captured_cpu_output_rows": 0,
+        "capture_combined_moe": false,
+        "combined_moe_dump_bytes": 0,
+        "prompt_sha256": {
+          "short": "30668ef6170b7f7d603497a7b8b9b21c198a893a8f625f541e86bb899d8e378a",
+          "long": "17b2c3babd98abc6748be8da6afe12206c9de3272cf2f14a3ec7deb92ded6a4e"
+        },
+        "requests": [
+          {
+            "name": "short-512",
+            "prompt_tokens": 512,
+            "ids": [
+              760,
+              3766,
+              1433,
+              16661,
+              11040,
+              314,
+              819,
+              5639,
+              27718,
+              59,
+              87,
+              15,
+              15,
+              63,
+              681,
+              864
+            ],
+            "state": {
+              "L": "527",
+              "gdn": "0e01bff1ed6a5322",
+              "ple": "88cdf75745ceda18",
+              "tail": "7b31b82a8c3ea27e",
+              "dead": "48fb10575fbf3848",
+              "pooled": "4fb304e6e04d4a30",
+              "pooled_full": "60fc5f4dc2f79c27",
+              "kv": "64a29dbd3229bc59",
+              "ple_prev": "63,681"
+            }
+          },
+          {
+            "name": "long-2048",
+            "prompt_tokens": 2048,
+            "ids": [
+              27775,
+              383,
+              279,
+              3766,
+              2002,
+              10142,
+              1433,
+              11,
+              567,
+              628,
+              22270,
+              264,
+              12103,
+              5215,
+              314,
+              4906
+            ],
+            "state": {
+              "L": "2063",
+              "gdn": "3981831fbbdc0cfd",
+              "ple": "9b261b1724e52ce2",
+              "tail": "5887d9c808ba40ed",
+              "dead": "01d30d2e242360e6",
+              "pooled": "fcbb237accca8c3a",
+              "pooled_full": "08a948a0093ef03b",
+              "kv": "874de884b42d35e4",
+              "ple_prev": "5215,314"
+            }
+          },
+          {
+            "name": "short-512-recovery",
+            "prompt_tokens": 512,
+            "ids": [
+              760,
+              3766,
+              1433,
+              16661,
+              11040,
+              314,
+              819,
+              5639,
+              27718,
+              59,
+              87,
+              15,
+              15,
+              63,
+              681,
+              864
+            ],
+            "state": {
+              "L": "527",
+              "gdn": "cb91785b783e3b57",
+              "ple": "88cdf75745ceda18",
+              "tail": "a9d831889a6242c4",
+              "dead": "48fb10575fbf3848",
+              "pooled": "abd127af31311602",
+              "pooled_full": "e3d21be8c8e44a99",
+              "kv": "140bcb20f6f51cfe",
+              "ple_prev": "63,681"
+            }
+          },
+          {
+            "name": "short-512-continuation-1",
+            "prompt_tokens": 512,
+            "ids": [
+              760,
+              3766,
+              1433,
+              16661,
+              11040,
+              314,
+              819,
+              5639,
+              27718,
+              59,
+              87,
+              15,
+              15,
+              63,
+              681,
+              864
+            ],
+            "state": {
+              "L": "527",
+              "gdn": "7d5f69c3715dad00",
+              "ple": "88cdf75745ceda18",
+              "tail": "b17b04d2b3c76546",
+              "dead": "48fb10575fbf3848",
+              "pooled": "dd6fea922dbb9e1e",
+              "pooled_full": "a5b4f9634f227dd5",
+              "kv": "d09cc9914d56b064",
+              "ple_prev": "63,681"
+            }
+          }
+        ],
+        "recovery_token_differences": 0,
+        "changed_state_keys": [
+          "gdn",
+          "tail",
+          "pooled",
+          "pooled_full",
+          "kv"
+        ],
+        "route": {
+          "rows": 64
+        },
+        "adaptive_byte_verification_passes": 15,
+        "adaptive_residency_verification_passes": 15,
+        "binary_sha256": "4d6a14c5299670edd6c7a86f8c2345a3a63e91d325b294b320845c4f79270f47",
+        "model_identity": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF IQ1_M"
+      }
+    },
+    "mirror": {
+      "binary_sha256": "4d6a14c5299670edd6c7a86f8c2345a3a63e91d325b294b320845c4f79270f47",
+      "opt_in": true,
+      "adaptive_byte_verification_passes": 15,
+      "adaptive_residency_verification_passes": 15,
+      "elapsed_s": 203.01394007983617,
+      "minimum_host_available_gib": 14.434452056884766,
+      "minimum_admission_available_gib": 14.434452056884766,
+      "peak_supervised_cgroup_gib": 10.409732818603516,
+      "maximum_observed_cgroup_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "requests": [
+        {
+          "name": "short-512",
+          "prompt_tokens": 512,
+          "ids": [
+            760,
+            3766,
+            1433,
+            16661,
+            11040,
+            314,
+            819,
+            5639,
+            27718,
+            59,
+            87,
+            15,
+            15,
+            63,
+            681,
+            864
+          ],
+          "state": {
+            "L": "527",
+            "gdn": "fff3a02f44766e54",
+            "ple": "88cdf75745ceda18",
+            "tail": "b5fabb3897b0d32c",
+            "dead": "48fb10575fbf3848",
+            "pooled": "594ec76377cd1d4e",
+            "pooled_full": "f7a4a741d079a681",
+            "kv": "fe88647058d8506b",
+            "ple_prev": "63,681"
+          }
+        },
+        {
+          "name": "long-2048",
+          "prompt_tokens": 2048,
+          "ids": [
+            27775,
+            383,
+            279,
+            3766,
+            2002,
+            10142,
+            1433,
+            11,
+            567,
+            628,
+            22270,
+            264,
+            12103,
+            5215,
+            314,
+            4906
+          ],
+          "state": {
+            "L": "2063",
+            "gdn": "827de78430bf5d33",
+            "ple": "9b261b1724e52ce2",
+            "tail": "a0ba30df8b2e54a0",
+            "dead": "01d30d2e242360e6",
+            "pooled": "447c60b5f9111c7a",
+            "pooled_full": "f701658827d3178f",
+            "kv": "bc6b8b8d59915407",
+            "ple_prev": "5215,314"
+          }
+        },
+        {
+          "name": "short-512-recovery",
+          "prompt_tokens": 512,
+          "ids": [
+            760,
+            3766,
+            1433,
+            16661,
+            11040,
+            314,
+            819,
+            5639,
+            27718,
+            59,
+            87,
+            15,
+            15,
+            63,
+            681,
+            864
+          ],
+          "state": {
+            "L": "527",
+            "gdn": "865569d4bb492436",
+            "ple": "88cdf75745ceda18",
+            "tail": "e28e46ad39402e65",
+            "dead": "48fb10575fbf3848",
+            "pooled": "025c43cffe542d8c",
+            "pooled_full": "be84c02bfaee8f0f",
+            "kv": "869e44e8641b620f",
+            "ple_prev": "63,681"
+          }
+        },
+        {
+          "name": "short-512-continuation-1",
+          "prompt_tokens": 512,
+          "ids": [
+            760,
+            3766,
+            1433,
+            16661,
+            11040,
+            314,
+            264,
+            3074,
+            11,
+            11173,
+            3542,
+            25,
+            359,
+            87,
+            4282,
+            1061
+          ],
+          "state": {
+            "L": "527",
+            "gdn": "233098ec7eba91f7",
+            "ple": "167e08917ca92511",
+            "tail": "526eb358dc09acb1",
+            "dead": "48fb10575fbf3848",
+            "pooled": "3facb06684aea45b",
+            "pooled_full": "973df007b786bd7c",
+            "kv": "78c8bb583367d15c",
+            "ple_prev": "87,4282"
+          }
+        }
+      ],
+      "analysis": {
+        "adapt_every": 4,
+        "adapt_swaps": 8,
+        "prompt_cache": 0,
+        "cpu_q8_1_dot": true,
+        "capture_layer": 1,
+        "capture_rows": 128,
+        "capture_start_row": 0,
+        "capture_cpu_output": false,
+        "capture_output_layer": null,
+        "capture_dispatch": null,
+        "captured_cpu_output_rows": 0,
+        "capture_combined_moe": false,
+        "combined_moe_dump_bytes": 0,
+        "prompt_sha256": {
+          "short": "30668ef6170b7f7d603497a7b8b9b21c198a893a8f625f541e86bb899d8e378a",
+          "long": "17b2c3babd98abc6748be8da6afe12206c9de3272cf2f14a3ec7deb92ded6a4e"
+        },
+        "requests": [
+          {
+            "name": "short-512",
+            "prompt_tokens": 512,
+            "ids": [
+              760,
+              3766,
+              1433,
+              16661,
+              11040,
+              314,
+              819,
+              5639,
+              27718,
+              59,
+              87,
+              15,
+              15,
+              63,
+              681,
+              864
+            ],
+            "state": {
+              "L": "527",
+              "gdn": "fff3a02f44766e54",
+              "ple": "88cdf75745ceda18",
+              "tail": "b5fabb3897b0d32c",
+              "dead": "48fb10575fbf3848",
+              "pooled": "594ec76377cd1d4e",
+              "pooled_full": "f7a4a741d079a681",
+              "kv": "fe88647058d8506b",
+              "ple_prev": "63,681"
+            }
+          },
+          {
+            "name": "long-2048",
+            "prompt_tokens": 2048,
+            "ids": [
+              27775,
+              383,
+              279,
+              3766,
+              2002,
+              10142,
+              1433,
+              11,
+              567,
+              628,
+              22270,
+              264,
+              12103,
+              5215,
+              314,
+              4906
+            ],
+            "state": {
+              "L": "2063",
+              "gdn": "827de78430bf5d33",
+              "ple": "9b261b1724e52ce2",
+              "tail": "a0ba30df8b2e54a0",
+              "dead": "01d30d2e242360e6",
+              "pooled": "447c60b5f9111c7a",
+              "pooled_full": "f701658827d3178f",
+              "kv": "bc6b8b8d59915407",
+              "ple_prev": "5215,314"
+            }
+          },
+          {
+            "name": "short-512-recovery",
+            "prompt_tokens": 512,
+            "ids": [
+              760,
+              3766,
+              1433,
+              16661,
+              11040,
+              314,
+              819,
+              5639,
+              27718,
+              59,
+              87,
+              15,
+              15,
+              63,
+              681,
+              864
+            ],
+            "state": {
+              "L": "527",
+              "gdn": "865569d4bb492436",
+              "ple": "88cdf75745ceda18",
+              "tail": "e28e46ad39402e65",
+              "dead": "48fb10575fbf3848",
+              "pooled": "025c43cffe542d8c",
+              "pooled_full": "be84c02bfaee8f0f",
+              "kv": "869e44e8641b620f",
+              "ple_prev": "63,681"
+            }
+          },
+          {
+            "name": "short-512-continuation-1",
+            "prompt_tokens": 512,
+            "ids": [
+              760,
+              3766,
+              1433,
+              16661,
+              11040,
+              314,
+              264,
+              3074,
+              11,
+              11173,
+              3542,
+              25,
+              359,
+              87,
+              4282,
+              1061
+            ],
+            "state": {
+              "L": "527",
+              "gdn": "233098ec7eba91f7",
+              "ple": "167e08917ca92511",
+              "tail": "526eb358dc09acb1",
+              "dead": "48fb10575fbf3848",
+              "pooled": "3facb06684aea45b",
+              "pooled_full": "973df007b786bd7c",
+              "kv": "78c8bb583367d15c",
+              "ple_prev": "87,4282"
+            }
+          }
+        ],
+        "recovery_token_differences": 0,
+        "changed_state_keys": [
+          "gdn",
+          "tail",
+          "pooled",
+          "pooled_full",
+          "kv"
+        ],
+        "route": {
+          "rows": 64
+        },
+        "adaptive_byte_verification_passes": 15,
+        "adaptive_residency_verification_passes": 15,
+        "binary_sha256": "4d6a14c5299670edd6c7a86f8c2345a3a63e91d325b294b320845c4f79270f47",
+        "model_identity": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF IQ1_M"
+      }
+    }
+  },
+  "cross_arm_request_comparison": [
+    {
+      "name": "short-512",
+      "token_differences": 0,
+      "state_equal_fields": [
+        "L",
+        "ple",
+        "dead",
+        "ple_prev"
+      ],
+      "state_different_fields": [
+        "gdn",
+        "tail",
+        "pooled",
+        "pooled_full",
+        "kv"
+      ]
+    },
+    {
+      "name": "long-2048",
+      "token_differences": 0,
+      "state_equal_fields": [
+        "L",
+        "ple",
+        "dead",
+        "ple_prev"
+      ],
+      "state_different_fields": [
+        "gdn",
+        "tail",
+        "pooled",
+        "pooled_full",
+        "kv"
+      ]
+    },
+    {
+      "name": "short-512-recovery",
+      "token_differences": 0,
+      "state_equal_fields": [
+        "L",
+        "ple",
+        "dead",
+        "ple_prev"
+      ],
+      "state_different_fields": [
+        "gdn",
+        "tail",
+        "pooled",
+        "pooled_full",
+        "kv"
+      ]
+    },
+    {
+      "name": "short-512-continuation-1",
+      "token_differences": 10,
+      "state_equal_fields": [
+        "L",
+        "dead"
+      ],
+      "state_different_fields": [
+        "gdn",
+        "ple",
+        "tail",
+        "pooled",
+        "pooled_full",
+        "kv",
+        "ple_prev"
+      ]
+    }
+  ],
+  "conclusion": "The first three request token IDs matched across arms; the continuation differed at 10/16 tokens. Persistent-state hashes differed in multiple fields. Exact IQ4_NL down-projection parity therefore does not establish whole-expert or service-state parity, and this one pair does not qualify a fix."
+}

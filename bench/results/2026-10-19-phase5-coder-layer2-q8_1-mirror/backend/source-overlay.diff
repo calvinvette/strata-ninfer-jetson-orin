@@ -1,0 +1,263 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index a4c86842..26e1c10f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1506,7 +1506,7 @@ if(STRATA_NATIVE_EXPERTS)
+       # down Q4_0 on 42 layers and Q4_1 on 6)
+       # q6_K/q8_0: Unsloth UD-Q6_K_XL gate/up Q6_K with Q8_0 down (docs/UNSLOTH_Q6.md). Layer 2 is q8_0/q8_0, already listed.
+       set(_strata_parity_pairs q4_K/q5_1 q4_K/q8_0 q5_K/q8_0 q8_0/q8_0 q4_K/q5_0 q5_0/q8_0 q4_0/q4_0 q4_0/q4_1
+-                              iq3_xxs/iq4_nl iq2_s/q2_0 iq3_s/iq4_nl iq4_xs/q2_0)
++                              iq3_xxs/iq4_nl iq2_s/q2_0 iq2_s/iq4_nl iq3_s/iq4_nl iq4_xs/q2_0)
+       if(STRATA_Q6K_EXPERTS)
+         list(APPEND _strata_parity_pairs q6_K/q8_0)
+       else()   # a pair without GPU kernels (Q6_K gate/up) is refused by native_expert_supported, not run
+@@ -1528,6 +1528,14 @@ if(STRATA_NATIVE_EXPERTS)
+                COMMAND ${CMAKE_COMMAND} -E env STRATA_NATIVE_CPU_Q8_1_DOT=1
+                        $<TARGET_FILE:native_expert_parity> --synthetic-windows iq2_s/q2_0)
+       set_tests_properties(native_expert_parity_iq2_s_q2_0_cpu_q8_1_windows PROPERTIES TIMEOUT 300)
++      add_test(NAME native_expert_parity_iq2_s_iq4_nl_cpu_q8_1_dot
++               COMMAND ${CMAKE_COMMAND} -E env STRATA_NATIVE_CPU_Q8_1_DOT=1
++                       $<TARGET_FILE:native_expert_parity> --synthetic iq2_s/iq4_nl)
++      set_tests_properties(native_expert_parity_iq2_s_iq4_nl_cpu_q8_1_dot PROPERTIES TIMEOUT 120)
++      add_test(NAME native_expert_parity_iq2_s_iq4_nl_cpu_q8_1_windows
++               COMMAND ${CMAKE_COMMAND} -E env STRATA_NATIVE_CPU_Q8_1_DOT=1
++                       $<TARGET_FILE:native_expert_parity> --synthetic-windows iq2_s/iq4_nl)
++      set_tests_properties(native_expert_parity_iq2_s_iq4_nl_cpu_q8_1_windows PROPERTIES TIMEOUT 300)
+       add_test(NAME native_expert_parity_q5_1_min COMMAND native_expert_parity --q5_1-min)
+       # #290: the BF16 token embedding (--embd-gguf) gathered and dequantized bit for bit
+       add_test(NAME native_expert_parity_bf16_embd COMMAND native_expert_parity --bf16-embd)
+diff --git a/include/strata/kernels/cpu/native_expert.hpp b/include/strata/kernels/cpu/native_expert.hpp
+index c41a1991..1cf36bcd 100644
+--- a/include/strata/kernels/cpu/native_expert.hpp
++++ b/include/strata/kernels/cpu/native_expert.hpp
+@@ -31,7 +31,9 @@ struct NativeFmt {
+
+ /// Whether this build has the ggml-cpu path.
+ bool native_experts_available() noexcept;
+-/// Fills `f` for a layer; false (with a reason) when ggml-cpu has no dot product for a type.
++/// Fills `f` for a layer; false (with a reason) when ggml-cpu has no dot product for a type. The opt-in
++/// STRATA_NATIVE_CPU_Q8_1_DOT diagnostic also selects the CUDA-matching Q8_1 route for IQ2_S/Q2_0 and
++/// IQ2_S/IQ4_NL expert pairs; it is not a default dispatch policy.
+ bool native_fmt(int gu_type, int d_type, int64_t n_embd, int64_t n_ff, NativeFmt& f, std::string& err);
+
+ /// x (n_embd floats) -> the gate/up activation (act_bytes).
+diff --git a/src/kernels/cpu/native_expert.cpp b/src/kernels/cpu/native_expert.cpp
+index 1efb57cb..c9453088 100644
+--- a/src/kernels/cpu/native_expert.cpp
++++ b/src/kernels/cpu/native_expert.cpp
+@@ -114,8 +114,63 @@ float q8_1_q2_0_cuda_dot(const uint8_t* row, const uint8_t* xq, int n) {
+     return lane_sum[0];
+ }
+
++float q8_1_iq4_nl_cuda_dot(const uint8_t* row, const uint8_t* xq, int n) {
++    constexpr int qk = QK4_NL;
++    static_assert(qk == 32, "IQ4_NL CUDA contract assumes 32-value weight blocks");
++    if (n % qk != 0) std::abort();
++    const int blocks = n / qk;
++    const auto* weights = reinterpret_cast<const block_iq4_nl*>(row);
++    const auto* acts = reinterpret_cast<const Q81Block*>(xq);
++
++    // Match native_small_mmvq_kernel's IQ4NLBlock, Qi=4, WARPS=4 mapping:
++    // each thread accumulates one block in one of four warps, then shared warp
++    // partials are added in order before the CUDA XOR reduction.
++    std::array<std::array<float, 32>, 4> warp_lanes{};
++    for (int warp = 0; warp < 4; ++warp) {
++        for (int lane = 0; lane < 32; ++lane) {
++            const int tid = warp * 32 + lane;
++            for (int block = tid / 2; block < blocks; block += 64) {
++                const int iqs = 2 * (tid % 2);
++                const auto* w = weights + block;
++                const auto* x = acts + block;
++                int sumi = 0;
++                for (int i = 0; i < 2; ++i) {
++                    const int group = iqs + i;
++                    const uint8_t* packed = w->qs + 4 * group;
++                    int dot_low = 0;
++                    int dot_high = 0;
++                    for (int j = 0; j < 4; ++j) {
++                        dot_low += (int) kvalues_iq4nl[packed[j] & 0x0f] * (int) x->qs[4 * group + j];
++                        dot_high += (int) kvalues_iq4nl[packed[j] >> 4] * (int) x->qs[16 + 4 * group + j];
++                    }
++                    sumi += dot_low;
++                    sumi += dot_high;
++                }
++                const float d = ggml_fp16_to_fp32(w->d) * ggml_fp16_to_fp32(x->d);
++                warp_lanes[(size_t) warp][(size_t) lane] += d * (float) sumi;
++            }
++        }
++    }
++
++    std::array<float, 32> lane_sum{};
++    for (int lane = 0; lane < 32; ++lane) {
++        lane_sum[(size_t) lane] = warp_lanes[0][(size_t) lane];
++        for (int warp = 1; warp < 4; ++warp) {
++            lane_sum[(size_t) lane] += warp_lanes[(size_t) warp][(size_t) lane];
++        }
++    }
++    for (int offset = 16; offset > 0; offset >>= 1) {
++        const auto previous = lane_sum;
++        for (int lane = 0; lane < 32; ++lane) {
++            lane_sum[(size_t) lane] = previous[(size_t) lane] + previous[(size_t) (lane ^ offset)];
++        }
++    }
++    return lane_sum[0];
++}
++
+ bool q8_1_scalar_dot(const NativeFmt& f) {
+-    return f.gu_type == GGML_TYPE_IQ2_S && f.d_type == GGML_TYPE_Q2_0 &&
++    return f.gu_type == GGML_TYPE_IQ2_S &&
++           (f.d_type == GGML_TYPE_Q2_0 || f.d_type == GGML_TYPE_IQ4_NL) &&
+            f.gu_act == GGML_TYPE_Q8_1 && f.d_act == GGML_TYPE_Q8_1;
+ }
+
+@@ -167,7 +222,8 @@ bool native_fmt(int gu_type, int d_type, int64_t n_embd, int64_t n_ff, NativeFmt
+     f.d_act = (int) td->vec_dot_type;
+     const char* q8_1_probe = std::getenv("STRATA_NATIVE_CPU_Q8_1_DOT");
+     if (q8_1_probe != nullptr && std::atoi(q8_1_probe) != 0 &&
+-        gu_type == GGML_TYPE_IQ2_S && d_type == GGML_TYPE_Q2_0) {
++        gu_type == GGML_TYPE_IQ2_S &&
++        (d_type == GGML_TYPE_Q2_0 || d_type == GGML_TYPE_IQ4_NL)) {
+         f.gu_act = GGML_TYPE_Q8_1;
+         f.d_act = GGML_TYPE_Q8_1;
+     }
+@@ -304,8 +360,11 @@ void native_down_rows(const NativeFmt& f, const uint8_t* blob, const void* const
+     if (q8_1_scalar_dot(f)) {
+         for (int r = r0; r < r1; ++r) {
+             const uint8_t* dr = blob + f.down_off + (size_t) r * f.d_row;
+-            for (int t = 0; t < nt; ++t)
+-                out[t][r] = q8_1_q2_0_cuda_dot(dr, (const uint8_t*) hq[t], (int) f.n_ff);
++            for (int t = 0; t < nt; ++t) {
++                out[t][r] = f.d_type == GGML_TYPE_Q2_0
++                    ? q8_1_q2_0_cuda_dot(dr, (const uint8_t*) hq[t], (int) f.n_ff)
++                    : q8_1_iq4_nl_cuda_dot(dr, (const uint8_t*) hq[t], (int) f.n_ff);
++            }
+         }
+         return;
+     }
+diff --git a/src/kernels/native_expert_parity.cpp b/src/kernels/native_expert_parity.cpp
+index 6dc583f4..12af3bf2 100644
+--- a/src/kernels/native_expert_parity.cpp
++++ b/src/kernels/native_expert_parity.cpp
+@@ -129,6 +129,67 @@ int check_q8_1_quantizers(const std::vector<float>& x, cudaStream_t stream) {
+     return scale_mismatches || code_mismatches || oracle_mismatches ? 1 : 0;
+ }
+
++int check_iq4_nl_down_q8_1(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int seed,
++                           cudaStream_t stream) {
++    constexpr int N_IN = (int) FF, N_OUT = (int) H;
++    const size_t qbytes = ggml_row_size(GGML_TYPE_Q8_1, N_IN);
++    std::mt19937 rng(0x4e4c + seed);
++    std::normal_distribution<float> normal(0.f, 1.f);
++    std::vector<float> h((size_t) N_IN), cpu_y((size_t) N_OUT), gpu_y((size_t) N_OUT);
++    for (float& value : h) value = normal(rng);
++
++    std::vector<uint8_t> cpu_q(qbytes);
++    cpu::NativeFmt down_fmt = f;
++    down_fmt.d_act = GGML_TYPE_Q8_1;
++    cpu::native_quant_h(down_fmt, h.data(), cpu_q.data());
++
++    const auto check = [](cudaError_t error, const char* operation) {
++        if (error != cudaSuccess) {
++            std::fprintf(stderr, "IQ4_NL Q8_1 down parity: %s: %s\n", operation, cudaGetErrorString(error));
++            std::exit(1);
++        }
++    };
++    float* d_h = nullptr;
++    void *d_q = nullptr, *d_w = nullptr;
++    float* d_y = nullptr;
++    const size_t down_bytes = f.d_row * (size_t) N_OUT;
++    check(cudaMalloc(&d_h, h.size() * sizeof(float)), "cudaMalloc activation");
++    check(cudaMalloc(&d_q, qbytes), "cudaMalloc Q8_1");
++    check(cudaMalloc(&d_w, down_bytes), "cudaMalloc weights");
++    check(cudaMalloc(&d_y, gpu_y.size() * sizeof(float)), "cudaMalloc output");
++    check(cudaMemcpy(d_h, h.data(), h.size() * sizeof(float), cudaMemcpyHostToDevice), "copy activation");
++    check(cudaMemcpy(d_w, blob.data() + f.down_off, down_bytes, cudaMemcpyHostToDevice), "copy down weights");
++    strata::kernels::native_quantize_q8_1(d_h, d_q, N_IN, 1, stream);
++    strata::kernels::native_mmvq(GGML_TYPE_IQ4_NL, d_w, d_q, d_y, N_IN, N_OUT, 1, stream);
++    check(cudaGetLastError(), "launch CUDA IQ4_NL MMVQ");
++    check(cudaStreamSynchronize(stream), "synchronize CUDA IQ4_NL MMVQ");
++    check(cudaMemcpy(gpu_y.data(), d_y, gpu_y.size() * sizeof(float), cudaMemcpyDeviceToHost), "copy CUDA output");
++
++    std::vector<uint8_t> gpu_q(qbytes);
++    check(cudaMemcpy(gpu_q.data(), d_q, qbytes, cudaMemcpyDeviceToHost), "copy Q8_1 activation");
++    int q8_mismatch_blocks = 0;
++    for (size_t offset = 0; offset < qbytes; offset += 36) {
++        // The stored sum intentionally differs; IQ4_NL consumes scale and codes only.
++        q8_mismatch_blocks += std::memcmp(cpu_q.data() + offset, gpu_q.data() + offset, 2) != 0 ||
++                              std::memcmp(cpu_q.data() + offset + 4, gpu_q.data() + offset + 4, 32) != 0;
++    }
++    const void* qptr[1] = {cpu_q.data()};
++    float* yptr[1] = {cpu_y.data()};
++    cpu::native_down_rows(down_fmt, blob.data(), qptr, 1, yptr, 0, N_OUT);
++    size_t value_mismatches = 0;
++    for (size_t i = 0; i < cpu_y.size(); ++i)
++        value_mismatches += std::memcmp(&cpu_y[i], &gpu_y[i], sizeof(float)) != 0;
++    std::printf("          IQ4_NL down Q8_1 oracle: quantizer scale/code blocks %d/%zu differ; "
++                "CPU/CUDA output words %zu/%zu differ\n",
++                q8_mismatch_blocks, qbytes / 36, value_mismatches, cpu_y.size());
++
++    check(cudaFree(d_y), "free output");
++    check(cudaFree(d_w), "free weights");
++    check(cudaFree(d_q), "free Q8_1");
++    check(cudaFree(d_h), "free activation");
++    return q8_mismatch_blocks == 0 && value_mismatches == 0 ? 0 : 1;
++}
++
+ // The three ways and the dequantizers for one expert blob and token-group width; returns failed checks.
+ template <int N>
+ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int seed, const std::string& label,
+@@ -566,12 +627,11 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
+     for (size_t i = 0; i < got_c.size(); ++i)
+         cpu_gpu_bitwise_diff += std::memcmp(&got_c[i], &got_g[i], sizeof(float)) != 0;
+     const bool ok = ec < 3e-2 && eg < 3e-2 && std::isfinite(ec) && std::isfinite(eg);
+-    const bool require_q8_1_exact = std::getenv("STRATA_NATIVE_CPU_Q8_1_DOT") != nullptr &&
+-                                    f.gu_type == GGML_TYPE_IQ2_S && f.d_type == GGML_TYPE_Q2_0;
+-    if (require_q8_1_exact && cpu_gpu_bitwise_diff != 0) {
+-        std::fprintf(stderr, "%s: opt-in IQ2_S/Q2_0 CPU Q8_1 CUDA-mirror route differs from CUDA in %zu/%zu words\n",
+-                     label.c_str(), cpu_gpu_bitwise_diff, got_c.size());
+-        ++failures;
++    if (std::getenv("STRATA_NATIVE_CPU_Q8_1_DOT") != nullptr &&
++        f.gu_type == GGML_TYPE_IQ2_S && f.d_type == GGML_TYPE_IQ4_NL) {
++        // Full expert output also includes backend-specific expf/SwiGLU rounding.
++        // Isolate the changed down dot and require exact quantizer-code and output parity.
++        failures += check_iq4_nl_down_q8_1(f, blob, seed, s);
+     }
+     std::printf("%-9s %-8s/%-7s blob %8zu  cpu rel %.2e  gpu rel %.2e  cpu-gpu %.2e (%zu/%zu words differ)  %s\n",
+                 label.c_str(), ggml_type_name((ggml_type) f.gu_type), ggml_type_name((ggml_type) f.d_type), f.bytes,
+@@ -737,9 +797,9 @@ int main(int argc, char** argv) {
+                              "       [--dump-f32-dir DIR] writes dequantized weights, input and reference/operator outputs\n"
+                              "       native_expert_parity --q8_1-quantizer --activation-f32 FILE\n"
+                              "       native_expert_parity --synthetic GU/DOWN ...   (ggml type names, e.g. q4_K/q5_1)\n"
+-                             "       native_expert_parity --synthetic-windows iq2_s/q2_0  (Q8_1 CPU/CUDA, widths 1..8)\n"
++                             "       native_expert_parity --synthetic-windows iq2_s/q2_0|iq2_s/iq4_nl  (Q8_1, widths 1..8)\n"
+                              "       <shard.gguf> --expert E --activation-f32 FILE --windows-1-through-8\n"
+-                             "           (real IQ2_S/Q2_0 weights and captured activation, Q8_1 CPU/CUDA)\n"
++                             "           (real IQ2_S/Q2_0 or IQ2_S/IQ4_NL weights and captured activation, Q8_1)\n"
+                              "       <shard.gguf> --expert E --activation-f32 MATRIX --activation-rows N --token-width N\n"
+                              "           (run distinct captured rows together, N=1..8)\n"
+                              "       native_expert_parity --q5_1-min\n"
+@@ -805,9 +865,9 @@ int main(int argc, char** argv) {
+             }
+             const auto blob = synthetic_blob(f, i);
+             if (all_windows) {
+-                if (gu != GGML_TYPE_IQ2_S || dn != GGML_TYPE_Q2_0 ||
++                if (gu != GGML_TYPE_IQ2_S || (dn != GGML_TYPE_Q2_0 && dn != GGML_TYPE_IQ4_NL) ||
+                     f.gu_act != GGML_TYPE_Q8_1 || f.d_act != GGML_TYPE_Q8_1) {
+-                    std::fprintf(stderr, "--synthetic-windows supports only iq2_s/q2_0 with Q8_1 activations\n");
++                    std::fprintf(stderr, "--synthetic-windows supports iq2_s/q2_0 or iq2_s/iq4_nl with Q8_1 activations\n");
+                     return 2;
+                 }
+                 failures += check_blob<1>(f, blob, i, "synthetic nt=1", s);
+@@ -915,9 +975,10 @@ int main(int argc, char** argv) {
+                     case 8: failures += check_blob<8>(f, blob, l, label + " nt=8", s, &service_activation, dump_f32_dir); break;
+                 }
+             } else if (all_windows) {
+-                if (f.gu_type != GGML_TYPE_IQ2_S || f.d_type != GGML_TYPE_Q2_0 ||
++                if (f.gu_type != GGML_TYPE_IQ2_S ||
++                    (f.d_type != GGML_TYPE_Q2_0 && f.d_type != GGML_TYPE_IQ4_NL) ||
+                     f.gu_act != GGML_TYPE_Q8_1 || f.d_act != GGML_TYPE_Q8_1) {
+-                    std::fprintf(stderr, "%s: widths 1..8 require IQ2_S/Q2_0 weights and Q8_1 activations\n",
++                    std::fprintf(stderr, "%s: widths 1..8 require IQ2_S/Q2_0 or IQ2_S/IQ4_NL weights and Q8_1 activations\n",
+                                  label.c_str());
+                     return 2;
+                 }

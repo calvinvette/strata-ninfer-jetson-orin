@@ -24,6 +24,21 @@ service-level state-causality result. The 28-GiB scopes retained 24.51 GiB
 minimum host/admission availability and zero cgroup events. Adaptive migration
 and Phase 5 remain unqualified.
 
+An opt-in [layer-2 IQ4_NL CPU Q8_1 arithmetic mirror check](../../bench/results/2026-10-19-phase5-coder-layer2-q8_1-mirror/README.md)
+matched the CUDA Q8_1 IQ4_NL down projection bit-for-bit for all seven
+CPU-owned Coder experts and token widths 1–8 (zero scale/code block and output
+word mismatches). It does not make the whole expert bitwise equal: a small
+full-expert residual remains, with its source not yet isolated among gate/up
+dot accumulation and SwiGLU rounding. Paired service checks found persistent-state
+hash differences under both fixed and adaptive residency. In the adaptive pair,
+the first three 16-token outputs matched but the continuation differed at 10/16
+tokens; with swaps disabled, the long output differed at 3/16 and the following
+short outputs matched. The mirror remains opt-in and diagnostic; these pairs do
+not isolate the complete cause or qualify migration. Current-source maestro1
+HIP/SYCL compile/link and CLI-help checks passed, with no accelerator runtime
+claim; see the [backend report](../../bench/results/2026-10-19-phase5-coder-layer2-q8_1-mirror/backend/maestro1/README.md).
+Phase 5 remains open.
+
 A new supervised [Q2_0 short→long→short check](../../bench/results/2026-10-18-phase5-q2-short-long-short/README.md)
 on the selected MTP-off, fixed-residency profile returned the same exact
 512-token retrieval-and-sum answer before and after an uncached 7,498-token

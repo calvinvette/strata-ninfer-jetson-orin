@@ -125,6 +125,19 @@ codec substitution based on a model's download label. A future Splash adapter
 must inventory actual tensors and preserve activation/cast boundaries in the
 same way. Header geometry is not an independent element-decoding oracle.
 
+The layer-2 IQ2_S/IQ4_NL diagnostic exposed a useful CPU/GPU boundary: the
+default ggml-cpu dot and CUDA's Q8_1 path need not quantize activations the same
+way. An opt-in scalar mirror now reproduces CUDA's IQ4_NL down projection for
+this pair exactly on Orin, but full expert outputs still differ slightly; the
+residual has not been isolated to gate/up accumulation or SwiGLU rounding, and
+service persistent-state hashes still differ. See the [retained
+operator and service evidence](../../bench/results/2026-10-19-phase5-coder-layer2-q8_1-mirror/README.md).
+For a future Splash integration, independently derive Metal's activation
+quantizer and reduction order from its kernel, then test full request state;
+CUDA lane assignments and an isolated dot match do not transfer to Metal or
+prove continuation equivalence. This is an adapter lesson, not a NInfer source
+promotion.
+
 A first campaign preserved one completed process and five failed starts because
 the harness's port precheck did not allow TCP TIME_WAIT reuse. The corrected
 precheck matches HTTPServer's SO_REUSEADDR behavior while rejecting a live

@@ -114,8 +114,63 @@ float q8_1_q2_0_cuda_dot(const uint8_t* row, const uint8_t* xq, int n) {
     return lane_sum[0];
 }
 
+float q8_1_iq4_nl_cuda_dot(const uint8_t* row, const uint8_t* xq, int n) {
+    constexpr int qk = QK4_NL;
+    static_assert(qk == 32, "IQ4_NL CUDA contract assumes 32-value weight blocks");
+    if (n % qk != 0) std::abort();
+    const int blocks = n / qk;
+    const auto* weights = reinterpret_cast<const block_iq4_nl*>(row);
+    const auto* acts = reinterpret_cast<const Q81Block*>(xq);
+
+    // Match native_small_mmvq_kernel's IQ4NLBlock, Qi=4, WARPS=4 mapping:
+    // each thread accumulates one block in one of four warps, then shared warp
+    // partials are added in order before the CUDA XOR reduction.
+    std::array<std::array<float, 32>, 4> warp_lanes{};
+    for (int warp = 0; warp < 4; ++warp) {
+        for (int lane = 0; lane < 32; ++lane) {
+            const int tid = warp * 32 + lane;
+            for (int block = tid / 2; block < blocks; block += 64) {
+                const int iqs = 2 * (tid % 2);
+                const auto* w = weights + block;
+                const auto* x = acts + block;
+                int sumi = 0;
+                for (int i = 0; i < 2; ++i) {
+                    const int group = iqs + i;
+                    const uint8_t* packed = w->qs + 4 * group;
+                    int dot_low = 0;
+                    int dot_high = 0;
+                    for (int j = 0; j < 4; ++j) {
+                        dot_low += (int) kvalues_iq4nl[packed[j] & 0x0f] * (int) x->qs[4 * group + j];
+                        dot_high += (int) kvalues_iq4nl[packed[j] >> 4] * (int) x->qs[16 + 4 * group + j];
+                    }
+                    sumi += dot_low;
+                    sumi += dot_high;
+                }
+                const float d = ggml_fp16_to_fp32(w->d) * ggml_fp16_to_fp32(x->d);
+                warp_lanes[(size_t) warp][(size_t) lane] += d * (float) sumi;
+            }
+        }
+    }
+
+    std::array<float, 32> lane_sum{};
+    for (int lane = 0; lane < 32; ++lane) {
+        lane_sum[(size_t) lane] = warp_lanes[0][(size_t) lane];
+        for (int warp = 1; warp < 4; ++warp) {
+            lane_sum[(size_t) lane] += warp_lanes[(size_t) warp][(size_t) lane];
+        }
+    }
+    for (int offset = 16; offset > 0; offset >>= 1) {
+        const auto previous = lane_sum;
+        for (int lane = 0; lane < 32; ++lane) {
+            lane_sum[(size_t) lane] = previous[(size_t) lane] + previous[(size_t) (lane ^ offset)];
+        }
+    }
+    return lane_sum[0];
+}
+
 bool q8_1_scalar_dot(const NativeFmt& f) {
-    return f.gu_type == GGML_TYPE_IQ2_S && f.d_type == GGML_TYPE_Q2_0 &&
+    return f.gu_type == GGML_TYPE_IQ2_S &&
+           (f.d_type == GGML_TYPE_Q2_0 || f.d_type == GGML_TYPE_IQ4_NL) &&
            f.gu_act == GGML_TYPE_Q8_1 && f.d_act == GGML_TYPE_Q8_1;
 }
 
@@ -167,7 +222,8 @@ bool native_fmt(int gu_type, int d_type, int64_t n_embd, int64_t n_ff, NativeFmt
     f.d_act = (int) td->vec_dot_type;
     const char* q8_1_probe = std::getenv("STRATA_NATIVE_CPU_Q8_1_DOT");
     if (q8_1_probe != nullptr && std::atoi(q8_1_probe) != 0 &&
-        gu_type == GGML_TYPE_IQ2_S && d_type == GGML_TYPE_Q2_0) {
+        gu_type == GGML_TYPE_IQ2_S &&
+        (d_type == GGML_TYPE_Q2_0 || d_type == GGML_TYPE_IQ4_NL)) {
         f.gu_act = GGML_TYPE_Q8_1;
         f.d_act = GGML_TYPE_Q8_1;
     }
@@ -304,8 +360,11 @@ void native_down_rows(const NativeFmt& f, const uint8_t* blob, const void* const
     if (q8_1_scalar_dot(f)) {
         for (int r = r0; r < r1; ++r) {
             const uint8_t* dr = blob + f.down_off + (size_t) r * f.d_row;
-            for (int t = 0; t < nt; ++t)
-                out[t][r] = q8_1_q2_0_cuda_dot(dr, (const uint8_t*) hq[t], (int) f.n_ff);
+            for (int t = 0; t < nt; ++t) {
+                out[t][r] = f.d_type == GGML_TYPE_Q2_0
+                    ? q8_1_q2_0_cuda_dot(dr, (const uint8_t*) hq[t], (int) f.n_ff)
+                    : q8_1_iq4_nl_cuda_dot(dr, (const uint8_t*) hq[t], (int) f.n_ff);
+            }
         }
         return;
     }
