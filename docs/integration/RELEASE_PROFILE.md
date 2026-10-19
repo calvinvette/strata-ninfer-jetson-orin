@@ -60,12 +60,18 @@ service.
 
 The unchanged default path has a current-source CUDA regression record at
 [`phase8-current-source-regression`](../../bench/results/2026-10-18-phase8-current-source-regression/README.md).
-The prior pinned control was restored and smoke-tested on Orin; see the
-[rollback record](../../bench/results/2026-10-18-phase8-rollback-smoke/README.md).
+The pinned control and current candidate both passed a seven-case model-backed
+API rollback check with the same Coder IQ1_M artifacts and a shared compatible
+configuration; see the [API rollback record](../../bench/results/2026-10-19-phase8-current-source-api-rollback/README.md).
+The earlier one-token CLI smoke remains at
+[`phase8-rollback-smoke`](../../bench/results/2026-10-18-phase8-rollback-smoke/README.md).
 Rollback requires restoring the pinned binary together with its compatible
 invocation and configuration. The pinned executable does not accept every
-candidate-profile option. The maestro1 HIP and SYCL results are x86 build and
-CLI checks only, not Orin accelerator-runtime or model-execution evidence.
+candidate-profile option, so the Q2_0 selected profile has not been tested on
+that binary. The API suite's short prefill disconnect did not retain prompt
+progress; active-prefill cancellation evidence is separate. The maestro1 HIP
+and SYCL results are x86 build and CLI checks only, not Orin accelerator-runtime
+or model-execution evidence.
 
 ## Exclusions
 

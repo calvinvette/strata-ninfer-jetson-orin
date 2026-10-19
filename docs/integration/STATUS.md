@@ -8,10 +8,10 @@ not general product support.
 
 Phase 8 now has a consolidated [bounded Orin integration profile]
 (RELEASE_PROFILE.md), including the current-source Q2_0 profile, reproduction
-command, default regression and pinned-control rollback evidence, and explicit
-exclusions. This is an experimental profile for the measured Orin cell, not a
-general support claim. Phase 8 remains open pending broader release gates and
-the remaining Phase 5/6 work.
+command, default regression and pinned-control API rollback evidence, and
+explicit exclusions. This is an experimental profile for the measured Orin
+cell, not a general support claim. Phase 8 remains open pending broader release
+gates and the remaining Phase 5/6 work.
 
 A corrected [layer-2 grouped IQ4_NL Q8_1 mapping](../../bench/results/2026-10-19-phase5-coder-layer2-hidden-q8_1/README.md)
 now mirrors the grouped CUDA service reduction schedule. Three randomized,
@@ -3184,3 +3184,5 @@ the corrected grouped-map follow-up; Phase 5 remains open for its other gates.
 A current-source [adaptive migration pair with matched Q8_1 CPU arithmetic](../../bench/results/2026-10-19-phase5-coder-q8_1-adaptive-matched-pair/README.md) used `STRATA_NATIVE_CPU_Q8_1_DOT=all` in both cadence-100,000 delayed and cadence-4/cap-8 adaptive services, then compared 64 accepted-prefix state records per arm across a 512→2,048→512→continuation sequence. Both services passed supervision at 28 GiB with at least 14.24 GiB host/admission availability and zero cgroup events; the adaptive arm passed 15 swap-byte and 15 residency checks. Despite matched Q8_1 arithmetic, adaptive recovery differed at all 16 state boundaries and 10/16 token IDs; delayed-control recovery matched all state and token IDs. The continuation had equal token IDs but differed at all 16 state boundaries, reaffirming direct state checks. At layer 1, the first seven activation/ID rows matched between initial and recovery prompts while 27 adaptive owner assignments flipped; nine later activation rows then differed. This rejects the tested selector as a migration-parity remedy, but does not prove exclusive causality because unsupported format pairs retain their default path. Phase 5 remains open.
 
 A current-source [Coder IQ1_M MTP accepted-prefix check with int8 KV](../../bench/results/2026-10-19-phase5-coder-current-source-mtp-prefix-int8/README.md) compared MTP off/2/3/4 on the same 2,048-token prompt, with 16 generated tokens per fresh service. Windows 2/3/4 offered and accepted 7/5, 10/7 and 13/8 drafts; all token IDs and all nine persistent-state fingerprints matched MTP-off at the final state and each of 11/9/8 shared commit boundaries. The 28-GiB supervised run took 396.8 seconds; minimum host/admission availability was 13.18/10.10 GiB over 376 samples, and all cgroup memory-event counters were zero. This extends current-source accepted-prefix evidence to int8 KV for one prompt/profile; it does not qualify other formats, quality, performance, or adaptive migration. Phase 5 remains open.
+
+A paired [pinned-control API rollback run](../../bench/results/2026-10-19-phase8-current-source-api-rollback/README.md) used the same Coder IQ1_M artifacts and compatible 8K configuration on the pinned control and current candidate, changing only the executable and per-run logs. Both passed the seven real-model protocol cases: repeated exact responses, OpenAI and Anthropic streaming, decode cancellation and prefill disconnect, each followed by same-service exact recovery. Minimum host/admission availability was 14.18 GiB for control and 14.28 GiB for candidate, with zero cgroup events. The short prefill disconnect did not retain prompt-progress evidence, so this does not validate active-prefill cancellation. The broader Phase 5/6 gates and Phase 8 release work remain open.
