@@ -44,7 +44,11 @@ def main():
     ap.add_argument("--output", type=Path, required=True)
     ap.add_argument("--dump-prefill-gdn", action="store_true",
                     help="retain the exact prompt-end GDN state bytes (diagnostic build only)")
+    ap.add_argument("--device-layer", type=int, default=1,
+                    help="verifier layer to capture on device (0-47; default: 1)")
     a = ap.parse_args()
+    if not 0 <= a.device_layer < 48:
+        ap.error("--device-layer must be in [0, 47]")
     a.output.mkdir(parents=True, exist_ok=False)
     cfg = json.loads((HERE / "config.json").read_text())
     argv = list(cfg["args"])
@@ -64,7 +68,7 @@ def main():
                 "STRATA_CAPTURE_MOE_PATH": str((a.output / "routes-all-layers.jsonl").resolve()),
                 "STRATA_CAPTURE_MOE_OUTPUT_PATH": str((a.output / "cpu-outputs-layer1.jsonl").resolve()),
                 "STRATA_CAPTURE_MOE_OUTPUT_LAYER": "1",
-                "STRATA_VERIFY_DUMP_GDN_LAYER": "1",
+                "STRATA_VERIFY_DUMP_GDN_LAYER": str(a.device_layer),
                 "STRATA_VERIFY_DUMP_GDN_PATH": str((a.output / "combined-moe.bin").resolve())})
     if a.dump_prefill_gdn:
         env["STRATA_PREFILL_DUMP_GDN"] = str((a.output / "prefill-gdn.bin").resolve())

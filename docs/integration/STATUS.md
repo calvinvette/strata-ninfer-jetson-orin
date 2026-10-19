@@ -2986,3 +2986,11 @@ all 36 state slices; the same prompt produced the same 16 completion IDs. The
 first post-commit GDN differences therefore begin during decode in this
 workload. This does not prove exact equality for prompt-end KV or other state,
 identify the responsible decode calculation, or close Phase 5.
+
+A focused [device-side layer-9 pair](../../bench/results/2026-10-18-phase5-coder-layer1-route-isolation/layer9-device-pair/README.md)
+for mirror CPU versus GPU profile confirms the all-layer host route activation
+matches verifier `ffn_x` bitwise on all 16 rows. At position 511, layer-9 device
+`ffn_x` and `ffn_y` differ even though expert IDs and owners still match; this
+validates the first GDN divergence layer for that token and places its change
+in the activation values before layer-9 routing. It does not localize the
+earlier decode operation that changed those values or close Phase 5.

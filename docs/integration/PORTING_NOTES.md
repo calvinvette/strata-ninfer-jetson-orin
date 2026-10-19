@@ -1781,6 +1781,14 @@ same per-prefix join through the engine's own command boundary. Layer alignment
 localizes the first observed divergence but does not prove that one route
 activation alone caused every downstream state difference.
 
+A targeted verifier capture at layer 9 then checked the host route activation
+against device-side `ffn_x` for all 16 positions in the mirror/GPU pair; every
+row matched bitwise. At the first differing GDN slice (position 511), layer-9
+device `ffn_x` and `ffn_y` differ while expert IDs and owners remain equal.
+For Splash, capture at the actual Metal command boundary and join that row with
+the route, weights and weighted output before assigning the difference to one
+operation.
+
 The capture change touched native `src/core/expert_source.cpp`, which CUDA and
 HIP compile. SYCL uses its migrated `sycl/src/core/expert_source.cpp`; confirm
 the active source route before assuming a similarly named file is shared. The

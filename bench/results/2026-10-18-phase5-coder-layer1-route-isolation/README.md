@@ -193,6 +193,12 @@ state slices are byte-identical across the three arms at the end of prefill.
 This places the observed GDN divergence during decode for this prompt, without
 proving which calculation causes it or establishing exact equality for KV and
 other prefill state.
+The [device-side layer-9 pair](layer9-device-pair/README.md) then confirmed
+that the host route capture matches verifier `ffn_x` bitwise at all 16 rows.
+For mirror versus GPU profile, layer-9 device `ffn_x` and `ffn_y` already differ
+at position 511 while expert IDs and owners still match, validating the first
+GDN divergence boundary there without identifying the earlier decode operation
+that caused it.
 Each arm ran in a separate 28-GiB scope with dynamic clocks; minimum host and
 admission availability was 14.14–14.43 GiB, scope peak was 10.87–11.32 GiB,
 and `high`, `max`, `oom` and `oom_kill` counters were zero. Energy was not
