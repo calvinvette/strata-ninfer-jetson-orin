@@ -1484,6 +1484,14 @@ An isolated expert match at an earlier owner flip did not explain the later
 state boundary. A future Splash port should keep state-layer localization and
 operator-output oracles as distinct evidence.
 
+At the Coder layer-25 boundary immediately before the first changed layer-26
+dispatch input, the route input, IDs and owners matched across initial and
+recovery requests. The three CPU-owned layer-25 expert rows also matched
+bitwise for 7,680 values. This rules out those captured CPU rows for that one
+position; it leaves the GPU rows, router weights, shared expert and complete
+weighted layer output untested. For Splash, capture the complete service
+combine before assigning a cause to a remaining activation difference.
+
 For a same-prefix raw-state comparison, the adaptive Coder initial and recovery
 GDN snapshots changed 12.92 million of 29.42 million float values (43.92%),
 with 1.686% relative L2. The first differing GDN layer had only 1.15e-5

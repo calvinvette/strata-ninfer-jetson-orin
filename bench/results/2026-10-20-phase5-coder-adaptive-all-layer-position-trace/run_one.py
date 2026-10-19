@@ -33,6 +33,10 @@ def main():
                         help="extra identical short requests after short/long/short")
     parser.add_argument("--dump-gdn-occurrence", type=int,
                         help="optionally dump GDN state at L=512 on this matching request occurrence")
+    parser.add_argument("--capture-cpu-output-layer", type=int,
+                        help="capture CPU expert rows from one verifier/prefill dispatch at this layer")
+    parser.add_argument("--capture-cpu-output-dispatch", type=int,
+                        help="select the dispatch ID for the optional CPU expert output capture")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.continuations < 0:
@@ -41,6 +45,11 @@ def main():
         parser.error("--dump-gdn-occurrence must be positive")
     if args.dump_gdn_occurrence is not None and args.dump_gdn_occurrence > 2 + args.continuations:
         parser.error("dump occurrence exceeds the number of 512-token requests; add continuations or lower the occurrence")
+    if (args.capture_cpu_output_layer is None) != (args.capture_cpu_output_dispatch is None):
+        parser.error("CPU output capture requires both --capture-cpu-output-layer and --capture-cpu-output-dispatch")
+    if args.capture_cpu_output_layer is not None and (
+            args.capture_cpu_output_layer < 0 or args.capture_cpu_output_dispatch < 0):
+        parser.error("CPU output capture layer and dispatch must be non-negative")
     args.output.mkdir(parents=True, exist_ok=False)
 
     cfg = json.loads((BASE / "config.json").read_text())
@@ -81,6 +90,12 @@ def main():
             "STRATA_STATE_DUMP_GDN_AT": "512",
             "STRATA_STATE_DUMP_GDN_OCCURRENCE": str(args.dump_gdn_occurrence),
         })
+    if args.capture_cpu_output_layer is not None:
+        env.update({
+            "STRATA_CAPTURE_MOE_OUTPUT_PATH": str((args.output / "cpu-moe-outputs.jsonl").resolve()),
+            "STRATA_CAPTURE_MOE_OUTPUT_LAYER": str(args.capture_cpu_output_layer),
+            "STRATA_CAPTURE_MOE_OUTPUT_DISPATCH": str(args.capture_cpu_output_dispatch),
+        })
     engine = StrataEngine(cfg["exe"], argv, cwd=cfg["cwd"], log=str(log), env=env)
     requests = []
     try:
@@ -100,6 +115,26 @@ def main():
     if not captured or captured[0].get("format") != "strata-moe-dispatch-v3":
         raise RuntimeError("missing current all-layer dispatch capture")
     rows = captured[1:]
+    cpu_output_capture = None
+    if args.capture_cpu_output_layer is not None:
+        output_path = args.output / "cpu-moe-outputs.jsonl"
+        if not output_path.is_file():
+            raise RuntimeError("requested CPU expert output capture was not written")
+        output_records = [json.loads(line) for line in output_path.read_text().splitlines()]
+        output_rows = output_records[1:]
+        target_rows = [row for row in output_rows
+                       if row.get("layer") == args.capture_cpu_output_layer
+                       and row.get("dispatch") == args.capture_cpu_output_dispatch
+                       and row.get("position") == 511]
+        if not target_rows:
+            raise RuntimeError("CPU expert output capture missed the selected layer/dispatch at position 511")
+        cpu_output_capture = {
+            "layer": args.capture_cpu_output_layer,
+            "dispatch": args.capture_cpu_output_dispatch,
+            "rows": len(output_rows),
+            "target_position_rows": len(target_rows),
+            "position": 511,
+        }
     route = {"rows": len(rows),
              "layers": sorted({row["layer"] for row in rows}),
              "positions": sorted({row["position"] for row in rows})}
@@ -113,6 +148,7 @@ def main():
         "requests": requests, "recovery_token_differences": sum(a != b for a, b in
                                                                   zip(requests[0]["ids"], requests[2]["ids"])),
         "changed_state_keys": state_changes, "route": route,
+        "cpu_output_capture": cpu_output_capture,
         "adaptive_byte_verification_passes": log.read_text().count("adaptive swap byte verification passed"),
         "adaptive_residency_verification_passes": log.read_text().count("adaptive residency table verification passed"),
         "binary_sha256": hashlib.sha256(Path(cfg["exe"]).read_bytes()).hexdigest(),

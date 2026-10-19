@@ -71,6 +71,47 @@ expert input and grows in later recurrent layers. These values describe the
 two states; they do not establish which state is more accurate or identify the
 operation that caused the first difference.
 
+## Layer-25 CPU-row follow-up
+
+The first changed captured expert-dispatch input is at layer 26. A further
+same-sequence capture joined layer 25 at position 511 in separate initial and
+recovery runs using the same binary (`89b1f96e…`). The layer-25 activation,
+expert IDs and owners were identical. Its three CPU-owned expert rows (experts
+30, 180 and 193) were bitwise identical across runs: 0 of 7,680 float values
+changed. This rules out those captured CPU rows as the source of the first
+layer-26 difference for this position. The layer-25 GPU rows, router weights,
+shared expert and full weighted layer output were not captured, so the cause is
+still unresolved.
+
+Both supervised runs passed with `MemoryMax=28G`, zero scope memory events and
+the six-GiB availability guard. They took 223.4 and 243.2 seconds, with minimum
+host/admission availability of 14.22 and 14.24 GiB. Clocks remained dynamic;
+this is correctness localization, not a timing comparison. The compact
+service captures, full route traces, supervisor samples and comparison are in
+`layer25-cpu-output-pair/`. Reproduce with dispatch IDs verified from the route
+trace:
+
+```sh
+systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes \
+  python3 tools/integration/run_control.py --output /tmp/layer25-initial/supervisor \
+  --timeout 1800 --interval 1 --sample-clocks -- \
+  python3 bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/run_one.py \
+  --adapt-every 4 --adapt-swaps 8 --capture-cpu-output-layer 25 \
+  --capture-cpu-output-dispatch 169 --output /tmp/layer25-initial/run
+
+systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes \
+  python3 tools/integration/run_control.py --output /tmp/layer25-recovery/supervisor \
+  --timeout 1800 --interval 1 --sample-clocks -- \
+  python3 bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/run_one.py \
+  --adapt-every 4 --adapt-swaps 8 --capture-cpu-output-layer 25 \
+  --capture-cpu-output-dispatch 1993 --output /tmp/layer25-recovery/run
+
+python3 bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/compare_layer25_cpu_outputs.py \
+  --initial /tmp/layer25-initial/run --recovery /tmp/layer25-recovery/run \
+  --initial-dispatch 169 --recovery-dispatch 1993 \
+  --output /tmp/layer25-cpu-output-pair.json
+```
+
 The two raw 113 MiB dumps remain outside Git under
 `~/models/strata-orin-validation/experiments/phase5-gdn-state/`; their full
 SHA256 values and per-layer comparison are in `gdn-state-delta.json`. The

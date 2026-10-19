@@ -33,6 +33,16 @@ remains open. Current-source maestro1 HIP and SYCL compile/link plus `strata
 is x86_64 build evidence only, with no accelerator runtime claim. See the
 backend report in the linked result bundle.
 
+A follow-up [layer-25 CPU-row capture](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/README.md#layer-25-cpu-row-follow-up)
+joined the initial and recovery prompt at position 511. The route input, IDs
+and owners matched, and the three CPU-owned expert rows matched bitwise across
+7,680 values. This excludes those captured CPU rows as the source of the first
+layer-26 difference for this position. GPU rows, router weights, shared-expert
+output and full weighted layer output remain uncaptured, so the cause is still
+unresolved. Both supervised checks passed with at least 14.22 GiB available and
+zero cgroup memory events; this is correctness localization, not performance
+evidence.
+
 The trace's per-layer accepted-prefix hashes now localize the adaptive state's
 first mismatch: at the first recovery token, GDN ordinals 20–35 differed from
 the initial short request, while ordinals 0–19 matched. Ordinal 20 maps to
