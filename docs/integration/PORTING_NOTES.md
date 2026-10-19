@@ -1893,3 +1893,12 @@ independent codec oracle. For a future Splash port,
 repeat this per-format operator comparison at the next boundary, but do not
 infer a combined layer or recurrent-state cause until device router weights,
 all expert outputs and the weighted combine are joined for that same input.
+
+The layer-2 [owner-placement counterexample](../../bench/results/2026-10-19-phase5-coder-layer2-q8_1-owner-equivalence/README.md)
+sets a boundary for that method: matching routes through the shared output prefix
+and a matched cache do not guarantee state parity when CPU and GPU expert
+arithmetic retain a residual. Compare the earliest committed state fields and
+exact device routes; classify later route changes after token divergence as
+consequences, not causes. For Splash, first establish the per-format numerical
+contract for the entire expert, including gate/up and activation rounding,
+before treating an owner change as a pure placement experiment.

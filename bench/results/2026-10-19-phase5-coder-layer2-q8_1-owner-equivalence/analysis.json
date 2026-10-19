@@ -1,0 +1,84 @@
+{
+  "source_commit": "58ea8c00",
+  "binary_sha256": "79368f55fbd024cef044fa9a3f58123766b118ae642f40e764cf23ca2e69e900",
+  "selector": "iq2_s/iq4_nl@layer=2",
+  "blocks": [
+    {
+      "block": 1,
+      "completion_ids_equal": false,
+      "common_completion_tokens": 6,
+      "first_state_fingerprint_different_fields": [
+        "gdn",
+        "pooled",
+        "pooled_full",
+        "kv"
+      ],
+      "prompt_end_gdn_byte_identical": true,
+      "host_route_records_same_through": 7,
+      "target_experts_moved_at_prompt_end": 7,
+      "host_route_owner_trace_after_divergence": "diagnostic only; route-kind callback can be stale on rows after token divergence",
+      "minimum_host_or_admission_gib": 15.879,
+      "cgroup_events": "zero"
+    },
+    {
+      "block": 2,
+      "completion_ids_equal": false,
+      "common_completion_tokens": 6,
+      "first_state_fingerprint_different_fields": [
+        "gdn",
+        "pooled",
+        "pooled_full",
+        "kv"
+      ],
+      "prompt_end_gdn_byte_identical": true,
+      "host_route_records_same_through": 7,
+      "target_experts_moved_at_prompt_end": 7,
+      "host_route_owner_trace_after_divergence": "diagnostic only; route-kind callback can be stale on rows after token divergence",
+      "minimum_host_or_admission_gib": 16.115,
+      "cgroup_events": "zero"
+    },
+    {
+      "block": 3,
+      "completion_ids_equal": false,
+      "common_completion_tokens": 6,
+      "first_state_fingerprint_different_fields": [
+        "gdn",
+        "pooled",
+        "pooled_full",
+        "kv"
+      ],
+      "prompt_end_gdn_byte_identical": true,
+      "host_route_records_same_through": 7,
+      "target_experts_moved_at_prompt_end": 7,
+      "host_route_owner_trace_after_divergence": "diagnostic only; route-kind callback can be stale on rows after token divergence",
+      "minimum_host_or_admission_gib": 16.113,
+      "cgroup_events": "zero"
+    }
+  ],
+  "device_route_pair": {
+    "device_topk_ids_and_router_weights_equal_through_matching_prefix": 7,
+    "first_divergent_device_route_position": 518,
+    "all_output_tokens_equal": false,
+    "minimum_host_gib": 16.087108612060547,
+    "minimum_admission_gib": 16.087108612060547
+  },
+  "randomized_order": [
+    "seed: 20261020",
+    "blocks: 3",
+    "selector: iq2_s/iq4_nl@layer=2",
+    "expert-cache argument: 3007",
+    "block 1 order: gpu_layer2 cpu_mirror",
+    "block 2 order: gpu_layer2 cpu_mirror",
+    "block 3 order: cpu_mirror gpu_layer2"
+  ],
+  "prompt_sha256": "e0bd698f8c50353ac64ce10b5ce3c6c8629e52839d7c3df9a90aec1cc7a19f91",
+  "profile_design_sha256": "5a397a6a33119894ba25039d27660551f56e57713bcb8cae5dd23ed5e65bff29",
+  "summary": {
+    "all_three_pairs_supervised": true,
+    "all_three_pairs_state_equal": false,
+    "common_output_prefix_tokens": 6,
+    "state_mismatch_at_first_commit": true,
+    "prompt_end_gdn_identical": true,
+    "conclusion": "Layer-1 owner equivalence does not generalize to this layer-2 IQ2_S/IQ4_NL path. With matching prompt-end GDN and exact device-side layer-2 IDs/weights through the shared prefix, persistent state differs at the first committed token; outputs match for six tokens then diverge at token seven. This is correctness evidence for this prompt/profile, not a performance or quality result."
+  }
+}

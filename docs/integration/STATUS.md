@@ -3130,3 +3130,14 @@ host/admission availability was 16.009 GiB, with zero cgroup events. No
 speculative drafts were accepted, no performance or quality claim follows, and
 this does not qualify other layers, formats or adaptive migration. Phase 5
 remains open.
+
+A three-block [layer-2 IQ2_S/IQ4_NL owner-placement check](../../bench/results/2026-10-19-phase5-coder-layer2-q8_1-owner-equivalence/README.md)
+repeated the matched 3,007-slot CPU-mirror/CUDA-target comparison with the
+layer-local Q8_1 selector. All seven targets were placed on GPU in the candidate.
+Across all blocks, prompt-end GDN bytes matched, but `gdn`, `pooled`,
+`pooled_full` and `kv` state fingerprints differed at the first commit. The
+outputs matched for six tokens, then diverged; exact device routes and weights
+matched through that common prefix. Minimum host/admission availability was
+15.879 GiB, with zero cgroup events. This counterexample limits the prior
+layer-1 owner-equivalence result to IQ2_S/Q2_0; it is correctness evidence only,
+not a task-quality or performance result. Phase 5 remains open.
