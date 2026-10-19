@@ -23,6 +23,18 @@ functional state-recovery sequence; it does not prove persistent-state identity
 or resolve the separate IQ1_M adaptive-migration divergence. Phase 5 remains
 open.
 
+A seven-block current-source [Q2_0 prefill-chunk confirmation](../../bench/results/2026-10-18-phase6-q2-current-source-prefill-confirm7/README.md)
+repeated the selected 512-token retrieval-plus-arithmetic comparison on the
+current candidate binary. All 14 fresh-service answers matched the exact
+47-token oracle. Chunk 128 reduced paired median request time 40.75% (95%
+interval −40.86% to −37.56%) and prompt time 48.21% (−48.50% to −46.49%);
+decode change included zero. Paired request-window `VIN_SYS_5V0` energy per
+output token fell 40.04% (−40.53% to −37.74%), but this rail includes board
+idle/background activity and is not process energy. Minimum host/admission
+availability was 18.06/14.70 GiB over 1,209 samples, with zero cgroup events.
+This repeats an existing task at current source and supports the bounded
+chunk-128 test profile only; no default changed and Phase 6 remains open.
+
 Phase 6 has selected one bounded Q2_0 test profile for Phase 7 qualification:
 FP16 KV, 8K context, MTP off, 3,000 expert slots, prefill chunk 128, eight
 workers and prompt cache/adaptive swaps disabled. This is not a default or

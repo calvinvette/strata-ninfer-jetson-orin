@@ -1,0 +1,132 @@
+{
+  "seed": 2026101886,
+  "expert_cache_arguments": [
+    3000
+  ],
+  "expert_cache_argument_units": "equivalents of the largest expert blob",
+  "prefill_chunk_tokens": [
+    32,
+    128
+  ],
+  "planned_cells": 2,
+  "rounds_per_service": 1,
+  "trace_enabled": false,
+  "clock_sampling": true,
+  "cell_memory_max_gib": 28,
+  "independent_block_confirmation": true,
+  "scope": "randomized order; independent server process per cell; one separate warmup and one measured request per process; admission and screening evidence only",
+  "started_wall_time_s": 1792377161.5533915,
+  "cells": [
+    {
+      "name": "cache3000-prefill128",
+      "expert_cache_argument": 3000,
+      "prefill_chunk_tokens": 128,
+      "order": 0,
+      "status": "pass",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "--",
+        "/usr/bin/python3.12",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-18-phase6-q2-current-source-prefill-confirm7/block-06/cache3000-prefill128/supervisor",
+        "--timeout",
+        "1800",
+        "--sample-clocks",
+        "--",
+        "/usr/bin/python3.12",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-18-phase6-q2-current-source-prefill-confirm7/block-06/cache3000-prefill128/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-18-phase6-q2-current-source-prefill-confirm7/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-18-phase6-q2-current-source-prefill-confirm7/block-06/cache3000-prefill128/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-18-phase6-q2-current-source-prefill-confirm7/warmup-workload.json",
+        "--no-trace"
+      ],
+      "minimum_available_bytes": 19413188608,
+      "elapsed_s": 67.38670829497278,
+      "reason": "command exit; numerical/workload qualification is separate",
+      "supervisor_returncode": 0,
+      "request_summary": [
+        {
+          "cell": "heldout-retrieval-arithmetic-512",
+          "passed_samples": 1,
+          "planned_samples": 1,
+          "median_prompt_per_second": 24.9,
+          "median_predicted_per_second": 6.0
+        }
+      ],
+      "measured_samples": 1
+    },
+    {
+      "name": "cache3000-prefill32",
+      "expert_cache_argument": 3000,
+      "prefill_chunk_tokens": 32,
+      "order": 1,
+      "status": "pass",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "--",
+        "/usr/bin/python3.12",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-18-phase6-q2-current-source-prefill-confirm7/block-06/cache3000-prefill32/supervisor",
+        "--timeout",
+        "1800",
+        "--sample-clocks",
+        "--",
+        "/usr/bin/python3.12",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-18-phase6-q2-current-source-prefill-confirm7/block-06/cache3000-prefill32/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-18-phase6-q2-current-source-prefill-confirm7/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-18-phase6-q2-current-source-prefill-confirm7/block-06/cache3000-prefill32/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-18-phase6-q2-current-source-prefill-confirm7/warmup-workload.json",
+        "--no-trace"
+      ],
+      "minimum_available_bytes": 19455528960,
+      "elapsed_s": 106.55471353512257,
+      "reason": "command exit; numerical/workload qualification is separate",
+      "supervisor_returncode": 0,
+      "request_summary": [
+        {
+          "cell": "heldout-retrieval-arithmetic-512",
+          "passed_samples": 1,
+          "planned_samples": 1,
+          "median_prompt_per_second": 12.9,
+          "median_predicted_per_second": 5.7
+        }
+      ],
+      "measured_samples": 1
+    }
+  ],
+  "finished_wall_time_s": 1792377336.4727454
+}
