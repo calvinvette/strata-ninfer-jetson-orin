@@ -13,9 +13,9 @@ backend builds, including the latest current-source HIP/SYCL compile and CLI
 checks and the pinned-control Orin rollback smoke, are recorded; supported
 release packaging and broader runtime gates remain open. The [bounded Orin
 integration profile](RELEASE_PROFILE.md) collects the exact current-source
-Q2_0 profile, reproduction command, rollback evidence and exclusions. A fresh
-current-source Q2_0 service run also confirms one selected-profile
-retrieval/recovery cell.
+Q2_0 profile, reproduction command, rollback evidence and exclusions. A latest current-source Q2_0 service run at engine source `b6ea6188` also
+confirms one selected-profile retrieval/recovery cell; see the [bounded release
+profile](RELEASE_PROFILE.md).
 Current admission, transfer, profiling, speculation and service evidence is
 summarized in [status](STATUS.md). See [control reproduction](PHASE1.md) and
 [porting notes for future engines](PORTING_NOTES.md) for reproducible methods

@@ -11,8 +11,9 @@ qualification are excluded.
 | Item | Value |
 | --- | --- |
 | Board | Orin AGX, ARM64, L4T R36.4.4, CUDA 12.6 |
-| Source | `0b28cd634fa3a7ba9da514df0200d96baea330e4` |
-| Candidate binary SHA256 | `320963c6572a13065e7704b3f98d477c8e29119ea45a96114f532008134e9932` |
+| Engine source | `b6ea61888cb1ffb0bf92e79217d6a88d46178111` |
+| Checkout at current-source test | `d50ff723281033ccb3ca3d481b017541e0506a85` |
+| Candidate binary SHA256 | `b09ed0b5774de235d145bff869950730a78cbf5ddc6b4057098d70b981130eaa` |
 | Model | `ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF`, revision `5348543e0147355ac9cbcb031184a3546350988e` |
 | Quantization | Q2_0, two GGUF shards plus the matching local PLE pack |
 | Profile | 8K context, FP16 KV, MTP off, 3,000 exact expert slots, prefill chunk 128, eight workers, 3,072 MiB workspace reserve, prompt cache and adaptive swaps off |
@@ -32,18 +33,21 @@ separate cohort.
 
 ## Evidence and reproduction
 
-The [current-source profile smoke](../../bench/results/2026-10-18-phase8-current-source-q2-profile-smoke/README.md)
-processed an uncached 7,498-token retrieval prompt, returned three planted
-markers exactly once and in order, then returned `RECOVERED` on the same
-service. The independent reviewer passed. The run retained 324 one-second
-supervisor samples, with 17.69 GiB minimum host availability, 8.69 GiB minimum
-admission availability, and zero cgroup pressure or OOM events. It is one
-functional cell; its timings are not a performance comparison.
+The latest [current-source profile smoke](../../bench/results/2026-10-19-phase8-current-source-q2-profile-smoke/README.md)
+used the candidate binary above. It processed an uncached 7,498-token retrieval
+prompt, returned three planted markers exactly once and in order, then returned
+`RECOVERED` on the same service. The independent reviewer passed. Across 322
+one-second samples, minimum host availability was 18.05 GiB and admission
+availability was 8.57 GiB, with zero cgroup pressure/OOM events. It is one
+functional cell; its timings are not a performance comparison. The earlier
+[2026-10-18 run](../../bench/results/2026-10-18-phase8-current-source-q2-profile-smoke/README.md)
+used a prior candidate and remains historical evidence.
 
 Reproduce from the repository root with:
 
 ```sh
-bash bench/results/2026-10-18-phase8-current-source-q2-profile-smoke/run.sh
+OUTPUT_ROOT=bench/results/2026-10-19-phase8-current-source-q2-profile-smoke/reproduction \
+  bash bench/results/2026-10-19-phase8-current-source-q2-profile-smoke/run.sh
 ```
 
 The selected profile is also qualified by the bounded Phase 7 evidence linked
