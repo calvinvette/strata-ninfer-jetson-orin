@@ -448,6 +448,9 @@ Verifier::~Verifier() {
     if (moe_route_diag_h_ && cudaFreeHost(moe_route_diag_h_) == cudaSuccess)
         strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
                                                     moe_route_diag_h_, 0, -1);
+    if (moe_parts_diag_h_ && cudaFreeHost(moe_parts_diag_h_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
+                                                    moe_parts_diag_h_, 0, -1);
     if (ev_fork_) cudaEventDestroy(ev_fork_);
     if (ev_join_) cudaEventDestroy(ev_join_);
     for (cudaStream_t s : df_side_)
@@ -581,6 +584,40 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
                                                         moe_route_diag_h_, moe_route_diag_capacity_, -1);
             std::fprintf(stderr, "strata verify: opt-in MoE route-weight dump at layer %d -> %s (%zu bytes)\n",
                          moe_route_diag_layer_, moe_route_diag_path_.c_str(), moe_route_diag_capacity_);
+        }
+    }
+    {
+        const char* layer = std::getenv("STRATA_VERIFY_DUMP_MOE_PARTS_LAYER");
+        const char* path = std::getenv("STRATA_VERIFY_DUMP_MOE_PARTS_PATH");
+        if ((layer != nullptr) != (path != nullptr)) {
+            err = "verify: STRATA_VERIFY_DUMP_MOE_PARTS_LAYER and STRATA_VERIFY_DUMP_MOE_PARTS_PATH must be set together";
+            return false;
+        }
+        if (layer != nullptr) {
+            char* end = nullptr;
+            const long parsed = std::strtol(layer, &end, 10);
+            if (end == layer || *end != '\0' || parsed < 0 || parsed >= g.n_layers || !*path) {
+                err = "verify: invalid opt-in MoE parts layer or output path";
+                return false;
+            }
+            moe_parts_diag_layer_ = (int) parsed;
+            moe_parts_diag_path_ = path;
+            if ((size_t) max_t > SIZE_MAX / (size_t) ss.k ||
+                (size_t) max_t * (size_t) ss.k > SIZE_MAX / (size_t) g.n_embd ||
+                (size_t) max_t * (size_t) ss.k * (size_t) g.n_embd > SIZE_MAX / sizeof(float)) {
+                err = "verify: opt-in MoE parts diagnostic size overflows";
+                return false;
+            }
+            moe_parts_diag_capacity_ = (size_t) max_t * (size_t) ss.k * (size_t) g.n_embd * sizeof(float);
+            if (cudaHostAlloc((void**) &moe_parts_diag_h_, moe_parts_diag_capacity_, cudaHostAllocPortable) != cudaSuccess) {
+                moe_parts_diag_h_ = nullptr;
+                err = "verify: could not allocate the opt-in MoE parts diagnostic buffer";
+                return false;
+            }
+            strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "allocate", this,
+                                                        moe_parts_diag_h_, moe_parts_diag_capacity_, -1);
+            std::fprintf(stderr, "strata verify: opt-in MoE expert-parts dump at layer %d -> %s (%zu bytes)\n",
+                         moe_parts_diag_layer_, moe_parts_diag_path_.c_str(), moe_parts_diag_capacity_);
         }
     }
 
@@ -1683,6 +1720,18 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
             }
             moe_hit_add(parts_out, hit_out, p_dst, p_counts + 1, cap, N, cs);
         }
+        if (moe_parts_diag_h_ != nullptr && l == moe_parts_diag_layer_ && !batch_rec_) {
+            const size_t dst_off = (size_t) tb * (size_t) K * (size_t) N;
+            const size_t copy_bytes = (size_t) n * (size_t) K * (size_t) N * sizeof(float);
+            const cudaError_t copy_error = cudaMemcpyAsync(moe_parts_diag_h_ + dst_off, parts_out, copy_bytes,
+                                                            cudaMemcpyDeviceToHost, cs);
+            if (copy_error != cudaSuccess) {
+                err = std::string("verify: could not queue opt-in MoE expert-parts capture: ") +
+                      cudaGetErrorString(copy_error);
+                return false;
+            }
+            moe_parts_diag_captured_ = true;
+        }
         // Same condition as `sh_fork` above, which is per group and out of scope here: wait only when the fork
         // actually ran (a wait on an event never recorded is a no-op, but saying it outright reads better).
         if (sh_stream_on() && !prof_on_ && sh_cs_ != nullptr && ev_fork_ != nullptr && ev_join_ != nullptr) {
@@ -2332,6 +2381,42 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
         }
         if (!written) {
             err = "verify: could not write opt-in device MoE route capture";
+            return false;
+        }
+    }
+    if (moe_parts_diag_captured_) {
+        struct PartsHeader {
+            char magic[8];
+            uint32_t version;
+            uint32_t layer;
+            uint32_t rows;
+            uint32_t k;
+            uint64_t n_embd;
+            int64_t pos0;
+            int32_t tokens[strata::kernels::kVerifyMaxT];
+        } header{};
+        static_assert(sizeof(PartsHeader) == 72, "STMPART1 header layout changed");
+        std::memcpy(header.magic, "STMPART1", sizeof(header.magic));
+        header.version = 1;
+        header.layer = (uint32_t) moe_parts_diag_layer_;
+        header.rows = (uint32_t) T;
+        header.k = (uint32_t) ss.k;
+        header.n_embd = (uint64_t) g.n_embd;
+        header.pos0 = pos0;
+        for (int t = 0; t < T; ++t) header.tokens[t] = tokens[t];
+        const size_t data_bytes = (size_t) T * (size_t) ss.k * (size_t) g.n_embd * sizeof(float);
+        static std::mutex parts_dump_mutex;
+        std::lock_guard<std::mutex> lock(parts_dump_mutex);
+        std::FILE* dump = std::fopen(moe_parts_diag_path_.c_str(), "ab");
+        bool written = dump != nullptr;
+        if (written) {
+            written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
+                      std::fwrite(moe_parts_diag_h_, 1, data_bytes, dump) == data_bytes;
+            if (std::fflush(dump) != 0) written = false;
+            if (std::fclose(dump) != 0) written = false;
+        }
+        if (!written) {
+            err = "verify: could not write opt-in MoE expert-parts diagnostic";
             return false;
         }
     }

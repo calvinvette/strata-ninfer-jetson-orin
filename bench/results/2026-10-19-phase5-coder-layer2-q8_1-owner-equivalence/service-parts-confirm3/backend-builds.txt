@@ -1,0 +1,8 @@
+Current worktree base commit: 6eda7595cb9b59e593e6a03a3bb0d478627c94ad
+CUDA/Orin: cmake --build build/integration/candidate --target strata -j2; pass.
+CUDA binary SHA256: b09ed0b5774de235d145bff869950730a78cbf5ddc6b4057098d70b981130eaa
+HIP/maestro1: cmake --build /dev/shm/phase5-q8-selector-maestro1/build-hip --target strata -j2; pass after setting TMPDIR and TEMP to /dev/shm/phase5-q8-selector-maestro1/tmp.
+HIP x86_64 binary SHA256: 76efe59b64b6383bf0ab53e08e9cb7ff07d7b0dbb8a3f1b9422adde60dca5784
+HIP CLI: strata --help exited 0 with ROCm toolchain libraries on LD_LIBRARY_PATH.
+SYCL/maestro1: the SYCL target reports no work to do. Its source resolver uses the separate migrated sycl/src/core/verify.cpp and sycl/include/strata/core/verify.hpp, neither changed by this CUDA/HIP-only diagnostic; no SYCL runtime claim is made.
+maestro1 builds are compile/link and CLI evidence only, not Orin runtime or performance evidence.

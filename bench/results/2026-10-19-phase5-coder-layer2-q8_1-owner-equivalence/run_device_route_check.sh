@@ -21,12 +21,15 @@ read -r -a order <<< "${order_line#order: }"
 for arm in "${order[@]}"; do
   cell="$OUT/$arm"
   mkdir -p "$cell"
+  run_args=(--arm "$arm" --output "$cell/run")
+  if [[ "${DUMP_PREFILL_GDN:-1}" == "1" ]]; then run_args+=(--dump-prefill-gdn); fi
+  run_args+=(--dump-moe-route-layer 2 --dump-moe-parts-layer 2)
   cmd=(systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes
        python3 tools/integration/run_control.py
        --output "$cell/supervisor" --timeout 1200 --interval 1 --sample-clocks --
        /home/calvin/.local/python/bin/python3
        bench/results/2026-10-19-phase5-coder-layer2-q8_1-owner-equivalence/run_owner_equivalence.py
-       --arm "$arm" --output "$cell/run" --dump-prefill-gdn --dump-moe-route-layer 2)
+       "${run_args[@]}")
   printf '%q ' "${cmd[@]}" > "$cell/command.txt"
   printf '\n' >> "$cell/command.txt"
   "${cmd[@]}"

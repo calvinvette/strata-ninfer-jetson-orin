@@ -1905,6 +1905,18 @@ from the actual grouped serving kernel, not a similarly named standalone
 operator; compare actual inputs and codec contracts before attributing an
 owner-placement divergence to migration or state handling.
 
+The [service expert-row capture](../../bench/results/2026-10-19-phase5-coder-layer2-q8_1-owner-equivalence/service-parts-confirm3/README.md)
+adds an opt-in diagnostic at the integration seam after `moe_hit_add` has
+merged CPU and GPU expert rows and before the router-weighted combine. A
+bounded pinned buffer holds `[rows, top_k, n_embd]`; its asynchronous device to
+host copy is queued on the verifier stream and the versioned record is written
+only after that stream completes. This made it possible to compare every
+service expert output and reconstruct the combined MoE result directly, rather
+than infer it from a one-expert replay or final text. For a future Splash port,
+capture this same boundary with the actual service planner and weights, keep the
+instrumentation off by default, and verify the capture against committed state
+before drawing conclusions about CPU/GPU ownership.
+
 A layer-scoped `native_expert_parity` replay must pass its selected layer to
 `native_fmt`; otherwise a selector like `pair@layer=0` is evaluated with the
 sentinel layer and silently tests the baseline activation path. The corrected

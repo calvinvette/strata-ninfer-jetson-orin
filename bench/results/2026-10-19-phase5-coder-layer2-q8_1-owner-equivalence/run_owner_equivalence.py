@@ -54,6 +54,8 @@ def main():
                     help="log per-QSA-layer state fingerprints at each accepted prefix")
     ap.add_argument("--dump-moe-route-layer", type=int,
                     help="capture exact verifier device top-k IDs/weights for one layer (0-47)")
+    ap.add_argument("--dump-moe-parts-layer", type=int,
+                    help="capture verifier expert outputs before router-weighted combine (0-47)")
     a = ap.parse_args()
     if not 0 <= a.device_layer < 48:
         ap.error("--device-layer must be in [0, 47]")
@@ -61,6 +63,8 @@ def main():
         ap.error("--output-layer must be in [0, 47]")
     if a.dump_moe_route_layer is not None and not 0 <= a.dump_moe_route_layer < 48:
         ap.error("--dump-moe-route-layer must be in [0, 47]")
+    if a.dump_moe_parts_layer is not None and not 0 <= a.dump_moe_parts_layer < 48:
+        ap.error("--dump-moe-parts-layer must be in [0, 47]")
     a.output.mkdir(parents=True, exist_ok=False)
     cfg = json.loads((HERE / "config.json").read_text())
     argv = list(cfg["args"])
@@ -89,6 +93,9 @@ def main():
     if a.dump_moe_route_layer is not None:
         env["STRATA_VERIFY_DUMP_MOE_ROUTE_LAYER"] = str(a.dump_moe_route_layer)
         env["STRATA_VERIFY_DUMP_MOE_ROUTE_PATH"] = str((a.output / "device-moe-routes.jsonl").resolve())
+    if a.dump_moe_parts_layer is not None:
+        env["STRATA_VERIFY_DUMP_MOE_PARTS_LAYER"] = str(a.dump_moe_parts_layer)
+        env["STRATA_VERIFY_DUMP_MOE_PARTS_PATH"] = str((a.output / "device-moe-parts.bin").resolve())
     tok_dir = Path(cfg["tokenizer"])
     tokenizer = load_tokenizer(tok_dir)
     template = ChatTemplate(tok_dir / "chat_template.jinja")
@@ -129,6 +136,7 @@ def main():
     if any(row.get("layer") != a.output_layer for row in cpu_rows):
         raise RuntimeError(f"CPU output capture included a row outside layer {a.output_layer}")
     prefill_dump = a.output / "prefill-gdn.bin"
+    prefill_hash = hashlib.sha256(prefill_dump.read_bytes()).hexdigest() if prefill_dump.exists() else None
     (a.output / "requests.json").write_text(json.dumps({
         "arm": a.arm, "selector": env["STRATA_NATIVE_CPU_Q8_1_DOT"],
         "expert_cache_argument": 3007, "prompt_tokens": len(prompt), "prompt_sha256": hashlib.sha256(
@@ -138,8 +146,8 @@ def main():
         "captured_positions_per_layer": 16,
         "captured_layers": 48, "profile": str(profile),
         "profile_sha256": hashlib.sha256(profile.read_bytes()).hexdigest(),
-        "prefill_gdn_sha256": hashlib.sha256(prefill_dump.read_bytes()).hexdigest(),
-        "prefill_gdn_bytes": prefill_dump.stat().st_size}, indent=2) + "\n")
+        "prefill_gdn_sha256": prefill_hash,
+        "prefill_gdn_bytes": prefill_dump.stat().st_size if prefill_dump.exists() else 0}, indent=2) + "\n")
     print(f"{a.arm}: passed; route rows={len(route)}, layer-{a.output_layer} CPU outputs={len(cpu_rows)}")
     return 0
 

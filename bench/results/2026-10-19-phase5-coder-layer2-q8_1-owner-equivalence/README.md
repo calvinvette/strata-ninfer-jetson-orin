@@ -1,5 +1,12 @@
 # Layer-2 Q8_1 CPU/GPU owner comparison — Orin — 2026-10-19
 
+**Historical pre-fix result.** This capture used the CPU's standalone IQ4_NL
+reduction mapping and found a layer-2 owner-path divergence. The mapping was
+later corrected to match the grouped CUDA service schedule. The corrected
+three-block service-row confirmation is in
+[`service-parts-confirm3`](service-parts-confirm3/README.md); the result below
+is retained to preserve the original counterexample and its provenance.
+
 This three-block diagnostic repeats the matched-capacity owner test on Coder's
 layer-2 IQ2_S/IQ4_NL experts. It tests whether the layer-1 result generalizes
 when the CPU and CUDA expert calculations retain the small full-expert residual

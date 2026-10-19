@@ -3154,15 +3154,16 @@ this does not qualify other layers, formats or adaptive migration. Phase 5
 remains open.
 
 A three-block [layer-2 IQ2_S/IQ4_NL owner-placement check](../../bench/results/2026-10-19-phase5-coder-layer2-q8_1-owner-equivalence/README.md)
-repeated the matched 3,007-slot CPU-mirror/CUDA-target comparison with the
-layer-local Q8_1 selector. All seven targets were placed on GPU in the candidate.
-Across all blocks, prompt-end GDN bytes matched, but `gdn`, `pooled`,
-`pooled_full` and `kv` state fingerprints differed at the first commit. The
-outputs matched for six tokens, then diverged; exact device routes and weights
-matched through that common prefix. Minimum host/admission availability was
-15.879 GiB, with zero cgroup events. This counterexample limits the prior
-layer-1 owner-equivalence result to IQ2_S/Q2_0; it is correctness evidence only,
-not a task-quality or performance result. Phase 5 remains open.
+recorded a layer-2 state and output divergence for the original standalone
+four-warp IQ4_NL CPU mapping. The grouped service mapping was subsequently
+corrected and validated at the operator level; a current-source three-block
+follow-up now captures every routed expert row and combined `ffn_y`, finding
+bitwise equality across all 16 positions, accepted-prefix state and completion
+IDs in every fixed-residency owner pair. See the [grouped-map report](../../bench/results/2026-10-19-phase5-coder-layer2-hidden-q8_1/README.md)
+and the [service expert-row capture](../../bench/results/2026-10-19-phase5-coder-layer2-q8_1-owner-equivalence/service-parts-confirm3/README.md).
+The initial counterexample remains in the historical report and is superseded
+for this corrected layer-2 selector. Neither result qualifies adaptive
+migration, other layers/formats, quality or performance. Phase 5 remains open.
 
 A current-source, serial [full CUDA/CPU CTest run](../../bench/results/2026-10-19-phase5-current-source-full-ctest/README.md)
 completed 124/128 tests successfully. `iq_parity_fixtures` and `iq_parity`
@@ -3174,5 +3175,5 @@ GDN, speculative-sampling, verifier-batch, KV, PLE, graph-lifecycle and native
 expert/Q8_1 tests all passed. The supervised run retained at least 20.70 GiB
 host/admission availability with zero observed cgroup pressure/OOM events.
 This records current-source regression coverage and explicit unsupported
-legacy test cells; it does not resolve the layer-2 persistent-state divergence
-or close Phase 5.
+legacy test cells. The layer-2 persistent-state counterexample is superseded by
+the corrected grouped-map follow-up; Phase 5 remains open for its other gates.
