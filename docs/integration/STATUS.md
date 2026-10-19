@@ -13,6 +13,16 @@ exclusions. This is an experimental profile for the measured Orin cell, not a
 general support claim. Phase 8 remains open pending broader release gates and
 the remaining Phase 5/6 work.
 
+A new supervised [Q2_0 short→long→short check](../../bench/results/2026-10-18-phase5-q2-short-long-short/README.md)
+on the selected MTP-off, fixed-residency profile returned the same exact
+512-token retrieval-and-sum answer before and after an uncached 7,498-token
+retrieval. All three long-prompt markers appeared once and in order. Independent
+review passed; minimum host/admission availability was 17.89/11.75 GiB across
+343 samples, with zero observed cgroup events. This adds one same-service
+functional state-recovery sequence; it does not prove persistent-state identity
+or resolve the separate IQ1_M adaptive-migration divergence. Phase 5 remains
+open.
+
 Phase 6 has selected one bounded Q2_0 test profile for Phase 7 qualification:
 FP16 KV, 8K context, MTP off, 3,000 expert slots, prefill chunk 128, eight
 workers and prompt cache/adaptive swaps disabled. This is not a default or
