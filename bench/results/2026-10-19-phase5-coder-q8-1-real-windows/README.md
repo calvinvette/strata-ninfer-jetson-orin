@@ -65,3 +65,61 @@ the grouped-owner claim above is based on expert 70, which appears in both
 rows of the captured dispatch.
 
 The focused three CTests passed again on the final CUDA build (20.14 seconds). A post-matrix single-row Q8_1 width regression also passed all 8 widths, preserving the legacy activation input form. Reproduce the matrix extraction and expert-70 probe with `./run_distinct_row_case.sh`; its rerun is in `distinct-row-rerun/supervisor/`. The matrix format probe and raw outputs are retained in `layer0-distinct-row-expert70/` and `matrix-ctest-final/`. The repeated expert-70 supervisor had minimum host/admission availability of 28.20/27.99 GiB over a 1.09-second run, zero cgroup events, dynamic CPU/GPU clock sampling, unavailable EMC readback, and no energy measurement.
+
+## Device-side input correction and route-transition rows
+
+The earlier keyed route report treated the GPU-profile JSONL layer-1 activation
+as an upstream input difference. That was a stale host-side capture for rows
+where every expert was GPU-owned: the capture hook runs in the CPU dispatch
+callback, which may observe a reused host buffer after the graph has advanced.
+The verifier's [device-side `ffn_x` dump](../../../src/core/verify.cpp#L1419) records
+the actual MoE input inside the graph. The host route hook in
+[expert_source.cpp](../../../src/core/expert_source.cpp#L3148) runs in the CPU
+dispatch callback; the data suggest that callback can observe a reused host
+buffer after the graph advances on all-GPU rows. Reanalysis shows the
+device-side layer-1
+input is bitwise identical between CPU mirror and GPU-profile arms for all 16
+decoded positions. The host route capture repeats the same-position layer-0
+input only at all-GPU rows 511 and 513. This corrects the earlier interpretation;
+those JSONL values do not establish a changed GPU MoE input.
+
+Combined layer-1 `ffn_y` outputs agree between CPU mirror and GPU profile at
+positions 511 and 513. They first differ at position 512, agree again at 513,
+then differ at positions 514–526. The exact graph inputs match, so these output
+differences are downstream of the same MoE input. This excludes an upstream
+activation change for this service pair, but does not by itself identify every
+weighted expert contribution.
+
+Eight supervised operator checks used the exact device-captured `ffn_x` rows
+for positions 512/token 760 and 514/token 1433 with actual IQ2_S/Q2_0 expert
+weights. CPU Q8_1 and CUDA outputs were bitwise equal for all 8/8 tested
+expert/row cases:
+
+| Position / token | Expert | Route relation | Default CPU vs Q8_1 relative L1 |
+| --- | ---: | --- | ---: |
+| 512 / 760 | 95, 11, 205, 18 | CPU mirror-owned; GPU-profile moved to GPU | Q8_1 equals CUDA bitwise |
+| 512 / 760 | 90 | CPU-owned in both; GPU-profile uses default CPU mode | 1.367% |
+| 514 / 1433 | 30 | CPU-owned in both; GPU-profile uses default CPU mode | 1.561% |
+| 514 / 1433 | 159 | CPU-owned in both; GPU-profile uses default CPU mode | 1.686% |
+| 514 / 1433 | 182 | CPU-owned in both; GPU-profile uses default CPU mode | 1.632% |
+
+For position 512, the four experts moved from CPU mirror to GPU have exact
+Q8_1/CUDA operator parity, while the one expert left on CPU (90) has the
+measured default-vs-Q8_1 difference. At position 514 the CPU owner set is the
+same in both service arms, but the GPU-profile run uses default CPU math while
+the CPU-mirror run opts into Q8_1; all three expert checks show the expected
+activation-format difference and Q8_1/CUDA equality. This strongly supports
+the CPU activation-format path as the source of these row-level combined-output
+differences. The report does not reconstruct the full router-weighted sum, and
+positions 515–526 do not have per-row route JSON, so later row-level attribution
+remains open.
+
+All 16 supervised operator cases passed in separate 28-GiB scopes, with minimum
+host/admission availability 28.08/27.97 GiB, no cgroup memory events, dynamic
+CPU/GPU clock sampling, unavailable EMC readback and no energy measurement.
+Recompute the layer chain with `python3 analyze_layer_activation_chain.py` and
+rerun the exact-device-input expert checks with
+`./run_captured_gdn_experts.sh`. The default-vs-Q8_1 per-expert output captures
+are reproduced by `./run_default_vs_q8_experts.sh` and summarized with
+`python3 analyze_default_vs_q8_outputs.py`; its eight-row result is
+`default-vs-q8-output-analysis.json`.
