@@ -3134,6 +3134,10 @@ uint64_t capture_moe_window(int64_t layer, const float* x, const int32_t* ids, c
         const char* p = std::getenv("STRATA_CAPTURE_MOE_START_ROW");
         return p == nullptr ? (int64_t) 0 : std::max<int64_t>(0, std::strtoll(p, nullptr, 10));
     }();
+    static const int64_t selected_position = [] {
+        const char* p = std::getenv("STRATA_CAPTURE_MOE_POSITION");
+        return p == nullptr ? (int64_t) -1 : std::strtoll(p, nullptr, 10);
+    }();
     struct State {
         int64_t rows = 0;
         int64_t seen_rows = 0;
@@ -3150,6 +3154,8 @@ uint64_t capture_moe_window(int64_t layer, const float* x, const int32_t* ids, c
     for (int64_t t = 0; t < n_tok && capture.rows < limit; ++t) {
         const int64_t stream_row = capture.seen_rows++;
         if (stream_row < start_row) continue;
+        const int64_t position = row_positions != nullptr ? row_positions[t] : position0 + t;
+        if (selected_position >= 0 && position != selected_position) continue;
         if (capture.file == nullptr) {
             capture.file = std::fopen(path, "wb");
             if (capture.file == nullptr) {
@@ -3159,7 +3165,6 @@ uint64_t capture_moe_window(int64_t layer, const float* x, const int32_t* ids, c
             }
             std::fprintf(capture.file, "{\"format\":\"strata-moe-dispatch-v3\",\"n_embd\":%lld}\n", (long long) n_embd);
         }
-        const int64_t position = row_positions != nullptr ? row_positions[t] : position0 + t;
         const int32_t token_id = row_tokens != nullptr ? row_tokens[t] : -1;
         std::fprintf(capture.file, "{\"layer\":%lld,\"dispatch\":%llu,\"row\":%lld,\"stream_row\":%lld,\"n_tok\":%lld,\"position\":%lld,\"token_id\":%d,\"k\":%lld,\"ids\":[",
                      (long long) layer, (unsigned long long) dispatch, (long long) t, (long long) stream_row,

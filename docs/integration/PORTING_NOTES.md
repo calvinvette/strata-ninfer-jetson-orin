@@ -1447,9 +1447,12 @@ been resolved. `STRATA_CAPTURE_MOE_PATH` enables a bounded JSONL trace;
 `STRATA_CAPTURE_MOE_ROWS` caps captured verifier rows (default 8, maximum 4096).
 `STRATA_CAPTURE_MOE_START_ROW` skips that many matching rows first (default 0),
 so later request windows can be sampled without retaining earlier activations.
-Each selected row carries its stream-row offset. The capture cursor advances
-only at the selected layer, independent of prompt token count; do not estimate
-its offset from formatted prompt length.
+`STRATA_CAPTURE_MOE_POSITION` optionally restricts capture to one absolute
+verifier position, which can collect the same row across all layers with
+`STRATA_CAPTURE_MOE_LAYER=-1`. Each selected row carries its stream-row offset.
+With one layer selected, the capture cursor advances only at that layer,
+independent of prompt token count; do not estimate its offset from formatted
+prompt length.
 Each record contains layer/dispatch-call/row indices, top-k expert IDs, final
 route kind (`-1` CPU, `0` primary VRAM or foresight slot, `1` PCIe, `2` peer/helper
 GPU), and the exact host FP32 activation supplied to the expert dispatcher.
