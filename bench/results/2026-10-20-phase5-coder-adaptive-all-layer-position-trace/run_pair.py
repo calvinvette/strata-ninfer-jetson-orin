@@ -32,8 +32,19 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--output', type=Path, required=True)
     ap.add_argument('--seed', type=int, default=20261030)
+    ap.add_argument('--continuations', type=int, default=1)
+    ap.add_argument('--capture-moe-positions', default='511')
     ap.add_argument('--run', action='store_true')
     a = ap.parse_args()
+    if a.continuations < 0:
+        ap.error('--continuations must be non-negative')
+    try:
+        capture_positions = [int(value) for value in a.capture_moe_positions.split(',')]
+    except ValueError:
+        ap.error('--capture-moe-positions must be comma-separated non-negative integers')
+    if not capture_positions or any(value < 0 for value in capture_positions) or \
+            capture_positions != sorted(set(capture_positions)):
+        ap.error('--capture-moe-positions must be strictly increasing non-negative integers')
     if a.output.exists():
         ap.error('output directory already exists')
     cfg = json.loads((BASE / 'config.json').read_text())
@@ -45,7 +56,9 @@ def main():
             raise RuntimeError(f'model checksum mismatch: {model}')
     campaign = {
         'schema': 1, 'status': 'planned', 'seed': a.seed,
-        'scope': 'one randomized same-service short/long/short/continuation correctness pair; delayed adaptation versus cap-8 adaptive swaps',
+        'scope': 'one randomized same-service short/long/short correctness pair with optional continuation; delayed adaptation versus cap-8 adaptive swaps',
+        'continuations': a.continuations,
+        'capture_moe_positions': capture_positions,
         'repository_head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'binary_sha256': digest(binary), 'model_repository': 'ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF',
         'model_revision': '5348543e0147355ac9cbcb031184a3546350988e', 'quantization': 'IQ1_M',
@@ -74,7 +87,8 @@ def main():
         result = d / 'result'
         cmd = [py, str(supervisor), '--output', str(sup), '--timeout', '1800', '--interval', '1', '--sample-clocks', '--',
                py, str(runner), '--adapt-every', str(arm['adapt_every']), '--adapt-swaps', str(arm['adapt_swaps']),
-               '--continuations', '1', '--output', str(result)]
+               '--continuations', str(a.continuations), '--capture-moe-positions', a.capture_moe_positions,
+               '--output', str(result)]
         (d / 'launch.txt').write_text('systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes ' + ' '.join(cmd) + '\n')
         start = time.time()
         completed = subprocess.run(['systemd-run', '--user', '--scope', '--collect', '-p', 'MemoryMax=28G', '-p', 'IOAccounting=yes', *cmd], cwd=ROOT, capture_output=True, text=True)

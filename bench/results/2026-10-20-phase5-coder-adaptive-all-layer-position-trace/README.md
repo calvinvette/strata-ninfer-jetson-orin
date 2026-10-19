@@ -269,6 +269,16 @@ Expert IDs first differ at layer 27 for position 505 and layer 31 for position
 the responsible upstream operation. “Coder GGUF” in the result name refers to
 the two IQ1_M shards from the pinned repository revision above.
 
+A randomized [delayed-control/adaptive pair](layer26-gdn-prompt-tail-dispatch/delayed-adaptive-pair/README.md)
+then repeated the same positions with the same binary and model. Delayed
+control had identical owners, expert IDs and activations across initial and
+recovery requests; adaptive cap 8 reproduced the layer-1 owner, layer-26
+activation and layer-27/31 expert-ID divergence. Both supervised services
+passed with 14.27 and 14.19 GiB minimum availability and zero cgroup events.
+The adaptive run again returned matching token IDs while its persistent-state
+fingerprints differed. This associates the captured change with the tested
+adaptive configuration, but does not isolate its underlying operation.
+
 Reproduce the extended service pair on Orin with the current source and local
 model artifacts:
 
