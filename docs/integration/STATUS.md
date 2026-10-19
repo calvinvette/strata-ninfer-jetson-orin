@@ -1046,6 +1046,8 @@ The latest tracked integration source at `0b28cd63` also completed fresh [maestr
 
 The pinned `0be090c` control binary and the current candidate also passed a same-input [Orin rollback smoke](../../bench/results/2026-10-18-phase8-rollback-smoke/README.md): each generated token ID `846` for input `248045`, with separate 28-GiB scopes, more than 8.9 GiB minimum physical availability and zero cgroup memory events. The pinned binary hash matches its original control manifest. This is one CLI inference cell, not API or performance evidence; rollback uses the control's compatible invocation together with its binary because the newer selected profile includes flags the pinned engine does not accept.
 
+The latest candidate also passed a fresh [Q2_0 selected-profile service check](../../bench/results/2026-10-18-phase8-current-source-q2-profile-smoke/README.md): all three markers from the 7,498-token uncached prompt appeared once and in order, and same-service recovery passed. The independent reviewer passed; minimum host/admission availability was 17.69/8.69 GiB across 324 samples, with zero cgroup memory events. This confirms one current-source functional cell, not a new performance comparison or a broad quality claim. Phase 8 remains open for release packaging and broader rollback/API coverage; Phases 5 and 6 remain open.
+
 | Phase | State | Evidence / next gate |
 | --- | --- | --- |
 | 0 — Repository and import | Complete | Pinned source/evidence manifest, source mapping, plan, offline planner checks |
