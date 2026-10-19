@@ -1999,3 +1999,10 @@ capture boundary visits every selected location. Record absent positions as
 unsupported cells, not matches. For Splash, use its actual service position
 semantics and retain recurrent/KV state checks; matching routes or output text
 alone does not prove continuation parity.
+
+When a verifier batches several candidate tokens into one GPU window, a
+single-token state snapshot cannot describe the intermediate transition between
+those rows. The layer-26 trace now retains the existing GDN intermediate arrays
+for every row in a selected multi-token window, then compares fields per
+absolute position. For Splash, keep the row/token mapping explicit and keep
+persistent-state claims separate from intermediate-value comparisons.

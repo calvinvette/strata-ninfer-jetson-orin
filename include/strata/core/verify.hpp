@@ -380,6 +380,8 @@ private:
     size_t trace_n_ = 0;
     int gdn_diag_layer_ = -1;
     int64_t gdn_diag_position_ = -1;
+    std::vector<int64_t> gdn_diag_positions_;
+    bool gdn_diag_multi_position_filter_ = false;
     float* gdn_diag_h_ = nullptr;       ///< opt-in pinned capture of one live GDN verifier layer
     size_t gdn_diag_capacity_ = 0;
     std::string gdn_diag_path_;

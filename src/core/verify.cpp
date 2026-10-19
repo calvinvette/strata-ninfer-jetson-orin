@@ -542,9 +542,11 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
     const int max_in = (int) std::max<uint64_t>(std::max<uint64_t>(N, ZV), NH * HD);
 
     const char* gdn_layer_env = std::getenv("STRATA_VERIFY_DUMP_GDN_LAYER");
-    const char* gdn_position_env = std::getenv("STRATA_VERIFY_DUMP_GDN_POSITION");
-    if (gdn_position_env != nullptr && gdn_layer_env == nullptr) {
-        err = "verify: STRATA_VERIFY_DUMP_GDN_POSITION needs the GDN layer and path";
+    const char* gdn_positions_env = std::getenv("STRATA_VERIFY_DUMP_GDN_POSITIONS");
+    const char* gdn_position_env = gdn_positions_env == nullptr ?
+                                   std::getenv("STRATA_VERIFY_DUMP_GDN_POSITION") : nullptr;
+    if ((gdn_positions_env != nullptr || gdn_position_env != nullptr) && gdn_layer_env == nullptr) {
+        err = "verify: GDN diagnostic positions need the GDN layer and path";
         return false;
     }
     if (const char* layer = gdn_layer_env) {
@@ -557,7 +559,35 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
         }
         gdn_diag_layer_ = (int) parsed;
         gdn_diag_path_ = path;
-        if (gdn_position_env != nullptr) {
+        if (gdn_positions_env != nullptr) {
+            if (!*gdn_positions_env) {
+                err = "verify: empty opt-in GDN diagnostic position list";
+                return false;
+            }
+            const char* cursor = gdn_positions_env;
+            while (*cursor) {
+                char* pos_end = nullptr;
+                errno = 0;
+                const long long selected = std::strtoll(cursor, &pos_end, 10);
+                if (errno != 0 || pos_end == cursor || selected < 0 ||
+                    (*pos_end != '\0' && *pos_end != ',') ||
+                    (!gdn_diag_positions_.empty() && selected <= gdn_diag_positions_.back())) {
+                    err = "verify: GDN diagnostic positions must be strictly increasing non-negative integers";
+                    return false;
+                }
+                gdn_diag_positions_.push_back((int64_t) selected);
+                if (*pos_end == ',') {
+                    cursor = pos_end + 1;
+                    if (*cursor == '\0') {
+                        err = "verify: invalid trailing separator in GDN diagnostic positions";
+                        return false;
+                    }
+                } else {
+                    cursor = pos_end;
+                }
+            }
+            gdn_diag_multi_position_filter_ = true;
+        } else if (gdn_position_env != nullptr) {
             char* pos_end = nullptr;
             const long long selected = std::strtoll(gdn_position_env, &pos_end, 10);
             if (pos_end == gdn_position_env || *pos_end != '\0' || selected < 0) {
@@ -2582,8 +2612,15 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
     const cudaError_t se = cudaStreamSynchronize(cs_);
     trace_ev("SYNCED", -1, -1, (int64_t) se);
     if (se != cudaSuccess) { err = std::string("verify: ") + cudaGetErrorString(se); return false; }
-    if (gdn_diag_captured_ &&
-        (gdn_diag_position_ < 0 || (T == 1 && pos0 == gdn_diag_position_))) {
+    bool gdn_diag_position_selected = gdn_diag_position_ < 0 && !gdn_diag_multi_position_filter_;
+    if (gdn_diag_multi_position_filter_) {
+        for (int t = 0; t < T && !gdn_diag_position_selected; ++t)
+            gdn_diag_position_selected = std::binary_search(gdn_diag_positions_.begin(),
+                                                             gdn_diag_positions_.end(), pos0 + t);
+    } else if (gdn_diag_position_ >= 0) {
+        gdn_diag_position_selected = T == 1 && pos0 == gdn_diag_position_;
+    }
+    if (gdn_diag_captured_ && gdn_diag_position_selected) {
         const uint64_t gdn_floats = (uint64_t) g.ssm_state_size * g.ssm_v_heads * g.ssm_state_size +
                                     (uint64_t) g.ssm_conv_channels * (g.ssm_d_conv - 1);
         const GdnDiagOffsets diag = gdn_diag_offsets(T, (size_t) g.n_embd, (size_t) g.ssm_conv_channels,

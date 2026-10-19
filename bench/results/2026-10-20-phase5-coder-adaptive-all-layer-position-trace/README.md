@@ -291,6 +291,19 @@ was accepted by the harness, but the runtime trace still emitted only verifier
 positions 505 and 506. Positions 500–504 remain unsupported at this capture
 boundary; the matching 505/506 results reproduced byte-for-byte.
 
+An attempted pre/post GDN state snapshot at those two positions was also
+unsupported: they execute as a two-token verifier window, while the current
+state hook snapshots only single-token calls. The service requests completed,
+but the runner rejected the missing requested dump; see the retained
+[unsupported capture cell](layer26-gdn-prompt-tail-dispatch/gdn-token-state-adaptive/README.md).
+
+The multi-row [GDN intermediate trace](layer26-gdn-prompt-tail-dispatch/gdn-intermediate-adaptive/README.md)
+then showed layer-26 input `x` already differs at position 505. At position 506,
+`x` and `qkv` match but the convolved value `h` differs, consistent with
+position 505's transition changing the recurrent convolution history carried
+into the second row. The upstream origin of the position-505 input difference
+remains unresolved.
+
 Reproduce the extended service pair on Orin with the current source and local
 model artifacts:
 

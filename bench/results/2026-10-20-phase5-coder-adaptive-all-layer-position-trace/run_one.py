@@ -45,7 +45,9 @@ def main():
     parser.add_argument("--capture-verify-moe-layer", type=int,
                         help="capture verifier router weights and all expert rows at position 511 for this layer")
     parser.add_argument("--capture-verify-gdn-layer", type=int,
-                        help="capture verifier GDN intermediates at position 511 for this layer")
+                        help="capture verifier GDN intermediates at selected positions for this layer")
+    parser.add_argument("--verify-gdn-positions", default="511",
+                        help="comma-separated increasing verifier GDN diagnostic positions (default: 511)")
     parser.add_argument("--capture-verify-gdn-state-layer", type=int,
                         help="capture the GDN pre/post state at selected positions for this layer")
     parser.add_argument("--gdn-state-output", type=Path,
@@ -88,6 +90,13 @@ def main():
         parser.error("verifier MoE capture layer must be non-negative")
     if args.capture_verify_gdn_layer is not None and args.capture_verify_gdn_layer < 0:
         parser.error("verifier GDN capture layer must be non-negative")
+    try:
+        verify_gdn_positions = [int(value) for value in args.verify_gdn_positions.split(",")]
+    except ValueError:
+        parser.error("--verify-gdn-positions must be comma-separated non-negative integers")
+    if not verify_gdn_positions or any(value < 0 for value in verify_gdn_positions) or \
+            verify_gdn_positions != sorted(set(verify_gdn_positions)):
+        parser.error("--verify-gdn-positions must be strictly increasing non-negative integers")
     if args.capture_verify_gdn_state_layer is not None and args.capture_verify_gdn_state_layer < 0:
         parser.error("verifier GDN state capture layer must be non-negative")
     if args.trace_prefill_gdn_state_layer is not None and args.trace_prefill_gdn_state_layer < 0:
@@ -183,8 +192,11 @@ def main():
         env.update({
             "STRATA_VERIFY_DUMP_GDN_LAYER": str(args.capture_verify_gdn_layer),
             "STRATA_VERIFY_DUMP_GDN_PATH": str((args.output / "verify-gdn.bin").resolve()),
-            "STRATA_VERIFY_DUMP_GDN_POSITION": "511",
         })
+        if verify_gdn_positions == [511]:
+            env["STRATA_VERIFY_DUMP_GDN_POSITION"] = "511"
+        else:
+            env["STRATA_VERIFY_DUMP_GDN_POSITIONS"] = ",".join(map(str, verify_gdn_positions))
     gdn_state_output = None
     if args.gdn_state_output is not None:
         gdn_state_output = args.gdn_state_output.expanduser().resolve()
@@ -328,7 +340,7 @@ def main():
             raise RuntimeError("requested verifier GDN capture was not written")
         verify_gdn_capture = {
             "layer": args.capture_verify_gdn_layer,
-            "position": 511,
+            "positions": verify_gdn_positions,
             "bytes": gdn_path.stat().st_size,
         }
     verify_gdn_state_capture = None

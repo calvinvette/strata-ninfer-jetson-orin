@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare selected layer-26 GDN verifier intermediates at position 511."""
+"""Compare selected layer-26 GDN verifier intermediates across initial/recovery."""
 import argparse
 import hashlib
 import json
@@ -11,7 +11,7 @@ HEADER = struct.Struct('<8sIiiqQQQQQ8i')
 FIELDS = ('x', 'qkv', 'h', 'gate', 'beta', 'z', 'y', 'gdn_out', 'ffn_x', 'ffn_y')
 
 
-def parse_records(path):
+def parse_records(path, positions):
     data = path.read_bytes()
     records = []
     offset = 0
@@ -21,25 +21,29 @@ def parse_records(path):
         values = HEADER.unpack_from(data, offset)
         magic, version, layer, rows, pos0, n_embd, conv, v_heads, value_dim, state_floats, *tokens = values
         offset += HEADER.size
-        if magic != b'STGDIAG4' or version != 4 or layer != 26 or rows != 1:
+        if magic != b'STGDIAG4' or version != 4 or layer != 26 or not 0 < rows <= 8:
             raise ValueError(f'invalid GDN record header: {values[:10]}')
         counts = (n_embd, conv, conv, v_heads, v_heads, value_dim, value_dim,
                   n_embd, n_embd, n_embd)
         arrays = {}
         for name, count in zip(FIELDS, counts):
-            size = count * 4
+            values_count = rows * count
+            size = values_count * 4
             if len(data) - offset < size:
                 raise ValueError(f'truncated GDN field {name} in {path} at {offset}')
-            raw = data[offset:offset + size]
-            arrays[name] = struct.unpack(f'<{count}f', raw)
+            arrays[name] = struct.unpack(f'<{values_count}f', data[offset:offset + size])
             offset += size
-        records.append({'pos0': pos0, 'token': tokens[0], 'n_embd': n_embd,
-                        'conv': conv, 'v_heads': v_heads, 'value_dim': value_dim,
-                        'state_floats': state_floats, 'arrays': arrays})
-    selected = [r for r in records if r['pos0'] == 511]
-    if len(selected) != 2:
-        raise ValueError(f'expected initial/recovery rows at position 511 in {path}, found {len(selected)}')
-    return selected
+        shape = {'n_embd': n_embd, 'conv': conv, 'v_heads': v_heads,
+                 'value_dim': value_dim, 'state_floats': state_floats}
+        for row in range(rows):
+            position = pos0 + row
+            if position not in positions:
+                continue
+            row_arrays = {name: values[row * count:(row + 1) * count]
+                          for name, values, count in zip(FIELDS, arrays.values(), counts)}
+            records.append({'position': position, 'token': tokens[row], 'shape': shape,
+                            'arrays': row_arrays})
+    return data, records
 
 
 def summarize(a, b):
@@ -63,30 +67,51 @@ def summarize(a, b):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--run', type=Path, required=True)
+    parser.add_argument('--positions', type=int, nargs='+', default=[511])
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
-    initial, recovery = parse_records(args.run / 'verify-gdn.bin')
-    if initial['token'] != 271 or recovery['token'] != 271:
-        raise ValueError(f'unexpected token IDs: {initial["token"]}, {recovery["token"]}')
-    if any(initial[key] != recovery[key] for key in ('n_embd', 'conv', 'v_heads', 'value_dim', 'state_floats')):
-        raise ValueError('GDN capture shapes differ')
-    fields = {name: summarize(initial['arrays'][name], recovery['arrays'][name]) for name in FIELDS}
-    changed = [name for name in FIELDS if fields[name]['different_values']]
+    if any(p < 0 for p in args.positions) or args.positions != sorted(set(args.positions)):
+        parser.error('--positions must be strictly increasing non-negative integers')
+
+    raw, records = parse_records(args.run / 'verify-gdn.bin', set(args.positions))
+    grouped = {}
+    for record in records:
+        grouped.setdefault(record['position'], []).append(record)
+    if set(grouped) != set(args.positions) or any(len(pair) != 2 for pair in grouped.values()):
+        raise ValueError(f'expected initial/recovery intermediates for {args.positions}; observed '
+                         f'{ {position: len(pair) for position, pair in grouped.items()} }')
+
+    comparisons = {}
+    for position in args.positions:
+        initial, recovery = grouped[position]
+        if initial['token'] != recovery['token'] or initial['shape'] != recovery['shape']:
+            raise ValueError(f'initial/recovery metadata differs at position {position}')
+        fields = {name: summarize(initial['arrays'][name], recovery['arrays'][name]) for name in FIELDS}
+        changed = [name for name in FIELDS if fields[name]['different_values']]
+        comparisons[str(position)] = {
+            'token_id': initial['token'],
+            'first_differing_field_in_capture_order': changed[0] if changed else None,
+            'all_fields_bitwise_identical': not changed,
+            'fields': fields,
+        }
+
     result = {
-        'scope': 'same-service initial/recovery Coder IQ1_M verifier GDN intermediates at layer 26',
-        'position': 511,
-        'token_id': 271,
-        'model_shape': {key: initial[key] for key in ('n_embd', 'conv', 'v_heads', 'value_dim', 'state_floats')},
-        'fields': fields,
-        'first_differing_field_in_capture_order': changed[0] if changed else None,
-        'all_fields_bitwise_identical': not changed,
-        'limits': ['the layer-26 persistent GDN state before and after this individual token was not captured']
+        'scope': 'same-service layer-26 GDN verifier intermediates at selected token positions',
+        'positions': args.positions,
+        'model_shape': records[0]['shape'],
+        'raw_capture_bytes': len(raw),
+        'raw_capture_sha256': hashlib.sha256(raw).hexdigest(),
+        'position_comparisons': comparisons,
+        'limits': ['GDN persistent state before and after each token is not part of this intermediate capture'],
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + '\n')
-    print(json.dumps({'first_differing_field_in_capture_order': result['first_differing_field_in_capture_order'],
-                      'fields': {name: {k: v for k, v in summary.items() if k != 'initial_f32_sha256' and k != 'recovery_f32_sha256'}
-                                 for name, summary in fields.items()}}, indent=2))
+    print(json.dumps({'positions': args.positions,
+                      'first_differing_field_by_position': {
+                          position: item['first_differing_field_in_capture_order']
+                          for position, item in comparisons.items()},
+                      'raw_capture_bytes': len(raw),
+                      'raw_capture_sha256': result['raw_capture_sha256']}, indent=2))
 
 
 if __name__ == '__main__':
