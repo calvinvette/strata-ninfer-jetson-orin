@@ -698,12 +698,40 @@ int check_q8_1_selector_contract() {
             }
         }
     }
+    set_selector("iq3_xxs/iq4_nl@layer=7");
+    for (size_t i = 0; i < std::size(pairs); ++i) {
+        for (const int layer : {7, 8}) {
+            cpu::NativeFmt got;
+            std::string layer_err;
+            if (!cpu::native_fmt(pairs[i].gu, pairs[i].down, H, FF, got, layer_err, layer)) {
+                std::fprintf(stderr, "layer selector on %s at %d: %s\n", pairs[i].selector, layer,
+                             layer_err.c_str());
+                ++failures;
+                continue;
+            }
+            const bool selected = i == 2 && layer == 7;
+            const int expected_gu = selected ? GGML_TYPE_Q8_1 : baseline[i].gu_act;
+            const int expected_down = selected ? GGML_TYPE_Q8_1 : baseline[i].d_act;
+            if (got.gu_act != expected_gu || got.d_act != expected_down) {
+                std::fprintf(stderr, "layer selector changed %s at layer %d unexpectedly\n", pairs[i].selector,
+                             layer);
+                ++failures;
+            }
+        }
+    }
     set_selector("not-a-pair");
     cpu::NativeFmt invalid;
     std::string err;
     if (cpu::native_fmt(pairs[0].gu, pairs[0].down, H, FF, invalid, err) ||
         err.find("STRATA_NATIVE_CPU_Q8_1_DOT") == std::string::npos) {
         std::fprintf(stderr, "invalid selector was not rejected clearly: %s\n", err.c_str());
+        ++failures;
+    }
+    set_selector("iq3_xxs/iq4_nl@layer=x");
+    err.clear();
+    if (cpu::native_fmt(pairs[2].gu, pairs[2].down, H, FF, invalid, err, 7) ||
+        err.find("STRATA_NATIVE_CPU_Q8_1_DOT") == std::string::npos) {
+        std::fprintf(stderr, "malformed layer selector was accepted\n");
         ++failures;
     }
     std::printf("Q8_1 selector contract: %s (%d failures)\n", failures ? "FAIL" : "PASS", failures);

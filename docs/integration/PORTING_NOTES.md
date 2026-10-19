@@ -1856,6 +1856,16 @@ input, route, weight, owner, prompt or token identities differ. A downstream
 layer is useful for locating propagation, but cannot isolate its own arithmetic
 once its input has diverged.
 
+The [layer-scoped Q8_1 service diagnostic](../../bench/results/2026-10-19-phase5-coder-layer1-q8_1-mirror/README.md)
+extends the format-pair selector with `@layer=N`, using Strata's per-layer
+native format table to change only one CPU-owned expert route. On the pinned
+Coder IQ1_M model, changing only zero-based layer 1 changed every one of the 16
+accepted-prefix states in each tested request, beginning at the first commit;
+the adaptive recovery sequence also changed 10/16 token IDs. This shows why a
+Splash investigation should support layer-local diagnostic routing and compare
+committed state directly, while keeping such precision changes opt-in until
+quality and serving effects are qualified.
+
 The [MTP round-cost/state diagnostic](../../bench/results/2026-10-19-phase5-coder-current-source-mtp-metrics/README.md)
 also records per-round verifier, draft, commit/emit, accepted and rejected
 draft counts from one current-source Orin request. For Splash, keep this cost

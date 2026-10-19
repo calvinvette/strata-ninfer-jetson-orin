@@ -3101,3 +3101,20 @@ selector, also completed fresh maestro1 HIP and SYCL compile/link builds. Both
 scope was capped at 1.5 GiB; `memory.events` recorded 171 `max` events and no
 OOM/kill events. These are x86 build and CLI checks only, not accelerator
 execution or Orin performance results. See the [backend report](../../bench/results/2026-10-19-phase5-coder-layer0-iq3xxs-only-service/backend/maestro1/README.md).
+
+A new [layer-1-only Q8_1 service diagnostic](../../bench/results/2026-10-19-phase5-coder-layer1-q8_1-mirror/README.md)
+scoped the CPU arithmetic route to IQ2_S/Q2_0 experts at zero-based layer 1
+of the pinned Coder IQ1_M artifact. All four supervised arms passed, and all
+64 accepted-prefix fingerprints per arm were compared directly. The layer-
+scoped mirror changed persistent state from commit 1 in every request; adaptive
+recovery changed 10/16 token IDs, while fixed-residency recovery token IDs
+matched despite state differences. Minimum host/admission availability was
+14.26/14.26 GiB, with zero cgroup pressure/OOM events. This isolates a sufficient
+layer-local arithmetic perturbation for the tested sequence; it does not
+establish answer quality or qualify adaptive migration. Phase 5 remains open.
+
+The layer-1-only selector source also completed maestro1 HIP and SYCL
+compile/link builds from the pinned source plus the recorded four-file overlay.
+Both CLI checks exited 0; the 1.5-GiB build scope recorded zero memory limit or
+OOM events. This remains x86 build evidence only, with no accelerator execution.
+See the [backend report](../../bench/results/2026-10-19-phase5-coder-layer1-q8_1-mirror/backend/maestro1/README.md).

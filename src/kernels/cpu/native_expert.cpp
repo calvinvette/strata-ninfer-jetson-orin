@@ -17,6 +17,8 @@
 #include "ggml-common.h"
 
 #include <cmath>
+#include <cerrno>
+#include <climits>
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
@@ -29,20 +31,39 @@ namespace {
 const ggml_type_traits_cpu* traits(int type) { return ggml_get_type_traits_cpu((ggml_type) type); }
 
 bool q8_1_selector_known(const char* selector) {
-    return std::strcmp(selector, "0") == 0 || std::strcmp(selector, "1") == 0 ||
-           std::strcmp(selector, "all") == 0 || std::strcmp(selector, "iq2_s/q2_0") == 0 ||
-           std::strcmp(selector, "iq2_s/iq4_nl") == 0 || std::strcmp(selector, "iq3_xxs/iq4_nl") == 0;
+    if (std::strcmp(selector, "0") == 0 || std::strcmp(selector, "1") == 0 ||
+        std::strcmp(selector, "all") == 0 || std::strcmp(selector, "iq2_s/q2_0") == 0 ||
+        std::strcmp(selector, "iq2_s/iq4_nl") == 0 || std::strcmp(selector, "iq3_xxs/iq4_nl") == 0)
+        return true;
+    const char* at = std::strstr(selector, "@layer=");
+    if (at == nullptr || at == selector) return false;
+    const char* n = at + 7;
+    if (*n == '\0') return false;
+    for (const char* p = n; *p != '\0'; ++p) if (*p < '0' || *p > '9') return false;
+    errno = 0;
+    char* end = nullptr;
+    const long layer = std::strtol(n, &end, 10);
+    if (errno == ERANGE || end == n || *end != '\0' || layer > INT_MAX) return false;
+    const std::string pair(selector, (size_t) (at - selector));
+    return pair == "iq2_s/q2_0" || pair == "iq2_s/iq4_nl" || pair == "iq3_xxs/iq4_nl";
 }
 
-bool q8_1_selector_matches(const char* selector, int gu_type, int d_type) {
+bool q8_1_selector_matches(const char* selector, int gu_type, int d_type, int layer) {
+    const char* at = std::strstr(selector, "@layer=");
+    if (at != nullptr) {
+        char* end = nullptr;
+        const long selected_layer = std::strtol(at + 7, &end, 10);
+        if (end == at + 7 || *end != '\0' || selected_layer != layer) return false;
+    }
     const bool iq2_s_q2_0 = gu_type == GGML_TYPE_IQ2_S && d_type == GGML_TYPE_Q2_0;
     const bool iq2_s_iq4_nl = gu_type == GGML_TYPE_IQ2_S && d_type == GGML_TYPE_IQ4_NL;
     const bool iq3_xxs_iq4_nl = gu_type == GGML_TYPE_IQ3_XXS && d_type == GGML_TYPE_IQ4_NL;
-    if (std::strcmp(selector, "1") == 0 || std::strcmp(selector, "all") == 0)
+    const std::string pair = at == nullptr ? selector : std::string(selector, (size_t) (at - selector));
+    if (pair == "1" || pair == "all")
         return iq2_s_q2_0 || iq2_s_iq4_nl || iq3_xxs_iq4_nl;
-    if (std::strcmp(selector, "iq2_s/q2_0") == 0) return iq2_s_q2_0;
-    if (std::strcmp(selector, "iq2_s/iq4_nl") == 0) return iq2_s_iq4_nl;
-    if (std::strcmp(selector, "iq3_xxs/iq4_nl") == 0) return iq3_xxs_iq4_nl;
+    if (pair == "iq2_s/q2_0") return iq2_s_q2_0;
+    if (pair == "iq2_s/iq4_nl") return iq2_s_iq4_nl;
+    if (pair == "iq3_xxs/iq4_nl") return iq3_xxs_iq4_nl;
     return false;
 }
 
@@ -269,7 +290,7 @@ bool iq256_supported(int type) noexcept {
 
 bool kq256_supported(int type) noexcept { return type == 12 || type == 7 || type == 8; }
 
-bool native_fmt(int gu_type, int d_type, int64_t n_embd, int64_t n_ff, NativeFmt& f, std::string& err) {
+bool native_fmt(int gu_type, int d_type, int64_t n_embd, int64_t n_ff, NativeFmt& f, std::string& err, int layer) {
     init_once();
     const ggml_type_traits_cpu* tg = traits(gu_type);
     const ggml_type_traits_cpu* td = traits(d_type);
@@ -295,11 +316,11 @@ bool native_fmt(int gu_type, int d_type, int64_t n_embd, int64_t n_ff, NativeFmt
     const char* q8_1_probe = std::getenv("STRATA_NATIVE_CPU_Q8_1_DOT");
     if (q8_1_probe != nullptr && !q8_1_selector_known(q8_1_probe)) {
         err = "native experts: STRATA_NATIVE_CPU_Q8_1_DOT must be 0, 1, all, "
-              "iq2_s/q2_0, iq2_s/iq4_nl or iq3_xxs/iq4_nl";
+              "iq2_s/q2_0, iq2_s/iq4_nl, iq3_xxs/iq4_nl, or a pair followed by @layer=N";
         return false;
     }
     if (q8_1_probe != nullptr && std::strcmp(q8_1_probe, "0") != 0 &&
-        q8_1_selector_matches(q8_1_probe, gu_type, d_type)) {
+        q8_1_selector_matches(q8_1_probe, gu_type, d_type, layer)) {
         f.gu_act = GGML_TYPE_Q8_1;
         f.d_act = GGML_TYPE_Q8_1;
     }

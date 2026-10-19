@@ -408,7 +408,7 @@ void act_quant_any(const float* x, int n, ActQ& a) {
 #if !defined(STRATA_NATIVE_EXPERTS)
 // Without ggml-cpu no native pack loads (expert_layout_load refuses), so these are never reached.
 bool native_experts_available() noexcept { return false; }
-bool native_fmt(int, int, int64_t, int64_t, NativeFmt&, std::string& err) { err = "built without native experts"; return false; }
+bool native_fmt(int, int, int64_t, int64_t, NativeFmt&, std::string& err, int) { err = "built without native experts"; return false; }
 void native_quant_act(const NativeFmt&, const float*, void*) { std::abort(); }
 void native_quant_h(const NativeFmt&, const float*, void*) { std::abort(); }
 int native_gu_mt_min(int) { return 2; }
@@ -467,7 +467,7 @@ bool expert_layout_load(const std::string& pack_dir, int64_t n_layers, int64_t n
             return false;
         }
         NativeFmt f;
-        if (!native_fmt((int) gt, (int) dt, H, FF, f, err)) return false;
+        if (!native_fmt((int) gt, (int) dt, H, FF, f, err, (int) l)) return false;
         if (f.bytes != blob) {
             err = "native_experts.txt: layer " + std::to_string(l) + " blob is " + std::to_string(blob) +
                   " B but its formats make " + std::to_string(f.bytes);

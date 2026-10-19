@@ -1,0 +1,32 @@
+{
+  "source_commit": "c5f9f319",
+  "source_overlay_sha256_file": "source-overlay.sha256",
+  "source_files": [
+    "include/strata/kernels/cpu/native_expert.hpp",
+    "src/kernels/cpu/expert_layout.cpp",
+    "src/kernels/cpu/native_expert.cpp",
+    "src/kernels/native_expert_parity.cpp"
+  ],
+  "service_binary_sha256": "79368f55fbd024cef044fa9a3f58123766b118ae642f40e764cf23ca2e69e900",
+  "selector": "STRATA_NATIVE_CPU_Q8_1_DOT=iq2_s/q2_0@layer=1",
+  "selector_scope": "CPU-owned IQ2_S/Q2_0 experts at zero-based layer 1 only",
+  "model": {
+    "repo": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+    "revision": "5348543e0147355ac9cbcb031184a3546350988e",
+    "variant": "IQ1_M",
+    "shards_sha256_file": "model-sha256.txt"
+  },
+  "host": "NVIDIA Jetson AGX Orin, aarch64, CUDA 12.6",
+  "profile": "expert-cache=3000, prefill=64, context=8192, prompt-cache=0, spec=2, dynamic clocks",
+  "arms": [
+    "service-test/scoped/control-v2",
+    "service-test/scoped/mirror",
+    "service-test/scoped/fixed-control",
+    "service-test/scoped/fixed-mirror"
+  ],
+  "functional_summary": "All four arms passed; 16 accepted-prefix fingerprints per request per arm; all mirror prefixes differed from their paired controls beginning at commit 1; adaptive recovery changed 10/16 token IDs; fixed recovery IDs matched.",
+  "resource_summary": "Minimum host/admission availability 14.26-14.38 GiB; cgroup event counters zero; 28-GiB cap.",
+  "performance_claim": "None; one run per arm, dynamic clocks, and no process-energy measurement.",
+  "limitations": "No accepted drafts, no answer-quality oracle, and no proof of general adaptive migration causality or support.",
+  "report": "README.md"
+}
