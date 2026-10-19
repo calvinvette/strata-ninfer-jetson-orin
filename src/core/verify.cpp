@@ -643,6 +643,59 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
         }
     }
     {
+        const char* layer = std::getenv("STRATA_VERIFY_DUMP_GDN_COMMIT_LAYER");
+        const char* path = std::getenv("STRATA_VERIFY_DUMP_GDN_COMMIT_PATH");
+        const char* positions = std::getenv("STRATA_VERIFY_DUMP_GDN_COMMIT_POSITIONS");
+        if ((layer != nullptr) != (path != nullptr) || (layer != nullptr) != (positions != nullptr)) {
+            err = "verify: GDN commit capture layer, path, and positions must be set together";
+            return false;
+        }
+        if (layer != nullptr) {
+            char* end = nullptr;
+            errno = 0;
+            const long parsed = std::strtol(layer, &end, 10);
+            if (errno != 0 || end == layer || *end != '\0' || parsed < 0 || parsed >= g.n_layers ||
+                is_qsa_layer(g, parsed) || !*path || !*positions) {
+                err = "verify: GDN commit capture needs a valid GDN layer, path, and token positions";
+                return false;
+            }
+            const char* cursor = positions;
+            while (*cursor) {
+                char* pos_end = nullptr;
+                errno = 0;
+                const long long selected = std::strtoll(cursor, &pos_end, 10);
+                if (errno != 0 || pos_end == cursor || selected < 0 ||
+                    (*pos_end != '\0' && *pos_end != ',') ||
+                    (!gdn_commit_diag_positions_.empty() && selected <= gdn_commit_diag_positions_.back())) {
+                    err = "verify: GDN commit positions must be strictly increasing non-negative integers";
+                    return false;
+                }
+                gdn_commit_diag_positions_.push_back((int64_t) selected);
+                if (*pos_end == ',') {
+                    cursor = pos_end + 1;
+                    if (*cursor == '\0') {
+                        err = "verify: invalid trailing separator in GDN commit positions";
+                        return false;
+                    }
+                } else {
+                    cursor = pos_end;
+                }
+            }
+            const uint64_t state_floats = (uint64_t) g.ssm_state_size * (uint64_t) g.ssm_v_heads *
+                                              (uint64_t) g.ssm_state_size +
+                                          (uint64_t) g.ssm_conv_channels * (uint64_t) (g.ssm_d_conv - 1);
+            if (state_floats == 0 || state_floats > SIZE_MAX / sizeof(float)) {
+                err = "verify: opt-in GDN commit capture size overflows";
+                return false;
+            }
+            gdn_commit_diag_layer_ = (int) parsed;
+            gdn_commit_diag_host_.resize((size_t) state_floats);
+            gdn_commit_diag_path_ = path;
+            std::fprintf(stderr, "strata verify: opt-in committed GDN state dump at layer %d for %zu positions -> %s\n",
+                         gdn_commit_diag_layer_, gdn_commit_diag_positions_.size(), gdn_commit_diag_path_.c_str());
+        }
+    }
+    {
         const char* layer = std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_LAYER");
         const char* path = std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_PATH");
         const char* position = std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_POSITION");
@@ -2925,6 +2978,73 @@ bool Verifier::window_logprobs(const int32_t* targets, int T, int64_t pos0, int3
 namespace { bool g_commit_async = false; }
 void Verifier::set_commit_async(bool on) { g_commit_async = on && std::getenv("STRATA_COMMIT_SYNC") == nullptr; }
 
+bool Verifier::capture_gdn_commit_state(SessionState& state, int64_t position, int32_t token, int slot,
+                                        std::string& err) {
+    if (gdn_commit_diag_layer_ < 0 ||
+        !std::binary_search(gdn_commit_diag_positions_.begin(), gdn_commit_diag_positions_.end(), position))
+        return true;
+    const ModelGeometry& g = *g_;
+    int64_t ordinal = 0;
+    for (int64_t layer = 0; layer < gdn_commit_diag_layer_; ++layer)
+        if (!is_qsa_layer(g, layer)) ++ordinal;
+    if (ordinal < state.gdn_ord0 || ordinal >= state.gdn_ord0 + state.gdn_alloc) return true;
+    const uint64_t recurrent_floats = (uint64_t) g.ssm_state_size * (uint64_t) g.ssm_v_heads *
+                                      (uint64_t) g.ssm_state_size;
+    const uint64_t state_floats = recurrent_floats +
+                                  (uint64_t) g.ssm_conv_channels * (uint64_t) (g.ssm_d_conv - 1);
+    if (state_floats != gdn_commit_diag_host_.size()) {
+        err = "verify: opt-in GDN commit capture state size changed";
+        return false;
+    }
+    const cudaError_t se = cudaStreamSynchronize(cs_);
+    if (se != cudaSuccess) {
+        err = std::string("verify: GDN commit capture sync: ") + cudaGetErrorString(se);
+        return false;
+    }
+    const float* device_state = state.gdn_state + (size_t) (ordinal - state.gdn_ord0) * (size_t) state_floats;
+    const cudaError_t ce = cudaMemcpy(gdn_commit_diag_host_.data(), device_state,
+                                     (size_t) state_floats * sizeof(float), cudaMemcpyDeviceToHost);
+    if (ce != cudaSuccess) {
+        err = std::string("verify: GDN commit capture copy: ") + cudaGetErrorString(ce);
+        return false;
+    }
+    struct GdnCommitHeader {
+        char magic[8];
+        uint32_t version;
+        int32_t layer;
+        int64_t position;
+        uint64_t recurrent_floats;
+        uint64_t state_floats;
+        int32_t token;
+        int32_t slot;
+    } header{};
+    static_assert(sizeof(GdnCommitHeader) == 48, "STGCMT1 header layout changed");
+    std::memcpy(header.magic, "STGCMT1", sizeof(header.magic));
+    header.version = 1;
+    header.layer = gdn_commit_diag_layer_;
+    header.position = position;
+    header.recurrent_floats = recurrent_floats;
+    header.state_floats = state_floats;
+    header.token = token;
+    header.slot = slot;
+    static std::mutex dump_mutex;
+    std::lock_guard<std::mutex> lock(dump_mutex);
+    std::FILE* dump = std::fopen(gdn_commit_diag_path_.c_str(), "ab");
+    bool written = dump != nullptr;
+    if (written) {
+        written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
+                  std::fwrite(gdn_commit_diag_host_.data(), sizeof(float), (size_t) state_floats, dump) ==
+                      (size_t) state_floats;
+        if (std::fflush(dump) != 0) written = false;
+        if (std::fclose(dump) != 0) written = false;
+    }
+    if (!written) {
+        err = "verify: could not write opt-in committed GDN state";
+        return false;
+    }
+    return true;
+}
+
 bool Verifier::commit(int n_keep, std::string& err) {
     const OnDevice on_device(device_);
     if (n_keep < 1 || n_keep > last_t_) { err = "verify: commit count out of range"; return false; }
@@ -2952,6 +3072,8 @@ bool Verifier::commit(int n_keep, std::string& err) {
             commit_pending_ = true;
         }
     }
+    if (!capture_gdn_commit_state(*ss_, last_pos0_ + n_keep - 1, last_tokens_[n_keep - 1], 0, err))
+        return false;
     if (ple_stage())   // stages that share one session must advance it once
         for (int t = 0; t < n_keep; ++t) {
             ss_->ple_prev[0] = ss_->ple_prev[1];
@@ -3427,6 +3549,16 @@ bool Verifier::commit_slot_prefixes(const int* keep, std::string& err) {
     if (le != cudaSuccess) { err = std::string("verify: batch commit launch: ") + cudaGetErrorString(le); return false; }
     const cudaError_t se = cudaStreamSynchronize(cs_);
     if (se != cudaSuccess) { err = std::string("verify: batch commit: ") + cudaGetErrorString(se); return false; }
+    for (int t = 0; t < S;) {
+        const int first = t;
+        while (t < S && last_rows_[t] == last_rows_[first]) ++t;
+        const int row = last_rows_[first];
+        const int accepted = keep[row];
+        if (accepted > 0 && !capture_gdn_commit_state(*slots_[(size_t) row],
+                                                       last_pos_b_[first + accepted - 1],
+                                                       last_tokens_[first + accepted - 1], row, err))
+            return false;
+    }
     if (ple_stage())
         for (int t = 0; t < S;) {
             const int first = t;
@@ -3835,6 +3967,8 @@ bool Verifier::pl_commit_async(int n_keep, std::string& err) {
     if (cudaEventRecord(ev_commit_, cs_) != cudaSuccess) { err = "verify: event record failed"; return false; }
     (void) cudaStreamQuery(cs_);
     commit_live_ = true;
+    if (!capture_gdn_commit_state(*ss_, last_pos0_ + n_keep - 1, last_tokens_[n_keep - 1], 0, err))
+        return false;
     if (ple_stage())
         for (int t = 0; t < n_keep; ++t) {
             ss_->ple_prev[0] = ss_->ple_prev[1];

@@ -78,6 +78,24 @@ Current-source maestro1 HIP rebuilt and linked; SYCL had no source work. Both
 CLI help checks passed. This remains a diagnostic, not a correction or
 performance result; Phase 5 remains open.
 
+The subsequent [accepted-commit state trace](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/layer26-gdn-commit-state-trace/README.md)
+narrowed the first captured divergence to layer-26 GDN state after the commit
+ending at position 506. Initial and recovery token IDs matched. Recurrent state
+and part of convolution history differed at 506; convolution history was exact
+again at 508 while the recurrent matrix remained different. Position-510
+committed state matched the earlier position-511 verifier pre-state byte-for-
+byte in both requests. This identifies the first changed accepted-window
+boundary after the bit-identical prefill snapshot, but it does not separate the
+individual token computations inside that window or establish cause. The Orin
+run passed at `MemoryMax=28G`, with 14.31 GiB minimum availability, 10.90 GiB
+peak scope use and zero cgroup events. Phase 5 remains open.
+
+An attempted `--spec 1` ablation could not split that two-token window: native
+Coder packs reject `--spec < 2` before model loading. No runtime data was
+collected, and the unsupported cell is retained with the trace. The current
+evidence locates the first difference to endpoint 506; token-level separation
+inside that supported window remains open.
+
 The trace's per-layer accepted-prefix hashes now localize the adaptive state's
 first mismatch: at the first recovery token, GDN ordinals 20–35 differed from
 the initial short request, while ordinals 0–19 matched. Ordinal 20 maps to

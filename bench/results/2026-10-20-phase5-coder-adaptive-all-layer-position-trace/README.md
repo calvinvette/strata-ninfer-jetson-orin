@@ -168,7 +168,29 @@ zero cgroup events. Clocks remained dynamic and energy was not request-
 attributed. The capture and analysis are in
 `layer26-gdn-prefill-state-comparison/`; raw state files remain outside Git
 under `~/models/strata-orin-validation/experiments/phase5-gdn-state/`.
+
+A follow-up `--spec 1` run intended to split that first two-token window was
+rejected during native-pack argument validation (`--spec T` requires `T >= 2`);
+it loaded no model and collected no state. The unsupported cell is retained in
+`layer26-gdn-spec1-state-trace/`. Resolving the per-token transition requires a
+capture inside the supported two-token window.
 Phase 5 remains open.
+
+The next accepted-state capture sampled layer 26 after every committed verifier
+window through position 514. Initial and recovery token IDs match at all seven
+captured endpoints. The earliest observed state difference is after the commit
+ending at position 506: 786,389/786,432 recurrent values and 10,240/30,720
+convolution-history values differ. At position 508 the convolution histories
+are bit-identical again, but 786,367 recurrent values still differ. The
+position-510 committed snapshots match the earlier position-511 verifier
+pre-state snapshots byte-for-byte for both requests, validating the captured
+state boundary. This narrows the first changed committed state to the verifier
+window ending at 506 after identical prefill state at boundary 505; the capture
+does not separate token-level work within that window. The same-service run
+passed in 183.2 s with 14.31 GiB minimum host/admission availability, 10.90
+GiB peak scope use, and zero cgroup events. The state records and analysis are
+in `layer26-gdn-commit-state-trace/`; raw arrays remain outside Git under
+`~/models/strata-orin-validation/experiments/phase5-gdn-state/`.
 
 The two raw 113 MiB dumps remain outside Git under
 `~/models/strata-orin-validation/experiments/phase5-gdn-state/`; their full

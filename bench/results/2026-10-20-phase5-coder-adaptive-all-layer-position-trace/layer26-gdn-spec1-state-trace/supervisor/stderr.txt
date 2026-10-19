@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/run_one.py", line 363, in <module>
+    main()
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/run_one.py", line 207, in main
+    engine = StrataEngine(cfg["exe"], argv, cwd=cfg["cwd"], log=str(log), env=env)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/calvin/workspace/strata-ninfer-jetson-orin/serve/server.py", line 693, in __init__
+    raise RuntimeError(why + (f" (see {log})" if log else "") +
+RuntimeError: the engine exited before it was ready (see bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/layer26-gdn-spec1-state-trace/run/service.log)
+the engine log's last lines:
+  [strata] 2026-10-19 18:34:58 engine started: /home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/candidate/strata --serve --pack /home/calvin/models/strata-orin-validation/pack --native /home/calvin/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf --ple-gguf /home/calvin/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf --expert-profile /home/calvin/workspace/strata-ninfer-jetson-orin/data/expert-profile-coder.bin --expert-cache 3000 --prefill 64 --spec 1 --max-context 8192 --mmap-experts --prompt-cache 6 --vram-reserve-mib 3072 --pcie-frac 0.55 --pool-workers 8 --suffix-draft 0 --spec-min-p 0 --adapt-every 4 --adapt-swaps 8 --adapt-accepted-only
+  strata generate: ARM CPU experts use ggml-cpu's native kernels
+  strata generate: /home/calvin/models/strata-orin-validation/pack is a native (IQ) pack: it needs --native SHARD1, --spec T (T >= 2) and --prefill CHUNK

@@ -30,6 +30,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--adapt-every", type=int, required=True)
     parser.add_argument("--adapt-swaps", type=int, required=True)
+    parser.add_argument("--spec", type=int,
+                        help="override the configured verifier window for a prompt-tail localization ablation")
     parser.add_argument("--continuations", type=int, default=0,
                         help="extra identical short requests after short/long/short")
     parser.add_argument("--dump-gdn-occurrence", type=int,
@@ -52,10 +54,18 @@ def main():
                         help="emit full GDN-state hashes after each prefill chunk for this model layer")
     parser.add_argument("--prefill-gdn-state-output", type=Path,
                         help="optional external raw end-of-prompt GDN snapshots for the traced layer")
+    parser.add_argument("--capture-gdn-commit-state-layer", type=int,
+                        help="capture committed GDN state after accepted windows at selected positions")
+    parser.add_argument("--gdn-commit-state-positions", default="",
+                        help="comma-separated increasing accepted positions to capture")
+    parser.add_argument("--gdn-commit-state-output", type=Path,
+                        help="external output path for committed GDN state records")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.continuations < 0:
         parser.error("--continuations must be non-negative")
+    if args.spec is not None and args.spec < 0:
+        parser.error("--spec must be non-negative")
     if args.dump_gdn_occurrence is not None and args.dump_gdn_occurrence < 1:
         parser.error("--dump-gdn-occurrence must be positive")
     if args.dump_gdn_occurrence is not None and args.dump_gdn_occurrence > 2 + args.continuations:
@@ -75,6 +85,19 @@ def main():
         parser.error("prefill GDN state trace layer must be non-negative")
     if args.prefill_gdn_state_output is not None and args.trace_prefill_gdn_state_layer is None:
         parser.error("prefill GDN state output requires --trace-prefill-gdn-state-layer")
+    if (args.capture_gdn_commit_state_layer is None) != (args.gdn_commit_state_output is None):
+        parser.error("GDN commit capture requires both --capture-gdn-commit-state-layer and --gdn-commit-state-output")
+    if args.capture_gdn_commit_state_layer is None and args.gdn_commit_state_positions:
+        parser.error("GDN commit positions require --capture-gdn-commit-state-layer")
+    try:
+        gdn_commit_positions = [int(value) for value in args.gdn_commit_state_positions.split(",") if value]
+    except ValueError:
+        parser.error("--gdn-commit-state-positions must be comma-separated non-negative integers")
+    if args.capture_gdn_commit_state_layer is not None and (
+            args.capture_gdn_commit_state_layer < 0 or not gdn_commit_positions or
+            any(value < 0 for value in gdn_commit_positions) or
+            gdn_commit_positions != sorted(set(gdn_commit_positions))):
+        parser.error("GDN commit capture requires a non-negative layer and increasing non-negative positions")
     if (args.capture_verify_gdn_state_layer is None) != (args.gdn_state_output is None):
         parser.error("GDN state capture requires both --capture-verify-gdn-state-layer and --gdn-state-output")
     try:
@@ -87,6 +110,9 @@ def main():
 
     cfg = json.loads((BASE / "config.json").read_text())
     argv = list(cfg["args"])
+    configured_spec = int(argv[argv.index("--spec") + 1])
+    if args.spec is not None:
+        replace_option(argv, "--spec", args.spec)
     replace_option(argv, "--adapt-every", args.adapt_every)
     replace_option(argv, "--adapt-swaps", args.adapt_swaps)
     if "--adapt-accepted-only" not in argv:
@@ -167,6 +193,17 @@ def main():
             parser.error(f"prefill GDN state output already exists: {prefill_state_output}")
         prefill_state_output.parent.mkdir(parents=True, exist_ok=True)
         env["STRATA_PREFILL_GDN_STATE_TRACE_PATH"] = str(prefill_state_output)
+    gdn_commit_state_output = None
+    if args.gdn_commit_state_output is not None:
+        gdn_commit_state_output = args.gdn_commit_state_output.expanduser().resolve()
+        if gdn_commit_state_output.exists():
+            parser.error(f"GDN commit state output already exists: {gdn_commit_state_output}")
+        gdn_commit_state_output.parent.mkdir(parents=True, exist_ok=True)
+        env.update({
+            "STRATA_VERIFY_DUMP_GDN_COMMIT_LAYER": str(args.capture_gdn_commit_state_layer),
+            "STRATA_VERIFY_DUMP_GDN_COMMIT_PATH": str(gdn_commit_state_output),
+            "STRATA_VERIFY_DUMP_GDN_COMMIT_POSITIONS": ",".join(map(str, gdn_commit_positions)),
+        })
     engine = StrataEngine(cfg["exe"], argv, cwd=cfg["cwd"], log=str(log), env=env)
     requests = []
     try:
@@ -181,6 +218,33 @@ def main():
             (args.output / "requests.json").write_text(json.dumps({"requests": requests}, indent=2) + "\n")
     finally:
         engine.close()
+
+    gdn_commit_capture = None
+    if gdn_commit_state_output is not None:
+        header = struct.Struct("<8sIiqQQii")
+        raw = gdn_commit_state_output.read_bytes()
+        offset = 0
+        observed = {}
+        while offset < len(raw):
+            if len(raw) - offset < header.size:
+                raise RuntimeError("truncated committed GDN state header")
+            magic, version, layer, position, recurrent, total, token, slot = header.unpack_from(raw, offset)
+            offset += header.size
+            if magic != b"STGCMT1\0" or version != 1 or layer != args.capture_gdn_commit_state_layer:
+                raise RuntimeError("invalid committed GDN state record")
+            if total < recurrent or len(raw) - offset < total * 4:
+                raise RuntimeError("truncated committed GDN state payload")
+            offset += total * 4
+            observed[position] = observed.get(position, 0) + 1
+        if not observed or any(count < 2 for count in observed.values()):
+            raise RuntimeError(f"committed GDN positions were not captured in both short requests: {observed}")
+        gdn_commit_capture = {
+            "layer": args.capture_gdn_commit_state_layer,
+            "path": str(gdn_commit_state_output),
+            "bytes": len(raw),
+            "requested_positions": gdn_commit_positions,
+            "observed_records_per_position": observed,
+        }
 
     if gdn_state_output is not None:
         header = struct.Struct("<8sIiqQQii")
@@ -271,6 +335,7 @@ def main():
     state_changes = [key for key in STATE_KEYS if requests[0]["state"][key] != requests[2]["state"][key]]
     results = {
         "adapt_every": args.adapt_every, "adapt_swaps": args.adapt_swaps,
+        "configured_spec": configured_spec, "spec_override": args.spec,
         "prompt_sha256": {
             "short": hashlib.sha256(json.dumps(list(prompts[0][1])).encode()).hexdigest(),
             "long": hashlib.sha256(json.dumps(long_ids).encode()).hexdigest(),
@@ -282,6 +347,7 @@ def main():
         "verify_moe_capture": verify_moe_capture,
         "verify_gdn_capture": verify_gdn_capture,
         "verify_gdn_state_capture": verify_gdn_state_capture,
+        "verify_gdn_commit_state_capture": gdn_commit_capture,
         "adaptive_byte_verification_passes": log.read_text().count("adaptive swap byte verification passed"),
         "adaptive_residency_verification_passes": log.read_text().count("adaptive residency table verification passed"),
         "binary_sha256": hashlib.sha256(Path(cfg["exe"]).read_bytes()).hexdigest(),

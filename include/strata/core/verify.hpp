@@ -369,6 +369,8 @@ private:
     bool staged_ = false;
     bool copy_used_ = false;
     bool capture_commit(std::string& err);
+    bool capture_gdn_commit_state(SessionState& state, int64_t position, int32_t token, int slot,
+                                  std::string& err);
     bool record_window(int T, cudaStream_t cs, std::string& err);
     // #649: STRATA_VERIFY_TRACE=1 - a host event ring (trace_ev) and GPU breadcrumbs: the profiler's stamp points,
     // per layer and token group, written to mapped memory (null when the trace is off)
@@ -388,6 +390,10 @@ private:
     size_t gdn_state_diag_capacity_ = 0;
     std::string gdn_state_diag_path_;
     bool gdn_state_diag_captured_ = false;
+    int gdn_commit_diag_layer_ = -1;
+    std::vector<int64_t> gdn_commit_diag_positions_;
+    std::vector<float> gdn_commit_diag_host_;
+    std::string gdn_commit_diag_path_;
     int moe_route_diag_layer_ = -1;
     int64_t moe_route_diag_position_ = -1;
     uint8_t* moe_route_diag_h_ = nullptr;  ///< opt-in pinned capture of device top-k IDs and weights
