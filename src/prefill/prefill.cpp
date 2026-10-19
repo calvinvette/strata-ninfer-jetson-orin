@@ -4053,19 +4053,65 @@ bool Prefill::run_impl(const int64_t* tokens, int64_t n, int64_t pos0, std::stri
                              (long long) m.pp->ps_experts, m.pp->layers ? (double) m.pp->ps_experts / m.pp->layers : 0.0);
         }
     }
-    if (std::getenv("STRATA_STATE_HASH_GDN") != nullptr) {   // debug: the GDN states as the prompt path leaves them
-        cudaStreamSynchronize(m.cs);
-        std::vector<uint8_t> b((size_t) gdn_floats * 4);
-        std::string line;
-        char h[8];
-        for (int64_t i = 0; i < ss.gdn_alloc; ++i) {
-            cudaMemcpy(b.data(), ss.gdn_state + (size_t) i * gdn_floats, b.size(), cudaMemcpyDeviceToHost);
-            uint64_t x = 1469598103934665603ull;
-            for (uint8_t c : b) x = (x ^ c) * 1099511628211ull;
-            std::snprintf(h, sizeof(h), "%04llx ", (unsigned long long) (x & 0xffff));
-            line += h;
+    if (std::getenv("STRATA_STATE_HASH_GDN") != nullptr ||
+        std::getenv("STRATA_PREFILL_DUMP_GDN") != nullptr) {   // debug: the GDN states as the prompt path leaves them
+        const cudaError_t sync_status = cudaStreamSynchronize(m.cs);
+        if (sync_status != cudaSuccess) {
+            err = std::string("prefill: GDN state capture sync: ") + cudaGetErrorString(sync_status);
+            return false;
         }
-        std::fprintf(stderr, "strata prefill: GDN_HASH %s\n", line.c_str());
+        std::vector<uint8_t> b((size_t) gdn_floats * 4);
+        if (std::getenv("STRATA_STATE_HASH_GDN") != nullptr) {
+            std::string line;
+            char h[8];
+            for (int64_t i = 0; i < ss.gdn_alloc; ++i) {
+                if (cudaMemcpy(b.data(), ss.gdn_state + (size_t) i * gdn_floats, b.size(),
+                               cudaMemcpyDeviceToHost) != cudaSuccess) {
+                    err = std::string("prefill: GDN state hash copy: ") + cudaGetErrorString(cudaGetLastError());
+                    return false;
+                }
+                uint64_t x = 1469598103934665603ull;
+                for (uint8_t c : b) x = (x ^ c) * 1099511628211ull;
+                std::snprintf(h, sizeof(h), "%04llx ", (unsigned long long) (x & 0xffff));
+                line += h;
+            }
+            std::fprintf(stderr, "strata prefill: GDN_HASH %s\n", line.c_str());
+        }
+        if (const char* path = std::getenv("STRATA_PREFILL_DUMP_GDN")) {
+            if (ss.gdn_alloc <= 0 || gdn_floats <= 0) {
+                err = "prefill: requested GDN state dump but no GDN state is allocated";
+                return false;
+            }
+            FILE* dump = std::fopen(path, "wb");
+            if (!dump) {
+                std::fprintf(stderr, "strata prefill: cannot open GDN state dump %s\n", path);
+                return false;
+            }
+            struct PrefillGdnDumpHeader {
+                char magic[8];
+                uint64_t layers;
+                uint64_t floats_per_layer;
+            } header{{'S','T','P','F','G','D','N','1'}, (uint64_t) ss.gdn_alloc,
+                     (uint64_t) gdn_floats};
+            bool dump_ok = std::fwrite(&header, sizeof(header), 1, dump) == 1;
+            for (int64_t i = 0; dump_ok && i < ss.gdn_alloc; ++i) {
+                if (cudaMemcpy(b.data(), ss.gdn_state + (size_t) i * gdn_floats, b.size(),
+                               cudaMemcpyDeviceToHost) != cudaSuccess ||
+                    std::fwrite(b.data(), 1, b.size(), dump) != b.size()) {
+                    dump_ok = false;
+                }
+            }
+            if (std::fclose(dump) != 0) dump_ok = false;
+            if (!dump_ok) {
+                std::fprintf(stderr, "strata prefill: failed writing GDN state dump %s\n", path);
+                return false;
+            }
+            std::fprintf(stderr,
+                         "strata prefill: GDN_STATE_DUMP path=%s layers=%llu floats_per_layer=%llu bytes=%llu\n",
+                         path, (unsigned long long) header.layers,
+                         (unsigned long long) header.floats_per_layer,
+                         (unsigned long long) (sizeof(header) + header.layers * header.floats_per_layer * sizeof(float)));
+        }
     }
     return true;
 }

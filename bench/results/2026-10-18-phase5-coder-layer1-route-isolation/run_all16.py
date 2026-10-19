@@ -42,6 +42,8 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--arm", choices=("cpu_default", "cpu_mirror", "gpu_layer1"), required=True)
     ap.add_argument("--output", type=Path, required=True)
+    ap.add_argument("--dump-prefill-gdn", action="store_true",
+                    help="retain the exact prompt-end GDN state bytes (diagnostic build only)")
     a = ap.parse_args()
     a.output.mkdir(parents=True, exist_ok=False)
     cfg = json.loads((HERE / "config.json").read_text())
@@ -64,6 +66,8 @@ def main():
                 "STRATA_CAPTURE_MOE_OUTPUT_LAYER": "1",
                 "STRATA_VERIFY_DUMP_GDN_LAYER": "1",
                 "STRATA_VERIFY_DUMP_GDN_PATH": str((a.output / "combined-moe.bin").resolve())})
+    if a.dump_prefill_gdn:
+        env["STRATA_PREFILL_DUMP_GDN"] = str((a.output / "prefill-gdn.bin").resolve())
     if a.arm == "cpu_mirror":
         env["STRATA_NATIVE_CPU_Q8_1_DOT"] = "1"
     tok_dir = Path(cfg["tokenizer"])

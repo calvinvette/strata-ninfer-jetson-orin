@@ -1,0 +1,144 @@
+{
+  "schema": 1,
+  "hardware": "Jetson Orin AGX (native run on orin1)",
+  "model_repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+  "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
+  "model_quantization": "IQ1_M",
+  "model_shards_sha256": {
+    "Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf": "e11083ba855e7666b48ea3f2db6a9c3a20c18751a012cc24f948de91b7087fad",
+    "Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+  },
+  "mtp_repository": "Qwen/Qwen3.8-Flash-Next",
+  "mtp_revision": "de4b8e4d43b917e7706784d8bb445c9af86a3540",
+  "mtp_inventory_sha256": "09a2cae54f5c8624d828597ec0788ef14be26eff5c1710b0281875ba18fd15cc",
+  "source_base_commit": "70daee1c74d4e65f112b35b06bd72a846a7d424f",
+  "source_file": "src/prefill/prefill.cpp",
+  "source_file_sha256": "4f41eb5ad99159fb9b7383314ef26964eb62ef90d0793191953b631ddbe588ee",
+  "cuda_build": {
+    "command": "cmake --build build/integration/candidate --target strata -j1",
+    "binary_path": "build/integration/candidate/strata",
+    "binary_sha256": "413b0fdadbc9cb62db65e9ad4d9910c2b6f661f1ed9d362c0d2de2c3f6b892bb",
+    "build_log": "backend-builds/cuda-prefill-build.txt"
+  },
+  "hip_build": {
+    "host": "maestro1 (compile/link evidence only)",
+    "source_file_sha256": "4f41eb5ad99159fb9b7383314ef26964eb62ef90d0793191953b631ddbe588ee",
+    "binary_path": "/mnt/sda2/tmp/calvin/phase5-q8-1-windows-58be4d54/build-hip/strata",
+    "binary_sha256": "6f50be7815afa73a449ce5aae9001bd7be340a4614e74e4c87c1b3f2b59fe469",
+    "build_log": "backend-builds/hip-prefill-build.txt",
+    "source_file": "src/prefill/prefill.cpp"
+  },
+  "sycl_build": "Not affected: SYCL resolves the separate migrated sycl/src/prefill/prefill.cpp, unchanged by this diagnostic.",
+  "prefill_gdn_dump": {
+    "magic": "STPFGDN1",
+    "header_bytes": 24,
+    "layers": 36,
+    "floats_per_layer": 817152,
+    "payload_bytes": 117669888,
+    "file_bytes": 117669912
+  },
+  "randomized_order": "cpu_mirror gpu_layer1 cpu_default",
+  "arms": {
+    "cpu_mirror": {
+      "supervisor_status": "pass",
+      "elapsed_seconds": 54.96357961418107,
+      "samples": 53,
+      "minimum_host_gib": 14.40292739868164,
+      "minimum_admission_gib": 14.40292739868164,
+      "memory_events_max": {
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "prompt_sha256": "e0bd698f8c50353ac64ce10b5ce3c6c8629e52839d7c3df9a90aec1cc7a19f91",
+      "completion_ids": [
+        760,
+        3766,
+        1433,
+        16661,
+        11040,
+        314,
+        819,
+        5639,
+        27718,
+        59,
+        87,
+        15,
+        15,
+        63,
+        681,
+        864
+      ]
+    },
+    "gpu_layer1": {
+      "supervisor_status": "pass",
+      "elapsed_seconds": 54.80673197004944,
+      "samples": 53,
+      "minimum_host_gib": 14.269489288330078,
+      "minimum_admission_gib": 14.269489288330078,
+      "memory_events_max": {
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "prompt_sha256": "e0bd698f8c50353ac64ce10b5ce3c6c8629e52839d7c3df9a90aec1cc7a19f91",
+      "completion_ids": [
+        760,
+        3766,
+        1433,
+        16661,
+        11040,
+        314,
+        819,
+        5639,
+        27718,
+        59,
+        87,
+        15,
+        15,
+        63,
+        681,
+        864
+      ]
+    },
+    "cpu_default": {
+      "supervisor_status": "pass",
+      "elapsed_seconds": 56.25725302007049,
+      "samples": 55,
+      "minimum_host_gib": 14.306083679199219,
+      "minimum_admission_gib": 14.306083679199219,
+      "memory_events_max": {
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "prompt_sha256": "e0bd698f8c50353ac64ce10b5ce3c6c8629e52839d7c3df9a90aec1cc7a19f91",
+      "completion_ids": [
+        760,
+        3766,
+        1433,
+        16661,
+        11040,
+        314,
+        819,
+        5639,
+        27718,
+        59,
+        87,
+        15,
+        15,
+        63,
+        681,
+        864
+      ]
+    }
+  },
+  "sycl_build_source": {
+    "path": "sycl/src/prefill/prefill.cpp",
+    "sha256": "a72b187648817f906a583a2fbebb20be5ebcc42cb85d5dc641a702c9672e7a89",
+    "status": "not affected; separate migrated source"
+  }
+}

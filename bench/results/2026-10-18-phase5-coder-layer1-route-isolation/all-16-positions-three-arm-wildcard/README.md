@@ -65,6 +65,10 @@ the accepted state starts to diverge, but hashes and route observations do not
 prove the causal path through all state updates. The machine-readable join is
 `prefix-state-alignment.json`, reproducible with
 `python3 bench/results/2026-10-18-phase5-coder-layer1-route-isolation/analyze_prefix_state_all16.py`.
+The subsequent [exact prompt-end GDN capture](../prefill-gdn-exact-three-arm-checked/README.md)
+compared all state bytes and proved GDN identity at the end of prefill across
+the three arms. Thus the observed GDN divergence begins during decode for this
+prompt; KV and other prefill state were not captured byte-for-byte.
 
 The output-capture dispatch filter now treats the default `UINT64_MAX` as a
 wildcard and explicit dispatch values as exact filters. The changed native

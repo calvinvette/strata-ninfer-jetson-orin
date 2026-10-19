@@ -2978,3 +2978,11 @@ positions 512–526. All 36 prefill GDN checksums match per pair, but they are
 16-bit checks and do not establish exact prefill state equality. This narrows
 the first observed state divergence but does not prove the full causal path or
 close Phase 5.
+
+A follow-up [exact prompt-end GDN comparison](../../bench/results/2026-10-18-phase5-coder-layer1-route-isolation/prefill-gdn-exact-three-arm-checked/README.md)
+dumped and compared all 117,669,888 GDN payload bytes per arm before decode.
+Default CPU, Q8_1 mirror, and GPU-profile payloads were byte-identical across
+all 36 state slices; the same prompt produced the same 16 completion IDs. The
+first post-commit GDN differences therefore begin during decode in this
+workload. This does not prove exact equality for prompt-end KV or other state,
+identify the responsible decode calculation, or close Phase 5.

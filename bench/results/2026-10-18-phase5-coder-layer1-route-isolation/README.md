@@ -187,10 +187,12 @@ The [accepted-prefix alignment](all-16-positions-three-arm-wildcard/prefix-state
 shows that the first full-width GDN slice difference matches the first host
 route activation difference at all 16 positions in both arm pairs: layer 2 for
 default versus mirror CPU, and layer 9 at position 511 then layer 2 for
-positions 512–526 in mirror versus GPU profile. The 36 prefill checksums match,
-but are only 16-bit checks and cannot establish exact prefill-state identity.
-This localizes the first observed accepted-state divergence without proving
-the full causal state-update path.
+positions 512–526 in mirror versus GPU profile. A follow-up [exact prompt-end
+GDN capture](prefill-gdn-exact-three-arm-checked/README.md) proves all 36 GDN
+state slices are byte-identical across the three arms at the end of prefill.
+This places the observed GDN divergence during decode for this prompt, without
+proving which calculation causes it or establishing exact equality for KV and
+other prefill state.
 Each arm ran in a separate 28-GiB scope with dynamic clocks; minimum host and
 admission availability was 14.14–14.43 GiB, scope peak was 10.87–11.32 GiB,
 and `high`, `max`, `oom` and `oom_kill` counters were zero. Energy was not
