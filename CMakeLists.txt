@@ -1544,6 +1544,14 @@ if(STRATA_NATIVE_EXPERTS)
                COMMAND ${CMAKE_COMMAND} -E env STRATA_NATIVE_CPU_Q8_1_DOT=iq3_xxs/iq4_nl
                        $<TARGET_FILE:native_expert_parity> --synthetic-windows iq3_xxs/iq4_nl)
       set_tests_properties(native_expert_parity_iq3_xxs_iq4_nl_cpu_q8_1_windows PROPERTIES TIMEOUT 300)
+      add_test(NAME native_expert_parity_iq3_xxs_q2_0_cpu_q8_1_dot
+               COMMAND ${CMAKE_COMMAND} -E env STRATA_NATIVE_CPU_Q8_1_DOT=iq3_xxs/q2_0
+                       $<TARGET_FILE:native_expert_parity> --synthetic iq3_xxs/q2_0)
+      set_tests_properties(native_expert_parity_iq3_xxs_q2_0_cpu_q8_1_dot PROPERTIES TIMEOUT 120)
+      add_test(NAME native_expert_parity_iq3_xxs_q2_0_cpu_q8_1_windows
+               COMMAND ${CMAKE_COMMAND} -E env STRATA_NATIVE_CPU_Q8_1_DOT=iq3_xxs/q2_0
+                       $<TARGET_FILE:native_expert_parity> --synthetic-windows iq3_xxs/q2_0)
+      set_tests_properties(native_expert_parity_iq3_xxs_q2_0_cpu_q8_1_windows PROPERTIES TIMEOUT 300)
       add_test(NAME native_expert_parity_q8_1_selector_contract
                COMMAND native_expert_parity --q8_1-selector-contract)
       set_tests_properties(native_expert_parity_q8_1_selector_contract PROPERTIES TIMEOUT 30)

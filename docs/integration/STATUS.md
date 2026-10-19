@@ -13,6 +13,20 @@ explicit exclusions. This is an experimental profile for the measured Orin
 cell, not a general support claim. Phase 8 remains open pending broader release
 gates and the remaining Phase 5/6 work.
 
+A same-position [Coder adaptive-migration trace and IQ3_XXS/Q2_0 CPU mirror
+check](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/README.md)
+found a layer-12 CPU-to-GPU owner change for a native format pair missing from
+the earlier Q8_1 diagnostic selector. Extending the opt-in route matched that
+real expert's CUDA output bit-for-bit for widths 1–8 and moved the first
+captured activation divergence from layer 13 to layer 26 in one randomized
+short/long/short comparison. The delayed control had no captured activation
+divergence. Adaptive recovery tokens matched the initial short request and the
+delayed control, but all 16 accepted-prefix state records still differed from
+the adaptive initial short state; the remaining divergence is unresolved. The
+four targeted Orin tests passed. This is correctness localization, not a
+migration fix or performance result. Phase 5 remains open. The maestro1
+HIP/SYCL rebuild is pending because its root filesystem has no free space.
+
 A corrected [layer-2 grouped IQ4_NL Q8_1 mapping](../../bench/results/2026-10-19-phase5-coder-layer2-hidden-q8_1/README.md)
 now mirrors the grouped CUDA service reduction schedule. Three randomized,
 fixed-residency owner pairs on the Coder IQ1_M artifact matched all 16 accepted-

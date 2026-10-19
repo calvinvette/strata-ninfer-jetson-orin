@@ -1,0 +1,163 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7341d8c7..9511ff68 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1544,6 +1544,14 @@ if(STRATA_NATIVE_EXPERTS)
+                COMMAND ${CMAKE_COMMAND} -E env STRATA_NATIVE_CPU_Q8_1_DOT=iq3_xxs/iq4_nl
+                        $<TARGET_FILE:native_expert_parity> --synthetic-windows iq3_xxs/iq4_nl)
+       set_tests_properties(native_expert_parity_iq3_xxs_iq4_nl_cpu_q8_1_windows PROPERTIES TIMEOUT 300)
++      add_test(NAME native_expert_parity_iq3_xxs_q2_0_cpu_q8_1_dot
++               COMMAND ${CMAKE_COMMAND} -E env STRATA_NATIVE_CPU_Q8_1_DOT=iq3_xxs/q2_0
++                       $<TARGET_FILE:native_expert_parity> --synthetic iq3_xxs/q2_0)
++      set_tests_properties(native_expert_parity_iq3_xxs_q2_0_cpu_q8_1_dot PROPERTIES TIMEOUT 120)
++      add_test(NAME native_expert_parity_iq3_xxs_q2_0_cpu_q8_1_windows
++               COMMAND ${CMAKE_COMMAND} -E env STRATA_NATIVE_CPU_Q8_1_DOT=iq3_xxs/q2_0
++                       $<TARGET_FILE:native_expert_parity> --synthetic-windows iq3_xxs/q2_0)
++      set_tests_properties(native_expert_parity_iq3_xxs_q2_0_cpu_q8_1_windows PROPERTIES TIMEOUT 300)
+       add_test(NAME native_expert_parity_q8_1_selector_contract
+                COMMAND native_expert_parity --q8_1-selector-contract)
+       set_tests_properties(native_expert_parity_q8_1_selector_contract PROPERTIES TIMEOUT 30)
+diff --git a/include/strata/kernels/cpu/native_expert.hpp b/include/strata/kernels/cpu/native_expert.hpp
+index c9038b14..882de637 100644
+--- a/include/strata/kernels/cpu/native_expert.hpp
++++ b/include/strata/kernels/cpu/native_expert.hpp
+@@ -33,8 +33,9 @@ struct NativeFmt {
+ bool native_experts_available() noexcept;
+ /// Fills `f` for a layer; false (with a reason) when ggml-cpu has no dot product for a type. The opt-in
+ /// STRATA_NATIVE_CPU_Q8_1_DOT diagnostic selects CUDA-matching Q8_1 routes for IQ2_S/Q2_0,
+-/// IQ2_S/IQ4_NL and IQ3_XXS/IQ4_NL expert pairs (`1` enables all supported pairs; a pair name selects one). A pair
+-/// may be suffixed with `@layer=N` to scope it to one zero-based model layer. It is not a default dispatch policy.
++/// IQ2_S/IQ4_NL, IQ3_XXS/Q2_0 and IQ3_XXS/IQ4_NL expert pairs (`1` enables all supported pairs; a pair name selects
++/// one). A pair may be suffixed with `@layer=N` to scope it to one zero-based model layer. It is not a default dispatch
++/// policy.
+ bool native_fmt(int gu_type, int d_type, int64_t n_embd, int64_t n_ff, NativeFmt& f, std::string& err, int layer = -1);
+ 
+ /// x (n_embd floats) -> the gate/up activation (act_bytes).
+diff --git a/src/kernels/cpu/native_expert.cpp b/src/kernels/cpu/native_expert.cpp
+index eefb9e77..bb81abf0 100644
+--- a/src/kernels/cpu/native_expert.cpp
++++ b/src/kernels/cpu/native_expert.cpp
+@@ -1,6 +1,7 @@
+ // src/kernels/cpu/native_expert.cpp - plan v0.3 P6: native (GGUF-form) experts on the CPU through ggml-cpu.
+ // See the header. The default activation quantizers and row dot products are ggml-cpu's. Explicitly opt-in Q8_1
+-// diagnostic routes for IQ2_S/Q2_0, IQ2_S/IQ4_NL and IQ3_XXS/IQ4_NL are implemented below for cross-backend tests.
++// diagnostic routes for IQ2_S/Q2_0, IQ2_S/IQ4_NL, IQ3_XXS/Q2_0 and IQ3_XXS/IQ4_NL are implemented below for
++// cross-backend tests.
+ #include "strata/kernels/cpu/native_expert.hpp"
+ #include "strata/kernels/cpu/expert.hpp"
+ #include "strata/platform/cpu_arch.hpp"
+@@ -33,7 +34,8 @@ const ggml_type_traits_cpu* traits(int type) { return ggml_get_type_traits_cpu((
+ bool q8_1_selector_known(const char* selector) {
+     if (std::strcmp(selector, "0") == 0 || std::strcmp(selector, "1") == 0 ||
+         std::strcmp(selector, "all") == 0 || std::strcmp(selector, "iq2_s/q2_0") == 0 ||
+-        std::strcmp(selector, "iq2_s/iq4_nl") == 0 || std::strcmp(selector, "iq3_xxs/iq4_nl") == 0)
++        std::strcmp(selector, "iq2_s/iq4_nl") == 0 || std::strcmp(selector, "iq3_xxs/q2_0") == 0 ||
++        std::strcmp(selector, "iq3_xxs/iq4_nl") == 0)
+         return true;
+     const char* at = std::strstr(selector, "@layer=");
+     if (at == nullptr || at == selector) return false;
+@@ -45,7 +47,8 @@ bool q8_1_selector_known(const char* selector) {
+     const long layer = std::strtol(n, &end, 10);
+     if (errno == ERANGE || end == n || *end != '\0' || layer > INT_MAX) return false;
+     const std::string pair(selector, (size_t) (at - selector));
+-    return pair == "iq2_s/q2_0" || pair == "iq2_s/iq4_nl" || pair == "iq3_xxs/iq4_nl";
++    return pair == "iq2_s/q2_0" || pair == "iq2_s/iq4_nl" || pair == "iq3_xxs/q2_0" ||
++           pair == "iq3_xxs/iq4_nl";
+ }
+ 
+ bool q8_1_selector_matches(const char* selector, int gu_type, int d_type, int layer) {
+@@ -57,12 +60,14 @@ bool q8_1_selector_matches(const char* selector, int gu_type, int d_type, int la
+     }
+     const bool iq2_s_q2_0 = gu_type == GGML_TYPE_IQ2_S && d_type == GGML_TYPE_Q2_0;
+     const bool iq2_s_iq4_nl = gu_type == GGML_TYPE_IQ2_S && d_type == GGML_TYPE_IQ4_NL;
++    const bool iq3_xxs_q2_0 = gu_type == GGML_TYPE_IQ3_XXS && d_type == GGML_TYPE_Q2_0;
+     const bool iq3_xxs_iq4_nl = gu_type == GGML_TYPE_IQ3_XXS && d_type == GGML_TYPE_IQ4_NL;
+     const std::string pair = at == nullptr ? selector : std::string(selector, (size_t) (at - selector));
+     if (pair == "1" || pair == "all")
+-        return iq2_s_q2_0 || iq2_s_iq4_nl || iq3_xxs_iq4_nl;
++        return iq2_s_q2_0 || iq2_s_iq4_nl || iq3_xxs_q2_0 || iq3_xxs_iq4_nl;
+     if (pair == "iq2_s/q2_0") return iq2_s_q2_0;
+     if (pair == "iq2_s/iq4_nl") return iq2_s_iq4_nl;
++    if (pair == "iq3_xxs/q2_0") return iq3_xxs_q2_0;
+     if (pair == "iq3_xxs/iq4_nl") return iq3_xxs_iq4_nl;
+     return false;
+ }
+@@ -252,7 +257,8 @@ float q8_1_iq4_nl_cuda_dot(const uint8_t* row, const uint8_t* xq, int n) {
+ bool q8_1_scalar_dot(const NativeFmt& f) {
+     const bool iq2_s_pair = f.gu_type == GGML_TYPE_IQ2_S &&
+                             (f.d_type == GGML_TYPE_Q2_0 || f.d_type == GGML_TYPE_IQ4_NL);
+-    const bool iq3_xxs_pair = f.gu_type == GGML_TYPE_IQ3_XXS && f.d_type == GGML_TYPE_IQ4_NL;
++    const bool iq3_xxs_pair = f.gu_type == GGML_TYPE_IQ3_XXS &&
++                              (f.d_type == GGML_TYPE_Q2_0 || f.d_type == GGML_TYPE_IQ4_NL);
+     return (iq2_s_pair || iq3_xxs_pair) &&
+            f.gu_act == GGML_TYPE_Q8_1 && f.d_act == GGML_TYPE_Q8_1;
+ }
+@@ -306,7 +312,7 @@ bool native_fmt(int gu_type, int d_type, int64_t n_embd, int64_t n_ff, NativeFmt
+     const char* q8_1_probe = std::getenv("STRATA_NATIVE_CPU_Q8_1_DOT");
+     if (q8_1_probe != nullptr && !q8_1_selector_known(q8_1_probe)) {
+         err = "native experts: STRATA_NATIVE_CPU_Q8_1_DOT must be 0, 1, all, "
+-              "iq2_s/q2_0, iq2_s/iq4_nl, iq3_xxs/iq4_nl, or a pair followed by @layer=N";
++              "iq2_s/q2_0, iq2_s/iq4_nl, iq3_xxs/q2_0, iq3_xxs/iq4_nl, or a pair followed by @layer=N";
+         return false;
+     }
+     if (q8_1_probe != nullptr && std::strcmp(q8_1_probe, "0") != 0 &&
+diff --git a/src/kernels/native_expert_parity.cpp b/src/kernels/native_expert_parity.cpp
+index 3a7dd5d9..715cddbc 100644
+--- a/src/kernels/native_expert_parity.cpp
++++ b/src/kernels/native_expert_parity.cpp
+@@ -715,6 +715,7 @@ int check_q8_1_selector_contract() {
+     const Pair pairs[] = {
+         {GGML_TYPE_IQ2_S, GGML_TYPE_Q2_0, "iq2_s/q2_0"},
+         {GGML_TYPE_IQ2_S, GGML_TYPE_IQ4_NL, "iq2_s/iq4_nl"},
++        {GGML_TYPE_IQ3_XXS, GGML_TYPE_Q2_0, "iq3_xxs/q2_0"},
+         {GGML_TYPE_IQ3_XXS, GGML_TYPE_IQ4_NL, "iq3_xxs/iq4_nl"},
+     };
+     auto set_selector = [](const char* value) {
+@@ -734,7 +735,7 @@ int check_q8_1_selector_contract() {
+             ++failures;
+         }
+     }
+-    const char* selectors[] = {"1", "all", "iq2_s/q2_0", "iq2_s/iq4_nl", "iq3_xxs/iq4_nl"};
++    const char* selectors[] = {"1", "all", "iq2_s/q2_0", "iq2_s/iq4_nl", "iq3_xxs/q2_0", "iq3_xxs/iq4_nl"};
+     for (const char* selector : selectors) {
+         set_selector(selector);
+         for (size_t i = 0; i < std::size(pairs); ++i) {
+@@ -768,7 +769,7 @@ int check_q8_1_selector_contract() {
+                 ++failures;
+                 continue;
+             }
+-            const bool selected = i == 2 && layer == 7;
++            const bool selected = i == 3 && layer == 7;
+             const int expected_gu = selected ? GGML_TYPE_Q8_1 : baseline[i].gu_act;
+             const int expected_down = selected ? GGML_TYPE_Q8_1 : baseline[i].d_act;
+             if (got.gu_act != expected_gu || got.d_act != expected_down) {
+@@ -945,9 +946,9 @@ int main(int argc, char** argv) {
+                              "       native_expert_parity --q8_1-selector-contract\n"
+                              "       STRATA_NATIVE_CPU_Q8_1_DOT=1|all|GU/DOWN selects all or one supported expert pair\n"
+                              "       native_expert_parity --synthetic GU/DOWN ...   (ggml type names, e.g. q4_K/q5_1)\n"
+-                             "       native_expert_parity --synthetic-windows iq2_s/q2_0|iq2_s/iq4_nl|iq3_xxs/iq4_nl  (Q8_1, widths 1..8)\n"
++                             "       native_expert_parity --synthetic-windows iq2_s/q2_0|iq2_s/iq4_nl|iq3_xxs/q2_0|iq3_xxs/iq4_nl  (Q8_1, widths 1..8)\n"
+                              "       <shard.gguf> --expert E --activation-f32 FILE --windows-1-through-8\n"
+-                             "           (real IQ2_S/Q2_0, IQ2_S/IQ4_NL or IQ3_XXS/IQ4_NL weights and captured activation, Q8_1)\n"
++                             "           (real supported IQ2_S/IQ3_XXS expert weights and captured activation, Q8_1)\n"
+                              "       <shard.gguf> --expert E --activation-f32 MATRIX --activation-rows N --token-width N\n"
+                              "           (run distinct captured rows together, N=1..8)\n"
+                              "       native_expert_parity --q5_1-min\n"
+@@ -1017,7 +1018,7 @@ int main(int argc, char** argv) {
+                 if ((gu != GGML_TYPE_IQ2_S && gu != GGML_TYPE_IQ3_XXS) ||
+                     (dn != GGML_TYPE_Q2_0 && dn != GGML_TYPE_IQ4_NL) ||
+                     f.gu_act != GGML_TYPE_Q8_1 || f.d_act != GGML_TYPE_Q8_1) {
+-                    std::fprintf(stderr, "--synthetic-windows supports iq2_s/q2_0, iq2_s/iq4_nl or iq3_xxs/iq4_nl with Q8_1 activations\n");
++                    std::fprintf(stderr, "--synthetic-windows supports iq2_s/q2_0, iq2_s/iq4_nl, iq3_xxs/q2_0 or iq3_xxs/iq4_nl with Q8_1 activations\n");
+                     return 2;
+                 }
+                 failures += check_blob<1>(f, blob, i, "synthetic nt=1", s);
+@@ -1123,7 +1124,7 @@ int main(int argc, char** argv) {
+                 if ((f.gu_type != GGML_TYPE_IQ2_S && f.gu_type != GGML_TYPE_IQ3_XXS) ||
+                     (f.d_type != GGML_TYPE_Q2_0 && f.d_type != GGML_TYPE_IQ4_NL) ||
+                     f.gu_act != GGML_TYPE_Q8_1 || f.d_act != GGML_TYPE_Q8_1) {
+-                    std::fprintf(stderr, "%s: widths 1..8 require IQ2_S/Q2_0, IQ2_S/IQ4_NL or IQ3_XXS/IQ4_NL weights and Q8_1 activations\n",
++                    std::fprintf(stderr, "%s: widths 1..8 require supported IQ2_S/IQ3_XXS pairs with Q2_0/IQ4_NL weights and Q8_1 activations\n",
+                                  label.c_str());
+                     return 2;
+                 }

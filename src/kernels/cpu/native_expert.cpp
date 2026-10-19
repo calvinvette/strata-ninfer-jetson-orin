@@ -1,6 +1,7 @@
 // src/kernels/cpu/native_expert.cpp - plan v0.3 P6: native (GGUF-form) experts on the CPU through ggml-cpu.
 // See the header. The default activation quantizers and row dot products are ggml-cpu's. Explicitly opt-in Q8_1
-// diagnostic routes for IQ2_S/Q2_0, IQ2_S/IQ4_NL and IQ3_XXS/IQ4_NL are implemented below for cross-backend tests.
+// diagnostic routes for IQ2_S/Q2_0, IQ2_S/IQ4_NL, IQ3_XXS/Q2_0 and IQ3_XXS/IQ4_NL are implemented below for
+// cross-backend tests.
 #include "strata/kernels/cpu/native_expert.hpp"
 #include "strata/kernels/cpu/expert.hpp"
 #include "strata/platform/cpu_arch.hpp"
@@ -33,7 +34,8 @@ const ggml_type_traits_cpu* traits(int type) { return ggml_get_type_traits_cpu((
 bool q8_1_selector_known(const char* selector) {
     if (std::strcmp(selector, "0") == 0 || std::strcmp(selector, "1") == 0 ||
         std::strcmp(selector, "all") == 0 || std::strcmp(selector, "iq2_s/q2_0") == 0 ||
-        std::strcmp(selector, "iq2_s/iq4_nl") == 0 || std::strcmp(selector, "iq3_xxs/iq4_nl") == 0)
+        std::strcmp(selector, "iq2_s/iq4_nl") == 0 || std::strcmp(selector, "iq3_xxs/q2_0") == 0 ||
+        std::strcmp(selector, "iq3_xxs/iq4_nl") == 0)
         return true;
     const char* at = std::strstr(selector, "@layer=");
     if (at == nullptr || at == selector) return false;
@@ -45,7 +47,8 @@ bool q8_1_selector_known(const char* selector) {
     const long layer = std::strtol(n, &end, 10);
     if (errno == ERANGE || end == n || *end != '\0' || layer > INT_MAX) return false;
     const std::string pair(selector, (size_t) (at - selector));
-    return pair == "iq2_s/q2_0" || pair == "iq2_s/iq4_nl" || pair == "iq3_xxs/iq4_nl";
+    return pair == "iq2_s/q2_0" || pair == "iq2_s/iq4_nl" || pair == "iq3_xxs/q2_0" ||
+           pair == "iq3_xxs/iq4_nl";
 }
 
 bool q8_1_selector_matches(const char* selector, int gu_type, int d_type, int layer) {
@@ -57,12 +60,14 @@ bool q8_1_selector_matches(const char* selector, int gu_type, int d_type, int la
     }
     const bool iq2_s_q2_0 = gu_type == GGML_TYPE_IQ2_S && d_type == GGML_TYPE_Q2_0;
     const bool iq2_s_iq4_nl = gu_type == GGML_TYPE_IQ2_S && d_type == GGML_TYPE_IQ4_NL;
+    const bool iq3_xxs_q2_0 = gu_type == GGML_TYPE_IQ3_XXS && d_type == GGML_TYPE_Q2_0;
     const bool iq3_xxs_iq4_nl = gu_type == GGML_TYPE_IQ3_XXS && d_type == GGML_TYPE_IQ4_NL;
     const std::string pair = at == nullptr ? selector : std::string(selector, (size_t) (at - selector));
     if (pair == "1" || pair == "all")
-        return iq2_s_q2_0 || iq2_s_iq4_nl || iq3_xxs_iq4_nl;
+        return iq2_s_q2_0 || iq2_s_iq4_nl || iq3_xxs_q2_0 || iq3_xxs_iq4_nl;
     if (pair == "iq2_s/q2_0") return iq2_s_q2_0;
     if (pair == "iq2_s/iq4_nl") return iq2_s_iq4_nl;
+    if (pair == "iq3_xxs/q2_0") return iq3_xxs_q2_0;
     if (pair == "iq3_xxs/iq4_nl") return iq3_xxs_iq4_nl;
     return false;
 }
@@ -252,7 +257,8 @@ float q8_1_iq4_nl_cuda_dot(const uint8_t* row, const uint8_t* xq, int n) {
 bool q8_1_scalar_dot(const NativeFmt& f) {
     const bool iq2_s_pair = f.gu_type == GGML_TYPE_IQ2_S &&
                             (f.d_type == GGML_TYPE_Q2_0 || f.d_type == GGML_TYPE_IQ4_NL);
-    const bool iq3_xxs_pair = f.gu_type == GGML_TYPE_IQ3_XXS && f.d_type == GGML_TYPE_IQ4_NL;
+    const bool iq3_xxs_pair = f.gu_type == GGML_TYPE_IQ3_XXS &&
+                              (f.d_type == GGML_TYPE_Q2_0 || f.d_type == GGML_TYPE_IQ4_NL);
     return (iq2_s_pair || iq3_xxs_pair) &&
            f.gu_act == GGML_TYPE_Q8_1 && f.d_act == GGML_TYPE_Q8_1;
 }
@@ -306,7 +312,7 @@ bool native_fmt(int gu_type, int d_type, int64_t n_embd, int64_t n_ff, NativeFmt
     const char* q8_1_probe = std::getenv("STRATA_NATIVE_CPU_Q8_1_DOT");
     if (q8_1_probe != nullptr && !q8_1_selector_known(q8_1_probe)) {
         err = "native experts: STRATA_NATIVE_CPU_Q8_1_DOT must be 0, 1, all, "
-              "iq2_s/q2_0, iq2_s/iq4_nl, iq3_xxs/iq4_nl, or a pair followed by @layer=N";
+              "iq2_s/q2_0, iq2_s/iq4_nl, iq3_xxs/q2_0, iq3_xxs/iq4_nl, or a pair followed by @layer=N";
         return false;
     }
     if (q8_1_probe != nullptr && std::strcmp(q8_1_probe, "0") != 0 &&

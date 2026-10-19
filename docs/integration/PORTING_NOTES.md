@@ -1459,6 +1459,19 @@ GPU), and the exact host FP32 activation supplied to the expert dispatcher.
 It contains no token text. With the path unset, capture exits immediately and
 does not change inference arithmetic.
 
+For a model with different expert formats by layer, inventory every distinct
+`(gate/up type, down type)` pair from its native pack before calling a CPU/GPU
+mirror complete. A same-position all-layer trace on the 48-layer Coder IQ1_M
+artifact found an owner change at layer 12 for IQ3_XXS/Q2_0, a pair missing
+from the earlier Q8_1 selector. Adding that opt-in route passed the captured
+real-expert oracle and moved the first differing captured activation from
+layer 13 to layer 26, while restoring exact text for this short/long/short
+sequence. All 16 adaptive recovery accepted-prefix states still differed,
+while delayed recovery matched. For future Splash ports, compare per-layer
+format inventories against implemented CPU routes, capture a common absolute
+position across layers, and keep operator equality, output equality and
+persistent-state parity as separate gates.
+
 `native_expert_parity` accepts `--expert E --activation-f32 FILE` for a raw
 little-endian vector of 2,560 float32 values. It reuses the chosen model shard
 to run the same captured activation through CPU and GPU expert implementations.
