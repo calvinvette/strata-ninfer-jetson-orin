@@ -148,13 +148,16 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
     std::normal_distribution<float> nd(0.f, 1.f);
     std::vector<float> x((size_t) N * H);
     if (service_activation != nullptr) {
-        if (service_activation->size() != (size_t) H) {
-            std::fprintf(stderr, "%s: service activation has %zu values; expected %lld\n", label.c_str(),
-                         service_activation->size(), (long long) H);
+        if (service_activation->size() == (size_t) H) {
+            for (int k = 0; k < N; ++k)
+                std::copy(service_activation->begin(), service_activation->end(), x.begin() + (size_t) k * H);
+        } else if (service_activation->size() == (size_t) N * H) {
+            x = *service_activation;
+        } else {
+            std::fprintf(stderr, "%s: service activation has %zu values; expected %lld or %lld\n", label.c_str(),
+                         service_activation->size(), (long long) H, (long long) N * H);
             return 1;
         }
-        for (int k = 0; k < N; ++k)
-            std::copy(service_activation->begin(), service_activation->end(), x.begin() + (size_t) k * H);
     } else {
         for (auto& v : x) v = nd(rng);
     }
@@ -171,7 +174,7 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
             return true;
         };
         if (!write("gate", G.data(), G.size()) || !write("up", U.data(), U.size()) ||
-            !write("down", D.data(), D.size()) || !write("activation", x.data(), (size_t) H)) return 1;
+            !write("down", D.data(), D.size()) || !write("activation", x.data(), x.size())) return 1;
     }
     std::vector<float> ref((size_t) N * H), got_c((size_t) N * H), got_g((size_t) N * H);
     for (int k = 0; k < N; ++k) {
@@ -737,6 +740,8 @@ int main(int argc, char** argv) {
                              "       native_expert_parity --synthetic-windows iq2_s/q2_0  (Q8_1 CPU/CUDA, widths 1..8)\n"
                              "       <shard.gguf> --expert E --activation-f32 FILE --windows-1-through-8\n"
                              "           (real IQ2_S/Q2_0 weights and captured activation, Q8_1 CPU/CUDA)\n"
+                             "       <shard.gguf> --expert E --activation-f32 MATRIX --activation-rows N --token-width N\n"
+                             "           (run distinct captured rows together, N=1..8)\n"
                              "       native_expert_parity --q5_1-min\n"
                              "       native_expert_parity --bf16-embd\n");
         return 2;
@@ -823,11 +828,15 @@ int main(int argc, char** argv) {
         int expert = E;
         std::string activation_path;
         std::string dump_f32_dir;
+        int activation_rows = 1;
+        int token_width = 0;
         bool all_windows = false;
         for (int i = 2; i < argc; ++i) {
             const std::string arg = argv[i];
             if (arg == "--expert" && i + 1 < argc) expert = std::atoi(argv[++i]);
             else if (arg == "--activation-f32" && i + 1 < argc) activation_path = argv[++i];
+            else if (arg == "--activation-rows" && i + 1 < argc) activation_rows = std::atoi(argv[++i]);
+            else if (arg == "--token-width" && i + 1 < argc) token_width = std::atoi(argv[++i]);
             else if (arg == "--dump-f32-dir" && i + 1 < argc) dump_f32_dir = argv[++i];
             else if (arg == "--windows-1-through-8") all_windows = true;
             else layers.push_back(std::atoi(argv[i]));
@@ -841,6 +850,12 @@ int main(int argc, char** argv) {
             std::fprintf(stderr, "--windows-1-through-8 requires --activation-f32 FILE\n");
             return 2;
         }
+        if (activation_rows < 1 || activation_rows > 8 || token_width < 0 || token_width > 8 ||
+            (token_width != 0 && (token_width != activation_rows || activation_path.empty() || all_windows)) ||
+            (token_width == 0 && activation_rows != 1)) {
+            std::fprintf(stderr, "matrix activation requires --activation-rows N and matching --token-width N (1..8)\n");
+            return 2;
+        }
         if (expert < 0 || expert >= cpu::NE) {
             std::fprintf(stderr, "expert id %d is outside the model's %d experts\n", expert, cpu::NE);
             return 2;
@@ -849,19 +864,21 @@ int main(int argc, char** argv) {
         if (!activation_path.empty()) {
             FILE* f = std::fopen(activation_path.c_str(), "rb");
             if (f == nullptr) { std::perror(activation_path.c_str()); return 2; }
-            service_activation.resize((size_t) H);
+            service_activation.resize((size_t) activation_rows * H);
             const size_t got = std::fread(service_activation.data(), sizeof(float), service_activation.size(), f);
             const int extra = std::fgetc(f);
             std::fclose(f);
             if (got != service_activation.size() || extra != EOF ||
                 std::any_of(service_activation.begin(), service_activation.end(), [](float v) { return !std::isfinite(v); })) {
-                std::fprintf(stderr, "%s: expected exactly %lld finite float32 values\n", activation_path.c_str(), (long long) H);
+                std::fprintf(stderr, "%s: expected exactly %lld finite float32 values\n", activation_path.c_str(),
+                             (long long) activation_rows * H);
                 return 2;
             }
-            std::printf("using captured service activation: %s (%lld float32 values)\n", activation_path.c_str(), (long long) H);
+            std::printf("using captured service activation: %s (%d rows, %lld float32 values)\n",
+                         activation_path.c_str(), activation_rows, (long long) service_activation.size());
         }
-        if (all_windows && layers.size() != 1) {
-            std::fprintf(stderr, "--windows-1-through-8 requires exactly one explicit layer\n");
+        if ((all_windows || token_width != 0) && layers.size() != 1) {
+            std::fprintf(stderr, "the selected verifier-window mode requires exactly one explicit layer\n");
             return 2;
         }
         if (layers.empty()) layers = {0, 1, 2, 3, 20, 47};
@@ -886,7 +903,18 @@ int main(int argc, char** argv) {
             std::memcpy(blob.data() + f.down_off, data[2] + (size_t) expert * (f.bytes - f.down_off),
                         f.bytes - f.down_off);
             const std::string label = "layer " + std::to_string(l) + " expert " + std::to_string(expert);
-            if (all_windows) {
+            if (token_width != 0) {
+                switch (token_width) {
+                    case 1: failures += check_blob<1>(f, blob, l, label + " nt=1", s, &service_activation, dump_f32_dir); break;
+                    case 2: failures += check_blob<2>(f, blob, l, label + " nt=2", s, &service_activation, dump_f32_dir); break;
+                    case 3: failures += check_blob<3>(f, blob, l, label + " nt=3", s, &service_activation, dump_f32_dir); break;
+                    case 4: failures += check_blob<4>(f, blob, l, label + " nt=4", s, &service_activation, dump_f32_dir); break;
+                    case 5: failures += check_blob<5>(f, blob, l, label + " nt=5", s, &service_activation, dump_f32_dir); break;
+                    case 6: failures += check_blob<6>(f, blob, l, label + " nt=6", s, &service_activation, dump_f32_dir); break;
+                    case 7: failures += check_blob<7>(f, blob, l, label + " nt=7", s, &service_activation, dump_f32_dir); break;
+                    case 8: failures += check_blob<8>(f, blob, l, label + " nt=8", s, &service_activation, dump_f32_dir); break;
+                }
+            } else if (all_windows) {
                 if (f.gu_type != GGML_TYPE_IQ2_S || f.d_type != GGML_TYPE_Q2_0 ||
                     f.gu_act != GGML_TYPE_Q8_1 || f.d_act != GGML_TYPE_Q8_1) {
                     std::fprintf(stderr, "%s: widths 1..8 require IQ2_S/Q2_0 weights and Q8_1 activations\n",

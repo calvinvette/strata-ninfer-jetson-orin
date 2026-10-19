@@ -1,6 +1,6 @@
 # Integration status
 
-Updated: 2026-10-18. Phases 1 through 4 are complete for their documented tested
+Updated: 2026-10-19. Phases 1 through 4 are complete for their documented tested
 Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 is
 complete for its bounded Orin qualification matrix under [its closeout]
 (PHASE7_CLOSEOUT.md); Phases 5 and 6 remain open. This records tested cells,
@@ -2930,3 +2930,12 @@ built for CUDA on Orin and HIP on maestro1. This confirms operator parity for
 these cases only; it does not prove persistent state or end-to-end service
 parity and does not resolve adaptive-residency divergence. Phase 5 remains
 open.
+
+The parity utility now accepts exact multi-row FP32 activations. A captured
+short-request two-token layer-0 dispatch routed expert 70 to CPU for both rows;
+replaying those distinct rows together reproduced zero CPU grouped-vs-single
+row differences, while the actual IQ3_XXS/IQ4_NL CPU-vs-CUDA output relative L1
+was 1.52%. The CPU Q8_1 experiment does not apply to this layer's tensor types,
+so it is recorded as unsupported. This validates grouped-row behavior for one
+captured expert/window but does not close the service-level state divergence or
+Phase 5. See the updated [probe report](../../bench/results/2026-10-19-phase5-coder-q8-1-real-windows/README.md).
