@@ -119,9 +119,11 @@ expert output rows for model layer 25 at position 511 in both the initial and
 recovery short requests. The token (271), expert IDs, and weights matched; all
 25,600 FP32 values after `moe_hit_add` were bit-identical. This rules out the
 captured routed expert contributions, including GPU-owned rows, as the source
-of the later layer-26 difference for this position. Shared-expert output,
-weighted combine, and residual write remain unresolved. This is still a
-single-position correctness trace, not a fix or a performance result.
+of the later layer-26 difference for this position. A paired follow-up also
+found the shared-expert vector and combined MoE output bit-identical. The
+remaining boundary is after layer-25 MoE combine: residual/
+hyper-connection application or the following recurrent state transition. This
+is still a single-position correctness trace, not a fix or a performance result.
 
 The new capture built on Orin, and four focused CTests passed. Its supervised
 same-service run passed with 14.31 GiB minimum host/admission availability,
@@ -132,7 +134,14 @@ attributed. Raw files and the analyzer output are under
 command and graph-capture position-filter behavior. A current top-level
 verifier HIP rebuild on maestro1 recompiled the changed file and passed its
 help check; the SYCL overlay was unaffected and its build reported no work.
-These are compile/CLI checks only. Phase 5 remains open.
+These are compile/CLI checks only. A subsequent HIP rebuild covered the shared/
+combined output diagnostic. The paired capture and analysis are in
+`layer25-verifier-output-followup/`. A layer-26 GDN trace then showed that all
+captured per-token inputs match, while the first differing value is the
+state-dependent recurrent output `y`; the persistent state immediately before
+that token remains uncaptured. See `layer25-to-layer26-gdn-followup/`. The
+GDN position-filter change also rebuilt on maestro1 HIP; SYCL remains on its
+unaffected overlay. Phase 5 remains open.
 
 The two raw 113 MiB dumps remain outside Git under
 `~/models/strata-orin-validation/experiments/phase5-gdn-state/`; their full

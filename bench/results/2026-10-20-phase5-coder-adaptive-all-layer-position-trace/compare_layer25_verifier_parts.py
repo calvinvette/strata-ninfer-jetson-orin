@@ -8,6 +8,7 @@ import struct
 from pathlib import Path
 
 HEADER = struct.Struct('<8sIIIIQq8i')
+OUTPUT_HEADER = struct.Struct('<8sIIIIQq8i')
 
 
 def read_routes(path):
@@ -41,6 +42,31 @@ def read_parts(path):
     return out
 
 
+def read_outputs(path):
+    data = path.read_bytes()
+    out = []
+    offset = 0
+    while offset < len(data):
+        if len(data) - offset < OUTPUT_HEADER.size:
+            raise ValueError(f'truncated MoE output header in {path} at {offset}')
+        values = OUTPUT_HEADER.unpack_from(data, offset)
+        magic, version, layer, rows, reserved, n_embd, pos0, *tokens = values
+        offset += OUTPUT_HEADER.size
+        if magic != b'STMOEOUT' or version != 1 or layer != 25 or reserved != 0:
+            raise ValueError(f'invalid MoE output header in {path}: {values[:8]}')
+        n_floats = rows * n_embd
+        n_bytes = n_floats * 4
+        if len(data) - offset < 2 * n_bytes:
+            raise ValueError(f'truncated MoE output payload in {path} at {offset}')
+        shared = struct.unpack(f'<{n_floats}f', data[offset:offset + n_bytes])
+        offset += n_bytes
+        combined = struct.unpack(f'<{n_floats}f', data[offset:offset + n_bytes])
+        offset += n_bytes
+        out.append({'rows': rows, 'n_embd': n_embd, 'pos0': pos0,
+                    'tokens': tokens[:rows], 'shared': shared, 'combined': combined})
+    return out
+
+
 def summarize(a, b):
     different = 0
     max_abs = 0.0
@@ -69,8 +95,11 @@ def main():
     args = parser.parse_args()
     route_rows = read_routes(args.run / 'verify-moe-routes.jsonl')
     parts_rows = read_parts(args.run / 'verify-moe-parts.bin')
-    if len(route_rows) != 2 or len(parts_rows) != 2:
-        raise ValueError(f'expected initial/recovery capture pairs, got routes={len(route_rows)} parts={len(parts_rows)}')
+    output_path = args.run / 'verify-moe-output.bin'
+    output_rows = read_outputs(output_path) if output_path.is_file() else None
+    if len(route_rows) != 2 or len(parts_rows) != 2 or (output_rows is not None and len(output_rows) != 2):
+        output_count = len(output_rows) if output_rows is not None else 'not captured'
+        raise ValueError(f'expected initial/recovery capture pairs, got routes={len(route_rows)} parts={len(parts_rows)} outputs={output_count}')
     for route, parts in zip(route_rows, parts_rows):
         if (parts['rows'], parts['k'], parts['n_embd'], parts['pos0'], parts['tokens']) != (
                 1, 10, 2560, 511, [route['token_id']]):
@@ -81,6 +110,12 @@ def main():
     if any(first_route[key] != recovery_route[key] for key in ('token_id', 'position', 'ids', 'weights')):
         raise ValueError('initial/recovery verifier token, routes, or router weights differ')
     first_parts, recovery_parts = parts_rows
+    if output_rows is not None:
+        first_output, recovery_output = output_rows
+        for output, route in zip(output_rows, route_rows):
+            if (output['rows'], output['n_embd'], output['pos0'], output['tokens']) != (
+                    1, 2560, 511, [route['token_id']]):
+                raise ValueError(f'route/output position or shape mismatch: {route}, {output}')
     per_expert = {}
     for rank, expert in enumerate(first_route['ids']):
         start = rank * 2560
@@ -97,7 +132,10 @@ def main():
         'router_weights': first_route['weights'],
         'all_expert_rows_after_moe_hit_add': summarize(first_parts['parts'], recovery_parts['parts']),
         'per_expert': per_expert,
-        'limits': ['expert rows were captured before weighted combine; shared-expert output and final layer output were not captured'],
+        'shared_expert_output': summarize(first_output['shared'], recovery_output['shared']) if output_rows else None,
+        'combined_moe_output_before_residual': summarize(first_output['combined'], recovery_output['combined']) if output_rows else None,
+        'limits': (['the post-combine residual/hyper-connection write and next-layer GDN state transition were not captured']
+                   if output_rows else ['shared-expert output, weighted combine, residual/hyper-connection write, and next-layer state were not captured']),
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + '\n')

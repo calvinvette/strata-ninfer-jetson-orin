@@ -13,9 +13,10 @@ expert IDs and router weights. All 25,600 FP32 values in the ten routed expert
 contributions, after `moe_hit_add` and before weighted combine, were bitwise
 identical (0 differing values; max absolute and relative L2 differences were
 zero). This rules out the captured router and routed expert contributions as
-the source of the later layer-26 divergence for this row. The shared-expert
-output, weighted combine, and residual write remain unmeasured, so the cause
-is unresolved.
+the source of the later layer-26 divergence for this row. A follow-up capture of shared-expert output and the combined MoE vector is
+reported in `../layer25-verifier-output-followup/README.md`; both also match
+bitwise. Residual/hyper-connection application and the following QSA/GDN
+transition remain unmeasured.
 
 The supervised run passed with `MemoryMax=28G`, minimum host/admission
 availability 14.31 GiB, maximum scope use 10.85 GiB, and zero scope

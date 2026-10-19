@@ -33,26 +33,32 @@ remains open. Current-source maestro1 HIP and SYCL compile/link plus `strata
 is x86_64 build evidence only, with no accelerator runtime claim. See the
 backend report in the linked result bundle.
 
-A follow-up [layer-25 CPU-row capture](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/README.md#layer-25-cpu-row-follow-up)
+An earlier [layer-25 CPU-row capture](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/README.md#layer-25-cpu-row-follow-up)
 joined the initial and recovery prompt at position 511. The route input, IDs
 and owners matched, and the three CPU-owned expert rows matched bitwise across
-7,680 values. This excludes those captured CPU rows as the source of the first
-layer-26 difference for this position. GPU rows, router weights, shared-expert
-output and full weighted layer output remain uncaptured, so the cause is still
-unresolved. Both supervised checks passed with at least 14.22 GiB available and
-zero cgroup memory events; this is correctness localization, not performance
-evidence.
+7,680 values. This ruled out those rows for that position; later verifier
+captures extended the comparison to GPU rows, router weights, shared output,
+and the combined MoE vector.
 
 A same-service [layer-25 verifier capture](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/layer25-verifier-parts/README.md)
 then compared the router and all ten expert rows at position 511. Initial and
 recovery token IDs, expert IDs, and router weights matched; all 25,600 FP32
 values after expert-hit accumulation were bit-identical. This excludes the
-captured routed-expert path for this row. Shared-expert output, weighted
-combine, and residual write remain to be checked. The 28-GiB supervisor passed
-with 14.31 GiB minimum host/admission availability, 10.85 GiB maximum scope
-use, and zero cgroup events. maestro1 HIP recompiled the verifier and passed
-`strata --help`; the unaffected SYCL overlay build reported no work and its
-help check passed. These are x86 compile/CLI checks only. Phase 5 remains open.
+captured routed-expert path for this row. A paired follow-up found the shared-
+expert output and combined MoE vector bit-identical too; the remaining boundary
+is after combine, at residual/hyper-connection application or the next recurrent
+state transition. A same-service layer-26 GDN trace found identical per-token
+inputs through `z` but a first difference in recurrent output `y` (5,152/6,144
+values). The persistent GDN state immediately before that token remains
+uncaptured, so the state divergence mechanism is not yet directly proven. The
+initial expert-parts capture passed with 14.31 GiB minimum host/admission
+availability, 10.85 GiB maximum scope use, and zero cgroup events. The
+shared/combined output capture passed with 14.37 GiB minimum availability,
+10.92 GiB maximum scope use, and zero events. The layer-26 GDN trace passed
+with 14.36 GiB minimum availability, 10.77 GiB maximum scope use, and zero
+events. maestro1 HIP recompiled the verifier for each diagnostic increment and
+passed `strata --help`; the unaffected SYCL overlay reported no work and passed
+help. These are x86 compile/CLI checks only. Phase 5 remains open.
 
 The trace's per-layer accepted-prefix hashes now localize the adaptive state's
 first mismatch: at the first recovery token, GDN ordinals 20–35 differed from

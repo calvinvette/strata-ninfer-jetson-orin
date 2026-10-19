@@ -451,6 +451,9 @@ Verifier::~Verifier() {
     if (moe_parts_diag_h_ && cudaFreeHost(moe_parts_diag_h_) == cudaSuccess)
         strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
                                                     moe_parts_diag_h_, 0, -1);
+    if (moe_output_diag_h_ && cudaFreeHost(moe_output_diag_h_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
+                                                    moe_output_diag_h_, 0, -1);
     if (ev_fork_) cudaEventDestroy(ev_fork_);
     if (ev_join_) cudaEventDestroy(ev_join_);
     for (cudaStream_t s : df_side_)
@@ -535,7 +538,13 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
     const uint64_t TS = (uint64_t) (s.idx_block - 1) * ID;
     const int max_in = (int) std::max<uint64_t>(std::max<uint64_t>(N, ZV), NH * HD);
 
-    if (const char* layer = std::getenv("STRATA_VERIFY_DUMP_GDN_LAYER")) {
+    const char* gdn_layer_env = std::getenv("STRATA_VERIFY_DUMP_GDN_LAYER");
+    const char* gdn_position_env = std::getenv("STRATA_VERIFY_DUMP_GDN_POSITION");
+    if (gdn_position_env != nullptr && gdn_layer_env == nullptr) {
+        err = "verify: STRATA_VERIFY_DUMP_GDN_POSITION needs the GDN layer and path";
+        return false;
+    }
+    if (const char* layer = gdn_layer_env) {
         const char* path = std::getenv("STRATA_VERIFY_DUMP_GDN_PATH");
         char* end = nullptr;
         const long parsed = std::strtol(layer, &end, 10);
@@ -545,6 +554,15 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
         }
         gdn_diag_layer_ = (int) parsed;
         gdn_diag_path_ = path;
+        if (gdn_position_env != nullptr) {
+            char* pos_end = nullptr;
+            const long long selected = std::strtoll(gdn_position_env, &pos_end, 10);
+            if (pos_end == gdn_position_env || *pos_end != '\0' || selected < 0) {
+                err = "verify: invalid opt-in GDN diagnostic position";
+                return false;
+            }
+            gdn_diag_position_ = (int64_t) selected;
+        }
         const GdnDiagOffsets diag = gdn_diag_offsets(max_t, N, C, HV, ZV);
         gdn_diag_capacity_ = diag.bytes;
         if (cudaHostAlloc((void**) &gdn_diag_h_, gdn_diag_capacity_, cudaHostAllocPortable) != cudaSuccess) {
@@ -646,6 +664,53 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
                                                         moe_parts_diag_h_, moe_parts_diag_capacity_, -1);
             std::fprintf(stderr, "strata verify: opt-in MoE expert-parts dump at layer %d -> %s (%zu bytes)\n",
                          moe_parts_diag_layer_, moe_parts_diag_path_.c_str(), moe_parts_diag_capacity_);
+        }
+    }
+    {
+        const char* layer = std::getenv("STRATA_VERIFY_DUMP_MOE_OUTPUT_LAYER");
+        const char* path = std::getenv("STRATA_VERIFY_DUMP_MOE_OUTPUT_PATH");
+        const char* position = std::getenv("STRATA_VERIFY_DUMP_MOE_OUTPUT_POSITION");
+        if ((layer != nullptr) != (path != nullptr)) {
+            err = "verify: STRATA_VERIFY_DUMP_MOE_OUTPUT_LAYER and STRATA_VERIFY_DUMP_MOE_OUTPUT_PATH must be set together";
+            return false;
+        }
+        if (position != nullptr && layer == nullptr) {
+            err = "verify: STRATA_VERIFY_DUMP_MOE_OUTPUT_POSITION needs the output layer and path";
+            return false;
+        }
+        if (layer != nullptr) {
+            char* end = nullptr;
+            const long parsed = std::strtol(layer, &end, 10);
+            if (end == layer || *end != '\0' || parsed < 0 || parsed >= g.n_layers || path[0] == '\0') {
+                err = "verify: invalid opt-in MoE output layer or path";
+                return false;
+            }
+            moe_output_diag_layer_ = (int) parsed;
+            moe_output_diag_path_ = path;
+            if (position != nullptr) {
+                char* pos_end = nullptr;
+                const long long selected = std::strtoll(position, &pos_end, 10);
+                if (pos_end == position || *pos_end != '\0' || selected < 0) {
+                    err = "verify: invalid opt-in MoE output position";
+                    return false;
+                }
+                moe_output_diag_position_ = (int64_t) selected;
+            }
+            if ((size_t) max_t > SIZE_MAX / (size_t) g.n_embd ||
+                (size_t) max_t * (size_t) g.n_embd > SIZE_MAX / (2 * sizeof(float))) {
+                err = "verify: opt-in MoE output diagnostic size overflows";
+                return false;
+            }
+            moe_output_diag_capacity_ = 2 * (size_t) max_t * (size_t) g.n_embd * sizeof(float);
+            if (cudaHostAlloc((void**) &moe_output_diag_h_, moe_output_diag_capacity_, cudaHostAllocPortable) != cudaSuccess) {
+                moe_output_diag_h_ = nullptr;
+                err = "verify: could not allocate the opt-in MoE output diagnostic buffer";
+                return false;
+            }
+            strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "allocate", this,
+                                                        moe_output_diag_h_, moe_output_diag_capacity_, -1);
+            std::fprintf(stderr, "strata verify: opt-in MoE shared/combined output dump at layer %d -> %s (%zu bytes)\n",
+                         moe_output_diag_layer_, moe_output_diag_path_.c_str(), moe_output_diag_capacity_);
         }
     }
 
@@ -1765,6 +1830,19 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
         if (sh_stream_on() && !prof_on_ && sh_cs_ != nullptr && ev_fork_ != nullptr && ev_join_ != nullptr) {
             cudaStreamWaitEvent(cs, ev_join_, 0);
         }
+        if (moe_output_diag_h_ != nullptr && l == moe_output_diag_layer_ && !batch_rec_) {
+            const size_t row_off = (size_t) tb * (size_t) N;
+            const size_t copy_bytes = (size_t) n * (size_t) N * sizeof(float);
+            const cudaError_t copy_error = cudaMemcpyAsync(moe_output_diag_h_ + row_off,
+                                                            shared_ + row_off, copy_bytes,
+                                                            cudaMemcpyDeviceToHost, cs);
+            if (copy_error != cudaSuccess) {
+                err = std::string("verify: could not queue opt-in shared-expert output capture: ") +
+                      cudaGetErrorString(copy_error);
+                return false;
+            }
+            moe_output_diag_captured_ = true;
+        }
         if (sg_gated_[grp]) {   // STRATA_LFUSE: the shared expert's gate was not applied: the combine applies it (all rows are hits)
             try {
                 native_moe_combine_multi_hits_gated(parts_out, w_ + tb * K, shared_ + tb * N, sh_g_ + tb, bo_ + tb * N, N, K, n, cs);
@@ -1782,6 +1860,19 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
         }
         if (remote_opt_) remote_opt_->combine(bo_ + tb * N, y_dummy_ + tb * N, tb, n,
                               device_plan_ ? skip_ + grp : nullptr, ring, cs);
+        if (moe_output_diag_h_ != nullptr && l == moe_output_diag_layer_ && !batch_rec_) {
+            const size_t row_off = (size_t) tb * (size_t) N;
+            const size_t buffer_off = (size_t) max_t_ * (size_t) N + row_off;
+            const size_t copy_bytes = (size_t) n * (size_t) N * sizeof(float);
+            const cudaError_t copy_error = cudaMemcpyAsync(moe_output_diag_h_ + buffer_off,
+                                                            bo_ + row_off, copy_bytes,
+                                                            cudaMemcpyDeviceToHost, cs);
+            if (copy_error != cudaSuccess) {
+                err = std::string("verify: could not queue opt-in combined MoE output capture: ") +
+                      cudaGetErrorString(copy_error);
+                return false;
+            }
+        }
         if (gdn_diag_h_ != nullptr && l == gdn_diag_layer_ && !batch_rec_ && !is_qsa_layer(g, l) &&
             cudaMemcpyAsync((uint8_t*) gdn_diag_h_ +
                                 gdn_diag_offsets(T, (size_t) N, (size_t) C, (size_t) HV, (size_t) ZV).ffn_y +
@@ -2348,7 +2439,8 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
     const cudaError_t se = cudaStreamSynchronize(cs_);
     trace_ev("SYNCED", -1, -1, (int64_t) se);
     if (se != cudaSuccess) { err = std::string("verify: ") + cudaGetErrorString(se); return false; }
-    if (gdn_diag_captured_) {
+    if (gdn_diag_captured_ &&
+        (gdn_diag_position_ < 0 || (T == 1 && pos0 == gdn_diag_position_))) {
         const uint64_t gdn_floats = (uint64_t) g.ssm_state_size * g.ssm_v_heads * g.ssm_state_size +
                                     (uint64_t) g.ssm_conv_channels * (g.ssm_d_conv - 1);
         const GdnDiagOffsets diag = gdn_diag_offsets(T, (size_t) g.n_embd, (size_t) g.ssm_conv_channels,
@@ -2449,6 +2541,44 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
         }
         if (!written) {
             err = "verify: could not write opt-in MoE expert-parts diagnostic";
+            return false;
+        }
+    }
+    if (moe_output_diag_captured_ &&
+        (moe_output_diag_position_ < 0 || (T == 1 && pos0 == moe_output_diag_position_))) {
+        struct OutputHeader {
+            char magic[8];
+            uint32_t version;
+            uint32_t layer;
+            uint32_t rows;
+            uint32_t reserved;
+            uint64_t n_embd;
+            int64_t pos0;
+            int32_t tokens[strata::kernels::kVerifyMaxT];
+        } header{};
+        static_assert(sizeof(OutputHeader) == 72, "STMOEOUT header layout changed");
+        std::memcpy(header.magic, "STMOEOUT", sizeof(header.magic));
+        header.version = 1;
+        header.layer = (uint32_t) moe_output_diag_layer_;
+        header.rows = (uint32_t) T;
+        header.n_embd = (uint64_t) g.n_embd;
+        header.pos0 = pos0;
+        for (int t = 0; t < T; ++t) header.tokens[t] = tokens[t];
+        const size_t section_bytes = (size_t) T * (size_t) g.n_embd * sizeof(float);
+        static std::mutex output_dump_mutex;
+        std::lock_guard<std::mutex> lock(output_dump_mutex);
+        std::FILE* dump = std::fopen(moe_output_diag_path_.c_str(), "ab");
+        bool written = dump != nullptr;
+        if (written) {
+            written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
+                      std::fwrite(moe_output_diag_h_, 1, section_bytes, dump) == section_bytes &&
+                      std::fwrite(moe_output_diag_h_ + (size_t) max_t_ * (size_t) g.n_embd,
+                                  1, section_bytes, dump) == section_bytes;
+            if (std::fflush(dump) != 0) written = false;
+            if (std::fclose(dump) != 0) written = false;
+        }
+        if (!written) {
+            err = "verify: could not write opt-in shared/combined MoE output diagnostic";
             return false;
         }
     }

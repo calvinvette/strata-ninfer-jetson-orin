@@ -377,6 +377,7 @@ private:
     unsigned long long* trace_m_ = nullptr;
     size_t trace_n_ = 0;
     int gdn_diag_layer_ = -1;
+    int64_t gdn_diag_position_ = -1;
     float* gdn_diag_h_ = nullptr;       ///< opt-in pinned capture of one live GDN verifier layer
     size_t gdn_diag_capacity_ = 0;
     std::string gdn_diag_path_;
@@ -393,6 +394,12 @@ private:
     size_t moe_parts_diag_capacity_ = 0;
     std::string moe_parts_diag_path_;
     bool moe_parts_diag_captured_ = false;
+    int moe_output_diag_layer_ = -1;
+    int64_t moe_output_diag_position_ = -1;
+    float* moe_output_diag_h_ = nullptr;  ///< pinned shared-expert and combined MoE output rows
+    size_t moe_output_diag_capacity_ = 0;
+    std::string moe_output_diag_path_;
+    bool moe_output_diag_captured_ = false;
     static constexpr int kProfPer = 33;              // stamps per layer (32 left the hc-read second
                                       // half's up-stamp at slot 32 = the next layer's slot 0: D8)
     bool prof_on_ = false;
