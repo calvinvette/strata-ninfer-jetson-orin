@@ -1866,6 +1866,17 @@ Splash investigation should support layer-local diagnostic routing and compare
 committed state directly, while keeping such precision changes opt-in until
 quality and serving effects are qualified.
 
+The follow-up [owner-equivalence check](../../bench/results/2026-10-19-phase5-coder-layer1-q8_1-owner-equivalence/README.md)
+held that arithmetic selector constant while a matched-capacity profile changed
+seven layer-1 experts from CPU to CUDA. Exact device-side IDs and router weights,
+all committed-prefix fingerprints and prompt-end GDN bytes matched across the
+three paired blocks. For a future Splash test, keep the numerical path identical
+across owners, preserve the common residency set and capacity, then directly
+check device routes and committed state. Use unused filler entries only after
+proving they were not routed; a placement change that also changes arithmetic
+cannot isolate ownership. This remains one Orin prompt and one expert format,
+not broad migration evidence.
+
 The [MTP round-cost/state diagnostic](../../bench/results/2026-10-19-phase5-coder-current-source-mtp-metrics/README.md)
 also records per-round verifier, draft, commit/emit, accepted and rejected
 draft counts from one current-source Orin request. For Splash, keep this cost

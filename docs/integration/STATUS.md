@@ -3118,3 +3118,15 @@ compile/link builds from the pinned source plus the recorded four-file overlay.
 Both CLI checks exited 0; the 1.5-GiB build scope recorded zero memory limit or
 OOM events. This remains x86 build evidence only, with no accelerator execution.
 See the [backend report](../../bench/results/2026-10-19-phase5-coder-layer1-q8_1-mirror/backend/maestro1/README.md).
+
+A three-block [layer-1 CPU/GPU owner-equivalence check](../../bench/results/2026-10-19-phase5-coder-layer1-q8_1-owner-equivalence/README.md)
+held the layer-1 Q8_1 selector constant while a matched 3,007-slot profile
+moved seven IQ2_S/Q2_0 experts from CPU to CUDA. All three 512→16 pairs matched
+all token IDs and 16 accepted-prefix state fingerprints; prompt-end GDN dumps
+were byte-identical. A supplemental device-side route capture confirmed that
+layer-1 expert IDs and router weights matched at all 16 output positions, and
+the changed owner assignments were confined to the seven targets. Minimum
+host/admission availability was 16.009 GiB, with zero cgroup events. No
+speculative drafts were accepted, no performance or quality claim follows, and
+this does not qualify other layers, formats or adaptive migration. Phase 5
+remains open.
