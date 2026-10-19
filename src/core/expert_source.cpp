@@ -3134,9 +3134,41 @@ uint64_t capture_moe_window(int64_t layer, const float* x, const int32_t* ids, c
         const char* p = std::getenv("STRATA_CAPTURE_MOE_START_ROW");
         return p == nullptr ? (int64_t) 0 : std::max<int64_t>(0, std::strtoll(p, nullptr, 10));
     }();
-    static const int64_t selected_position = [] {
-        const char* p = std::getenv("STRATA_CAPTURE_MOE_POSITION");
-        return p == nullptr ? (int64_t) -1 : std::strtoll(p, nullptr, 10);
+    struct PositionFilter {
+        bool enabled = false;
+        std::vector<int64_t> positions;
+    };
+    static const PositionFilter position_filter = [] {
+        PositionFilter filter;
+        const char* p = std::getenv("STRATA_CAPTURE_MOE_POSITIONS");
+        if (p == nullptr) p = std::getenv("STRATA_CAPTURE_MOE_POSITION");
+        if (p == nullptr) return filter;
+        filter.enabled = true;
+        while (*p) {
+            char* end = nullptr;
+            errno = 0;
+            const long long position = std::strtoll(p, &end, 10);
+            if (errno != 0 || end == p || position < 0 || (*end != '\0' && *end != ',') ||
+                (!filter.positions.empty() && position <= filter.positions.back())) {
+                filter.positions.clear();
+                std::fprintf(stderr, "strata: invalid STRATA_CAPTURE_MOE_POSITIONS list\n");
+                return filter;
+            }
+            filter.positions.push_back((int64_t) position);
+            if (*end == ',') {
+                p = end + 1;
+                if (*p == '\0') {
+                    filter.positions.clear();
+                    std::fprintf(stderr, "strata: invalid trailing separator in STRATA_CAPTURE_MOE_POSITIONS\n");
+                    return filter;
+                }
+            } else {
+                p = end;
+            }
+        }
+        if (filter.positions.empty())
+            std::fprintf(stderr, "strata: empty STRATA_CAPTURE_MOE_POSITIONS list\n");
+        return filter;
     }();
     struct State {
         int64_t rows = 0;
@@ -3155,7 +3187,9 @@ uint64_t capture_moe_window(int64_t layer, const float* x, const int32_t* ids, c
         const int64_t stream_row = capture.seen_rows++;
         if (stream_row < start_row) continue;
         const int64_t position = row_positions != nullptr ? row_positions[t] : position0 + t;
-        if (selected_position >= 0 && position != selected_position) continue;
+        if (position_filter.enabled &&
+            !std::binary_search(position_filter.positions.begin(), position_filter.positions.end(), position))
+            continue;
         if (capture.file == nullptr) {
             capture.file = std::fopen(path, "wb");
             if (capture.file == nullptr) {

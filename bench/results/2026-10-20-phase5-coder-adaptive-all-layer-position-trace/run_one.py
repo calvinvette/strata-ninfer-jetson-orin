@@ -32,6 +32,8 @@ def main():
     parser.add_argument("--adapt-swaps", type=int, required=True)
     parser.add_argument("--spec", type=int,
                         help="override the configured verifier window for a prompt-tail localization ablation")
+    parser.add_argument("--capture-moe-positions", default="511",
+                        help="comma-separated increasing absolute positions for the all-layer expert trace")
     parser.add_argument("--continuations", type=int, default=0,
                         help="extra identical short requests after short/long/short")
     parser.add_argument("--dump-gdn-occurrence", type=int,
@@ -66,6 +68,13 @@ def main():
         parser.error("--continuations must be non-negative")
     if args.spec is not None and args.spec < 0:
         parser.error("--spec must be non-negative")
+    try:
+        capture_moe_positions = [int(value) for value in args.capture_moe_positions.split(",")]
+    except ValueError:
+        parser.error("--capture-moe-positions must be comma-separated non-negative integers")
+    if not capture_moe_positions or any(value < 0 for value in capture_moe_positions) or \
+            capture_moe_positions != sorted(set(capture_moe_positions)):
+        parser.error("--capture-moe-positions must be strictly increasing non-negative integers")
     if args.dump_gdn_occurrence is not None and args.dump_gdn_occurrence < 1:
         parser.error("--dump-gdn-occurrence must be positive")
     if args.dump_gdn_occurrence is not None and args.dump_gdn_occurrence > 2 + args.continuations:
@@ -133,13 +142,16 @@ def main():
 
     log = args.output / "service.log"
     env = child_env(cfg)
+    capture_path = args.output / ("all-layer-position511.jsonl" if capture_moe_positions == [511]
+                                  else "all-layer-selected-positions.jsonl")
     env.update({
         "STRATA_STATE_HASH": "1", "STRATA_STATE_HASH_GDN": "1",
         "STRATA_ACCEPTED_PREFIX_TRACE": "1", "STRATA_INTEGRATION_TRACE": "1",
         "STRATA_PREFILL_CPU_SHARE": "0", "STRATA_CAPTURE_MOE_LAYER": "-1",
-        "STRATA_CAPTURE_MOE_ROWS": "96", "STRATA_CAPTURE_MOE_START_ROW": "0",
-        "STRATA_CAPTURE_MOE_POSITION": "511",
-        "STRATA_CAPTURE_MOE_PATH": str((args.output / "all-layer-position511.jsonl").resolve()),
+        "STRATA_CAPTURE_MOE_ROWS": "4096" if capture_moe_positions != [511] else "96",
+        "STRATA_CAPTURE_MOE_START_ROW": "0",
+        "STRATA_CAPTURE_MOE_POSITIONS": ",".join(map(str, capture_moe_positions)),
+        "STRATA_CAPTURE_MOE_PATH": str(capture_path.resolve()),
         "STRATA_VERIFY_ADAPT_SWAPS": "1",
         "STRATA_NATIVE_CPU_Q8_1_DOT": "all",
     })
@@ -266,7 +278,7 @@ def main():
         if observed != expected:
             raise RuntimeError(f"verifier GDN state positions not observed twice in initial/recovery: {observed}; expected {expected}")
 
-    captured = [json.loads(line) for line in (args.output / "all-layer-position511.jsonl").read_text().splitlines()]
+    captured = [json.loads(line) for line in capture_path.read_text().splitlines()]
     if not captured or captured[0].get("format") != "strata-moe-dispatch-v3":
         raise RuntimeError("missing current all-layer dispatch capture")
     rows = captured[1:]
@@ -336,6 +348,7 @@ def main():
     results = {
         "adapt_every": args.adapt_every, "adapt_swaps": args.adapt_swaps,
         "configured_spec": configured_spec, "spec_override": args.spec,
+        "capture_moe_positions": capture_moe_positions,
         "prompt_sha256": {
             "short": hashlib.sha256(json.dumps(list(prompts[0][1])).encode()).hexdigest(),
             "long": hashlib.sha256(json.dumps(long_ids).encode()).hexdigest(),

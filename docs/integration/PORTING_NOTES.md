@@ -1986,3 +1986,13 @@ make hashes identical. The GDN snapshot diagnostic is now represented in both
 source paths, with queue-based SYCL copies and backend-specific error returns.
 maestro1 checks compile/link and CLI behavior only; runtime state comparison
 still needs the target accelerator.
+
+The [prompt-tail route trace](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/layer26-gdn-prompt-tail-dispatch/README.md)
+extends the service dispatch probe to an opt-in, strictly increasing list of
+absolute token positions. Pair the same position across initial and recovery
+requests, then compare owner assignments, expert IDs and activation vectors
+separately: owner changes can precede any captured numerical difference. Keep
+the capture bounded and off by default, and treat decimal activation dumps as
+diagnostic inputs with documented round-trip precision. For Splash, use its
+actual service position semantics and retain recurrent/KV state checks; matching
+routes or output text alone does not prove continuation parity.

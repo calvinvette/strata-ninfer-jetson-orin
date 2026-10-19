@@ -1,0 +1,238 @@
+[0/2] Re-checking globbed directories...
+[1/18] Building CXX object CMakeFiles/strata_engine.dir/src/core/expert_source.cpp.o
+In file included from /dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp:4:
+/dev/shm/phase5-q8-selector-maestro1/source/include/strata/core/on_device.hpp: In destructor ‘strata::core::OnDevice::~OnDevice()’:
+/dev/shm/phase5-q8-selector-maestro1/source/include/strata/core/on_device.hpp:17:51: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+   17 |     ~OnDevice() { if (previous >= 0) cudaSetDevice(previous); }
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:2233:12: note: in call to ‘hipError_t hipSetDevice(int)’, declared here
+ 2233 | hipError_t hipSetDevice(int deviceId);
+      |            ^~~~~~~~~~~~
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp: In function ‘void strata::core::expert_hit_run(void*, void*, strata::core::HitPhase, const int32_t*, int64_t)’:
+/dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp:3659:51: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 3659 |         if (d.hit_done != nullptr) cudaEventRecord((cudaEvent_t) d.hit_done, cs);
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:3436:12: note: in call to ‘hipError_t hipEventRecord(hipEvent_t, hipStream_t)’, declared here
+ 3436 | hipError_t hipEventRecord(hipEvent_t event, hipStream_t stream = NULL);
+      |            ^~~~~~~~~~~~~~
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp: In member function ‘bool strata::core::ArenaExpertSource::open(const string&, int64_t, int64_t, int, std::string&, uint64_t, const string&)’:
+/dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp:4200:22: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4200 |         cudaGetDevice(&dev);
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:2260:12: note: in call to ‘hipError_t hipGetDevice(int*)’, declared here
+ 2260 | hipError_t hipGetDevice(int* deviceId);
+      |            ^~~~~~~~~~~~
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp: In lambda function:
+/dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp:4202:26: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4202 |             cudaSetDevice(dev);
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:2233:12: note: in call to ‘hipError_t hipSetDevice(int)’, declared here
+ 2233 | hipError_t hipSetDevice(int deviceId);
+      |            ^~~~~~~~~~~~
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp: In member function ‘bool strata::core::ForesightSwap::init(int, int64_t, int64_t, const std::vector<int>&, const std::vector<int>&, std::string&)’:
+/dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp:4392:29: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4392 |             cudaGetLastError();
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:2708:12: note: in call to ‘hipError_t hipGetLastError()’, declared here
+ 2708 | hipError_t hipGetLastError(void);
+      |            ^~~~~~~~~~~~~~~
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp:4409:37: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4409 |                     cudaGetLastError();
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:2708:12: note: in call to ‘hipError_t hipGetLastError()’, declared here
+ 2708 | hipError_t hipGetLastError(void);
+      |            ^~~~~~~~~~~~~~~
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp: In destructor ‘strata::core::ForesightSwap::~ForesightSwap()’:
+/dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp:4431:50: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4431 |         if (card_stream[c]) cudaStreamSynchronize((cudaStream_t) card_stream[c]);
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:2923:12: note: in call to ‘hipError_t hipStreamSynchronize(hipStream_t)’, declared here
+ 2923 | hipError_t hipStreamSynchronize(hipStream_t stream);
+      |            ^~~~~~~~~~~~~~~~~~~~
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp:4432:34: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4432 |         if (card_mem[c]) cudaFree(card_mem[c]);
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:4592:12: note: in call to ‘hipError_t hipFree(void*)’, declared here
+ 4592 | hipError_t hipFree(void* ptr);
+      |            ^~~~~~~
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp:4433:46: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4433 |         if (card_stream[c]) cudaStreamDestroy((cudaStream_t) card_stream[c]);
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:2885:12: note: in call to ‘hipError_t hipStreamDestroy(hipStream_t)’, declared here
+ 2885 | hipError_t hipStreamDestroy(hipStream_t stream);
+      |            ^~~~~~~~~~~~~~~~
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp:4437:54: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4437 |             if (slot[(size_t) i].ev) cudaEventDestroy((cudaEvent_t) slot[(size_t) i].ev);
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:3456:12: note: in call to ‘hipError_t hipEventDestroy(hipEvent_t)’, declared here
+ 3456 | hipError_t hipEventDestroy(hipEvent_t event);
+      |            ^~~~~~~~~~~~~~~
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp: In member function ‘void strata::core::ForesightSwap::fill_loop()’:
+/dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp:4454:44: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4454 |         if (dev != cur_dev) { cudaSetDevice(dev); cur_dev = dev; }
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:2233:12: note: in call to ‘hipError_t hipSetDevice(int)’, declared here
+ 2233 | hipError_t hipSetDevice(int deviceId);
+      |            ^~~~~~~~~~~~
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp:4458:29: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4458 |             cudaGetLastError();
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:2708:12: note: in call to ‘hipError_t hipGetLastError()’, declared here
+ 2708 | hipError_t hipGetLastError(void);
+      |            ^~~~~~~~~~~~~~~
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp: In member function ‘bool strata::core::ForesightSwap::take(int64_t, int32_t, long long unsigned int&)’:
+/dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp:4475:57: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4475 |             if (q != cudaErrorNotReady) cudaGetLastError();
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:2708:12: note: in call to ‘hipError_t hipGetLastError()’, declared here
+ 2708 | hipError_t hipGetLastError(void);
+      |            ^~~~~~~~~~~~~~~
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp:4488:33: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4488 |                 cudaGetLastError();
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:2708:12: note: in call to ‘hipError_t hipGetLastError()’, declared here
+ 2708 | hipError_t hipGetLastError(void);
+      |            ^~~~~~~~~~~~~~~
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+/dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp: In member function ‘void strata::core::ForesightSwap::request_locked(strata::core::ExpertSource*, int64_t, int32_t, bool)’:
+/dev/shm/phase5-q8-selector-maestro1/source/src/core/expert_source.cpp:4538:81: warning: ignoring returned value of type ‘hipError_t’, declared with attribute ‘nodiscard’ [-Wunused-result]
+ 4538 |             if (q != cudaSuccess) { if (q != cudaErrorNotReady) cudaGetLastError(); continue; }
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:2708:12: note: in call to ‘hipError_t hipGetLastError()’, declared here
+ 2708 | hipError_t hipGetLastError(void);
+      |            ^~~~~~~~~~~~~~~
+In file included from /mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime.h:65,
+                 from /dev/shm/phase5-q8-selector-maestro1/source/include/strata/hip_compat/cuda_runtime.h:12,
+                 from <command-line>:
+/mnt/sda2/home/calvin/workspace/strata-validation/toolchains/rocm/lib/python3.10/site-packages/_rocm_sdk_core/include/hip/hip_runtime_api.h:419:3: note: ‘hipError_t’ declared here
+  419 | } hipError_t;
+      |   ^~~~~~~~~~
+[2/18] Linking HIP static library libstrata_engine.a
+[3/18] Linking HIP executable vmm_test
+[4/18] Linking HIP executable file_expert_source_test
+[5/18] Linking HIP executable expert_profile_save_test
+[6/18] Linking HIP executable expert_profile_version_test
+[7/18] Linking HIP executable conversation_snapshot_test
+[8/18] Linking HIP executable conversation_validation_test
+[9/18] Linking HIP executable strata
+[10/18] Linking HIP executable hip_prefill_gemm
+[11/18] Linking HIP executable hip_gemm_f16_io_parity
+[12/18] Linking HIP executable hip_expert_cache_staging
+[13/18] Linking HIP executable hip_gdn_rec_head
+[14/18] Linking HIP executable hip_prefill_wmma_gemm_parity
+[15/18] Linking HIP executable hip_prefill_hcd_exact_parity
+[16/18] Linking HIP executable hip_prefill_hipblaslt_gemm
+[17/18] Linking HIP executable hip_prefill_mmq_parity

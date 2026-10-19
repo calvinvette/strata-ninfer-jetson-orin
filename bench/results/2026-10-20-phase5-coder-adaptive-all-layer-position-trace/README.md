@@ -1,7 +1,7 @@
-# Coder adaptive migration all-layer trace and IQ3_XXS/Q2_0 mirror — Orin — 2026-10-19
+# Coder adaptive migration all-layer trace and IQ3_XXS/Q2_0 mirror — Orin — 2026-10-20
 
-This experiment used the current Orin candidate and the pinned Coder IQ1_M
-artifact from `ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF`, revision
+This experiment used the current Orin candidate and the pinned **IQ1_M** Coder
+GGUF artifact from `ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF`, revision
 `5348543e0147355ac9cbcb031184a3546350988e`. The model and pack remain under
 `~/models/strata-orin-validation/`. Both paired service runs used the same
 512→2,048→512→continuation sequence, 16 tokens per request, accepted-only
@@ -254,6 +254,20 @@ checks only. This change does not alter default dispatch.
 `76eec469`; `gdn-state-capture.patch` records the state-dump diagnostic change
 relative to `25daf34d`. `SHA256SUMS` covers the report, source overlays, paired
 captures, state analysis and retained supervision data. Phase 5 remains open.
+
+## Prompt-tail router and activation trace
+
+The follow-up [two-position trace](layer26-gdn-prompt-tail-dispatch/README.md)
+captures verifier dispatches at absolute prompt positions 505 and 506 in both
+the initial 512-token request and its same-service recovery after the 2,048-token
+request. Expert IDs match between requests through layer 26 at both positions.
+Owner placement already differs at layer 1, but all 2,560 activation values
+remain bit-identical through layer 25. Layer 26 is the first activation that
+differs at both positions (relative L2 0.00482 at 505 and 0.00105 at 506).
+Expert IDs first differ at layer 27 for position 505 and layer 31 for position
+506. This localizes the first observed activation change but does not identify
+the responsible upstream operation. “Coder GGUF” in the result name refers to
+the two IQ1_M shards from the pinned repository revision above.
 
 Reproduce the extended service pair on Orin with the current source and local
 model artifacts:
