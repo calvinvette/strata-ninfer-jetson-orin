@@ -138,10 +138,15 @@ These are compile/CLI checks only. A subsequent HIP rebuild covered the shared/
 combined output diagnostic. The paired capture and analysis are in
 `layer25-verifier-output-followup/`. A layer-26 GDN trace then showed that all
 captured per-token inputs match, while the first differing value is the
-state-dependent recurrent output `y`; the persistent state immediately before
-that token remains uncaptured. See `layer25-to-layer26-gdn-followup/`. The
-GDN position-filter change also rebuilt on maestro1 HIP; SYCL remains on its
-unaffected overlay. Phase 5 remains open.
+state-dependent recurrent output `y`. The follow-up verifier-state snapshot
+found that the recurrent matrix already differed before layer 26 processed the
+recovery token (688,243/786,432 values); convolution history matched exactly.
+This narrows the immediate boundary to the incoming recurrent matrix, but does
+not identify which earlier token or operation introduced the difference. The
+captured state belongs to the verifier diagnostic path, not the serving
+session's accepted-prefix state. See `layer26-gdn-state-pair/` and
+`layer25-to-layer26-gdn-followup/`. The GDN position-filter change also rebuilt
+on maestro1 HIP; SYCL remains on its unaffected overlay. Phase 5 remains open.
 
 The two raw 113 MiB dumps remain outside Git under
 `~/models/strata-orin-validation/experiments/phase5-gdn-state/`; their full

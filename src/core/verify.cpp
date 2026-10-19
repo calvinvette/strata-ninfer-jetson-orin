@@ -445,6 +445,9 @@ Verifier::~Verifier() {
     if (gdn_diag_h_ && cudaFreeHost(gdn_diag_h_) == cudaSuccess)
         strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
                                                     gdn_diag_h_, 0, -1);
+    if (gdn_state_diag_h_ && cudaFreeHost(gdn_state_diag_h_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
+                                                    gdn_state_diag_h_, 0, -1);
     if (moe_route_diag_h_ && cudaFreeHost(moe_route_diag_h_) == cudaSuccess)
         strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
                                                     moe_route_diag_h_, 0, -1);
@@ -574,6 +577,56 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
                                                     gdn_diag_h_, gdn_diag_capacity_, -1);
         std::fprintf(stderr, "strata verify: opt-in GDN activation dump at layer %d -> %s (%zu bytes)\n",
                      gdn_diag_layer_, gdn_diag_path_.c_str(), gdn_diag_capacity_);
+    }
+    {
+        const char* layer = std::getenv("STRATA_VERIFY_DUMP_GDN_STATE_LAYER");
+        const char* path = std::getenv("STRATA_VERIFY_DUMP_GDN_STATE_PATH");
+        const char* position = std::getenv("STRATA_VERIFY_DUMP_GDN_STATE_POSITION");
+        if ((layer != nullptr) != (path != nullptr)) {
+            err = "verify: STRATA_VERIFY_DUMP_GDN_STATE_LAYER and STRATA_VERIFY_DUMP_GDN_STATE_PATH must be set together";
+            return false;
+        }
+        if (position != nullptr && layer == nullptr) {
+            err = "verify: STRATA_VERIFY_DUMP_GDN_STATE_POSITION needs the state layer and path";
+            return false;
+        }
+        if (layer != nullptr) {
+            char* end = nullptr;
+            const long parsed = std::strtol(layer, &end, 10);
+            if (end == layer || *end != '\0' || parsed < 0 || parsed >= g.n_layers || is_qsa_layer(g, parsed) ||
+                !*path || position == nullptr) {
+                err = "verify: GDN state capture needs a valid GDN layer, path, and exact token position";
+                return false;
+            }
+            char* pos_end = nullptr;
+            const long long selected = std::strtoll(position, &pos_end, 10);
+            if (pos_end == position || *pos_end != '\0' || selected < 0) {
+                err = "verify: invalid opt-in GDN state position";
+                return false;
+            }
+            gdn_state_diag_layer_ = (int) parsed;
+            gdn_state_diag_position_ = (int64_t) selected;
+            gdn_state_diag_path_ = path;
+            const uint64_t state_floats = (uint64_t) g.ssm_state_size * (uint64_t) g.ssm_v_heads *
+                                              (uint64_t) g.ssm_state_size +
+                                          (uint64_t) g.ssm_conv_channels * (uint64_t) (g.ssm_d_conv - 1);
+            if (state_floats == 0 || state_floats > SIZE_MAX || (size_t) max_t > SIZE_MAX / (size_t) state_floats ||
+                (size_t) max_t * (size_t) state_floats > SIZE_MAX / (2 * sizeof(float))) {
+                err = "verify: opt-in GDN state diagnostic size overflows";
+                return false;
+            }
+            gdn_state_diag_capacity_ = 2 * (size_t) max_t * (size_t) state_floats * sizeof(float);
+            if (cudaHostAlloc((void**) &gdn_state_diag_h_, gdn_state_diag_capacity_, cudaHostAllocPortable) != cudaSuccess) {
+                gdn_state_diag_h_ = nullptr;
+                err = "verify: could not allocate the opt-in GDN state diagnostic buffer";
+                return false;
+            }
+            strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "allocate", this,
+                                                        gdn_state_diag_h_, gdn_state_diag_capacity_, -1);
+            std::fprintf(stderr, "strata verify: opt-in GDN pre/post state dump at layer %d, position %lld -> %s (%zu bytes)\n",
+                         gdn_state_diag_layer_, (long long) gdn_state_diag_position_, gdn_state_diag_path_.c_str(),
+                         gdn_state_diag_capacity_);
+        }
     }
     {
         const char* layer = std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_LAYER");
@@ -1235,6 +1288,17 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                 const int64_t gi = gdn_idx[(size_t) l];
                 float* state = ss.gdn_state + (size_t) (gi - ss.gdn_ord0) * gdn_floats;
                 float* conv = state + (uint64_t) g.ssm_state_size * g.ssm_v_heads * g.ssm_state_size;
+                if (gdn_state_diag_h_ != nullptr && l == gdn_state_diag_layer_ && T == 1 && !batch_rec_) {
+                    const size_t state_bytes = (size_t) gdn_floats * sizeof(float);
+                    const cudaError_t copy_error = cudaMemcpyAsync(gdn_state_diag_h_, state, state_bytes,
+                                                                    cudaMemcpyDeviceToHost, cs);
+                    if (copy_error != cudaSuccess) {
+                        err = std::string("verify: could not queue pre-GDN state capture: ") +
+                              cudaGetErrorString(copy_error);
+                        return false;
+                    }
+                    gdn_state_diag_captured_ = true;
+                }
                 float* qkv = qkv_L_ + (size_t) gi * MT * C;
                 float* hb = h_L_ + (size_t) gi * MT * C;
                 float* gate = gate_L_ + (size_t) gi * MT * HV;
@@ -1320,6 +1384,18 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                 } else
                 gdn_step_norm_multi(state, hb, (int) C, gate, beta, z_, (const float*) wnm->data, EPS, y_, (int) HK,
                                     (int) HV, te, self_commit ? one_ : nullptr, cs, tb, g_qfuse() ? (void*) xq_ : nullptr);
+                if (gdn_state_diag_h_ != nullptr && l == gdn_state_diag_layer_ && T == 1 && !batch_rec_) {
+                    const size_t state_floats = (size_t) gdn_floats;
+                    const size_t state_bytes = state_floats * sizeof(float);
+                    float* const post_state = gdn_state_diag_h_ + (size_t) max_t_ * state_floats;
+                    const cudaError_t copy_error = cudaMemcpyAsync(post_state, state, state_bytes,
+                                                                    cudaMemcpyDeviceToHost, cs);
+                    if (copy_error != cudaSuccess) {
+                        err = std::string("verify: could not queue post-GDN state capture: ") +
+                              cudaGetErrorString(copy_error);
+                        return false;
+                    }
+                }
                 if (dump_gdn) {
                     const size_t row = (size_t) tb;
                     if (cudaMemcpyAsync((uint8_t*) gdn_diag_h_ + diag.y + row * (size_t) ZV * sizeof(float),
@@ -2467,6 +2543,46 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
         }
         if (!written) {
             err = "verify: could not write opt-in GDN layer diagnostic";
+            return false;
+        }
+    }
+    if (gdn_state_diag_captured_ && T == 1 && pos0 == gdn_state_diag_position_) {
+        struct GdnStateHeader {
+            char magic[8];
+            uint32_t version;
+            int32_t layer;
+            int64_t position;
+            uint64_t recurrent_floats;
+            uint64_t state_floats;
+            int32_t token;
+            int32_t reserved;
+        } header{};
+        static_assert(sizeof(GdnStateHeader) == 48, "STGSTAT1 header layout changed");
+        std::memcpy(header.magic, "STGSTAT1", sizeof(header.magic));
+        header.version = 1;
+        header.layer = gdn_state_diag_layer_;
+        header.position = pos0;
+        header.recurrent_floats = (uint64_t) g.ssm_state_size * (uint64_t) g.ssm_v_heads *
+                                  (uint64_t) g.ssm_state_size;
+        header.state_floats = (uint64_t) g.ssm_state_size * (uint64_t) g.ssm_v_heads *
+                                  (uint64_t) g.ssm_state_size +
+                              (uint64_t) g.ssm_conv_channels * (uint64_t) (g.ssm_d_conv - 1);
+        header.token = tokens[0];
+        const size_t state_bytes = (size_t) header.state_floats * sizeof(float);
+        const float* const post_state = gdn_state_diag_h_ + (size_t) max_t_ * (size_t) header.state_floats;
+        static std::mutex gdn_state_dump_mutex;
+        std::lock_guard<std::mutex> lock(gdn_state_dump_mutex);
+        std::FILE* dump = std::fopen(gdn_state_diag_path_.c_str(), "ab");
+        bool written = dump != nullptr;
+        if (written) {
+            written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
+                      std::fwrite(gdn_state_diag_h_, 1, state_bytes, dump) == state_bytes &&
+                      std::fwrite(post_state, 1, state_bytes, dump) == state_bytes;
+            if (std::fflush(dump) != 0) written = false;
+            if (std::fclose(dump) != 0) written = false;
+        }
+        if (!written) {
+            err = "verify: could not write opt-in GDN pre/post state diagnostic";
             return false;
         }
     }

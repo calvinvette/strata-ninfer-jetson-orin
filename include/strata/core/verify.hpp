@@ -382,6 +382,12 @@ private:
     size_t gdn_diag_capacity_ = 0;
     std::string gdn_diag_path_;
     bool gdn_diag_captured_ = false;
+    int gdn_state_diag_layer_ = -1;
+    int64_t gdn_state_diag_position_ = -1;
+    float* gdn_state_diag_h_ = nullptr;  ///< pinned pre/post snapshot of one GDN layer state
+    size_t gdn_state_diag_capacity_ = 0;
+    std::string gdn_state_diag_path_;
+    bool gdn_state_diag_captured_ = false;
     int moe_route_diag_layer_ = -1;
     int64_t moe_route_diag_position_ = -1;
     uint8_t* moe_route_diag_h_ = nullptr;  ///< opt-in pinned capture of device top-k IDs and weights

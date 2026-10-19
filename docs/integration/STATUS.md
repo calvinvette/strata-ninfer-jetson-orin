@@ -49,16 +49,22 @@ expert output and combined MoE vector bit-identical too; the remaining boundary
 is after combine, at residual/hyper-connection application or the next recurrent
 state transition. A same-service layer-26 GDN trace found identical per-token
 inputs through `z` but a first difference in recurrent output `y` (5,152/6,144
-values). The persistent GDN state immediately before that token remains
-uncaptured, so the state divergence mechanism is not yet directly proven. The
+values). A paired verifier-state snapshot found a pre-existing difference in
+the incoming recurrent matrix (688,243/786,432 values) while convolution history
+matched exactly. This narrows the immediate boundary but does not identify which
+earlier token or operation caused it; the snapshot is verifier-owned, not the
+serving session's accepted-prefix state. The
 initial expert-parts capture passed with 14.31 GiB minimum host/admission
 availability, 10.85 GiB maximum scope use, and zero cgroup events. The
 shared/combined output capture passed with 14.37 GiB minimum availability,
 10.92 GiB maximum scope use, and zero events. The layer-26 GDN trace passed
 with 14.36 GiB minimum availability, 10.77 GiB maximum scope use, and zero
-events. maestro1 HIP recompiled the verifier for each diagnostic increment and
-passed `strata --help`; the unaffected SYCL overlay reported no work and passed
-help. These are x86 compile/CLI checks only. Phase 5 remains open.
+events. The verifier-state snapshot passed with 14.35 GiB minimum availability,
+10.37 GiB maximum scope use, and zero events; see the linked report for raw-file
+identity and state deltas in [the experiment bundle](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/layer26-gdn-state-pair/README.md).
+maestro1 HIP recompiled the verifier for each diagnostic increment and for the
+state capture, and passed `strata --help`; the SYCL overlay reported no work
+and passed help. These are x86 compile/CLI checks only. Phase 5 remains open.
 
 The trace's per-layer accepted-prefix hashes now localize the adaptive state's
 first mismatch: at the first recovery token, GDN ordinals 20–35 differed from

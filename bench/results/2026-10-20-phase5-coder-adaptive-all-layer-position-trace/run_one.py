@@ -41,6 +41,10 @@ def main():
                         help="capture verifier router weights and all expert rows at position 511 for this layer")
     parser.add_argument("--capture-verify-gdn-layer", type=int,
                         help="capture verifier GDN intermediates at position 511 for this layer")
+    parser.add_argument("--capture-verify-gdn-state-layer", type=int,
+                        help="capture the GDN pre/post persistent state at position 511 for this layer")
+    parser.add_argument("--gdn-state-output", type=Path,
+                        help="external output path for the raw pre/post GDN state records")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.continuations < 0:
@@ -58,6 +62,10 @@ def main():
         parser.error("verifier MoE capture layer must be non-negative")
     if args.capture_verify_gdn_layer is not None and args.capture_verify_gdn_layer < 0:
         parser.error("verifier GDN capture layer must be non-negative")
+    if args.capture_verify_gdn_state_layer is not None and args.capture_verify_gdn_state_layer < 0:
+        parser.error("verifier GDN state capture layer must be non-negative")
+    if (args.capture_verify_gdn_state_layer is None) != (args.gdn_state_output is None):
+        parser.error("GDN state capture requires both --capture-verify-gdn-state-layer and --gdn-state-output")
     args.output.mkdir(parents=True, exist_ok=False)
 
     cfg = json.loads((BASE / "config.json").read_text())
@@ -121,6 +129,17 @@ def main():
             "STRATA_VERIFY_DUMP_GDN_LAYER": str(args.capture_verify_gdn_layer),
             "STRATA_VERIFY_DUMP_GDN_PATH": str((args.output / "verify-gdn.bin").resolve()),
             "STRATA_VERIFY_DUMP_GDN_POSITION": "511",
+        })
+    gdn_state_output = None
+    if args.gdn_state_output is not None:
+        gdn_state_output = args.gdn_state_output.expanduser().resolve()
+        if gdn_state_output.exists():
+            parser.error(f"GDN state output already exists: {gdn_state_output}")
+        gdn_state_output.parent.mkdir(parents=True, exist_ok=True)
+        env.update({
+            "STRATA_VERIFY_DUMP_GDN_STATE_LAYER": str(args.capture_verify_gdn_state_layer),
+            "STRATA_VERIFY_DUMP_GDN_STATE_PATH": str(gdn_state_output),
+            "STRATA_VERIFY_DUMP_GDN_STATE_POSITION": "511",
         })
     engine = StrataEngine(cfg["exe"], argv, cwd=cfg["cwd"], log=str(log), env=env)
     requests = []
@@ -190,6 +209,16 @@ def main():
             "position": 511,
             "bytes": gdn_path.stat().st_size,
         }
+    verify_gdn_state_capture = None
+    if gdn_state_output is not None:
+        if not gdn_state_output.is_file():
+            raise RuntimeError("requested pre/post GDN state capture was not written")
+        verify_gdn_state_capture = {
+            "layer": args.capture_verify_gdn_state_layer,
+            "position": 511,
+            "path": str(gdn_state_output),
+            "bytes": gdn_state_output.stat().st_size,
+        }
     route = {"rows": len(rows),
              "layers": sorted({row["layer"] for row in rows}),
              "positions": sorted({row["position"] for row in rows})}
@@ -206,6 +235,7 @@ def main():
         "cpu_output_capture": cpu_output_capture,
         "verify_moe_capture": verify_moe_capture,
         "verify_gdn_capture": verify_gdn_capture,
+        "verify_gdn_state_capture": verify_gdn_state_capture,
         "adaptive_byte_verification_passes": log.read_text().count("adaptive swap byte verification passed"),
         "adaptive_residency_verification_passes": log.read_text().count("adaptive residency table verification passed"),
         "binary_sha256": hashlib.sha256(Path(cfg["exe"]).read_bytes()).hexdigest(),
