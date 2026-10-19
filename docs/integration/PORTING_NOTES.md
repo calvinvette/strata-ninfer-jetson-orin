@@ -1830,3 +1830,10 @@ capture the earliest boundary first and have the analyzer fail closed whenever
 input, route, weight, owner, prompt or token identities differ. A downstream
 layer is useful for locating propagation, but cannot isolate its own arithmetic
 once its input has diverged.
+
+The [MTP round-cost/state diagnostic](../../bench/results/2026-10-19-phase5-coder-current-source-mtp-metrics/README.md)
+also records per-round verifier, draft, commit/emit, accepted and rejected
+draft counts from one current-source Orin request. For Splash, keep this cost
+trace aligned to each accepted prefix and report target correction/bonus tokens
+separately from rejected proposals. Use these synchronized diagnostic timings
+to explain a path, then measure the untraced serving path for performance.
