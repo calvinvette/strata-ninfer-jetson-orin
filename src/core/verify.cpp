@@ -560,8 +560,13 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
     {
         const char* layer = std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_LAYER");
         const char* path = std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_PATH");
+        const char* position = std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_POSITION");
         if ((layer != nullptr) != (path != nullptr)) {
             err = "verify: STRATA_VERIFY_DUMP_MOE_ROUTE_LAYER and STRATA_VERIFY_DUMP_MOE_ROUTE_PATH must be set together";
+            return false;
+        }
+        if (position != nullptr && layer == nullptr) {
+            err = "verify: STRATA_VERIFY_DUMP_MOE_ROUTE_POSITION needs the route layer and path";
             return false;
         }
         if (layer != nullptr) {
@@ -573,6 +578,15 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
             }
             moe_route_diag_layer_ = (int) parsed;
             moe_route_diag_path_ = path;
+            if (position != nullptr) {
+                char* pos_end = nullptr;
+                const long long selected = std::strtoll(position, &pos_end, 10);
+                if (pos_end == position || *pos_end != '\0' || selected < 0) {
+                    err = "verify: invalid opt-in MoE route position";
+                    return false;
+                }
+                moe_route_diag_position_ = (int64_t) selected;
+            }
             const size_t ids_bytes = (size_t) max_t * (size_t) ss.k * sizeof(int32_t);
             moe_route_diag_capacity_ = ids_bytes + (size_t) max_t * (size_t) ss.k * sizeof(float);
             if (cudaHostAlloc((void**) &moe_route_diag_h_, moe_route_diag_capacity_, cudaHostAllocPortable) != cudaSuccess) {
@@ -589,8 +603,13 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
     {
         const char* layer = std::getenv("STRATA_VERIFY_DUMP_MOE_PARTS_LAYER");
         const char* path = std::getenv("STRATA_VERIFY_DUMP_MOE_PARTS_PATH");
+        const char* position = std::getenv("STRATA_VERIFY_DUMP_MOE_PARTS_POSITION");
         if ((layer != nullptr) != (path != nullptr)) {
             err = "verify: STRATA_VERIFY_DUMP_MOE_PARTS_LAYER and STRATA_VERIFY_DUMP_MOE_PARTS_PATH must be set together";
+            return false;
+        }
+        if (position != nullptr && layer == nullptr) {
+            err = "verify: STRATA_VERIFY_DUMP_MOE_PARTS_POSITION needs the parts layer and path";
             return false;
         }
         if (layer != nullptr) {
@@ -602,6 +621,15 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
             }
             moe_parts_diag_layer_ = (int) parsed;
             moe_parts_diag_path_ = path;
+            if (position != nullptr) {
+                char* pos_end = nullptr;
+                const long long selected = std::strtoll(position, &pos_end, 10);
+                if (pos_end == position || *pos_end != '\0' || selected < 0) {
+                    err = "verify: invalid opt-in MoE parts position";
+                    return false;
+                }
+                moe_parts_diag_position_ = (int64_t) selected;
+            }
             if ((size_t) max_t > SIZE_MAX / (size_t) ss.k ||
                 (size_t) max_t * (size_t) ss.k > SIZE_MAX / (size_t) g.n_embd ||
                 (size_t) max_t * (size_t) ss.k * (size_t) g.n_embd > SIZE_MAX / sizeof(float)) {
@@ -2173,6 +2201,8 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
     using namespace strata::kernels;
     const OnDevice on_device(device_);
     last_batch_ = false;
+    // Position-filtered captures may repeat at that position in later
+    // requests. Keep the existing one-shot behavior without a filter.
     if (T < 1 || T > max_t_) { err = "verify: window size out of range"; return false; }
     if (released_.load()) { err = "verify: an earlier window never finished on the GPU (#267); restart the engine"; return false; }
     const ModelGeometry& g = *g_;
@@ -2348,7 +2378,8 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
             return false;
         }
     }
-    if (moe_route_diag_captured_) {
+    if (moe_route_diag_captured_ &&
+        (moe_route_diag_position_ < 0 || (T == 1 && pos0 == moe_route_diag_position_))) {
         static std::mutex route_dump_mutex;
         std::lock_guard<std::mutex> lock(route_dump_mutex);
         std::FILE* dump = std::fopen(moe_route_diag_path_.c_str(), "ab");
@@ -2384,7 +2415,8 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
             return false;
         }
     }
-    if (moe_parts_diag_captured_) {
+    if (moe_parts_diag_captured_ &&
+        (moe_parts_diag_position_ < 0 || (T == 1 && pos0 == moe_parts_diag_position_))) {
         struct PartsHeader {
             char magic[8];
             uint32_t version;

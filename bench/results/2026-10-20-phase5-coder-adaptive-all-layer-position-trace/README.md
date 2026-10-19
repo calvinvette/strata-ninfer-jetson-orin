@@ -112,6 +112,28 @@ python3 bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/
   --output /tmp/layer25-cpu-output-pair.json
 ```
 
+## Layer-25 verifier router and expert-parts follow-up
+
+A same-service run captured the verifier router IDs and weights and all ten
+expert output rows for model layer 25 at position 511 in both the initial and
+recovery short requests. The token (271), expert IDs, and weights matched; all
+25,600 FP32 values after `moe_hit_add` were bit-identical. This rules out the
+captured routed expert contributions, including GPU-owned rows, as the source
+of the later layer-26 difference for this position. Shared-expert output,
+weighted combine, and residual write remain unresolved. This is still a
+single-position correctness trace, not a fix or a performance result.
+
+The new capture built on Orin, and four focused CTests passed. Its supervised
+same-service run passed with 14.31 GiB minimum host/admission availability,
+10.85 GiB maximum scope use, and zero cgroup events; duration was 184.9 s.
+Clocks were dynamic, EMC readback was denied, and energy was not request-
+attributed. Raw files and the analyzer output are under
+`layer25-verifier-parts/`; the focused report documents the reproduction
+command and graph-capture position-filter behavior. A current top-level
+verifier HIP rebuild on maestro1 recompiled the changed file and passed its
+help check; the SYCL overlay was unaffected and its build reported no work.
+These are compile/CLI checks only. Phase 5 remains open.
+
 The two raw 113 MiB dumps remain outside Git under
 `~/models/strata-orin-validation/experiments/phase5-gdn-state/`; their full
 SHA256 values and per-layer comparison are in `gdn-state-delta.json`. The

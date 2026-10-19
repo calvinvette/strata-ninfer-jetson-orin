@@ -37,6 +37,8 @@ def main():
                         help="capture CPU expert rows from one verifier/prefill dispatch at this layer")
     parser.add_argument("--capture-cpu-output-dispatch", type=int,
                         help="select the dispatch ID for the optional CPU expert output capture")
+    parser.add_argument("--capture-verify-moe-layer", type=int,
+                        help="capture verifier router weights and all expert rows at position 511 for this layer")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.continuations < 0:
@@ -50,6 +52,8 @@ def main():
     if args.capture_cpu_output_layer is not None and (
             args.capture_cpu_output_layer < 0 or args.capture_cpu_output_dispatch < 0):
         parser.error("CPU output capture layer and dispatch must be non-negative")
+    if args.capture_verify_moe_layer is not None and args.capture_verify_moe_layer < 0:
+        parser.error("verifier MoE capture layer must be non-negative")
     args.output.mkdir(parents=True, exist_ok=False)
 
     cfg = json.loads((BASE / "config.json").read_text())
@@ -96,6 +100,15 @@ def main():
             "STRATA_CAPTURE_MOE_OUTPUT_LAYER": str(args.capture_cpu_output_layer),
             "STRATA_CAPTURE_MOE_OUTPUT_DISPATCH": str(args.capture_cpu_output_dispatch),
         })
+    if args.capture_verify_moe_layer is not None:
+        env.update({
+            "STRATA_VERIFY_DUMP_MOE_ROUTE_LAYER": str(args.capture_verify_moe_layer),
+            "STRATA_VERIFY_DUMP_MOE_ROUTE_PATH": str((args.output / "verify-moe-routes.jsonl").resolve()),
+            "STRATA_VERIFY_DUMP_MOE_ROUTE_POSITION": "511",
+            "STRATA_VERIFY_DUMP_MOE_PARTS_LAYER": str(args.capture_verify_moe_layer),
+            "STRATA_VERIFY_DUMP_MOE_PARTS_PATH": str((args.output / "verify-moe-parts.bin").resolve()),
+            "STRATA_VERIFY_DUMP_MOE_PARTS_POSITION": "511",
+        })
     engine = StrataEngine(cfg["exe"], argv, cwd=cfg["cwd"], log=str(log), env=env)
     requests = []
     try:
@@ -135,6 +148,23 @@ def main():
             "target_position_rows": len(target_rows),
             "position": 511,
         }
+    verify_moe_capture = None
+    if args.capture_verify_moe_layer is not None:
+        route_path = args.output / "verify-moe-routes.jsonl"
+        parts_path = args.output / "verify-moe-parts.bin"
+        if not route_path.is_file() or not parts_path.is_file():
+            raise RuntimeError("requested verifier MoE route/parts capture was not written")
+        route_records = [json.loads(line) for line in route_path.read_text().splitlines()]
+        selected_routes = [row for row in route_records[1:]
+                           if row.get("layer") == args.capture_verify_moe_layer and row.get("position") == 511]
+        if len(selected_routes) != 2:
+            raise RuntimeError(f"expected initial and recovery verifier route rows at position 511, got {len(selected_routes)}")
+        verify_moe_capture = {
+            "layer": args.capture_verify_moe_layer,
+            "position": 511,
+            "route_rows": len(selected_routes),
+            "parts_bytes": parts_path.stat().st_size,
+        }
     route = {"rows": len(rows),
              "layers": sorted({row["layer"] for row in rows}),
              "positions": sorted({row["position"] for row in rows})}
@@ -149,6 +179,7 @@ def main():
                                                                   zip(requests[0]["ids"], requests[2]["ids"])),
         "changed_state_keys": state_changes, "route": route,
         "cpu_output_capture": cpu_output_capture,
+        "verify_moe_capture": verify_moe_capture,
         "adaptive_byte_verification_passes": log.read_text().count("adaptive swap byte verification passed"),
         "adaptive_residency_verification_passes": log.read_text().count("adaptive residency table verification passed"),
         "binary_sha256": hashlib.sha256(Path(cfg["exe"]).read_bytes()).hexdigest(),

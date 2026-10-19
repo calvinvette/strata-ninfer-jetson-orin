@@ -382,11 +382,13 @@ private:
     std::string gdn_diag_path_;
     bool gdn_diag_captured_ = false;
     int moe_route_diag_layer_ = -1;
+    int64_t moe_route_diag_position_ = -1;
     uint8_t* moe_route_diag_h_ = nullptr;  ///< opt-in pinned capture of device top-k IDs and weights
     size_t moe_route_diag_capacity_ = 0;
     std::string moe_route_diag_path_;
     bool moe_route_diag_captured_ = false;
     int moe_parts_diag_layer_ = -1;
+    int64_t moe_parts_diag_position_ = -1;
     float* moe_parts_diag_h_ = nullptr;  ///< opt-in pinned capture of per-expert outputs before weighted combine
     size_t moe_parts_diag_capacity_ = 0;
     std::string moe_parts_diag_path_;

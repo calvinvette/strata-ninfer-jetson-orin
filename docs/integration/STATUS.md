@@ -1,6 +1,6 @@
 # Integration status
 
-Updated: 2026-10-19. Phases 1 through 4 are complete for their documented tested
+Updated: 2026-10-20. Phases 1 through 4 are complete for their documented tested
 Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 is
 complete for its bounded Orin qualification matrix under [its closeout]
 (PHASE7_CLOSEOUT.md); Phases 5 and 6 remain open. This records tested cells,
@@ -42,6 +42,17 @@ output and full weighted layer output remain uncaptured, so the cause is still
 unresolved. Both supervised checks passed with at least 14.22 GiB available and
 zero cgroup memory events; this is correctness localization, not performance
 evidence.
+
+A same-service [layer-25 verifier capture](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/layer25-verifier-parts/README.md)
+then compared the router and all ten expert rows at position 511. Initial and
+recovery token IDs, expert IDs, and router weights matched; all 25,600 FP32
+values after expert-hit accumulation were bit-identical. This excludes the
+captured routed-expert path for this row. Shared-expert output, weighted
+combine, and residual write remain to be checked. The 28-GiB supervisor passed
+with 14.31 GiB minimum host/admission availability, 10.85 GiB maximum scope
+use, and zero cgroup events. maestro1 HIP recompiled the verifier and passed
+`strata --help`; the unaffected SYCL overlay build reported no work and its
+help check passed. These are x86 compile/CLI checks only. Phase 5 remains open.
 
 The trace's per-layer accepted-prefix hashes now localize the adaptive state's
 first mismatch: at the first recovery token, GDN ordinals 20–35 differed from
