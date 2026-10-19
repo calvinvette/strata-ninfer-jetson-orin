@@ -50,3 +50,8 @@ identities are in `artifact-identity.json`; the source overlay is hashed in
 The focused Orin tests include six synthetic dot/window checks and the new
 pair-selector contract. Phase 5 remains open: the per-format service result
 does not identify the full source of state drift or qualify a serving policy.
+
+The exact-source [maestro1 HIP/SYCL rebuild](backend/maestro1/README.md) then
+compiled and linked both backends, with successful `strata --help` checks.
+These x86 build/CLI checks do not test accelerator execution. The build used a
+1.5 GiB scope; `memory.events` recorded `max 171` but no OOM or kill events.

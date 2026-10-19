@@ -3094,3 +3094,10 @@ persistent-state or quality consequence. Both pairs passed 28-GiB supervision
 with zero observed memory events and at least 14.37 GiB host/admission
 availability. Adaptive migration remains unqualified and Phase 5 remains
 open.
+
+The exact shared source at `c5f9f319`, including the Q8_1 format-pair
+selector, also completed fresh maestro1 HIP and SYCL compile/link builds. Both
+`strata --help` checks exited 0, and SYCL completed 123/123 build steps. The
+scope was capped at 1.5 GiB; `memory.events` recorded 171 `max` events and no
+OOM/kill events. These are x86 build and CLI checks only, not accelerator
+execution or Orin performance results. See the [backend report](../../bench/results/2026-10-19-phase5-coder-layer0-iq3xxs-only-service/backend/maestro1/README.md).
