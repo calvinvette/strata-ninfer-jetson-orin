@@ -44,12 +44,16 @@ changed clocks, and energy was not measured.
 `delayed-layer3-verifier-comparison.json` compare same-service routed expert
 parts, shared output and combined MoE output. The independent exact-row join is
 `operator-checks/expert182-q8_1-mirror/service-parity-row-comparison.json`;
-raw activations and CPU/GPU parity outputs are retained beside it. The
-Q8_1-input quantizer diagnostic is also retained; it found identical CPU/GPU
-scales and codes but exited with one unresolved block in its independent
-stored-sum formula check. Its stored-sum differences mostly reflect the
-documented GGML versus CUDA encoding rule, and it is not used to infer operator
-parity.
+raw activations and CPU/GPU parity outputs are retained beside it. The first
+Q8_1-input quantizer diagnostic is retained as a failed checker cell. Its host
+oracle used round-away-from-zero for Orin's GGML NEON path, which uses
+ties-to-even; it also modeled CUDA division without the build's fast-math
+rounding. The corrected check passes: CPU codes and both stored-sum formulas
+match independently, and CUDA codes are exact or within one quantization step
+(one block is one step). CPU/GPU stored-sum bytes differ in 75/80 blocks by
+design: GGML stores `d*sum(q)` while this CUDA path stores `sum(input)`. See
+`q8_1-quantizer-check-corrected.txt`; this check does not change the routed-row
+or persistent-state findings.
 
 Reproduce the supervised pair from the repository root with:
 

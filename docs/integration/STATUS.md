@@ -74,9 +74,12 @@ exactly, while the post-SwiGLU hidden Q8_1 blocks differ. The remaining
 owner-dependent arithmetic boundary is before the down projection; the first
 persistent-state write and complete recovery parity remain unresolved. Both
 arms passed supervision with 14.22/14.37 GiB minimum host/admission
-availability and zero cgroup memory events. The optional input-quantizer check
-is retained with one independent stored-sum formula failure; scales and codes
-matched, and the failure is not used as a parity result. Phase 5 remains open.
+availability and zero cgroup memory events. The first optional input-quantizer
+check exposed a host-oracle rounding mismatch and remains retained as a failed
+checker cell. A corrected independent check now passes CPU code and both
+stored-sum formulas; CUDA codes are exact or within one step (one block).
+CPU/GPU stored sums differ by their documented GGML versus CUDA encodings.
+This does not change the routed-row or state findings. Phase 5 remains open.
 
 An earlier [layer-25 CPU-row capture](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/README.md#layer-25-cpu-row-follow-up)
 joined the initial and recovery prompt at position 511. The route input, IDs

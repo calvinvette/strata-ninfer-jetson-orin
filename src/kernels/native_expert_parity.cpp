@@ -88,7 +88,13 @@ int check_q8_1_quantizers(const std::vector<float>& x, cudaStream_t stream) {
     cuda_check(cudaFree(dq), "free Q8_1 blocks");
     cuda_check(cudaFree(dx), "free input");
 
-    size_t scale_mismatches = 0, code_mismatches = 0, sum_mismatches = 0, oracle_mismatches = 0;
+    size_t scale_mismatches = 0, code_mismatches = 0, sum_mismatches = 0;
+    size_t oracle_scale_mismatches = 0, oracle_cpu_code_errors = 0;
+    size_t oracle_gpu_code_errors = 0, oracle_gpu_code_one_step = 0;
+    size_t oracle_cpu_sum_mismatches = 0, oracle_gpu_sum_mismatches = 0;
+    int first_oracle_failure = -1;
+    int first_bad_code = -1, first_actual_code = 0, first_cpu_formula_code = 0, first_gpu_formula_code = 0;
+    uint16_t first_cpu_sum = 0, first_gpu_sum = 0, first_expected_cpu_sum = 0, first_expected_gpu_sum = 0;
     for (int block = 0; block < H / 32; ++block) {
         const uint8_t* c = cpu_q.data() + (size_t) block * 36;
         const uint8_t* g = gpu_q.data() + (size_t) block * 36;
@@ -110,23 +116,70 @@ int check_q8_1_quantizers(const std::vector<float>& x, cudaStream_t stream) {
         }
         const float d = amax / 127.f;
         const float inv = d > 0.f ? 1.f / d : 0.f;
-        int qsum = 0;
-        bool codes_ok = true;
+        int cpu_qsum = 0;
+        bool cpu_codes_ok = true, gpu_codes_ok = true;
+        bool gpu_code_one_step = false;
         for (int i = 0; i < 32; ++i) {
-            const int q = std::clamp((int) std::round(row[i] * inv), -127, 127);
-            qsum += q;
-            codes_ok &= c[4 + i] == (uint8_t) (int8_t) q && g[4 + i] == (uint8_t) (int8_t) q;
+            // Orin's GGML NEON quantizer uses vcvtn (ties to even), unlike the
+            // scalar reference's roundf (ties away from zero).
+            const int cpu_q = std::clamp((int) std::nearbyint(row[i] * inv), -127, 127);
+            const int gpu_q = std::clamp((int) std::round(row[i] / d), -127, 127);
+            cpu_qsum += cpu_q;
+            cpu_codes_ok &= c[4 + i] == (uint8_t) (int8_t) cpu_q;
+            const int gpu_actual = (int8_t) g[4 + i];
+            const int gpu_step = std::abs(gpu_actual - gpu_q);
+            gpu_codes_ok &= gpu_step <= 1;
+            gpu_code_one_step |= gpu_step == 1;
+            if (first_bad_code < 0 && (c[4 + i] != (uint8_t) (int8_t) cpu_q ||
+                                       std::abs(gpu_actual - gpu_q) > 1)) {
+                first_bad_code = i;
+                first_actual_code = (int8_t) c[4 + i];
+                first_cpu_formula_code = cpu_q;
+                first_gpu_formula_code = gpu_q;
+            }
         }
         const ggml_fp16_t half_d = ggml_fp32_to_fp16(d);
-        const ggml_fp16_t cpu_sum = ggml_fp32_to_fp16(d * (float) qsum);
+        const ggml_fp16_t cpu_sum = ggml_fp32_to_fp16(d * (float) cpu_qsum);
         const ggml_fp16_t gpu_sum = ggml_fp32_to_fp16(sums[0]);
-        oracle_mismatches += !codes_ok || std::memcmp(c, &half_d, 2) != 0 || std::memcmp(g, &half_d, 2) != 0 ||
-                             std::memcmp(c + 2, &cpu_sum, 2) != 0 || std::memcmp(g + 2, &gpu_sum, 2) != 0;
+        const bool scale_ok = std::memcmp(c, &half_d, 2) == 0 && std::memcmp(g, &half_d, 2) == 0;
+        const bool cpu_sum_ok = std::memcmp(c + 2, &cpu_sum, 2) == 0;
+        const bool gpu_sum_ok = std::memcmp(g + 2, &gpu_sum, 2) == 0;
+        if ((!scale_ok || !cpu_codes_ok || !gpu_codes_ok || !cpu_sum_ok || !gpu_sum_ok) && first_oracle_failure < 0) {
+            first_cpu_sum = (uint16_t) c[2] | (uint16_t) c[3] << 8;
+            first_gpu_sum = (uint16_t) g[2] | (uint16_t) g[3] << 8;
+            first_expected_cpu_sum = cpu_sum;
+            first_expected_gpu_sum = gpu_sum;
+        }
+        oracle_scale_mismatches += !scale_ok;
+        oracle_cpu_code_errors += !cpu_codes_ok;
+        oracle_gpu_code_errors += !gpu_codes_ok;
+        oracle_gpu_code_one_step += gpu_code_one_step;
+        oracle_cpu_sum_mismatches += !cpu_sum_ok;
+        oracle_gpu_sum_mismatches += !gpu_sum_ok;
+        if ((!scale_ok || !cpu_codes_ok || !gpu_codes_ok || !cpu_sum_ok || !gpu_sum_ok) && first_oracle_failure < 0) {
+            first_oracle_failure = block;
+        }
     }
     std::printf("captured activation Q8_1 blocks=%lld: CPU/GPU scale mismatches=%zu, code mismatches=%zu, "
-                "stored-sum mismatches=%zu (GGML d*sum(q), CUDA sum(input)); independent formula block failures=%zu\n",
-                (long long) (H / 32), scale_mismatches, code_mismatches, sum_mismatches, oracle_mismatches);
-    return scale_mismatches || code_mismatches || oracle_mismatches ? 1 : 0;
+                "stored-sum mismatches=%zu (GGML d*sum(q), CUDA sum(input)); independent checks: "
+                "scale-errors=%zu CPU-code-errors=%zu CUDA-code-errors-over-1=%zu CUDA-code-1-step-blocks=%zu "
+                "GGML-sum-errors=%zu CUDA-sum-errors=%zu first-block=%d\n",
+                (long long) (H / 32), scale_mismatches, code_mismatches, sum_mismatches,
+                oracle_scale_mismatches, oracle_cpu_code_errors, oracle_gpu_code_errors,
+                oracle_gpu_code_one_step, oracle_cpu_sum_mismatches, oracle_gpu_sum_mismatches,
+                first_oracle_failure);
+    if (first_oracle_failure >= 0) {
+        std::printf("first formula mismatch detail: block=%d code-index=%d actual=%d CPU-formula=%d GPU-formula=%d "
+                    "CPU-sum=%04x expected=%04x GPU-sum=%04x expected=%04x\n",
+                    first_oracle_failure, first_bad_code, first_actual_code, first_cpu_formula_code,
+                    first_gpu_formula_code, first_cpu_sum, first_expected_cpu_sum, first_gpu_sum,
+                    first_expected_gpu_sum);
+    }
+    return scale_mismatches || code_mismatches || oracle_scale_mismatches || oracle_cpu_code_errors ||
+                   oracle_gpu_code_errors ||
+                   oracle_cpu_sum_mismatches || oracle_gpu_sum_mismatches
+               ? 1
+               : 0;
 }
 
 int check_iq4_nl_down_q8_1(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int seed,
