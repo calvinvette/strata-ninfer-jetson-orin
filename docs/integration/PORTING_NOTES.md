@@ -315,6 +315,14 @@ the service's per-layer fingerprint. A future Splash port should join owner,
 per-expert output, combine, recurrent inputs and committed state at the same
 accepted token, and keep those evidence layers distinct in its report.
 
+The captured IQ3_XXS/IQ4_NL expert-22 discrepancy was further narrowed with
+hidden-activation records: input Q8_1 bytes matched, while three post-SwiGLU
+Q8_1 block scales differed by one FP16 step and all codes/sum scales matched.
+CPU down projection on the GPU-produced hidden blocks was bit-identical to the
+grouped GPU result. For a future Splash implementation, compare the fused
+gate/up/SwiGLU output immediately before quantization; do not infer that stage
+from scratch buffers unless the kernel writes them by contract.
+
 The Oct 11 Strata accepted-prefix test exposed a QSA indexer transaction detail
 that also applies when integrating another speculative engine. Commit replay
 correctly rebuilt rows for the accepted prefix, but a rejected suffix could

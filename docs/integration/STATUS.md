@@ -74,6 +74,18 @@ confirms the committed-state boundary but does not establish an accuracy
 winner. Both supervisors passed with at least 14.22 GiB minimum
 host/admission availability and zero cgroup events. Phase 5 remains open.
 
+A same-input [expert-22 Q8_1 stage check](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/operator-checks/layer31-position519/README.md)
+compared the actual captured layer-31 activation with the independent native
+expert harness. CPU and CUDA input Q8_1 blocks were byte-identical. After
+gate/up and SwiGLU, 3/60 hidden Q8_1 blocks differed only in the FP16 `d` scale
+by one representable step; their sums and integer codes matched. Replaying the
+down projection on the CUDA-produced hidden blocks yielded bit-identical CPU
+IQ4_NL and grouped CUDA outputs (0/7,680 words different). This localizes the
+numeric seam to gate/up output before hidden quantization, but does not yet
+distinguish fast-exp/division arithmetic from another scheduling detail. The
+harness's auxiliary fused-kernel float buffers are excluded as invalid. Phase 5
+remains open.
+
 A same-input [layer-25 owner trace](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/layer25-owner-position505-506/README.md)
 directly ties the position-505 adaptive divergence to expert 183 changing from
 CPU to GPU at layer 25. Its input, route IDs and weights match bitwise; the

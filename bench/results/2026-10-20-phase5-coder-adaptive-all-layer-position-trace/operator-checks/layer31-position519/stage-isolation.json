@@ -1,0 +1,48 @@
+{
+  "model_repo": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+  "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
+  "variant": "IQ1_M",
+  "candidate_binary_sha256": "14afd1a4b953e176a88d7812bddcdf2beb65944bb5795beaf0f37e5834a496aa",
+  "native_expert_parity_sha256": "b89863837260a2267e719ac8ab4dc2abcbf5221b194ff76b802a16e2f21d7836",
+  "captured_activation_sha256": "bf609469743a057a07de8b514bf616399e84fe79fc84f71ca643cfe9f950e824",
+  "expert": "layer 31 expert 22 (IQ3_XXS gate/up, IQ4_NL down)",
+  "input_q8_1_equal": true,
+  "input_q8_1_sha256": "ad7638010d5a5314ea29ee674d79898c36188e34e806d1848cfa116aa8de768f",
+  "hidden_q8_1_blocks": 60,
+  "hidden_q8_1_differing_blocks": 3,
+  "hidden_quantized_codes_differing_bytes": 0,
+  "hidden_scale_differences": [
+    {
+      "block": 12,
+      "cpu_d_hex": "781a",
+      "gpu_d_hex": "791a",
+      "cpu_d": 0.0031585693359375,
+      "gpu_d": 0.0031604766845703125,
+      "cpu_sum_scale": -0.29150390625,
+      "gpu_sum_scale": -0.29150390625,
+      "quantized_codes_equal": true
+    },
+    {
+      "block": 32,
+      "cpu_d_hex": "781a",
+      "gpu_d_hex": "791a",
+      "cpu_d": 0.0031585693359375,
+      "gpu_d": 0.0031604766845703125,
+      "cpu_sum_scale": -0.29150390625,
+      "gpu_sum_scale": -0.29150390625,
+      "quantized_codes_equal": true
+    },
+    {
+      "block": 52,
+      "cpu_d_hex": "781a",
+      "gpu_d_hex": "791a",
+      "cpu_d": 0.0031585693359375,
+      "gpu_d": 0.0031604766845703125,
+      "cpu_sum_scale": -0.29150390625,
+      "gpu_sum_scale": -0.29150390625,
+      "quantized_codes_equal": true
+    }
+  ],
+  "same_gpu_hidden_down_projection": "CPU IQ4_NL down on CUDA-produced hidden Q8_1 matched grouped CUDA output bit-for-bit (0/7680 words differ), as reported in stage-isolation.txt",
+  "qualification": "The harness intermediate float arrays for fused gate/up are not interpreted as valid; only the Q8_1 block captures and downstream replay are used."
+}
