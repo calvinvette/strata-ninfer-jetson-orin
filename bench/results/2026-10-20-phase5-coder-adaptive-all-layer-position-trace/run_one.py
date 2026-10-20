@@ -43,7 +43,9 @@ def main():
     parser.add_argument("--capture-cpu-output-dispatch", type=int,
                         help="select the dispatch ID for the optional CPU expert output capture")
     parser.add_argument("--capture-verify-moe-layer", type=int,
-                        help="capture verifier router weights and all expert rows at position 511 for this layer")
+                        help="capture verifier router weights and all expert rows at selected positions for this layer")
+    parser.add_argument("--verify-moe-positions", default="511",
+                        help="comma-separated increasing verifier MoE diagnostic positions (default: 511)")
     parser.add_argument("--capture-verify-gdn-layer", type=int,
                         help="capture verifier GDN intermediates at selected positions for this layer")
     parser.add_argument("--verify-gdn-positions", default="511",
@@ -88,6 +90,13 @@ def main():
         parser.error("CPU output capture layer and dispatch must be non-negative")
     if args.capture_verify_moe_layer is not None and args.capture_verify_moe_layer < 0:
         parser.error("verifier MoE capture layer must be non-negative")
+    try:
+        verify_moe_positions = [int(value) for value in args.verify_moe_positions.split(",")]
+    except ValueError:
+        parser.error("--verify-moe-positions must be comma-separated non-negative integers")
+    if not verify_moe_positions or any(value < 0 for value in verify_moe_positions) or \
+            verify_moe_positions != sorted(set(verify_moe_positions)):
+        parser.error("--verify-moe-positions must be strictly increasing non-negative integers")
     if args.capture_verify_gdn_layer is not None and args.capture_verify_gdn_layer < 0:
         parser.error("verifier GDN capture layer must be non-negative")
     try:
@@ -180,14 +189,16 @@ def main():
         env.update({
             "STRATA_VERIFY_DUMP_MOE_ROUTE_LAYER": str(args.capture_verify_moe_layer),
             "STRATA_VERIFY_DUMP_MOE_ROUTE_PATH": str((args.output / "verify-moe-routes.jsonl").resolve()),
-            "STRATA_VERIFY_DUMP_MOE_ROUTE_POSITION": "511",
             "STRATA_VERIFY_DUMP_MOE_PARTS_LAYER": str(args.capture_verify_moe_layer),
             "STRATA_VERIFY_DUMP_MOE_PARTS_PATH": str((args.output / "verify-moe-parts.bin").resolve()),
-            "STRATA_VERIFY_DUMP_MOE_PARTS_POSITION": "511",
             "STRATA_VERIFY_DUMP_MOE_OUTPUT_LAYER": str(args.capture_verify_moe_layer),
             "STRATA_VERIFY_DUMP_MOE_OUTPUT_PATH": str((args.output / "verify-moe-output.bin").resolve()),
-            "STRATA_VERIFY_DUMP_MOE_OUTPUT_POSITION": "511",
         })
+        for kind in ("ROUTE", "PARTS", "OUTPUT"):
+            if verify_moe_positions == [511]:
+                env[f"STRATA_VERIFY_DUMP_MOE_{kind}_POSITION"] = "511"
+            else:
+                env[f"STRATA_VERIFY_DUMP_MOE_{kind}_POSITIONS"] = ",".join(map(str, verify_moe_positions))
     if args.capture_verify_gdn_layer is not None:
         env.update({
             "STRATA_VERIFY_DUMP_GDN_LAYER": str(args.capture_verify_gdn_layer),
@@ -323,12 +334,15 @@ def main():
             raise RuntimeError("requested verifier MoE route/parts/output capture was not written")
         route_records = [json.loads(line) for line in route_path.read_text().splitlines()]
         selected_routes = [row for row in route_records[1:]
-                           if row.get("layer") == args.capture_verify_moe_layer and row.get("position") == 511]
-        if len(selected_routes) != 2:
-            raise RuntimeError(f"expected initial and recovery verifier route rows at position 511, got {len(selected_routes)}")
+                           if row.get("layer") == args.capture_verify_moe_layer
+                           and row.get("position") in verify_moe_positions]
+        counts = {position: sum(row.get("position") == position for row in selected_routes)
+                  for position in verify_moe_positions}
+        if counts != {position: 2 for position in verify_moe_positions}:
+            raise RuntimeError(f"expected initial and recovery verifier route rows at selected positions; got {counts}")
         verify_moe_capture = {
             "layer": args.capture_verify_moe_layer,
-            "position": 511,
+            "positions": verify_moe_positions,
             "route_rows": len(selected_routes),
             "parts_bytes": parts_path.stat().st_size,
             "output_bytes": output_path.stat().st_size,

@@ -717,6 +717,7 @@ int check_q8_1_selector_contract() {
         {GGML_TYPE_IQ2_S, GGML_TYPE_IQ4_NL, "iq2_s/iq4_nl"},
         {GGML_TYPE_IQ3_XXS, GGML_TYPE_Q2_0, "iq3_xxs/q2_0"},
         {GGML_TYPE_IQ3_XXS, GGML_TYPE_IQ4_NL, "iq3_xxs/iq4_nl"},
+        {GGML_TYPE_IQ3_S, GGML_TYPE_IQ4_NL, "iq3_s/iq4_nl"},
     };
     auto set_selector = [](const char* value) {
 #ifdef _WIN32
@@ -735,7 +736,8 @@ int check_q8_1_selector_contract() {
             ++failures;
         }
     }
-    const char* selectors[] = {"1", "all", "iq2_s/q2_0", "iq2_s/iq4_nl", "iq3_xxs/q2_0", "iq3_xxs/iq4_nl"};
+    const char* selectors[] = {"1", "all", "iq2_s/q2_0", "iq2_s/iq4_nl", "iq3_xxs/q2_0",
+                               "iq3_xxs/iq4_nl", "iq3_s/iq4_nl"};
     for (const char* selector : selectors) {
         set_selector(selector);
         for (size_t i = 0; i < std::size(pairs); ++i) {
@@ -1015,10 +1017,10 @@ int main(int argc, char** argv) {
             }
             const auto blob = synthetic_blob(f, i);
             if (all_windows) {
-                if ((gu != GGML_TYPE_IQ2_S && gu != GGML_TYPE_IQ3_XXS) ||
+                if ((gu != GGML_TYPE_IQ2_S && gu != GGML_TYPE_IQ3_XXS && gu != GGML_TYPE_IQ3_S) ||
                     (dn != GGML_TYPE_Q2_0 && dn != GGML_TYPE_IQ4_NL) ||
                     f.gu_act != GGML_TYPE_Q8_1 || f.d_act != GGML_TYPE_Q8_1) {
-                    std::fprintf(stderr, "--synthetic-windows supports iq2_s/q2_0, iq2_s/iq4_nl, iq3_xxs/q2_0 or iq3_xxs/iq4_nl with Q8_1 activations\n");
+                    std::fprintf(stderr, "--synthetic-windows supports iq2_s/q2_0, iq2_s/iq4_nl, iq3_xxs/q2_0, iq3_xxs/iq4_nl or iq3_s/iq4_nl with Q8_1 activations\n");
                     return 2;
                 }
                 failures += check_blob<1>(f, blob, i, "synthetic nt=1", s);

@@ -23,6 +23,25 @@ reading and pinning that engine's actual source and license:
 | Attribute helper-process allocations | `cuda_alloc_observations.py` groups a test interposer's runtime allocation events by PID; pair it with the owner event ledger and whole-board MemAvailable | Instrument the encoder/helper process as well as the engine; keep process request totals separate from physical capacity and from each other |
 | Independent correctness before schedules | Codec/math oracle and accepted-prefix state gates remain pending | CPU FP64 or independent exact codec reference; directly inspect recurrent/KV state for speculation |
 
+The Coder migration investigation showed why a CPU fallback needs a
+format-qualified arithmetic contract. An owner trace first exposed an
+IQ3_S/IQ4_NL expert whose captured CPU and CUDA outputs differed for the same
+input. A narrow opt-in CPU Q8_1 mirror then matched that row bit-for-bit, yet
+adaptive persistent-state divergence continued at a later token. For a future
+Splash backend, porting a packed format or owner path is therefore only one
+gate: compare each CPU/accelerator operator on identical stored inputs, capture
+layer inputs/outputs across multiple accepted positions, and compare the
+accepted persistent state directly. Do not treat a local operator match as
+proof of full-sequence state parity.
+
+A second captured owner transition (`IQ2_S`/`IQ4_NL`) remained 0.2819% relative
+L2 apart after the same Q8_1 mirror. The CPU down projection matched grouped
+accelerator output when given the accelerator's hidden Q8_1 row, but the
+post-SwiGLU hidden rows themselves differed. This is a useful diagnostic split
+for future backends: compare intermediate quantized activations before blaming
+the final matrix operator, and retain the original and mirrored path when an
+experimental arithmetic change only reduces the error.
+
 `tools/integration/run_control.py` supervises explicit commands. It samples
 physical availability, cgroup-v2 ancestor limits, swap, process-group RSS,
 faults/I/O and host disk counters, and preserves raw tegrastats output when
@@ -149,6 +168,22 @@ some requests. The scalar mirror is useful for causal isolation, not evidence
 that layer arithmetic alone restores request state. For Splash, test each
 actual Metal-supported expert pair, then follow the numerical change through
 committed state and continuation.
+
+A multi-position [IQ1_M Coder owner trace](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/layer25-owner-position505-506/README.md)
+shows how to join three boundaries when a later recurrent state differs:
+capture per-layer dispatch input and owner, capture verifier router/expert/shared
+and combined outputs at the same token positions, then replay the selected
+expert on the identical input through each backend and an independent decoded-
+weight reference. Here the layer-25 input, expert IDs and weights matched,
+while expert 183 changed owner from CPU to GPU and its output changed by 1.2575%
+relative L2; both service outputs matched the corresponding operator run
+bitwise. `route_kind < 0` denotes CPU and nonnegative values denote GPU in this
+Strata trace format. For Splash, record the equivalent backend identity and
+capture the exact Metal/CPU intermediate rows; do not reuse this owner encoding,
+quantizer, reduction schedule or tolerance without checking Splash's source.
+Follow the combined output into the next recurrent state and later completion;
+an operator difference identifies a numerical boundary, not by itself an
+acceptable quality budget.
 
 A first campaign preserved one completed process and five failed starts because
 the harness's port precheck did not allow TCP TIME_WAIT reuse. The corrected

@@ -398,18 +398,24 @@ private:
     std::string gdn_commit_diag_path_;
     int moe_route_diag_layer_ = -1;
     int64_t moe_route_diag_position_ = -1;
+    std::vector<int64_t> moe_route_diag_positions_;
+    bool moe_route_diag_multi_position_filter_ = false;
     uint8_t* moe_route_diag_h_ = nullptr;  ///< opt-in pinned capture of device top-k IDs and weights
     size_t moe_route_diag_capacity_ = 0;
     std::string moe_route_diag_path_;
     bool moe_route_diag_captured_ = false;
     int moe_parts_diag_layer_ = -1;
     int64_t moe_parts_diag_position_ = -1;
+    std::vector<int64_t> moe_parts_diag_positions_;
+    bool moe_parts_diag_multi_position_filter_ = false;
     float* moe_parts_diag_h_ = nullptr;  ///< opt-in pinned capture of per-expert outputs before weighted combine
     size_t moe_parts_diag_capacity_ = 0;
     std::string moe_parts_diag_path_;
     bool moe_parts_diag_captured_ = false;
     int moe_output_diag_layer_ = -1;
     int64_t moe_output_diag_position_ = -1;
+    std::vector<int64_t> moe_output_diag_positions_;
+    bool moe_output_diag_multi_position_filter_ = false;
     float* moe_output_diag_h_ = nullptr;  ///< pinned shared-expert and combined MoE output rows
     size_t moe_output_diag_capacity_ = 0;
     std::string moe_output_diag_path_;

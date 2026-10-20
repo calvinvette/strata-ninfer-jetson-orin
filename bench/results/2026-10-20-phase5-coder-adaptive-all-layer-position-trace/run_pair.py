@@ -34,6 +34,10 @@ def main():
     ap.add_argument('--seed', type=int, default=20261030)
     ap.add_argument('--continuations', type=int, default=1)
     ap.add_argument('--capture-moe-positions', default='511')
+    ap.add_argument('--capture-verify-moe-layer', type=int)
+    ap.add_argument('--verify-moe-positions', default='511')
+    ap.add_argument('--capture-verify-gdn-layer', type=int)
+    ap.add_argument('--verify-gdn-positions', default='511')
     ap.add_argument('--run', action='store_true')
     a = ap.parse_args()
     if a.continuations < 0:
@@ -45,6 +49,22 @@ def main():
     if not capture_positions or any(value < 0 for value in capture_positions) or \
             capture_positions != sorted(set(capture_positions)):
         ap.error('--capture-moe-positions must be strictly increasing non-negative integers')
+    try:
+        verify_positions = [int(value) for value in a.verify_moe_positions.split(',')]
+    except ValueError:
+        ap.error('--verify-moe-positions must be comma-separated non-negative integers')
+    if not verify_positions or any(value < 0 for value in verify_positions) or \
+            verify_positions != sorted(set(verify_positions)):
+        ap.error('--verify-moe-positions must be strictly increasing non-negative integers')
+    try:
+        gdn_positions = [int(value) for value in a.verify_gdn_positions.split(',')]
+    except ValueError:
+        ap.error('--verify-gdn-positions must be comma-separated non-negative integers')
+    if not gdn_positions or any(value < 0 for value in gdn_positions) or \
+            gdn_positions != sorted(set(gdn_positions)):
+        ap.error('--verify-gdn-positions must be strictly increasing non-negative integers')
+    if a.capture_verify_gdn_layer is not None and a.capture_verify_gdn_layer < 0:
+        ap.error('--capture-verify-gdn-layer must be non-negative')
     if a.output.exists():
         ap.error('output directory already exists')
     cfg = json.loads((BASE / 'config.json').read_text())
@@ -59,6 +79,10 @@ def main():
         'scope': 'one randomized same-service short/long/short correctness pair with optional continuation; delayed adaptation versus cap-8 adaptive swaps',
         'continuations': a.continuations,
         'capture_moe_positions': capture_positions,
+        'capture_verify_moe_layer': a.capture_verify_moe_layer,
+        'verify_moe_positions': verify_positions if a.capture_verify_moe_layer is not None else None,
+        'capture_verify_gdn_layer': a.capture_verify_gdn_layer,
+        'verify_gdn_positions': gdn_positions if a.capture_verify_gdn_layer is not None else None,
         'repository_head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'binary_sha256': digest(binary), 'model_repository': 'ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF',
         'model_revision': '5348543e0147355ac9cbcb031184a3546350988e', 'quantization': 'IQ1_M',
@@ -89,6 +113,12 @@ def main():
                py, str(runner), '--adapt-every', str(arm['adapt_every']), '--adapt-swaps', str(arm['adapt_swaps']),
                '--continuations', str(a.continuations), '--capture-moe-positions', a.capture_moe_positions,
                '--output', str(result)]
+        if a.capture_verify_moe_layer is not None:
+            cmd.extend(['--capture-verify-moe-layer', str(a.capture_verify_moe_layer),
+                        '--verify-moe-positions', a.verify_moe_positions])
+        if a.capture_verify_gdn_layer is not None:
+            cmd.extend(['--capture-verify-gdn-layer', str(a.capture_verify_gdn_layer),
+                        '--verify-gdn-positions', a.verify_gdn_positions])
         (d / 'launch.txt').write_text('systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes ' + ' '.join(cmd) + '\n')
         start = time.time()
         completed = subprocess.run(['systemd-run', '--user', '--scope', '--collect', '-p', 'MemoryMax=28G', '-p', 'IOAccounting=yes', *cmd], cwd=ROOT, capture_output=True, text=True)

@@ -1,7 +1,7 @@
 // src/kernels/cpu/native_expert.cpp - plan v0.3 P6: native (GGUF-form) experts on the CPU through ggml-cpu.
 // See the header. The default activation quantizers and row dot products are ggml-cpu's. Explicitly opt-in Q8_1
-// diagnostic routes for IQ2_S/Q2_0, IQ2_S/IQ4_NL, IQ3_XXS/Q2_0 and IQ3_XXS/IQ4_NL are implemented below for
-// cross-backend tests.
+// diagnostic routes for IQ2_S/Q2_0, IQ2_S/IQ4_NL, IQ3_XXS/Q2_0, IQ3_XXS/IQ4_NL and IQ3_S/IQ4_NL are implemented
+// below for cross-backend tests.
 #include "strata/kernels/cpu/native_expert.hpp"
 #include "strata/kernels/cpu/expert.hpp"
 #include "strata/platform/cpu_arch.hpp"
@@ -35,7 +35,7 @@ bool q8_1_selector_known(const char* selector) {
     if (std::strcmp(selector, "0") == 0 || std::strcmp(selector, "1") == 0 ||
         std::strcmp(selector, "all") == 0 || std::strcmp(selector, "iq2_s/q2_0") == 0 ||
         std::strcmp(selector, "iq2_s/iq4_nl") == 0 || std::strcmp(selector, "iq3_xxs/q2_0") == 0 ||
-        std::strcmp(selector, "iq3_xxs/iq4_nl") == 0)
+        std::strcmp(selector, "iq3_xxs/iq4_nl") == 0 || std::strcmp(selector, "iq3_s/iq4_nl") == 0)
         return true;
     const char* at = std::strstr(selector, "@layer=");
     if (at == nullptr || at == selector) return false;
@@ -48,7 +48,7 @@ bool q8_1_selector_known(const char* selector) {
     if (errno == ERANGE || end == n || *end != '\0' || layer > INT_MAX) return false;
     const std::string pair(selector, (size_t) (at - selector));
     return pair == "iq2_s/q2_0" || pair == "iq2_s/iq4_nl" || pair == "iq3_xxs/q2_0" ||
-           pair == "iq3_xxs/iq4_nl";
+           pair == "iq3_xxs/iq4_nl" || pair == "iq3_s/iq4_nl";
 }
 
 bool q8_1_selector_matches(const char* selector, int gu_type, int d_type, int layer) {
@@ -62,13 +62,15 @@ bool q8_1_selector_matches(const char* selector, int gu_type, int d_type, int la
     const bool iq2_s_iq4_nl = gu_type == GGML_TYPE_IQ2_S && d_type == GGML_TYPE_IQ4_NL;
     const bool iq3_xxs_q2_0 = gu_type == GGML_TYPE_IQ3_XXS && d_type == GGML_TYPE_Q2_0;
     const bool iq3_xxs_iq4_nl = gu_type == GGML_TYPE_IQ3_XXS && d_type == GGML_TYPE_IQ4_NL;
+    const bool iq3_s_iq4_nl = gu_type == GGML_TYPE_IQ3_S && d_type == GGML_TYPE_IQ4_NL;
     const std::string pair = at == nullptr ? selector : std::string(selector, (size_t) (at - selector));
     if (pair == "1" || pair == "all")
-        return iq2_s_q2_0 || iq2_s_iq4_nl || iq3_xxs_q2_0 || iq3_xxs_iq4_nl;
+        return iq2_s_q2_0 || iq2_s_iq4_nl || iq3_xxs_q2_0 || iq3_xxs_iq4_nl || iq3_s_iq4_nl;
     if (pair == "iq2_s/q2_0") return iq2_s_q2_0;
     if (pair == "iq2_s/iq4_nl") return iq2_s_iq4_nl;
     if (pair == "iq3_xxs/q2_0") return iq3_xxs_q2_0;
     if (pair == "iq3_xxs/iq4_nl") return iq3_xxs_iq4_nl;
+    if (pair == "iq3_s/iq4_nl") return iq3_s_iq4_nl;
     return false;
 }
 
@@ -175,6 +177,53 @@ float q8_1_iq3_xxs_cuda_dot(const uint8_t* row, const uint8_t* xq, int n) {
     return lane_sum[0];
 }
 
+float q8_1_iq3_s_cuda_dot(const uint8_t* row, const uint8_t* xq, int n) {
+    // Mirror vec_dot_iq3_s_q8_1 / Fmt<21> in cuda/iq_kernels.cu and the
+    // grouped expert's 32-lane strided accumulation plus XOR reduction.
+    constexpr int qk = QK_K;
+    static_assert(qk == 256, "IQ3_S CUDA contract assumes 256-value weight blocks");
+    if (n % qk != 0) std::abort();
+    const int nb = n / qk;
+    const auto* weights = reinterpret_cast<const block_iq3_s*>(row);
+    const auto* acts = reinterpret_cast<const Q81Block*>(xq);
+    std::array<float, 32> lane_sum{};
+    for (int lane = 0; lane < 32; ++lane) {
+        for (int k = lane; k < nb * 8; k += 32) {
+            const int kbx = k / 8;
+            const int iqs = 2 * (k % 8);
+            const auto* w = weights + kbx;
+            const auto* x = acts + kbx * 8 + iqs / 2;
+            const uint8_t* qs = w->qs + 4 * iqs;
+            const uint8_t qh = w->qh[iqs / 2];
+            const uint8_t* signs = w->signs + 4 * (iqs / 2);
+            int sumi = 0;
+            for (int l0 = 0; l0 < 8; l0 += 2) {
+                const uint32_t grid_l = iq3s_grid[qs[l0] | ((qh << (8 - l0)) & 0x100)];
+                const uint32_t grid_h = iq3s_grid[qs[l0 + 1] | ((qh << (7 - l0)) & 0x100)];
+                const uint8_t sign = signs[l0 / 2];
+                for (int j = 0; j < 4; ++j) {
+                    int gl = (int) ((grid_l >> (8 * j)) & 0xff);
+                    int gh = (int) ((grid_h >> (8 * j)) & 0xff);
+                    if ((sign >> j) & 1) gl = -gl;
+                    if ((sign >> (j + 4)) & 1) gh = -gh;
+                    sumi += gl * (int) x->qs[4 * l0 + j];
+                    sumi += gh * (int) x->qs[4 * (l0 + 1) + j];
+                }
+            }
+            const int scale = 1 + 2 * ((w->scales[iqs / 4] >> ((iqs << 1) & 0x04)) & 0x0f);
+            sumi *= scale;
+            const float d = ggml_fp16_to_fp32(w->d) * ggml_fp16_to_fp32(x->d);
+            lane_sum[(size_t) lane] += d * (float) sumi;
+        }
+    }
+    for (int offset = 16; offset > 0; offset >>= 1) {
+        const auto previous = lane_sum;
+        for (int lane = 0; lane < 32; ++lane)
+            lane_sum[(size_t) lane] = previous[(size_t) lane] + previous[(size_t) (lane ^ offset)];
+    }
+    return lane_sum[0];
+}
+
 float q8_1_q2_0_cuda_dot(const uint8_t* row, const uint8_t* xq, int n) {
     constexpr int qk = QK2_0;
     if (n % qk != 0) std::abort();
@@ -259,7 +308,8 @@ bool q8_1_scalar_dot(const NativeFmt& f) {
                             (f.d_type == GGML_TYPE_Q2_0 || f.d_type == GGML_TYPE_IQ4_NL);
     const bool iq3_xxs_pair = f.gu_type == GGML_TYPE_IQ3_XXS &&
                               (f.d_type == GGML_TYPE_Q2_0 || f.d_type == GGML_TYPE_IQ4_NL);
-    return (iq2_s_pair || iq3_xxs_pair) &&
+    const bool iq3_s_pair = f.gu_type == GGML_TYPE_IQ3_S && f.d_type == GGML_TYPE_IQ4_NL;
+    return (iq2_s_pair || iq3_xxs_pair || iq3_s_pair) &&
            f.gu_act == GGML_TYPE_Q8_1 && f.d_act == GGML_TYPE_Q8_1;
 }
 
@@ -312,7 +362,7 @@ bool native_fmt(int gu_type, int d_type, int64_t n_embd, int64_t n_ff, NativeFmt
     const char* q8_1_probe = std::getenv("STRATA_NATIVE_CPU_Q8_1_DOT");
     if (q8_1_probe != nullptr && !q8_1_selector_known(q8_1_probe)) {
         err = "native experts: STRATA_NATIVE_CPU_Q8_1_DOT must be 0, 1, all, "
-              "iq2_s/q2_0, iq2_s/iq4_nl, iq3_xxs/q2_0, iq3_xxs/iq4_nl, or a pair followed by @layer=N";
+              "iq2_s/q2_0, iq2_s/iq4_nl, iq3_xxs/q2_0, iq3_xxs/iq4_nl, iq3_s/iq4_nl, or a pair followed by @layer=N";
         return false;
     }
     if (q8_1_probe != nullptr && std::strcmp(q8_1_probe, "0") != 0 &&
@@ -388,7 +438,8 @@ void native_gu_rows(const NativeFmt& f, const uint8_t* blob, const void* const* 
             const uint8_t* ur = blob + f.up_off + (size_t) r * f.gu_row;
             for (int t = 0; t < nt; ++t) {
                 const auto* xq = (const uint8_t*) act[t];
-                const auto dot = f.gu_type == GGML_TYPE_IQ2_S ? q8_1_iq2_s_cuda_dot : q8_1_iq3_xxs_cuda_dot;
+                const auto dot = f.gu_type == GGML_TYPE_IQ2_S ? q8_1_iq2_s_cuda_dot :
+                                 f.gu_type == GGML_TYPE_IQ3_XXS ? q8_1_iq3_xxs_cuda_dot : q8_1_iq3_s_cuda_dot;
                 const float g = dot(gr, xq, (int) f.n_embd);
                 const float u = dot(ur, xq, (int) f.n_embd);
                 ff[t][r] = (g / (1.f + std::exp(-g))) * u;

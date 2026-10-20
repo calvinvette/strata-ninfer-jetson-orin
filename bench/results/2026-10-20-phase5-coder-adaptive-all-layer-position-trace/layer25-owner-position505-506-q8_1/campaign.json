@@ -1,0 +1,446 @@
+{
+  "schema": 1,
+  "status": "pass",
+  "seed": 20261030,
+  "scope": "one randomized same-service short/long/short correctness pair with optional continuation; delayed adaptation versus cap-8 adaptive swaps",
+  "continuations": 0,
+  "capture_moe_positions": [
+    505,
+    506
+  ],
+  "capture_verify_moe_layer": 25,
+  "verify_moe_positions": [
+    505,
+    506
+  ],
+  "repository_head": "cd8a12f88b7a731735cf5a0676514277f0a31c27",
+  "binary_sha256": "9212d8140eaac1c1544b426dcd60b95a921235d04633ab36735a7b209d804743",
+  "model_repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+  "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
+  "quantization": "IQ1_M",
+  "model_shard_sha256": {
+    "Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf": "e11083ba855e7666b48ea3f2db6a9c3a20c18751a012cc24f948de91b7087fad",
+    "Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+  },
+  "runs": [
+    {
+      "name": "adaptive-cap8",
+      "adapt_every": 4,
+      "adapt_swaps": 8,
+      "status": "pass",
+      "launcher_returncode": 0,
+      "supervisor_status": "pass",
+      "minimum_available_bytes": 15295664128,
+      "minimum_admission_available_bytes": 15295664128,
+      "elapsed_s": 185.95760526298545,
+      "analysis": {
+        "adapt_every": 4,
+        "adapt_swaps": 8,
+        "configured_spec": 2,
+        "spec_override": null,
+        "capture_moe_positions": [
+          505,
+          506
+        ],
+        "prompt_sha256": {
+          "short": "30668ef6170b7f7d603497a7b8b9b21c198a893a8f625f541e86bb899d8e378a",
+          "long": "17b2c3babd98abc6748be8da6afe12206c9de3272cf2f14a3ec7deb92ded6a4e"
+        },
+        "requests": [
+          {
+            "name": "short-512",
+            "prompt_tokens": 512,
+            "ids": [
+              760,
+              3766,
+              1433,
+              16661,
+              11040,
+              314,
+              264,
+              3074,
+              11,
+              11173,
+              3542,
+              25,
+              359,
+              87,
+              4282,
+              1061
+            ],
+            "state": {
+              "L": "527",
+              "gdn": "3e43e782f7dc1614",
+              "ple": "a7bca872cc2b4f6a",
+              "tail": "58c24ac36967c993",
+              "dead": "48fb10575fbf3848",
+              "pooled": "866e42eb8270c8fb",
+              "pooled_full": "fea72d45e32a811c",
+              "kv": "2c3d2d13ab79b33c",
+              "ple_prev": "87,4282"
+            }
+          },
+          {
+            "name": "long-2048",
+            "prompt_tokens": 2048,
+            "ids": [
+              27775,
+              383,
+              279,
+              3766,
+              2002,
+              10142,
+              1433,
+              11,
+              567,
+              628,
+              22270,
+              264,
+              12103,
+              5215,
+              314,
+              4906
+            ],
+            "state": {
+              "L": "2063",
+              "gdn": "253cb0eb93948009",
+              "ple": "cfa8d78c8b69e5f8",
+              "tail": "35a52afd7c38cf64",
+              "dead": "01d30d2e242360e6",
+              "pooled": "f614ad189a7af3d4",
+              "pooled_full": "581093370a7a2dbd",
+              "kv": "c60086cd2e4ee35a",
+              "ple_prev": "5215,314"
+            }
+          },
+          {
+            "name": "short-512-recovery",
+            "prompt_tokens": 512,
+            "ids": [
+              760,
+              3766,
+              1433,
+              16661,
+              11040,
+              314,
+              264,
+              3074,
+              11,
+              11173,
+              3542,
+              25,
+              359,
+              87,
+              4282,
+              1061
+            ],
+            "state": {
+              "L": "527",
+              "gdn": "8dc0e44ee4125057",
+              "ple": "a7bca872cc2b4f6a",
+              "tail": "aca49c0e50567bd6",
+              "dead": "48fb10575fbf3848",
+              "pooled": "4532d63fa8999d04",
+              "pooled_full": "937de0db3ab61087",
+              "kv": "cb63965c4b917c62",
+              "ple_prev": "87,4282"
+            }
+          }
+        ],
+        "recovery_token_differences": 0,
+        "changed_state_keys": [
+          "gdn",
+          "tail",
+          "pooled",
+          "pooled_full",
+          "kv"
+        ],
+        "route": {
+          "rows": 192,
+          "layers": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47
+          ],
+          "positions": [
+            505,
+            506
+          ]
+        },
+        "cpu_output_capture": null,
+        "verify_moe_capture": {
+          "layer": 25,
+          "positions": [
+            505,
+            506
+          ],
+          "route_rows": 4,
+          "parts_bytes": 409744,
+          "output_bytes": 82064
+        },
+        "verify_gdn_capture": null,
+        "verify_gdn_state_capture": null,
+        "verify_gdn_commit_state_capture": null,
+        "adaptive_byte_verification_passes": 11,
+        "adaptive_residency_verification_passes": 11,
+        "binary_sha256": "9212d8140eaac1c1544b426dcd60b95a921235d04633ab36735a7b209d804743",
+        "model_identity": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF IQ1_M"
+      },
+      "wall_start_s": 1792454592.8767798
+    },
+    {
+      "name": "delayed-control",
+      "adapt_every": 100000,
+      "adapt_swaps": 96,
+      "status": "pass",
+      "launcher_returncode": 0,
+      "supervisor_status": "pass",
+      "minimum_available_bytes": 15424307200,
+      "minimum_admission_available_bytes": 15424307200,
+      "elapsed_s": 212.80148371309042,
+      "analysis": {
+        "adapt_every": 100000,
+        "adapt_swaps": 96,
+        "configured_spec": 2,
+        "spec_override": null,
+        "capture_moe_positions": [
+          505,
+          506
+        ],
+        "prompt_sha256": {
+          "short": "30668ef6170b7f7d603497a7b8b9b21c198a893a8f625f541e86bb899d8e378a",
+          "long": "17b2c3babd98abc6748be8da6afe12206c9de3272cf2f14a3ec7deb92ded6a4e"
+        },
+        "requests": [
+          {
+            "name": "short-512",
+            "prompt_tokens": 512,
+            "ids": [
+              760,
+              3766,
+              1433,
+              16661,
+              11040,
+              314,
+              264,
+              3074,
+              11,
+              11173,
+              3542,
+              25,
+              359,
+              87,
+              4282,
+              1061
+            ],
+            "state": {
+              "L": "527",
+              "gdn": "3e43e782f7dc1614",
+              "ple": "a7bca872cc2b4f6a",
+              "tail": "58c24ac36967c993",
+              "dead": "48fb10575fbf3848",
+              "pooled": "866e42eb8270c8fb",
+              "pooled_full": "fea72d45e32a811c",
+              "kv": "2c3d2d13ab79b33c",
+              "ple_prev": "87,4282"
+            }
+          },
+          {
+            "name": "long-2048",
+            "prompt_tokens": 2048,
+            "ids": [
+              27775,
+              383,
+              279,
+              3766,
+              2002,
+              10142,
+              1433,
+              11,
+              567,
+              628,
+              22270,
+              264,
+              12103,
+              5215,
+              314,
+              4906
+            ],
+            "state": {
+              "L": "2063",
+              "gdn": "afbcc0ff97850e4d",
+              "ple": "cfa8d78c8b69e5f8",
+              "tail": "8aac80203460feea",
+              "dead": "01d30d2e242360e6",
+              "pooled": "10b8961eff29f3de",
+              "pooled_full": "750f1c60c1c4a13b",
+              "kv": "15c7172622da51ef",
+              "ple_prev": "5215,314"
+            }
+          },
+          {
+            "name": "short-512-recovery",
+            "prompt_tokens": 512,
+            "ids": [
+              760,
+              3766,
+              1433,
+              16661,
+              11040,
+              314,
+              264,
+              3074,
+              11,
+              11173,
+              3542,
+              25,
+              359,
+              87,
+              4282,
+              1061
+            ],
+            "state": {
+              "L": "527",
+              "gdn": "3e43e782f7dc1614",
+              "ple": "a7bca872cc2b4f6a",
+              "tail": "58c24ac36967c993",
+              "dead": "48fb10575fbf3848",
+              "pooled": "866e42eb8270c8fb",
+              "pooled_full": "fea72d45e32a811c",
+              "kv": "2c3d2d13ab79b33c",
+              "ple_prev": "87,4282"
+            }
+          }
+        ],
+        "recovery_token_differences": 0,
+        "changed_state_keys": [],
+        "route": {
+          "rows": 192,
+          "layers": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47
+          ],
+          "positions": [
+            505,
+            506
+          ]
+        },
+        "cpu_output_capture": null,
+        "verify_moe_capture": {
+          "layer": 25,
+          "positions": [
+            505,
+            506
+          ],
+          "route_rows": 4,
+          "parts_bytes": 409744,
+          "output_bytes": 82064
+        },
+        "verify_gdn_capture": null,
+        "verify_gdn_state_capture": null,
+        "verify_gdn_commit_state_capture": null,
+        "adaptive_byte_verification_passes": 0,
+        "adaptive_residency_verification_passes": 0,
+        "binary_sha256": "9212d8140eaac1c1544b426dcd60b95a921235d04633ab36735a7b209d804743",
+        "model_identity": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF IQ1_M"
+      },
+      "wall_start_s": 1792454779.3233514
+    }
+  ],
+  "order": [
+    "adaptive-cap8",
+    "delayed-control"
+  ],
+  "finished_wall_time_s": 1792454992.5626001
+}

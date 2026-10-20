@@ -1,4 +1,4 @@
-# Coder adaptive migration all-layer trace and IQ3_XXS/Q2_0 mirror — Orin — 2026-10-20
+# Coder adaptive migration trace and CPU Q8_1 mirrors — Orin — 2026-10-20
 
 This experiment used the current Orin candidate and the pinned **IQ1_M** Coder
 GGUF artifact from `ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF`, revision
@@ -244,12 +244,12 @@ The source patch was built on Orin CUDA/SM87. `file_expert_source_test` passed
 the four focused CTests passed. The full CTest suite was not rerun. The current
 source also passed the full 163-test integration Python suite. Current-source
 HIP and SYCL builds on maestro1 passed compile/link and `strata --help` with
-two jobs. The SYCL build consumed its `sycl/src/program/generate.cpp` overlay;
-the GDN dump diagnostic was ported to that overlay and rebuilt, including its
-per-kernel device-link step. Exact source hashes, binary hashes and logs are
-under `backend/maestro1-current-source-2026-10-19/`; the SYCL overlay patch is
-`sycl-gdn-state-capture.patch`. Maestro1 is x86_64, so these are build/CLI
-checks only. This change does not alter default dispatch.
+two jobs. The fresh SYCL build completed 123/123 steps using the refreshed
+`sycl/src/program/generate.cpp` overlay. Exact source hashes, binary hashes and
+logs are under `backend/maestro1-current-source-2026-10-20-iq3s/`; earlier
+overlay diagnostics remain documented under the 2026-10-19 build report.
+Maestro1 is x86_64, so these are build/CLI checks only. This change does not
+alter default dispatch.
 `source-overlay.patch` records the selector changes relative to source commit
 `76eec469`; `gdn-state-capture.patch` records the state-dump diagnostic change
 relative to `25daf34d`. `SHA256SUMS` covers the report, source overlays, paired
@@ -317,3 +317,78 @@ python3 bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/
   --run bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/reproduction \
   --output bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/reproduction-analysis.json
 ```
+
+## Layer-25 owner-transition follow-up
+
+The [position-505/506 owner and output capture](layer25-owner-position505-506/README.md)
+now directly joins the service's layer-25 dispatch inputs to the verifier's
+expert rows and the same-input CPU/GPU operator oracle. Adaptive recovery moves
+expert 183 (`IQ3_S` / `IQ4_NL`) from CPU to GPU with identical input, IDs and
+router weights. Both outputs match their corresponding parity output bitwise,
+but differ by 1.2575% relative L2; the combined MoE vector differs at position
+505. Delayed control is bit-identical at both selected positions. This
+identifies an owner-dependent operator difference on the observed adaptive
+path; it does not qualify long-chain drift, quality, or performance. See
+`layer25-owner-position505-506/operator-comparison.json` and the retained raw
+captures for exact values and reproduction.
+
+## IQ3_S/IQ4_NL mirror and generated-position-520 trace
+
+An opt-in CPU Q8_1 arithmetic mirror for IQ3_S/IQ4_NL now reproduces the CUDA
+expert-183 output bit-for-bit on the captured layer-25 input. This corrects the
+earlier owner-output difference above for that specific captured row; it does
+not establish that adaptive migration is generally safe. With
+`STRATA_NATIVE_CPU_Q8_1_DOT=all`, the repeated position-505/506 pair has
+bit-identical initial/recovery activations and combined layer-25 MoE output at
+both positions. The accepted state still differs, and its first observed
+token-level state divergence is later, at accepted position 520.
+
+The supervised [position-520 pair](layer26-generated-position520/) captured all
+48 per-layer MoE dispatch inputs, IDs and owners plus the layer-26 GDN verifier
+intermediates for initial short request versus adaptive recovery. Both arms
+returned the same 16 recovery token IDs as their initial short request. The
+delayed control had identical dispatch activations/IDs/owners across those
+requests and bit-identical layer-26 GDN fields. In adaptive recovery, owner
+changes first appear at layers 2 and 3; layer 4 is the first captured
+activation difference. By layer 26 the GDN input `x` differs (all 2,560 values;
+relative L2 5.743%). This indicates the changed verifier input was already
+present before the GDN layer, but the captures do not identify which earlier
+state transition or operator first caused it. Adaptive final fingerprints
+still differ in `gdn`, `tail`, `pooled`, `pooled_full`, and `kv`; delayed
+fingerprints match. Minimum host/admission availability was 14.24 GiB for
+adaptive and 14.36 GiB for delayed, with zero sampled cgroup memory events.
+The capture is a correctness-localization diagnostic, not a timing or quality
+comparison.
+
+The raw GDN captures are 345,032 bytes each and their hashes plus per-field
+comparisons are in `layer26-generated-position520/*-gdn-comparison.json`.
+`layer25-owner-comparison.json` contains the layer-by-layer dispatch comparison.
+The paired campaign metadata records the model revision, IQ1_M shard hashes,
+binary identity and supervision results. The code and harness diff from the
+recorded repository head is retained in
+`source-iq3s-iq2s-and-capture.patch`. Reproduce the pair with:
+
+```sh
+python3 bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/run_pair.py \
+  --run --continuations 0 --capture-moe-positions 520 \
+  --capture-verify-gdn-layer 26 --verify-gdn-positions 520 \
+  --output bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/reproduction-position520
+```
+
+The three comparison JSON files can be regenerated with
+`compare_layer25_owner_positions.py --run <campaign> --positions 520` and
+`compare_layer26_gdn_intermediates.py --run <campaign>/<arm>/result --positions 520`.
+
+The subsequent [layer-3 verifier capture](layer3-generated-position520/README.md)
+isolated the first changed operator boundary. At position 520, expert 182
+(`IQ2_S`/`IQ4_NL`) changes CPU→GPU with identical input, IDs and router
+weights. Its two service outputs match the same-input independent parity
+outputs exactly, but differ from each other by 0.2819% relative L2. It is the
+only differing routed expert row at layer 3; the combined layer-3 MoE output
+differs, and layer 4 is the first changed activation. The Q8_1 CPU mirror
+reduces this expert's CPU/GPU discrepancy from 1.82% to 0.2819% but does not
+eliminate it. CPU down-projection on the GPU-produced hidden Q8_1 activation
+matches grouped CUDA exactly, while the post-SwiGLU hidden Q8_1 rows differ in
+all 60 blocks. This localizes the remaining arithmetic mismatch to gate/up or
+SwiGLU and hidden quantization before down projection. It still does not
+identify the first persistent-state write or qualify adaptive migration.

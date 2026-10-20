@@ -1,0 +1,64 @@
+{
+  "scope": "same activation and expert weights, adaptive CPU-to-GPU owner migration, Coder IQ1_M",
+  "model_repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+  "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
+  "quantization": "IQ1_M",
+  "layer": 25,
+  "position": 505,
+  "token_id": 248045,
+  "expert": 183,
+  "expert_rank": 1,
+  "initial_owner_kind": -1,
+  "recovery_owner_kind": 0,
+  "activation_bit_identical": true,
+  "router_ids_and_weights_bit_identical": true,
+  "native_expert_parity_oracle": {
+    "cpu_vs_float_reference": {
+      "values": 2560,
+      "different_values": 2560,
+      "max_abs_diff": 0.0014057522639632225,
+      "relative_l2": 0.011555094265301744
+    },
+    "gpu_vs_float_reference": {
+      "values": 2560,
+      "different_values": 2560,
+      "max_abs_diff": 0.0011798255145549774,
+      "relative_l2": 0.011111574015001447
+    },
+    "cpu_vs_gpu": {
+      "values": 2560,
+      "different_values": 2560,
+      "max_abs_diff": 0.00132074486464262,
+      "relative_l2": 0.012574918353947055
+    }
+  },
+  "service_capture_vs_same_input_oracle": {
+    "initial_cpu_vs_oracle_cpu": {
+      "values": 2560,
+      "different_values": 0,
+      "max_abs_diff": 0.0,
+      "relative_l2": 0.0
+    },
+    "recovery_gpu_vs_oracle_gpu": {
+      "values": 2560,
+      "different_values": 0,
+      "max_abs_diff": 0.0,
+      "relative_l2": 0.0
+    },
+    "service_initial_cpu_vs_recovery_gpu": {
+      "values": 2560,
+      "different_values": 2560,
+      "max_abs_diff": 0.00132074486464262,
+      "relative_l2": 0.012574918353947055
+    }
+  },
+  "source_hashes": {
+    "all_layer_routes_sha256": "f2ed1861fd751751d870e3140c3b81001f87d7e60f22bd594cb45079093d9b0b",
+    "parts_sha256": "f0c06e28cd9d05ab43ea16413129c2dff9aacc801decd25279a5830a4782bdd1",
+    "operator_activation_sha256": "00a8d92a93ba2626b22a761e63830ee816b8d39356397045178ec5bd1e129799",
+    "operator_activation_dump_sha256": "b3a5381fbf63d6c9f4c9f27788a1adb77b8c3817c59663d3f821aac34b5a6d08"
+  },
+  "limitations": [
+    "single selected expert, model position and adaptive pair; no full quality or long-chain drift qualification"
+  ]
+}

@@ -96,6 +96,44 @@ GdnDiagOffsets gdn_diag_offsets(int rows, size_t n, size_t c, size_t hv, size_t 
     return o;
 }
 
+bool parse_diag_positions(const char* text, std::vector<int64_t>& positions,
+                          const char* label, std::string& err) {
+    if (text == nullptr || *text == '\0') {
+        err = std::string("verify: empty opt-in ") + label + " position list";
+        return false;
+    }
+    const char* cursor = text;
+    while (*cursor) {
+        char* end = nullptr;
+        errno = 0;
+        const long long selected = std::strtoll(cursor, &end, 10);
+        if (errno != 0 || end == cursor || selected < 0 || (*end != '\0' && *end != ',') ||
+            (!positions.empty() && selected <= positions.back())) {
+            err = std::string("verify: ") + label + " positions must be strictly increasing non-negative integers";
+            return false;
+        }
+        positions.push_back((int64_t) selected);
+        if (*end == ',') {
+            cursor = end + 1;
+            if (*cursor == '\0') {
+                err = std::string("verify: invalid trailing separator in ") + label + " positions";
+                return false;
+            }
+        } else {
+            cursor = end;
+        }
+    }
+    return !positions.empty();
+}
+
+bool diag_position_matches(int64_t selected, const std::vector<int64_t>& positions,
+                           bool multi_filter, int64_t pos0, int rows) {
+    if (!multi_filter) return selected < 0 || (rows == 1 && pos0 == selected);
+    for (int row = 0; row < rows; ++row)
+        if (std::binary_search(positions.begin(), positions.end(), pos0 + row)) return true;
+    return false;
+}
+
 const bool g_dbg = std::getenv("STRATA_VERIFY_DEBUG") != nullptr;
 inline bool g_lfuse() { static const bool on = [] { const char* v = std::getenv("STRATA_LFUSE"); return v != nullptr && v[0] == '1'; }(); return on; }
 // STRATA_ROUTE_RESIDENT=<margin logits> (+ STRATA_ROUTE_RESIDENT_RANKS=lo-hi, default 6-9): residency-biased routing.
@@ -728,13 +766,14 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
     {
         const char* layer = std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_LAYER");
         const char* path = std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_PATH");
-        const char* position = std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_POSITION");
+        const char* positions = std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_POSITIONS");
+        const char* position = positions == nullptr ? std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_POSITION") : nullptr;
         if ((layer != nullptr) != (path != nullptr)) {
             err = "verify: STRATA_VERIFY_DUMP_MOE_ROUTE_LAYER and STRATA_VERIFY_DUMP_MOE_ROUTE_PATH must be set together";
             return false;
         }
-        if (position != nullptr && layer == nullptr) {
-            err = "verify: STRATA_VERIFY_DUMP_MOE_ROUTE_POSITION needs the route layer and path";
+        if ((position != nullptr || positions != nullptr) && layer == nullptr) {
+            err = "verify: MoE route positions need the route layer and path";
             return false;
         }
         if (layer != nullptr) {
@@ -746,7 +785,10 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
             }
             moe_route_diag_layer_ = (int) parsed;
             moe_route_diag_path_ = path;
-            if (position != nullptr) {
+            if (positions != nullptr) {
+                if (!parse_diag_positions(positions, moe_route_diag_positions_, "MoE route", err)) return false;
+                moe_route_diag_multi_position_filter_ = true;
+            } else if (position != nullptr) {
                 char* pos_end = nullptr;
                 const long long selected = std::strtoll(position, &pos_end, 10);
                 if (pos_end == position || *pos_end != '\0' || selected < 0) {
@@ -771,13 +813,14 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
     {
         const char* layer = std::getenv("STRATA_VERIFY_DUMP_MOE_PARTS_LAYER");
         const char* path = std::getenv("STRATA_VERIFY_DUMP_MOE_PARTS_PATH");
-        const char* position = std::getenv("STRATA_VERIFY_DUMP_MOE_PARTS_POSITION");
+        const char* positions = std::getenv("STRATA_VERIFY_DUMP_MOE_PARTS_POSITIONS");
+        const char* position = positions == nullptr ? std::getenv("STRATA_VERIFY_DUMP_MOE_PARTS_POSITION") : nullptr;
         if ((layer != nullptr) != (path != nullptr)) {
             err = "verify: STRATA_VERIFY_DUMP_MOE_PARTS_LAYER and STRATA_VERIFY_DUMP_MOE_PARTS_PATH must be set together";
             return false;
         }
-        if (position != nullptr && layer == nullptr) {
-            err = "verify: STRATA_VERIFY_DUMP_MOE_PARTS_POSITION needs the parts layer and path";
+        if ((position != nullptr || positions != nullptr) && layer == nullptr) {
+            err = "verify: MoE parts positions need the parts layer and path";
             return false;
         }
         if (layer != nullptr) {
@@ -789,7 +832,10 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
             }
             moe_parts_diag_layer_ = (int) parsed;
             moe_parts_diag_path_ = path;
-            if (position != nullptr) {
+            if (positions != nullptr) {
+                if (!parse_diag_positions(positions, moe_parts_diag_positions_, "MoE parts", err)) return false;
+                moe_parts_diag_multi_position_filter_ = true;
+            } else if (position != nullptr) {
                 char* pos_end = nullptr;
                 const long long selected = std::strtoll(position, &pos_end, 10);
                 if (pos_end == position || *pos_end != '\0' || selected < 0) {
@@ -819,13 +865,14 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
     {
         const char* layer = std::getenv("STRATA_VERIFY_DUMP_MOE_OUTPUT_LAYER");
         const char* path = std::getenv("STRATA_VERIFY_DUMP_MOE_OUTPUT_PATH");
-        const char* position = std::getenv("STRATA_VERIFY_DUMP_MOE_OUTPUT_POSITION");
+        const char* positions = std::getenv("STRATA_VERIFY_DUMP_MOE_OUTPUT_POSITIONS");
+        const char* position = positions == nullptr ? std::getenv("STRATA_VERIFY_DUMP_MOE_OUTPUT_POSITION") : nullptr;
         if ((layer != nullptr) != (path != nullptr)) {
             err = "verify: STRATA_VERIFY_DUMP_MOE_OUTPUT_LAYER and STRATA_VERIFY_DUMP_MOE_OUTPUT_PATH must be set together";
             return false;
         }
-        if (position != nullptr && layer == nullptr) {
-            err = "verify: STRATA_VERIFY_DUMP_MOE_OUTPUT_POSITION needs the output layer and path";
+        if ((position != nullptr || positions != nullptr) && layer == nullptr) {
+            err = "verify: MoE output positions need the output layer and path";
             return false;
         }
         if (layer != nullptr) {
@@ -837,7 +884,10 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
             }
             moe_output_diag_layer_ = (int) parsed;
             moe_output_diag_path_ = path;
-            if (position != nullptr) {
+            if (positions != nullptr) {
+                if (!parse_diag_positions(positions, moe_output_diag_positions_, "MoE output", err)) return false;
+                moe_output_diag_multi_position_filter_ = true;
+            } else if (position != nullptr) {
                 char* pos_end = nullptr;
                 const long long selected = std::strtoll(position, &pos_end, 10);
                 if (pos_end == position || *pos_end != '\0' || selected < 0) {
@@ -2691,8 +2741,8 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
             return false;
         }
     }
-    if (moe_route_diag_captured_ &&
-        (moe_route_diag_position_ < 0 || (T == 1 && pos0 == moe_route_diag_position_))) {
+    if (moe_route_diag_captured_ && diag_position_matches(moe_route_diag_position_,
+            moe_route_diag_positions_, moe_route_diag_multi_position_filter_, pos0, T)) {
         static std::mutex route_dump_mutex;
         std::lock_guard<std::mutex> lock(route_dump_mutex);
         std::FILE* dump = std::fopen(moe_route_diag_path_.c_str(), "ab");
@@ -2728,8 +2778,8 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
             return false;
         }
     }
-    if (moe_parts_diag_captured_ &&
-        (moe_parts_diag_position_ < 0 || (T == 1 && pos0 == moe_parts_diag_position_))) {
+    if (moe_parts_diag_captured_ && diag_position_matches(moe_parts_diag_position_,
+            moe_parts_diag_positions_, moe_parts_diag_multi_position_filter_, pos0, T)) {
         struct PartsHeader {
             char magic[8];
             uint32_t version;
@@ -2765,8 +2815,8 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
             return false;
         }
     }
-    if (moe_output_diag_captured_ &&
-        (moe_output_diag_position_ < 0 || (T == 1 && pos0 == moe_output_diag_position_))) {
+    if (moe_output_diag_captured_ && diag_position_matches(moe_output_diag_position_,
+            moe_output_diag_positions_, moe_output_diag_multi_position_filter_, pos0, T)) {
         struct OutputHeader {
             char magic[8];
             uint32_t version;

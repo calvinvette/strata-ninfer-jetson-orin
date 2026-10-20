@@ -23,15 +23,60 @@ short/long/short comparison. The delayed control had no captured activation
 divergence. Adaptive recovery tokens matched the initial short request and the
 delayed control, but all 16 accepted-prefix state records still differed from
 the adaptive initial short state; the remaining divergence is unresolved. The
-four targeted Orin tests passed, the full integration Python suite passed
-163/163, and a fresh GDN dump comparison reproduced the report's numeric delta
-while validating both dumps against their logged per-layer hashes. This is
+Ten focused Orin CTests covering accepted windows, verifier/state parity, CPU
+Q8_1 mirrors and the selector contract passed; the full integration Python
+suite passed 163/163. A fresh GDN dump comparison reproduced the report's
+numeric delta while validating both dumps against their logged per-layer
+hashes. This is
 correctness localization, not a migration fix or performance result. Phase 5
 remains open. Current-source maestro1 HIP and SYCL compile/link plus `strata
---help` checks passed with two jobs; the SYCL build consumed its own migrated
-`generate.cpp` overlay, so the diagnostic was ported there and rebuilt. This
-is x86_64 build evidence only, with no accelerator runtime claim. See the
-backend report in the linked result bundle.
+--help` checks passed with two jobs; the fresh SYCL build completed 123/123
+steps using its migrated `generate.cpp` overlay. This is x86_64 build evidence
+only, with no accelerator runtime claim. See the backend report in the linked
+result bundle.
+
+A same-input [layer-25 owner trace](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/layer25-owner-position505-506/README.md)
+directly ties the position-505 adaptive divergence to expert 183 changing from
+CPU to GPU at layer 25. Its input, route IDs and weights match bitwise; the
+captured CPU and GPU outputs each match the corresponding same-input
+`native_expert_parity` result exactly, but differ from one another by 1.2575%
+relative L2. The combined layer-25 MoE output differs at position 505 and is
+exact at position 506. Delayed control is exact at both positions. This
+narrows the first observed boundary to owner-dependent IQ3_S/IQ4_NL expert
+arithmetic, but does not yet qualify long-chain state drift or answer quality.
+Both supervised arms passed at 14.17 and 14.31 GiB minimum host/admission
+availability with zero sampled cgroup events. Phase 5 remains open; this is a
+diagnostic result, not a migration fix or performance claim.
+
+An opt-in CUDA-order CPU Q8_1 mirror for IQ3_S/IQ4_NL now makes expert 183's
+captured layer-25 CPU and GPU outputs bit-identical. In a repeated same-service
+pair with that mirror active, initial/recovery activations and combined layer-25
+MoE output match at positions 505 and 506, but adaptive accepted-state
+fingerprints still differ. A [position-520 trace](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/layer26-generated-position520/README.md)
+found the first route-owner changes at layers 2 and 3 and the first activation
+difference at layer 4. Layer-26 GDN input `x` was already different; the
+delayed control remained bit-identical through the same captures. The adaptive
+state mismatch therefore persists beyond the fixed-row operator difference,
+and its first cause remains unresolved. Both arms passed supervision, retaining
+14.25/14.36 GiB minimum host/admission availability and zero sampled cgroup
+events. Phase 5 remains open.
+
+A [generated-position-520 operator trace](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/layer3-generated-position520/README.md)
+then captured the earlier layer-3 boundary. Expert 182 (`IQ2_S`/`IQ4_NL`)
+changes from CPU to GPU on identical input, IDs and router weights. The two
+service expert outputs match independent same-input CPU/GPU parity outputs
+exactly, but differ from each other by 0.2819% relative L2. It is the only
+changed routed expert row at that layer; the combined MoE output changes and
+layer 4 is the first changed activation. The opt-in Q8_1 CPU mirror reduces
+this row difference from 1.82% to 0.2819%, but does not remove it. The CPU
+down projection on the GPU-produced hidden activation matches grouped CUDA
+exactly, while the post-SwiGLU hidden Q8_1 blocks differ. The remaining
+owner-dependent arithmetic boundary is before the down projection; the first
+persistent-state write and complete recovery parity remain unresolved. Both
+arms passed supervision with 14.22/14.37 GiB minimum host/admission
+availability and zero cgroup memory events. The optional input-quantizer check
+is retained with one independent stored-sum formula failure; scales and codes
+matched, and the failure is not used as a parity result. Phase 5 remains open.
 
 An earlier [layer-25 CPU-row capture](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/README.md#layer-25-cpu-row-follow-up)
 joined the initial and recovery prompt at position 511. The route input, IDs

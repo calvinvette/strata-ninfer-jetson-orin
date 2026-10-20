@@ -1,0 +1,771 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9511ff68..c839eed6 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1552,6 +1552,14 @@ if(STRATA_NATIVE_EXPERTS)
+                COMMAND ${CMAKE_COMMAND} -E env STRATA_NATIVE_CPU_Q8_1_DOT=iq3_xxs/q2_0
+                        $<TARGET_FILE:native_expert_parity> --synthetic-windows iq3_xxs/q2_0)
+       set_tests_properties(native_expert_parity_iq3_xxs_q2_0_cpu_q8_1_windows PROPERTIES TIMEOUT 300)
++      add_test(NAME native_expert_parity_iq3_s_iq4_nl_cpu_q8_1_dot
++               COMMAND ${CMAKE_COMMAND} -E env STRATA_NATIVE_CPU_Q8_1_DOT=iq3_s/iq4_nl
++                       $<TARGET_FILE:native_expert_parity> --synthetic iq3_s/iq4_nl)
++      set_tests_properties(native_expert_parity_iq3_s_iq4_nl_cpu_q8_1_dot PROPERTIES TIMEOUT 120)
++      add_test(NAME native_expert_parity_iq3_s_iq4_nl_cpu_q8_1_windows
++               COMMAND ${CMAKE_COMMAND} -E env STRATA_NATIVE_CPU_Q8_1_DOT=iq3_s/iq4_nl
++                       $<TARGET_FILE:native_expert_parity> --synthetic-windows iq3_s/iq4_nl)
++      set_tests_properties(native_expert_parity_iq3_s_iq4_nl_cpu_q8_1_windows PROPERTIES TIMEOUT 300)
+       add_test(NAME native_expert_parity_q8_1_selector_contract
+                COMMAND native_expert_parity --q8_1-selector-contract)
+       set_tests_properties(native_expert_parity_q8_1_selector_contract PROPERTIES TIMEOUT 30)
+diff --git a/bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/compare_layer25_verifier_parts.py b/bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/compare_layer25_verifier_parts.py
+index cab17c00..7eb5cb34 100644
+--- a/bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/compare_layer25_verifier_parts.py
++++ b/bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/compare_layer25_verifier_parts.py
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-"""Compare exact verifier expert rows and router weights at Coder layer 25."""
++"""Compare verifier routes, expert rows, and combined MoE outputs at one layer."""
+ import argparse
+ import hashlib
+ import json
+@@ -11,14 +11,14 @@ HEADER = struct.Struct('<8sIIIIQq8i')
+ OUTPUT_HEADER = struct.Struct('<8sIIIIQq8i')
+ 
+ 
+-def read_routes(path):
++def read_routes(path, layer, positions):
+     records = [json.loads(line) for line in path.read_text().splitlines()]
+     if not records or records[0].get('format') != 'strata-verify-moe-route-v1':
+         raise ValueError(f'invalid verifier route capture: {path}')
+-    return [row for row in records[1:] if row.get('layer') == 25 and row.get('position') == 511]
++    return [row for row in records[1:] if row.get('layer') == layer and row.get('position') in positions]
+ 
+ 
+-def read_parts(path):
++def read_parts(path, selected_layer, positions):
+     data = path.read_bytes()
+     out = []
+     offset = 0
+@@ -26,23 +26,26 @@ def read_parts(path):
+         if len(data) - offset < HEADER.size:
+             raise ValueError(f'truncated MoE parts header in {path} at {offset}')
+         values = HEADER.unpack_from(data, offset)
+-        magic, version, layer, rows, k, n_embd, pos0, *tokens = values
++        magic, version, record_layer, rows, k, n_embd, pos0, *tokens = values
+         offset += HEADER.size
+-        if magic != b'STMPART1' or version != 1 or layer != 25:
++        if magic != b'STMPART1' or version != 1 or record_layer != selected_layer or not 0 < rows <= 8:
+             raise ValueError(f'invalid MoE parts header in {path}: {values[:7]}')
+         n_floats = rows * k * n_embd
+         n_bytes = n_floats * 4
+         if len(data) - offset < n_bytes:
+             raise ValueError(f'truncated MoE parts payload in {path} at {offset}')
+-        payload = data[offset:offset + n_bytes]
+-        floats = struct.unpack(f'<{n_floats}f', payload)
++        floats = struct.unpack(f'<{n_floats}f', data[offset:offset + n_bytes])
+         offset += n_bytes
+-        out.append({'rows': rows, 'k': k, 'n_embd': n_embd, 'pos0': pos0,
+-                    'tokens': tokens[:rows], 'parts': floats})
+-    return out
++        for row in range(rows):
++            position = pos0 + row
++            if position in positions:
++                start = row * k * n_embd
++                out.append({'position': position, 'token': tokens[row], 'k': k, 'n_embd': n_embd,
++                            'parts': floats[start:start + k * n_embd]})
++    return data, out
+ 
+ 
+-def read_outputs(path):
++def read_outputs(path, selected_layer, positions):
+     data = path.read_bytes()
+     out = []
+     offset = 0
+@@ -50,9 +53,9 @@ def read_outputs(path):
+         if len(data) - offset < OUTPUT_HEADER.size:
+             raise ValueError(f'truncated MoE output header in {path} at {offset}')
+         values = OUTPUT_HEADER.unpack_from(data, offset)
+-        magic, version, layer, rows, reserved, n_embd, pos0, *tokens = values
++        magic, version, record_layer, rows, reserved, n_embd, pos0, *tokens = values
+         offset += OUTPUT_HEADER.size
+-        if magic != b'STMOEOUT' or version != 1 or layer != 25 or reserved != 0:
++        if magic != b'STMOEOUT' or version != 1 or record_layer != selected_layer or reserved != 0 or not 0 < rows <= 8:
+             raise ValueError(f'invalid MoE output header in {path}: {values[:8]}')
+         n_floats = rows * n_embd
+         n_bytes = n_floats * 4
+@@ -62,16 +65,24 @@ def read_outputs(path):
+         offset += n_bytes
+         combined = struct.unpack(f'<{n_floats}f', data[offset:offset + n_bytes])
+         offset += n_bytes
+-        out.append({'rows': rows, 'n_embd': n_embd, 'pos0': pos0,
+-                    'tokens': tokens[:rows], 'shared': shared, 'combined': combined})
+-    return out
++        for row in range(rows):
++            position = pos0 + row
++            if position in positions:
++                start = row * n_embd
++                out.append({'position': position, 'token': tokens[row], 'n_embd': n_embd,
++                            'shared': shared[start:start + n_embd],
++                            'combined': combined[start:start + n_embd]})
++    return data, out
+ 
+ 
+ def summarize(a, b):
++    if len(a) != len(b):
++        raise ValueError('captured MoE vector dimensions differ')
++    if any(not math.isfinite(x) for x in a + b):
++        raise ValueError('captured MoE vector contains a non-finite value')
+     different = 0
+     max_abs = 0.0
+-    delta_sq = 0.0
+-    ref_sq = 0.0
++    delta_sq = ref_sq = 0.0
+     for x, y in zip(a, b):
+         d = float(y) - float(x)
+         different += x != y
+@@ -91,55 +102,88 @@ def summarize(a, b):
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument('--run', type=Path, required=True, help='same-service run directory')
++    parser.add_argument('--layer', type=int, default=25)
++    parser.add_argument('--positions', type=int, nargs='+', default=[511])
+     parser.add_argument('--output', type=Path, required=True)
+     args = parser.parse_args()
+-    route_rows = read_routes(args.run / 'verify-moe-routes.jsonl')
+-    parts_rows = read_parts(args.run / 'verify-moe-parts.bin')
++    if any(p < 0 for p in args.positions) or args.positions != sorted(set(args.positions)):
++        parser.error('--positions must be strictly increasing non-negative integers')
++    if not 0 <= args.layer < 48:
++        parser.error('--layer must be in [0, 47]')
++    selected = set(args.positions)
++    route_rows = read_routes(args.run / 'verify-moe-routes.jsonl', args.layer, selected)
++    parts_raw, parts_rows = read_parts(args.run / 'verify-moe-parts.bin', args.layer, selected)
+     output_path = args.run / 'verify-moe-output.bin'
+-    output_rows = read_outputs(output_path) if output_path.is_file() else None
+-    if len(route_rows) != 2 or len(parts_rows) != 2 or (output_rows is not None and len(output_rows) != 2):
+-        output_count = len(output_rows) if output_rows is not None else 'not captured'
+-        raise ValueError(f'expected initial/recovery capture pairs, got routes={len(route_rows)} parts={len(parts_rows)} outputs={output_count}')
+-    for route, parts in zip(route_rows, parts_rows):
+-        if (parts['rows'], parts['k'], parts['n_embd'], parts['pos0'], parts['tokens']) != (
+-                1, 10, 2560, 511, [route['token_id']]):
+-            raise ValueError(f'route/parts position or shape mismatch: {route}, {parts}')
+-        if route['token_id'] != 271 or route['position'] != 511:
+-            raise ValueError(f'unexpected target row: {route}')
+-    first_route, recovery_route = route_rows
+-    if any(first_route[key] != recovery_route[key] for key in ('token_id', 'position', 'ids', 'weights')):
+-        raise ValueError('initial/recovery verifier token, routes, or router weights differ')
+-    first_parts, recovery_parts = parts_rows
+-    if output_rows is not None:
+-        first_output, recovery_output = output_rows
+-        for output, route in zip(output_rows, route_rows):
+-            if (output['rows'], output['n_embd'], output['pos0'], output['tokens']) != (
+-                    1, 2560, 511, [route['token_id']]):
+-                raise ValueError(f'route/output position or shape mismatch: {route}, {output}')
+-    per_expert = {}
+-    for rank, expert in enumerate(first_route['ids']):
+-        start = rank * 2560
+-        a = first_parts['parts'][start:start + 2560]
+-        b = recovery_parts['parts'][start:start + 2560]
+-        per_expert[str(expert)] = summarize(a, b)
++    output_raw, output_rows = read_outputs(output_path, args.layer, selected) if output_path.is_file() else (None, None)
++
++    grouped = {}
++    for kind, rows in (('routes', route_rows), ('parts', parts_rows), ('outputs', output_rows or [])):
++        for row in rows:
++            grouped.setdefault(row['position'], {}).setdefault(kind, []).append(row)
++    if set(grouped) != selected:
++        raise ValueError(f'expected selected positions {args.positions}; observed {sorted(grouped)}')
++
++    comparisons = {}
++    for position in args.positions:
++        group = grouped[position]
++        if len(group.get('routes', [])) != 2 or len(group.get('parts', [])) != 2 or \
++                (output_rows is not None and len(group.get('outputs', [])) != 2):
++            raise ValueError(f'expected initial/recovery records at {position}; got '
++                             f'{ {key: len(value) for key, value in group.items()} }')
++        first_route, recovery_route = group['routes']
++        first_parts, recovery_parts = group['parts']
++        for row, route in ((first_parts, first_route), (recovery_parts, recovery_route)):
++            if (row['position'], row['token'], row['k'], row['n_embd']) != (
++                    route['position'], route['token_id'], len(route['ids']), 2560):
++                raise ValueError(f'route/parts position or shape mismatch: {route}, {row}')
++        route_same = all(first_route[key] == recovery_route[key]
++                         for key in ('token_id', 'position', 'ids', 'weights'))
++        result = {
++            'token_ids': [first_route['token_id'], recovery_route['token_id']],
++            'expert_ids': {'initial': first_route['ids'], 'recovery': recovery_route['ids']},
++            'router_weights': {'initial': first_route['weights'], 'recovery': recovery_route['weights']},
++            'routes_and_router_weights_identical': route_same,
++            'all_expert_rows_after_moe_hit_add': summarize(first_parts['parts'], recovery_parts['parts']),
++        }
++        result['per_expert_rank'] = {
++            str(rank): {'initial_expert': first_route['ids'][rank],
++                        'recovery_expert': recovery_route['ids'][rank],
++                        'output': summarize(first_parts['parts'][rank * 2560:(rank + 1) * 2560],
++                                            recovery_parts['parts'][rank * 2560:(rank + 1) * 2560])}
++            for rank in range(len(first_route['ids']))
++        }
++        if output_rows is not None:
++            first_output, recovery_output = group['outputs']
++            for row, route in ((first_output, first_route), (recovery_output, recovery_route)):
++                if (row['position'], row['token'], row['n_embd']) != (
++                        route['position'], route['token_id'], 2560):
++                    raise ValueError(f'route/output position or shape mismatch: {route}, {row}')
++            result['shared_expert_output'] = summarize(first_output['shared'], recovery_output['shared'])
++            result['combined_moe_output_before_residual'] = summarize(first_output['combined'], recovery_output['combined'])
++        comparisons[str(position)] = result
++
+     result = {
+-        'scope': 'same-service initial/recovery Coder IQ1_M verifier row at model layer 25',
+-        'position': 511,
+-        'token_id': 271,
++        'scope': f'same-service initial/recovery Coder IQ1_M verifier MoE capture at model layer {args.layer}',
++        'layer': args.layer,
++        'positions': args.positions,
+         'binary_sha256': json.loads((args.run / 'analysis.json').read_text())['binary_sha256'],
+-        'route_and_router_weights_identical': True,
+-        'expert_ids': first_route['ids'],
+-        'router_weights': first_route['weights'],
+-        'all_expert_rows_after_moe_hit_add': summarize(first_parts['parts'], recovery_parts['parts']),
+-        'per_expert': per_expert,
+-        'shared_expert_output': summarize(first_output['shared'], recovery_output['shared']) if output_rows else None,
+-        'combined_moe_output_before_residual': summarize(first_output['combined'], recovery_output['combined']) if output_rows else None,
+-        'limits': (['the post-combine residual/hyper-connection write and next-layer GDN state transition were not captured']
+-                   if output_rows else ['shared-expert output, weighted combine, residual/hyper-connection write, and next-layer state were not captured']),
++        'raw_capture_sha256': {
++            'routes': hashlib.sha256((args.run / 'verify-moe-routes.jsonl').read_bytes()).hexdigest(),
++            'parts': hashlib.sha256(parts_raw).hexdigest(),
++            'outputs': hashlib.sha256(output_raw).hexdigest() if output_raw is not None else None,
++        },
++        'position_comparisons': comparisons,
++        'limits': ['post-combine residual/hyper-connection write and next-layer GDN state transition were not captured'],
+     }
+     args.output.parent.mkdir(parents=True, exist_ok=True)
+     args.output.write_text(json.dumps(result, indent=2) + '\n')
+-    print(json.dumps(result, indent=2))
++    print(json.dumps({'positions': args.positions,
++                      'route_and_router_weights_identical': {
++                          position: item['routes_and_router_weights_identical']
++                          for position, item in comparisons.items()},
++                      'combined_moe_different_values': {
++                          position: item.get('combined_moe_output_before_residual', {}).get('different_values')
++                          for position, item in comparisons.items()}}, indent=2))
+ 
+ 
+ if __name__ == '__main__':
+diff --git a/bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/run_one.py b/bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/run_one.py
+index e2316937..307b9abe 100644
+--- a/bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/run_one.py
++++ b/bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/run_one.py
+@@ -43,7 +43,9 @@ def main():
+     parser.add_argument("--capture-cpu-output-dispatch", type=int,
+                         help="select the dispatch ID for the optional CPU expert output capture")
+     parser.add_argument("--capture-verify-moe-layer", type=int,
+-                        help="capture verifier router weights and all expert rows at position 511 for this layer")
++                        help="capture verifier router weights and all expert rows at selected positions for this layer")
++    parser.add_argument("--verify-moe-positions", default="511",
++                        help="comma-separated increasing verifier MoE diagnostic positions (default: 511)")
+     parser.add_argument("--capture-verify-gdn-layer", type=int,
+                         help="capture verifier GDN intermediates at selected positions for this layer")
+     parser.add_argument("--verify-gdn-positions", default="511",
+@@ -88,6 +90,13 @@ def main():
+         parser.error("CPU output capture layer and dispatch must be non-negative")
+     if args.capture_verify_moe_layer is not None and args.capture_verify_moe_layer < 0:
+         parser.error("verifier MoE capture layer must be non-negative")
++    try:
++        verify_moe_positions = [int(value) for value in args.verify_moe_positions.split(",")]
++    except ValueError:
++        parser.error("--verify-moe-positions must be comma-separated non-negative integers")
++    if not verify_moe_positions or any(value < 0 for value in verify_moe_positions) or \
++            verify_moe_positions != sorted(set(verify_moe_positions)):
++        parser.error("--verify-moe-positions must be strictly increasing non-negative integers")
+     if args.capture_verify_gdn_layer is not None and args.capture_verify_gdn_layer < 0:
+         parser.error("verifier GDN capture layer must be non-negative")
+     try:
+@@ -180,14 +189,16 @@ def main():
+         env.update({
+             "STRATA_VERIFY_DUMP_MOE_ROUTE_LAYER": str(args.capture_verify_moe_layer),
+             "STRATA_VERIFY_DUMP_MOE_ROUTE_PATH": str((args.output / "verify-moe-routes.jsonl").resolve()),
+-            "STRATA_VERIFY_DUMP_MOE_ROUTE_POSITION": "511",
+             "STRATA_VERIFY_DUMP_MOE_PARTS_LAYER": str(args.capture_verify_moe_layer),
+             "STRATA_VERIFY_DUMP_MOE_PARTS_PATH": str((args.output / "verify-moe-parts.bin").resolve()),
+-            "STRATA_VERIFY_DUMP_MOE_PARTS_POSITION": "511",
+             "STRATA_VERIFY_DUMP_MOE_OUTPUT_LAYER": str(args.capture_verify_moe_layer),
+             "STRATA_VERIFY_DUMP_MOE_OUTPUT_PATH": str((args.output / "verify-moe-output.bin").resolve()),
+-            "STRATA_VERIFY_DUMP_MOE_OUTPUT_POSITION": "511",
+         })
++        for kind in ("ROUTE", "PARTS", "OUTPUT"):
++            if verify_moe_positions == [511]:
++                env[f"STRATA_VERIFY_DUMP_MOE_{kind}_POSITION"] = "511"
++            else:
++                env[f"STRATA_VERIFY_DUMP_MOE_{kind}_POSITIONS"] = ",".join(map(str, verify_moe_positions))
+     if args.capture_verify_gdn_layer is not None:
+         env.update({
+             "STRATA_VERIFY_DUMP_GDN_LAYER": str(args.capture_verify_gdn_layer),
+@@ -323,12 +334,15 @@ def main():
+             raise RuntimeError("requested verifier MoE route/parts/output capture was not written")
+         route_records = [json.loads(line) for line in route_path.read_text().splitlines()]
+         selected_routes = [row for row in route_records[1:]
+-                           if row.get("layer") == args.capture_verify_moe_layer and row.get("position") == 511]
+-        if len(selected_routes) != 2:
+-            raise RuntimeError(f"expected initial and recovery verifier route rows at position 511, got {len(selected_routes)}")
++                           if row.get("layer") == args.capture_verify_moe_layer
++                           and row.get("position") in verify_moe_positions]
++        counts = {position: sum(row.get("position") == position for row in selected_routes)
++                  for position in verify_moe_positions}
++        if counts != {position: 2 for position in verify_moe_positions}:
++            raise RuntimeError(f"expected initial and recovery verifier route rows at selected positions; got {counts}")
+         verify_moe_capture = {
+             "layer": args.capture_verify_moe_layer,
+-            "position": 511,
++            "positions": verify_moe_positions,
+             "route_rows": len(selected_routes),
+             "parts_bytes": parts_path.stat().st_size,
+             "output_bytes": output_path.stat().st_size,
+diff --git a/bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/run_pair.py b/bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/run_pair.py
+index eacbf4cd..f66f27e6 100644
+--- a/bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/run_pair.py
++++ b/bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/run_pair.py
+@@ -34,6 +34,10 @@ def main():
+     ap.add_argument('--seed', type=int, default=20261030)
+     ap.add_argument('--continuations', type=int, default=1)
+     ap.add_argument('--capture-moe-positions', default='511')
++    ap.add_argument('--capture-verify-moe-layer', type=int)
++    ap.add_argument('--verify-moe-positions', default='511')
++    ap.add_argument('--capture-verify-gdn-layer', type=int)
++    ap.add_argument('--verify-gdn-positions', default='511')
+     ap.add_argument('--run', action='store_true')
+     a = ap.parse_args()
+     if a.continuations < 0:
+@@ -45,6 +49,22 @@ def main():
+     if not capture_positions or any(value < 0 for value in capture_positions) or \
+             capture_positions != sorted(set(capture_positions)):
+         ap.error('--capture-moe-positions must be strictly increasing non-negative integers')
++    try:
++        verify_positions = [int(value) for value in a.verify_moe_positions.split(',')]
++    except ValueError:
++        ap.error('--verify-moe-positions must be comma-separated non-negative integers')
++    if not verify_positions or any(value < 0 for value in verify_positions) or \
++            verify_positions != sorted(set(verify_positions)):
++        ap.error('--verify-moe-positions must be strictly increasing non-negative integers')
++    try:
++        gdn_positions = [int(value) for value in a.verify_gdn_positions.split(',')]
++    except ValueError:
++        ap.error('--verify-gdn-positions must be comma-separated non-negative integers')
++    if not gdn_positions or any(value < 0 for value in gdn_positions) or \
++            gdn_positions != sorted(set(gdn_positions)):
++        ap.error('--verify-gdn-positions must be strictly increasing non-negative integers')
++    if a.capture_verify_gdn_layer is not None and a.capture_verify_gdn_layer < 0:
++        ap.error('--capture-verify-gdn-layer must be non-negative')
+     if a.output.exists():
+         ap.error('output directory already exists')
+     cfg = json.loads((BASE / 'config.json').read_text())
+@@ -59,6 +79,10 @@ def main():
+         'scope': 'one randomized same-service short/long/short correctness pair with optional continuation; delayed adaptation versus cap-8 adaptive swaps',
+         'continuations': a.continuations,
+         'capture_moe_positions': capture_positions,
++        'capture_verify_moe_layer': a.capture_verify_moe_layer,
++        'verify_moe_positions': verify_positions if a.capture_verify_moe_layer is not None else None,
++        'capture_verify_gdn_layer': a.capture_verify_gdn_layer,
++        'verify_gdn_positions': gdn_positions if a.capture_verify_gdn_layer is not None else None,
+         'repository_head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
+         'binary_sha256': digest(binary), 'model_repository': 'ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF',
+         'model_revision': '5348543e0147355ac9cbcb031184a3546350988e', 'quantization': 'IQ1_M',
+@@ -89,6 +113,12 @@ def main():
+                py, str(runner), '--adapt-every', str(arm['adapt_every']), '--adapt-swaps', str(arm['adapt_swaps']),
+                '--continuations', str(a.continuations), '--capture-moe-positions', a.capture_moe_positions,
+                '--output', str(result)]
++        if a.capture_verify_moe_layer is not None:
++            cmd.extend(['--capture-verify-moe-layer', str(a.capture_verify_moe_layer),
++                        '--verify-moe-positions', a.verify_moe_positions])
++        if a.capture_verify_gdn_layer is not None:
++            cmd.extend(['--capture-verify-gdn-layer', str(a.capture_verify_gdn_layer),
++                        '--verify-gdn-positions', a.verify_gdn_positions])
+         (d / 'launch.txt').write_text('systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes ' + ' '.join(cmd) + '\n')
+         start = time.time()
+         completed = subprocess.run(['systemd-run', '--user', '--scope', '--collect', '-p', 'MemoryMax=28G', '-p', 'IOAccounting=yes', *cmd], cwd=ROOT, capture_output=True, text=True)
+diff --git a/include/strata/core/verify.hpp b/include/strata/core/verify.hpp
+index d98a08c1..ffc68a5c 100644
+--- a/include/strata/core/verify.hpp
++++ b/include/strata/core/verify.hpp
+@@ -398,18 +398,24 @@ private:
+     std::string gdn_commit_diag_path_;
+     int moe_route_diag_layer_ = -1;
+     int64_t moe_route_diag_position_ = -1;
++    std::vector<int64_t> moe_route_diag_positions_;
++    bool moe_route_diag_multi_position_filter_ = false;
+     uint8_t* moe_route_diag_h_ = nullptr;  ///< opt-in pinned capture of device top-k IDs and weights
+     size_t moe_route_diag_capacity_ = 0;
+     std::string moe_route_diag_path_;
+     bool moe_route_diag_captured_ = false;
+     int moe_parts_diag_layer_ = -1;
+     int64_t moe_parts_diag_position_ = -1;
++    std::vector<int64_t> moe_parts_diag_positions_;
++    bool moe_parts_diag_multi_position_filter_ = false;
+     float* moe_parts_diag_h_ = nullptr;  ///< opt-in pinned capture of per-expert outputs before weighted combine
+     size_t moe_parts_diag_capacity_ = 0;
+     std::string moe_parts_diag_path_;
+     bool moe_parts_diag_captured_ = false;
+     int moe_output_diag_layer_ = -1;
+     int64_t moe_output_diag_position_ = -1;
++    std::vector<int64_t> moe_output_diag_positions_;
++    bool moe_output_diag_multi_position_filter_ = false;
+     float* moe_output_diag_h_ = nullptr;  ///< pinned shared-expert and combined MoE output rows
+     size_t moe_output_diag_capacity_ = 0;
+     std::string moe_output_diag_path_;
+diff --git a/include/strata/kernels/cpu/native_expert.hpp b/include/strata/kernels/cpu/native_expert.hpp
+index 882de637..f464d2c7 100644
+--- a/include/strata/kernels/cpu/native_expert.hpp
++++ b/include/strata/kernels/cpu/native_expert.hpp
+@@ -33,9 +33,9 @@ struct NativeFmt {
+ bool native_experts_available() noexcept;
+ /// Fills `f` for a layer; false (with a reason) when ggml-cpu has no dot product for a type. The opt-in
+ /// STRATA_NATIVE_CPU_Q8_1_DOT diagnostic selects CUDA-matching Q8_1 routes for IQ2_S/Q2_0,
+-/// IQ2_S/IQ4_NL, IQ3_XXS/Q2_0 and IQ3_XXS/IQ4_NL expert pairs (`1` enables all supported pairs; a pair name selects
+-/// one). A pair may be suffixed with `@layer=N` to scope it to one zero-based model layer. It is not a default dispatch
+-/// policy.
++/// IQ2_S/IQ4_NL, IQ3_XXS/Q2_0, IQ3_XXS/IQ4_NL and IQ3_S/IQ4_NL expert pairs (`1` enables all supported pairs; a
++/// pair name selects one). A pair may be suffixed with `@layer=N` to scope it to one zero-based model layer. It is not
++/// a default dispatch policy.
+ bool native_fmt(int gu_type, int d_type, int64_t n_embd, int64_t n_ff, NativeFmt& f, std::string& err, int layer = -1);
+ 
+ /// x (n_embd floats) -> the gate/up activation (act_bytes).
+diff --git a/src/core/verify.cpp b/src/core/verify.cpp
+index 74fac214..6627490d 100644
+--- a/src/core/verify.cpp
++++ b/src/core/verify.cpp
+@@ -96,6 +96,44 @@ GdnDiagOffsets gdn_diag_offsets(int rows, size_t n, size_t c, size_t hv, size_t
+     return o;
+ }
+ 
++bool parse_diag_positions(const char* text, std::vector<int64_t>& positions,
++                          const char* label, std::string& err) {
++    if (text == nullptr || *text == '\0') {
++        err = std::string("verify: empty opt-in ") + label + " position list";
++        return false;
++    }
++    const char* cursor = text;
++    while (*cursor) {
++        char* end = nullptr;
++        errno = 0;
++        const long long selected = std::strtoll(cursor, &end, 10);
++        if (errno != 0 || end == cursor || selected < 0 || (*end != '\0' && *end != ',') ||
++            (!positions.empty() && selected <= positions.back())) {
++            err = std::string("verify: ") + label + " positions must be strictly increasing non-negative integers";
++            return false;
++        }
++        positions.push_back((int64_t) selected);
++        if (*end == ',') {
++            cursor = end + 1;
++            if (*cursor == '\0') {
++                err = std::string("verify: invalid trailing separator in ") + label + " positions";
++                return false;
++            }
++        } else {
++            cursor = end;
++        }
++    }
++    return !positions.empty();
++}
++
++bool diag_position_matches(int64_t selected, const std::vector<int64_t>& positions,
++                           bool multi_filter, int64_t pos0, int rows) {
++    if (!multi_filter) return selected < 0 || (rows == 1 && pos0 == selected);
++    for (int row = 0; row < rows; ++row)
++        if (std::binary_search(positions.begin(), positions.end(), pos0 + row)) return true;
++    return false;
++}
++
+ const bool g_dbg = std::getenv("STRATA_VERIFY_DEBUG") != nullptr;
+ inline bool g_lfuse() { static const bool on = [] { const char* v = std::getenv("STRATA_LFUSE"); return v != nullptr && v[0] == '1'; }(); return on; }
+ // STRATA_ROUTE_RESIDENT=<margin logits> (+ STRATA_ROUTE_RESIDENT_RANKS=lo-hi, default 6-9): residency-biased routing.
+@@ -728,13 +766,14 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
+     {
+         const char* layer = std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_LAYER");
+         const char* path = std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_PATH");
+-        const char* position = std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_POSITION");
++        const char* positions = std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_POSITIONS");
++        const char* position = positions == nullptr ? std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_POSITION") : nullptr;
+         if ((layer != nullptr) != (path != nullptr)) {
+             err = "verify: STRATA_VERIFY_DUMP_MOE_ROUTE_LAYER and STRATA_VERIFY_DUMP_MOE_ROUTE_PATH must be set together";
+             return false;
+         }
+-        if (position != nullptr && layer == nullptr) {
+-            err = "verify: STRATA_VERIFY_DUMP_MOE_ROUTE_POSITION needs the route layer and path";
++        if ((position != nullptr || positions != nullptr) && layer == nullptr) {
++            err = "verify: MoE route positions need the route layer and path";
+             return false;
+         }
+         if (layer != nullptr) {
+@@ -746,7 +785,10 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
+             }
+             moe_route_diag_layer_ = (int) parsed;
+             moe_route_diag_path_ = path;
+-            if (position != nullptr) {
++            if (positions != nullptr) {
++                if (!parse_diag_positions(positions, moe_route_diag_positions_, "MoE route", err)) return false;
++                moe_route_diag_multi_position_filter_ = true;
++            } else if (position != nullptr) {
+                 char* pos_end = nullptr;
+                 const long long selected = std::strtoll(position, &pos_end, 10);
+                 if (pos_end == position || *pos_end != '\0' || selected < 0) {
+@@ -771,13 +813,14 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
+     {
+         const char* layer = std::getenv("STRATA_VERIFY_DUMP_MOE_PARTS_LAYER");
+         const char* path = std::getenv("STRATA_VERIFY_DUMP_MOE_PARTS_PATH");
+-        const char* position = std::getenv("STRATA_VERIFY_DUMP_MOE_PARTS_POSITION");
++        const char* positions = std::getenv("STRATA_VERIFY_DUMP_MOE_PARTS_POSITIONS");
++        const char* position = positions == nullptr ? std::getenv("STRATA_VERIFY_DUMP_MOE_PARTS_POSITION") : nullptr;
+         if ((layer != nullptr) != (path != nullptr)) {
+             err = "verify: STRATA_VERIFY_DUMP_MOE_PARTS_LAYER and STRATA_VERIFY_DUMP_MOE_PARTS_PATH must be set together";
+             return false;
+         }
+-        if (position != nullptr && layer == nullptr) {
+-            err = "verify: STRATA_VERIFY_DUMP_MOE_PARTS_POSITION needs the parts layer and path";
++        if ((position != nullptr || positions != nullptr) && layer == nullptr) {
++            err = "verify: MoE parts positions need the parts layer and path";
+             return false;
+         }
+         if (layer != nullptr) {
+@@ -789,7 +832,10 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
+             }
+             moe_parts_diag_layer_ = (int) parsed;
+             moe_parts_diag_path_ = path;
+-            if (position != nullptr) {
++            if (positions != nullptr) {
++                if (!parse_diag_positions(positions, moe_parts_diag_positions_, "MoE parts", err)) return false;
++                moe_parts_diag_multi_position_filter_ = true;
++            } else if (position != nullptr) {
+                 char* pos_end = nullptr;
+                 const long long selected = std::strtoll(position, &pos_end, 10);
+                 if (pos_end == position || *pos_end != '\0' || selected < 0) {
+@@ -819,13 +865,14 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
+     {
+         const char* layer = std::getenv("STRATA_VERIFY_DUMP_MOE_OUTPUT_LAYER");
+         const char* path = std::getenv("STRATA_VERIFY_DUMP_MOE_OUTPUT_PATH");
+-        const char* position = std::getenv("STRATA_VERIFY_DUMP_MOE_OUTPUT_POSITION");
++        const char* positions = std::getenv("STRATA_VERIFY_DUMP_MOE_OUTPUT_POSITIONS");
++        const char* position = positions == nullptr ? std::getenv("STRATA_VERIFY_DUMP_MOE_OUTPUT_POSITION") : nullptr;
+         if ((layer != nullptr) != (path != nullptr)) {
+             err = "verify: STRATA_VERIFY_DUMP_MOE_OUTPUT_LAYER and STRATA_VERIFY_DUMP_MOE_OUTPUT_PATH must be set together";
+             return false;
+         }
+-        if (position != nullptr && layer == nullptr) {
+-            err = "verify: STRATA_VERIFY_DUMP_MOE_OUTPUT_POSITION needs the output layer and path";
++        if ((position != nullptr || positions != nullptr) && layer == nullptr) {
++            err = "verify: MoE output positions need the output layer and path";
+             return false;
+         }
+         if (layer != nullptr) {
+@@ -837,7 +884,10 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
+             }
+             moe_output_diag_layer_ = (int) parsed;
+             moe_output_diag_path_ = path;
+-            if (position != nullptr) {
++            if (positions != nullptr) {
++                if (!parse_diag_positions(positions, moe_output_diag_positions_, "MoE output", err)) return false;
++                moe_output_diag_multi_position_filter_ = true;
++            } else if (position != nullptr) {
+                 char* pos_end = nullptr;
+                 const long long selected = std::strtoll(position, &pos_end, 10);
+                 if (pos_end == position || *pos_end != '\0' || selected < 0) {
+@@ -2691,8 +2741,8 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
+             return false;
+         }
+     }
+-    if (moe_route_diag_captured_ &&
+-        (moe_route_diag_position_ < 0 || (T == 1 && pos0 == moe_route_diag_position_))) {
++    if (moe_route_diag_captured_ && diag_position_matches(moe_route_diag_position_,
++            moe_route_diag_positions_, moe_route_diag_multi_position_filter_, pos0, T)) {
+         static std::mutex route_dump_mutex;
+         std::lock_guard<std::mutex> lock(route_dump_mutex);
+         std::FILE* dump = std::fopen(moe_route_diag_path_.c_str(), "ab");
+@@ -2728,8 +2778,8 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
+             return false;
+         }
+     }
+-    if (moe_parts_diag_captured_ &&
+-        (moe_parts_diag_position_ < 0 || (T == 1 && pos0 == moe_parts_diag_position_))) {
++    if (moe_parts_diag_captured_ && diag_position_matches(moe_parts_diag_position_,
++            moe_parts_diag_positions_, moe_parts_diag_multi_position_filter_, pos0, T)) {
+         struct PartsHeader {
+             char magic[8];
+             uint32_t version;
+@@ -2765,8 +2815,8 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
+             return false;
+         }
+     }
+-    if (moe_output_diag_captured_ &&
+-        (moe_output_diag_position_ < 0 || (T == 1 && pos0 == moe_output_diag_position_))) {
++    if (moe_output_diag_captured_ && diag_position_matches(moe_output_diag_position_,
++            moe_output_diag_positions_, moe_output_diag_multi_position_filter_, pos0, T)) {
+         struct OutputHeader {
+             char magic[8];
+             uint32_t version;
+diff --git a/src/kernels/cpu/native_expert.cpp b/src/kernels/cpu/native_expert.cpp
+index bb81abf0..19be9d6a 100644
+--- a/src/kernels/cpu/native_expert.cpp
++++ b/src/kernels/cpu/native_expert.cpp
+@@ -1,7 +1,7 @@
+ // src/kernels/cpu/native_expert.cpp - plan v0.3 P6: native (GGUF-form) experts on the CPU through ggml-cpu.
+ // See the header. The default activation quantizers and row dot products are ggml-cpu's. Explicitly opt-in Q8_1
+-// diagnostic routes for IQ2_S/Q2_0, IQ2_S/IQ4_NL, IQ3_XXS/Q2_0 and IQ3_XXS/IQ4_NL are implemented below for
+-// cross-backend tests.
++// diagnostic routes for IQ2_S/Q2_0, IQ2_S/IQ4_NL, IQ3_XXS/Q2_0, IQ3_XXS/IQ4_NL and IQ3_S/IQ4_NL are implemented
++// below for cross-backend tests.
+ #include "strata/kernels/cpu/native_expert.hpp"
+ #include "strata/kernels/cpu/expert.hpp"
+ #include "strata/platform/cpu_arch.hpp"
+@@ -35,7 +35,7 @@ bool q8_1_selector_known(const char* selector) {
+     if (std::strcmp(selector, "0") == 0 || std::strcmp(selector, "1") == 0 ||
+         std::strcmp(selector, "all") == 0 || std::strcmp(selector, "iq2_s/q2_0") == 0 ||
+         std::strcmp(selector, "iq2_s/iq4_nl") == 0 || std::strcmp(selector, "iq3_xxs/q2_0") == 0 ||
+-        std::strcmp(selector, "iq3_xxs/iq4_nl") == 0)
++        std::strcmp(selector, "iq3_xxs/iq4_nl") == 0 || std::strcmp(selector, "iq3_s/iq4_nl") == 0)
+         return true;
+     const char* at = std::strstr(selector, "@layer=");
+     if (at == nullptr || at == selector) return false;
+@@ -48,7 +48,7 @@ bool q8_1_selector_known(const char* selector) {
+     if (errno == ERANGE || end == n || *end != '\0' || layer > INT_MAX) return false;
+     const std::string pair(selector, (size_t) (at - selector));
+     return pair == "iq2_s/q2_0" || pair == "iq2_s/iq4_nl" || pair == "iq3_xxs/q2_0" ||
+-           pair == "iq3_xxs/iq4_nl";
++           pair == "iq3_xxs/iq4_nl" || pair == "iq3_s/iq4_nl";
+ }
+ 
+ bool q8_1_selector_matches(const char* selector, int gu_type, int d_type, int layer) {
+@@ -62,13 +62,15 @@ bool q8_1_selector_matches(const char* selector, int gu_type, int d_type, int la
+     const bool iq2_s_iq4_nl = gu_type == GGML_TYPE_IQ2_S && d_type == GGML_TYPE_IQ4_NL;
+     const bool iq3_xxs_q2_0 = gu_type == GGML_TYPE_IQ3_XXS && d_type == GGML_TYPE_Q2_0;
+     const bool iq3_xxs_iq4_nl = gu_type == GGML_TYPE_IQ3_XXS && d_type == GGML_TYPE_IQ4_NL;
++    const bool iq3_s_iq4_nl = gu_type == GGML_TYPE_IQ3_S && d_type == GGML_TYPE_IQ4_NL;
+     const std::string pair = at == nullptr ? selector : std::string(selector, (size_t) (at - selector));
+     if (pair == "1" || pair == "all")
+-        return iq2_s_q2_0 || iq2_s_iq4_nl || iq3_xxs_q2_0 || iq3_xxs_iq4_nl;
++        return iq2_s_q2_0 || iq2_s_iq4_nl || iq3_xxs_q2_0 || iq3_xxs_iq4_nl || iq3_s_iq4_nl;
+     if (pair == "iq2_s/q2_0") return iq2_s_q2_0;
+     if (pair == "iq2_s/iq4_nl") return iq2_s_iq4_nl;
+     if (pair == "iq3_xxs/q2_0") return iq3_xxs_q2_0;
+     if (pair == "iq3_xxs/iq4_nl") return iq3_xxs_iq4_nl;
++    if (pair == "iq3_s/iq4_nl") return iq3_s_iq4_nl;
+     return false;
+ }
+ 
+@@ -175,6 +177,53 @@ float q8_1_iq3_xxs_cuda_dot(const uint8_t* row, const uint8_t* xq, int n) {
+     return lane_sum[0];
+ }
+ 
++float q8_1_iq3_s_cuda_dot(const uint8_t* row, const uint8_t* xq, int n) {
++    // Mirror vec_dot_iq3_s_q8_1 / Fmt<21> in cuda/iq_kernels.cu and the
++    // grouped expert's 32-lane strided accumulation plus XOR reduction.
++    constexpr int qk = QK_K;
++    static_assert(qk == 256, "IQ3_S CUDA contract assumes 256-value weight blocks");
++    if (n % qk != 0) std::abort();
++    const int nb = n / qk;
++    const auto* weights = reinterpret_cast<const block_iq3_s*>(row);
++    const auto* acts = reinterpret_cast<const Q81Block*>(xq);
++    std::array<float, 32> lane_sum{};
++    for (int lane = 0; lane < 32; ++lane) {
++        for (int k = lane; k < nb * 8; k += 32) {
++            const int kbx = k / 8;
++            const int iqs = 2 * (k % 8);
++            const auto* w = weights + kbx;
++            const auto* x = acts + kbx * 8 + iqs / 2;
++            const uint8_t* qs = w->qs + 4 * iqs;
++            const uint8_t qh = w->qh[iqs / 2];
++            const uint8_t* signs = w->signs + 4 * (iqs / 2);
++            int sumi = 0;
++            for (int l0 = 0; l0 < 8; l0 += 2) {
++                const uint32_t grid_l = iq3s_grid[qs[l0] | ((qh << (8 - l0)) & 0x100)];
++                const uint32_t grid_h = iq3s_grid[qs[l0 + 1] | ((qh << (7 - l0)) & 0x100)];
++                const uint8_t sign = signs[l0 / 2];
++                for (int j = 0; j < 4; ++j) {
++                    int gl = (int) ((grid_l >> (8 * j)) & 0xff);
++                    int gh = (int) ((grid_h >> (8 * j)) & 0xff);
++                    if ((sign >> j) & 1) gl = -gl;
++                    if ((sign >> (j + 4)) & 1) gh = -gh;
++                    sumi += gl * (int) x->qs[4 * l0 + j];
++                    sumi += gh * (int) x->qs[4 * (l0 + 1) + j];
++                }
++            }
++            const int scale = 1 + 2 * ((w->scales[iqs / 4] >> ((iqs << 1) & 0x04)) & 0x0f);
++            sumi *= scale;
++            const float d = ggml_fp16_to_fp32(w->d) * ggml_fp16_to_fp32(x->d);
++            lane_sum[(size_t) lane] += d * (float) sumi;
++        }
++    }
++    for (int offset = 16; offset > 0; offset >>= 1) {
++        const auto previous = lane_sum;
++        for (int lane = 0; lane < 32; ++lane)
++            lane_sum[(size_t) lane] = previous[(size_t) lane] + previous[(size_t) (lane ^ offset)];
++    }
++    return lane_sum[0];
++}
++
+ float q8_1_q2_0_cuda_dot(const uint8_t* row, const uint8_t* xq, int n) {
+     constexpr int qk = QK2_0;
+     if (n % qk != 0) std::abort();
+@@ -259,7 +308,8 @@ bool q8_1_scalar_dot(const NativeFmt& f) {
+                             (f.d_type == GGML_TYPE_Q2_0 || f.d_type == GGML_TYPE_IQ4_NL);
+     const bool iq3_xxs_pair = f.gu_type == GGML_TYPE_IQ3_XXS &&
+                               (f.d_type == GGML_TYPE_Q2_0 || f.d_type == GGML_TYPE_IQ4_NL);
+-    return (iq2_s_pair || iq3_xxs_pair) &&
++    const bool iq3_s_pair = f.gu_type == GGML_TYPE_IQ3_S && f.d_type == GGML_TYPE_IQ4_NL;
++    return (iq2_s_pair || iq3_xxs_pair || iq3_s_pair) &&
+            f.gu_act == GGML_TYPE_Q8_1 && f.d_act == GGML_TYPE_Q8_1;
+ }
+ 
+@@ -312,7 +362,7 @@ bool native_fmt(int gu_type, int d_type, int64_t n_embd, int64_t n_ff, NativeFmt
+     const char* q8_1_probe = std::getenv("STRATA_NATIVE_CPU_Q8_1_DOT");
+     if (q8_1_probe != nullptr && !q8_1_selector_known(q8_1_probe)) {
+         err = "native experts: STRATA_NATIVE_CPU_Q8_1_DOT must be 0, 1, all, "
+-              "iq2_s/q2_0, iq2_s/iq4_nl, iq3_xxs/q2_0, iq3_xxs/iq4_nl, or a pair followed by @layer=N";
++              "iq2_s/q2_0, iq2_s/iq4_nl, iq3_xxs/q2_0, iq3_xxs/iq4_nl, iq3_s/iq4_nl, or a pair followed by @layer=N";
+         return false;
+     }
+     if (q8_1_probe != nullptr && std::strcmp(q8_1_probe, "0") != 0 &&
+@@ -388,7 +438,8 @@ void native_gu_rows(const NativeFmt& f, const uint8_t* blob, const void* const*
+             const uint8_t* ur = blob + f.up_off + (size_t) r * f.gu_row;
+             for (int t = 0; t < nt; ++t) {
+                 const auto* xq = (const uint8_t*) act[t];
+-                const auto dot = f.gu_type == GGML_TYPE_IQ2_S ? q8_1_iq2_s_cuda_dot : q8_1_iq3_xxs_cuda_dot;
++                const auto dot = f.gu_type == GGML_TYPE_IQ2_S ? q8_1_iq2_s_cuda_dot :
++                                 f.gu_type == GGML_TYPE_IQ3_XXS ? q8_1_iq3_xxs_cuda_dot : q8_1_iq3_s_cuda_dot;
+                 const float g = dot(gr, xq, (int) f.n_embd);
+                 const float u = dot(ur, xq, (int) f.n_embd);
+                 ff[t][r] = (g / (1.f + std::exp(-g))) * u;
+diff --git a/src/kernels/native_expert_parity.cpp b/src/kernels/native_expert_parity.cpp
+index 715cddbc..1c087cb9 100644
+--- a/src/kernels/native_expert_parity.cpp
++++ b/src/kernels/native_expert_parity.cpp
+@@ -717,6 +717,7 @@ int check_q8_1_selector_contract() {
+         {GGML_TYPE_IQ2_S, GGML_TYPE_IQ4_NL, "iq2_s/iq4_nl"},
+         {GGML_TYPE_IQ3_XXS, GGML_TYPE_Q2_0, "iq3_xxs/q2_0"},
+         {GGML_TYPE_IQ3_XXS, GGML_TYPE_IQ4_NL, "iq3_xxs/iq4_nl"},
++        {GGML_TYPE_IQ3_S, GGML_TYPE_IQ4_NL, "iq3_s/iq4_nl"},
+     };
+     auto set_selector = [](const char* value) {
+ #ifdef _WIN32
+@@ -735,7 +736,8 @@ int check_q8_1_selector_contract() {
+             ++failures;
+         }
+     }
+-    const char* selectors[] = {"1", "all", "iq2_s/q2_0", "iq2_s/iq4_nl", "iq3_xxs/q2_0", "iq3_xxs/iq4_nl"};
++    const char* selectors[] = {"1", "all", "iq2_s/q2_0", "iq2_s/iq4_nl", "iq3_xxs/q2_0",
++                               "iq3_xxs/iq4_nl", "iq3_s/iq4_nl"};
+     for (const char* selector : selectors) {
+         set_selector(selector);
+         for (size_t i = 0; i < std::size(pairs); ++i) {
+@@ -1015,10 +1017,10 @@ int main(int argc, char** argv) {
+             }
+             const auto blob = synthetic_blob(f, i);
+             if (all_windows) {
+-                if ((gu != GGML_TYPE_IQ2_S && gu != GGML_TYPE_IQ3_XXS) ||
++                if ((gu != GGML_TYPE_IQ2_S && gu != GGML_TYPE_IQ3_XXS && gu != GGML_TYPE_IQ3_S) ||
+                     (dn != GGML_TYPE_Q2_0 && dn != GGML_TYPE_IQ4_NL) ||
+                     f.gu_act != GGML_TYPE_Q8_1 || f.d_act != GGML_TYPE_Q8_1) {
+-                    std::fprintf(stderr, "--synthetic-windows supports iq2_s/q2_0, iq2_s/iq4_nl, iq3_xxs/q2_0 or iq3_xxs/iq4_nl with Q8_1 activations\n");
++                    std::fprintf(stderr, "--synthetic-windows supports iq2_s/q2_0, iq2_s/iq4_nl, iq3_xxs/q2_0, iq3_xxs/iq4_nl or iq3_s/iq4_nl with Q8_1 activations\n");
+                     return 2;
+                 }
+                 failures += check_blob<1>(f, blob, i, "synthetic nt=1", s);
