@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare selected layer-26 GDN verifier intermediates across initial/recovery."""
+"""Compare selected GDN verifier intermediates across initial/recovery."""
 import argparse
 import hashlib
 import json
@@ -11,7 +11,7 @@ HEADER = struct.Struct('<8sIiiqQQQQQ8i')
 FIELDS = ('x', 'qkv', 'h', 'gate', 'beta', 'z', 'y', 'gdn_out', 'ffn_x', 'ffn_y')
 
 
-def parse_records(path, positions):
+def parse_records(path, layer, positions):
     data = path.read_bytes()
     records = []
     offset = 0
@@ -19,9 +19,9 @@ def parse_records(path, positions):
         if len(data) - offset < HEADER.size:
             raise ValueError(f'truncated GDN header in {path} at {offset}')
         values = HEADER.unpack_from(data, offset)
-        magic, version, layer, rows, pos0, n_embd, conv, v_heads, value_dim, state_floats, *tokens = values
+        magic, version, record_layer, rows, pos0, n_embd, conv, v_heads, value_dim, state_floats, *tokens = values
         offset += HEADER.size
-        if magic != b'STGDIAG4' or version != 4 or layer != 26 or not 0 < rows <= 8:
+        if magic != b'STGDIAG4' or version != 4 or record_layer != layer or not 0 < rows <= 8:
             raise ValueError(f'invalid GDN record header: {values[:10]}')
         counts = (n_embd, conv, conv, v_heads, v_heads, value_dim, value_dim,
                   n_embd, n_embd, n_embd)
@@ -67,13 +67,16 @@ def summarize(a, b):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--run', type=Path, required=True)
+    parser.add_argument('--layer', type=int, default=26)
     parser.add_argument('--positions', type=int, nargs='+', default=[511])
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     if any(p < 0 for p in args.positions) or args.positions != sorted(set(args.positions)):
         parser.error('--positions must be strictly increasing non-negative integers')
 
-    raw, records = parse_records(args.run / 'verify-gdn.bin', set(args.positions))
+    if not 0 <= args.layer < 48:
+        parser.error('--layer must be in [0, 47]')
+    raw, records = parse_records(args.run / 'verify-gdn.bin', args.layer, set(args.positions))
     grouped = {}
     for record in records:
         grouped.setdefault(record['position'], []).append(record)
@@ -96,7 +99,8 @@ def main():
         }
 
     result = {
-        'scope': 'same-service layer-26 GDN verifier intermediates at selected token positions',
+        'scope': f'same-service layer-{args.layer} GDN verifier intermediates at selected token positions',
+        'layer': args.layer,
         'positions': args.positions,
         'model_shape': records[0]['shape'],
         'raw_capture_bytes': len(raw),

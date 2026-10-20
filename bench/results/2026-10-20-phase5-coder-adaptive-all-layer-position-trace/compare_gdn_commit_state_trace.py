@@ -2,8 +2,10 @@
 """Compare committed layer-specific GDN states across initial/long/recovery requests."""
 import argparse
 from array import array
+from collections import defaultdict
 import hashlib
 import json
+import re
 import struct
 from pathlib import Path
 
@@ -52,6 +54,31 @@ def split(a, b, recurrent):
             'convolution_history': summarize(a[recurrent:], b[recurrent:])}
 
 
+def read_service_gdn_hashes(path):
+    pattern = re.compile(r'ACCEPTED_PREFIX position=(\d+)')
+    pending = None
+    result = defaultdict(list)
+    for line in path.read_text().splitlines():
+        if 'STATE_HASH_GDN ' in line:
+            pending = [value.lower() for value in line.split('STATE_HASH_GDN ', 1)[1].split()]
+            continue
+        match = pattern.search(line)
+        if match is not None:
+            if pending is None:
+                raise ValueError('accepted-prefix service row has no preceding per-GDN hashes')
+            result[int(match.group(1))].append(pending)
+            pending = None
+    return result
+
+
+def fnv1a(data):
+    value = 1469598103934665603
+    for byte in data:
+        value ^= byte
+        value = (value * 1099511628211) & 0xffffffffffffffff
+    return f'{value:016x}'
+
+
 def read_verifier_pre_states(path, expected_layer):
     raw = path.read_bytes()
     records = []
@@ -79,6 +106,10 @@ def main():
     parser.add_argument('--layer', type=int, required=True)
     parser.add_argument('--verifier-state-dump', type=Path,
                         help='optional earlier STGSTAT1 pre/post capture for exact boundary cross-check')
+    parser.add_argument('--service-log', type=Path,
+                        help='optional accepted-prefix log for checking raw GDN bytes against per-layer hashes')
+    parser.add_argument('--gdn-ordinal', type=int,
+                        help='global GDN ordinal represented by this layer-specific capture')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     raw, records = read_records(args.state_dump, args.layer)
@@ -129,6 +160,28 @@ def main():
         }
         if not all(exact):
             raise ValueError('position-510 commit does not match the earlier position-511 verifier pre-state')
+    if (args.service_log is None) != (args.gdn_ordinal is None):
+        parser.error('--service-log and --gdn-ordinal must be supplied together')
+    if args.gdn_ordinal is not None:
+        service = read_service_gdn_hashes(args.service_log)
+        checks = []
+        for position, group in sorted(by_position.items()):
+            service_rows = service.get(position, [])
+            if len(service_rows) != len(group):
+                raise ValueError(f'position {position}: {len(group)} raw records but {len(service_rows)} service hashes')
+            for record, hashes in zip(group, service_rows):
+                if not 0 <= args.gdn_ordinal < len(hashes):
+                    raise ValueError(f'GDN ordinal {args.gdn_ordinal} out of range at position {position}')
+                observed = fnv1a(record['state'].tobytes())
+                expected = hashes[args.gdn_ordinal]
+                checks.append({'position': position, 'raw_hash': observed,
+                               'service_hash': expected, 'matches': observed == expected})
+        if not all(row['matches'] for row in checks):
+            raise ValueError('raw committed state does not match accepted-prefix service hashes')
+        summary['service_hash_crosscheck'] = {
+            'gdn_ordinal': args.gdn_ordinal, 'records': len(checks),
+            'all_match': True, 'checks': checks,
+        }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(summary, indent=2) + '\n')
     print(json.dumps(summary, indent=2))

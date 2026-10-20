@@ -40,6 +40,8 @@ def main():
     ap.add_argument('--verify-moe-positions', default='511')
     ap.add_argument('--capture-verify-gdn-layer', type=int)
     ap.add_argument('--verify-gdn-positions', default='511')
+    ap.add_argument('--capture-gdn-commit-state-layer', type=int)
+    ap.add_argument('--gdn-commit-state-positions', default='')
     ap.add_argument('--run', action='store_true')
     a = ap.parse_args()
     if a.continuations < 0:
@@ -69,6 +71,16 @@ def main():
         ap.error('--verify-gdn-positions must be strictly increasing non-negative integers')
     if a.capture_verify_gdn_layer is not None and a.capture_verify_gdn_layer < 0:
         ap.error('--capture-verify-gdn-layer must be non-negative')
+    try:
+        commit_positions = [int(value) for value in a.gdn_commit_state_positions.split(',') if value]
+    except ValueError:
+        ap.error('--gdn-commit-state-positions must be comma-separated non-negative integers')
+    if a.capture_gdn_commit_state_layer is None and commit_positions:
+        ap.error('--gdn-commit-state-positions requires --capture-gdn-commit-state-layer')
+    if a.capture_gdn_commit_state_layer is not None and (
+            a.capture_gdn_commit_state_layer < 0 or not commit_positions or
+            any(value < 0 for value in commit_positions) or commit_positions != sorted(set(commit_positions))):
+        ap.error('--capture-gdn-commit-state-layer requires a layer and increasing non-negative positions')
     if a.output.exists():
         ap.error('output directory already exists')
     cfg = json.loads((BASE / 'config.json').read_text())
@@ -87,7 +99,13 @@ def main():
         'verify_moe_positions': verify_positions if a.capture_verify_moe_layer is not None else None,
         'capture_verify_gdn_layer': a.capture_verify_gdn_layer,
         'verify_gdn_positions': gdn_positions if a.capture_verify_gdn_layer is not None else None,
+        'capture_gdn_commit_state_layer': a.capture_gdn_commit_state_layer,
+        'gdn_commit_state_positions': commit_positions if a.capture_gdn_commit_state_layer is not None else None,
         'repository_head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
+        'runner_source_sha256': {
+            'run_pair.py': digest(HERE / 'run_pair.py'),
+            'run_one.py': digest(HERE / 'run_one.py'),
+        },
         'binary_sha256': digest(binary), 'model_repository': 'ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF',
         'model_revision': '5348543e0147355ac9cbcb031184a3546350988e', 'quantization': 'IQ1_M',
         'model_shard_sha256': EXPECTED_MODEL, 'runs': [],
@@ -124,6 +142,10 @@ def main():
         if a.capture_verify_gdn_layer is not None:
             cmd.extend(['--capture-verify-gdn-layer', str(a.capture_verify_gdn_layer),
                         '--verify-gdn-positions', a.verify_gdn_positions])
+        if a.capture_gdn_commit_state_layer is not None:
+            cmd.extend(['--capture-gdn-commit-state-layer', str(a.capture_gdn_commit_state_layer),
+                        '--gdn-commit-state-positions', a.gdn_commit_state_positions,
+                        '--gdn-commit-state-output', str(result / 'gdn-commit-state.bin')])
         (d / 'launch.txt').write_text('systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes ' + ' '.join(cmd) + '\n')
         start = time.time()
         completed = subprocess.run(['systemd-run', '--user', '--scope', '--collect', '-p', 'MemoryMax=28G', '-p', 'IOAccounting=yes', *cmd], cwd=ROOT, capture_output=True, text=True)

@@ -56,6 +56,24 @@ control remained exact at all captured positions. Earlier adaptive activation
 differences did not yet change committed-state hashes. This narrows the
 boundary without proving a causal operation; Phase 5 remains open.
 
+A verifier-level [layer-31/layer-32 follow-up](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/adaptive-state-prefix8-verifier-capture/README.md)
+strengthened the localization. At position 519, layer-31 IDs and router
+weights matched; adaptive migration moved expert 22 from CPU to GPU, and its
+service verifier contribution changed in 2,559/2,560 values. The weighted
+layer-31 combine then differed in 2,555/2,560 values (relative L2
+`3.38419e-5`), followed by changed layer-32 GDN input `x`; delayed control was
+bit-identical. The same-input oracle found expert 76 bit-exact and expert 22
+different across CPU/GPU. This strongly implicates layer-31 expert-22 arithmetic
+as the immediate source of the observed layer-32 input change. A subsequent
+[raw committed-state capture](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/adaptive-state-prefix8-committed-raw/README.md)
+confirmed that the serving layer-32 recurrent matrix first differs at accepted
+position 519 (564,534/786,432 values; relative L2 `1.28332e-7`), while its
+convolution history remains exact. The raw per-layer hash matches the service
+fingerprint; delayed control is bit-identical at positions 518–520. This
+confirms the committed-state boundary but does not establish an accuracy
+winner. Both supervisors passed with at least 14.22 GiB minimum
+host/admission availability and zero cgroup events. Phase 5 remains open.
+
 A same-input [layer-25 owner trace](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/layer25-owner-position505-506/README.md)
 directly ties the position-505 adaptive divergence to expert 183 changing from
 CPU to GPU at layer 25. Its input, route IDs and weights match bitwise; the

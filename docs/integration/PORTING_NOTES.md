@@ -303,6 +303,18 @@ Also capture the service's actual CPU-owned expert rows immediately before its
 weighted combine; a standalone operator harness proves its own path, not that
 the integrated scheduler dispatches the same math and writes the expected row.
 
+A 64-token adaptive trace shows why that distinction matters. Output token IDs
+matched, and the first eight accepted state fingerprints matched. At accepted
+prefix 8, a same-position verifier capture showed a CPU/GPU owner change for
+one layer-31 expert, an exact route and router-weight match, a changed expert
+contribution and weighted combine, and then a changed layer-32 GDN input. The
+state hashes first changed at GDN ordinal 24 (model layer 32). A follow-up raw
+committed-state capture confirmed the layer-32 recurrent matrix first differs
+at that boundary while convolution history stays exact; each raw hash matches
+the service's per-layer fingerprint. A future Splash port should join owner,
+per-expert output, combine, recurrent inputs and committed state at the same
+accepted token, and keep those evidence layers distinct in its report.
+
 The Oct 11 Strata accepted-prefix test exposed a QSA indexer transaction detail
 that also applies when integrating another speculative engine. Commit replay
 correctly rebuilt rows for the accepted prefix, but a rejected suffix could

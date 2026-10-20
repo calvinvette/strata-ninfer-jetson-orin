@@ -76,7 +76,17 @@ layer 32); at the same position, the first changed captured MoE input is layer
 32, with relative L2 `1.4294e-5`, while its expert IDs still match and its owner
 placement differs. Delayed control remains exact across the capture. Earlier
 adaptive activation differences did not yet change committed-state hashes, so
-this is a boundary localization rather than proof of cause.
+this is a boundary localization rather than proof of cause. A verifier-level
+[layer-31 capture](adaptive-state-prefix8-verifier-capture/README.md) then
+found matching IDs and router weights but a changed contribution for owner-
+migrated expert 22; the weighted combine changed before the layer-32 GDN input.
+The [raw committed-state follow-up](adaptive-state-prefix8-committed-raw/README.md)
+then confirmed that the accepted layer-32 recurrent matrix first differs at
+position 519, while convolution history stays bit-identical. The raw snapshot's
+per-layer hash matches the service log at that accepted prefix. This directly
+confirms the state divergence and strongly implicates the preceding owner-
+dependent layer-31 expert-22 arithmetic; it remains correctness evidence for
+this one model/configuration.
 
 To measure the state delta without committing large state files, I captured the
 initial short request at occurrence 1 and the recovery short request at
