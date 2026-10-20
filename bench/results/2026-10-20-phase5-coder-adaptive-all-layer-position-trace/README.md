@@ -52,6 +52,23 @@ full-model parity.
 
 ## Raw accepted-prefix GDN state follow-up
 
+### 64-token accepted-prefix follow-up
+
+Extending generation from 16 to 64 tokens exposed a later adaptive state
+divergence. Initial and recovery short outputs had identical token IDs in both
+arms. Delayed-control state remained identical through all 64 accepted
+prefixes, while adaptive state first differed at zero-based prefix 8 and
+remained different through prefix 63; GDN ordinals 24–35 were the first
+per-layer hashes to differ. This confirms that the earlier 16-token parity
+checks did not qualify longer accepted chains. The all-layer position-511
+capture still found equal initial/recovery activations, with owner changes in
+23 layers, so it does not identify the state divergence's first operation.
+Both 28-GiB supervisors passed with zero cgroup events and at least 14.14 GiB
+minimum host/admission availability. Full records and reproduction commands are
+in [the 64-token campaign](reproduction-q8-cuda-input-quantizer-long64/README.md).
+This remains correctness evidence for one model/configuration; adaptive
+migration is still opt-in and Phase 5 remains open.
+
 To measure the state delta without committing large state files, I captured the
 initial short request at occurrence 1 and the recovery short request at
 occurrence 2 in separate supervised reruns of the same adaptive sequence. Both

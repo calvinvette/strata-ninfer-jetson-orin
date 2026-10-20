@@ -36,6 +36,8 @@ def main():
                         help="comma-separated increasing absolute positions for the all-layer expert trace")
     parser.add_argument("--continuations", type=int, default=0,
                         help="extra identical short requests after short/long/short")
+    parser.add_argument("--generated-tokens", type=int, default=16,
+                        help="maximum generated tokens per request (default: 16)")
     parser.add_argument("--dump-gdn-occurrence", type=int,
                         help="optionally dump GDN state at L=512 on this matching request occurrence")
     parser.add_argument("--capture-cpu-output-layer", type=int,
@@ -70,6 +72,8 @@ def main():
     args = parser.parse_args()
     if args.continuations < 0:
         parser.error("--continuations must be non-negative")
+    if args.generated_tokens <= 0:
+        parser.error("--generated-tokens must be positive")
     if args.spec is not None and args.spec < 0:
         parser.error("--spec must be non-negative")
     try:
@@ -243,12 +247,14 @@ def main():
     requests = []
     try:
         for name, prompt in prompts:
-            ids = [int(token) for token in engine.generate(prompt, 16, {"temperature": 0}, threading.Event())
+            ids = [int(token) for token in engine.generate(
+                prompt, args.generated_tokens, {"temperature": 0}, threading.Event())
                    if token is not None]
             hashes = parse_hashes(log)
             if len(hashes) != len(requests) + 1:
                 raise RuntimeError(f"expected {len(requests) + 1} state records, found {len(hashes)}")
-            requests.append({"name": name, "prompt_tokens": len(prompt), "ids": ids,
+            requests.append({"name": name, "prompt_tokens": len(prompt),
+                             "generated_tokens_requested": args.generated_tokens, "ids": ids,
                              "state": hashes[-1]})
             (args.output / "requests.json").write_text(json.dumps({"requests": requests}, indent=2) + "\n")
     finally:

@@ -33,6 +33,8 @@ def main():
     ap.add_argument('--output', type=Path, required=True)
     ap.add_argument('--seed', type=int, default=20261030)
     ap.add_argument('--continuations', type=int, default=1)
+    ap.add_argument('--generated-tokens', type=int, default=16,
+                    help='maximum generated tokens per request (default: 16)')
     ap.add_argument('--capture-moe-positions', default='511')
     ap.add_argument('--capture-verify-moe-layer', type=int)
     ap.add_argument('--verify-moe-positions', default='511')
@@ -42,6 +44,8 @@ def main():
     a = ap.parse_args()
     if a.continuations < 0:
         ap.error('--continuations must be non-negative')
+    if a.generated_tokens <= 0:
+        ap.error('--generated-tokens must be positive')
     try:
         capture_positions = [int(value) for value in a.capture_moe_positions.split(',')]
     except ValueError:
@@ -77,7 +81,7 @@ def main():
     campaign = {
         'schema': 1, 'status': 'planned', 'seed': a.seed,
         'scope': 'one randomized same-service short/long/short correctness pair with optional continuation; delayed adaptation versus cap-8 adaptive swaps',
-        'continuations': a.continuations,
+        'continuations': a.continuations, 'generated_tokens': a.generated_tokens,
         'capture_moe_positions': capture_positions,
         'capture_verify_moe_layer': a.capture_verify_moe_layer,
         'verify_moe_positions': verify_positions if a.capture_verify_moe_layer is not None else None,
@@ -111,7 +115,8 @@ def main():
         result = d / 'result'
         cmd = [py, str(supervisor), '--output', str(sup), '--timeout', '1800', '--interval', '1', '--sample-clocks', '--',
                py, str(runner), '--adapt-every', str(arm['adapt_every']), '--adapt-swaps', str(arm['adapt_swaps']),
-               '--continuations', str(a.continuations), '--capture-moe-positions', a.capture_moe_positions,
+               '--continuations', str(a.continuations), '--generated-tokens', str(a.generated_tokens),
+               '--capture-moe-positions', a.capture_moe_positions,
                '--output', str(result)]
         if a.capture_verify_moe_layer is not None:
             cmd.extend(['--capture-verify-moe-layer', str(a.capture_verify_moe_layer),

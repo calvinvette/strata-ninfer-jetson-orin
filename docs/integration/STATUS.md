@@ -35,6 +35,17 @@ steps using its migrated `generate.cpp` overlay. This is x86_64 build evidence
 only, with no accelerator runtime claim. See the backend report in the linked
 result bundle.
 
+A subsequent 64-token accepted-prefix pair extended the same Coder IQ1_M
+workload. Token IDs still matched between initial short and recovery requests,
+but adaptive state first differed at zero-based accepted prefix 8 and remained
+different through prefix 63; delayed-control state and per-layer GDN hashes
+matched at all 64 prefixes. The first adaptive GDN hash differences were
+ordinals 24–35. Both supervised arms passed with 14.14 and 14.32 GiB minimum
+host/admission availability and zero cgroup events. This shows the earlier
+16-token recovery parity did not qualify longer accepted chains, without
+identifying the first divergent operation. See the
+[64-token trace](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/reproduction-q8-cuda-input-quantizer-long64/README.md).
+
 A same-input [layer-25 owner trace](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/layer25-owner-position505-506/README.md)
 directly ties the position-505 adaptive divergence to expert 183 changing from
 CPU to GPU at layer 25. Its input, route IDs and weights match bitwise; the
