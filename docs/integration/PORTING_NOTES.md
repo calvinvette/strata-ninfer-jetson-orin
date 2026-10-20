@@ -2041,3 +2041,11 @@ those rows. The layer-26 trace now retains the existing GDN intermediate arrays
 for every row in a selected multi-token window, then compares fields per
 absolute position. For Splash, keep the row/token mapping explicit and keep
 persistent-state claims separate from intermediate-value comparisons.
+
+A corrected Q8_1 activation oracle for the layer-3 IQ2_S/IQ4_NL owner change
+had to model Orin's NEON ties-to-even quantization separately from CUDA's
+fast-math division. The service's fused SwiGLU/quantize kernel also leaves its
+float scratch unused; reading it produced zeros. For Splash, qualify rounding
+per backend and inspect the actual fusion path before treating scratch as an
+intermediate capture. An existing unfused path can expose useful values only
+after its quantized result is checked against the default fused path.

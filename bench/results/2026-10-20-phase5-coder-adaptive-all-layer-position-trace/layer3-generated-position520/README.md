@@ -55,6 +55,21 @@ design: GGML stores `d*sum(q)` while this CUDA path stores `sum(input)`. See
 `q8_1-quantizer-check-corrected.txt`; this check does not change the routed-row
 or persistent-state findings.
 
+An opt-in [hidden-stage capture](hidden-stage-comparison.json) narrows the
+remaining boundary to before Q8_1 quantization. The default grouped GPU path
+fuses SwiGLU and quantization, so it does not materialize the intermediate
+float buffer. With the existing unfused grouped-v1 path enabled, all three
+repeated rows expose identical CPU and GPU captures across token widths; the
+CPU/GPU pre-quantized hidden floats differ in all 1,920 values (relative L2
+0.00100083, maximum absolute difference 0.00019974). The resulting GPU Q8_1
+blocks match the default fused path exactly, while CPU/GPU blocks differ in
+all 60 blocks. This shows the discrepancy is already present before hidden
+quantization. The captures do not yet separate gate/up projection arithmetic
+from SwiGLU arithmetic, and they do not identify a persistent-state write.
+Raw rows and Q8_1 blocks plus the replay log are under
+`operator-checks/expert182-q8_1-mirror/stage-detail-v1/`. The default fused
+capture's unused GPU float scratch was excluded.
+
 Reproduce the supervised pair from the repository root with:
 
 ```sh

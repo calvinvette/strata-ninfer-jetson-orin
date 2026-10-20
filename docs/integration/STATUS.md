@@ -72,7 +72,13 @@ this row difference from 1.82% to 0.2819%, but does not remove it. The CPU
 down projection on the GPU-produced hidden activation matches grouped CUDA
 exactly, while the post-SwiGLU hidden Q8_1 blocks differ. The remaining
 owner-dependent arithmetic boundary is before the down projection; the first
-persistent-state write and complete recovery parity remain unresolved. Both
+persistent-state write and complete recovery parity remain unresolved. A
+separate opt-in hidden-stage capture with the existing unfused GPU path found
+the CPU/GPU pre-quantized SwiGLU floats differ in all 1,920 values (relative
+L2 0.00100083, maximum absolute difference 0.00019974); its GPU Q8_1 output is
+bit-identical to the default fused path. This confirms the discrepancy is
+present before hidden quantization, while gate/up and SwiGLU arithmetic remain
+unseparated. Both
 arms passed supervision with 14.22/14.37 GiB minimum host/admission
 availability and zero cgroup memory events. The first optional input-quantizer
 check exposed a host-oracle rounding mismatch and remains retained as a failed

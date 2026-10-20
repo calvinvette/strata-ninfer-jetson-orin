@@ -389,6 +389,9 @@ differs, and layer 4 is the first changed activation. The Q8_1 CPU mirror
 reduces this expert's CPU/GPU discrepancy from 1.82% to 0.2819% but does not
 eliminate it. CPU down-projection on the GPU-produced hidden Q8_1 activation
 matches grouped CUDA exactly, while the post-SwiGLU hidden Q8_1 rows differ in
-all 60 blocks. This localizes the remaining arithmetic mismatch to gate/up or
-SwiGLU and hidden quantization before down projection. It still does not
+all 60 blocks. A separate unfused-path capture finds the pre-quantized hidden
+floats already differ (relative L2 0.00100083, maximum absolute difference
+0.00019974); the resulting GPU Q8_1 blocks match the default fused path
+exactly. This localizes the remaining arithmetic mismatch to gate/up or
+SwiGLU before hidden quantization and down projection. It still does not
 identify the first persistent-state write or qualify adaptive migration.

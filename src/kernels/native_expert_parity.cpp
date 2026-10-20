@@ -298,6 +298,7 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
     }
     std::vector<float> ref((size_t) N * H), got_c((size_t) N * H), got_g((size_t) N * H);
     std::vector<uint8_t> cpu_hq_snapshot;
+    std::vector<float> cpu_hidden_snapshot;
     const bool compare_hidden_q8_1 = std::getenv("STRATA_PARITY_COMPARE_HIDDEN_Q8_1") != nullptr;
     for (int k = 0; k < N; ++k) {
         std::vector<float> h(FF);
@@ -327,6 +328,11 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
             ffp[k] = ff[k].data();
         }
         cpu::native_gu_rows(f, blob.data(), a, N, ffp, 0, (int) FF);
+        if (std::getenv("STRATA_PARITY_DUMP_HIDDEN_Q8_1") != nullptr) {
+            cpu_hidden_snapshot.resize((size_t) N * FF);
+            for (int k = 0; k < N; ++k)
+                std::copy(ff[k].begin(), ff[k].end(), cpu_hidden_snapshot.begin() + (size_t) k * FF);
+        }
         // either multi-token kernel: IQ4_XS has an AVX-2 one and no AVX-512 one, so the gate cannot be
         // iq512_supported alone - that would leave the format untested on every CPU.
 #if STRATA_CPU_X86
@@ -581,6 +587,27 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
                     ++failures;
                 } else {
                     cudaMemcpy(gpu_hq.data(), (const uint8_t*) dscr + hq_offset, nbytes, cudaMemcpyDeviceToHost);
+                    if (std::getenv("STRATA_PARITY_DUMP_HIDDEN_Q8_1") != nullptr && !dump_f32_dir.empty()) {
+                        std::vector<float> gpu_hidden((size_t) N * FF);
+                        cudaMemcpy(gpu_hidden.data(), (const uint8_t*) dscr + 2 * fa, fbytes,
+                                   cudaMemcpyDeviceToHost);
+                        std::string stem = label;
+                        std::replace(stem.begin(), stem.end(), ' ', '-');
+                        const auto write_dump = [&](const std::string& suffix, const void* values, size_t bytes) {
+                            const std::string path = dump_f32_dir + "/" + stem + "-" + suffix;
+                            std::ofstream out(path, std::ios::binary);
+                            if (!out || !out.write(reinterpret_cast<const char*>(values), (std::streamsize) bytes)) {
+                                std::fprintf(stderr, "%s: cannot write hidden-stage dump %s\n", label.c_str(), path.c_str());
+                                return false;
+                            }
+                            return true;
+                        };
+                        if (cpu_hidden_snapshot.size() != (size_t) N * FF ||
+                            !write_dump("-cpu-hidden.f32", cpu_hidden_snapshot.data(), fbytes) ||
+                            !write_dump("-gpu-hidden.f32", gpu_hidden.data(), fbytes) ||
+                            !write_dump("-cpu-hidden.q8_1", cpu_hq_snapshot.data(), nbytes) ||
+                            !write_dump("-gpu-hidden.q8_1", gpu_hq.data(), nbytes)) return 1;
+                    }
                     const size_t blocks = nbytes / 36;
                     size_t blocks_differ = 0, d_bytes_differ = 0, sum_bytes_differ = 0, code_bytes_differ = 0;
                     for (size_t b = 0; b < blocks; ++b) {
