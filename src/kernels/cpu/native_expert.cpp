@@ -17,6 +17,8 @@
 #define GGML_COMMON_IMPL_CPP
 #include "ggml-common.h"
 
+#include <algorithm>
+#include <array>
 #include <cmath>
 #include <cerrno>
 #include <climits>
@@ -123,6 +125,37 @@ float q8_1_iq2_s_cuda_dot(const uint8_t* row, const uint8_t* xq, int n) {
         for (int lane = 0; lane < 32; ++lane) lane_sum[(size_t) lane] = previous[(size_t) lane] + previous[(size_t) (lane ^ offset)];
     }
     return lane_sum[0];
+}
+
+// The opt-in CUDA-order expert mirror consumes the grouped CUDA Q8_1 producer's
+// bytes. GGML's Orin NEON producer uses reciprocal-multiply plus ties-to-even;
+// grouped CUDA uses roundf(x / d). Keep the activation contract aligned at this
+// seam while leaving all non-Q8_1/default routes on ggml-cpu.
+void quantize_q8_1_cuda_order(const float* x, int n, void* dst) {
+    if (n % 32 != 0) std::abort();
+    auto* blocks = static_cast<Q81Block*>(dst);
+    for (int block = 0; block < n / 32; ++block) {
+        const float* row = x + (size_t) block * 32;
+        float amax = 0.f;
+        std::array<float, 32> sums{};
+        for (int lane = 0; lane < 32; ++lane) {
+            amax = std::max(amax, std::fabs(row[lane]));
+            sums[(size_t) lane] = row[lane];
+        }
+        for (int offset = 16; offset > 0; offset >>= 1) {
+            const auto prior = sums;
+            for (int lane = 0; lane < 32; ++lane)
+                sums[(size_t) lane] = prior[(size_t) lane] + prior[(size_t) (lane ^ offset)];
+        }
+        const float d = amax / 127.f;
+        blocks[block].d = ggml_fp32_to_fp16(std::fabs(d) > 65504.f ? std::copysign(65504.f, d) : d);
+        const float sum = sums[0];
+        blocks[block].s = ggml_fp32_to_fp16(std::fabs(sum) > 65504.f ? std::copysign(65504.f, sum) : sum);
+        for (int lane = 0; lane < 32; ++lane) {
+            const int q = amax == 0.f ? 0 : std::clamp((int) std::round(row[lane] / d), -127, 127);
+            blocks[block].qs[lane] = (int8_t) q;
+        }
+    }
 }
 
 float q8_1_iq3_xxs_cuda_dot(const uint8_t* row, const uint8_t* xq, int n) {
@@ -398,6 +431,7 @@ bool q8k_avx2(int type) {
 }  // namespace
 
 void native_quant_act(const NativeFmt& f, const float* x, void* dst) {
+    if (f.gu_act == GGML_TYPE_Q8_1) { quantize_q8_1_cuda_order(x, (int) f.n_embd, dst); return; }
 #if STRATA_CPU_X86
     if (q8k_avx2(f.gu_act)) { q8k_quant_avx2(x, dst, f.n_embd); return; }
 #endif
@@ -405,6 +439,7 @@ void native_quant_act(const NativeFmt& f, const float* x, void* dst) {
 }
 
 void native_quant_h(const NativeFmt& f, const float* h, void* dst) {
+    if (f.d_act == GGML_TYPE_Q8_1) { quantize_q8_1_cuda_order(h, (int) f.n_ff, dst); return; }
 #if STRATA_CPU_X86
     if (q8k_avx2(f.d_act)) { q8k_quant_avx2(h, dst, f.n_ff); return; }
 #endif

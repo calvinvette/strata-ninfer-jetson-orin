@@ -24,6 +24,10 @@
 
 #include "ggml.h"
 
+#define GGML_COMMON_DECL_CPP
+#define GGML_COMMON_IMPL_CPP
+#include "../../third_party/ggml/ggml-common.h"
+
 #include <cuda_runtime.h>
 
 #include <algorithm>
@@ -40,6 +44,55 @@
 #include <vector>
 
 namespace cpu = strata::kernels::cpu;
+
+namespace {
+struct ParityQ81 { ggml_fp16_t d, s; int8_t qs[32]; };
+static_assert(sizeof(ParityQ81) == 36, "Q8_1 block layout");
+
+// Independent harness transcription of the packed IQ2_S/Q8_1 CPU mirror. The
+// caller validates its reconstructed SwiGLU row against native_gu_rows output.
+float parity_iq2_s_q8_1_dot(const uint8_t* row, const uint8_t* xq, int n) {
+    if (n % QK_K != 0) std::abort();
+    const int nb = n / QK_K;
+    std::array<float, 32> lane_sum{};
+    for (int lane = 0; lane < 32; ++lane) {
+        for (int k = lane; k < nb * 8; k += 32) {
+            const int kbx = k / 8;
+            const int iqs = 2 * (k % 8);
+            const auto* w = reinterpret_cast<const block_iq2_s*>(row) + kbx;
+            const auto* x = reinterpret_cast<const ParityQ81*>(xq) + kbx * 8 + iqs / 2;
+            const uint8_t* qs = w->qs + 4 * (iqs / 2);
+            const uint8_t qh = w->qh[iqs / 2];
+            const uint8_t* signs = w->qs + 32 + 4 * (iqs / 2);
+            const int ls0 = w->scales[iqs / 2] & 0x0f;
+            const int ls1 = w->scales[iqs / 2] >> 4;
+            int sumi0 = 0, sumi1 = 0;
+            for (int l0 = 0; l0 < 8; l0 += 2) {
+                const uint64_t grid = iq2s_grid[qs[l0 / 2] | ((qh << (8 - l0)) & 0x300)];
+                const uint8_t sign = signs[l0 / 2];
+                const int q8_offset = l0 * 4;
+                for (int j = 0; j < 4; ++j) {
+                    int lo = (int) ((grid >> (8 * j)) & 0xff);
+                    int hi = (int) ((grid >> (8 * (j + 4))) & 0xff);
+                    if ((sign >> j) & 1) lo = -lo;
+                    if ((sign >> (j + 4)) & 1) hi = -hi;
+                    if (l0 < 4) sumi0 += lo * x->qs[q8_offset + j] + hi * x->qs[q8_offset + 4 + j];
+                    else sumi1 += lo * x->qs[q8_offset + j] + hi * x->qs[q8_offset + 4 + j];
+                }
+            }
+            const int sumi = (sumi0 * ls0 + sumi1 * ls1 + (sumi0 + sumi1) / 2) / 4;
+            const float d = ggml_fp16_to_fp32(w->d) * ggml_fp16_to_fp32(x->d);
+            lane_sum[(size_t) lane] += d * (float) sumi;
+        }
+    }
+    for (int offset = 16; offset > 0; offset >>= 1) {
+        const auto previous = lane_sum;
+        for (int lane = 0; lane < 32; ++lane)
+            lane_sum[(size_t) lane] = previous[(size_t) lane] + previous[(size_t) (lane ^ offset)];
+    }
+    return lane_sum[0];
+}
+}  // namespace
 
 static double rel(const std::vector<float>& a, const std::vector<float>& b) {
     double n = 0, d = 0;
@@ -63,7 +116,7 @@ int check_q8_1_quantizers(const std::vector<float>& x, cudaStream_t stream) {
         return 1;
     }
     const size_t bytes = ggml_row_size(GGML_TYPE_Q8_1, H);
-    std::vector<uint8_t> cpu_q(bytes), gpu_q(bytes);
+    std::vector<uint8_t> cpu_q(bytes), gpu_q(bytes), grouped_q(bytes);
     const auto* traits = ggml_get_type_traits_cpu(GGML_TYPE_Q8_1);
     if (!traits || !traits->from_float) {
         std::fprintf(stderr, "GGML CPU Q8_1 quantizer is unavailable\n");
@@ -85,6 +138,10 @@ int check_q8_1_quantizers(const std::vector<float>& x, cudaStream_t stream) {
     cuda_check(cudaGetLastError(), "launch CUDA quantizer");
     cuda_check(cudaStreamSynchronize(stream), "synchronize CUDA quantizer");
     cuda_check(cudaMemcpy(gpu_q.data(), dq, bytes, cudaMemcpyDeviceToHost), "copy Q8_1 blocks");
+    strata::kernels::quantize_q8_1_rows(dx, 1, H, dq, stream);
+    cuda_check(cudaGetLastError(), "launch grouped-row CUDA quantizer");
+    cuda_check(cudaStreamSynchronize(stream), "synchronize grouped-row CUDA quantizer");
+    cuda_check(cudaMemcpy(grouped_q.data(), dq, bytes, cudaMemcpyDeviceToHost), "copy grouped-row Q8_1 blocks");
     cuda_check(cudaFree(dq), "free Q8_1 blocks");
     cuda_check(cudaFree(dx), "free input");
 
@@ -95,9 +152,19 @@ int check_q8_1_quantizers(const std::vector<float>& x, cudaStream_t stream) {
     int first_oracle_failure = -1;
     int first_bad_code = -1, first_actual_code = 0, first_cpu_formula_code = 0, first_gpu_formula_code = 0;
     uint16_t first_cpu_sum = 0, first_gpu_sum = 0, first_expected_cpu_sum = 0, first_expected_gpu_sum = 0;
+    size_t grouped_cpu_code_mismatches = 0, grouped_native_code_mismatches = 0;
+    int first_grouped_cpu_code_mismatch = -1;
     for (int block = 0; block < H / 32; ++block) {
         const uint8_t* c = cpu_q.data() + (size_t) block * 36;
         const uint8_t* g = gpu_q.data() + (size_t) block * 36;
+        const uint8_t* gr = grouped_q.data() + (size_t) block * 36;
+        for (int i = 0; i < 32; ++i) {
+            const bool cpu_diff = c[4 + i] != gr[4 + i];
+            grouped_cpu_code_mismatches += cpu_diff;
+            grouped_native_code_mismatches += g[4 + i] != gr[4 + i];
+            if (cpu_diff && first_grouped_cpu_code_mismatch < 0)
+                first_grouped_cpu_code_mismatch = 32 * block + i;
+        }
         scale_mismatches += std::memcmp(c, g, 2) != 0;
         sum_mismatches += std::memcmp(c + 2, g + 2, 2) != 0;
         code_mismatches += std::memcmp(c + 4, g + 4, 32) != 0;
@@ -163,11 +230,13 @@ int check_q8_1_quantizers(const std::vector<float>& x, cudaStream_t stream) {
     std::printf("captured activation Q8_1 blocks=%lld: CPU/GPU scale mismatches=%zu, code mismatches=%zu, "
                 "stored-sum mismatches=%zu (GGML d*sum(q), CUDA sum(input)); independent checks: "
                 "scale-errors=%zu CPU-code-errors=%zu CUDA-code-errors-over-1=%zu CUDA-code-1-step-blocks=%zu "
-                "GGML-sum-errors=%zu CUDA-sum-errors=%zu first-block=%d\n",
+                "GGML-sum-errors=%zu CUDA-sum-errors=%zu first-block=%d; grouped-row CUDA code mismatches "
+                "vs CPU=%zu, vs native CUDA=%zu, first CPU mismatch index=%d\n",
                 (long long) (H / 32), scale_mismatches, code_mismatches, sum_mismatches,
                 oracle_scale_mismatches, oracle_cpu_code_errors, oracle_gpu_code_errors,
                 oracle_gpu_code_one_step, oracle_cpu_sum_mismatches, oracle_gpu_sum_mismatches,
-                first_oracle_failure);
+                first_oracle_failure, grouped_cpu_code_mismatches, grouped_native_code_mismatches,
+                first_grouped_cpu_code_mismatch);
     if (first_oracle_failure >= 0) {
         std::printf("first formula mismatch detail: block=%d code-index=%d actual=%d CPU-formula=%d GPU-formula=%d "
                     "CPU-sum=%04x expected=%04x GPU-sum=%04x expected=%04x\n",
@@ -298,7 +367,9 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
     }
     std::vector<float> ref((size_t) N * H), got_c((size_t) N * H), got_g((size_t) N * H);
     std::vector<uint8_t> cpu_hq_snapshot;
+    std::vector<uint8_t> cpu_activation_snapshot;
     std::vector<float> cpu_hidden_snapshot;
+    std::vector<float> cpu_gate_snapshot, cpu_up_snapshot;
     const bool compare_hidden_q8_1 = std::getenv("STRATA_PARITY_COMPARE_HIDDEN_Q8_1") != nullptr;
     for (int k = 0; k < N; ++k) {
         std::vector<float> h(FF);
@@ -328,10 +399,51 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
             ffp[k] = ff[k].data();
         }
         cpu::native_gu_rows(f, blob.data(), a, N, ffp, 0, (int) FF);
+        if (std::getenv("STRATA_PARITY_DUMP_HIDDEN_Q8_1") != nullptr && f.d_act == GGML_TYPE_Q8_1) {
+            const size_t act_bytes = ggml_row_size(GGML_TYPE_Q8_1, H);
+            cpu_activation_snapshot.resize((size_t) N * act_bytes);
+            for (int token = 0; token < N; ++token)
+                std::memcpy(cpu_activation_snapshot.data() + (size_t) token * act_bytes, a[token], act_bytes);
+        }
         if (std::getenv("STRATA_PARITY_DUMP_HIDDEN_Q8_1") != nullptr) {
             cpu_hidden_snapshot.resize((size_t) N * FF);
             for (int k = 0; k < N; ++k)
                 std::copy(ff[k].begin(), ff[k].end(), cpu_hidden_snapshot.begin() + (size_t) k * FF);
+            if (f.gu_type == GGML_TYPE_IQ2_S && f.d_act == GGML_TYPE_Q8_1) {
+                cpu_gate_snapshot.resize((size_t) N * FF);
+                cpu_up_snapshot.resize((size_t) N * FF);
+                size_t reconstructed_differences = 0;
+                for (int token = 0; token < N; ++token) {
+                    const auto* xq = static_cast<const uint8_t*>(a[token]);
+                    for (int64_t row = 0; row < FF; ++row) {
+                        const float g = parity_iq2_s_q8_1_dot(blob.data() + row * f.gu_row, xq, (int) H);
+                        const float u = parity_iq2_s_q8_1_dot(blob.data() + f.up_off + row * f.gu_row, xq,
+                                                               (int) H);
+                        const size_t at = (size_t) token * FF + (size_t) row;
+                        cpu_gate_snapshot[at] = g;
+                        cpu_up_snapshot[at] = u;
+                        const float h = (g / (1.f + std::exp(-g))) * u;
+                        reconstructed_differences += std::memcmp(&h, &cpu_hidden_snapshot[at], sizeof(float)) != 0;
+                    }
+                }
+                std::printf("          independent packed-Q8_1 gate/up reconstruction vs native hidden: "
+                            "%zu/%zu words differ\n", reconstructed_differences, cpu_hidden_snapshot.size());
+                if (reconstructed_differences != 0) ++failures;
+                if (!dump_f32_dir.empty()) {
+                    std::string stem = label;
+                    std::replace(stem.begin(), stem.end(), ' ', '-');
+                    for (const auto& item : {std::pair<const char*, const std::vector<float>*>("cpu-gate", &cpu_gate_snapshot),
+                                             std::pair<const char*, const std::vector<float>*>("cpu-up", &cpu_up_snapshot)}) {
+                        const std::string path = dump_f32_dir + "/" + stem + "--" + item.first + ".f32";
+                        std::ofstream out(path, std::ios::binary);
+                        if (!out || !out.write(reinterpret_cast<const char*>(item.second->data()),
+                                               (std::streamsize) ((size_t) N * FF * 4))) {
+                            std::fprintf(stderr, "%s: cannot write CPU gate/up dump %s\n", label.c_str(), path.c_str());
+                            return 1;
+                        }
+                    }
+                }
+            }
         }
         // either multi-token kernel: IQ4_XS has an AVX-2 one and no AVX-512 one, so the gate cannot be
         // iq512_supported alone - that would leave the format untested on every CPU.
@@ -588,9 +700,29 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
                 } else {
                     cudaMemcpy(gpu_hq.data(), (const uint8_t*) dscr + hq_offset, nbytes, cudaMemcpyDeviceToHost);
                     if (std::getenv("STRATA_PARITY_DUMP_HIDDEN_Q8_1") != nullptr && !dump_f32_dir.empty()) {
+                        std::vector<float> gpu_gate((size_t) N * FF), gpu_up((size_t) N * FF);
                         std::vector<float> gpu_hidden((size_t) N * FF);
+                        std::vector<uint8_t> gpu_activation((size_t) N * ggml_row_size(GGML_TYPE_Q8_1, H));
+                        cudaMemcpy(gpu_gate.data(), dscr, fbytes, cudaMemcpyDeviceToHost);
+                        cudaMemcpy(gpu_up.data(), (const uint8_t*) dscr + fa, fbytes, cudaMemcpyDeviceToHost);
                         cudaMemcpy(gpu_hidden.data(), (const uint8_t*) dscr + 2 * fa, fbytes,
                                    cudaMemcpyDeviceToHost);
+                        cudaMemcpy(gpu_activation.data(), dxq, gpu_activation.size(), cudaMemcpyDeviceToHost);
+                        std::vector<float> cpu_gate_gpuq((size_t) N * FF), cpu_up_gpuq((size_t) N * FF);
+                        std::vector<float> cpu_hidden_gpuq((size_t) N * FF);
+                        const size_t input_row_bytes = ggml_row_size(GGML_TYPE_Q8_1, H);
+                        for (int token = 0; token < N; ++token) {
+                            const uint8_t* xq = gpu_activation.data() + (size_t) token * input_row_bytes;
+                            for (int64_t row = 0; row < FF; ++row) {
+                                const float g = parity_iq2_s_q8_1_dot(blob.data() + row * f.gu_row, xq, (int) H);
+                                const float u = parity_iq2_s_q8_1_dot(blob.data() + f.up_off + row * f.gu_row, xq,
+                                                                       (int) H);
+                                const size_t at = (size_t) token * FF + (size_t) row;
+                                cpu_gate_gpuq[at] = g;
+                                cpu_up_gpuq[at] = u;
+                                cpu_hidden_gpuq[at] = (g / (1.f + std::exp(-g))) * u;
+                            }
+                        }
                         std::string stem = label;
                         std::replace(stem.begin(), stem.end(), ' ', '-');
                         const auto write_dump = [&](const std::string& suffix, const void* values, size_t bytes) {
@@ -603,6 +735,15 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
                             return true;
                         };
                         if (cpu_hidden_snapshot.size() != (size_t) N * FF ||
+                            cpu_activation_snapshot.size() != gpu_activation.size() ||
+                            !write_dump("-gpu-gate.f32", gpu_gate.data(), fbytes) ||
+                            !write_dump("-gpu-up.f32", gpu_up.data(), fbytes) ||
+                            !write_dump("-cpu-gate-on-gpu-activation.f32", cpu_gate_gpuq.data(), fbytes) ||
+                            !write_dump("-cpu-up-on-gpu-activation.f32", cpu_up_gpuq.data(), fbytes) ||
+                            !write_dump("-cpu-hidden-on-gpu-activation.f32", cpu_hidden_gpuq.data(), fbytes) ||
+                            !write_dump("-cpu-activation.q8_1", cpu_activation_snapshot.data(),
+                                        cpu_activation_snapshot.size()) ||
+                            !write_dump("-gpu-activation.q8_1", gpu_activation.data(), gpu_activation.size()) ||
                             !write_dump("-cpu-hidden.f32", cpu_hidden_snapshot.data(), fbytes) ||
                             !write_dump("-gpu-hidden.f32", gpu_hidden.data(), fbytes) ||
                             !write_dump("-cpu-hidden.q8_1", cpu_hq_snapshot.data(), nbytes) ||

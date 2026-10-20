@@ -87,6 +87,28 @@ stored-sum formulas; CUDA codes are exact or within one step (one block).
 CPU/GPU stored sums differ by their documented GGML versus CUDA encodings.
 This does not change the routed-row or state findings. Phase 5 remains open.
 
+A follow-up corrected the Q8_1 input producer used by the opt-in CPU mirror to
+match the grouped CUDA reduction and rounding contract. In a fresh same-service
+adaptive/delayed pair, adaptive ownership still flipped at 14 layers, but the
+captured dispatch activations and expert IDs matched across all 48 layers at
+position 520. The layer-3 expert-hit rows (25,600 values), shared output,
+combined MoE output and layer-26 GDN verifier fields were bit-identical. The
+adaptive recovery also matched its initial short request's 16 token IDs and
+nine accepted-state fingerprints. Two further same-service pair campaigns,
+with the third reversing arm order, also matched all 16 recovery token IDs and
+all nine accepted-state fingerprints in both arms. All six supervised runs
+passed; minimum host/admission availability across them ranged from 14.03 to
+14.32 GiB with no cgroup memory events. This is correctness evidence for one
+model and workload, not broad migration qualification or a performance result;
+the selector remains opt-in. All 11 Q8_1 selector/window CTest cases and the
+163-test integration Python suite passed on this source. maestro1 rebuilt HIP
+`strata` and `native_expert_parity`, passed the Strata help and GPU-free
+selector-contract checks, and rebuilt the SYCL `strata` target with a
+successful help check; the report distinguishes these x86_64 checks from
+accelerator execution. Phase 5 remains open. See the
+[quantizer follow-up report](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/layer3-generated-position520/README.md#cuda-order-q8_1-activation-quantizer-follow-up)
+and [backend report](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/backend/maestro1-current-q8quant-2026-10-19/README.md), plus the retained raw pairs.
+
 An earlier [layer-25 CPU-row capture](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/README.md#layer-25-cpu-row-follow-up)
 joined the initial and recovery prompt at position 511. The route input, IDs
 and owners matched, and the three CPU-owned expert rows matched bitwise across

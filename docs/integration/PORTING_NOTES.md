@@ -2049,3 +2049,18 @@ float scratch unused; reading it produced zeros. For Splash, qualify rounding
 per backend and inspect the actual fusion path before treating scratch as an
 intermediate capture. An existing unfused path can expose useful values only
 after its quantized result is checked against the default fused path.
+
+The subsequent opt-in CPU mirror showed that activation production is part of
+the operator contract: the grouped CUDA Q8_1 producer uses a warp-XOR sum
+reduction and `roundf(x / d)`, while Orin's stock GGML path uses NEON
+ties-to-even. Mirroring the grouped producer only when the diagnostic selector
+chooses Q8_1 made the captured IQ2_S gate/up projections and all hidden Q8_1
+blocks bit-identical; the remaining pre-quantized SwiGLU float delta was below
+the code boundary and did not alter packed activations. A same-service adaptive
+pair then matched the captured dispatch outputs, final tokens and accepted
+state despite owner changes. For Splash, identify the service's exact
+activation producer, reduction topology, scale/sum encoding and rounding mode;
+keep any backend-specific mirror gated, validate it against the real grouped
+kernel on captured inputs, and test committed state before treating one owner
+transition as equivalent. Three randomized pairs matched for one Coder IQ1_M
+model/workload; that is not broad migration qualification.

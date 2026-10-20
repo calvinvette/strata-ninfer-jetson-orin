@@ -55,20 +55,19 @@ design: GGML stores `d*sum(q)` while this CUDA path stores `sum(input)`. See
 `q8_1-quantizer-check-corrected.txt`; this check does not change the routed-row
 or persistent-state findings.
 
-An opt-in [hidden-stage capture](hidden-stage-comparison.json) narrows the
-remaining boundary to before Q8_1 quantization. The default grouped GPU path
-fuses SwiGLU and quantization, so it does not materialize the intermediate
-float buffer. With the existing unfused grouped-v1 path enabled, all three
-repeated rows expose identical CPU and GPU captures across token widths; the
-CPU/GPU pre-quantized hidden floats differ in all 1,920 values (relative L2
-0.00100083, maximum absolute difference 0.00019974). The resulting GPU Q8_1
-blocks match the default fused path exactly, while CPU/GPU blocks differ in
-all 60 blocks. This shows the discrepancy is already present before hidden
-quantization. The captures do not yet separate gate/up projection arithmetic
-from SwiGLU arithmetic, and they do not identify a persistent-state write.
-Raw rows and Q8_1 blocks plus the replay log are under
-`operator-checks/expert182-q8_1-mirror/stage-detail-v1/`. The default fused
-capture's unused GPU float scratch was excluded.
+An opt-in [hidden-stage capture](hidden-stage-comparison.json) separates the
+remaining arithmetic stages. In the original capture, before the CUDA-order
+CPU Q8_1 producer was added, CPU/GPU gate and up projections appeared to differ
+and all 60 hidden Q8_1 blocks differed. The follow-up capture and independent
+IQ2_S/Q8_1 reconstruction show gate and up are actually bit-identical when
+both consume the same grouped-CUDA Q8_1 bytes. The pre-quantized SwiGLU floats
+differ in 237/1,920 values (relative L2 `4.57e-8`, maximum absolute difference
+`1.49e-8`), while the resulting CPU/GPU hidden Q8_1 blocks are bit-identical
+across all 60 blocks. The GPU blocks also match the default fused path. This
+locates the residual at tiny pre-quantization float rounding that does not
+change the packed hidden activation for this captured input. The original raw
+rows remain under `operator-checks/expert182-q8_1-mirror/stage-detail-v1/`; the
+CUDA-order follow-up rows are under `stage-detail-parts/`.
 
 Reproduce the supervised pair from the repository root with:
 
@@ -89,4 +88,54 @@ STRATA_NATIVE_CPU_Q8_1_DOT=all \
   --expert 182 \
   --activation-f32 bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/layer3-generated-position520/operator-checks/expert182-q8_1-mirror/activation.f32 \
   --dump-f32-dir /tmp/expert182-parity 3
+```
+
+## CUDA-order Q8_1 activation quantizer follow-up
+
+The remaining owner-dependent difference was traced to the activation producer:
+Orin's GGML Q8_1 quantizer can round a boundary value one code differently from
+the grouped CUDA producer. The opt-in `STRATA_NATIVE_CPU_Q8_1_DOT` path now uses
+the grouped producer's CUDA reduction and `roundf(x / d)` contract for its Q8_1
+input and hidden rows. Three randomized same-service adaptive/delayed pairs
+then passed on this binary and workload, with the third reversing arm order.
+The detailed pair captured generated position 520: adaptive ownership still
+flipped at 14 layers, but all 48 captured dispatch activations and expert IDs
+matched; the layer-3 verifier's 25,600 expert-hit values, shared output and
+combined MoE output were bit-identical. Layer-26 GDN verifier fields also
+matched. In all three pairs, adaptive recovery reproduced all 16 initial
+short-request token IDs and all nine accepted-state fingerprints; delayed
+control did too. The additional pair results and per-arm supervision records
+are retained in `../reproduction-q8-cuda-input-quantizer-repeat2/` and
+`../reproduction-q8-cuda-input-quantizer-repeat3/`.
+
+All six supervised arms passed. Minimum host/admission availability across the
+three pairs ranged from 14.03 to 14.32 GiB, above the 6 GiB floor. This is
+same-day correctness evidence for one IQ1_M Coder workload and selected capture
+position; it does not establish broad adaptive migration safety or a performance
+gain. The selector remains opt-in. The independent hidden-stage
+checker also reports identical CPU/GPU Q8_1 codes and exact gate/up outputs on
+the captured expert input. Full raw captures and comparison JSON are in
+`../reproduction-q8-cuda-input-quantizer/`; the binary SHA256 is
+`14afd1a4b953e176a88d7812bddcdf2beb65944bb5795beaf0f37e5834a496aa`.
+
+Reproduce this follow-up with:
+
+```sh
+python3 bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/run_pair.py \
+  --run --continuations 0 --capture-moe-positions 520 \
+  --capture-verify-moe-layer 3 --verify-moe-positions 520 \
+  --capture-verify-gdn-layer 26 --verify-gdn-positions 520 \
+  --output bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/reproduction-q8-cuda-input-quantizer
+```
+
+Repeat the uninstrumented state/token pair twice; the second seed reverses arm
+order:
+
+```sh
+python3 bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/run_pair.py \
+  --run --continuations 0 \
+  --output bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/reproduction-q8-cuda-input-quantizer-repeat2
+python3 bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/run_pair.py \
+  --run --seed 20261031 --continuations 0 \
+  --output bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/reproduction-q8-cuda-input-quantizer-repeat3
 ```

@@ -395,3 +395,16 @@ floats already differ (relative L2 0.00100083, maximum absolute difference
 exactly. This localizes the remaining arithmetic mismatch to gate/up or
 SwiGLU before hidden quantization and down projection. It still does not
 identify the first persistent-state write or qualify adaptive migration.
+
+The [CUDA-order Q8_1 producer follow-up](layer3-generated-position520/README.md#cuda-order-q8_1-activation-quantizer-follow-up)
+refines that boundary. Using the grouped CUDA reduction and rounding for the
+opt-in CPU Q8_1 producer made the captured IQ2_S gate/up rows and all hidden
+Q8_1 blocks bit-identical. Three same-service adaptive/delayed pair campaigns
+then matched all short-request recovery tokens and accepted-state fingerprints
+in both arms; the detailed position-520 pair retained exact router, expert,
+combined-MoE and GDN verifier comparisons. All six supervised runs passed.
+This remains one model/workload correctness evidence, with the selector
+opt-in, and makes no performance claim. The current-source 18-test Orin
+selection and 163 Python integration tests passed, and current-source HIP and
+SYCL builds/CLI checks are recorded in
+[`backend/maestro1-current-q8quant-2026-10-19/`](backend/maestro1-current-q8quant-2026-10-19/README.md).
