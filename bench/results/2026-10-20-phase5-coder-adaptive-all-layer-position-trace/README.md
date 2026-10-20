@@ -69,6 +69,15 @@ in [the 64-token campaign](reproduction-q8-cuda-input-quantizer-long64/README.md
 This remains correctness evidence for one model/configuration; adaptive
 migration is still opt-in and Phase 5 remains open.
 
+The follow-up [multi-position capture](adaptive-state-prefix8-capture/README.md)
+then localized the first accepted-state mismatch to prefix 8, logged after
+verifier position 519. The first changed GDN fingerprint is ordinal 24 (model
+layer 32); at the same position, the first changed captured MoE input is layer
+32, with relative L2 `1.4294e-5`, while its expert IDs still match and its owner
+placement differs. Delayed control remains exact across the capture. Earlier
+adaptive activation differences did not yet change committed-state hashes, so
+this is a boundary localization rather than proof of cause.
+
 To measure the state delta without committing large state files, I captured the
 initial short request at occurrence 1 and the recovery short request at
 occurrence 2 in separate supervised reruns of the same adaptive sequence. Both

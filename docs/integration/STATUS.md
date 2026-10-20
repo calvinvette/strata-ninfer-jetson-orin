@@ -46,6 +46,16 @@ host/admission availability and zero cgroup events. This shows the earlier
 identifying the first divergent operation. See the
 [64-token trace](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/reproduction-q8-cuda-input-quantizer-long64/README.md).
 
+A same-day [multi-position follow-up](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/adaptive-state-prefix8-capture/README.md)
+captured positions 511–520 across all layers. The first adaptive accepted-state
+mismatch remains prefix 8 at verifier position 519, with GDN ordinals 24–35
+(model layers beginning at 32) changed. At that position, the first changed
+captured MoE input is layer 32 (relative L2 `1.4294e-5`, maximum absolute delta
+`5.2571e-5`); expert IDs match there but owner placement differs. Delayed
+control remained exact at all captured positions. Earlier adaptive activation
+differences did not yet change committed-state hashes. This narrows the
+boundary without proving a causal operation; Phase 5 remains open.
+
 A same-input [layer-25 owner trace](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/layer25-owner-position505-506/README.md)
 directly ties the position-505 adaptive divergence to expert 183 changing from
 CPU to GPU at layer 25. Its input, route IDs and weights match bitwise; the
