@@ -42,6 +42,7 @@ def main():
             serial.setdefault(key, []).extend((slot, value) for value in values)
 
     rows = []
+    batch_groups = {}
     for line in batch_path.read_text().splitlines():
         fields = dict(item.split('=', 1) for item in line.split() if '=' in item)
         if 'position' not in fields or 'hashes' not in fields:
@@ -56,6 +57,13 @@ def main():
         batch_hashes = values('hashes')
         batch_index_hashes = values('idx_hashes')
         batch_kv_hashes = values('kv_hashes')
+        key = (int(fields['state_length']), int(fields['token']))
+        batch_record = {
+            'position': int(fields['position']), 'state_length': key[0], 'token': key[1],
+            'batch_slot': int(fields['slot']), 'batch_row': int(fields['row']),
+            'aggregate': batch_hashes, 'index': batch_index_hashes, 'kv': batch_kv_hashes,
+        }
+        batch_groups.setdefault(key, []).append(batch_record)
         comparisons = []
         for serial_slot, hashes in candidates:
             differences = [i for i, (a, b) in enumerate(zip(batch_hashes, hashes['aggregate'])) if a != b]
@@ -74,12 +82,30 @@ def main():
                 'compared_layers': min(len(batch_hashes), len(hashes['aggregate'])),
             })
         rows.append({
-            'position': int(fields['position']), 'state_length': key[0], 'token': key[1],
-            'batch_slot': int(fields['slot']), 'batch_row': int(fields['row']),
+            **{k: batch_record[k] for k in ('position', 'state_length', 'token', 'batch_slot', 'batch_row')},
+            'aggregate': batch_hashes, 'index': batch_index_hashes, 'kv': batch_kv_hashes,
             'serial_candidates': comparisons,
             'status': 'paired' if candidates else 'no-exact-length-token-control',
         })
-    result = {'schema': 1, 'scope': 'diagnostic hash comparison; not a correctness or performance gate',
+    for row in rows:
+        peers = []
+        for other in batch_groups[(row['state_length'], row['token'])]:
+            if (other['batch_slot'], other['batch_row']) == (row['batch_slot'], row['batch_row']):
+                continue
+            differences = [i for i, (a, b) in enumerate(zip(row['aggregate'], other['aggregate'])) if a != b]
+            index_differences = [i for i, (a, b) in enumerate(zip(row['index'], other['index'])) if a != b]
+            kv_differences = [i for i, (a, b) in enumerate(zip(row['kv'], other['kv'])) if a != b]
+            peers.append({
+                'batch_slot': other['batch_slot'], 'batch_row': other['batch_row'],
+                'exact': not differences and len(row['aggregate']) == len(other['aggregate']),
+                'aggregate_differing_layers': len(differences),
+                'index_differing_layers': len(index_differences),
+                'kv_differing_layers': len(kv_differences),
+                'first_differing_qsa_ordinal': differences[0] if differences else None,
+            })
+        row['batch_peers'] = peers
+        del row['aggregate'], row['index'], row['kv']
+    result = {'schema': 2, 'scope': 'diagnostic hash comparison; not a correctness or performance gate',
               'batch_hash_file': str(batch_path), 'rows': rows}
     rendered = json.dumps(result, indent=2) + '\n'
     if args.output:

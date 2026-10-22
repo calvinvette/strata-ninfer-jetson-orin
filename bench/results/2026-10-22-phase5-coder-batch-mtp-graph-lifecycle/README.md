@@ -293,6 +293,18 @@ memory events. These negative controls rule out either batched append/update
 or batched decoder compute as the sole cause in this reproducer. The ablations
 were correctness diagnostics, not randomized timing comparisons.
 
+### Concurrent duplicate-prompt control (2026-10-22)
+
+To check slot isolation, both concurrent batch requests used prompt 0 with the
+same MTP2 profile. At state length 77/token 709, their committed QSA hashes
+were identical across all 12 indexer and K/V layer groups. Each batch row's
+hashes nevertheless differed from both fresh serial controls in all 12 groups.
+Both request outputs matched the serial ten-token sequence exactly. Minimum
+host/admission availability was 16.61/16.37 GiB over 93 samples, with zero
+cgroup memory events. The duplicate rows therefore stay mutually consistent,
+while batch QSA state still drifts from serial despite identical text; this
+does not identify the differing operation or establish longer-chain behavior.
+
 For this final diagnostic source, maestro1 rebuilt HIP from the identical
 `src/program/generate.cpp` SHA256 `9f136bb977fe118fd1f25b5c3312828577b4b301a47d3929fddbe9cb50d06e5f`;
 the HIP binary SHA256 is `904c1a32d9427de12aa635b238dd58f386902022e5218fa9a7551a2f0df7b8b5`,

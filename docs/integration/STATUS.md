@@ -41,6 +41,14 @@ the sole cause for this repro. Minimum host/admission availability was at least
 16.40 GiB in both runs, with zero cgroup events. No performance inference is
 drawn from these ablations.
 
+A concurrent duplicate-prompt MTP2 control found both batch slots' hashes equal
+across all 12 QSA indexer and K/V groups at length 77, while each
+differed from serial across all 12 groups. Their generated ten-token outputs
+were exact. This rules against a disagreement between the two live rows for
+identical inputs, but confirms batch-versus-serial persistent QSA drift can
+occur without different prompt content. The run retained at least 16.37 GiB
+host/admission availability and zero cgroup events. Phase 5 remains open.
+
 A separate [MTP2 cancellation test](../../bench/results/2026-10-22-phase5-coder-mtp2-cancel-state/README.md)
 passed at five accepted-prefix lengths (48, 50, 51, 53, 55). The canceled
 request's token sequences and all state fingerprints matched two fresh

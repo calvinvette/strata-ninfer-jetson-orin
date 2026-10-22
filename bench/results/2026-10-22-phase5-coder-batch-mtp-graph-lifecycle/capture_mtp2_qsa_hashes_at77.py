@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import sys
 import threading
+import time
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
@@ -18,9 +19,15 @@ parser.add_argument('--serial-kv-appends', action='store_true',
                     help='disable batched K/V and indexer appends for the batch-MTP arm')
 parser.add_argument('--per-token-verify', action='store_true',
                     help='disable decoder batched projections/updates for the batch-MTP arm')
+parser.add_argument('--reverse-arrival', action='store_true',
+                    help='start the batch requests in reverse prompt order with a 250 ms stagger')
+parser.add_argument('--duplicate-prompt', action='store_true',
+                    help='run prompt slot-0 in both requests to check batch row state isolation')
 ARGS = parser.parse_args()
 SERIAL_KV_APPENDS = ARGS.serial_kv_appends
 PER_TOKEN_VERIFY = ARGS.per_token_verify
+REVERSE_ARRIVAL = ARGS.reverse_arrival
+DUPE_PROMPT = ARGS.duplicate_prompt
 OUT = ARGS.output.resolve()
 OUT.mkdir(parents=True, exist_ok=False)
 CFG = json.loads((Path(__file__).resolve().parent / 'config.json').read_text())
@@ -32,6 +39,8 @@ replace_arg(args, '--prompt-cache', '6')
 remove_arg(args, '--adapt-every')
 remove_arg(args, '--adapt-accepted-only')
 prompts = prepared_prompts(CFG, 2)
+if DUPE_PROMPT:
+    prompts = {'slot-0': prompts['slot-0'], 'slot-1': prompts['slot-0']}
 
 
 def arm(name, arm_args, env, requests):
@@ -46,7 +55,11 @@ def arm(name, arm_args, env, requests):
         if len(requests) == 1:
             return {requests[0]: generate(requests[0])}
         with ThreadPoolExecutor(max_workers=len(requests)) as pool:
-            futures = {key: pool.submit(generate, key) for key in requests}
+            order = list(reversed(requests)) if REVERSE_ARRIVAL and name == 'batch' else list(requests)
+            futures = {order[0]: pool.submit(generate, order[0])}
+            if REVERSE_ARRIVAL and name == 'batch':
+                time.sleep(0.25)
+            futures[order[1]] = pool.submit(generate, order[1])
             return {key: future.result() for key, future in futures.items()}
     finally:
         engine.close()
@@ -73,6 +86,8 @@ batch = arm('batch-mtp2', args + ['--batch', '2', '--batch-mtp'], make_env('batc
     'state_length': 77,
     'batch_append_mode': 'per-token' if SERIAL_KV_APPENDS else 'batched',
     'decoder_compute_mode': 'per-token' if PER_TOKEN_VERIFY else 'batched',
+    'arrival_order': 'reverse-with-250ms-stagger' if REVERSE_ARRIVAL else 'concurrent',
+    'duplicate_prompt': DUPE_PROMPT,
     'outputs': {'serial': serial, 'batch': batch},
 }, indent=2) + '\n')
 print(json.dumps({arm_name: {key: len(value['tokens']) for key, value in rows.items()}

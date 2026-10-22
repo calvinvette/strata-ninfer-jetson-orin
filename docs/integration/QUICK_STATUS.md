@@ -99,7 +99,9 @@ GiB with no cgroup events. The split trace shows both indexer arrays and K/V
 cache state change across all 12 layers from model layer 3 by length 76.
 Per-token K/V/indexer and decoder-compute ablations retain the same divergence,
 so neither batched path alone explains it. The cause and relation to later
-output drift remain unknown.
+output drift remain unknown. A concurrent duplicate-prompt control found both
+batch slots' QSA hashes mutually matched but differed from serial,
+while their ten-token outputs remained exact.
 See the [batch-MTP report](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
 
 ## Near-term direction
