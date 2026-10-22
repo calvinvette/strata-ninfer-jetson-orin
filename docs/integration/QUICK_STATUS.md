@@ -44,12 +44,16 @@ target-only at slot 1, and batch-MTP differs from its matched target-only batch
 at that token. The concurrent run retained at least 14.77 GiB available
 physical RAM (11.39 GiB at admission), with zero scoped cgroup OOM events. It
 is a correctness diagnostic, not a throughput comparison. Direct GDN capture
-shows the target-only row's committed state matches serial bit-for-bit at the
-68-token prompt boundary, then differs by position 127 (relative L2 0.01044).
-At that position, all 248,320 MTP verifier logits differ from serial and the
-top-two ranking reverses. This narrows the mismatch to decode-time batch
-numerics; the responsible operation and MTP state parity are still unknown.
-Batch-MTP remains unqualified.
+and a per-layer hash sweep show state equality at selected committed lengths,
+followed by early decode drift: target-only rows first differ at positions 69
+and 72, while the mapped MTP2 row first differs at 76. One target-only request
+still returns identical 96-token text; the other first diverges at token 60.
+At position 127, all 248,320 MTP verifier logits differ from serial and the
+top-two ranking reverses. These are numerical correctness findings, not
+throughput results. One serial process also changed the second prompt relative
+to a fresh process, so state pairing uses the isolated control and that
+request/session behavior needs separate investigation. Batch-MTP remains
+unqualified.
 
 Correctness work has found a separate adaptive-recovery issue. In a 256-token
 short–short–short Coder IQ1_M chain, adaptive recovery differed on 237/256

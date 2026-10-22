@@ -118,6 +118,7 @@
 #include <sstream>
 #include <string>
 #include <set>
+#include <utility>
 #include <vector>
 
 namespace {
@@ -219,6 +220,63 @@ bool dump_batch_gdn_state(const strata::core::ModelGeometry& geometry, const str
     }
     if (std::fclose(file) != 0) ok = false;
     if (!ok) std::fprintf(stderr, "strata batch: failed writing GDN dump %s\n", output.c_str());
+    return ok;
+}
+
+// Hash committed batch GDN state at each requested decode position without retaining large state dumps.
+bool trace_batch_gdn_hash(const strata::core::ModelGeometry& geometry, const strata::core::SessionState& state,
+                          int64_t position, int slot, int row) {
+    static const char* path = std::getenv("STRATA_BATCH_GDN_HASH_PATH");
+    static const auto range = [] {
+        auto parse = [](const char* name, int64_t fallback) {
+            const char* value = std::getenv(name);
+            if (value == nullptr) return fallback;
+            char* end = nullptr;
+            errno = 0;
+            const long long parsed = std::strtoll(value, &end, 10);
+            return errno == 0 && end != value && *end == '\0' ? (int64_t) parsed : fallback;
+        };
+        return std::pair<int64_t, int64_t>{parse("STRATA_BATCH_GDN_HASH_FROM", -1),
+                                           parse("STRATA_BATCH_GDN_HASH_TO", -1)};
+    }();
+    if (path == nullptr || range.first < 0 || range.second < range.first ||
+        position < range.first || position > range.second) return true;
+    if (state.gdn_alloc <= 0 || state.gdn_state == nullptr || cudaDeviceSynchronize() != cudaSuccess) return false;
+    strata::core::ConversationStateSizes sizes;
+    std::string error;
+    if (!strata::core::conversation_session_sizes(geometry, state, sizes, error) ||
+        sizes.gdn == 0 || sizes.gdn % (size_t) state.gdn_alloc != 0) {
+        std::fprintf(stderr, "strata batch: GDN hash sizing failed at slot %d position %lld: %s\n",
+                     slot, (long long) position, error.c_str());
+        return false;
+    }
+    const size_t per_layer = sizes.gdn / (size_t) state.gdn_alloc;
+    constexpr size_t chunk = 65536;
+    std::array<uint8_t, chunk> buffer{};
+    std::vector<uint64_t> hashes((size_t) state.gdn_alloc, 1469598103934665603ull);
+    for (int64_t layer = 0; layer < state.gdn_alloc; ++layer) {
+        for (size_t offset = 0; offset < per_layer;) {
+            const size_t count = std::min(buffer.size(), per_layer - offset);
+            const auto* source = (const uint8_t*) state.gdn_state + (size_t) layer * per_layer + offset;
+            if (cudaMemcpy(buffer.data(), source, count, cudaMemcpyDefault) != cudaSuccess) return false;
+            for (size_t i = 0; i < count; ++i) {
+                hashes[(size_t) layer] ^= buffer[i];
+                hashes[(size_t) layer] *= 1099511628211ull;
+            }
+            offset += count;
+        }
+    }
+    FILE* file = std::fopen(path, "ab");
+    if (file == nullptr) {
+        std::fprintf(stderr, "strata batch: cannot open GDN hash trace %s\n", path);
+        return false;
+    }
+    bool ok = std::fprintf(file, "position=%lld slot=%d row=%d layers=%lld hashes=",
+                           (long long) position, slot, row, (long long) state.gdn_alloc) > 0;
+    for (uint64_t hash : hashes)
+        if (ok && std::fprintf(file, "%016llx ", (unsigned long long) hash) < 0) ok = false;
+    if (ok && std::fputc('\n', file) == EOF) ok = false;
+    if (std::fclose(file) != 0) ok = false;
     return ok;
 }
 
@@ -8774,6 +8832,10 @@ int main(int argc, char** argv) {
             for (int t = 0; t < A; ++t) {
                 const int b = active[t];
                 const int row = first[t];
+                if (!trace_batch_gdn_hash(g, *bslot_ss[0][(size_t) b], pos[row], b, row)) {
+                    err = "batch GDN hash trace failed";
+                    return false;
+                }
                 if (!dump_batch_gdn_state(g, *bslot_ss[0][(size_t) b], pos[row], b)) {
                     err = "batch GDN state dump failed";
                     return false;

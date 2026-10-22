@@ -85,6 +85,30 @@ not reach the lifecycle behavior it was intended to stress. A follow-up must
 produce more than 64 distinct layouts and observe a reused layout after
 invalidation/eviction before graph-pool resize behavior can be qualified.
 
+The next [per-layer GDN hash sweep](gdn-hash-sweep-analysis.json) compared
+committed states from batch positions 68–127 with fresh serial controls. In
+target-only mode, one batch row matched its serial state exactly at positions
+70 and 71; at position 72, GDN state ordinals 5–35 first differed (31/36
+layers). The other target-only row matched its fresh serial control at
+position 68, then first differed at position 69 in ordinals 4–35 (32/36).
+In MTP2 mode, the mapped row matched at positions 68, 70, 72 and 74, then
+first differed at 76 in ordinals 2–35 (34/36). Its peer had no exact common
+committed-length hash in this sweep, so no onset is assigned. The target-only
+row that first differed at position 72 still produced identical 96-token text;
+the other row's first text mismatch remained token 60. Thus text equality can
+hide earlier recurrent-state drift. The MTP2 result is likewise a state
+diagnostic, not a speed result.
+
+For this sweep the first target-only serial process was used for prompt 0, and
+a separate fresh serial process supplied prompt 1. Reusing the same serial
+process for both prompts changed prompt 1's state and output (its text first
+differed from the fresh control at token 62), so those same-process data are
+retained but excluded from the state pairing. This request-to-request serial
+variation needs a separate cache/session investigation. The batch supervisor
+reported 16.47 GiB minimum available RAM; the isolated prompt-1 serial control
+reported 17.24 GiB. Both had zero sampled cgroup memory events. Clocks varied,
+EMC readback was denied, and energy was not request-attributed.
+
 ## Configuration and limits
 
 Model identity: `Qwen3.8-Flash-Next-Coder-GGUF-IQ1_M`, split across the two
@@ -131,6 +155,13 @@ energy was not attributed to individual requests.
 - `run-position-127-logits-all-slots/` and
   `state-and-logit-analysis.json`: full verifier-row comparisons and paired
   committed-state deltas. Full GDN binary captures are local-only.
+- `capture_batch_gdn_hash_sweep.py`,
+  `capture_isolated_prompt1_gdn_hashes.py`,
+  `analyze_batch_gdn_hash_sweep.py`, `run-gdn-hash-sweep/`,
+  `run-isolated-prompt1-gdn/`, and their supervisor directories: compact
+  per-layer position sweep and its fresh serial second-prompt control. Hash
+  files retain all batch positions; the analysis lists first exact mapping and
+  first later divergence per mapped slot.
 - `backend-builds-maestro1/`: exact-source HIP/SYCL build and help logs;
   compile evidence only.
 - `run-retry/`, `run/`, and earlier supervisor directories preserve failed or
