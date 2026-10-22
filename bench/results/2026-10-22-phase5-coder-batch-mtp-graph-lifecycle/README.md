@@ -227,3 +227,21 @@ not a phase gate pass. Phase 5 remains open. Near-term work is to add opt-in
 per-slot terminal state diagnostics, compare one-live and concurrent runs with
 identical arguments, isolate the first divergent shared-window operation, then
 exercise actual graph-pool eviction and recapture.
+
+### Position-76 MTP2 committed-state follow-up (2026-10-22)
+
+A supervised two-live MTP2 capture paired the batch row with isolated serial
+controls by the generated token at position 76, not by physical slot number.
+For prompt 0 (token 12654), all 36 GDN layer records were present. The batch
+state differs from serial in 26,965,859/29,417,472 floats (relative L2
+0.0182307); model layers 0–3 are exact, and the first changed state is GDN
+model layer 4, where 817,139/817,152 floats differ (relative L2 0.00410183,
+maximum absolute difference 0.0227253). Its 64-token output still matches the
+serial MTP2 output. Prompt 1 (token 3069) has no captured accepted commit at
+position 76, so that comparison is incomplete. The accepted-prefix log hook
+also emitted QSA layer hashes only through state length 69 for the batch arm;
+the serial arm reached length 77. It therefore cannot establish whether QSA
+state had diverged before the layer-4 GDN difference. The raw batch `.stgcmt`
+and serial `.gdn` arrays remain local-only; the comparator and capture harness
+are retained for reproducibility. This localizes a state difference but does
+not identify its cause or pass the Phase 5 gate.

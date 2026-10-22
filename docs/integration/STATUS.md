@@ -6,6 +6,14 @@ complete for its bounded Orin qualification matrix under [its closeout]
 (PHASE7_CLOSEOUT.md); Phases 5 and 6 remain open. This records tested cells,
 not general product support.
 
+The latest [MTP2 position-76 committed-state comparison](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md)
+paired batch and serial rows by token. Prompt 0's 36-layer GDN state differs
+in 26,965,859/29,417,472 floats (relative L2 0.0182307), first at GDN model
+layer 4; the first four model layers are exact. Its 64-token output matches
+serial. Prompt 1 has no capture at that accepted position. Batch QSA hashes
+stop at state length 69 while serial reaches 77, so this does not locate an
+earlier QSA difference. It is a state diagnostic only; Phase 5 remains open.
+
 A [batch-MTP state/logit follow-up](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md)
 captures full verifier rows and committed GDN arrays/hashes for the two-live
 request reproducer. In target-only mode, the row mapped to prompt 0 matches

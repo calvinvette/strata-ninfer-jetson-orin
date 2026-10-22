@@ -54,6 +54,15 @@ isolated serial prompt, but state arrays differ broadly despite equal short
 outputs. At position 127, all 248,320 verifier logits differ and the top-two
 ranking reverses. Batch-MTP remains unqualified; no throughput claim is made.
 
+A new position-76 MTP2 comparison pairs rows by generated token. Prompt 0's
+committed GDN state differs from its serial control in 26,965,859/29,417,472
+values (relative L2 0.01823), first at model layer 4, despite an identical
+64-token output. Prompt 1 did not produce a captured commit at that position.
+The batch QSA hash hook stopped at state length 69, so it cannot rule out an
+earlier QSA difference. This narrows the observed state onset for one row but
+does not explain the two-live output mismatch or pass Phase 5. See the [state
+follow-up](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
+
 Correctness work has found a separate adaptive-recovery issue. In a 256-token
 short–short–short Coder IQ1_M chain, adaptive recovery differed on 237/256
 tokens, while delayed control was bit-exact at captured positions. At position
@@ -73,9 +82,9 @@ records.
 
 ## Near-term direction
 
-1. Continue resolving batch-MTP output divergence: capture MTP2 committed state
-   from prompt boundary through its first divergent decode window, then isolate
-   the first recurrence or verifier operation that changes the row. Extend
+1. Continue resolving batch-MTP output divergence: repair/extend per-row state
+   logging through the first divergent decode window, then isolate the first
+   recurrence or verifier operation that changes the row. Extend
    accepted-prefix direct-state and long-chain
    recovery coverage, widen cancellation boundaries beyond the passing Coder
    MTP4 decode/prefill points, and keep adaptive migration opt-in until its
