@@ -74,6 +74,17 @@ struct GdnDiagHeader {
     uint64_t n_embd, conv_channels, v_heads, value_dim, state_floats;
     int32_t tokens[strata::kernels::kVerifyMaxT];
 };
+struct GdnDiagHeaderV5 {
+    char magic[8];
+    uint32_t version;
+    int32_t layer, rows;
+    int64_t pos0;
+    uint64_t n_embd, conv_channels, v_heads, value_dim, state_floats;
+    int64_t positions[strata::kernels::kVerifyMaxT];
+    int32_t slots[strata::kernels::kVerifyMaxT];
+    int32_t tokens[strata::kernels::kVerifyMaxT];
+};
+static_assert(sizeof(GdnDiagHeaderV5) == 196, "STGDIAG5 header layout changed");
 #pragma pack(pop)
 
 struct GdnDiagOffsets {
@@ -589,6 +600,9 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
     const int max_in = (int) std::max<uint64_t>(std::max<uint64_t>(N, ZV), NH * HD);
 
     const char* gdn_layer_env = std::getenv("STRATA_VERIFY_DUMP_GDN_LAYER");
+    const char* gdn_batch_env = std::getenv("STRATA_VERIFY_DUMP_GDN_BATCH");
+    gdn_diag_include_batch_ = gdn_batch_env != nullptr && gdn_batch_env[0] != '\0' &&
+                             std::strcmp(gdn_batch_env, "0") != 0;
     const char* gdn_positions_env = std::getenv("STRATA_VERIFY_DUMP_GDN_POSITIONS");
     const char* gdn_position_env = gdn_positions_env == nullptr ?
                                    std::getenv("STRATA_VERIFY_DUMP_GDN_POSITION") : nullptr;
@@ -652,8 +666,9 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
         }
         strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "allocate", this,
                                                     gdn_diag_h_, gdn_diag_capacity_, -1);
-        std::fprintf(stderr, "strata verify: opt-in GDN activation dump at layer %d -> %s (%zu bytes)\n",
-                     gdn_diag_layer_, gdn_diag_path_.c_str(), gdn_diag_capacity_);
+        std::fprintf(stderr, "strata verify: opt-in GDN activation dump at layer %d%s -> %s (%zu bytes)\n",
+                     gdn_diag_layer_, gdn_diag_include_batch_ ? " including batch windows" : "",
+                     gdn_diag_path_.c_str(), gdn_diag_capacity_);
     }
     {
         const char* layer = std::getenv("STRATA_VERIFY_DUMP_GDN_STATE_LAYER");
@@ -1691,7 +1706,8 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                 mm(wg, z_ + (size_t) tb * ZV, (int) N, (int) ZV);
                 stamp(l, 5, grp);
                 }
-                const bool dump_gdn = gdn_diag_h_ != nullptr && l == gdn_diag_layer_ && !batch_rec_;
+                const bool dump_gdn = gdn_diag_h_ != nullptr && l == gdn_diag_layer_ &&
+                                      (!batch_rec_ || gdn_diag_include_batch_);
                 GdnDiagOffsets diag{};
                 if (dump_gdn) {
                     diag = gdn_diag_offsets(T, (size_t) N, (size_t) C, (size_t) HV, (size_t) ZV);
@@ -2002,7 +2018,8 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
         }
         stamp(l, 16, grp);
         const bool q8_ffn = gr_read_group(1, true, inj_, inj2_);   // true: nat_xq_ holds the MoE input's q8_1 (STRATA_QFUSE)
-        if (gdn_diag_h_ != nullptr && l == gdn_diag_layer_ && !batch_rec_ && !is_qsa_layer(g, l) &&
+        if (gdn_diag_h_ != nullptr && l == gdn_diag_layer_ &&
+            (!batch_rec_ || gdn_diag_include_batch_) && !is_qsa_layer(g, l) &&
             cudaMemcpyAsync((uint8_t*) gdn_diag_h_ +
                                 gdn_diag_offsets(T, (size_t) N, (size_t) C, (size_t) HV, (size_t) ZV).ffn_x +
                                 (size_t) tb * (size_t) N * sizeof(float),
@@ -2313,7 +2330,8 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                 return false;
             }
         }
-        if (gdn_diag_h_ != nullptr && l == gdn_diag_layer_ && !batch_rec_ && !is_qsa_layer(g, l) &&
+        if (gdn_diag_h_ != nullptr && l == gdn_diag_layer_ &&
+            (!batch_rec_ || gdn_diag_include_batch_) && !is_qsa_layer(g, l) &&
             cudaMemcpyAsync((uint8_t*) gdn_diag_h_ +
                                 gdn_diag_offsets(T, (size_t) N, (size_t) C, (size_t) HV, (size_t) ZV).ffn_y +
                                 (size_t) tb * (size_t) N * sizeof(float),
@@ -2921,33 +2939,57 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
     }
     bool gdn_diag_position_selected = gdn_diag_position_ < 0 && !gdn_diag_multi_position_filter_;
     if (gdn_diag_multi_position_filter_) {
-        for (int t = 0; t < T && !gdn_diag_position_selected; ++t)
+        for (int t = 0; t < T && !gdn_diag_position_selected; ++t) {
             gdn_diag_position_selected = std::binary_search(gdn_diag_positions_.begin(),
                                                              gdn_diag_positions_.end(), pos0 + t);
+        }
     } else if (gdn_diag_position_ >= 0) {
         gdn_diag_position_selected = T == 1 && pos0 == gdn_diag_position_;
     }
-    if (gdn_diag_captured_ && gdn_diag_position_selected) {
+    if (gdn_diag_captured_ && gdn_diag_position_selected && (!batch_rec_ || !gdn_diag_include_batch_)) {
         const uint64_t gdn_floats = (uint64_t) g.ssm_state_size * g.ssm_v_heads * g.ssm_state_size +
                                     (uint64_t) g.ssm_conv_channels * (g.ssm_d_conv - 1);
         const GdnDiagOffsets diag = gdn_diag_offsets(T, (size_t) g.n_embd, (size_t) g.ssm_conv_channels,
                                                      (size_t) g.ssm_v_heads, (size_t) g.ssm_value_dim);
         GdnDiagHeader header{};
-        std::memcpy(header.magic, "STGDIAG4", sizeof(header.magic));
-        header.version = 4;
-        header.layer = gdn_diag_layer_;
-        header.rows = T;
-        header.pos0 = pos0;
-        header.n_embd = (uint64_t) g.n_embd;
-        header.conv_channels = (uint64_t) g.ssm_conv_channels;
-        header.v_heads = (uint64_t) g.ssm_v_heads;
-        header.value_dim = (uint64_t) g.ssm_value_dim;
-        header.state_floats = gdn_floats;
-        for (int t = 0; t < T; ++t) header.tokens[t] = tokens[t];
+        GdnDiagHeaderV5 header_v5{};
+        const void* header_data = &header;
+        size_t header_size = sizeof(header);
+        if (gdn_diag_include_batch_) {
+            std::memcpy(header_v5.magic, "STGDIAG5", sizeof(header_v5.magic));
+            header_v5.version = 5;
+            header_v5.layer = gdn_diag_layer_;
+            header_v5.rows = T;
+            header_v5.pos0 = pos0;
+            header_v5.n_embd = (uint64_t) g.n_embd;
+            header_v5.conv_channels = (uint64_t) g.ssm_conv_channels;
+            header_v5.v_heads = (uint64_t) g.ssm_v_heads;
+            header_v5.value_dim = (uint64_t) g.ssm_value_dim;
+            header_v5.state_floats = gdn_floats;
+            for (int t = 0; t < T; ++t) {
+                header_v5.positions[t] = pos0 + t;
+                header_v5.slots[t] = -1;
+                header_v5.tokens[t] = tokens[t];
+            }
+            header_data = &header_v5;
+            header_size = sizeof(header_v5);
+        } else {
+            std::memcpy(header.magic, "STGDIAG4", sizeof(header.magic));
+            header.version = 4;
+            header.layer = gdn_diag_layer_;
+            header.rows = T;
+            header.pos0 = pos0;
+            header.n_embd = (uint64_t) g.n_embd;
+            header.conv_channels = (uint64_t) g.ssm_conv_channels;
+            header.v_heads = (uint64_t) g.ssm_v_heads;
+            header.value_dim = (uint64_t) g.ssm_value_dim;
+            header.state_floats = gdn_floats;
+            for (int t = 0; t < T; ++t) header.tokens[t] = tokens[t];
+        }
         std::FILE* dump = std::fopen(gdn_diag_path_.c_str(), "ab");
         bool written = false;
         if (dump) {
-            const bool header_ok = std::fwrite(&header, sizeof(header), 1, dump) == 1;
+            const bool header_ok = std::fwrite(header_data, header_size, 1, dump) == 1;
             const bool data_ok = header_ok && std::fwrite(gdn_diag_h_, 1, diag.bytes, dump) == diag.bytes;
             const bool close_ok = std::fclose(dump) == 0;
             written = header_ok && data_ok && close_ok;
@@ -3855,6 +3897,56 @@ bool Verifier::run_slots(int S, const int32_t* tokens, const int64_t* pos, PoolM
     return run_slot_rows(rows, S, tokens, pos, pool, user, out, err);
 }
 
+bool Verifier::write_gdn_diag_batch(int T, const int* slots, const int32_t* tokens, const int64_t* positions,
+                                    std::string& err) {
+    if (!gdn_diag_include_batch_ || gdn_diag_h_ == nullptr || !gdn_diag_captured_) return true;
+    bool selected = gdn_diag_position_ < 0 && !gdn_diag_multi_position_filter_;
+    for (int t = 0; t < T && !selected; ++t) {
+        if (gdn_diag_multi_position_filter_)
+            selected = std::binary_search(gdn_diag_positions_.begin(), gdn_diag_positions_.end(), positions[t]);
+        else if (gdn_diag_position_ >= 0)
+            selected = positions[t] == gdn_diag_position_;
+    }
+    if (!selected) return true;
+
+    const ModelGeometry& g = *g_;
+    const uint64_t state_floats = (uint64_t) g.ssm_state_size * g.ssm_v_heads * g.ssm_state_size +
+                                  (uint64_t) g.ssm_conv_channels * (g.ssm_d_conv - 1);
+    const GdnDiagOffsets diag = gdn_diag_offsets(T, (size_t) g.n_embd, (size_t) g.ssm_conv_channels,
+                                                 (size_t) g.ssm_v_heads, (size_t) g.ssm_value_dim);
+    GdnDiagHeaderV5 header{};
+    std::memcpy(header.magic, "STGDIAG5", sizeof(header.magic));
+    header.version = 5;
+    header.layer = gdn_diag_layer_;
+    header.rows = T;
+    header.pos0 = positions[0];
+    header.n_embd = (uint64_t) g.n_embd;
+    header.conv_channels = (uint64_t) g.ssm_conv_channels;
+    header.v_heads = (uint64_t) g.ssm_v_heads;
+    header.value_dim = (uint64_t) g.ssm_value_dim;
+    header.state_floats = state_floats;
+    for (int t = 0; t < T; ++t) {
+        header.positions[t] = positions[t];
+        header.slots[t] = slots[t];
+        header.tokens[t] = tokens[t];
+    }
+    static std::mutex batch_gdn_dump_mutex;
+    std::lock_guard<std::mutex> lock(batch_gdn_dump_mutex);
+    std::FILE* dump = std::fopen(gdn_diag_path_.c_str(), "ab");
+    bool written = dump != nullptr;
+    if (written) {
+        written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
+                  std::fwrite(gdn_diag_h_, 1, diag.bytes, dump) == diag.bytes;
+        if (std::fflush(dump) != 0) written = false;
+        if (std::fclose(dump) != 0) written = false;
+    }
+    if (!written) {
+        err = "verify: could not write opt-in batch GDN diagnostic";
+        return false;
+    }
+    return true;
+}
+
 bool Verifier::run_slot_rows(const int* rows, int S, const int32_t* tokens, const int64_t* pos, PoolMultiFn pool,
                              void* user, int32_t* out, std::string& err) {
     using namespace strata::kernels;
@@ -3884,6 +3976,7 @@ bool Verifier::run_slot_rows(const int* rows, int S, const int32_t* tokens, cons
         const cudaError_t se = cudaStreamSynchronize(cs_);
         if (se != cudaSuccess) { err = std::string("verify batch: ") + cudaGetErrorString(se); return false; }
         cudaStreamSynchronize(copy_);
+        if (!write_gdn_diag_batch(S, rows, tokens, pos, err)) return false;
         if (prof_on_) collect_profile();
         ++windows;
         if (le_ < g.n_layers) return next_ == nullptr || next_->run_slot_rows(rows, S, tokens, pos, pool, next_user_, out, err);
@@ -3945,6 +4038,7 @@ bool Verifier::run_slot_rows(const int* rows, int S, const int32_t* tokens, cons
     const cudaError_t se = cudaStreamSynchronize(cs_);
     if (se != cudaSuccess) { err = std::string("verify batch: ") + cudaGetErrorString(se); return false; }
     cudaStreamSynchronize(copy_);
+    if (!write_gdn_diag_batch(S, rows, tokens, pos, err)) return false;
     if (prof_on_) collect_profile();
     ++windows;
     if (le_ < g.n_layers) return next_ == nullptr || next_->run_slot_rows(rows, S, tokens, pos, pool, next_user_, out, err);

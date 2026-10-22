@@ -2682,3 +2682,17 @@ each state independently against every matching isolated control and report
 ambiguous mappings rather than extending a slot-to-prompt assignment through
 slot reuse. Keep raw arrays local-only and retain compact hashes/deltas in the
 review record.
+
+## 2026-10-22 — serialize batched activation rows after synchronization
+
+For CUDA graph captures, copy selected activations into a pinned host buffer as
+part of graph replay, then serialize them only after the scheduler's compute and
+copy streams have synchronized. The scheduler must supply each row's request
+slot, consumed token and absolute position; reconstructing positions from a
+base plus row index mislabels independently advanced sequences. Keep this
+diagnostic opt-in, version the binary record when its metadata changes, and
+validate its layout with an independent parser. A single-row batch window is
+useful for locating a selected-path delta but is not evidence about multirow
+interference. For a future Strata/Splash port, preserve the same explicit row
+identity and synchronization contract while implementing the backend-native
+capture and independent decoder.

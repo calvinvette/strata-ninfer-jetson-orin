@@ -371,6 +371,8 @@ private:
     bool capture_commit(std::string& err);
     bool capture_gdn_commit_state(SessionState& state, int64_t position, int32_t token, int slot,
                                   std::string& err);
+    bool write_gdn_diag_batch(int rows, const int* slots, const int32_t* tokens, const int64_t* positions,
+                              std::string& err);
     bool record_window(int T, cudaStream_t cs, std::string& err);
     // #649: STRATA_VERIFY_TRACE=1 - a host event ring (trace_ev) and GPU breadcrumbs: the profiler's stamp points,
     // per layer and token group, written to mapped memory (null when the trace is off)
@@ -379,6 +381,7 @@ private:
     unsigned long long* trace_m_ = nullptr;
     size_t trace_n_ = 0;
     int gdn_diag_layer_ = -1;
+    bool gdn_diag_include_batch_ = false;
     int64_t gdn_diag_position_ = -1;
     std::vector<int64_t> gdn_diag_positions_;
     bool gdn_diag_multi_position_filter_ = false;

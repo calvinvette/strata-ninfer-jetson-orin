@@ -126,11 +126,18 @@ layer 1. Per-token KV/indexer and decoder ablations retained MTP2's first QSA
 mismatch at length 124, ruling out either batched path alone. State drift
 persists; its source and quality bound remain unresolved.
 
+A corrected opt-in layer-12 capture paired rows by explicit position/token and
+recorded batch slot IDs. The delayed target-only run matched the serial 96-token
+output exactly and matched all captured fields at position 118; at position 119,
+layer-12 input `x` and every captured downstream field differed. The batch
+scheduler averaged one row per window, so this run did not explain the separate
+multirow mismatch. See the [capture report](../../bench/results/2026-10-22-phase5-coder-batch-gdn-layer-capture/README.md).
+
 ## Near-term direction
 
-1. Continue resolving batch-MTP output divergence: repair/extend per-row state
-   logging through the first divergent decode window, then isolate the first
-   recurrence or verifier operation that changes the row. Extend
+1. Continue resolving batch-MTP output divergence: extend per-row state and
+   activation logging through a genuinely multirow decode window, then isolate
+   the first recurrence or verifier operation that changes the row. Extend
    accepted-prefix direct-state and long-chain
    recovery coverage, widen cancellation boundaries beyond the passing Coder
    MTP4 decode/prefill points, and keep adaptive migration opt-in until its
