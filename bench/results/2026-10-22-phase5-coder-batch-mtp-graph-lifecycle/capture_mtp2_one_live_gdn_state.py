@@ -29,8 +29,7 @@ if not positions or positions != sorted(set(positions)) or positions[0] < 0:
     p.error('commit positions must be sorted, unique and non-negative')
 if args.admit_after_tokens < 1:
     p.error('--admit-after-tokens must be positive')
-if args.mode == 'mtp2':
-    os.environ['STRATA_PARALLEL_SOLO'] = '0'
+os.environ['STRATA_PARALLEL_SOLO'] = '0'
 out = args.output.resolve()
 out.mkdir(parents=True, exist_ok=False)
 cfg = json.loads((Path(__file__).resolve().parent / 'config.json').read_text())

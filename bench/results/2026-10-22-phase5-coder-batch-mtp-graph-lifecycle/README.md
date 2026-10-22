@@ -426,3 +426,27 @@ and only captured position 121; it is incomplete for positions 120/123 and is
 not used in the comparison. The complete raw files (about 674 MiB combined)
 remain local-only. The analyzer groups repeated STGCMT1 records by exact
 position, token and capture occurrence.
+
+### Delayed-admission mode and batched-path controls (2026-10-22)
+
+A target-only run with the same 48-token solo prefix and retained batch slot
+captured positions 116–120. GDN state matched serial at positions 116–118, then
+first differed at position 119/model layer 12 (21,504,738/29,417,472 values,
+relative L2 0.00779578, maximum absolute difference 0.380125). At position 120,
+the same first layer remained changed. Both outputs matched for all 96 tokens.
+The run retained 17.93 GiB minimum host/admission availability over 133 samples
+and zero cgroup events. In the MTP2 schedule, GDN was still exact at positions
+120/121 and first differed at 123/model layer 1. Thus the generic target-only
+batch path drifts without MTP, while MTP2 changes the first sampled layer and
+position; neither state movement changed this sample's emitted tokens.
+
+Two MTP2 negative controls repeated the delayed 48-token schedule through
+position 164. `STRATA_NO_BATCH_KV_STEP=1` (per-token K/V and indexer appends)
+and `STRATA_DEC_BATCH=0` (per-token decoder projections/updates) both remained
+exact at QSA lengths 121/122, then differed across all 12 aggregate/indexer/KV
+hashes at length 124 and every later paired sample through 163. Both slot-0
+outputs matched all 96 serial tokens. Minimum host availability was 16.88 GiB
+for the append control and 16.86 GiB for the decoder control; sampled cgroup
+events were zero in both. Neither batched append nor batched decoder compute
+alone accounts for the delayed MTP2 onset. These are state diagnostics, not
+performance comparisons; energy was not measured.
