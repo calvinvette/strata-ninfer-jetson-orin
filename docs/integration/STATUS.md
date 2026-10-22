@@ -14,6 +14,14 @@ serial. Prompt 1 has no capture at that accepted position. Batch QSA hashes
 stop at state length 69 while serial reaches 77, so this does not locate an
 earlier QSA difference. It is a state diagnostic only; Phase 5 remains open.
 
+A separate [MTP2 cancellation test](../../bench/results/2026-10-22-phase5-coder-mtp2-cancel-state/README.md)
+passed at five accepted-prefix lengths (48, 50, 51, 53, 55). The canceled
+request's token sequences and all state fingerprints matched two fresh
+exact-length references; same-service recovery returned `Hello Orin!`.
+Minimum host/admission availability was 13.18/12.53 GiB across 98 samples,
+with zero cgroup memory events. This adds one bounded cancellation cell, not a
+long-chain drift bound or multi-live batch-MTP qualification.
+
 A [batch-MTP state/logit follow-up](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md)
 captures full verifier rows and committed GDN arrays/hashes for the two-live
 request reproducer. In target-only mode, the row mapped to prompt 0 matches

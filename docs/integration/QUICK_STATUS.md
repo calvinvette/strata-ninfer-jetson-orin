@@ -80,6 +80,13 @@ See the [owner transition](../../bench/results/2026-10-22-phase5-coder-longchain
 and [API cancellation](../../bench/results/2026-10-22-phase5-coder-api-cancellation-current-source/README.md)
 records.
 
+An MTP2 cancellation run also passed at five accepted-prefix lengths. Both
+fresh exact-length controls matched every committed token and state
+fingerprint; the canceled service returned `Hello Orin!` on recovery. Minimum
+host/admission availability was 13.18/12.53 GiB with zero cgroup events.
+This is a bounded cancellation cell only; adaptive long-chain drift and
+two-live batch divergence remain open. [Details](../../bench/results/2026-10-22-phase5-coder-mtp2-cancel-state/README.md).
+
 ## Near-term direction
 
 1. Continue resolving batch-MTP output divergence: repair/extend per-row state
