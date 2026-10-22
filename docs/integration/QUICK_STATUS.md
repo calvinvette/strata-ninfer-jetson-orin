@@ -119,12 +119,12 @@ all 36 layers for both MTP2 (relative L2 0.00973) and target-only (0.00841),
 despite exact 96-token output parity. MTP2 is not required; numerical cause
 and quality bound remain unknown.
 
-A delayed target-only control matched GDN state through positions 116–118, then
-first differed at 119/model layer 12 (relative L2 0.00780), with exact output.
-MTP2 stayed exact at positions 120/121 and first differed at 123/model layer 1.
-Per-token KV/indexer and decoder ablations retained MTP2's first QSA mismatch
-at length 124, ruling out either batched path alone. State drift persists; its
-source and quality bound remain unresolved.
+A delayed target-only control matched GDN state through positions 116–118,
+then first differed at 119/model layer 12 (relative L2 0.00780), with exact
+output. MTP2 stayed exact at positions 120/121 and first differed at 123/model
+layer 1. Per-token KV/indexer and decoder ablations retained MTP2's first QSA
+mismatch at length 124, ruling out either batched path alone. State drift
+persists; its source and quality bound remain unresolved.
 
 ## Near-term direction
 

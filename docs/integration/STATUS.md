@@ -61,14 +61,14 @@ route. Phase 5 remains open.
 A delayed-admission target-only control matched serial GDN state through
 committed positions 116–118, then first differed at position 119/model layer
 12 (21,504,738/29,417,472 values; relative L2 0.00779578, max absolute
-0.380125), while output matched for 96 tokens. In MTP2, GDN remained exact at
-120/121 and first changed at 123/model layer 1. `STRATA_NO_BATCH_KV_STEP=1`
-and `STRATA_DEC_BATCH=0` delayed-admission ablations both preserved the MTP2
-QSA onset at length 124 after exact lengths 121/122; each retained exact 96-token
+0.380125); at position 120 its first changed layer remained 12. Output matched
+for 96 tokens. In MTP2, GDN remained exact at positions 120/121 and first
+changed at 123/model layer 1. `STRATA_NO_BATCH_KV_STEP=1` and
+`STRATA_DEC_BATCH=0` delayed-admission ablations both preserved the MTP2 QSA
+onset at length 124 after exact lengths 121/122; each retained exact 96-token
 output. This excludes either batched append or decoder compute as the sole
-source in that controlled MTP2 case. The earlier target-only state result shows
-MTP is not required for all batch-state drift, though the mode changes its onset
-and first layer. Phase 5 remains open.
+source in that controlled MTP2 case. MTP is not required for all batch-state
+drift, though it changes the sampled onset and first layer. Phase 5 remains open.
 
 The latest [MTP2 position-76 committed-state comparison](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md)
 paired batch and serial rows by token. Prompt 0's 36-layer GDN state differs
