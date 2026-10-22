@@ -21,11 +21,17 @@ had grown to `0.0255905` and `0.0252282`. All recurrent values differed at
 534. Adaptive recovery differed from the initial short request at 40/64 token
 IDs; delayed control differed at 0/64.
 
-This shows that the captured layer-32 state difference grows substantially
-within the tested chain and precedes its first changed output token. It does
-not establish a general numerical bound: this is one prompt sequence, one
-model/quantization and one cache/adaptation profile. The requested endpoint
-575 did not produce a raw record, so no chain-end magnitude is claimed. The
+An adaptive-only supervised rerun with the same seed, model, binary and request
+sequence captured the actual final committed endpoint, position 574 (the
+64th generated token uses zero-based positions 511–574). It matched the service
+hashes and found a recurrent relative-L2 delta of `0.524326` (max absolute
+`0.420518`) and a convolution delta of `0.915769` (max absolute `10.0160`);
+all values differed. The initial/recovery token IDs at this endpoint were
+`264`/`1785`. This confirms substantial growth through the end of this chain.
+The earlier request for position 575 was outside its generated range.
+
+These measurements do not establish a general numerical bound: this is one
+prompt sequence, one model/quantization and one cache/adaptation profile. The
 underlying owner/arithmetic source is covered by the adjacent layer-11 and
 layer-31 captures; this result does not test a proposed correction. Phase 5
 remains open.
@@ -41,7 +47,9 @@ and 376.5 seconds. Clocks were sampled read-only and dynamic; energy was not
 measured. Full service logs, raw arrays, requests, all-layer trace, supervisor
 samples and tegrastats are retained in the local result directory beside this
 note. `captured-artifacts-sha256.txt` records their hashes;
-`state-delta-summary.json` contains the compact numerical comparison.
+`state-delta-summary.json` contains the compact numerical comparison, including
+the separately captured endpoint 574; `adaptive-cap8-end574-command.txt` records
+its single-arm supervised reproduction command.
 
 Reproduce from the repository root:
 
@@ -49,6 +57,8 @@ Reproduce from the repository root:
 python3 bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/run_pair.py \
   --run --seed 20261044 --sequence short-long-short --continuations 0 \
   --generated-tokens 64 --native-cpu-q8-1-dot all \
-  --capture-gdn-commit-state-layer 32 --gdn-commit-state-positions 515,534,575 \
+  --capture-gdn-commit-state-layer 32 --gdn-commit-state-positions 515,534 \
   --output bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/adaptive-current-081212f0-state-bound-64pos
 ```
+
+The final-endpoint capture command is recorded in `adaptive-cap8-end574-command.txt`.

@@ -1,0 +1,11 @@
+python3 tools/integration/run_control.py \
+  --output bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/adaptive-current-081212f0-state-bound-64pos/adaptive-cap8-end574/supervisor \
+  --timeout 1800 --interval 1 --sample-clocks -- \
+  /home/calvin/.local/python/bin/python3 \
+  bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/run_one.py \
+  --adapt-every 4 --adapt-swaps 8 --continuations 0 --generated-tokens 64 \
+  --sequence short-long-short --native-cpu-q8-1-dot all --capture-moe-positions 511 \
+  --capture-moe-rows 96 \
+  --output bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/adaptive-current-081212f0-state-bound-64pos/adaptive-cap8-end574/result \
+  --capture-gdn-commit-state-layer 32 --gdn-commit-state-positions 574 \
+  --gdn-commit-state-output bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/adaptive-current-081212f0-state-bound-64pos/adaptive-cap8-end574/result/gdn-commit-state.bin
