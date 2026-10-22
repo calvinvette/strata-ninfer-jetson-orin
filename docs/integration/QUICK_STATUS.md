@@ -39,8 +39,12 @@ completed eight concurrent requests and observed 14 LRU evictions and 11
 recaptures across four repeated layout keys; all requests returned six tokens,
 with 16.50 GiB minimum available RAM and zero cgroup memory events. The default
 cap remains 64, confirmed by a no-override run whose six-token single-request
-output matched serial MTP2. The 64-layout capacity itself has not been forced
-past its limit. Outputs in the original eight-prompt batch differed from
+output matched serial MTP2. A supervised 80-request stress exercised 88 unique
+layouts: the first eviction came at layout 64, and 26 evictions occurred in
+total. All requests completed, minimum host availability was 11.12 GiB, and
+784 supervisor samples showed zero cgroup pressure or OOM events. This is
+lifecycle and memory evidence only, not a correctness or speed result. Outputs
+in the original eight-prompt batch differed from
 serial controls; a same-profile single-live follow-up matched serial MTP2,
 while a two-request run still diverges at token 60 on slot 1 for MTP-enabled
 and MTP-disabled batches. Full state capture corrected the earlier layer-6
@@ -59,8 +63,8 @@ contribution, not all later persistent-state drift. Current-source Coder MTP4
 decode cancellation matched all 11 state fingerprints at four accepted-prefix
 boundaries; early-prefill cancellation also matched all 11 recovery state
 fingerprints. These qualify the tested points, not every cancellation boundary
-or adaptive recovery. Opt-in cap-1 batch graph eviction/recapture now passes;
-the default 64-layout capacity still needs an over-limit stress run.
+or adaptive recovery. Opt-in cap-1 and default cap-64 batch graph
+eviction/recapture now pass lifecycle stress coverage.
 See the [owner transition](../../bench/results/2026-10-22-phase5-coder-longchain-owner-capture/README.md),
 [raw state](../../bench/results/2026-10-22-phase5-coder-long-chain-raw-state-pair-pos767/README.md),
 and [API cancellation](../../bench/results/2026-10-22-phase5-coder-api-cancellation-current-source/README.md)
@@ -70,9 +74,8 @@ records.
 
 1. Continue resolving batch-MTP output divergence: capture MTP2 committed state
    from prompt boundary through its first divergent decode window, then isolate
-   the first recurrence or verifier operation that changes the row. Exercise
-   the default 64-layout capacity past its limit; the opt-in cap-1 eviction and
-   recapture path now passes. Extend accepted-prefix direct-state and long-chain
+   the first recurrence or verifier operation that changes the row. Extend
+   accepted-prefix direct-state and long-chain
    recovery coverage, widen cancellation boundaries beyond the passing Coder
    MTP4 decode/prefill points, and keep adaptive migration opt-in until its
    long-chain state contract is bounded.
