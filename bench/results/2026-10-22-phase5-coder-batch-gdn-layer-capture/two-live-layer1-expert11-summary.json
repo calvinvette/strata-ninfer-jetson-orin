@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-22",
+  "device": "Jetson AGX Orin ARM64/CUDA",
+  "model": "Qwen3.8-Flash-Next-Coder-GGUF-IQ1_M-Orin-validation",
+  "workload": "two-live greedy target-only requests, batch capacity 2, six generated tokens, layer 1 at positions 68 and 71",
+  "slot_to_prompt": {"0": 0, "1": 1},
+  "slot_mapping": "nearest fresh serial control by directly committed layer-1 GDN state at each matching position/token",
+  "outputs": "both six-token batch continuations exactly match their fresh serial controls",
+  "position_71_prompt_1": {
+    "consumed_token": 1156,
+    "layer1_moe_input_exact": true,
+    "route_ids_exact": true,
+    "expert_ids_by_rank": [137, 26, 229, 3, 205, 21, 246, 252, 11, 65],
+    "route_weights_exact": true,
+    "changed_expert_parts": [{"rank": 8, "expert_id": 11, "weight": 0.0513039827, "different_values": 2560, "relative_l2": 0.013359884252798084, "max_abs": 0.0008241906762123108}],
+    "unchanged_expert_parts": 9,
+    "combined_output_delta": {"different_values": 2560, "relative_l2": 0.0008626505588464076, "max_abs": 0.00004228483885526657},
+    "weighted_parts_prediction": {"relative_l2": 0.0008626516055357089, "max_abs": 0.00004228426419389773},
+    "residual_vs_observed_delta": {"relative_l2": 0.00004833778926310824, "max_abs": 0.000000003234522360102401}
+  },
+  "resources": {"minimum_available_physical_ram_bytes": 18944540672, "minimum_available_physical_ram_gib": 17.643478393554688, "host_headroom_floor_gib": 6, "nonzero_sampled_cgroup_memory_events": 0, "energy_attributed_to_requests": false, "emc_clock_readback": "permission denied"},
+  "interpretation": "At this selected boundary, the route and weights are exact, nine expert outputs are exact, and expert 11's weighted output delta accounts for the combined-output delta to floating-point rounding. This isolates the measured change to expert 11's output path for this row and configuration, but does not identify why that expert output differs or establish it as the later token-60 cause. This is correctness evidence, not performance qualification."
+}

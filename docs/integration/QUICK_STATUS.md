@@ -169,6 +169,14 @@ requests already have changed layer-1 state, GDN fields, MoE inputs and shared
 outputs. Minimum available RAM was 17.434 GiB; the added state capture makes
 timing diagnostic only. [Selected-position results](../../bench/results/2026-10-22-phase5-coder-batch-gdn-layer-capture/two-live-layer1-moe-long-chain-summary.json).
 
+An opt-in route/parts trace then showed prompt 1 keeps identical top-10 expert
+IDs and weights at position 71, with nine expert outputs exact and only expert
+11 changed. Weighting that expert's part delta reproduces the combined MoE
+delta to a `3.24e-9` maximum residual. This pins the selected numerical delta
+to expert 11's output path, without explaining its numerical cause. The six
+output tokens still matched serial; minimum available RAM was 17.643 GiB.
+[Compact result](../../bench/results/2026-10-22-phase5-coder-batch-gdn-layer-capture/two-live-layer1-expert11-summary.json).
+
 ## Near-term direction
 
 1. Continue resolving batch-MTP output divergence: capture earlier layer

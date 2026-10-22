@@ -94,8 +94,19 @@ struct MoeOutputHeaderV2 {
     int32_t slot, token;
 };
 static_assert(sizeof(MoeOutputHeaderV2) == 48, "STMOEOUT2 header layout changed");
-std::mutex moe_output_dump_mutex;
+struct MoePartsHeaderV2 {
+    char magic[8];
+    uint32_t version;
+    uint32_t layer, k, reserved;
+    uint64_t n_embd;
+    int64_t position;
+    int32_t slot, token;
+};
+static_assert(sizeof(MoePartsHeaderV2) == 48, "STMPART2 header layout changed");
 #pragma pack(pop)
+std::mutex moe_output_dump_mutex;
+std::mutex moe_route_dump_mutex;
+std::mutex moe_parts_dump_mutex;
 
 struct GdnDiagOffsets {
     size_t x, qkv, h, gate, beta, z, y, gdn_out, ffn_x, ffn_y, bytes;
@@ -889,6 +900,7 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
     }
     {
         const char* layer = std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_LAYER");
+        const char* batch_env = std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_BATCH");
         const char* path = std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_PATH");
         const char* positions = std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_POSITIONS");
         const char* position = positions == nullptr ? std::getenv("STRATA_VERIFY_DUMP_MOE_ROUTE_POSITION") : nullptr;
@@ -901,6 +913,8 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
             return false;
         }
         if (layer != nullptr) {
+            moe_route_diag_include_batch_ = batch_env != nullptr && batch_env[0] != '\0' &&
+                                            std::strcmp(batch_env, "0") != 0;
             char* end = nullptr;
             const long parsed = std::strtol(layer, &end, 10);
             if (end == layer || *end != '\0' || parsed < 0 || parsed >= g.n_layers || !*path) {
@@ -995,6 +1009,7 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
     }
     {
         const char* layer = std::getenv("STRATA_VERIFY_DUMP_MOE_PARTS_LAYER");
+        const char* batch_env = std::getenv("STRATA_VERIFY_DUMP_MOE_PARTS_BATCH");
         const char* path = std::getenv("STRATA_VERIFY_DUMP_MOE_PARTS_PATH");
         const char* positions = std::getenv("STRATA_VERIFY_DUMP_MOE_PARTS_POSITIONS");
         const char* position = positions == nullptr ? std::getenv("STRATA_VERIFY_DUMP_MOE_PARTS_POSITION") : nullptr;
@@ -1007,6 +1022,8 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
             return false;
         }
         if (layer != nullptr) {
+            moe_parts_diag_include_batch_ = batch_env != nullptr && batch_env[0] != '\0' &&
+                                            std::strcmp(batch_env, "0") != 0;
             char* end = nullptr;
             const long parsed = std::strtol(layer, &end, 10);
             if (end == layer || *end != '\0' || parsed < 0 || parsed >= g.n_layers || !*path) {
@@ -2112,7 +2129,8 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
             }
             moe_input_diag_captured_layers_[layer_slot] = 1;
         }
-        if (moe_route_diag_h_ != nullptr && l == moe_route_diag_layer_ && !batch_rec_) {
+        if (moe_route_diag_h_ != nullptr && l == moe_route_diag_layer_ &&
+            (!batch_rec_ || moe_route_diag_include_batch_)) {
             const size_t ids_bytes = (size_t) max_t_ * (size_t) K * sizeof(int32_t);
             int32_t* host_ids = (int32_t*) moe_route_diag_h_;
             float* host_weights = (float*) (moe_route_diag_h_ + ids_bytes);
@@ -2284,7 +2302,8 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
             }
             moe_hit_add(parts_out, hit_out, p_dst, p_counts + 1, cap, N, cs);
         }
-        if (moe_parts_diag_h_ != nullptr && l == moe_parts_diag_layer_ && !batch_rec_) {
+        if (moe_parts_diag_h_ != nullptr && l == moe_parts_diag_layer_ &&
+            (!batch_rec_ || moe_parts_diag_include_batch_)) {
             const size_t dst_off = (size_t) tb * (size_t) K * (size_t) N;
             const size_t copy_bytes = (size_t) n * (size_t) K * (size_t) N * sizeof(float);
             const cudaError_t copy_error = cudaMemcpyAsync(moe_parts_diag_h_ + dst_off, parts_out, copy_bytes,
@@ -3093,8 +3112,7 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
     }
     if (moe_route_diag_captured_ && diag_position_matches(moe_route_diag_position_,
             moe_route_diag_positions_, moe_route_diag_multi_position_filter_, pos0, T)) {
-        static std::mutex route_dump_mutex;
-        std::lock_guard<std::mutex> lock(route_dump_mutex);
+        std::lock_guard<std::mutex> lock(moe_route_dump_mutex);
         std::FILE* dump = std::fopen(moe_route_diag_path_.c_str(), "ab");
         bool written = dump != nullptr;
         if (written) {
@@ -3196,13 +3214,32 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
         header.pos0 = pos0;
         for (int t = 0; t < T; ++t) header.tokens[t] = tokens[t];
         const size_t data_bytes = (size_t) T * (size_t) ss.k * (size_t) g.n_embd * sizeof(float);
-        static std::mutex parts_dump_mutex;
-        std::lock_guard<std::mutex> lock(parts_dump_mutex);
+        std::lock_guard<std::mutex> lock(moe_parts_dump_mutex);
         std::FILE* dump = std::fopen(moe_parts_diag_path_.c_str(), "ab");
         bool written = dump != nullptr;
         if (written) {
-            written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
-                      std::fwrite(moe_parts_diag_h_, 1, data_bytes, dump) == data_bytes;
+            if (moe_parts_diag_include_batch_) {
+                const size_t row_bytes = (size_t) ss.k * (size_t) g.n_embd * sizeof(float);
+                for (int t = 0; t < T && written; ++t) {
+                    if (!diag_position_matches(moe_parts_diag_position_, moe_parts_diag_positions_,
+                                               moe_parts_diag_multi_position_filter_, pos0 + t, 1)) continue;
+                    MoePartsHeaderV2 row{};
+                    std::memcpy(row.magic, "STMPART2", sizeof(row.magic));
+                    row.version = 2;
+                    row.layer = (uint32_t) moe_parts_diag_layer_;
+                    row.k = (uint32_t) ss.k;
+                    row.n_embd = (uint64_t) g.n_embd;
+                    row.position = pos0 + t;
+                    row.slot = -1;
+                    row.token = tokens[t];
+                    written = std::fwrite(&row, sizeof(row), 1, dump) == 1 &&
+                              std::fwrite(moe_parts_diag_h_ + (size_t) t * (size_t) ss.k * (size_t) g.n_embd,
+                                          1, row_bytes, dump) == row_bytes;
+                }
+            } else {
+                written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
+                          std::fwrite(moe_parts_diag_h_, 1, data_bytes, dump) == data_bytes;
+            }
             if (std::fflush(dump) != 0) written = false;
             if (std::fclose(dump) != 0) written = false;
         }
@@ -4025,6 +4062,93 @@ bool Verifier::write_moe_output_diag_batch(int T, const int* slots, const int32_
     return true;
 }
 
+bool Verifier::write_moe_route_diag_batch(int T, const int* slots, const int32_t* tokens,
+                                          const int64_t* positions, std::string& err) {
+    if (!moe_route_diag_include_batch_ || moe_route_diag_h_ == nullptr || !moe_route_diag_captured_) return true;
+    bool selected = false;
+    for (int t = 0; t < T && !selected; ++t)
+        selected = diag_position_matches(moe_route_diag_position_, moe_route_diag_positions_,
+                                         moe_route_diag_multi_position_filter_, positions[t], 1);
+    if (!selected) return true;
+    const size_t ids_bytes = (size_t) max_t_ * (size_t) ss_->k * sizeof(int32_t);
+    const int32_t* ids = (const int32_t*) moe_route_diag_h_;
+    const float* weights = (const float*) (moe_route_diag_h_ + ids_bytes);
+    std::lock_guard<std::mutex> lock(moe_route_dump_mutex);
+    std::FILE* dump = std::fopen(moe_route_diag_path_.c_str(), "ab");
+    bool written = dump != nullptr;
+    if (written) {
+        if (std::fseek(dump, 0, SEEK_END) != 0) written = false;
+        const long end = written ? std::ftell(dump) : -1;
+        if (end < 0) written = false;
+        else if (end == 0)
+            written = std::fprintf(dump, "{\"format\":\"strata-verify-moe-route-v1\",\"k\":%lld}\n",
+                                   (long long) ss_->k) >= 0;
+    }
+    for (int row = 0; row < T && written; ++row) {
+        if (!diag_position_matches(moe_route_diag_position_, moe_route_diag_positions_,
+                                   moe_route_diag_multi_position_filter_, positions[row], 1)) continue;
+        const size_t off = (size_t) row * (size_t) ss_->k;
+        written = std::fprintf(dump,
+                               "{\"layer\":%d,\"position\":%lld,\"token_id\":%d,\"slot\":%d,\"ids\":[",
+                               moe_route_diag_layer_, (long long) positions[row], (int) tokens[row], slots[row]) >= 0;
+        for (int j = 0; j < ss_->k && written; ++j)
+            written = std::fprintf(dump, "%s%d", j ? "," : "", ids[off + (size_t) j]) >= 0;
+        if (written) written = std::fputs("],\"weights\":[", dump) != EOF;
+        for (int j = 0; j < ss_->k && written; ++j)
+            written = std::fprintf(dump, "%s%.9g", j ? "," : "", (double) weights[off + (size_t) j]) >= 0;
+        if (written) written = std::fputs("]}\n", dump) != EOF;
+    }
+    if (dump != nullptr) {
+        if (std::fflush(dump) != 0) written = false;
+        if (std::fclose(dump) != 0) written = false;
+    }
+    if (!written) {
+        err = "verify: could not write opt-in batch MoE route capture";
+        return false;
+    }
+    return true;
+}
+
+bool Verifier::write_moe_parts_diag_batch(int T, const int* slots, const int32_t* tokens,
+                                          const int64_t* positions, std::string& err) {
+    if (!moe_parts_diag_include_batch_ || moe_parts_diag_h_ == nullptr || !moe_parts_diag_captured_) return true;
+    bool selected = false;
+    for (int t = 0; t < T && !selected; ++t)
+        selected = diag_position_matches(moe_parts_diag_position_, moe_parts_diag_positions_,
+                                         moe_parts_diag_multi_position_filter_, positions[t], 1);
+    if (!selected) return true;
+    const ModelGeometry& g = *g_;
+    const size_t row_bytes = (size_t) ss_->k * (size_t) g.n_embd * sizeof(float);
+    std::lock_guard<std::mutex> lock(moe_parts_dump_mutex);
+    std::FILE* dump = std::fopen(moe_parts_diag_path_.c_str(), "ab");
+    bool written = dump != nullptr;
+    for (int t = 0; t < T && written; ++t) {
+        if (!diag_position_matches(moe_parts_diag_position_, moe_parts_diag_positions_,
+                                   moe_parts_diag_multi_position_filter_, positions[t], 1)) continue;
+        MoePartsHeaderV2 row{};
+        std::memcpy(row.magic, "STMPART2", sizeof(row.magic));
+        row.version = 2;
+        row.layer = (uint32_t) moe_parts_diag_layer_;
+        row.k = (uint32_t) ss_->k;
+        row.n_embd = (uint64_t) g.n_embd;
+        row.position = positions[t];
+        row.slot = slots[t];
+        row.token = tokens[t];
+        const float* parts = moe_parts_diag_h_ + (size_t) t * (size_t) ss_->k * (size_t) g.n_embd;
+        written = std::fwrite(&row, sizeof(row), 1, dump) == 1 &&
+                  std::fwrite(parts, 1, row_bytes, dump) == row_bytes;
+    }
+    if (dump != nullptr) {
+        if (std::fflush(dump) != 0) written = false;
+        if (std::fclose(dump) != 0) written = false;
+    }
+    if (!written) {
+        err = "verify: could not write opt-in batch MoE expert-parts capture";
+        return false;
+    }
+    return true;
+}
+
 bool Verifier::run_slot_rows(const int* rows, int S, const int32_t* tokens, const int64_t* pos, PoolMultiFn pool,
                              void* user, int32_t* out, std::string& err) {
     using namespace strata::kernels;
@@ -4056,6 +4180,8 @@ bool Verifier::run_slot_rows(const int* rows, int S, const int32_t* tokens, cons
         cudaStreamSynchronize(copy_);
         if (!write_gdn_diag_batch(S, rows, tokens, pos, err)) return false;
         if (!write_moe_output_diag_batch(S, rows, tokens, pos, err)) return false;
+        if (!write_moe_route_diag_batch(S, rows, tokens, pos, err)) return false;
+        if (!write_moe_parts_diag_batch(S, rows, tokens, pos, err)) return false;
         if (prof_on_) collect_profile();
         ++windows;
         if (le_ < g.n_layers) return next_ == nullptr || next_->run_slot_rows(rows, S, tokens, pos, pool, next_user_, out, err);
@@ -4119,6 +4245,8 @@ bool Verifier::run_slot_rows(const int* rows, int S, const int32_t* tokens, cons
     cudaStreamSynchronize(copy_);
     if (!write_gdn_diag_batch(S, rows, tokens, pos, err)) return false;
     if (!write_moe_output_diag_batch(S, rows, tokens, pos, err)) return false;
+    if (!write_moe_route_diag_batch(S, rows, tokens, pos, err)) return false;
+    if (!write_moe_parts_diag_batch(S, rows, tokens, pos, err)) return false;
     if (prof_on_) collect_profile();
     ++windows;
     if (le_ < g.n_layers) return next_ == nullptr || next_->run_slot_rows(rows, S, tokens, pos, pool, next_user_, out, err);

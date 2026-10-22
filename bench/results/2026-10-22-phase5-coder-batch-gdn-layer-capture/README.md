@@ -163,6 +163,29 @@ nonzero sampled cgroup event counters. Because state capture adds work, its
 window timing is not performance evidence. See
 `two-live-layer1-moe-long-chain-summary.json`; raw captures remain local.
 
+## Route and expert-output isolation
+
+The next six-token trace adds opt-in batch captures for route IDs/weights and
+the ten per-expert output vectors at layer 1. At position 71 for prompt 1, the
+batch row uses the exact serial route IDs and weights. Nine expert output
+vectors are bit-identical; rank 8, expert 11, differs in all 2,560 values
+(relative L2 `0.01336`, max absolute `0.0008242`). Its router weight is
+`0.051304`. The weighted expert-11 delta reproduces the combined MoE output
+delta: the residual is at most `3.24e-9` per value and `0.00484%` of the
+observed delta in L2. This isolates the selected combined-output change to
+expert 11's output path for this row and configuration. It does not explain why
+expert 11 differs or establish a causal link to the later token-60 mismatch.
+
+Both generated continuations match their serial controls for all six tokens.
+The batch averaged 1.33 rows/window and retained 17.643 GiB minimum available
+physical RAM; sampled cgroup event counters stayed zero. Energy was not
+attributed and EMC readback was denied. The route/parts capture is correctness
+instrumentation, not performance evidence. The compact result is
+`two-live-layer1-expert11-summary.json`; raw `.parts`, route, activation, state
+and output files remain local. `compare_moe_route_parts_batch.py` replays the
+route, per-expert, weighted-output and combined-output comparison from those
+files plus the same-run slot mapping.
+
 ## Resources and validation
 
 Minimum available physical RAM and minimum admission availability were both
@@ -173,40 +196,28 @@ attributed to the request, and no performance conclusion is drawn.
 
 The current-source CUDA candidate built `strata` and `verify_batch_parity`.
 Focused CTests passed 3/3: `verify_batch_parity`,
-`captured_graph_trace_test`, and `graph_registry_lifecycle_test`. On maestro1,
-the configured HIP build recompiled and linked `strata` successfully, then its
-CLI help check passed. The configured SYCL target reported no work because this
-CUDA verifier translation unit is not part of that target; the existing SYCL
-binary's CLI help check passed. Neither backend was run on an accelerator.
-
-The local and maestro1 source hashes match:
+`captured_graph_trace_test`, and `graph_registry_lifecycle_test`. Maestro1
+rebuilt and linked the configured HIP targets with one build job; its SYCL
+target reported no work because the CUDA verifier translation unit is not in
+that target. Both configured binaries passed their CLI help checks. The source
+files used for the backend build match the local tree:
 
 ```text
-include/strata/core/verify.hpp  6f7a80315b8fa51aa38e66c667712e89bcf96db6fb36bea118e7d07a49b85a50
-src/core/verify.cpp             2398e915a99b0d72420818884b6938c55cd201ead4fd1d770222a4c89ae71fe3
+include/strata/core/verify.hpp  75595d43c82ad36764f275a945cc30a45d8b072929dd3937c0599dd1de7cf7c3
+src/core/verify.cpp             9d6a41162b930197045155d66da0cfdd80d8e10b796f2b8b8e879f45ffe44d5f
+src/program/generate.cpp        de1258c0fc439883c424562b58201d8d486e34a9a8cefbaffa22ae12390d16ba
 ```
 
-For the layer-1 capture changes, the exact verifier files used by maestro1
-match the local working tree:
-
-```text
-include/strata/core/verify.hpp  de2bc44996887c59f29b5db409274721cc310ab13930071791f3524372793fea
-src/core/verify.cpp             78b60f8c484ab56e5b8118b56ef4be00d705c3eb7ec3cde25a9df4f50bbe0111
-```
-
-The HIP build recompiled and linked successfully; the SYCL build reported no
-work because this CUDA verifier translation unit is not in that target. Both
-configured binaries passed their CLI help checks. Their hashes were
-`f11337e544bce9e5624c54692ed18d8d657e3fcbc55f8e78215b90b9f017184c` (HIP) and
+The HIP and SYCL binary hashes were
+`4e98c335be392c385e0aeeac74dcf1cf747159814a72d88e7e585a67377b2cd5` (HIP) and
 `9233e5ad6b07e83180a8fc4b542c0d7e47e92c6d3e870ec9efa5232b07acb985` (SYCL).
-The remote checkout's unrelated `src/program/generate.cpp` differs from the
-local tree and was not synchronized for this check. These are compile/startup
-checks only; neither backend had accelerator-runtime coverage. Earlier maestro1
-checks and their hashes are retained in the history above.
+These are compile/startup checks only; neither backend had accelerator-runtime
+coverage.
 
 The harnesses and parsers are retained as `capture_target_only_gdn_layer.py`,
 `two_live_multrow_layer12.py`, `compare_layer_capture.py`,
-`compare_gdn_commit_state.py`, and `compare_moe_output_v2.py`. The last parser
-uses a same-run slot mapping from the all-layer state comparison. Raw
-`*.stgdiag`/`*.stgcmt`/`*.stmoe` data, run logs, and supervisor telemetry remain
-local and are intentionally excluded from Git.
+`compare_gdn_commit_state.py`, `compare_moe_output_v2.py`, and
+`compare_moe_route_parts_batch.py`. The MoE comparators use same-run slot
+mapping from committed-state comparisons. Raw
+`*.stgdiag`/`*.stgcmt`/`*.stmoe`/`*.parts` data, route logs, run logs, and
+supervisor telemetry remain local and are intentionally excluded from Git.

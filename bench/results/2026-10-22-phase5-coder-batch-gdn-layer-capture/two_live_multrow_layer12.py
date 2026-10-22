@@ -21,6 +21,10 @@ parser.add_argument('--commit-layer', default='-1',
 parser.add_argument('--max-new', type=int, default=96)
 parser.add_argument('--moe-output-layer', type=int, default=-1,
                     help='also capture shared and combined MoE outputs at this layer')
+parser.add_argument('--moe-route-layer', type=int, default=-1,
+                    help='also capture routed expert IDs and weights at this layer')
+parser.add_argument('--moe-parts-layer', type=int, default=-1,
+                    help='also capture each routed expert output before weighted combine')
 args = parser.parse_args()
 positions = [int(value) for value in args.positions.split(',')]
 if positions != sorted(set(positions)) or not positions or positions[0] < 0:
@@ -29,6 +33,10 @@ if args.layer < 0:
     parser.error('--layer must be non-negative')
 if args.moe_output_layer < -1:
     parser.error('--moe-output-layer must be -1 or non-negative')
+if args.moe_route_layer < -1:
+    parser.error('--moe-route-layer must be -1 or non-negative')
+if args.moe_parts_layer < -1:
+    parser.error('--moe-parts-layer must be -1 or non-negative')
 if args.commit_layer != 'all':
     try:
         args.commit_layer = int(args.commit_layer)
@@ -64,6 +72,16 @@ def make_env(name):
                     'STRATA_VERIFY_DUMP_MOE_OUTPUT_POSITIONS': ','.join(map(str, positions)),
                     'STRATA_VERIFY_DUMP_MOE_OUTPUT_BATCH': '1',
                     'STRATA_VERIFY_DUMP_MOE_OUTPUT_PATH': str((out / f'{name}.stmoe').resolve())})
+    if args.moe_route_layer >= 0:
+        env.update({'STRATA_VERIFY_DUMP_MOE_ROUTE_LAYER': str(args.moe_route_layer),
+                    'STRATA_VERIFY_DUMP_MOE_ROUTE_POSITIONS': ','.join(map(str, positions)),
+                    'STRATA_VERIFY_DUMP_MOE_ROUTE_BATCH': '1',
+                    'STRATA_VERIFY_DUMP_MOE_ROUTE_PATH': str((out / f'{name}.routes.jsonl').resolve())})
+    if args.moe_parts_layer >= 0:
+        env.update({'STRATA_VERIFY_DUMP_MOE_PARTS_LAYER': str(args.moe_parts_layer),
+                    'STRATA_VERIFY_DUMP_MOE_PARTS_POSITIONS': ','.join(map(str, positions)),
+                    'STRATA_VERIFY_DUMP_MOE_PARTS_BATCH': '1',
+                    'STRATA_VERIFY_DUMP_MOE_PARTS_PATH': str((out / f'{name}.parts').resolve())})
     if args.commit_layer != -1:
         env.update({'STRATA_VERIFY_DUMP_GDN_COMMIT_LAYER': str(args.commit_layer),
                     'STRATA_VERIFY_DUMP_GDN_COMMIT_POSITIONS': ','.join(map(str, positions)),
@@ -102,6 +120,8 @@ for name in ('slot-0', 'slot-1'):
 result = {'model': cfg['model_name'], 'mode': 'two-live-target-only', 'layer': args.layer,
           'positions': positions, 'max_new': args.max_new, 'commit_layer': args.commit_layer,
           'moe_output_layer': args.moe_output_layer,
+          'moe_route_layer': args.moe_route_layer,
+          'moe_parts_layer': args.moe_parts_layer,
           'prompts': prompts, 'serial_fresh': serial, 'batch': batch,
           'first_mismatch_index': first_mismatch}
 (out / 'result.json').write_text(json.dumps(result, indent=2) + '\n')

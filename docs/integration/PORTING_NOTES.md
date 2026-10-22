@@ -2729,3 +2729,11 @@ positions. For a Splash investigation, retain both an early boundary and the
 later output-mismatch boundary in one capture, with persistent state sampled at
 those same points. This checks whether the early combined-output delta persists
 as upstream state diverges without confusing correlation with a causal proof.
+
+The expert-parts boundary shows how to separate routing from expert execution:
+here top-10 IDs and weights matched serial, nine parts matched bitwise, and one
+ranked expert output accounted for the combined delta after applying its router
+weight. A future Strata/Splash port should capture routed IDs, weights, each
+expert's pre-combine output and the combined result under the same request and
+state mapping. That distinguishes routing changes, per-expert arithmetic and
+combine behavior before any backend-specific fix is proposed.
