@@ -18,6 +18,14 @@ need for two simultaneously active verifier rows to reproduce persistent QSA
 drift, but leaves the solo-to-batch transition versus batch-slot execution
 unresolved. Phase 5 remains open. See the [batch-MTP diagnostic](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
 
+An extended one-live-after-admission run generated 96 tokens with exact serial
+output parity. Early state samples were unpaired because batch and serial MTP2
+recorded different accepted-length parity; at every common captured length
+91–163 (41 samples), all 12 QSA indexer and K/V hashes differed. The run kept
+16.76 GiB minimum host/admission availability and zero cgroup events. State
+divergence therefore persists across this sampled range, but has no numerical
+bound here and its effect on quality is unknown.
+
 The latest [MTP2 position-76 committed-state comparison](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md)
 paired batch and serial rows by token. Prompt 0's 36-layer GDN state differs
 in 26,965,859/29,417,472 floats (relative L2 0.0182307), first at GDN model

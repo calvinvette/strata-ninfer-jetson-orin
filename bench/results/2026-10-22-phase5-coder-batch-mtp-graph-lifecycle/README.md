@@ -337,3 +337,20 @@ verifier rows. It does not distinguish the solo-to-batch transition from
 batch-slot execution, identify the changed operation, or establish output
 impact beyond this exact 96-token sample. Raw traces remain local-only; the
 concise analyzer output is retained with the local capture.
+
+
+### Extended one-live batch-slot trace (2026-10-22)
+
+The same supervised one-live-after-admission control was extended through 96
+generated tokens (QSA hashes requested through position 164). Both the 96-token
+slot-0 output and the one-token competitor exactly matched their serial MTP2
+controls. Early batch state samples had odd accepted lengths while the serial
+MTP2 run recorded even lengths, so those points have no exact-length serial
+control and are not compared. At every common captured state length from 91
+through 163 (41 paired samples), aggregate, indexer and K/V hashes differed
+across all 12 QSA layers, beginning at model layer 3. Thus state divergence
+persists over this sampled range while output remains token-exact; this does
+not bound numeric error, establish a user-visible quality effect, or identify
+the originating transition/operation. The supervisor passed with 16.76 GiB
+minimum host and admission availability over 115 samples and zero sampled
+cgroup memory events. Energy was not measured. Full traces remain local-only.
