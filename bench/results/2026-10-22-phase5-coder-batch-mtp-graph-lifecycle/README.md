@@ -354,3 +354,24 @@ not bound numeric error, establish a user-visible quality effect, or identify
 the originating transition/operation. The supervisor passed with 16.76 GiB
 minimum host and admission availability over 115 samples and zero sampled
 cgroup memory events. Energy was not measured. Full traces remain local-only.
+
+### One-live GDN numeric capture (2026-10-22)
+
+A supervised serial-versus-one-live-after-admission MTP2 run captured every
+GDN layer at the common committed boundary 126. The long request's 96 generated
+tokens matched serial exactly; the one-token competitor completed after
+admission. All 36 GDN layers differed: 28,576,901/29,417,472 float values,
+relative L2 0.00972594, maximum absolute difference 0.373845, first changed
+model layer 1. The first attempt requested position 127, which this MTP2 commit
+schedule did not emit; that capture produced no state records and is retained
+locally as an unpaired/unsupported position. Position 126 was selected from the
+observed common commit sequence and yielded complete 36-layer records. This
+confirms numeric GDN drift in the one-live batch slot but does not bound its
+quality effect or identify the initiating operation. The successful supervisor
+passed with 16.69 GiB minimum host/admission availability across 71 samples and
+zero cgroup events. Dynamic clocks were observed, EMC readback was unavailable,
+and energy was not measured. Raw 226 MiB state files remain local-only.
+
+The capture harness is `capture_mtp2_one_live_gdn_state.py`; the compact
+comparator is `compare_mtp2_one_live_gdn_commit.cpp`. The tested binary SHA256
+was `832068fd31b9e1dff9f835fb318e7c7c5c7f481026e9398111256345ac20ab45`.

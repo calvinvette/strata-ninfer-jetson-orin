@@ -111,6 +111,11 @@ all 12 indexer and KV hashes differed. This shows two active verifier rows are
 not required for persistent-state drift. Its numerical bound and cause remain
 unknown; Phase 5 stays open.
 
+A direct one-live numeric capture at committed position 126 also found GDN
+state drift in all 36 layers (relative L2 0.00973; 28.58 million of 29.42
+million floats changed), despite exact 96-token output parity. The numerical
+cause and quality bound remain unknown.
+
 ## Near-term direction
 
 1. Continue resolving batch-MTP output divergence: repair/extend per-row state

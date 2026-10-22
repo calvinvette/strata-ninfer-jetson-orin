@@ -26,6 +26,16 @@ recorded different accepted-length parity; at every common captured length
 divergence therefore persists across this sampled range, but has no numerical
 bound here and its effect on quality is unknown.
 
+A direct numeric follow-up captured the one-live-after-admission MTP2 slot at
+common committed position 126. Its output matched serial for all 96 tokens, but
+all 36 GDN layers differed in 28,576,901/29,417,472 floats (relative L2
+0.00972594, maximum absolute difference 0.373845; first changed model layer
+1). The run retained 16.69 GiB minimum host/admission availability and zero
+cgroup events. This confirms the longer one-slot QSA hash drift also accompanies
+numeric recurrent-state movement; the cause and quality bound remain unknown.
+A requested position-127 dump had no matching commit and yielded no records;
+position 126 was the complete capture. See the [batch-MTP report](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
+
 The latest [MTP2 position-76 committed-state comparison](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md)
 paired batch and serial rows by token. Prompt 0's 36-layer GDN state differs
 in 26,965,859/29,417,472 floats (relative L2 0.0182307), first at GDN model
