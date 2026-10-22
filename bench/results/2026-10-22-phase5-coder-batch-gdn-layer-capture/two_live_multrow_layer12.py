@@ -25,6 +25,8 @@ parser.add_argument('--moe-route-layer', type=int, default=-1,
                     help='also capture routed expert IDs and weights at this layer')
 parser.add_argument('--moe-parts-layer', type=int, default=-1,
                     help='also capture each routed expert output before weighted combine')
+parser.add_argument('--capture-moe-owners', action='store_true',
+                    help='capture actual CPU/GPU owners and CPU expert output rows')
 args = parser.parse_args()
 positions = [int(value) for value in args.positions.split(',')]
 if positions != sorted(set(positions)) or not positions or positions[0] < 0:
@@ -82,6 +84,13 @@ def make_env(name):
                     'STRATA_VERIFY_DUMP_MOE_PARTS_POSITIONS': ','.join(map(str, positions)),
                     'STRATA_VERIFY_DUMP_MOE_PARTS_BATCH': '1',
                     'STRATA_VERIFY_DUMP_MOE_PARTS_PATH': str((out / f'{name}.parts').resolve())})
+    if args.capture_moe_owners:
+        env.update({'STRATA_CAPTURE_MOE_PATH': str((out / f'{name}.owners.jsonl').resolve()),
+                    'STRATA_CAPTURE_MOE_LAYER': str(args.layer),
+                    'STRATA_CAPTURE_MOE_POSITIONS': ','.join(map(str, positions)),
+                    'STRATA_CAPTURE_MOE_ROWS': '64',
+                    'STRATA_CAPTURE_MOE_OUTPUT_PATH': str((out / f'{name}.cpuouts.jsonl').resolve()),
+                    'STRATA_CAPTURE_MOE_OUTPUT_LAYER': str(args.layer)})
     if args.commit_layer != -1:
         env.update({'STRATA_VERIFY_DUMP_GDN_COMMIT_LAYER': str(args.commit_layer),
                     'STRATA_VERIFY_DUMP_GDN_COMMIT_POSITIONS': ','.join(map(str, positions)),
@@ -122,6 +131,7 @@ result = {'model': cfg['model_name'], 'mode': 'two-live-target-only', 'layer': a
           'moe_output_layer': args.moe_output_layer,
           'moe_route_layer': args.moe_route_layer,
           'moe_parts_layer': args.moe_parts_layer,
+          'capture_moe_owners': args.capture_moe_owners,
           'prompts': prompts, 'serial_fresh': serial, 'batch': batch,
           'first_mismatch_index': first_mismatch}
 (out / 'result.json').write_text(json.dumps(result, indent=2) + '\n')

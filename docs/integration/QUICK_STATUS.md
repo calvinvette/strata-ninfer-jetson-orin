@@ -196,3 +196,5 @@ output tokens still matched serial; minimum available RAM was 17.643 GiB.
 Models stay under `~/models/`; build products, credentials and local agent
 configuration stay out of Git. Do not combine host RAM and CUDA capacity into a
 single memory figure.
+
+A dispatch-owner follow-up maps the selected layer-1 position-71 Coder row exactly: expert 11 moves from primary VRAM in serial to CPU in batch, and its recorded CPU output matches the batch part within `5.0e-11` (serialization rounding). This associates the isolated expert delta with an owner change but leaves the numerical cause and later token-60 relationship unresolved. [Details](../../bench/results/2026-10-22-phase5-coder-batch-gdn-layer-capture/README.md).

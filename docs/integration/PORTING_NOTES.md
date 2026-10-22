@@ -2737,3 +2737,12 @@ weight. A future Strata/Splash port should capture routed IDs, weights, each
 expert's pre-combine output and the combined result under the same request and
 state mapping. That distinguishes routing changes, per-expert arithmetic and
 combine behavior before any backend-specific fix is proposed.
+
+For a Strata/Splash numerical boundary, join per-expert outputs to the actual
+dispatch owner on the same request, position and route. A matching expert ID
+does not imply matching execution backend: in the Coder two-live probe, expert
+11 changed from primary VRAM to CPU while its input, ID and weight matched.
+Capture the CPU owner result with the dispatch identifier and compare that exact
+row to the per-expert pre-combine vector. Preserve serialization precision
+limits and avoid treating an owner transition alone as proof of its numerical
+cause.

@@ -217,7 +217,23 @@ coverage.
 The harnesses and parsers are retained as `capture_target_only_gdn_layer.py`,
 `two_live_multrow_layer12.py`, `compare_layer_capture.py`,
 `compare_gdn_commit_state.py`, `compare_moe_output_v2.py`, and
-`compare_moe_route_parts_batch.py`. The MoE comparators use same-run slot
+`compare_moe_route_parts_batch.py`, and `compare_moe_dispatch_owner.py`. The MoE comparators use same-run slot
 mapping from committed-state comparisons. Raw
 `*.stgdiag`/`*.stgcmt`/`*.stmoe`/`*.parts` data, route logs, run logs, and
 supervisor telemetry remain local and are intentionally excluded from Git.
+
+## Dispatch-owner follow-up
+
+An opt-in dispatch-owner trace was joined to the mapped serial rows by exact
+layer-1 activation. At position 71, prompt 1 / physical slot 1 uses the same
+expert IDs as serial, but rank 8 (expert 11) changes from primary VRAM in the
+serial control to CPU in the batch dispatch (dispatch 3601). The captured CPU
+owner output for that exact dispatch agrees with the batch expert-part vector
+to maximum absolute difference `5.0e-11` (JSON decimal serialization rounding).
+This associates the previously isolated part delta with a CPU/GPU owner change;
+it does not establish why the backend outputs differ or prove a causal link to
+the later token-60 mismatch. The other sampled prompt/position rows do not show
+this owner change. The large CPU-output traces and owner JSONL files remain
+local and are excluded from Git. The opt-in capture switch and exact row join
+are reproducible with `two_live_multrow_layer12.py --capture-moe-owners` and
+`compare_moe_dispatch_owner.py`; see `two-live-layer1-owner-summary.json`.
