@@ -312,7 +312,7 @@ bool trace_batch_qsa_hash(const strata::core::ModelGeometry& geometry, const str
     const int64_t cells = position + 1;
     constexpr size_t chunk = 65536;
     std::array<uint8_t, chunk> buffer{};
-    auto hash_bytes = [&](const void* source, size_t bytes, uint64_t& hash) {
+    auto hash_bytes = [&](const void* source, size_t bytes, uint64_t& hash, uint64_t& component_hash) {
         if (source == nullptr && bytes != 0) return false;
         for (size_t offset = 0; offset < bytes;) {
             const size_t count = std::min(buffer.size(), bytes - offset);
@@ -321,12 +321,15 @@ bool trace_batch_qsa_hash(const strata::core::ModelGeometry& geometry, const str
             for (size_t i = 0; i < count; ++i) {
                 hash ^= buffer[i];
                 hash *= 1099511628211ull;
+                component_hash ^= buffer[i];
+                component_hash *= 1099511628211ull;
             }
             offset += count;
         }
         return true;
     };
-    auto hash_cells = [&](const void* pool, int64_t bytes_per_head_cell, int64_t max_cells, uint64_t& hash) {
+    auto hash_cells = [&](const void* pool, int64_t bytes_per_head_cell, int64_t max_cells,
+                          uint64_t& hash, uint64_t& component_hash) {
         if (pool == nullptr) return false;
         const int64_t end = std::min<int64_t>(cells, max_cells);
         for (int64_t page = 0; page * shapes.page_size < end; ++page) {
@@ -338,42 +341,47 @@ bool trace_batch_qsa_hash(const strata::core::ModelGeometry& geometry, const str
                 const size_t offset = (size_t) ((page * shapes.n_head_kv + head) * shapes.page_size +
                                                 (int64_t) offset_cell) * (size_t) bytes_per_head_cell;
                 const size_t bytes = count_cell * (size_t) bytes_per_head_cell;
-                if (!hash_bytes(static_cast<const uint8_t*>(pool) + offset, bytes, hash)) return false;
+                if (!hash_bytes(static_cast<const uint8_t*>(pool) + offset, bytes, hash, component_hash)) return false;
             }
         }
         return true;
     };
 
     std::vector<uint64_t> hashes((size_t) state.qsa_alloc, 1469598103934665603ull);
+    std::vector<uint64_t> index_hashes((size_t) state.qsa_alloc, 1469598103934665603ull);
+    std::vector<uint64_t> kv_hashes((size_t) state.qsa_alloc, 1469598103934665603ull);
     for (int64_t ordinal = 0; ordinal < state.qsa_alloc; ++ordinal) {
         const auto& qsa = state.qsa_states[state.qsa_ord0 + ordinal];
         if (cells > qsa.max_cells || qsa.kv_mode == 2) return false;
         uint64_t& hash = hashes[(size_t) ordinal];
+        uint64_t& index_hash = index_hashes[(size_t) ordinal];
+        uint64_t& kv_hash = kv_hashes[(size_t) ordinal];
         const size_t tail_bytes = (size_t) (shapes.idx_block - 1) * (size_t) shapes.idx_dim * sizeof(float);
         const size_t dead_bytes = (size_t) shapes.idx_dim * sizeof(float);
         const size_t pooled_rows = (size_t) (cells / shapes.idx_block + 1);
-        if (!hash_bytes(qsa.idx_tail, tail_bytes, hash) || !hash_bytes(qsa.idx_dead, dead_bytes, hash) ||
-            !hash_bytes(qsa.idx_pooled, pooled_rows * (size_t) shapes.idx_dim * sizeof(float), hash)) return false;
+        if (!hash_bytes(qsa.idx_tail, tail_bytes, hash, index_hash) ||
+            !hash_bytes(qsa.idx_dead, dead_bytes, hash, index_hash) ||
+            !hash_bytes(qsa.idx_pooled, pooled_rows * (size_t) shapes.idx_dim * sizeof(float), hash, index_hash)) return false;
 
         const bool host = qsa.kv_mode != 0;
         if (qsa.kv_q4) {
             const int64_t bytes = (int64_t) strata::kernels::kv_q4_bytes_per_head((int) shapes.head_dim);
-            if (!hash_cells(host ? qsa.host.k_q4 : qsa.k_q4, bytes, qsa.max_cells, hash) ||
-                !hash_cells(host ? qsa.host.v_q4 : qsa.v_q4, bytes, qsa.max_cells, hash)) return false;
+            if (!hash_cells(host ? qsa.host.k_q4 : qsa.k_q4, bytes, qsa.max_cells, hash, kv_hash) ||
+                !hash_cells(host ? qsa.host.v_q4 : qsa.v_q4, bytes, qsa.max_cells, hash, kv_hash)) return false;
         } else if (qsa.kv_hybrid) {
             const int64_t q4_bytes = (int64_t) strata::kernels::kv_q4_bytes_per_head((int) shapes.head_dim);
             const int64_t scale_bytes = (shapes.head_dim / 64) * 2;
-            if (!hash_cells(host ? qsa.host.k_q : qsa.k_q, shapes.head_dim, qsa.max_cells, hash) ||
-                !hash_cells(host ? qsa.host.v_q4 : qsa.v_q4, q4_bytes, qsa.max_cells, hash) ||
-                !hash_cells(host ? qsa.host.k_scale : qsa.k_scale, scale_bytes, qsa.max_cells, hash)) return false;
+            if (!hash_cells(host ? qsa.host.k_q : qsa.k_q, shapes.head_dim, qsa.max_cells, hash, kv_hash) ||
+                !hash_cells(host ? qsa.host.v_q4 : qsa.v_q4, q4_bytes, qsa.max_cells, hash, kv_hash) ||
+                !hash_cells(host ? qsa.host.k_scale : qsa.k_scale, scale_bytes, qsa.max_cells, hash, kv_hash)) return false;
         } else if (qsa.kv_int8) {
             const int64_t scale_bytes = (shapes.head_dim / 64) * 2;
-            if (!hash_cells(host ? qsa.host.k_q : qsa.k_q, shapes.head_dim, qsa.max_cells, hash) ||
-                !hash_cells(host ? qsa.host.v_q : qsa.v_q, shapes.head_dim, qsa.max_cells, hash) ||
-                !hash_cells(host ? qsa.host.k_scale : qsa.k_scale, scale_bytes, qsa.max_cells, hash) ||
-                !hash_cells(host ? qsa.host.v_scale : qsa.v_scale, scale_bytes, qsa.max_cells, hash)) return false;
-        } else if (!hash_cells(host ? qsa.host.k_pool : qsa.k_pool, shapes.head_dim * 2, qsa.max_cells, hash) ||
-                   !hash_cells(host ? qsa.host.v_pool : qsa.v_pool, shapes.head_dim * 2, qsa.max_cells, hash)) {
+            if (!hash_cells(host ? qsa.host.k_q : qsa.k_q, shapes.head_dim, qsa.max_cells, hash, kv_hash) ||
+                !hash_cells(host ? qsa.host.v_q : qsa.v_q, shapes.head_dim, qsa.max_cells, hash, kv_hash) ||
+                !hash_cells(host ? qsa.host.k_scale : qsa.k_scale, scale_bytes, qsa.max_cells, hash, kv_hash) ||
+                !hash_cells(host ? qsa.host.v_scale : qsa.v_scale, scale_bytes, qsa.max_cells, hash, kv_hash)) return false;
+        } else if (!hash_cells(host ? qsa.host.k_pool : qsa.k_pool, shapes.head_dim * 2, qsa.max_cells, hash, kv_hash) ||
+                   !hash_cells(host ? qsa.host.v_pool : qsa.v_pool, shapes.head_dim * 2, qsa.max_cells, hash, kv_hash)) {
             return false;
         }
     }
@@ -384,6 +392,12 @@ bool trace_batch_qsa_hash(const strata::core::ModelGeometry& geometry, const str
                            (long long) position, (long long) cells, token, slot, row,
                            (long long) state.qsa_alloc) > 0;
     for (uint64_t hash : hashes)
+        if (ok && std::fprintf(file, "%016llx ", (unsigned long long) hash) < 0) ok = false;
+    if (ok && std::fprintf(file, " idx_hashes=") < 0) ok = false;
+    for (uint64_t hash : index_hashes)
+        if (ok && std::fprintf(file, "%016llx ", (unsigned long long) hash) < 0) ok = false;
+    if (ok && std::fprintf(file, " kv_hashes=") < 0) ok = false;
+    for (uint64_t hash : kv_hashes)
         if (ok && std::fprintf(file, "%016llx ", (unsigned long long) hash) < 0) ok = false;
     if (ok && std::fputc('\n', file) == EOF) ok = false;
     if (std::fclose(file) != 0) ok = false;
@@ -10568,6 +10582,19 @@ int main(int argc, char** argv) {
                     }
                     return h;
                 };
+                auto hash_dev_pair = [&](const void* p, size_t bytes, uint64_t& h, uint64_t& component) {
+                    for (size_t offset = 0; hash_ok && offset < bytes;) {
+                        const size_t n = std::min(hash_buffer.size(), bytes - offset);
+                        if (cudaMemcpy(hash_buffer.data(), static_cast<const uint8_t*>(p) + offset, n,
+                                       cudaMemcpyDefault) != cudaSuccess) {
+                            hash_ok = false;
+                            break;
+                        }
+                        h = fnv1a(hash_buffer.data(), n, h);
+                        component = fnv1a(hash_buffer.data(), n, component);
+                        offset += n;
+                    }
+                };
                 // the cells [c0, c1) of one int8 K or V pool ([page][kv_head][page_size][head_dim]), bytes per value `w`
                 auto hash_cells = [&](const void* pool, int64_t per_cell, int64_t c0, int64_t c1, uint64_t h) {
                     const int64_t ps = qs.page_size;
@@ -10578,6 +10605,16 @@ int main(int argc, char** argv) {
                             h = hash_dev((const uint8_t*) pool + off, (size_t) ((e - a) * per_cell), h);
                         }
                     return h;
+                };
+                auto hash_cells_pair = [&](const void* pool, int64_t per_cell, int64_t c0, int64_t c1,
+                                           uint64_t& h, uint64_t& component) {
+                    const int64_t ps = qs.page_size;
+                    for (int64_t pg = c0 / ps; pg * ps < c1; ++pg)
+                        for (int64_t hd = 0; hd < qs.n_head_kv; ++hd) {
+                            const int64_t a = std::max(c0, pg * ps) - pg * ps, e = std::min(c1, (pg + 1) * ps) - pg * ps;
+                            const size_t off = (size_t) (((pg * qs.n_head_kv + hd) * ps + a) * per_cell);
+                            hash_dev_pair((const uint8_t*) pool + off, (size_t) ((e - a) * per_cell), h, component);
+                        }
                 };
                 ConvStateSizes z;
                 std::string state_size_error;
@@ -10689,30 +10726,34 @@ int main(int argc, char** argv) {
                 for (int64_t j = 0; j < ss.qsa_alloc; ++j) {   // this session's owned QSA ordinals only
                     const strata::core::QsaState& st = ss.qsa_states[ss.qsa_ord0 + j];
                     uint64_t h_qsa = 1469598103934665603ull;
+                    uint64_t h_qsa_index = 1469598103934665603ull;
+                    uint64_t h_qsa_kv = 1469598103934665603ull;
                     h_tail = hash_dev(st.idx_tail, z.tail, h_tail);
                     h_dead = hash_dev(st.idx_dead, z.dead, h_dead);
                     h_pool = hash_dev(st.idx_pooled, (size_t) (L / qs.idx_block) * qs.idx_dim * 4, h_pool);
                     h_pool_full = hash_dev(st.idx_pooled, (size_t) (L > 0 ? L / qs.idx_block + 1 : 0) * qs.idx_dim * 4,
                                            h_pool_full);
                     if (hash_qsa_layers) {
-                        h_qsa = hash_dev(st.idx_tail, z.tail, h_qsa);
-                        h_qsa = hash_dev(st.idx_dead, z.dead, h_qsa);
-                        h_qsa = hash_dev(st.idx_pooled,
-                                         (size_t) (L > 0 ? L / qs.idx_block + 1 : 0) * qs.idx_dim * 4, h_qsa);
+                        hash_dev_pair(st.idx_tail, z.tail, h_qsa, h_qsa_index);
+                        hash_dev_pair(st.idx_dead, z.dead, h_qsa, h_qsa_index);
+                        hash_dev_pair(st.idx_pooled,
+                                      (size_t) (L > 0 ? L / qs.idx_block + 1 : 0) * qs.idx_dim * 4,
+                                      h_qsa, h_qsa_index);
                     }
                     // KV streaming: the host copy is the identity layout and holds every cell
                     for (const auto& [pool, w] : kv_arrays(st)) {
                         h_kv = hash_cells(pool, w, 0, L, h_kv);
                         h_stale = hash_cells(pool, w, L, end_cell, h_stale);
-                        if (hash_qsa_layers) h_qsa = hash_cells(pool, w, 0, L, h_qsa);
+                        if (hash_qsa_layers) hash_cells_pair(pool, w, 0, L, h_qsa, h_qsa_kv);
                     }
                     if (hash_qsa_layers) {
                         const int64_t qsa_ordinal = ss.qsa_ord0 + j;
                         const int64_t model_layer = (qsa_ordinal + 1) * g.qsa_interval - 1;
-                        char b[80];
-                        std::snprintf(b, sizeof(b), "qsa=%lld layer=%lld hash=%016llx ",
+                        char b[160];
+                        std::snprintf(b, sizeof(b), "qsa=%lld layer=%lld hash=%016llx idx=%016llx kv=%016llx ",
                                       (long long) qsa_ordinal, (long long) model_layer,
-                                      (unsigned long long) h_qsa);
+                                      (unsigned long long) h_qsa, (unsigned long long) h_qsa_index,
+                                      (unsigned long long) h_qsa_kv);
                         qsa_layer_hashes += b;
                     }
                 }

@@ -264,6 +264,20 @@ that it causes the output divergence. The opt-in trace copies state to host and
 is not a performance measurement. Raw per-request logs and hash streams remain
 local-only; the capture and analyzer scripts are retained here.
 
+### QSA indexer versus KV follow-up (2026-10-22)
+
+The next instrumented capture split each per-layer QSA fingerprint into its
+indexer arrays and K/V cache arrays while preserving the original aggregate
+hash. The new serial aggregate hashes were identical to the previous capture.
+Both indexer and K/V hashes matched their serial controls at accepted lengths
+70, 72 and 74. At lengths 76 and 77, each component differed in all 12 QSA
+layers, first at model layer 3; both prompts still generated the same ten token
+IDs as their serial controls. The capture passed supervision at 16.53 GiB
+minimum available host/admission memory with zero cgroup events. The divergence
+therefore reaches both QSA indexer and attention-cache state by length 76, but
+this does not distinguish an upstream input difference from two independent
+state-update errors. The component hashes and raw logs remain local-only.
+
 For this final diagnostic source, maestro1 rebuilt HIP from the identical
 `src/program/generate.cpp` SHA256 `9f136bb977fe118fd1f25b5c3312828577b4b301a47d3929fddbe9cb50d06e5f`;
 the HIP binary SHA256 is `904c1a32d9427de12aa635b238dd58f386902022e5218fa9a7551a2f0df7b8b5`,
@@ -272,3 +286,10 @@ build uses a separate migrated file at `source/sycl/src/program/generate.cpp`;
 the QSA hook does not modify that source, and its build reported no work. A
 current SYCL binary startup check on maestro1 aborted with “No device of
 requested type available,” so no new SYCL startup pass is claimed here.
+
+The component-hash revision was also rebuilt on maestro1 for HIP from source
+SHA256 `de1258c0fc439883c424562b58201d8d486e34a9a8cefbaffa22ae12390d16ba`;
+the HIP binary SHA256 is
+`59fd1a42a4ecbd63ba478cf10af26ba1eee51850955444093d81961f57cf8c63`, and its
+help check exited 0. The SYCL overlay remained unchanged and no-work; its
+current startup limitation above remains.

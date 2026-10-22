@@ -25,6 +25,14 @@ prove it causes the output mismatch. The opt-in trace is diagnostic and adds
 host-copy overhead. Details and the capture/analyzer scripts are in the linked
 batch-MTP report; raw logs and hash streams remain local-only.
 
+A component split of those hashes shows both QSA indexer state and QSA K/V
+cache state matching serial through accepted length 74, then differing across
+all 12 layers at lengths 76 and 77, beginning at model layer 3. Both ten-token
+outputs remain exact. This confirms the divergence reaches both state groups,
+but does not tell whether an upstream input difference or separate update
+errors produce them. The supervised run retained 16.53 GiB minimum host and
+admission availability with zero cgroup events.
+
 A separate [MTP2 cancellation test](../../bench/results/2026-10-22-phase5-coder-mtp2-cancel-state/README.md)
 passed at five accepted-prefix lengths (48, 50, 51, 53, 55). The canceled
 request's token sequences and all state fingerprints matched two fresh

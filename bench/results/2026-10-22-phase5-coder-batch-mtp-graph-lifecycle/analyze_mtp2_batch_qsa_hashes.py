@@ -12,8 +12,12 @@ def serial_prefixes(path):
     for line in path.read_text(errors='replace').splitlines():
         match = re.search(r'STATE_HASH_QSA_LAYERS L=(\d+) (.*)', line)
         if match:
-            hashes = re.findall(r'qsa=(\d+) layer=(\d+) hash=([0-9a-f]+)', match.group(2))
-            current = (int(match.group(1)), [row[2] for row in hashes])
+            hashes = re.findall(r'qsa=(\d+) layer=(\d+) hash=([0-9a-f]+) idx=([0-9a-f]+) kv=([0-9a-f]+)', match.group(2))
+            current = (int(match.group(1)), {
+                'aggregate': [row[2] for row in hashes],
+                'index': [row[3] for row in hashes],
+                'kv': [row[4] for row in hashes],
+            })
             continue
         match = re.search(r'ACCEPTED_PREFIX position=(\d+).*tokens=([0-9,]+) state=\{STATE_HASH L=(\d+)', line)
         if match and current is not None:
@@ -44,18 +48,30 @@ def main():
             continue
         key = (int(fields['state_length']), int(fields['token']))
         candidates = serial.get(key, [])
-        hash_match = re.search(r' hashes=(.*)$', line)
-        batch_hashes = hash_match.group(1).split() if hash_match else []
+        def values(name):
+            stop = {'hashes': r'(?= idx_hashes=)', 'idx_hashes': r'(?= kv_hashes=)',
+                    'kv_hashes': r'$'}[name]
+            match = re.search(rf' {name}=(.*?){stop}', line)
+            return match.group(1).split() if match else []
+        batch_hashes = values('hashes')
+        batch_index_hashes = values('idx_hashes')
+        batch_kv_hashes = values('kv_hashes')
         comparisons = []
         for serial_slot, hashes in candidates:
-            differences = [i for i, (a, b) in enumerate(zip(batch_hashes, hashes)) if a != b]
+            differences = [i for i, (a, b) in enumerate(zip(batch_hashes, hashes['aggregate'])) if a != b]
+            index_differences = [i for i, (a, b) in enumerate(zip(batch_index_hashes, hashes['index'])) if a != b]
+            kv_differences = [i for i, (a, b) in enumerate(zip(batch_kv_hashes, hashes['kv'])) if a != b]
             comparisons.append({
                 'serial_slot': serial_slot,
-                'exact': not differences and len(batch_hashes) == len(hashes),
+                'exact': not differences and len(batch_hashes) == len(hashes['aggregate']),
                 'first_differing_qsa_ordinal': differences[0] if differences else None,
                 'first_differing_model_layer': (differences[0] + 1) * 4 - 1 if differences else None,
                 'differing_layers': len(differences),
-                'compared_layers': min(len(batch_hashes), len(hashes)),
+                'index_first_differing_qsa_ordinal': index_differences[0] if index_differences else None,
+                'index_differing_layers': len(index_differences),
+                'kv_first_differing_qsa_ordinal': kv_differences[0] if kv_differences else None,
+                'kv_differing_layers': len(kv_differences),
+                'compared_layers': min(len(batch_hashes), len(hashes['aggregate'])),
             })
         rows.append({
             'position': int(fields['position']), 'state_length': key[0], 'token': key[1],
