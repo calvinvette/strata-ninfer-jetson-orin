@@ -3206,9 +3206,16 @@ uint64_t capture_moe_window(int64_t layer, const float* x, const int32_t* ids, c
         for (int64_t j = 0; j < k; ++j) std::fprintf(capture.file, "%s%d", j ? "," : "", ids[t * k + j]);
         std::fputs("],\"route_kind\":[", capture.file);
         for (int64_t j = 0; j < k; ++j) std::fprintf(capture.file, "%s%d", j ? "," : "", kind[t * k + j]);
-        std::fputs("],\"activation\":[", capture.file);
-        const float* row = x + (size_t) t * (size_t) n_embd;
-        for (int64_t i = 0; i < n_embd; ++i) std::fprintf(capture.file, "%s%.9g", i ? "," : "", (double) row[i]);
+        bool has_cpu_expert = false;
+        for (int64_t j = 0; j < k; ++j)
+            if (kind[t * k + j] < 0) { has_cpu_expert = true; break; }
+        std::fprintf(capture.file, "],\"activation_valid\":%s,\"activation\":[",
+                     has_cpu_expert ? "true" : "false");
+        if (has_cpu_expert) {
+            const float* row = x + (size_t) t * (size_t) n_embd;
+            for (int64_t i = 0; i < n_embd; ++i)
+                std::fprintf(capture.file, "%s%.9g", i ? "," : "", (double) row[i]);
+        }
         std::fputs("]}\n", capture.file);
         ++capture.rows;
     }
@@ -3519,6 +3526,7 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
                 jo = (int16_t) njobs++;
                 ExpertJobMulti& nj = d.jobs_multi[(size_t) jo];
                 nj.blob = b;
+                nj.expert_id = e;
                 nj.nt = 0;
             }
             ExpertJobMulti& jb = d.jobs_multi[(size_t) jo];

@@ -647,7 +647,11 @@ void ExpertPool::drain(int id, ExpertScratch& scratch, uint32_t epoch) {
                 } else if (mode_ == 5) {
                     float* ff[MAXT];
                     for (int t = 0; t < mjobs_[e].nt; ++t) ff[t] = sb.ff[t];
-                    native_gu_rows(*nfmt_, mjobs_[e].blob, mjobs_[e].nact, mjobs_[e].nt, ff, r0, r1);
+                    NativeFmt fmt = *nfmt_;
+                    if (fmt.q8_1_reciprocal_silu_expert >= 0 &&
+                        fmt.q8_1_reciprocal_silu_expert != mjobs_[e].expert_id)
+                        fmt.q8_1_reciprocal_silu = false;
+                    native_gu_rows(fmt, mjobs_[e].blob, mjobs_[e].nact, mjobs_[e].nt, ff, r0, r1);
                 } else if (q2_native_kernels(nfmt_->d_type)) {
                     // Q2_0 down (most IQ layers): the AVX-512 kernel, ggml-cpu has only a scalar one on x86
                     const ActQ* a2[MAXT];

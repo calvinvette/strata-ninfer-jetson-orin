@@ -33,7 +33,7 @@ namespace {
 
 const ggml_type_traits_cpu* traits(int type) { return ggml_get_type_traits_cpu((ggml_type) type); }
 
-bool q8_1_selector_known(const char* selector) {
+bool q8_1_selector_known_one(const char* selector) {
     if (std::strcmp(selector, "0") == 0 || std::strcmp(selector, "1") == 0 ||
         std::strcmp(selector, "all") == 0 || std::strcmp(selector, "iq2_s/q2_0") == 0 ||
         std::strcmp(selector, "iq2_s/iq4_nl") == 0 || std::strcmp(selector, "iq3_xxs/q2_0") == 0 ||
@@ -53,7 +53,33 @@ bool q8_1_selector_known(const char* selector) {
            pair == "iq3_xxs/iq4_nl" || pair == "iq3_s/iq4_nl";
 }
 
-bool q8_1_selector_matches(const char* selector, int gu_type, int d_type, int layer) {
+bool q8_1_selector_known(const char* selector) {
+    if (std::strchr(selector, ',') == nullptr) return q8_1_selector_known_one(selector);
+    const std::string list(selector);
+    size_t begin = 0;
+    while (begin <= list.size()) {
+        const size_t end = list.find(',', begin);
+        const std::string item = list.substr(begin, end == std::string::npos ? end : end - begin);
+        if (item.empty() || !q8_1_selector_known_one(item.c_str())) return false;
+        if (end == std::string::npos) break;
+        begin = end + 1;
+    }
+    return true;
+}
+
+bool parse_layer_selector(const char* value, int& layer) {
+    if (value == nullptr) return false;
+    if (*value == '\0') return false;
+    for (const char* p = value; *p != '\0'; ++p) if (*p < '0' || *p > '9') return false;
+    errno = 0;
+    char* end = nullptr;
+    const long parsed = std::strtol(value, &end, 10);
+    if (errno == ERANGE || end == value || *end != '\0' || parsed > INT_MAX) return false;
+    layer = (int) parsed;
+    return true;
+}
+
+bool q8_1_selector_matches_one(const char* selector, int gu_type, int d_type, int layer) {
     const char* at = std::strstr(selector, "@layer=");
     if (at != nullptr) {
         char* end = nullptr;
@@ -73,6 +99,21 @@ bool q8_1_selector_matches(const char* selector, int gu_type, int d_type, int la
     if (pair == "iq3_xxs/q2_0") return iq3_xxs_q2_0;
     if (pair == "iq3_xxs/iq4_nl") return iq3_xxs_iq4_nl;
     if (pair == "iq3_s/iq4_nl") return iq3_s_iq4_nl;
+    return false;
+}
+
+bool q8_1_selector_matches(const char* selector, int gu_type, int d_type, int layer) {
+    if (std::strchr(selector, ',') == nullptr)
+        return q8_1_selector_matches_one(selector, gu_type, d_type, layer);
+    const std::string list(selector);
+    size_t begin = 0;
+    while (begin <= list.size()) {
+        const size_t end = list.find(',', begin);
+        const std::string item = list.substr(begin, end == std::string::npos ? end : end - begin);
+        if (q8_1_selector_matches_one(item.c_str(), gu_type, d_type, layer)) return true;
+        if (end == std::string::npos) break;
+        begin = end + 1;
+    }
     return false;
 }
 
@@ -394,14 +435,30 @@ bool native_fmt(int gu_type, int d_type, int64_t n_embd, int64_t n_ff, NativeFmt
     f.d_act = (int) td->vec_dot_type;
     const char* q8_1_probe = std::getenv("STRATA_NATIVE_CPU_Q8_1_DOT");
     if (q8_1_probe != nullptr && !q8_1_selector_known(q8_1_probe)) {
-        err = "native experts: STRATA_NATIVE_CPU_Q8_1_DOT must be 0, 1, all, "
-              "iq2_s/q2_0, iq2_s/iq4_nl, iq3_xxs/q2_0, iq3_xxs/iq4_nl, iq3_s/iq4_nl, or a pair followed by @layer=N";
+        err = "native experts: STRATA_NATIVE_CPU_Q8_1_DOT must be 0, 1, all, a supported GU/DOWN pair "
+              "(optionally followed by @layer=N), or a comma-separated list of those selectors";
         return false;
     }
     if (q8_1_probe != nullptr && std::strcmp(q8_1_probe, "0") != 0 &&
         q8_1_selector_matches(q8_1_probe, gu_type, d_type, layer)) {
         f.gu_act = GGML_TYPE_Q8_1;
         f.d_act = GGML_TYPE_Q8_1;
+    }
+    const char* reciprocal_silu_layer = std::getenv("STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_LAYER");
+    const char* reciprocal_silu_expert = std::getenv("STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_EXPERT");
+    if (reciprocal_silu_layer != nullptr) {
+        int selected_layer = -1;
+        if (!parse_layer_selector(reciprocal_silu_layer, selected_layer)) {
+            err = "native experts: STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_LAYER must be a non-negative layer number";
+            return false;
+        }
+        f.q8_1_reciprocal_silu = selected_layer == layer && f.gu_act == GGML_TYPE_Q8_1 &&
+                                 f.d_act == GGML_TYPE_Q8_1;
+    }
+    if (reciprocal_silu_expert != nullptr &&
+        !parse_layer_selector(reciprocal_silu_expert, f.q8_1_reciprocal_silu_expert)) {
+        err = "native experts: STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_EXPERT must be a non-negative expert number";
+        return false;
     }
     f.n_embd = n_embd;
     f.n_ff = n_ff;
@@ -477,7 +534,12 @@ void native_gu_rows(const NativeFmt& f, const uint8_t* blob, const void* const* 
                                  f.gu_type == GGML_TYPE_IQ3_XXS ? q8_1_iq3_xxs_cuda_dot : q8_1_iq3_s_cuda_dot;
                 const float g = dot(gr, xq, (int) f.n_embd);
                 const float u = dot(ur, xq, (int) f.n_embd);
-                ff[t][r] = (g / (1.f + std::exp(-g))) * u;
+                if (f.q8_1_reciprocal_silu) {
+                    const float sigmoid = 1.f / (1.f + std::exp(-g));
+                    ff[t][r] = (g * sigmoid) * u;
+                } else {
+                    ff[t][r] = (g / (1.f + std::exp(-g))) * u;
+                }
             }
         }
         return;

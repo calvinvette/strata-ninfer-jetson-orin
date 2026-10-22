@@ -22,6 +22,8 @@ inline constexpr size_t kNativeHBytes = 1024;
 struct NativeFmt {
     int gu_type = -1, d_type = -1;      ///< ggml types of gate/up and of down
     int gu_act = -1, d_act = -1;        ///< their vec_dot_type (the activation formats)
+    bool q8_1_reciprocal_silu = false;  ///< opt-in CUDA-order SiLU expression for selected Q8_1 routes
+    int q8_1_reciprocal_silu_expert = -1; ///< optional model expert ID filter
     int64_t n_embd = 0, n_ff = 0;
     size_t gu_row = 0, d_row = 0;       ///< bytes per weight row
     size_t up_off = 0, down_off = 0;    ///< inside the blob

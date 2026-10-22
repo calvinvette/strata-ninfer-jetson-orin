@@ -92,6 +92,59 @@ float parity_iq2_s_q8_1_dot(const uint8_t* row, const uint8_t* xq, int n) {
     }
     return lane_sum[0];
 }
+
+// Independent scalar transcription of the CUDA IQ3_XXS/Q8_1 dot. Used only
+// to inspect gate/up rows from the same captured activation as the grouped
+// kernel; it does not share the production CPU mirror's implementation.
+float parity_iq3_xxs_q8_1_dot(const uint8_t* row, const uint8_t* xq, int n) {
+    if (n % QK_K != 0) std::abort();
+    const int nb = n / QK_K;
+    const auto* weights = reinterpret_cast<const block_iq3_xxs*>(row);
+    const auto* acts = reinterpret_cast<const ParityQ81*>(xq);
+    std::array<float, 32> lane_sum{};
+    for (int lane = 0; lane < 32; ++lane) {
+        for (int k = lane; k < nb * 8; k += 32) {
+            const int kbx = k / 8;
+            const int iqs = 2 * (k % 8);
+            const auto* w = weights + kbx;
+            const auto* x = acts + kbx * 8 + iqs / 2;
+            uint32_t packed[2];
+            std::memcpy(&packed[0], w->qs + 4 * iqs, sizeof(uint32_t));
+            std::memcpy(&packed[1], w->qs + 4 * (iqs + 1), sizeof(uint32_t));
+            uint8_t q3[8];
+            std::memcpy(q3, packed, sizeof(q3));
+            uint32_t aux32;
+            std::memcpy(&aux32, w->qs + 4 * (QK_K / 16 + iqs / 2), sizeof(aux32));
+            int sumi = 0;
+            for (int l0 = 0; l0 < 8; l0 += 2) {
+                const uint8_t raw_signs = (uint8_t) (aux32 >> (7 * l0 / 2));
+                unsigned parity = 0;
+                for (unsigned bits = raw_signs; bits != 0; bits &= bits - 1) parity ^= 1;
+                const uint8_t signs = raw_signs ^ ((uint8_t) parity << 7);
+                const uint32_t grid_l = iq3xxs_grid[q3[l0 + 0]];
+                const uint32_t grid_h = iq3xxs_grid[q3[l0 + 1]];
+                for (int j = 0; j < 4; ++j) {
+                    int gl = (int8_t) (grid_l >> (8 * j));
+                    int gh = (int8_t) (grid_h >> (8 * j));
+                    if ((signs >> j) & 1) gl = -gl;
+                    if ((signs >> (j + 4)) & 1) gh = -gh;
+                    sumi += gl * (int) x->qs[4 * l0 + j];
+                    sumi += gh * (int) x->qs[4 * (l0 + 1) + j];
+                }
+            }
+            const int ls = (int) (aux32 >> 28);
+            sumi = (ls * sumi + sumi / 2) / 2;
+            const float d = ggml_fp16_to_fp32(w->d) * ggml_fp16_to_fp32(x->d);
+            lane_sum[(size_t) lane] += d * (float) sumi;
+        }
+    }
+    for (int offset = 16; offset > 0; offset >>= 1) {
+        const auto previous = lane_sum;
+        for (int lane = 0; lane < 32; ++lane)
+            lane_sum[(size_t) lane] = previous[(size_t) lane] + previous[(size_t) (lane ^ offset)];
+    }
+    return lane_sum[0];
+}
 }  // namespace
 
 static double rel(const std::vector<float>& a, const std::vector<float>& b) {
@@ -409,25 +462,30 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
             cpu_hidden_snapshot.resize((size_t) N * FF);
             for (int k = 0; k < N; ++k)
                 std::copy(ff[k].begin(), ff[k].end(), cpu_hidden_snapshot.begin() + (size_t) k * FF);
-            if (f.gu_type == GGML_TYPE_IQ2_S && f.d_act == GGML_TYPE_Q8_1) {
+            if ((f.gu_type == GGML_TYPE_IQ2_S || f.gu_type == GGML_TYPE_IQ3_XXS) &&
+                f.d_act == GGML_TYPE_Q8_1) {
                 cpu_gate_snapshot.resize((size_t) N * FF);
                 cpu_up_snapshot.resize((size_t) N * FF);
                 size_t reconstructed_differences = 0;
+                const auto dot_q8_1 = f.gu_type == GGML_TYPE_IQ2_S
+                    ? parity_iq2_s_q8_1_dot : parity_iq3_xxs_q8_1_dot;
                 for (int token = 0; token < N; ++token) {
                     const auto* xq = static_cast<const uint8_t*>(a[token]);
                     for (int64_t row = 0; row < FF; ++row) {
-                        const float g = parity_iq2_s_q8_1_dot(blob.data() + row * f.gu_row, xq, (int) H);
-                        const float u = parity_iq2_s_q8_1_dot(blob.data() + f.up_off + row * f.gu_row, xq,
-                                                               (int) H);
+                        const float g = dot_q8_1(blob.data() + row * f.gu_row, xq, (int) H);
+                        const float u = dot_q8_1(blob.data() + f.up_off + row * f.gu_row, xq, (int) H);
                         const size_t at = (size_t) token * FF + (size_t) row;
                         cpu_gate_snapshot[at] = g;
                         cpu_up_snapshot[at] = u;
-                        const float h = (g / (1.f + std::exp(-g))) * u;
+                        const float sigmoid = 1.f / (1.f + std::exp(-g));
+                        const float h = (g * sigmoid) * u;
                         reconstructed_differences += std::memcmp(&h, &cpu_hidden_snapshot[at], sizeof(float)) != 0;
                     }
                 }
-                std::printf("          independent packed-Q8_1 gate/up reconstruction vs native hidden: "
-                            "%zu/%zu words differ\n", reconstructed_differences, cpu_hidden_snapshot.size());
+                std::printf("          independent %s/Q8_1 gate/up reconstruction vs native hidden: "
+                            "%zu/%zu words differ\n",
+                            f.gu_type == GGML_TYPE_IQ2_S ? "IQ2_S" : "IQ3_XXS",
+                            reconstructed_differences, cpu_hidden_snapshot.size());
                 if (reconstructed_differences != 0) ++failures;
                 if (!dump_f32_dir.empty()) {
                     std::string stem = label;
@@ -701,26 +759,31 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
                     cudaMemcpy(gpu_hq.data(), (const uint8_t*) dscr + hq_offset, nbytes, cudaMemcpyDeviceToHost);
                     if (std::getenv("STRATA_PARITY_DUMP_HIDDEN_Q8_1") != nullptr && !dump_f32_dir.empty()) {
                         std::vector<float> gpu_gate((size_t) N * FF), gpu_up((size_t) N * FF);
-                        std::vector<float> gpu_hidden((size_t) N * FF);
                         std::vector<uint8_t> gpu_activation((size_t) N * ggml_row_size(GGML_TYPE_Q8_1, H));
                         cudaMemcpy(gpu_gate.data(), dscr, fbytes, cudaMemcpyDeviceToHost);
                         cudaMemcpy(gpu_up.data(), (const uint8_t*) dscr + fa, fbytes, cudaMemcpyDeviceToHost);
-                        cudaMemcpy(gpu_hidden.data(), (const uint8_t*) dscr + 2 * fa, fbytes,
-                                   cudaMemcpyDeviceToHost);
                         cudaMemcpy(gpu_activation.data(), dxq, gpu_activation.size(), cudaMemcpyDeviceToHost);
                         std::vector<float> cpu_gate_gpuq((size_t) N * FF), cpu_up_gpuq((size_t) N * FF);
                         std::vector<float> cpu_hidden_gpuq((size_t) N * FF);
+                        const bool scalar_q8_pair =
+                            (f.gu_type == GGML_TYPE_IQ2_S || f.gu_type == GGML_TYPE_IQ3_XXS) &&
+                            f.d_act == GGML_TYPE_Q8_1;
+                        const char* exp_mode_env = std::getenv("STRATA_EXP_MODE");
+                        const bool cuda_gate_up_stages_captured =
+                            exp_mode_env != nullptr && std::atoi(exp_mode_env) == 0;
+                        const auto dot_q8_1 = f.gu_type == GGML_TYPE_IQ2_S
+                            ? parity_iq2_s_q8_1_dot : parity_iq3_xxs_q8_1_dot;
                         const size_t input_row_bytes = ggml_row_size(GGML_TYPE_Q8_1, H);
-                        for (int token = 0; token < N; ++token) {
+                        for (int token = 0; scalar_q8_pair && token < N; ++token) {
                             const uint8_t* xq = gpu_activation.data() + (size_t) token * input_row_bytes;
                             for (int64_t row = 0; row < FF; ++row) {
-                                const float g = parity_iq2_s_q8_1_dot(blob.data() + row * f.gu_row, xq, (int) H);
-                                const float u = parity_iq2_s_q8_1_dot(blob.data() + f.up_off + row * f.gu_row, xq,
-                                                                       (int) H);
+                                const float g = dot_q8_1(blob.data() + row * f.gu_row, xq, (int) H);
+                                const float u = dot_q8_1(blob.data() + f.up_off + row * f.gu_row, xq, (int) H);
                                 const size_t at = (size_t) token * FF + (size_t) row;
                                 cpu_gate_gpuq[at] = g;
                                 cpu_up_gpuq[at] = u;
-                                cpu_hidden_gpuq[at] = (g / (1.f + std::exp(-g))) * u;
+                                const float sigmoid = 1.f / (1.f + std::exp(-g));
+                                cpu_hidden_gpuq[at] = (g * sigmoid) * u;
                             }
                         }
                         std::string stem = label;
@@ -736,18 +799,48 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
                         };
                         if (cpu_hidden_snapshot.size() != (size_t) N * FF ||
                             cpu_activation_snapshot.size() != gpu_activation.size() ||
-                            !write_dump("-gpu-gate.f32", gpu_gate.data(), fbytes) ||
-                            !write_dump("-gpu-up.f32", gpu_up.data(), fbytes) ||
-                            !write_dump("-cpu-gate-on-gpu-activation.f32", cpu_gate_gpuq.data(), fbytes) ||
-                            !write_dump("-cpu-up-on-gpu-activation.f32", cpu_up_gpuq.data(), fbytes) ||
                             !write_dump("-cpu-hidden-on-gpu-activation.f32", cpu_hidden_gpuq.data(), fbytes) ||
                             !write_dump("-cpu-activation.q8_1", cpu_activation_snapshot.data(),
                                         cpu_activation_snapshot.size()) ||
                             !write_dump("-gpu-activation.q8_1", gpu_activation.data(), gpu_activation.size()) ||
                             !write_dump("-cpu-hidden.f32", cpu_hidden_snapshot.data(), fbytes) ||
-                            !write_dump("-gpu-hidden.f32", gpu_hidden.data(), fbytes) ||
                             !write_dump("-cpu-hidden.q8_1", cpu_hq_snapshot.data(), nbytes) ||
                             !write_dump("-gpu-hidden.q8_1", gpu_hq.data(), nbytes)) return 1;
+                        if (scalar_q8_pair && !write_dump("-cpu-gate-on-gpu-activation.f32",
+                                                          cpu_gate_gpuq.data(), fbytes)) return 1;
+                        if (scalar_q8_pair && !write_dump("-cpu-up-on-gpu-activation.f32",
+                                                          cpu_up_gpuq.data(), fbytes)) return 1;
+                        if (scalar_q8_pair && cuda_gate_up_stages_captured &&
+                            (!write_dump("-gpu-gate.f32", gpu_gate.data(), fbytes) ||
+                             !write_dump("-gpu-up.f32", gpu_up.data(), fbytes))) return 1;
+                        if (scalar_q8_pair && cuda_gate_up_stages_captured) {
+                            const auto stage_diff = [](const std::vector<float>& cpu_values,
+                                                       const std::vector<float>& gpu_values,
+                                                       float& max_abs, double& relative_l2) {
+                                size_t different = 0;
+                                double sum_sq = 0.0, ref_sq = 0.0;
+                                max_abs = 0.f;
+                                for (size_t i = 0; i < cpu_values.size(); ++i) {
+                                    const float delta = cpu_values[i] - gpu_values[i];
+                                    different += std::memcmp(&cpu_values[i], &gpu_values[i], sizeof(float)) != 0;
+                                    max_abs = std::max(max_abs, std::fabs(delta));
+                                    sum_sq += (double) delta * delta;
+                                    ref_sq += (double) gpu_values[i] * gpu_values[i];
+                                }
+                                relative_l2 = std::sqrt(sum_sq / (ref_sq + 1e-300));
+                                return different;
+                            };
+                            float gate_max = 0.f, up_max = 0.f;
+                            double gate_l2 = 0.0, up_l2 = 0.0;
+                            const size_t gate_diffs = stage_diff(cpu_gate_gpuq, gpu_gate, gate_max, gate_l2);
+                            const size_t up_diffs = stage_diff(cpu_up_gpuq, gpu_up, up_max, up_l2);
+                            std::printf("          independent %s/Q8_1 gate/up dots vs CUDA stages: "
+                                        "gate %zu/%zu (max %.3g, relL2 %.3g), "
+                                        "up %zu/%zu (max %.3g, relL2 %.3g)\n",
+                                        f.gu_type == GGML_TYPE_IQ2_S ? "IQ2_S" : "IQ3_XXS",
+                                        gate_diffs, cpu_gate_gpuq.size(), gate_max, gate_l2,
+                                        up_diffs, cpu_up_gpuq.size(), up_max, up_l2);
+                        }
                     }
                     const size_t blocks = nbytes / 36;
                     size_t blocks_differ = 0, d_bytes_differ = 0, sum_bytes_differ = 0, code_bytes_differ = 0;
@@ -947,6 +1040,14 @@ int check_q8_1_selector_contract() {
         setenv("STRATA_NATIVE_CPU_Q8_1_DOT", value, 1);
 #endif
     };
+    auto set_env = [](const char* name, const char* value) {
+#ifdef _WIN32
+        _putenv_s(name, value == nullptr ? "" : value);
+#else
+        if (value == nullptr) unsetenv(name);
+        else setenv(name, value, 1);
+#endif
+    };
     cpu::NativeFmt baseline[std::size(pairs)];
     int failures = 0;
     set_selector("0");
@@ -981,6 +1082,27 @@ int check_q8_1_selector_contract() {
             }
         }
     }
+    set_selector("iq2_s/q2_0@layer=1,iq2_s/iq4_nl@layer=3");
+    for (size_t i = 0; i < std::size(pairs); ++i) {
+        for (const int layer : {1, 2, 3}) {
+            cpu::NativeFmt got;
+            std::string layer_err;
+            if (!cpu::native_fmt(pairs[i].gu, pairs[i].down, H, FF, got, layer_err, layer)) {
+                std::fprintf(stderr, "multi-selector on %s at %d: %s\n", pairs[i].selector, layer,
+                             layer_err.c_str());
+                ++failures;
+                continue;
+            }
+            const bool selected = (i == 0 && layer == 1) || (i == 1 && layer == 3);
+            const int expected_gu = selected ? GGML_TYPE_Q8_1 : baseline[i].gu_act;
+            const int expected_down = selected ? GGML_TYPE_Q8_1 : baseline[i].d_act;
+            if (got.gu_act != expected_gu || got.d_act != expected_down) {
+                std::fprintf(stderr, "multi-selector changed %s at layer %d unexpectedly\n",
+                             pairs[i].selector, layer);
+                ++failures;
+            }
+        }
+    }
     set_selector("iq3_xxs/iq4_nl@layer=7");
     for (size_t i = 0; i < std::size(pairs); ++i) {
         for (const int layer : {7, 8}) {
@@ -1010,6 +1132,13 @@ int check_q8_1_selector_contract() {
         std::fprintf(stderr, "invalid selector was not rejected clearly: %s\n", err.c_str());
         ++failures;
     }
+    set_selector("iq2_s/q2_0@layer=1,");
+    err.clear();
+    if (cpu::native_fmt(pairs[0].gu, pairs[0].down, H, FF, invalid, err) ||
+        err.find("STRATA_NATIVE_CPU_Q8_1_DOT") == std::string::npos) {
+        std::fprintf(stderr, "malformed selector list was not rejected clearly: %s\n", err.c_str());
+        ++failures;
+    }
     set_selector("iq3_xxs/iq4_nl@layer=x");
     err.clear();
     if (cpu::native_fmt(pairs[2].gu, pairs[2].down, H, FF, invalid, err, 7) ||
@@ -1017,6 +1146,42 @@ int check_q8_1_selector_contract() {
         std::fprintf(stderr, "malformed layer selector was accepted\n");
         ++failures;
     }
+    set_selector("all");
+    set_env("STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_LAYER", "3");
+    set_env("STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_EXPERT", "201");
+    for (size_t i = 0; i < std::size(pairs); ++i) {
+        cpu::NativeFmt selected, other_layer;
+        std::string selected_err, other_err;
+        if (!cpu::native_fmt(pairs[i].gu, pairs[i].down, H, FF, selected, selected_err, 3) ||
+            !cpu::native_fmt(pairs[i].gu, pairs[i].down, H, FF, other_layer, other_err, 4)) {
+            std::fprintf(stderr, "reciprocal-SiLU selector setup failed for %s: %s / %s\n",
+                         pairs[i].selector, selected_err.c_str(), other_err.c_str());
+            ++failures;
+            continue;
+        }
+        if (!selected.q8_1_reciprocal_silu || selected.q8_1_reciprocal_silu_expert != 201 ||
+            other_layer.q8_1_reciprocal_silu || other_layer.q8_1_reciprocal_silu_expert != 201) {
+            std::fprintf(stderr, "reciprocal-SiLU layer/expert selector mismatch for %s\n", pairs[i].selector);
+            ++failures;
+        }
+    }
+    set_env("STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_LAYER", "x");
+    err.clear();
+    if (cpu::native_fmt(pairs[0].gu, pairs[0].down, H, FF, invalid, err, 3) ||
+        err.find("STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_LAYER") == std::string::npos) {
+        std::fprintf(stderr, "malformed reciprocal-SiLU layer was not rejected clearly: %s\n", err.c_str());
+        ++failures;
+    }
+    set_env("STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_LAYER", "3");
+    set_env("STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_EXPERT", "999999999999999999999999999999");
+    err.clear();
+    if (cpu::native_fmt(pairs[0].gu, pairs[0].down, H, FF, invalid, err, 3) ||
+        err.find("STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_EXPERT") == std::string::npos) {
+        std::fprintf(stderr, "out-of-range reciprocal-SiLU expert was not rejected clearly: %s\n", err.c_str());
+        ++failures;
+    }
+    set_env("STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_LAYER", nullptr);
+    set_env("STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_EXPERT", nullptr);
     std::printf("Q8_1 selector contract: %s (%d failures)\n", failures ? "FAIL" : "PASS", failures);
     return failures;
 }
@@ -1167,7 +1332,7 @@ int main(int argc, char** argv) {
                              "       [--dump-f32-dir DIR] writes dequantized weights, input and reference/operator outputs\n"
                              "       native_expert_parity --q8_1-quantizer --activation-f32 FILE\n"
                              "       native_expert_parity --q8_1-selector-contract\n"
-                             "       STRATA_NATIVE_CPU_Q8_1_DOT=1|all|GU/DOWN selects all or one supported expert pair\n"
+                             "       STRATA_NATIVE_CPU_Q8_1_DOT=1|all|GU/DOWN[,...] selects expert-pair routes\n"
                              "       native_expert_parity --synthetic GU/DOWN ...   (ggml type names, e.g. q4_K/q5_1)\n"
                              "       native_expert_parity --synthetic-windows iq2_s/q2_0|iq2_s/iq4_nl|iq3_xxs/q2_0|iq3_xxs/iq4_nl  (Q8_1, widths 1..8)\n"
                              "       <shard.gguf> --expert E --activation-f32 FILE --windows-1-through-8\n"

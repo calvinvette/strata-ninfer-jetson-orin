@@ -20,3 +20,25 @@ STRATA_TEST_EXPERTS_BIN="$HOME/models/strata-orin-validation/generated-fixtures/
 The two pack-backed CTests were first run against a temporary one-layer S2 fixture derived by `tools/pack_layer.py` from the first shard of the actual local Q2_0 model (`69820c02…` SHA256; full source and fixture hashes are in `fixture-source-sha256.txt`). One layer contains all 512 layer-0 expert blobs in the exact expected 1,382,400-byte S2 layout; both CTests access only layer 0 and adjacent experts. The generated 675-MiB arena remains under `~/models/strata-orin-validation/generated-fixtures/q2_0-s2-layer0/`. Their test-only default path now accepts `STRATA_TEST_EXPERTS_BIN`; when unset, the existing default remains unchanged, and CLI `--file` still overrides it.
 
 The complete configured CTest suite was rerun with that variable set to the external fixture: 130 passed, two optional IQ-fixture tests skipped, and no failures. This includes passing `expert_parity` and `pool_test`. The full log is `full-ctest-with-external-s2-fixture.log.gz`; the 48-layer arena-load test remains unrun. Python integration discovery passed 163/163. `SHA256SUMS` covers the report artifacts. This is regression evidence only; Phase 5 accepted-state drift remains unresolved.
+
+After the narrow experimental native-expert selector contract was extended, a
+fresh focused rerun of all matching `native_expert` and `pool_test` CTests passed
+28/28 on the same ARM64/CUDA candidate with the external layer-0 S2 fixture.
+This covers the parser's supported/malformed multi-selector forms, reciprocal-
+SiLU layer/expert filters, scalar and multi-token Q8_1 routes, and pool fixture
+path. No new full-suite run was needed for this test-only helper extension.
+
+The diagnostic hooks remain opt-in. `STRATA_NATIVE_CPU_Q8_1_DOT` accepts a
+comma-separated list of supported format pairs and optional exact layer
+selectors. `STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_LAYER` selects a layer, and
+`STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_EXPERT` can further restrict the model
+expert; the latter uses the CUDA-order multiply-by-sigmoid expression only on
+the native CPU Q8_1 route. With these variables unset, the existing route and
+operation order remain unchanged. These hooks support numerical localization;
+the long-chain state experiments have not validated them as a recovery fix.
+
+The corresponding source work also carries model expert IDs into multi-token
+CPU worker jobs and marks trace activations valid only when a row has a
+CPU-owned expert. The parity tool adds a scalar IQ3_XXS/Q8_1 oracle for
+same-input diagnostics. These changes support operator localization; they do
+not alter CUDA dispatch or qualify a new default.

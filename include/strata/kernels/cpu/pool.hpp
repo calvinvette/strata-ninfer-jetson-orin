@@ -56,6 +56,7 @@ struct ExpertJob {
 /// is bitwise the single-token job's.
 struct ExpertJobMulti {
     const uint8_t* blob = nullptr;
+    int expert_id = -1;                 ///< model expert ID for narrow experimental selectors
     int nt = 0;
     const ActQ* act[MAXT] = {};
     float* out[MAXT] = {};

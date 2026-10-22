@@ -100,9 +100,9 @@ int main(int argc, char** argv) {
     const cpu::CpuFeatures feat = cpu::cpu_features();
     std::printf("  %-44s %s\n", "AVX512 F/BW/VL/VNNI/VBMI",
                 feat.usable() ? "all present" : feat.reason());
-    if (STRATA_CPU_X86 && !feat.usable()) {
-        std::printf("      the VNNI path cannot run here; only the scalar oracle can be exercised.\n");
-        std::printf("      P2.S3's kernel check is SKIPPED, not passed.\n");
+    if (!STRATA_CPU_X86 || !feat.usable()) {
+        std::printf("      the AVX-512 VNNI path cannot run on this target; only the scalar oracle may be available.\n");
+        std::printf("      P2.S3's x86 kernel check is SKIPPED, not passed.\n");
         std::printf("\nexpert_parity: 0 failures, 1 SKIPPED\n");
         return 0;
     }

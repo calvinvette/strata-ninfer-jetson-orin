@@ -81,6 +81,14 @@ lifecycle and memory-headroom behavior only; it makes no serial-state, output
 quality or performance claim. The test took 811 seconds. See
 [`2026-10-22-phase5-coder-batch-mtp-graph-limit64`](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-limit64/analysis.json).
 
+The current-source ARM64/CUDA candidate then passed 28/28 focused
+`native_expert` and `pool_test` cases with the external layer-0 S2 fixture,
+including the new opt-in comma-list and reciprocal-SiLU selector contract
+checks. The candidate’s CUDA route remains unchanged when the selectors are
+unset; these CPU arithmetic hooks are diagnostic and have not fixed the
+accepted-state mismatch. Details and reproduction are in the
+[regression record](../../bench/results/2026-10-22-phase5-current-source-regression/README.md).
+
 A current-source ARM64/CUDA 12.6 Release rebuild completed with two build jobs. The configured CTest suite passed 130 tests with the external one-layer Q2_0 S2 fixture supplied to the two pack-backed tests; two optional IQ-fixture tests skipped because their external fixtures are absent. Integration Python discovery passed 163/163. The NInfer import manifest verified 1,320 imports at pinned revision `b07248f2`; the matrix validator reported 162 proposed cells / 936 paired entries without executing them. These are current regression and specification checks, not Phase 5 or Phase 6 closeout. The initial missing-pack run is retained in the linked regression report.
 
 A fresh [current-worktree regression rerun](../../bench/results/2026-10-22-phase5-current-source-regression/README.md) rebuilt the ARM64/CUDA candidate with two jobs and passed the focused accepted-window, verifier/GDN/KV, graph, Q8_1 and native-expert selection (29/29), plus Python integration discovery (163/163). The full configured CTest suite completed 132 tests with the external one-layer Q2_0 S2 fixture supplied through `STRATA_TEST_EXPERTS_BIN`: 130 passed and two optional IQ-fixture tests skipped. This includes passing `expert_parity` and `pool_test`; the initial missing-pack issue and fixture/source hashes remain documented. The full 48-layer arena-load test remains unrun. This is regression coverage only; Phase 5 accepted-state drift remains unresolved.
