@@ -2746,3 +2746,11 @@ Capture the CPU owner result with the dispatch identifier and compare that exact
 row to the per-expert pre-combine vector. Preserve serialization precision
 limits and avoid treating an owner transition alone as proof of its numerical
 cause.
+
+
+Qualify an oracle against a captured service output on the exact same activation
+and format pair before using it to explain an owner transition. An oracle can
+pass its own internal parity tests yet still disagree substantially with the
+active service dispatch; in that case preserve the failed cross-path comparison
+as an explicit unsupported cell and inspect weight-source/format and execution
+contracts before attributing the difference to CPU versus GPU arithmetic.

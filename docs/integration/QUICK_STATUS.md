@@ -198,3 +198,6 @@ configuration stay out of Git. Do not combine host RAM and CUDA capacity into a
 single memory figure.
 
 A dispatch-owner follow-up maps the selected layer-1 position-71 Coder row exactly: expert 11 moves from primary VRAM in serial to CPU in batch, and its recorded CPU output matches the batch part within `5.0e-11` (serialization rounding). This associates the isolated expert delta with an owner change but leaves the numerical cause and later token-60 relationship unresolved. [Details](../../bench/results/2026-10-22-phase5-coder-batch-gdn-layer-capture/README.md).
+
+
+The existing `native_expert_parity` tool does not yet serve as an oracle for this sampled MoE service path: same-activation serial and batch CPU results match each other exactly but differ from its CPU/GPU/FP32 outputs by about 2.19 relative L2. Its internal pass does not resolve the cross-path mismatch; investigate source/format contracts before drawing kernel conclusions.
