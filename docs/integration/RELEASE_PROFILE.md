@@ -4,7 +4,9 @@ This record describes one reproducible, opt-in integration profile for the
 Jetson Orin AGX. It is an experimental qualification target for this repository,
 not a general Strata support statement or a default configuration. Phases 5 and
 6 remain open, so speculation/state migration and broader parametric and energy
-qualification are excluded.
+qualification are excluded. Phase 8 is complete for this profile under the
+[Phase 8 closeout](PHASE8_CLOSEOUT.md); this record was revalidated on the
+current candidate in the [2026-10-22 smoke](../../bench/results/2026-10-22-phase8-current-source-q2-profile-smoke/README.md).
 
 ## Qualified cell
 

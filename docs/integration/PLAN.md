@@ -197,6 +197,9 @@ closed for the tested opt-in kernel and CPU candidates under
 is closed for its bounded Orin matrix under [its closeout](PHASE7_CLOSEOUT.md);
 reopen it if the model, profile, feature or hardware scope changes. Phases 5 and
 6 remain open, so Phase 8 must state those exclusions for any release feature
-that depends on them. Do not change kernels, quantization, model, toolchain and
-clocks simultaneously; select each candidate from measured bottlenecks and
-qualify its contract first.
+that depends on them. Phase 8 is complete for the bounded Q2_0 profile under
+[its closeout](PHASE8_CLOSEOUT.md); adaptive migration, MTP, multi-live batch
+decoding, and general Phase 6 profiles remain excluded. Reopen Phase 8 when
+those features are added to a release scope. Do not change kernels,
+quantization, model, toolchain and clocks simultaneously; select each candidate
+from measured bottlenecks and qualify its contract first.

@@ -11,15 +11,19 @@ Strata and Splash.
 ## Overall status
 
 Phases 0–4 are complete for their documented scopes. Phase 7 is complete for
-its bounded Orin qualification matrix. Phases 5 and 6 remain open, so Phase 8
-is also open. The latest Orin CUDA regression suite passed 130 tests with two
+its bounded Orin qualification matrix. Phase 8 is complete for one bounded,
+opt-in Q2_0 release profile; Phases 5 and 6 remain open for unresolved
+accepted-state correctness and broader performance interactions. The latest
+Orin CUDA regression suite passed 130 tests with two
 optional IQ-fixture tests skipped; integration Python discovery passed 163/163,
 and focused accepted-prefix, verifier, batch and graph tests passed. The latest
 seven shared-source files were rebuilt from a fresh isolated snapshot for HIP
 and SYCL on maestro1 with two jobs; both `strata --help` checks returned zero.
 This is x86 compile/link and CLI-startup evidence only, not accelerator runtime
 or Orin performance evidence. Build/source hashes are in the linked backend
-record in [STATUS](STATUS.md).
+or Orin performance evidence. Build/source hashes are in the linked backend
+record in [STATUS](STATUS.md). See the [Phase 8 closeout](PHASE8_CLOSEOUT.md)
+for the exact release scope and exclusions.
 
 ## Performance observed
 

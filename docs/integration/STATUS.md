@@ -3,8 +3,10 @@
 Updated: 2026-10-22. Phases 1 through 4 are complete for their documented tested
 Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 is
 complete for its bounded Orin qualification matrix under [its closeout]
-(PHASE7_CLOSEOUT.md); Phases 5 and 6 remain open. This records tested cells,
-not general product support.
+(PHASE7_CLOSEOUT.md), and Phase 8 is complete for the bounded Q2_0 release
+profile under [its closeout](PHASE8_CLOSEOUT.md). Phases 5 and 6 remain open;
+the Phase 8 profile excludes their unresolved adaptive/MTP and broader
+parametric/energy scope. This records tested cells, not general product support.
 
 The latest [MTP2 position-76 committed-state comparison](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md)
 paired batch and serial rows by token. Prompt 0's 36-layer GDN state differs
