@@ -120,6 +120,32 @@ all-layer `.stgcmt` files are local-only; the compact per-layer analysis is
 `two-live-all-layer-state-68-71-summary.json`. This run's profiling capture
 adds substantial commit-copy work and is correctness evidence only.
 
+## Layer-1 MoE output boundary
+
+A follow-up used the same six-token two-live workload and sampled layer 1 at
+positions 68 and 71. The opt-in `STRATA_VERIFY_DUMP_MOE_OUTPUT_BATCH=1` format
+records the shared-expert vector and combined MoE output with each verifier
+row's position, physical slot, and consumed token. The full set of 36 committed
+GDN states mapped slot 0 to prompt 0 and slot 1 to prompt 1 in this run.
+
+At position 68, all captured layer-1 fields matched both controls for the
+mapped rows. At position 71, slot 0/prompt 0 remained exact. For slot 1/prompt
+1, `x`, GDN intermediates/output, and MoE input `ffn_x` remained exact; the
+shared-expert output was also exact. The combined MoE result (`ffn_y`) differed
+in all 2,560 values, with relative L2 `0.00086265` and maximum absolute
+difference `0.00004228`. The same result appears in the dedicated shared and
+combined output capture. All six generated tokens still matched their fresh
+serial controls; this run stops before the known token-60 mismatch.
+
+This localizes a small numerical change to routed expert output/combination or
+related per-row state at this boundary. It does not identify the expert or
+operation that introduced it. The batch processed six windows averaging 1.33
+rows and retained 17.465 GiB minimum available physical RAM; sampled cgroup
+memory event counters stayed zero. Energy was not attributable to requests and
+EMC readback was denied. This is correctness evidence, not a performance
+measurement. The compact result is `two-live-layer1-moe-output-summary.json`;
+raw captures remain local.
+
 ## Resources and validation
 
 Minimum available physical RAM and minimum admission availability were both
@@ -143,11 +169,27 @@ include/strata/core/verify.hpp  6f7a80315b8fa51aa38e66c667712e89bcf96db6fb36bea1
 src/core/verify.cpp             2398e915a99b0d72420818884b6938c55cd201ead4fd1d770222a4c89ae71fe3
 ```
 
-maestro1 HIP binary SHA256: `594ec3031ad9c3e93ffd6481d981844de47c4b975b8c9c3aa6ffe69c6e3cb8d9`.
-The backend checks were compile/startup evidence only and do not qualify
-accelerator runtime.
+For the layer-1 capture changes, the exact verifier files used by maestro1
+match the local working tree:
+
+```text
+include/strata/core/verify.hpp  de2bc44996887c59f29b5db409274721cc310ab13930071791f3524372793fea
+src/core/verify.cpp             78b60f8c484ab56e5b8118b56ef4be00d705c3eb7ec3cde25a9df4f50bbe0111
+```
+
+The HIP build recompiled and linked successfully; the SYCL build reported no
+work because this CUDA verifier translation unit is not in that target. Both
+configured binaries passed their CLI help checks. Their hashes were
+`f11337e544bce9e5624c54692ed18d8d657e3fcbc55f8e78215b90b9f017184c` (HIP) and
+`9233e5ad6b07e83180a8fc4b542c0d7e47e92c6d3e870ec9efa5232b07acb985` (SYCL).
+The remote checkout's unrelated `src/program/generate.cpp` differs from the
+local tree and was not synchronized for this check. These are compile/startup
+checks only; neither backend had accelerator-runtime coverage. Earlier maestro1
+checks and their hashes are retained in the history above.
 
 The harnesses and parsers are retained as `capture_target_only_gdn_layer.py`,
-`two_live_multrow_layer12.py`, `compare_layer_capture.py`, and
-`compare_gdn_commit_state.py`. Raw `*.stgdiag`/`*.stgcmt` data, run logs, and
-supervisor telemetry remain local and are intentionally excluded from Git.
+`two_live_multrow_layer12.py`, `compare_layer_capture.py`,
+`compare_gdn_commit_state.py`, and `compare_moe_output_v2.py`. The last parser
+uses a same-run slot mapping from the all-layer state comparison. Raw
+`*.stgdiag`/`*.stgcmt`/`*.stmoe` data, run logs, and supervisor telemetry remain
+local and are intentionally excluded from Git.

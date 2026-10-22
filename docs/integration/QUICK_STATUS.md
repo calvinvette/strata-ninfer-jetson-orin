@@ -155,6 +155,14 @@ position 68, first at layer 5. Both six-token outputs matched their controls.
 Slot-to-prompt assignment varied across runs, so these boundaries are kept
 run-local and do not explain token 60.
 
+A same-workload layer-1 MoE capture found exact inputs, GDN fields and shared
+expert output for prompt 1 at position 71, while the combined MoE vector differs
+in all 2,560 values (relative L2 `0.00086265`). The six generated tokens still
+match serial. This narrows the selected boundary to routed expert output,
+combination or related per-row state without identifying a specific expert or
+operation. Minimum available RAM was 17.465 GiB, with zero cgroup memory events.
+[Compact result](../../bench/results/2026-10-22-phase5-coder-batch-gdn-layer-capture/two-live-layer1-moe-output-summary.json).
+
 ## Near-term direction
 
 1. Continue resolving batch-MTP output divergence: capture earlier layer

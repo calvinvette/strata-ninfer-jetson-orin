@@ -373,6 +373,8 @@ private:
                                   std::string& err);
     bool write_gdn_diag_batch(int rows, const int* slots, const int32_t* tokens, const int64_t* positions,
                               std::string& err);
+    bool write_moe_output_diag_batch(int rows, const int* slots, const int32_t* tokens,
+                                     const int64_t* positions, std::string& err);
     bool record_window(int T, cudaStream_t cs, std::string& err);
     // #649: STRATA_VERIFY_TRACE=1 - a host event ring (trace_ev) and GPU breadcrumbs: the profiler's stamp points,
     // per layer and token group, written to mapped memory (null when the trace is off)
@@ -436,6 +438,7 @@ private:
     std::string moe_parts_diag_path_;
     bool moe_parts_diag_captured_ = false;
     int moe_output_diag_layer_ = -1;
+    bool moe_output_diag_include_batch_ = false;
     int64_t moe_output_diag_position_ = -1;
     std::vector<int64_t> moe_output_diag_positions_;
     bool moe_output_diag_multi_position_filter_ = false;

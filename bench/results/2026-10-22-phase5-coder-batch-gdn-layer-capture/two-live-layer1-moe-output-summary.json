@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-22",
+  "device": "Jetson AGX Orin, ARM64/CUDA",
+  "model": "Qwen3.8-Flash-Next-Coder-GGUF-IQ1_M-Orin-validation",
+  "workload": "two simultaneous greedy target-only requests, batch capacity 2, six generated tokens, selected positions 68 and 71",
+  "purpose": "localize the early layer-1 MoE output change in a previously observed multirow numerical divergence",
+  "output_tokens": {"slot-0": {"generated": 6, "matches_serial": true}, "slot-1": {"generated": 6, "matches_serial": true}},
+  "batch_windows": 6,
+  "average_rows_per_window": 1.33,
+  "slot_mapping_method": "all 36 committed GDN state layers compared at matching position/token to both fresh serial controls, mapping resolved independently per row",
+  "slot_to_prompt": {"0": 0, "1": 1},
+  "state_mapping_relative_l2_squared_sums": [
+    {"position": 68, "slot": 0, "layers": 36, "prompt0": 0.0, "prompt1": 2.30648},
+    {"position": 68, "slot": 1, "layers": 36, "prompt0": 2.23255, "prompt1": 0.0192061},
+    {"position": 71, "slot": 0, "layers": 36, "prompt0": 0.00308641, "prompt1": 1.66363},
+    {"position": 71, "slot": 1, "layers": 36, "prompt0": 1.60055, "prompt1": 0.0189222}
+  ],
+  "layer1_activation_comparison": [
+    {"position": 68, "slot": 1, "prompt": 1, "all_captured_fields_exact": true},
+    {"position": 71, "slot": 0, "prompt": 0, "all_captured_fields_exact": true},
+    {"position": 71, "slot": 1, "prompt": 1, "exact_fields": ["x", "qkv", "h", "gate", "beta", "z", "y", "gdn_out", "ffn_x"], "changed_field": "ffn_y", "different_values": 2560, "relative_l2": 0.0008626505588464076, "max_abs": 0.00004228483885526657}
+  ],
+  "moe_output_comparison": [
+    {"position": 71, "slot": 1, "prompt": 1, "consumed_token": 1156, "shared_expert_exact": true, "combined_moe_output_different_values": 2560, "combined_moe_output_relative_l2": 0.0008626505588464076, "combined_moe_output_max_abs": 0.00004228483885526657}
+  ],
+  "resources": {"minimum_available_physical_ram_bytes": 18753236992, "minimum_available_physical_ram_gib": 17.465312957763672, "host_headroom_floor_gib": 6, "nonzero_sampled_cgroup_memory_events": 0, "energy_attributed_to_requests": false, "emc_clock_readback": "permission denied"},
+  "interpretation": "At this selected boundary, shared-expert output and all captured upstream layer-1 fields match, while the combined MoE result differs. This narrows the discrepancy to routed expert output/combination or related per-row state, but does not identify an expert or establish causality. The short run does not reach the later token-60 output mismatch and is correctness instrumentation, not performance qualification."
+}

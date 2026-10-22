@@ -85,6 +85,16 @@ struct GdnDiagHeaderV5 {
     int32_t tokens[strata::kernels::kVerifyMaxT];
 };
 static_assert(sizeof(GdnDiagHeaderV5) == 196, "STGDIAG5 header layout changed");
+struct MoeOutputHeaderV2 {
+    char magic[8];
+    uint32_t version;
+    uint32_t layer, rows, reserved;
+    uint64_t n_embd;
+    int64_t position;
+    int32_t slot, token;
+};
+static_assert(sizeof(MoeOutputHeaderV2) == 48, "STMOEOUT2 header layout changed");
+std::mutex moe_output_dump_mutex;
 #pragma pack(pop)
 
 struct GdnDiagOffsets {
@@ -1037,6 +1047,7 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
     }
     {
         const char* layer = std::getenv("STRATA_VERIFY_DUMP_MOE_OUTPUT_LAYER");
+        const char* batch_env = std::getenv("STRATA_VERIFY_DUMP_MOE_OUTPUT_BATCH");
         const char* path = std::getenv("STRATA_VERIFY_DUMP_MOE_OUTPUT_PATH");
         const char* positions = std::getenv("STRATA_VERIFY_DUMP_MOE_OUTPUT_POSITIONS");
         const char* position = positions == nullptr ? std::getenv("STRATA_VERIFY_DUMP_MOE_OUTPUT_POSITION") : nullptr;
@@ -1049,6 +1060,8 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
             return false;
         }
         if (layer != nullptr) {
+            moe_output_diag_include_batch_ = batch_env != nullptr && batch_env[0] != '\0' &&
+                                             std::strcmp(batch_env, "0") != 0;
             char* end = nullptr;
             const long parsed = std::strtol(layer, &end, 10);
             if (end == layer || *end != '\0' || parsed < 0 || parsed >= g.n_layers || path[0] == '\0') {
@@ -1082,8 +1095,9 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
             }
             strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "allocate", this,
                                                         moe_output_diag_h_, moe_output_diag_capacity_, -1);
-            std::fprintf(stderr, "strata verify: opt-in MoE shared/combined output dump at layer %d -> %s (%zu bytes)\n",
-                         moe_output_diag_layer_, moe_output_diag_path_.c_str(), moe_output_diag_capacity_);
+            std::fprintf(stderr, "strata verify: opt-in MoE shared/combined output dump at layer %d%s -> %s (%zu bytes)\n",
+                         moe_output_diag_layer_, moe_output_diag_include_batch_ ? " including batch windows" : "",
+                         moe_output_diag_path_.c_str(), moe_output_diag_capacity_);
         }
     }
 
@@ -2287,7 +2301,8 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
         if (sh_stream_on() && !prof_on_ && sh_cs_ != nullptr && ev_fork_ != nullptr && ev_join_ != nullptr) {
             cudaStreamWaitEvent(cs, ev_join_, 0);
         }
-        if (moe_output_diag_h_ != nullptr && l == moe_output_diag_layer_ && !batch_rec_) {
+        if (moe_output_diag_h_ != nullptr && l == moe_output_diag_layer_ &&
+            (!batch_rec_ || moe_output_diag_include_batch_)) {
             const size_t row_off = (size_t) tb * (size_t) N;
             const size_t copy_bytes = (size_t) n * (size_t) N * sizeof(float);
             const cudaError_t copy_error = cudaMemcpyAsync(moe_output_diag_h_ + row_off,
@@ -2317,7 +2332,8 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
         }
         if (remote_opt_) remote_opt_->combine(bo_ + tb * N, y_dummy_ + tb * N, tb, n,
                               device_plan_ ? skip_ + grp : nullptr, ring, cs);
-        if (moe_output_diag_h_ != nullptr && l == moe_output_diag_layer_ && !batch_rec_) {
+        if (moe_output_diag_h_ != nullptr && l == moe_output_diag_layer_ &&
+            (!batch_rec_ || moe_output_diag_include_batch_)) {
             const size_t row_off = (size_t) tb * (size_t) N;
             const size_t buffer_off = (size_t) max_t_ * (size_t) N + row_off;
             const size_t copy_bytes = (size_t) n * (size_t) N * sizeof(float);
@@ -3197,34 +3213,57 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
     }
     if (moe_output_diag_captured_ && diag_position_matches(moe_output_diag_position_,
             moe_output_diag_positions_, moe_output_diag_multi_position_filter_, pos0, T)) {
-        struct OutputHeader {
-            char magic[8];
-            uint32_t version;
-            uint32_t layer;
-            uint32_t rows;
-            uint32_t reserved;
-            uint64_t n_embd;
-            int64_t pos0;
-            int32_t tokens[strata::kernels::kVerifyMaxT];
-        } header{};
-        static_assert(sizeof(OutputHeader) == 72, "STMOEOUT header layout changed");
-        std::memcpy(header.magic, "STMOEOUT", sizeof(header.magic));
-        header.version = 1;
-        header.layer = (uint32_t) moe_output_diag_layer_;
-        header.rows = (uint32_t) T;
-        header.n_embd = (uint64_t) g.n_embd;
-        header.pos0 = pos0;
-        for (int t = 0; t < T; ++t) header.tokens[t] = tokens[t];
-        const size_t section_bytes = (size_t) T * (size_t) g.n_embd * sizeof(float);
-        static std::mutex output_dump_mutex;
-        std::lock_guard<std::mutex> lock(output_dump_mutex);
+        std::lock_guard<std::mutex> lock(moe_output_dump_mutex);
         std::FILE* dump = std::fopen(moe_output_diag_path_.c_str(), "ab");
         bool written = dump != nullptr;
         if (written) {
-            written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
-                      std::fwrite(moe_output_diag_h_, 1, section_bytes, dump) == section_bytes &&
-                      std::fwrite(moe_output_diag_h_ + (size_t) max_t_ * (size_t) g.n_embd,
-                                  1, section_bytes, dump) == section_bytes;
+            if (moe_output_diag_include_batch_) {
+                for (int t = 0; t < T && written; ++t) {
+                    if (!diag_position_matches(moe_output_diag_position_, moe_output_diag_positions_,
+                                               moe_output_diag_multi_position_filter_, pos0 + t, 1))
+                        continue;
+                    MoeOutputHeaderV2 header{};
+                    std::memcpy(header.magic, "MOEOUT02", sizeof(header.magic));
+                    header.version = 2;
+                    header.layer = (uint32_t) moe_output_diag_layer_;
+                    header.rows = 1;
+                    header.n_embd = (uint64_t) g.n_embd;
+                    header.position = pos0 + t;
+                    header.slot = -1;
+                    header.token = tokens[t];
+                    const size_t row_bytes = (size_t) g.n_embd * sizeof(float);
+                    const float* shared = moe_output_diag_h_ + (size_t) t * (size_t) g.n_embd;
+                    const float* combined = moe_output_diag_h_ +
+                        ((size_t) max_t_ + (size_t) t) * (size_t) g.n_embd;
+                    written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
+                              std::fwrite(shared, 1, row_bytes, dump) == row_bytes &&
+                              std::fwrite(combined, 1, row_bytes, dump) == row_bytes;
+                }
+            } else {
+                struct OutputHeader {
+                    char magic[8];
+                    uint32_t version;
+                    uint32_t layer;
+                    uint32_t rows;
+                    uint32_t reserved;
+                    uint64_t n_embd;
+                    int64_t pos0;
+                    int32_t tokens[strata::kernels::kVerifyMaxT];
+                } header{};
+                static_assert(sizeof(OutputHeader) == 72, "STMOEOUT header layout changed");
+                std::memcpy(header.magic, "STMOEOUT", sizeof(header.magic));
+                header.version = 1;
+                header.layer = (uint32_t) moe_output_diag_layer_;
+                header.rows = (uint32_t) T;
+                header.n_embd = (uint64_t) g.n_embd;
+                header.pos0 = pos0;
+                for (int t = 0; t < T; ++t) header.tokens[t] = tokens[t];
+                const size_t section_bytes = (size_t) T * (size_t) g.n_embd * sizeof(float);
+                written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
+                          std::fwrite(moe_output_diag_h_, 1, section_bytes, dump) == section_bytes &&
+                          std::fwrite(moe_output_diag_h_ + (size_t) max_t_ * (size_t) g.n_embd,
+                                      1, section_bytes, dump) == section_bytes;
+            }
             if (std::fflush(dump) != 0) written = false;
             if (std::fclose(dump) != 0) written = false;
         }
@@ -3947,6 +3986,45 @@ bool Verifier::write_gdn_diag_batch(int T, const int* slots, const int32_t* toke
     return true;
 }
 
+bool Verifier::write_moe_output_diag_batch(int T, const int* slots, const int32_t* tokens,
+                                           const int64_t* positions, std::string& err) {
+    if (!moe_output_diag_include_batch_ || moe_output_diag_h_ == nullptr || !moe_output_diag_captured_) return true;
+    const ModelGeometry& g = *g_;
+    const size_t row_bytes = (size_t) g.n_embd * sizeof(float);
+    std::lock_guard<std::mutex> lock(moe_output_dump_mutex);
+    std::FILE* dump = std::fopen(moe_output_diag_path_.c_str(), "ab");
+    bool written = dump != nullptr;
+    bool any = false;
+    for (int t = 0; t < T && written; ++t) {
+        if (!diag_position_matches(moe_output_diag_position_, moe_output_diag_positions_,
+                                   moe_output_diag_multi_position_filter_, positions[t], 1)) continue;
+        MoeOutputHeaderV2 header{};
+        std::memcpy(header.magic, "MOEOUT02", sizeof(header.magic));
+        header.version = 2;
+        header.layer = (uint32_t) moe_output_diag_layer_;
+        header.rows = 1;
+        header.n_embd = (uint64_t) g.n_embd;
+        header.position = positions[t];
+        header.slot = slots[t];
+        header.token = tokens[t];
+        const float* shared = moe_output_diag_h_ + (size_t) t * (size_t) g.n_embd;
+        const float* combined = moe_output_diag_h_ + ((size_t) max_t_ + (size_t) t) * (size_t) g.n_embd;
+        written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
+                  std::fwrite(shared, 1, row_bytes, dump) == row_bytes &&
+                  std::fwrite(combined, 1, row_bytes, dump) == row_bytes;
+        any = true;
+    }
+    if (dump != nullptr) {
+        if (any && std::fflush(dump) != 0) written = false;
+        if (std::fclose(dump) != 0) written = false;
+    }
+    if (!written) {
+        err = "verify: could not write opt-in batch shared/combined MoE output diagnostic";
+        return false;
+    }
+    return true;
+}
+
 bool Verifier::run_slot_rows(const int* rows, int S, const int32_t* tokens, const int64_t* pos, PoolMultiFn pool,
                              void* user, int32_t* out, std::string& err) {
     using namespace strata::kernels;
@@ -3977,6 +4055,7 @@ bool Verifier::run_slot_rows(const int* rows, int S, const int32_t* tokens, cons
         if (se != cudaSuccess) { err = std::string("verify batch: ") + cudaGetErrorString(se); return false; }
         cudaStreamSynchronize(copy_);
         if (!write_gdn_diag_batch(S, rows, tokens, pos, err)) return false;
+        if (!write_moe_output_diag_batch(S, rows, tokens, pos, err)) return false;
         if (prof_on_) collect_profile();
         ++windows;
         if (le_ < g.n_layers) return next_ == nullptr || next_->run_slot_rows(rows, S, tokens, pos, pool, next_user_, out, err);
@@ -4039,6 +4118,7 @@ bool Verifier::run_slot_rows(const int* rows, int S, const int32_t* tokens, cons
     if (se != cudaSuccess) { err = std::string("verify batch: ") + cudaGetErrorString(se); return false; }
     cudaStreamSynchronize(copy_);
     if (!write_gdn_diag_batch(S, rows, tokens, pos, err)) return false;
+    if (!write_moe_output_diag_batch(S, rows, tokens, pos, err)) return false;
     if (prof_on_) collect_profile();
     ++windows;
     if (le_ < g.n_layers) return next_ == nullptr || next_->run_slot_rows(rows, S, tokens, pos, pool, next_user_, out, err);

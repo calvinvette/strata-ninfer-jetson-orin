@@ -2713,3 +2713,12 @@ same supervised run. Hash-only sweeps identify the sampled state boundary, while
 raw numeric state and activation pairs show the scale and whether the layer's
 input has already changed. Keep request-to-slot mapping explicit and record
 when a boundary capture starts after the first observed divergence.
+
+For the layer-1 follow-up, the shared-expert result stayed exact while the
+combined MoE output changed at a selected row/position. A future Strata/Splash
+batch-port diagnosis should capture both values, alongside routed expert parts
+and the combine weights, with explicit request/row identity. A changed combined
+result alone narrows the boundary but cannot distinguish expert arithmetic,
+weight gathering, or accumulation order. Keep the run's all-layer state mapping
+with the output record; repeated prompts can consume the same token at the same
+position while representing different requests.
