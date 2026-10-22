@@ -28,6 +28,8 @@ parser.add_argument('--one-live-after-admission', action='store_true',
                     help='start slot-0, then admit a one-token slot-1 request so slot-0 continues in batch mode')
 parser.add_argument('--hash-to', type=int, default=76,
                     help='inclusive final accepted position for batch QSA hashes')
+parser.add_argument('--admit-after-tokens', type=int, default=1,
+                    help='in one-live mode, admit the short competitor after this many slot-0 output tokens')
 ARGS = parser.parse_args()
 SERIAL_KV_APPENDS = ARGS.serial_kv_appends
 PER_TOKEN_VERIFY = ARGS.per_token_verify
@@ -38,6 +40,8 @@ if DUPE_PROMPT and ONE_LIVE_AFTER_ADMISSION:
     parser.error('--duplicate-prompt and --one-live-after-admission are mutually exclusive')
 if REVERSE_ARRIVAL and ONE_LIVE_AFTER_ADMISSION:
     parser.error('--reverse-arrival and --one-live-after-admission are mutually exclusive')
+if ARGS.admit_after_tokens < 1:
+    parser.error('--admit-after-tokens must be positive')
 OUT = ARGS.output.resolve()
 OUT.mkdir(parents=True, exist_ok=False)
 if ONE_LIVE_AFTER_ADMISSION:
@@ -67,21 +71,22 @@ def arm(name, arm_args, env, requests):
             for token in engine.generate(prompts[key], limit, {'temperature': 0}, threading.Event()):
                 if token is not None:
                     tokens.append(token)
-                    if name == 'batch' and ONE_LIVE_AFTER_ADMISSION and key == 'slot-0':
+                    if ('--batch' in arm_args and ONE_LIVE_AFTER_ADMISSION and key == 'slot-0' and
+                            len(tokens) >= ARGS.admit_after_tokens):
                         first_token.set()
             return {'tokens': tokens, 'finish': engine.last.get('finish')}
         if len(requests) == 1:
             return {requests[0]: generate(requests[0])}
         with ThreadPoolExecutor(max_workers=len(requests)) as pool:
-            if name == 'batch' and ONE_LIVE_AFTER_ADMISSION:
+            if '--batch' in arm_args and ONE_LIVE_AFTER_ADMISSION:
                 futures = {'slot-0': pool.submit(generate, 'slot-0')}
-                if not first_token.wait(timeout=120):
-                    raise TimeoutError('slot-0 did not emit a token before the one-live batch admission')
+                if not first_token.wait(timeout=300):
+                    raise TimeoutError(f'slot-0 did not emit {ARGS.admit_after_tokens} tokens before admission')
                 futures['slot-1'] = pool.submit(generate, 'slot-1')
             else:
-                order = list(reversed(requests)) if REVERSE_ARRIVAL and name == 'batch' else list(requests)
+                order = list(reversed(requests)) if REVERSE_ARRIVAL and '--batch' in arm_args else list(requests)
                 futures = {order[0]: pool.submit(generate, order[0])}
-                if REVERSE_ARRIVAL and name == 'batch':
+                if REVERSE_ARRIVAL and '--batch' in arm_args:
                     time.sleep(0.25)
                 futures[order[1]] = pool.submit(generate, order[1])
             return {key: future.result() for key, future in futures.items()}
@@ -110,9 +115,11 @@ batch = arm('batch-mtp2', args + ['--batch', '2', '--batch-mtp'], make_env('batc
     'state_length': 77,
     'batch_append_mode': 'per-token' if SERIAL_KV_APPENDS else 'batched',
     'decoder_compute_mode': 'per-token' if PER_TOKEN_VERIFY else 'batched',
-    'arrival_order': 'reverse-with-250ms-stagger' if REVERSE_ARRIVAL else 'concurrent',
+    'arrival_order': ('slot-0-first-delayed' if ONE_LIVE_AFTER_ADMISSION else
+                     'reverse-with-250ms-stagger' if REVERSE_ARRIVAL else 'concurrent'),
     'duplicate_prompt': DUPE_PROMPT,
     'one_live_after_admission': ONE_LIVE_AFTER_ADMISSION,
+    'admit_after_tokens': ARGS.admit_after_tokens,
     'batch_hash_to_position': ARGS.hash_to,
     'outputs': {'serial': serial, 'batch': batch},
 }, indent=2) + '\n')

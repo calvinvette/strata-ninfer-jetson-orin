@@ -45,6 +45,8 @@ target-only and MTP2 reproduce the movement, MTP2 is not required; the shared
 batch-row path versus solo-to-batch transition remains unresolved. This is
 not a performance result.
 
+A corrected [delayed-admission MTP2 trace](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md) submitted the second request only after slot 0 had generated 48 solo-path tokens. Both outputs matched serial (96 and one token). QSA hashes matched serial at the first common post-handoff lengths 121/122, then all 12 indexer/KV groups first differed at length 124/model layer 3 and remained different through 163. This places the first captured state change after the solo prefix and handoff, during later batch-slot work; it does not identify an operation. The earlier QSA `one-live` runs submitted both requests concurrently because of a harness name-check error; they show the long request continuing after its one-token peer finished, not a delayed arrival. The separate target-only GDN capture did wait for the first output token. Phase 5 remains open.
+
 The latest [MTP2 position-76 committed-state comparison](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md)
 paired batch and serial rows by token. Prompt 0's 36-layer GDN state differs
 in 26,965,859/29,417,472 floats (relative L2 0.0182307), first at GDN model

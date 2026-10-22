@@ -104,17 +104,18 @@ batch slots' QSA hashes mutually matched but differed from serial,
 while their ten-token outputs remained exact.
 See the [batch-MTP report](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
 
-A one-live-after-admission trace generated 96 tokens with exact serial output
-parity. Early QSA states could not be paired because batch and serial MTP2
-recorded different accepted-length parity; at common captured lengths 91–163,
-all 12 indexer and KV hashes differed. This shows two active verifier rows are
-not required for persistent-state drift. Its numerical bound and cause remain
-unknown; Phase 5 stays open.
+Earlier QSA runs submitted the long request and one-token peer concurrently;
+a harness name-check error meant they did not delay the peer after the first
+output as intended. They still show QSA drift after the peer finishes. A
+corrected MTP2 control submitted the peer after 48 solo-path tokens: state
+hashes matched serial at common lengths 121/122, then all 12 indexer/KV hashes
+differed from length 124 through 163, while output remained exact. This points
+to state movement during later batch-slot work, with the operation unknown.
 
 Direct numeric captures at committed position 126 found GDN state drift in
 all 36 layers for both MTP2 (relative L2 0.00973) and target-only (0.00841),
-despite exact 96-token output parity. MTP2 is not required; the shared batch
-row path versus solo-to-batch transition and the quality bound remain unknown.
+despite exact 96-token output parity. MTP2 is not required; numerical cause
+and quality bound remain unknown.
 
 ## Near-term direction
 

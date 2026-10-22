@@ -387,3 +387,28 @@ This shows MTP2 is not required for one-live batch-path GDN drift. The similar
 state deltas suggest the shared batch-row path or solo-to-batch transition,
 but the current controls do not separate those causes. These are correctness
 diagnostics, not performance measurements.
+
+
+### Delayed batch admission with an exact 48-token solo prefix (2026-10-22)
+
+Review found that the earlier QSA harness compared the batch arm's label
+`batch-mtp2` to the exact string `batch`; its one-live and reverse-arrival
+branches therefore did not activate. The earlier one-live captures submitted
+both requests concurrently. They remain valid evidence that slot 0 continued
+after the one-token slot 1 completed, but do not establish a delayed arrival
+after slot 0's first token. The target-only numeric GDN capture used a separate
+harness and did wait for slot 0's first token.
+
+The QSA harness now selects its admission gate from the actual `--batch`
+arguments. In the corrected MTP2 run, slot 0 generated 48 tokens on the solo
+path before slot 1 was submitted. Both requests completed with exact serial
+MTP2 token parity (96 and one token). At the first common comparable QSA states
+after handoff, lengths 121 and 122, all 12 aggregate/indexer/KV hashes matched
+serial. The first common divergence was at length 124; all 12 indexer and K/V
+states differed, first at model layer 3. All 21 subsequent comparable samples
+through length 163 retained that full-layer hash difference. The supervisor
+passed with 16.92 GiB minimum host/admission availability over 138 samples and
+zero cgroup events. This places the first sampled divergence after an exact
+solo prefix and two exact post-transition states, during subsequent batch-slot
+execution; it does not identify the operation or quantify the numeric error.
+Energy was not measured. The raw traces remain local-only.
