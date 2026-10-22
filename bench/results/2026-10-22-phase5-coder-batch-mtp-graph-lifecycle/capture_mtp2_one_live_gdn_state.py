@@ -3,6 +3,7 @@
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 import json
+import os
 from pathlib import Path
 import sys
 import threading
@@ -14,9 +15,22 @@ from tools.integration.batch_mtp_graph_lifecycle import prepared_prompts, replac
 
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--output', type=Path, required=True)
-p.add_argument('--position', type=int, default=126)
+p.add_argument('--position', type=int, default=None, help='single commit position (legacy form)')
+p.add_argument('--positions', help='comma-separated commit positions')
+p.add_argument('--admit-after-tokens', type=int, default=1,
+               help='submit the one-token competitor after this many slot-0 outputs')
 p.add_argument('--mode', choices=('mtp2', 'target-only'), default='mtp2')
 args = p.parse_args()
+if args.position is not None and args.positions is not None:
+    p.error('use --position or --positions, not both')
+positions = ([args.position] if args.position is not None else
+             [int(x) for x in args.positions.split(',')] if args.positions else [126])
+if not positions or positions != sorted(set(positions)) or positions[0] < 0:
+    p.error('commit positions must be sorted, unique and non-negative')
+if args.admit_after_tokens < 1:
+    p.error('--admit-after-tokens must be positive')
+if args.mode == 'mtp2':
+    os.environ['STRATA_PARALLEL_SOLO'] = '0'
 out = args.output.resolve()
 out.mkdir(parents=True, exist_ok=False)
 cfg = json.loads((Path(__file__).resolve().parent / 'config.json').read_text())
@@ -36,17 +50,17 @@ def make_env(name):
     env = child_env(cfg)
     env.update({'STRATA_PREFILL_CPU_SHARE': '0',
                 'STRATA_VERIFY_DUMP_GDN_COMMIT_LAYER': 'all',
-                'STRATA_VERIFY_DUMP_GDN_COMMIT_POSITIONS': str(args.position),
+                'STRATA_VERIFY_DUMP_GDN_COMMIT_POSITIONS': ','.join(map(str, positions)),
                 'STRATA_VERIFY_DUMP_GDN_COMMIT_PATH': str((out / f'{name}.stgcmt').resolve())})
     return env
 
-def generate(engine, key, limit, first=None):
+def generate(engine, key, limit, ready=None):
     tokens = []
     for token in engine.generate(prompts[key], limit, {'temperature': 0}, threading.Event()):
         if token is not None:
             tokens.append(token)
-            if first is not None and key == 'slot-0':
-                first.set()
+            if ready is not None and key == 'slot-0' and len(tokens) >= args.admit_after_tokens:
+                ready.set()
     return {'tokens': tokens, 'finish': engine.last.get('finish')}
 
 serial_engine = StrataEngine(cfg['exe'], engine_args, cwd=cfg.get('cwd'), log=str(out / 'serial.log'), env=make_env('serial'))
@@ -65,13 +79,14 @@ try:
     first = threading.Event()
     with ThreadPoolExecutor(max_workers=2) as pool:
         a = pool.submit(generate, batch_engine, 'slot-0', 96, first)
-        if not first.wait(timeout=120):
-            raise TimeoutError('slot 0 did not emit a token before competitor admission')
+        if not first.wait(timeout=300):
+            raise TimeoutError(f'slot 0 did not emit {args.admit_after_tokens} tokens before competitor admission')
         b = pool.submit(generate, batch_engine, 'slot-1', 1)
         batch = {'slot-0': a.result(), 'slot-1': b.result()}
 finally:
     batch_engine.close()
-result = {'mode': args.mode, 'position': args.position, 'prompts': prompts,
+result = {'mode': args.mode, 'positions': positions,
+          'admit_after_tokens': args.admit_after_tokens, 'prompts': prompts,
           'outputs': {'serial-slot-0': serial, 'batch': batch}}
 (out / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
 print(json.dumps({'serial_tokens': len(serial['tokens']),

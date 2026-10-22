@@ -47,6 +47,17 @@ not a performance result.
 
 A corrected [delayed-admission MTP2 trace](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md) submitted the second request only after slot 0 had generated 48 solo-path tokens. Both outputs matched serial (96 and one token). QSA hashes matched serial at the first common post-handoff lengths 121/122, then all 12 indexer/KV groups first differed at length 124/model layer 3 and remained different through 163. This places the first captured state change after the solo prefix and handoff, during later batch-slot work; it does not identify an operation. The earlier QSA `one-live` runs submitted both requests concurrently because of a harness name-check error; they show the long request continuing after its one-token peer finished, not a delayed arrival. The separate target-only GDN capture did wait for the first output token. Phase 5 remains open.
 
+A matching all-layer GDN capture at the same delayed-admission boundary was
+bit-identical to serial at committed positions 120 and 121. At position 123,
+all 36 layers differed (28,228,404/29,417,472 floats; relative L2 0.0142116,
+maximum absolute difference 0.518419; first changed model layer 1), aligning
+with the first QSA hash divergence at accepted length 124. Slot-0 output stayed
+exact for 96 tokens. Minimum host/admission availability was 16.78 GiB over 65
+samples with zero cgroup events. A first multi-position attempt allowed the
+engine to return to solo mode after the peer exited and captured only position
+121; that incomplete attempt is excluded. The corrected harness pins the slot
+route. Phase 5 remains open.
+
 The latest [MTP2 position-76 committed-state comparison](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md)
 paired batch and serial rows by token. Prompt 0's 36-layer GDN state differs
 in 26,965,859/29,417,472 floats (relative L2 0.0182307), first at GDN model

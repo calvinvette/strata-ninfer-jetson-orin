@@ -412,3 +412,17 @@ zero cgroup events. This places the first sampled divergence after an exact
 solo prefix and two exact post-transition states, during subsequent batch-slot
 execution; it does not identify the operation or quantify the numeric error.
 Energy was not measured. The raw traces remain local-only.
+
+The matching all-layer GDN capture used the same corrected 48-token delayed
+admission and kept slot 0 in the batch path with `STRATA_PARALLEL_SOLO=0`. At
+committed positions 120 and 121, all 36 GDN layers were bit-identical to serial.
+At position 123, all 36 layers differed: 28,228,404/29,417,472 floats, relative
+L2 0.0142116, maximum absolute difference 0.518419, first changed model layer
+1. This aligns the GDN onset with the first QSA mismatch at accepted length
+124. Output remained exact at 96 tokens; minimum available host/admission
+memory was 16.78 GiB over 65 samples, with zero cgroup events. The first
+multi-position GDN attempt did not hold the batch slot after its peer exited
+and only captured position 121; it is incomplete for positions 120/123 and is
+not used in the comparison. The complete raw files (about 674 MiB combined)
+remain local-only. The analyzer groups repeated STGCMT1 records by exact
+position, token and capture occurrence.

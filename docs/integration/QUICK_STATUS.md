@@ -107,10 +107,12 @@ See the [batch-MTP report](../../bench/results/2026-10-22-phase5-coder-batch-mtp
 Earlier QSA runs submitted the long request and one-token peer concurrently;
 a harness name-check error meant they did not delay the peer after the first
 output as intended. They still show QSA drift after the peer finishes. A
-corrected MTP2 control submitted the peer after 48 solo-path tokens: state
-hashes matched serial at common lengths 121/122, then all 12 indexer/KV hashes
-differed from length 124 through 163, while output remained exact. This points
-to state movement during later batch-slot work, with the operation unknown.
+corrected MTP2 control submitted the peer after 48 solo-path tokens: QSA
+hashes matched at common lengths 121/122, then all 12 indexer/KV hashes
+changed from 124 through 163. Direct GDN captures were bit-exact at committed
+positions 120/121 and differed across all 36 layers at 123 (relative L2 0.0142).
+Output remained exact. The first state change is after handoff during batch-slot
+work; the responsible operation and quality bound remain unknown.
 
 Direct numeric captures at committed position 126 found GDN state drift in
 all 36 layers for both MTP2 (relative L2 0.00973) and target-only (0.00841),
