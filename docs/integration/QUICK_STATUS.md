@@ -147,6 +147,14 @@ slot 1 was already changed at position 68 (0.00822). Layer-12 input `x` changed
 at the same selected positions. Slot 1's earlier onset remains unbounded; see
 the linked capture report for paired state and activation metrics.
 
+A six-token all-layer state capture then found the row mapping was reversed in
+that run: physical slot 0 matched serial prompt 1, slot 1 matched prompt 0, with
+36/36 GDN layers agreeing on each mapping. Slot 0 was exact at position 68 and
+first changed at GDN layer 2 by position 71; slot 1 was already changed at
+position 68, first at layer 5. Both six-token outputs matched their controls.
+Slot-to-prompt assignment varied across runs, so these boundaries are kept
+run-local and do not explain token 60.
+
 ## Near-term direction
 
 1. Continue resolving batch-MTP output divergence: capture earlier layer

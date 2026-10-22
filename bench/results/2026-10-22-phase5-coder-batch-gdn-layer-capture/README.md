@@ -92,6 +92,34 @@ layers or identify a responsible operation. The supervised run retained 17.49
 GiB minimum available RAM and zero nonzero sampled cgroup memory events. See
 `two-live-early-boundary-summary.json`.
 
+## Short all-layer committed-state boundary
+
+A separate six-token two-live run captured all 36 GDN committed states at
+positions 68 and 71, with the same layer-12 activation trace. Both requests
+returned six tokens matching their fresh serial controls; this run stops before
+the known output mismatch at token 60. Mapping each physical batch row to the
+serial control by its complete set of GDN state deltas gave a unanimous 36/36
+layer vote. In this run, physical slot 0 maps to serial prompt 1 and slot 1 to
+serial prompt 0, illustrating why the numeric slot cannot serve as request
+identity.
+
+For slot 0 / prompt 1, all 36 committed layer states were bit-exact at position
+68; by position 71 the first changed GDN layer was model layer 2 (relative L2
+0.000707, with two exact layers remaining). Its layer-12 input `x` differed at
+position 71 (relative L2 0.01067). For slot 1 / prompt 0, only four committed
+GDN layers were exact at position 68, and the first changed layer was model
+layer 5; at position 71 the first changed layer was model layer 4. Its layer-12
+input `x` differed at position 68 (relative L2 0.01538) and position 71
+(0.01278). Since the batch-to-prompt slot assignment differed from the longer
+run, these boundaries are reported for this run's own nearest-state mapping.
+They do not by themselves explain the later token-60 mismatch.
+
+The six-token run processed six windows averaging 1.33 rows. It retained 17.46
+GiB minimum available physical RAM with zero nonzero sampled cgroup events. The
+all-layer `.stgcmt` files are local-only; the compact per-layer analysis is
+`two-live-all-layer-state-68-71-summary.json`. This run's profiling capture
+adds substantial commit-copy work and is correctness evidence only.
+
 ## Resources and validation
 
 Minimum available physical RAM and minimum admission availability were both

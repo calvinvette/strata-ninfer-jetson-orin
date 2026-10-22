@@ -16,16 +16,24 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--layer', type=int, default=12)
 parser.add_argument('--positions', default=','.join(map(str, range(120, 133))))
-parser.add_argument('--commit-layer', type=int, default=-1,
-                    help='also capture committed recurrent state at this GDN layer')
+parser.add_argument('--commit-layer', default='-1',
+                    help='also capture committed recurrent state at a GDN layer, or all')
+parser.add_argument('--max-new', type=int, default=96)
 args = parser.parse_args()
 positions = [int(value) for value in args.positions.split(',')]
 if positions != sorted(set(positions)) or not positions or positions[0] < 0:
     parser.error('--positions must be sorted unique non-negative integers')
 if args.layer < 0:
     parser.error('--layer must be non-negative')
-if args.commit_layer < -1:
-    parser.error('--commit-layer must be -1 (disabled) or a non-negative GDN layer')
+if args.commit_layer != 'all':
+    try:
+        args.commit_layer = int(args.commit_layer)
+    except ValueError:
+        parser.error('--commit-layer must be -1, all, or a non-negative GDN layer')
+    if args.commit_layer < -1:
+        parser.error('--commit-layer must be -1, all, or a non-negative GDN layer')
+if args.max_new < 1:
+    parser.error('--max-new must be positive')
 
 out = args.output.resolve()
 out.mkdir(parents=True, exist_ok=False)
@@ -47,14 +55,14 @@ def make_env(name):
                 'STRATA_VERIFY_DUMP_GDN_POSITIONS': ','.join(map(str, positions)),
                 'STRATA_VERIFY_DUMP_GDN_BATCH': '1',
                 'STRATA_VERIFY_DUMP_GDN_PATH': str((out / f'{name}.stgdiag').resolve())})
-    if args.commit_layer >= 0:
+    if args.commit_layer != -1:
         env.update({'STRATA_VERIFY_DUMP_GDN_COMMIT_LAYER': str(args.commit_layer),
                     'STRATA_VERIFY_DUMP_GDN_COMMIT_POSITIONS': ','.join(map(str, positions)),
                     'STRATA_VERIFY_DUMP_GDN_COMMIT_PATH': str((out / f'{name}.stgcmt').resolve())})
     return env
 
 def generate(engine, prompt):
-    tokens = [token for token in engine.generate(prompt, 96, {'temperature': 0}, threading.Event())
+    tokens = [token for token in engine.generate(prompt, args.max_new, {'temperature': 0}, threading.Event())
               if token is not None]
     return {'tokens': tokens, 'finish': engine.last.get('finish')}
 
@@ -83,7 +91,8 @@ for name in ('slot-0', 'slot-1'):
     first_mismatch[name] = next((i for i, (a, b) in
                                  enumerate(zip(serial[name]['tokens'], batch[name]['tokens'])) if a != b), None)
 result = {'model': cfg['model_name'], 'mode': 'two-live-target-only', 'layer': args.layer,
-          'positions': positions, 'prompts': prompts, 'serial_fresh': serial, 'batch': batch,
+          'positions': positions, 'max_new': args.max_new, 'commit_layer': args.commit_layer,
+          'prompts': prompts, 'serial_fresh': serial, 'batch': batch,
           'first_mismatch_index': first_mismatch}
 (out / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
 print(json.dumps({'serial_tokens': {k: len(v['tokens']) for k, v in serial.items()},
