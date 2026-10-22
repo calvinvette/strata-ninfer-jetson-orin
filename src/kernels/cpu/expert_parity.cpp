@@ -81,7 +81,8 @@ float f16_at(const std::vector<uint8_t>& b, size_t off) {
 
 int main(int argc, char** argv) {
     bool selftest = false;
-    const char* path = "pack/full/experts.bin";
+    const char* path = std::getenv("STRATA_TEST_EXPERTS_BIN");
+    if (path == nullptr || !*path) path = "pack/full/experts.bin";
     long long layer = 0, expert = 0;
     for (int i = 1; i < argc; ++i) {
         const std::string a = argv[i];
