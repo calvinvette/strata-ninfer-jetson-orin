@@ -375,3 +375,15 @@ and energy was not measured. Raw 226 MiB state files remain local-only.
 The capture harness is `capture_mtp2_one_live_gdn_state.py`; the compact
 comparator is `compare_mtp2_one_live_gdn_commit.cpp`. The tested binary SHA256
 was `832068fd31b9e1dff9f835fb318e7c7c5c7f481026e9398111256345ac20ab45`.
+
+The same one-live admission control was then repeated with MTP disabled, using
+target-only decode and the same prompt, context, expert cache and capture
+position. The long output again matched its serial control for all 96 tokens,
+but the GDN commit differed in all 36 layers at position 126: 28,576,928 of
+29,417,472 values changed, relative L2 0.00841253, maximum absolute difference
+0.46446, first changed model layer 1. The supervisor passed with 17.80 GiB
+minimum host/admission availability across 75 samples and zero cgroup events.
+This shows MTP2 is not required for one-live batch-path GDN drift. The similar
+state deltas suggest the shared batch-row path or solo-to-batch transition,
+but the current controls do not separate those causes. These are correctness
+diagnostics, not performance measurements.

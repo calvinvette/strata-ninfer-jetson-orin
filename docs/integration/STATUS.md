@@ -36,6 +36,15 @@ numeric recurrent-state movement; the cause and quality bound remain unknown.
 A requested position-127 dump had no matching commit and yielded no records;
 position 126 was the complete capture. See the [batch-MTP report](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
 
+A matched target-only one-live-after-admission control also produced numeric
+GDN drift at committed position 126 while matching all 96 serial output tokens.
+All 36 layers changed (28,576,928/29,417,472 values; relative L2 0.00841253,
+maximum absolute difference 0.46446; first changed model layer 1). Minimum
+host/admission availability was 17.80 GiB with zero cgroup events. Since both
+target-only and MTP2 reproduce the movement, MTP2 is not required; the shared
+batch-row path versus solo-to-batch transition remains unresolved. This is
+not a performance result.
+
 The latest [MTP2 position-76 committed-state comparison](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md)
 paired batch and serial rows by token. Prompt 0's 36-layer GDN state differs
 in 26,965,859/29,417,472 floats (relative L2 0.0182307), first at GDN model

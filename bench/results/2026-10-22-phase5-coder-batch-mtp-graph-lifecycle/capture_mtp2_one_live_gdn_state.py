@@ -15,11 +15,15 @@ from tools.integration.batch_mtp_graph_lifecycle import prepared_prompts, replac
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--output', type=Path, required=True)
 p.add_argument('--position', type=int, default=126)
+p.add_argument('--mode', choices=('mtp2', 'target-only'), default='mtp2')
 args = p.parse_args()
 out = args.output.resolve()
 out.mkdir(parents=True, exist_ok=False)
 cfg = json.loads((Path(__file__).resolve().parent / 'config.json').read_text())
 engine_args = list(cfg['args'])
+if args.mode == 'target-only':
+    remove_arg(engine_args, '--mtp')
+    remove_arg(engine_args, '--mtp-max-t')
 replace_arg(engine_args, '--spec', '2')
 replace_arg(engine_args, '--max-context', '1024')
 replace_arg(engine_args, '--expert-cache', '1500')
@@ -50,7 +54,10 @@ try:
     serial = generate(serial_engine, 'slot-0', 96)
 finally:
     serial_engine.close()
-batch_engine = StrataEngine(cfg['exe'], engine_args + ['--batch', '2', '--batch-mtp'], cwd=cfg.get('cwd'),
+batch_args = engine_args + ['--batch', '2']
+if args.mode == 'mtp2':
+    batch_args.append('--batch-mtp')
+batch_engine = StrataEngine(cfg['exe'], batch_args, cwd=cfg.get('cwd'),
                             log=str(out / 'batch.log'), env=make_env('batch'))
 try:
     if batch_engine.batch != 2:
@@ -64,7 +71,7 @@ try:
         batch = {'slot-0': a.result(), 'slot-1': b.result()}
 finally:
     batch_engine.close()
-result = {'position': args.position, 'prompts': prompts,
+result = {'mode': args.mode, 'position': args.position, 'prompts': prompts,
           'outputs': {'serial-slot-0': serial, 'batch': batch}}
 (out / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
 print(json.dumps({'serial_tokens': len(serial['tokens']),
