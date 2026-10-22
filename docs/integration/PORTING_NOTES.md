@@ -2696,3 +2696,11 @@ useful for locating a selected-path delta but is not evidence about multirow
 interference. For a future Strata/Splash port, preserve the same explicit row
 identity and synchronization contract while implementing the backend-native
 capture and independent decoder.
+
+The first genuine two-live capture averaged 1.96 rows per decode window. At the
+known output-mismatch boundary, slot 1 still consumed the same token as its
+fresh serial control, while its layer-12 input and all captured downstream
+fields had changed. For future batch backends, pair by request, position and
+consumed token, then capture the preceding layer boundary and logits as well;
+a changed downstream activation does not identify which earlier shared or
+per-row operation introduced it.

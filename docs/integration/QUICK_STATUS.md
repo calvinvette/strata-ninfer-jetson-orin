@@ -133,10 +133,18 @@ layer-12 input `x` and every captured downstream field differed. The batch
 scheduler averaged one row per window, so this run did not explain the separate
 multirow mismatch. See the [capture report](../../bench/results/2026-10-22-phase5-coder-batch-gdn-layer-capture/README.md).
 
+A separate two-live target-only run averaged 1.96 rows across 96 windows and
+reproduced slot 1's first output mismatch at token 60. At position 127 it
+consumed the same token as its fresh serial control, while all captured layer-12
+fields differed; input `x` relative L2 was 0.06058. The internal delta therefore
+precedes the visible token change, but the model-wide origin remains unknown.
+The selected positions and captured arrays repeated bit-for-bit in a second
+supervised run; this is bounded to the same prompt pair and build.
+
 ## Near-term direction
 
-1. Continue resolving batch-MTP output divergence: extend per-row state and
-   activation logging through a genuinely multirow decode window, then isolate
+1. Continue resolving batch-MTP output divergence: capture earlier layer
+   boundaries and logits around the reproducible multirow drift, then isolate
    the first recurrence or verifier operation that changes the row. Extend
    accepted-prefix direct-state and long-chain
    recovery coverage, widen cancellation boundaries beyond the passing Coder

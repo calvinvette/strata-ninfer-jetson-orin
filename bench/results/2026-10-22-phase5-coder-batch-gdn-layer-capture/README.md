@@ -37,6 +37,45 @@ two-live-request mismatch. It remains a delayed-admission batch-mode diagnostic.
 The prior batch-MTP and two-live target-only tests remain the relevant multirow
 evidence.
 
+## Two-live multirow follow-up
+
+A second supervised run used two simultaneous target-only Coder requests with
+the existing `--batch 2` reproducer settings, but captured independent fresh
+serial controls and batch slot rows at positions 120–132. The batch output
+again matched slot 0 and first differed from the slot-1 serial control at
+generated token index 60. The engine processed 96 windows at an average 1.96
+rows per window, confirming that this run includes actual multirow verifier
+work. Both batch slots map to their matching fresh serial prompt in the
+captured pre-mismatch rows.
+
+At position 127, physical slot 1 consumed token 11 in both batch and serial.
+All ten captured layer-12 fields differed before the output token at index 60
+diverged. The first listed field, layer-12 input `x`, differed in all 2,560
+values (relative L2 0.06058, maximum absolute difference 0.16310); `gdn_out`
+relative L2 was 0.04090. At position 120, the same slot/token pairing already
+had a changed `x` (relative L2 0.01563), so this selected capture does not bound
+the onset. The earlier accepted-state sweep found drift much earlier, at
+position 69 for this row. These layer-12 values show that the hidden numerical
+state is already different before the known output mismatch, but do not locate
+the first changed model operation or prove which field causes the argmax
+change.
+
+The three supervised arms retained at least 17.53 GiB available physical RAM;
+all 104 sampled cgroup records had zero `low`, `high`, `max`, `oom`, and
+`oom_kill` events. The six-GiB host headroom remained in effect. Dynamic clocks
+were observed without intervention, EMC readback was denied, and energy was
+not attributed to requests. No performance claim is made. The compact paired
+field report is `two-live-layer12-summary.json`; raw activations and full run
+telemetry remain local.
+
+A repeat restricted to positions 125–127 reproduced the same slot-1 token-60
+output mismatch and the same 1.96-row average. For both batch slots, consumed
+tokens and every captured layer-12 array at positions 125, 126 and 127 were
+bit-identical between the two runs. The repeated run retained 17.52 GiB minimum
+available RAM and zero nonzero sampled cgroup memory events. This confirms
+repeatability for the selected prompt pair and current build, not across other
+prompts or configurations. See `two-live-layer12-repeat-check.json`.
+
 ## Resources and validation
 
 Minimum available physical RAM and minimum admission availability were both
@@ -64,6 +103,7 @@ maestro1 HIP binary SHA256: `594ec3031ad9c3e93ffd6481d981844de47c4b975b8c9c3aa6f
 The backend checks were compile/startup evidence only and do not qualify
 accelerator runtime.
 
-The harness and parser are retained as `capture_target_only_gdn_layer.py` and
-`compare_layer_capture.py`. Raw `*.stgdiag` data, run logs, and supervisor
-telemetry remain local and are intentionally excluded from Git.
+The harnesses and parser are retained as `capture_target_only_gdn_layer.py`,
+`two_live_multrow_layer12.py`, and `compare_layer_capture.py`. Raw `*.stgdiag`
+data, run logs, and supervisor telemetry remain local and are intentionally
+excluded from Git.
