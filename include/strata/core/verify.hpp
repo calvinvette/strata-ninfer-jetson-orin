@@ -392,10 +392,22 @@ private:
     size_t gdn_state_diag_capacity_ = 0;
     std::string gdn_state_diag_path_;
     bool gdn_state_diag_captured_ = false;
+    int boundary_diag_layer_ = -1;
+    int64_t boundary_diag_position_ = -1;
+    float* boundary_diag_h_ = nullptr; ///< opt-in residual/hyperconnection boundary snapshots
+    size_t boundary_diag_capacity_ = 0;
+    std::string boundary_diag_path_;
+    bool boundary_diag_captured_ = false;
     int gdn_commit_diag_layer_ = -1;
     std::vector<int64_t> gdn_commit_diag_positions_;
     std::vector<float> gdn_commit_diag_host_;
     std::string gdn_commit_diag_path_;
+    int gr_read_diag_layer_ = -1;
+    int64_t gr_read_diag_position_ = -1;
+    float* gr_read_diag_host_ = nullptr; ///< xn/lo/rs/inject/mixed outputs from one fused GR read
+    size_t gr_read_diag_capacity_ = 0;
+    std::string gr_read_diag_path_;
+    bool gr_read_diag_captured_ = false;
     int moe_route_diag_layer_ = -1;
     int64_t moe_route_diag_position_ = -1;
     std::vector<int64_t> moe_route_diag_positions_;
@@ -404,6 +416,14 @@ private:
     size_t moe_route_diag_capacity_ = 0;
     std::string moe_route_diag_path_;
     bool moe_route_diag_captured_ = false;
+    int moe_input_diag_layer_ = -1;
+    int64_t moe_input_diag_position_ = -1;
+    std::vector<int64_t> moe_input_diag_positions_;
+    bool moe_input_diag_multi_position_filter_ = false;
+    float* moe_input_diag_h_ = nullptr;  ///< opt-in pinned capture of the exact verifier MoE input
+    size_t moe_input_diag_capacity_ = 0;
+    std::string moe_input_diag_path_;
+    std::vector<uint8_t> moe_input_diag_captured_layers_;
     int moe_parts_diag_layer_ = -1;
     int64_t moe_parts_diag_position_ = -1;
     std::vector<int64_t> moe_parts_diag_positions_;

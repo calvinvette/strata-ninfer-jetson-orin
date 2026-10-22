@@ -486,15 +486,24 @@ Verifier::~Verifier() {
     if (gdn_state_diag_h_ && cudaFreeHost(gdn_state_diag_h_) == cudaSuccess)
         strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
                                                     gdn_state_diag_h_, 0, -1);
+    if (boundary_diag_h_ && cudaFreeHost(boundary_diag_h_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
+                                                    boundary_diag_h_, 0, -1);
     if (moe_route_diag_h_ && cudaFreeHost(moe_route_diag_h_) == cudaSuccess)
         strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
                                                     moe_route_diag_h_, 0, -1);
+    if (moe_input_diag_h_ && cudaFreeHost(moe_input_diag_h_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
+                                                    moe_input_diag_h_, 0, -1);
     if (moe_parts_diag_h_ && cudaFreeHost(moe_parts_diag_h_) == cudaSuccess)
         strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
                                                     moe_parts_diag_h_, 0, -1);
     if (moe_output_diag_h_ && cudaFreeHost(moe_output_diag_h_) == cudaSuccess)
         strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
                                                     moe_output_diag_h_, 0, -1);
+    if (gr_read_diag_host_ && cudaFreeHost(gr_read_diag_host_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
+                                                    gr_read_diag_host_, 0, -1);
     if (ev_fork_) cudaEventDestroy(ev_fork_);
     if (ev_join_) cudaEventDestroy(ev_join_);
     for (cudaStream_t s : df_side_)
@@ -711,6 +720,48 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
         }
     }
     {
+        const char* layer = std::getenv("STRATA_VERIFY_DUMP_BOUNDARY_LAYER");
+        const char* path = std::getenv("STRATA_VERIFY_DUMP_BOUNDARY_PATH");
+        const char* position = std::getenv("STRATA_VERIFY_DUMP_BOUNDARY_POSITION");
+        if ((layer != nullptr) != (path != nullptr) || (layer != nullptr) != (position != nullptr)) {
+            err = "verify: boundary capture layer, path, and position must be set together";
+            return false;
+        }
+        if (layer != nullptr) {
+            char* layer_end = nullptr;
+            char* position_end = nullptr;
+            errno = 0;
+            const long parsed_layer = std::strtol(layer, &layer_end, 10);
+            const long long parsed_position = std::strtoll(position, &position_end, 10);
+            if (errno != 0 || layer_end == layer || *layer_end != '\0' || parsed_layer < 0 ||
+                parsed_layer + 1 >= g.n_layers || position_end == position || *position_end != '\0' ||
+                parsed_position < 0 || !*path) {
+                err = "verify: invalid opt-in residual-boundary layer, position, or path";
+                return false;
+            }
+            const uint64_t row_floats = HC * N + N + HC;
+            const uint64_t total_floats = 2 * row_floats + 2 * HC * N;
+            if (total_floats > SIZE_MAX / sizeof(float)) {
+                err = "verify: opt-in residual-boundary diagnostic size overflows";
+                return false;
+            }
+            boundary_diag_layer_ = (int) parsed_layer;
+            boundary_diag_position_ = (int64_t) parsed_position;
+            boundary_diag_path_ = path;
+            boundary_diag_capacity_ = (size_t) total_floats * sizeof(float);
+            if (cudaHostAlloc((void**) &boundary_diag_h_, boundary_diag_capacity_, cudaHostAllocPortable) != cudaSuccess) {
+                boundary_diag_h_ = nullptr;
+                err = "verify: could not allocate the opt-in residual-boundary diagnostic buffer";
+                return false;
+            }
+            strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "allocate", this,
+                                                        boundary_diag_h_, boundary_diag_capacity_, -1);
+            std::fprintf(stderr, "strata verify: opt-in residual/hyperconnection boundary capture at %d/%d position %lld -> %s (%zu bytes)\n",
+                         boundary_diag_layer_, boundary_diag_layer_ + 1,
+                         (long long) boundary_diag_position_, boundary_diag_path_.c_str(), boundary_diag_capacity_);
+        }
+    }
+    {
         const char* layer = std::getenv("STRATA_VERIFY_DUMP_GDN_COMMIT_LAYER");
         const char* path = std::getenv("STRATA_VERIFY_DUMP_GDN_COMMIT_PATH");
         const char* positions = std::getenv("STRATA_VERIFY_DUMP_GDN_COMMIT_POSITIONS");
@@ -719,11 +770,12 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
             return false;
         }
         if (layer != nullptr) {
+            const bool all_layers = std::strcmp(layer, "all") == 0;
             char* end = nullptr;
             errno = 0;
-            const long parsed = std::strtol(layer, &end, 10);
-            if (errno != 0 || end == layer || *end != '\0' || parsed < 0 || parsed >= g.n_layers ||
-                is_qsa_layer(g, parsed) || !*path || !*positions) {
+            const long parsed = all_layers ? -2 : std::strtol(layer, &end, 10);
+            if (errno != 0 || (!all_layers && (end == layer || *end != '\0' || parsed < 0 || parsed >= g.n_layers ||
+                is_qsa_layer(g, parsed))) || !*path || !*positions) {
                 err = "verify: GDN commit capture needs a valid GDN layer, path, and token positions";
                 return false;
             }
@@ -759,8 +811,55 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
             gdn_commit_diag_layer_ = (int) parsed;
             gdn_commit_diag_host_.resize((size_t) state_floats);
             gdn_commit_diag_path_ = path;
-            std::fprintf(stderr, "strata verify: opt-in committed GDN state dump at layer %d for %zu positions -> %s\n",
-                         gdn_commit_diag_layer_, gdn_commit_diag_positions_.size(), gdn_commit_diag_path_.c_str());
+            if (all_layers)
+                std::fprintf(stderr, "strata verify: opt-in committed GDN state dump at all GDN layers for %zu positions -> %s\n",
+                             gdn_commit_diag_positions_.size(), gdn_commit_diag_path_.c_str());
+            else
+                std::fprintf(stderr, "strata verify: opt-in committed GDN state dump at layer %d for %zu positions -> %s\n",
+                             gdn_commit_diag_layer_, gdn_commit_diag_positions_.size(), gdn_commit_diag_path_.c_str());
+        }
+    }
+    {
+        const char* layer = std::getenv("STRATA_VERIFY_DUMP_GR_READ_LAYER");
+        const char* position = std::getenv("STRATA_VERIFY_DUMP_GR_READ_POSITION");
+        const char* path = std::getenv("STRATA_VERIFY_DUMP_GR_READ_PATH");
+        if ((layer != nullptr) != (position != nullptr) || (layer != nullptr) != (path != nullptr)) {
+            err = "verify: fused GR-read capture layer, position, and path must be set together";
+            return false;
+        }
+        if (layer != nullptr) {
+            char* layer_end = nullptr;
+            char* position_end = nullptr;
+            errno = 0;
+            const long parsed_layer = std::strtol(layer, &layer_end, 10);
+            const long long parsed_position = std::strtoll(position, &position_end, 10);
+            if (errno != 0 || layer_end == layer || *layer_end != '\0' || parsed_layer < 0 ||
+                parsed_layer >= g.n_layers || position_end == position || *position_end != '\0' ||
+                parsed_position < 0 || !*path) {
+                err = "verify: invalid fused GR-read capture layer, position, or path";
+                return false;
+            }
+            const uint64_t floats = (uint64_t) g.hc * (uint64_t) g.n_embd + (uint64_t) g.n_embd +
+                                    2 * (uint64_t) g.hc + (uint64_t) g.hc_lr;
+            if (floats == 0 || floats > SIZE_MAX / sizeof(float)) {
+                err = "verify: fused GR-read capture size overflows";
+                return false;
+            }
+            gr_read_diag_layer_ = (int) parsed_layer;
+            gr_read_diag_position_ = (int64_t) parsed_position;
+            gr_read_diag_path_ = path;
+            gr_read_diag_capacity_ = (size_t) floats * sizeof(float);
+            if (cudaHostAlloc((void**) &gr_read_diag_host_, gr_read_diag_capacity_, cudaHostAllocPortable) != cudaSuccess) {
+                gr_read_diag_host_ = nullptr;
+                err = "verify: could not allocate the opt-in fused GR-read diagnostic buffer";
+                return false;
+            }
+            strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "allocate", this,
+                                                        gr_read_diag_host_, gr_read_diag_capacity_, -1);
+            gr_read_diag_captured_ = true;
+            std::fprintf(stderr, "strata verify: opt-in fused GR-read capture at layer %d position %lld -> %s (%zu bytes)\n",
+                         gr_read_diag_layer_, (long long) gr_read_diag_position_, gr_read_diag_path_.c_str(),
+                         gr_read_diag_capacity_);
         }
     }
     {
@@ -808,6 +907,65 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
                                                         moe_route_diag_h_, moe_route_diag_capacity_, -1);
             std::fprintf(stderr, "strata verify: opt-in MoE route-weight dump at layer %d -> %s (%zu bytes)\n",
                          moe_route_diag_layer_, moe_route_diag_path_.c_str(), moe_route_diag_capacity_);
+        }
+    }
+    {
+        const char* layer = std::getenv("STRATA_VERIFY_DUMP_MOE_INPUT_LAYER");
+        const char* path = std::getenv("STRATA_VERIFY_DUMP_MOE_INPUT_PATH");
+        const char* positions = std::getenv("STRATA_VERIFY_DUMP_MOE_INPUT_POSITIONS");
+        const char* position = positions == nullptr ? std::getenv("STRATA_VERIFY_DUMP_MOE_INPUT_POSITION") : nullptr;
+        if ((layer != nullptr) != (path != nullptr)) {
+            err = "verify: STRATA_VERIFY_DUMP_MOE_INPUT_LAYER and STRATA_VERIFY_DUMP_MOE_INPUT_PATH must be set together";
+            return false;
+        }
+        if ((position != nullptr || positions != nullptr) && layer == nullptr) {
+            err = "verify: MoE input positions need the input layer and path";
+            return false;
+        }
+        if (layer != nullptr) {
+            const bool all_layers = std::strcmp(layer, "all") == 0;
+            char* end = nullptr;
+            const long parsed = all_layers ? -2 : std::strtol(layer, &end, 10);
+            if ((!all_layers && (end == layer || *end != '\0' || parsed < 0 || parsed >= g.n_layers)) || !*path) {
+                err = "verify: invalid opt-in MoE input layer or output path";
+                return false;
+            }
+            moe_input_diag_layer_ = (int) parsed;
+            moe_input_diag_path_ = path;
+            if (positions != nullptr) {
+                if (!parse_diag_positions(positions, moe_input_diag_positions_, "MoE input", err)) return false;
+                moe_input_diag_multi_position_filter_ = true;
+            } else if (position != nullptr) {
+                char* pos_end = nullptr;
+                const long long selected = std::strtoll(position, &pos_end, 10);
+                if (pos_end == position || *pos_end != '\0' || selected < 0) {
+                    err = "verify: invalid opt-in MoE input position";
+                    return false;
+                }
+                moe_input_diag_position_ = (int64_t) selected;
+            }
+            const size_t input_layers = all_layers ? (size_t) g.n_layers : 1;
+            if ((size_t) max_t > SIZE_MAX / (size_t) g.n_embd ||
+                (size_t) max_t * (size_t) g.n_embd > SIZE_MAX / input_layers ||
+                (size_t) max_t * (size_t) g.n_embd * input_layers > SIZE_MAX / sizeof(float)) {
+                err = "verify: opt-in MoE input diagnostic size overflows";
+                return false;
+            }
+            moe_input_diag_capacity_ = input_layers * (size_t) max_t * (size_t) g.n_embd * sizeof(float);
+            moe_input_diag_captured_layers_.assign(input_layers, 0);
+            if (cudaHostAlloc((void**) &moe_input_diag_h_, moe_input_diag_capacity_, cudaHostAllocPortable) != cudaSuccess) {
+                moe_input_diag_h_ = nullptr;
+                err = "verify: could not allocate the opt-in MoE input diagnostic buffer";
+                return false;
+            }
+            strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "allocate", this,
+                                                        moe_input_diag_h_, moe_input_diag_capacity_, -1);
+            if (all_layers)
+                std::fprintf(stderr, "strata verify: opt-in MoE input dump at all %lld layers -> %s (%zu bytes)\n",
+                             (long long) g.n_layers, moe_input_diag_path_.c_str(), moe_input_diag_capacity_);
+            else
+                std::fprintf(stderr, "strata verify: opt-in MoE input dump at layer %d -> %s (%zu bytes)\n",
+                             moe_input_diag_layer_, moe_input_diag_path_.c_str(), moe_input_diag_capacity_);
         }
     }
     {
@@ -1178,6 +1336,16 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
         if (trace_m_ != nullptr) gpu_stamp(trace_m_, (int) ((l * kProfPer + i) * 2 + grp), cs);   // #649
     };
     const int tb_[2] = {0, (T + 1) / 2}, te_[2] = {G == 2 ? (T + 1) / 2 : T, T};
+    auto boundary_copy = [&](size_t offset_floats, const float* src, size_t floats) -> bool {
+        if (boundary_diag_h_ == nullptr || T != 1 || batch_rec_) return true;
+        const cudaError_t ce = cudaMemcpyAsync(boundary_diag_h_ + offset_floats, src,
+                                                floats * sizeof(float), cudaMemcpyDeviceToHost, cs);
+        if (ce == cudaSuccess) return true;
+        err = std::string("verify: could not queue opt-in boundary capture: ") + cudaGetErrorString(ce);
+        return false;
+    };
+    const size_t boundary_row_floats = (size_t) HC * (size_t) N + (size_t) N + (size_t) HC;
+    const size_t boundary_hc_floats = (size_t) HC * (size_t) N;
     // S26 STRATA_LFUSE=1: where the shared expert's gate / scale fusions apply (the paths they replace are the ones taken)
     auto lfuse_on = [&](int n) {
         return g_lfuse() && ar_on() && native_moe_combine_enabled() && dec_batch && n > 1 && n <= 8 &&
@@ -1398,10 +1566,45 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                     else if (strata::kernels::cpu::expert_layout().native) a.q8_mixed = nat_xq_ + (size_t) t * (N / 32) * 36;
                 }
             }
-            return fused_gr_read_multi(fa, n, xn_ + (size_t) tb * HC * N, cs, (prof_on_ && grp == 0) ? prof_ : nullptr,
-                                (int) (l * kProfPer + (half == 0 ? 27 : 30)));
+            const bool read_ok = fused_gr_read_multi(fa, n, xn_ + (size_t) tb * HC * N, cs,
+                                                     (prof_on_ && grp == 0) ? prof_ : nullptr,
+                                                     (int) (l * kProfPer + (half == 0 ? 27 : 30)));
+            if (!read_ok) return false;
+            if (gr_read_diag_host_ != nullptr && half == 0 && l == gr_read_diag_layer_ && T == 1 && !batch_rec_) {
+                const size_t xn_bytes = (size_t) HC * (size_t) N * sizeof(float);
+                const size_t n_bytes = (size_t) N * sizeof(float);
+                const size_t hc_bytes = (size_t) HC * sizeof(float);
+                const size_t lo_bytes = (size_t) g.hc_lr * sizeof(float);
+                size_t offset = 0;
+                const auto capture = [&](const float* source, size_t bytes) {
+                    const cudaError_t copy_error = cudaMemcpyAsync((uint8_t*) gr_read_diag_host_ + offset,
+                                                                    source, bytes, cudaMemcpyDeviceToHost, cs);
+                    if (copy_error != cudaSuccess) return false;
+                    offset += bytes;
+                    return true;
+                };
+                if (!capture(xn_ + (size_t) tb * HC * N, xn_bytes) ||
+                    !capture(lo_ + (size_t) tb * g.hc_lr, lo_bytes) ||
+                    !capture(rs_ + (size_t) tb * HC, hc_bytes) ||
+                    !capture(inj_out + (size_t) tb * HC, hc_bytes) ||
+                    !capture(mixed_ + (size_t) tb * N, n_bytes)) {
+                    err = "verify: could not queue opt-in fused GR-read capture";
+                    return false;
+                }
+            }
+            return true;
         };
+        if (boundary_diag_layer_ >= 0 && l == boundary_diag_layer_ + 1 &&
+            !boundary_copy(boundary_row_floats, Rt(tb), boundary_hc_floats)) return false;
+        if (boundary_diag_layer_ >= 0 && l == boundary_diag_layer_ + 1 &&
+            (!boundary_copy(boundary_row_floats + boundary_hc_floats, bo_ + tb * N, (size_t) N) ||
+             !boundary_copy(boundary_row_floats + boundary_hc_floats + (size_t) N,
+                            inj2_ + tb * HC, (size_t) HC))) return false;
         const bool q8_attn = gr_read_group(0, pending, inj2_, inj_);   // true: xq_ holds mixed's q8_1 (STRATA_QFUSE)
+        if (boundary_diag_layer_ >= 0 && l == boundary_diag_layer_ + 1 &&
+            (!boundary_copy(2 * boundary_row_floats, Rt(tb), boundary_hc_floats) ||
+             !boundary_copy(2 * boundary_row_floats + boundary_hc_floats,
+                            xn_ + (size_t) tb * boundary_hc_floats, boundary_hc_floats))) return false;
         if (inputs_pending) {   // the window's steps and positions, before the first mixer reads them
             join(1);
             inputs_pending = false;
@@ -1864,6 +2067,20 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
         }
         // Capture after optional route-resident rewrites so these are the exact IDs and weights
         // consumed by the expert plan and combine below.
+        if (moe_input_diag_h_ != nullptr && (moe_input_diag_layer_ == -2 || l == moe_input_diag_layer_) && !batch_rec_) {
+            const size_t layer_slot = moe_input_diag_layer_ == -2 ? (size_t) l : 0;
+            const size_t dst_off = layer_slot * (size_t) max_t_ * (size_t) N + (size_t) tb * (size_t) N;
+            const size_t copy_bytes = (size_t) n * (size_t) N * sizeof(float);
+            const cudaError_t copy_error = cudaMemcpyAsync(moe_input_diag_h_ + dst_off,
+                                                            mixed_ + (size_t) tb * (size_t) N,
+                                                            copy_bytes, cudaMemcpyDeviceToHost, cs);
+            if (copy_error != cudaSuccess) {
+                err = std::string("verify: could not queue opt-in MoE input capture: ") +
+                      cudaGetErrorString(copy_error);
+                return false;
+            }
+            moe_input_diag_captured_layers_[layer_slot] = 1;
+        }
         if (moe_route_diag_h_ != nullptr && l == moe_route_diag_layer_ && !batch_rec_) {
             const size_t ids_bytes = (size_t) max_t_ * (size_t) K * sizeof(int32_t);
             int32_t* host_ids = (int32_t*) moe_route_diag_h_;
@@ -2115,6 +2332,10 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
         } else if (cvec().covers(l)) {
             cvec_apply(Rt(tb), l, n, HC * N, bo_ + tb * N, N, inj2_ + tb * HC, HC, true, cs);
         }
+        if (boundary_diag_layer_ >= 0 && l == boundary_diag_layer_ &&
+            (!boundary_copy(0, Rt(tb), boundary_hc_floats) ||
+             !boundary_copy(boundary_hc_floats, bo_ + tb * N, (size_t) N) ||
+             !boundary_copy(boundary_hc_floats + (size_t) N, inj2_ + tb * HC, (size_t) HC))) return false;
         return true;
     };
 
@@ -2662,6 +2883,42 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
     const cudaError_t se = cudaStreamSynchronize(cs_);
     trace_ev("SYNCED", -1, -1, (int64_t) se);
     if (se != cudaSuccess) { err = std::string("verify: ") + cudaGetErrorString(se); return false; }
+    if (gr_read_diag_captured_ && T == 1 && pos0 == gr_read_diag_position_) {
+        struct GrReadHeader {
+            char magic[8];
+            uint32_t version;
+            uint32_t layer;
+            int64_t position;
+            int32_t token;
+            int32_t reserved;
+            uint64_t n_embd;
+            uint64_t hc;
+            uint64_t hc_lr;
+        } header{};
+        static_assert(sizeof(GrReadHeader) == 56, "STGRRD1 header layout changed");
+        std::memcpy(header.magic, "STGRRD1", sizeof(header.magic));
+        header.version = 1;
+        header.layer = (uint32_t) gr_read_diag_layer_;
+        header.position = pos0;
+        header.token = tokens[0];
+        header.n_embd = (uint64_t) g.n_embd;
+        header.hc = (uint64_t) g.hc;
+        header.hc_lr = (uint64_t) g.hc_lr;
+        static std::mutex gr_read_dump_mutex;
+        std::lock_guard<std::mutex> lock(gr_read_dump_mutex);
+        std::FILE* dump = std::fopen(gr_read_diag_path_.c_str(), "ab");
+        bool written = dump != nullptr;
+        if (written) {
+            written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
+                      std::fwrite(gr_read_diag_host_, 1, gr_read_diag_capacity_, dump) == gr_read_diag_capacity_;
+            if (std::fflush(dump) != 0) written = false;
+            if (std::fclose(dump) != 0) written = false;
+        }
+        if (!written) {
+            err = "verify: could not write opt-in fused GR-read capture";
+            return false;
+        }
+    }
     bool gdn_diag_position_selected = gdn_diag_position_ < 0 && !gdn_diag_multi_position_filter_;
     if (gdn_diag_multi_position_filter_) {
         for (int t = 0; t < T && !gdn_diag_position_selected; ++t)
@@ -2741,6 +2998,41 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
             return false;
         }
     }
+    if (boundary_diag_h_ != nullptr && T == 1 && !batch_rec_ && pos0 == boundary_diag_position_) {
+        struct BoundaryHeader {
+            char magic[8];
+            uint32_t version;
+            int32_t layer;
+            int64_t position;
+            uint64_t n_embd;
+            uint64_t hc;
+            int32_t token;
+            int32_t reserved;
+        } header{};
+        static_assert(sizeof(BoundaryHeader) == 48, "STBNDY1 header layout changed");
+        std::memcpy(header.magic, "STBNDY1", sizeof(header.magic));
+        header.version = 1;
+        header.layer = boundary_diag_layer_;
+        header.position = pos0;
+        header.n_embd = (uint64_t) g.n_embd;
+        header.hc = (uint64_t) g.hc;
+        header.token = tokens[0];
+        static std::mutex boundary_dump_mutex;
+        std::lock_guard<std::mutex> lock(boundary_dump_mutex);
+        std::FILE* dump = std::fopen(boundary_diag_path_.c_str(), "ab");
+        bool written = dump != nullptr;
+        if (written) {
+            written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
+                      std::fwrite(boundary_diag_h_, 1, boundary_diag_capacity_, dump) == boundary_diag_capacity_;
+            if (std::fflush(dump) != 0) written = false;
+            if (std::fclose(dump) != 0) written = false;
+        }
+        if (!written) {
+            err = "verify: could not write opt-in residual-boundary diagnostic";
+            return false;
+        }
+        boundary_diag_captured_ = true;
+    }
     if (moe_route_diag_captured_ && diag_position_matches(moe_route_diag_position_,
             moe_route_diag_positions_, moe_route_diag_multi_position_filter_, pos0, T)) {
         static std::mutex route_dump_mutex;
@@ -2775,6 +3067,52 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
         }
         if (!written) {
             err = "verify: could not write opt-in device MoE route capture";
+            return false;
+        }
+    }
+    if (moe_input_diag_h_ != nullptr && diag_position_matches(moe_input_diag_position_,
+            moe_input_diag_positions_, moe_input_diag_multi_position_filter_, pos0, T)) {
+        struct InputHeader {
+            char magic[8];
+            uint32_t version;
+            uint32_t layer;
+            uint32_t rows;
+            uint32_t reserved;
+            uint64_t n_embd;
+            int64_t pos0;
+            int32_t tokens[strata::kernels::kVerifyMaxT];
+        } header{};
+        static_assert(sizeof(InputHeader) == 72, "STMOINP1 header layout changed");
+        std::memcpy(header.magic, "STMOINP1", sizeof(header.magic));
+        header.version = 1;
+        header.rows = (uint32_t) T;
+        header.n_embd = (uint64_t) g.n_embd;
+        header.pos0 = pos0;
+        for (int t = 0; t < T; ++t) header.tokens[t] = tokens[t];
+        const size_t data_bytes = (size_t) T * (size_t) g.n_embd * sizeof(float);
+        static std::mutex input_dump_mutex;
+        std::lock_guard<std::mutex> lock(input_dump_mutex);
+        std::FILE* dump = std::fopen(moe_input_diag_path_.c_str(), "ab");
+        bool written = dump != nullptr;
+        const size_t first_layer = moe_input_diag_layer_ == -2 ? 0 : (size_t) moe_input_diag_layer_;
+        const size_t layer_count = moe_input_diag_layer_ == -2 ? (size_t) g.n_layers : 1;
+        for (size_t index = 0; index < layer_count && written; ++index) {
+            const size_t layer_slot = moe_input_diag_layer_ == -2 ? index : 0;
+            if (!moe_input_diag_captured_layers_[layer_slot]) {
+                written = false;
+                break;
+            }
+            header.layer = (uint32_t) (first_layer + index);
+            const float* layer_data = moe_input_diag_h_ + layer_slot * (size_t) max_t_ * (size_t) g.n_embd;
+            written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
+                      std::fwrite(layer_data, 1, data_bytes, dump) == data_bytes;
+        }
+        if (dump != nullptr) {
+            if (std::fflush(dump) != 0) written = false;
+            if (std::fclose(dump) != 0) written = false;
+        }
+        if (!written) {
+            err = "verify: could not write opt-in MoE input diagnostic";
             return false;
         }
     }
@@ -3067,14 +3405,11 @@ void Verifier::set_commit_async(bool on) { g_commit_async = on && std::getenv("S
 
 bool Verifier::capture_gdn_commit_state(SessionState& state, int64_t position, int32_t token, int slot,
                                         std::string& err) {
-    if (gdn_commit_diag_layer_ < 0 ||
+    if (gdn_commit_diag_layer_ == -1 ||
         !std::binary_search(gdn_commit_diag_positions_.begin(), gdn_commit_diag_positions_.end(), position))
         return true;
     const ModelGeometry& g = *g_;
-    int64_t ordinal = 0;
-    for (int64_t layer = 0; layer < gdn_commit_diag_layer_; ++layer)
-        if (!is_qsa_layer(g, layer)) ++ordinal;
-    if (ordinal < state.gdn_ord0 || ordinal >= state.gdn_ord0 + state.gdn_alloc) return true;
+    const bool all_layers = gdn_commit_diag_layer_ == -2;
     const uint64_t recurrent_floats = (uint64_t) g.ssm_state_size * (uint64_t) g.ssm_v_heads *
                                       (uint64_t) g.ssm_state_size;
     const uint64_t state_floats = recurrent_floats +
@@ -3088,13 +3423,6 @@ bool Verifier::capture_gdn_commit_state(SessionState& state, int64_t position, i
         err = std::string("verify: GDN commit capture sync: ") + cudaGetErrorString(se);
         return false;
     }
-    const float* device_state = state.gdn_state + (size_t) (ordinal - state.gdn_ord0) * (size_t) state_floats;
-    const cudaError_t ce = cudaMemcpy(gdn_commit_diag_host_.data(), device_state,
-                                     (size_t) state_floats * sizeof(float), cudaMemcpyDeviceToHost);
-    if (ce != cudaSuccess) {
-        err = std::string("verify: GDN commit capture copy: ") + cudaGetErrorString(ce);
-        return false;
-    }
     struct GdnCommitHeader {
         char magic[8];
         uint32_t version;
@@ -3104,32 +3432,53 @@ bool Verifier::capture_gdn_commit_state(SessionState& state, int64_t position, i
         uint64_t state_floats;
         int32_t token;
         int32_t slot;
-    } header{};
+    };
     static_assert(sizeof(GdnCommitHeader) == 48, "STGCMT1 header layout changed");
-    std::memcpy(header.magic, "STGCMT1", sizeof(header.magic));
-    header.version = 1;
-    header.layer = gdn_commit_diag_layer_;
-    header.position = position;
-    header.recurrent_floats = recurrent_floats;
-    header.state_floats = state_floats;
-    header.token = token;
-    header.slot = slot;
     static std::mutex dump_mutex;
     std::lock_guard<std::mutex> lock(dump_mutex);
     std::FILE* dump = std::fopen(gdn_commit_diag_path_.c_str(), "ab");
-    bool written = dump != nullptr;
-    if (written) {
+    if (!dump) {
+        err = "verify: could not open opt-in committed GDN state output";
+        return false;
+    }
+    bool written = true;
+    int64_t ordinal = 0;
+    for (int64_t layer = 0; layer < g.n_layers && written; ++layer) {
+        if (is_qsa_layer(g, layer)) continue;
+        if ((!all_layers && layer != gdn_commit_diag_layer_) || ordinal < state.gdn_ord0 ||
+            ordinal >= state.gdn_ord0 + state.gdn_alloc) {
+            ++ordinal;
+            continue;
+        }
+        const float* device_state = state.gdn_state + (size_t) (ordinal - state.gdn_ord0) * (size_t) state_floats;
+        const cudaError_t ce = cudaMemcpy(gdn_commit_diag_host_.data(), device_state,
+                                         (size_t) state_floats * sizeof(float), cudaMemcpyDeviceToHost);
+        if (ce != cudaSuccess) {
+            err = std::string("verify: GDN commit capture copy: ") + cudaGetErrorString(ce);
+            written = false;
+            break;
+        }
+        GdnCommitHeader header{};
+        std::memcpy(header.magic, "STGCMT1", sizeof(header.magic));
+        header.version = 1;
+        header.layer = (int32_t) layer;
+        header.position = position;
+        header.recurrent_floats = recurrent_floats;
+        header.state_floats = state_floats;
+        header.token = token;
+        header.slot = slot;
         written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
                   std::fwrite(gdn_commit_diag_host_.data(), sizeof(float), (size_t) state_floats, dump) ==
                       (size_t) state_floats;
-        if (std::fflush(dump) != 0) written = false;
-        if (std::fclose(dump) != 0) written = false;
+        ++ordinal;
     }
-    if (!written) {
+    if (std::fflush(dump) != 0) written = false;
+    if (std::fclose(dump) != 0) written = false;
+    if (!written && err.empty()) {
         err = "verify: could not write opt-in committed GDN state";
         return false;
     }
-    return true;
+    return written;
 }
 
 bool Verifier::commit(int n_keep, std::string& err) {
@@ -3371,6 +3720,9 @@ bool Verifier::evict_batch_graph(const std::vector<int>& keep, bool& evicted, st
         commit_bm_.erase(commit_old);
     }
     evicted = true;
+    std::fprintf(stderr, "strata verify: evicted least-recently-used batch graph layout (%zu layouts remain)\n",
+                 exec_bm_.size());
+    strata::platform::integration_trace::event("verifier", "batch_graph_evict", this, nullptr, 0, device_);
     return true;
 }
 

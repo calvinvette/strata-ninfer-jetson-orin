@@ -7138,7 +7138,22 @@ int main(int argc, char** argv) {
             ver_b.set_next(&gs.ver_b, &split_drive_b);   // the setters reach it; the pipeline never chains run/commit
         }
         ver.set_remote_expert_opt(remote_opt.get());
-        if (batch_mtp) ver.set_batch_graph_limit(64);   // --batch-mtp only: slot rotation makes many layouts (LRU); 0.1.39 keeps all
+        if (batch_mtp) {
+            size_t batch_graph_limit = 64;
+            if (const char* value = std::getenv("STRATA_BATCH_MTP_GRAPH_LIMIT")) {
+                char* end = nullptr;
+                errno = 0;
+                const unsigned long parsed = std::strtoul(value, &end, 10);
+                if (errno != 0 || end == value || *end != '\0' || parsed < 1 || parsed > 64) {
+                    std::fprintf(stderr, "strata serve: STRATA_BATCH_MTP_GRAPH_LIMIT must be an integer from 1 to 64\n");
+                    return 1;
+                }
+                batch_graph_limit = (size_t) parsed;
+            }
+            ver.set_batch_graph_limit(batch_graph_limit); // --batch-mtp only; default cap bounds slot-rotation layouts
+            std::fprintf(stderr, "strata verify: batch-MTP graph layout limit %zu%s\n", batch_graph_limit,
+                         std::getenv("STRATA_BATCH_MTP_GRAPH_LIMIT") ? " (opt-in override)" : "");
+        }
         if (!ver.init(wt, g, ss, vh, native_head.loaded() ? &native_head : nullptr,
                       batch_mtp ? strata::kernels::kVerifyMaxT : std::max(o.spec, o.batch), err) ||
             (use_mtp && !mtp.bind(last_st ? last_st->wt : wt, last_st ? &last_st->head : &native_head,

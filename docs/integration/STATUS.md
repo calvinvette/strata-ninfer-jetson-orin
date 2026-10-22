@@ -46,6 +46,26 @@ capture retained 17.69 GiB minimum available RAM and zero cgroup OOM events.
 Full arrays remain local-only; this is not a performance result or Phase 5
 closeout.
 
+A cap-1 batch-MTP graph lifecycle stress run then exercised the opt-in
+`STRATA_BATCH_MTP_GRAPH_LIMIT` override (the default remains 64). Eight
+concurrent requests on two slots completed six tokens each across 16 batch
+windows. Logs show four graph-layout patterns, 14 LRU evictions, and 11
+recaptures after eviction. The supervised run retained 16.50 GiB minimum
+available RAM and zero cgroup memory events. This qualifies the forced cap-1
+lifecycle only, not the default cap or speed. The updated ARM64/CUDA candidate
+rebuilt with two jobs and focused accepted-window, batch-parity and graph tests
+passed 5/5. HIP/SYCL rebuilds for these latest source changes are pending:
+maestro1's filesystem reported 0 bytes available, so no cleanup or overwrite
+was attempted. This remains Phase 5 diagnostic evidence.
+
+A no-override single-live-request check confirmed the batch-MTP graph limit
+remains 64 and its six generated tokens matched serial MTP2 exactly. Minimum
+available RAM was 16.97 GiB with zero cgroup OOM events. The full configured
+CUDA CTest suite passed 130 tests with two optional IQ-fixture tests skipped
+when the external one-layer Q2_0 S2 fixture was supplied. The initial run
+without `STRATA_TEST_EXPERTS_BIN` failed only `pool_test` for the missing
+fixture; the fixture-backed rerun passed it.
+
 A current-source ARM64/CUDA 12.6 Release rebuild completed with two build jobs. The configured CTest suite passed 130 tests with the external one-layer Q2_0 S2 fixture supplied to the two pack-backed tests; two optional IQ-fixture tests skipped because their external fixtures are absent. Integration Python discovery passed 163/163. The NInfer import manifest verified 1,320 imports at pinned revision `b07248f2`; the matrix validator reported 162 proposed cells / 936 paired entries without executing them. These are current regression and specification checks, not Phase 5 or Phase 6 closeout. The initial missing-pack run is retained in the linked regression report.
 
 A fresh [current-worktree regression rerun](../../bench/results/2026-10-22-phase5-current-source-regression/README.md) rebuilt the ARM64/CUDA candidate with two jobs and passed the focused accepted-window, verifier/GDN/KV, graph, Q8_1 and native-expert selection (29/29), plus Python integration discovery (163/163). The full configured CTest suite completed 132 tests with the external one-layer Q2_0 S2 fixture supplied through `STRATA_TEST_EXPERTS_BIN`: 130 passed and two optional IQ-fixture tests skipped. This includes passing `expert_parity` and `pool_test`; the initial missing-pack issue and fixture/source hashes remain documented. The full 48-layer arena-load test remains unrun. This is regression coverage only; Phase 5 accepted-state drift remains unresolved.

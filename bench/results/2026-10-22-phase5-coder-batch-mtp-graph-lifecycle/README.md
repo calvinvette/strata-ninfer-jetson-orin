@@ -129,6 +129,31 @@ establish a cause. Raw arrays remain local-only; the all-layer capture retained
 17.69 GiB minimum available RAM, with zero sampled cgroup OOM events. Clocks
 varied, EMC readback was denied, and energy was not request-attributed.
 
+
+A follow-up adds the opt-in `STRATA_BATCH_MTP_GRAPH_LIMIT` override, valid from
+1 to 64; batch MTP still defaults to 64. The cap-1 stress run submitted eight
+requests concurrently to two batch slots (six output tokens each). It completed
+16 batch windows, logged 15 layout captures across four layout keys, and
+observed 14 LRU evictions followed by 11 recaptures of previously evicted
+layouts. All eight requests returned six tokens. The run passed supervision
+with 16.50 GiB minimum available RAM and zero cgroup memory events. This
+qualifies eviction and recapture behavior for the forced cap-1 test path only;
+it does not qualify the default 64-layout cap or performance. A separate no-override single-live-request check confirmed the effective
+batch-MTP graph limit remains 64 and its six generated tokens matched the
+serial MTP2 control exactly. The supervised run retained 16.97 GiB minimum
+available RAM with zero cgroup OOM events. The configured full CUDA CTest suite
+then passed 130/132 tests with the two optional IQ-fixture tests skipped; the
+first run's only failure was `pool_test` missing its external S2 fixture, and
+that test passed when the local fixture was supplied through
+`STRATA_TEST_EXPERTS_BIN`.
+
+The ARM64/CUDA
+candidate rebuilt with two jobs and the five focused accepted-window, batch
+parity and graph tests passed. maestro1's filesystem had zero free bytes when
+the HIP/SYCL rebuild was attempted, so those builds remain pending; no changes
+were made to its existing artifacts. `build_maestro1.sh` and `sync_build_maestro1.sh` preserve the source-sync and
+rebuild commands for after space is available.
+
 ## Configuration and limits
 
 Model identity: `Qwen3.8-Flash-Next-Coder-GGUF-IQ1_M`, split across the two
@@ -182,6 +207,10 @@ energy was not attributed to individual requests.
   per-layer position sweep and its fresh serial second-prompt control. Hash
   files retain all batch positions; the analysis lists first exact mapping and
   first later divergence per mapped slot.
+- `graph_lifecycle_lowcap.py`, `analyze_graph_lifecycle_lowcap.py`,
+  `graph-lifecycle-lowcap-analysis.json`, and
+  `run-graph-lifecycle-recapture/`: cap-1 eviction/recapture exercise and
+  structural analysis. `build_maestro1.sh` records the pending backend build.
 - `capture_alllayer_targetonly_commit_state.py`,
   `analyze_alllayer_targetonly_commit_state.cpp`,
   `run-alllayer-targetonly-commit-state/`, and

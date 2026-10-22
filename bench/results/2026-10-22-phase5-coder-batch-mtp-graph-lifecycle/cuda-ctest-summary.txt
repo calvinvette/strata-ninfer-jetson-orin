@@ -1,0 +1,8 @@
+Command:
+STRATA_TEST_EXPERTS_BIN="$HOME/models/strata-orin-validation/generated-fixtures/q2_0-s2-layer0/experts.bin" ctest --test-dir build/integration/candidate --output-on-failure -j2
+
+Result on Jetson AGX Orin, ARM64, CUDA 12.6 Release candidate:
+132 tests discovered; 130 passed; 2 optional IQ fixture tests skipped; 0 failed.
+The external one-layer Q2_0 S2 fixture was only supplied to the test process and remains under ~/models/.
+The preceding run without STRATA_TEST_EXPERTS_BIN failed pool_test because its default pack/full/experts.bin path was absent; the fixture-backed rerun passed pool_test.
+The full verbose CTest log is available locally at build/integration/candidate/Testing/Temporary/LastTest.log and is not committed.
