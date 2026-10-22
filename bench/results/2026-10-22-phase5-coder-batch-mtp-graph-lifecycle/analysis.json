@@ -1,0 +1,369 @@
+{
+  "scope": "one current-source Orin Coder IQ1_M batch-MTP correctness/graph diagnostic; not a performance qualification",
+  "profile": {
+    "batch_slots": 8,
+    "batch_mtp": true,
+    "adaptive_swaps": false,
+    "max_new": 96,
+    "max_context": 1024,
+    "expert_cache_mib": 1500,
+    "serial_target_only_control_profile": "inherited source config: max_context=8192, expert_cache=3000 MiB; prompts remain below 70 tokens"
+  },
+  "outputs_target_only_vs_batch_mtp": {
+    "slot-0": {
+      "same": true,
+      "target_only_tokens": 96,
+      "batch_mtp_tokens": 96,
+      "first_mismatch_index": null,
+      "target_only_tail": [
+        11,
+        292,
+        283,
+        292
+      ],
+      "batch_mtp_tail": [
+        11,
+        292,
+        283,
+        292
+      ]
+    },
+    "slot-1": {
+      "same": false,
+      "target_only_tokens": 96,
+      "batch_mtp_tokens": 96,
+      "first_mismatch_index": 30,
+      "target_only_tail": [
+        11,
+        220,
+        19,
+        11
+      ],
+      "batch_mtp_tail": [
+        30,
+        32645,
+        413,
+        2624
+      ]
+    },
+    "slot-2": {
+      "same": false,
+      "target_only_tokens": 96,
+      "batch_mtp_tokens": 96,
+      "first_mismatch_index": 59,
+      "target_only_tail": [
+        271,
+        18770,
+        25,
+        687
+      ],
+      "batch_mtp_tail": [
+        1067,
+        283,
+        2958,
+        271
+      ]
+    },
+    "slot-3": {
+      "same": false,
+      "target_only_tokens": 96,
+      "batch_mtp_tokens": 96,
+      "first_mismatch_index": 42,
+      "target_only_tail": [
+        61446,
+        13,
+        28320,
+        10631
+      ],
+      "batch_mtp_tail": [
+        54488,
+        92217,
+        1542,
+        279
+      ]
+    },
+    "slot-4": {
+      "same": true,
+      "target_only_tokens": 90,
+      "batch_mtp_tokens": 90,
+      "first_mismatch_index": null,
+      "target_only_tail": [
+        26,
+        198,
+        71093,
+        248046
+      ],
+      "batch_mtp_tail": [
+        26,
+        198,
+        71093,
+        248046
+      ]
+    },
+    "slot-5": {
+      "same": false,
+      "target_only_tokens": 96,
+      "batch_mtp_tokens": 96,
+      "first_mismatch_index": 34,
+      "target_only_tail": [
+        424,
+        628,
+        381,
+        13145
+      ],
+      "batch_mtp_tail": [
+        424,
+        628,
+        381,
+        13145
+      ]
+    },
+    "slot-6": {
+      "same": false,
+      "target_only_tokens": 96,
+      "batch_mtp_tokens": 96,
+      "first_mismatch_index": 67,
+      "target_only_tail": [
+        18078,
+        2387,
+        1411,
+        1103
+      ],
+      "batch_mtp_tail": [
+        18078,
+        2387,
+        1411,
+        1103
+      ]
+    },
+    "slot-7": {
+      "same": false,
+      "target_only_tokens": 96,
+      "batch_mtp_tokens": 96,
+      "first_mismatch_index": 72,
+      "target_only_tail": [
+        369,
+        3140,
+        5742,
+        1429
+      ],
+      "batch_mtp_tail": [
+        11,
+        1992,
+        3514,
+        12404
+      ]
+    }
+  },
+  "all_outputs_match_target_only": false,
+  "single_active_slot_batch_mtp": {
+    "profile": {
+      "live_requests": 1,
+      "batch_slots": 8,
+      "mtp_depth": 2,
+      "context": 1024,
+      "expert_cache_mib": 1500
+    },
+    "outputs_match_serial_mtp2": true,
+    "first_mismatch_index": null,
+    "minimum_available_gib": 16.051471710205078,
+    "minimum_admission_available_gib": 16.051471710205078,
+    "scope_memory_events": {
+      "samples": 75,
+      "event_maxima": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      }
+    }
+  },
+  "two_active_slots_batch_mtp": {
+    "profile": {
+      "live_requests": 2,
+      "batch_slots": 2,
+      "mtp_depth": 2,
+      "context": 1024,
+      "expert_cache_mib": 1500
+    },
+    "per_prompt_match": {
+      "slot-0": true,
+      "slot-1": false
+    },
+    "first_mismatch_index": {
+      "slot-0": null,
+      "slot-1": 60
+    },
+    "minimum_available_gib": 16.65604019165039,
+    "minimum_admission_available_gib": 16.65604019165039,
+    "scope_memory_events": {
+      "samples": 124,
+      "event_maxima": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      }
+    }
+  },
+  "two_active_slots_target_only_batch": {
+    "profile": {
+      "live_requests": 2,
+      "batch_slots": 2,
+      "mtp": false,
+      "context": 1024,
+      "expert_cache_mib": 1500
+    },
+    "per_prompt_match": {
+      "slot-0": true,
+      "slot-1": false
+    },
+    "first_mismatch_index": {
+      "slot-0": null,
+      "slot-1": 60
+    },
+    "minimum_available_gib": 17.412296295166016,
+    "minimum_admission_available_gib": 17.412296295166016,
+    "scope_memory_events": {
+      "samples": 142,
+      "event_maxima": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      }
+    }
+  },
+  "batch_mtp_vs_target_only_batch": {
+    "slot-0": {
+      "same": true,
+      "first_mismatch_index": null
+    },
+    "slot-1": {
+      "same": false,
+      "first_mismatch_index": 60
+    }
+  },
+  "terminal_state_matching_target_only": {
+    "slot-0": {
+      "expected_L": "163",
+      "expected_ple_prev": "292,283",
+      "matches": 1
+    },
+    "slot-1": {
+      "expected_L": "163",
+      "expected_ple_prev": "220,19",
+      "matches": 1
+    },
+    "slot-2": {
+      "expected_L": "160",
+      "expected_ple_prev": "18770,25",
+      "matches": 1
+    },
+    "slot-3": {
+      "expected_L": "161",
+      "expected_ple_prev": "13,28320",
+      "matches": 1
+    },
+    "slot-4": {
+      "expected_L": "157",
+      "expected_ple_prev": "198,71093",
+      "matches": 1
+    },
+    "slot-5": {
+      "expected_L": "162",
+      "expected_ple_prev": "628,381",
+      "matches": 1
+    },
+    "slot-6": {
+      "expected_L": "162",
+      "expected_ple_prev": "2387,1411",
+      "matches": 1
+    },
+    "slot-7": {
+      "expected_L": "164",
+      "expected_ple_prev": "3140,5742",
+      "matches": 1
+    }
+  },
+  "terminal_state_matching_batch_mtp": {
+    "slot-0": {
+      "expected_L": "163",
+      "expected_ple_prev": "292,283",
+      "matches": 0
+    },
+    "slot-1": {
+      "expected_L": "163",
+      "expected_ple_prev": "32645,413",
+      "matches": 0
+    },
+    "slot-2": {
+      "expected_L": "160",
+      "expected_ple_prev": "283,2958",
+      "matches": 0
+    },
+    "slot-3": {
+      "expected_L": "161",
+      "expected_ple_prev": "92217,1542",
+      "matches": 0
+    },
+    "slot-4": {
+      "expected_L": "157",
+      "expected_ple_prev": "198,71093",
+      "matches": 0
+    },
+    "slot-5": {
+      "expected_L": "162",
+      "expected_ple_prev": "628,381",
+      "matches": 0
+    },
+    "slot-6": {
+      "expected_L": "162",
+      "expected_ple_prev": "2387,1411",
+      "matches": 0
+    },
+    "slot-7": {
+      "expected_L": "164",
+      "expected_ple_prev": "1992,3514",
+      "matches": 0
+    }
+  },
+  "batch_state_coverage": "engine log contains solo-to-batch handoff state fingerprints but no terminal fingerprint for each completed batch slot; cannot qualify per-slot persistent-state equality",
+  "graph_layouts": {
+    "capture_events": 16,
+    "unique_layouts": 16,
+    "recaptured_layouts": {},
+    "pool_limit": 64,
+    "eviction_and_recapture_observed": false
+  },
+  "memory": {
+    "batch_minimum_available_gib": 14.766277313232422,
+    "batch_minimum_admission_available_gib": 11.390979766845703,
+    "target_minimum_available_gib": 14.234638214111328,
+    "target_minimum_admission_available_gib": 14.234638214111328,
+    "batch_scope_memory_events": {
+      "samples": 220,
+      "event_maxima": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      }
+    },
+    "target_scope_memory_events": {
+      "samples": 140,
+      "event_maxima": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      }
+    }
+  },
+  "clock_energy": "dynamic clocks observed; EMC readback denied; energy not request-attributed"
+}
