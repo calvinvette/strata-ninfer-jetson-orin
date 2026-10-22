@@ -30,6 +30,12 @@ sources compiled and linked on maestro1 for HIP and SYCL, with both help
 commands exiting 0 and no accelerator execution. This is diagnostic evidence,
 not a Phase 5 gate pass or performance result.
 
+A later fresh [maestro1 backend rebuild](../../bench/results/2026-10-22-phase5-maestro1-q8-selector-backend-build/README.md)
+used an isolated current-worktree source snapshot. All seven shared files
+matched their local SHA256 values. HIP and SYCL Release builds completed with
+two jobs, and both binaries returned zero for `strata --help`. This is x86
+compile/link and CLI-startup evidence only; no accelerator runtime was tested.
+
 A selected-position raw all-layer committed-state run in the same diagnostic
 bundle clarified prompt-to-slot pairing. Two position-67 prompt-boundary
 captures were both logged against physical slot 0 before the live requests
@@ -54,9 +60,9 @@ recaptures after eviction. The supervised run retained 16.50 GiB minimum
 available RAM and zero cgroup memory events. This qualifies the forced cap-1
 lifecycle only, not the default cap or speed. The updated ARM64/CUDA candidate
 rebuilt with two jobs and focused accepted-window, batch-parity and graph tests
-passed 5/5. HIP/SYCL rebuilds for these latest source changes are pending:
-maestro1's filesystem reported 0 bytes available, so no cleanup or overwrite
-was attempted. This remains Phase 5 diagnostic evidence.
+passed 5/5. A later fresh maestro1 scratch-volume build also compiled and
+linked the latest shared sources for HIP and SYCL, with both help checks passing.
+This remains Phase 5 diagnostic evidence, not a gate pass.
 
 A no-override single-live-request check confirmed the batch-MTP graph limit
 remains 64 and its six generated tokens matched serial MTP2 exactly. Minimum
