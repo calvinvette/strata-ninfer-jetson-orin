@@ -16,6 +16,15 @@ serial. Prompt 1 has no capture at that accepted position. Batch QSA hashes
 stop at state length 69 while serial reaches 77, so this does not locate an
 earlier QSA difference. It is a state diagnostic only; Phase 5 remains open.
 
+A fresh instrumented MTP2 run now pairs prompt 1's batch and isolated serial QSA
+hashes at lengths 70, 72 and 74 (exact), then finds all 12 QSA layers changed
+at lengths 76 and 77, beginning at model layer 3. Prompt 0 also differs across
+all 12 QSA layers at length 77. Both ten-token outputs still match serial. This
+reproduces an earlier QSA-state difference, but does not identify its cause or
+prove it causes the output mismatch. The opt-in trace is diagnostic and adds
+host-copy overhead. Details and the capture/analyzer scripts are in the linked
+batch-MTP report; raw logs and hash streams remain local-only.
+
 A separate [MTP2 cancellation test](../../bench/results/2026-10-22-phase5-coder-mtp2-cancel-state/README.md)
 passed at five accepted-prefix lengths (48, 50, 51, 53, 55). The canceled
 request's token sequences and all state fingerprints matched two fresh

@@ -280,6 +280,116 @@ bool trace_batch_gdn_hash(const strata::core::ModelGeometry& geometry, const str
     return ok;
 }
 
+// Hash every committed batch QSA layer after each accepted window. This is opt-in because it
+// copies the live KV prefix to host; the record is keyed by accepted position/token, not row order.
+bool trace_batch_qsa_hash(const strata::core::ModelGeometry& geometry, const strata::core::SessionState& state,
+                          int64_t position, int32_t token, int slot, int row) {
+    static const char* path = std::getenv("STRATA_BATCH_QSA_HASH_PATH");
+    static const auto range = [] {
+        auto parse = [](const char* name, int64_t fallback) {
+            const char* value = std::getenv(name);
+            if (value == nullptr) return fallback;
+            char* end = nullptr;
+            errno = 0;
+            const long long parsed = std::strtoll(value, &end, 10);
+            return errno == 0 && end != value && *end == '\0' ? (int64_t) parsed : fallback;
+        };
+        return std::pair<int64_t, int64_t>{parse("STRATA_BATCH_QSA_HASH_FROM", -1),
+                                           parse("STRATA_BATCH_QSA_HASH_TO", -1)};
+    }();
+    if (path == nullptr || range.first < 0 || range.second < range.first ||
+        position < range.first || position > range.second) return true;
+    if (position < 0 || state.qsa_alloc <= 0 || state.qsa_states == nullptr ||
+        cudaDeviceSynchronize() != cudaSuccess) return false;
+
+    const auto shapes = [&] {
+        auto s = strata::kernels::qsa_real_shapes();
+        s.n_head_kv = geometry.n_head_kv;
+        s.head_dim = geometry.head_dim;
+        s.idx_dim = geometry.idx_key_dim;
+        return s;
+    }();
+    const int64_t cells = position + 1;
+    constexpr size_t chunk = 65536;
+    std::array<uint8_t, chunk> buffer{};
+    auto hash_bytes = [&](const void* source, size_t bytes, uint64_t& hash) {
+        if (source == nullptr && bytes != 0) return false;
+        for (size_t offset = 0; offset < bytes;) {
+            const size_t count = std::min(buffer.size(), bytes - offset);
+            if (cudaMemcpy(buffer.data(), static_cast<const uint8_t*>(source) + offset,
+                           count, cudaMemcpyDefault) != cudaSuccess) return false;
+            for (size_t i = 0; i < count; ++i) {
+                hash ^= buffer[i];
+                hash *= 1099511628211ull;
+            }
+            offset += count;
+        }
+        return true;
+    };
+    auto hash_cells = [&](const void* pool, int64_t bytes_per_head_cell, int64_t max_cells, uint64_t& hash) {
+        if (pool == nullptr) return false;
+        const int64_t end = std::min<int64_t>(cells, max_cells);
+        for (int64_t page = 0; page * shapes.page_size < end; ++page) {
+            const int64_t begin_cell = page * shapes.page_size;
+            const int64_t end_cell = std::min<int64_t>(end, (page + 1) * shapes.page_size);
+            const size_t offset_cell = (size_t) (begin_cell - page * shapes.page_size);
+            const size_t count_cell = (size_t) (end_cell - begin_cell);
+            for (int64_t head = 0; head < shapes.n_head_kv; ++head) {
+                const size_t offset = (size_t) ((page * shapes.n_head_kv + head) * shapes.page_size +
+                                                (int64_t) offset_cell) * (size_t) bytes_per_head_cell;
+                const size_t bytes = count_cell * (size_t) bytes_per_head_cell;
+                if (!hash_bytes(static_cast<const uint8_t*>(pool) + offset, bytes, hash)) return false;
+            }
+        }
+        return true;
+    };
+
+    std::vector<uint64_t> hashes((size_t) state.qsa_alloc, 1469598103934665603ull);
+    for (int64_t ordinal = 0; ordinal < state.qsa_alloc; ++ordinal) {
+        const auto& qsa = state.qsa_states[state.qsa_ord0 + ordinal];
+        if (cells > qsa.max_cells || qsa.kv_mode == 2) return false;
+        uint64_t& hash = hashes[(size_t) ordinal];
+        const size_t tail_bytes = (size_t) (shapes.idx_block - 1) * (size_t) shapes.idx_dim * sizeof(float);
+        const size_t dead_bytes = (size_t) shapes.idx_dim * sizeof(float);
+        const size_t pooled_rows = (size_t) (cells / shapes.idx_block + 1);
+        if (!hash_bytes(qsa.idx_tail, tail_bytes, hash) || !hash_bytes(qsa.idx_dead, dead_bytes, hash) ||
+            !hash_bytes(qsa.idx_pooled, pooled_rows * (size_t) shapes.idx_dim * sizeof(float), hash)) return false;
+
+        const bool host = qsa.kv_mode != 0;
+        if (qsa.kv_q4) {
+            const int64_t bytes = (int64_t) strata::kernels::kv_q4_bytes_per_head((int) shapes.head_dim);
+            if (!hash_cells(host ? qsa.host.k_q4 : qsa.k_q4, bytes, qsa.max_cells, hash) ||
+                !hash_cells(host ? qsa.host.v_q4 : qsa.v_q4, bytes, qsa.max_cells, hash)) return false;
+        } else if (qsa.kv_hybrid) {
+            const int64_t q4_bytes = (int64_t) strata::kernels::kv_q4_bytes_per_head((int) shapes.head_dim);
+            const int64_t scale_bytes = (shapes.head_dim / 64) * 2;
+            if (!hash_cells(host ? qsa.host.k_q : qsa.k_q, shapes.head_dim, qsa.max_cells, hash) ||
+                !hash_cells(host ? qsa.host.v_q4 : qsa.v_q4, q4_bytes, qsa.max_cells, hash) ||
+                !hash_cells(host ? qsa.host.k_scale : qsa.k_scale, scale_bytes, qsa.max_cells, hash)) return false;
+        } else if (qsa.kv_int8) {
+            const int64_t scale_bytes = (shapes.head_dim / 64) * 2;
+            if (!hash_cells(host ? qsa.host.k_q : qsa.k_q, shapes.head_dim, qsa.max_cells, hash) ||
+                !hash_cells(host ? qsa.host.v_q : qsa.v_q, shapes.head_dim, qsa.max_cells, hash) ||
+                !hash_cells(host ? qsa.host.k_scale : qsa.k_scale, scale_bytes, qsa.max_cells, hash) ||
+                !hash_cells(host ? qsa.host.v_scale : qsa.v_scale, scale_bytes, qsa.max_cells, hash)) return false;
+        } else if (!hash_cells(host ? qsa.host.k_pool : qsa.k_pool, shapes.head_dim * 2, qsa.max_cells, hash) ||
+                   !hash_cells(host ? qsa.host.v_pool : qsa.v_pool, shapes.head_dim * 2, qsa.max_cells, hash)) {
+            return false;
+        }
+    }
+
+    FILE* file = std::fopen(path, "ab");
+    if (file == nullptr) return false;
+    bool ok = std::fprintf(file, "position=%lld state_length=%lld token=%d slot=%d row=%d qsa_layers=%lld hashes=",
+                           (long long) position, (long long) cells, token, slot, row,
+                           (long long) state.qsa_alloc) > 0;
+    for (uint64_t hash : hashes)
+        if (ok && std::fprintf(file, "%016llx ", (unsigned long long) hash) < 0) ok = false;
+    if (ok && std::fputc('\n', file) == EOF) ok = false;
+    if (std::fclose(file) != 0) ok = false;
+    return ok;
+}
+
 // Windows' WDDM driver model: native Windows, or WSL2 (its GPU goes through /dev/dxg to the Windows driver).  There,
 // pinning a large arena into two CUDA contexts leaves WDDM refusing every later allocation (the 5080 + 3090 rig);
 // a Linux driver has no such limit (#253: the 8 GiB cap cost a 4090 + 3060 split 3x of its prompt speed).
@@ -8879,6 +8989,16 @@ int main(int argc, char** argv) {
             if (!(batch_mtp ? ver.commit_slot_prefixes(keep.data(), err) : ver.commit_slots(err))) {
                 std::printf("ERR %s\n", err.c_str());
                 return false;
+            }
+            for (int a = 0; a < A; ++a) {
+                const int b = active[a];
+                const int last = first[a] + keep[(size_t) b] - 1;
+                if (!trace_batch_qsa_hash(g, *bslot_ss[0][(size_t) b],
+                                          pos[first[a]] + keep[(size_t) b] - 1,
+                                          outb[last], b, last)) {
+                    err = "batch QSA hash trace failed";
+                    return false;
+                }
             }
             const Clock::time_point w2 = Clock::now();
             auto msd = [](Clock::time_point a0, Clock::time_point b0) { return std::chrono::duration<double, std::milli>(b0 - a0).count(); };

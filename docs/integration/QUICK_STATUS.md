@@ -91,6 +91,14 @@ host/admission availability was 13.18/12.53 GiB with zero cgroup events.
 This is a bounded cancellation cell only; adaptive long-chain drift and
 two-live batch divergence remain open. [Details](../../bench/results/2026-10-22-phase5-coder-mtp2-cancel-state/README.md).
 
+A fresh, supervised per-layer QSA trace now matches the serial MTP2 control at
+accepted lengths 70, 72 and 74, then differs in all 12 QSA layers at lengths 76
+and 77, starting at model layer 3. Both prompts still match serial for their
+ten generated tokens. Minimum available host/admission memory was 16.55/15.10
+GiB with no cgroup events. This narrows state localization only; the operation
+causing the difference and its relation to later output drift remain unknown.
+See the [batch-MTP report](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
+
 ## Near-term direction
 
 1. Continue resolving batch-MTP output divergence: repair/extend per-row state

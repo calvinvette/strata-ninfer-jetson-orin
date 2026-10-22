@@ -50,6 +50,9 @@ def make_env(name):
     env.update({'STRATA_STATE_HASH': '1', 'STRATA_STATE_HASH_GDN': '1',
                 'STRATA_STATE_HASH_QSA_LAYERS': '1', 'STRATA_ACCEPTED_PREFIX_TRACE': '1',
                 'STRATA_PREFILL_CPU_SHARE': '0'})
+    if name == 'batch':
+        env.update({'STRATA_BATCH_QSA_HASH_PATH': str(OUT / 'batch-qsa-state-hashes.txt'),
+                    'STRATA_BATCH_QSA_HASH_FROM': '67', 'STRATA_BATCH_QSA_HASH_TO': '76'})
     return env
 
 

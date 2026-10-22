@@ -245,3 +245,30 @@ state had diverged before the layer-4 GDN difference. The raw batch `.stgcmt`
 and serial `.gdn` arrays remain local-only; the comparator and capture harness
 are retained for reproducibility. This localizes a state difference but does
 not identify its cause or pass the Phase 5 gate.
+
+### Per-layer QSA state follow-up (2026-10-22)
+
+A second supervised run rebuilt the opt-in batch QSA hash hook into the current
+Orin CUDA binary and repeated the two-live MTP2 capture with exact-profile
+isolated serial controls. For prompt 1, per-QSA hashes match at committed
+lengths 70, 72 and 74. At length 76 (token 3069) and length 77 (token 264), all
+12 QSA states differ; the first differing state is QSA ordinal 0, model layer
+3. Prompt 0 also differs across all 12 QSA states at length 77 (token 709).
+The ten generated tokens for each prompt still match its serial control. Some
+intermediate batch prefix lengths have no serial row with the same accepted
+length and token, so no comparison is assigned there. Minimum host/admission
+availability was 16.55/15.10 GiB, with zero cgroup memory events. These
+instrumented hashes locate an earlier QSA state difference than the captured
+GDN difference, but do not identify the operation that causes it or establish
+that it causes the output divergence. The opt-in trace copies state to host and
+is not a performance measurement. Raw per-request logs and hash streams remain
+local-only; the capture and analyzer scripts are retained here.
+
+For this final diagnostic source, maestro1 rebuilt HIP from the identical
+`src/program/generate.cpp` SHA256 `9f136bb977fe118fd1f25b5c3312828577b4b301a47d3929fddbe9cb50d06e5f`;
+the HIP binary SHA256 is `904c1a32d9427de12aa635b238dd58f386902022e5218fa9a7551a2f0df7b8b5`,
+and its binary `--help` exited 0. The SYCL
+build uses a separate migrated file at `source/sycl/src/program/generate.cpp`;
+the QSA hook does not modify that source, and its build reported no work. A
+current SYCL binary startup check on maestro1 aborted with “No device of
+requested type available,” so no new SYCL startup pass is claimed here.
