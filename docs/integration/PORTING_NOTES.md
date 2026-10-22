@@ -34,6 +34,20 @@ layer inputs/outputs across multiple accepted positions, and compare the
 accepted persistent state directly. Do not treat a local operator match as
 proof of full-sequence state parity.
 
+A current-source follow-up makes the owner-path rule more specific. At Coder
+layer 16, the captured service CPU rows for experts 118 and 39 matched their
+same-input CPU Q8_1 oracles exactly. Expert 118 still differed from the CUDA
+oracle in all 2,560 output values (relative L2 `1.35199e-4`), while expert 39
+matched bit-for-bit; expert 118 was the only measured numerical contributor
+among those two CPU→VRAM owner changes. Layer-17 raw state had identical
+pre-state but a slightly changed `x` input, followed by a broad recurrent-state
+delta. A direct-division SwiGLU trial left expert 118 unchanged and failed the
+independent reciprocal-form reconstruction, so expression changes need
+same-input stage captures and oracle updates before they are considered. For
+Splash, record actual service owner rows alongside the backend oracle, then
+follow their weighted combined output into the next persistent-state update;
+matching a CPU row to its CPU oracle alone does not qualify a Metal migration.
+
 A second captured owner transition (`IQ2_S`/`IQ4_NL`) remained 0.2819% relative
 L2 apart after the same Q8_1 mirror. The CPU down projection matched grouped
 accelerator output when given the accelerator's hidden Q8_1 row, but the
@@ -91,6 +105,51 @@ Models remain under `~/models/`; build products and transient evidence stay unde
 ignored `build/integration/`. Original Strata/NInfer checkouts are only read for
 local toolchain/dependency reuse. No service or clock changes are part of this
 checkpoint.
+
+For future Strata/Splash state-migration diagnosis, do not stop at matching a
+layer's main operator or persistent state. The Coder position-512 boundary
+capture found identical layer-12 GDN intermediates/state and layer-12 MoE
+parts/output. A CPU-pool trace appeared to show a changed layer-13 input, but
+its recovery row had no CPU-owned expert and the host activation was stale. The
+CUDA-side verifier input, layer-13 GDN intermediates and raw state are exact;
+the first changed verifier input on that request transition is layer 15. Keep
+the execution source and whether the host buffer was materialized with every
+tensor capture, then compare the next layer's read output and persistent state.
+
+A later same-position Coder trace shows why the residual/hyperconnection
+components should be captured separately. At generated position 515, the first
+changed all-layer verifier input was layer 12. Capturing the preceding
+layer-11 boundary showed `R` and `inj2` still bit-identical but every `bo`
+value changed during adaptive recovery; layer-12 pre-GDN state was exact and
+post-GDN state was not. The initial state matched between arms, and delayed
+control recovered bitwise. For a future Splash port, retain named residual,
+gate, hyperconnection and recurrent pre/post fields around the earliest changed
+layer. A single hidden-state hash can place the symptom too late, while a
+changed persistent state alone does not say which incoming component changed.
+
+The layer-11 follow-up then joined the boundary to an owner transition. On the
+same IQ2_S/IQ4_NL activation, expert 201 moved from CPU to GPU and changed in
+all output values (relative L2 `4.415e-4`); independent CPU/GPU parity rows
+matched the service outputs bitwise. Expert 63 also moved owners but its output
+remained exact. The changed expert's weighted MoE output and `bo` changed
+before the layer-12 GDN update. For Splash, inspect every routed expert in an
+owner transition and connect its same-input backend result through the weighted
+combine to the named recurrent boundary; aggregate layer deltas can hide which
+owner change contributed.
+
+The expert-201 stage oracle further split that CPU/GPU delta: IQ2_S gate/up
+dot outputs match CUDA exactly on the same Q8_1 activation, and CPU IQ4_NL down
+on the captured GPU hidden Q8_1 row matches CUDA exactly. Only three hidden
+Q8_1 code bytes differ after SwiGLU, one adjacent code step in each token row;
+scales and stored sums match there. A host replay from captured CUDA gate/up
+values showed that the CPU multiply-by-sigmoid expression reproduces CPU codes,
+while the CUDA direct-division expression reproduces all GPU codes with either
+tested code quantizer. Both used the same host `std::exp`, so this isolates
+operation order for this row without establishing CUDA `__expf` equivalence.
+No runtime change was made, and this does not establish a migration correction.
+In a future Splash investigation, preserve the post-activation quantized bytes
+and correlate each changed code with the weighted output before proposing a
+backend-specific formula.
 
 The Oct 10 Phase 3 follow-up found that this runtime namespace omits
 `/proc/<pid>/io` and does not expose `io.stat` in the harness leaf cgroup.
@@ -316,12 +375,31 @@ per-expert output, combine, recurrent inputs and committed state at the same
 accepted token, and keep those evidence layers distinct in its report.
 
 The captured IQ3_XXS/IQ4_NL expert-22 discrepancy was further narrowed with
-hidden-activation records: input Q8_1 bytes matched, while three post-SwiGLU
-Q8_1 block scales differed by one FP16 step and all codes/sum scales matched.
-CPU down projection on the GPU-produced hidden blocks was bit-identical to the
-grouped GPU result. For a future Splash implementation, compare the fused
-gate/up/SwiGLU output immediately before quantization; do not infer that stage
-from scratch buffers unless the kernel writes them by contract.
+hidden-activation records: input Q8_1 bytes and mode-0 gate/up dot outputs
+matched bitwise, while three post-SwiGLU Q8_1 block scales differed by one FP16
+step and all codes/sum scales matched. CPU down projection on the GPU-produced
+hidden blocks was bit-identical to the grouped GPU result. For a future Splash
+implementation, compare the fused gate/up/SwiGLU output immediately before
+quantization; do not infer that stage from scratch buffers unless the kernel
+writes them by contract.
+
+An opt-in CPU mirror using `sigmoid = 1 / (1 + exp(-g)); hidden = (g *
+sigmoid) * up` made the captured IQ3_XXS/IQ4_NL expert-22 output bit-identical
+to CUDA, including its hidden Q8_1 blocks. Applying that operation order to all
+enabled Q8_1 native CPU routes changed 40 of 64 adaptive recovery tokens. A
+layer-31-only service pair kept output tokens equal but still had different
+accepted layer-32 state beginning at position 518. For a future Splash port,
+preserve this operation order as an operator-level candidate and compare the
+pre-quantization hidden floats directly; do not treat one fixed expert's parity
+as proof of transaction or recovery correctness.
+
+At the earliest current Coder boundary, a same-input layer-1 verifier capture
+found all routed expert rows and the combined MoE output exact across initial
+and recovery requests; the next layer's MoE input already differed. For a
+future Splash comparison, capture residual/hyper-connection output and the
+following recurrent mixer separately after the expert path matches, so an
+expert-kernel fix is not credited for a downstream state change it did not
+remove.
 
 The Oct 11 Strata accepted-prefix test exposed a QSA indexer transaction detail
 that also applies when integrating another speculative engine. Commit replay
@@ -2084,3 +2162,523 @@ keep any backend-specific mirror gated, validate it against the real grouped
 kernel on captured inputs, and test committed state before treating one owner
 transition as equivalent. Three randomized pairs matched for one Coder IQ1_M
 model/workload; that is not broad migration qualification.
+
+The [position-512 verifier-parts trace](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/adaptive-position512-layer1-verifier-pair/README.md)
+also exposed a stage-identity problem in owner diagnostics: the ordinary
+dispatch trace reported expert 205 as CPU-owned during adaptive recovery, but
+the same-input verifier contribution matched the independent CUDA expert
+oracle bit-for-bit. The other two changed verifier rows also matched the CUDA
+oracle, while their initial and delayed rows matched the CPU oracle. For a
+future Splash port, capture the planner's residency/owner decision at the same
+verifier stage as the expert output; token position and expert ID alone do not
+prove two owner records came from the same execution path. Treat matching
+oracle output as direct evidence about the captured row, and retain any
+disagreement with route metadata as an instrumentation gap until resolved.
+
+The layer-1 arithmetic mirror follow-up also shows why a stateful layer should
+be selected from the per-layer hash trace before allocating large raw dumps:
+layer-2 verifier and committed state stayed exact across positions 512–522,
+while adaptive service hashes first diverged at GDN ordinal 3, model layer 4,
+at the final prompt endpoint 511. The prefill trace can hash each chunk boundary
+and retain only the final raw state for the repeated prompt, which is smaller
+and better aligned than dumping every recurrent state. Map GDN ordinal to the
+model layer explicitly and distinguish a prefill boundary from a verifier row;
+use the former for endpoint 511 and the latter for generated positions. In a
+future Splash comparison, record both the boundary convention and raw state
+header so an off-by-one selection cannot be mistaken for a parity result.
+
+The layer-4 follow-up separated three boundaries that can otherwise be
+conflated: end-of-prefill GDN state matched, the layer-4 decode activation
+changed, and the layer-4 verifier's incoming state was already different in
+adaptive recovery. Its accepted commit bytes matched the service's per-GDN
+hash, while delayed initial/recovery and adaptive-initial versus delayed-initial
+states matched exactly. For Splash, place input/intermediate/pre-state/post-
+state/commit captures at the same layer and position, then compare the selected
+commit bytes with the service hash. A state delta at a layer does not by itself
+prove that layer introduced it; the incoming state may already contain the
+earlier divergence.
+
+The exact layer-3 IQ2_S/IQ4_NL row required a selector scoped by both weight
+pair and model layer to test alongside the earlier layer-1 IQ2_S/Q2_0 mirror.
+The opt-in selector accepts comma-separated rules and its contract test checks
+both matches and non-matches at neighboring layers. A broad `all` selector
+would change unrelated owner rows and confound this experiment. For Splash,
+keep combined backend mirrors narrow to the measured row set, verify each rule
+against exact model tensor types, and use a same-activation CPU/GPU oracle before
+running the expensive service pair.
+
+The combined layer-1/layer-3 follow-up is a useful caution for stateful layer
+debugging: both selected MoE rows and the following layer-4 state became exact,
+yet layer-5 GDN state still changed during adaptive recovery. A layer-5 prefill
+trace matched through its 505-token payload boundary, while the formatted
+request contained 512 tokens; position 505 was the first selected verifier row
+with a changed layer-5 GDN input. The broad verifier route/intermediate hooks
+can cover multi-token windows, but the current pre/post-state hook only records
+single-token windows, and service accepted-prefix hashes are not emitted for
+every internal row of a multi-token window. For Splash, log the window length,
+absolute positions, actual formatted prompt length and hook coverage together.
+Treat an unobserved state position as unsupported rather than silently
+comparing a neighboring boundary; retain the failed capture selection, then
+rerun with supported raw-state positions and wider intermediate traces.
+
+Two prompt-tail follow-ups show why an owner trace needs a layer-scoped
+mathematical oracle. With the first mirror set, layer-4 expert 153 changed
+owners at three of seven adjacent positions; the exact same-input CPU/GPU
+oracle tied each service row to the corresponding implementation, and the
+layer-4 Q8_1 mirror removed that row delta. With that row fixed, layer-6
+experts 110 and 162 changed owners at six adjacent positions. Their oracle rows
+also matched the service, and the same mirror made the isolated CPU/GPU outputs
+bit-identical. The captured layer-5 transition and layer-6 recurrent commits
+were exact even though the next layer's activation changed. For a future Splash
+port, capture per-layer inputs, IDs, weights, owners, expert rows, combined
+outputs, and persistent-state commits at the same accepted positions; run the
+CPU/GPU oracle on the exact service input; then add only the measured format
+and layer to an opt-in mirror selector. A match in one operator row is not
+evidence that the whole request's persistent state or generated tokens match.
+The measured rows also differ in weight pair: layer 8's expert 196 uses
+IQ2_S/Q2_0 while the earlier migrated rows use IQ2_S/IQ4_NL. The selector must
+match both tensor types and layer; an incorrect weight-pair rule is an
+unapplied probe, not a negative result.
+The layer-9 trace also shows that one changed prompt-tail row can coexist with
+matching 12-token recovery output while terminal persistent-state fingerprints
+still differ. Compare accepted state directly even when sampled output tokens
+match.
+When the first accepted token differs, later same-position service hashes do
+not form a valid initial/recovery comparison. Preserve the first mismatch and
+stop; if there is no shared token prefix, report an empty hash-comparison set
+and use raw state captures only at boundaries where inputs are comparable.
+
+The later layer-12/13 traces add an important qualification: a migrated expert
+row can differ while its following GDN intermediates and committed state remain
+exact at the sampled boundary. The next QSA/MoE layer can then contain another
+owner-dependent row. Continue one layer at a time, retaining routes, router
+weights, activation, each expert output and the combined output; do not infer
+that a locally exact recurrent state clears downstream MoE rows. For an oracle
+join, single-row native expert runs are the reference path. A batched native
+probe is useful only after every output row has been independently joined to
+its service activation and owner; the retained layer-12 second-row batch cells
+did not join and are explicitly inconclusive.
+
+The layer-13 follow-up repeats the same pattern at a later boundary: mirroring
+expert 147 makes layer-14 verifier output, GDN intermediates, recurrent state,
+and the accepted raw commit exact at the sampled positions, while adaptive
+recovery tokens diverge. The next dispatch trace contains a new layer-15 owner
+flip. Record each locally restored boundary as a narrow result, then continue
+the capture to the next owner-dependent row instead of treating it as whole-
+request parity.
+The layer-15 mirror then reveals that a single layer boundary can have many
+distinct owner-migrated experts: layer 16 has 21 captured rows across four
+expert IDs, all requiring their own exact-input oracle joins before the layer
+selector claim is justified.
+
+The layer-24 follow-up adds a cross-request caveat. Adding a layer-24 arithmetic
+mirror made the next captured layer exact at sampled positions in one pair, but
+adaptive initial/recovery history already differed by layer 3. A new randomized
+pair reproduced that earliest difference at all seven positions, while delayed
+control stayed exact. This cannot be a same-request downstream layer-24 effect;
+the selector may instead change what adaptive residency history carries into a
+later request, though the source is not yet isolated. For a future Splash
+port, repeat suspicious mirror results with fresh processes and explicit
+history/state controls, and inspect the earliest upstream boundary before
+calling a later-layer result causal.
+
+The follow-up capture at layer 2 separated the boundary further: expert IDs
+and weights matched at positions 505–511, while IQ2_S/IQ4_NL expert 62 alone
+changed CPU/GPU owner and output. The combined MoE output changed, and the GDN
+trace first differed at `ffn_y`; sampled layer-2 raw state at accepted position
+511 remained exact. For Splash, capture the owner-specific expert row as well
+as GDN state around the boundary. A row/output delta can reach the next
+activation before a recurrent-state delta appears at the sampled endpoint.
+Enabling the matching layer-2 mirror restored that layer's rows, combined
+output, captured GDN fields and sampled state exactly, but the adaptive request
+still diverged later. For Splash, report the exact boundary restored and keep
+tracing subsequent layers; a local mirror result must not be promoted as
+request-level state parity.
+The next layer-5 owner trace joined expert 26's actual CPU/GPU service rows to
+an independent same-input oracle at position 506; both rows matched exactly,
+while the CPU/GPU operator outputs differed by 1.4092% relative L2. This is a
+useful Splash validation pattern: same-input mathematical oracle, exact service
+row join, then a narrow opt-in mirror followed by a separate state check.
+The layer-5 mirror then restored all captured local outputs and sampled state
+and brought adaptive recovery tokens into agreement, while accepted-state
+hashes continued to differ. The trace advanced to a layer-18 owner flip. Keep
+token agreement and state agreement as separate gates, and require a service
+row join before assigning a later owner flip as causal.
+The direct layer-18 follow-up joined IQ3_XXS/IQ4_NL expert 110 at position 506:
+the initial CPU and recovery GPU rows each matched an independent exact-input
+oracle, while CPU/GPU outputs differed by 1.5597% relative L2. This resolves
+the limitation from the prior all-layer-only trace; it still does not prove a
+full accepted-state consequence.
+
+
+The same-service request-history check is also useful when porting adaptive residency to Splash: compare repeated short requests with and without an intervening long prefill, and compare accepted persistent state directly even when tokens match. Here the adaptive Coder IQ1_M run first diverged in state at prefix 4 between the first and second short requests; the second and third requests then matched state exactly. The same initial-to-recovery divergence appeared under short/long/short, while delayed control stayed exact. At selected positions, activation and expert IDs matched but owner placement differed. This rules out the long request as a necessary trigger for this observation, not the possibility of a particular earlier owner change or commit-order issue. A future backend investigation should retain the request sequence, route owner map, accepted-prefix hashes, and exact native owner-row oracle together.
+
+
+The follow-up generated-position trace adds a useful boundary for future Splash work: after the first short request, adaptive accepted-state divergence appeared at prefix 4; the next identical short request and its recovery remained state-identical. At position 512, the first selected input activation difference was layer 27 while expert IDs stayed fixed and owners differed at layers 26 and 27. The next useful capture is the exact routed expert rows and GDN state around layers 26–27 for the same accepted token, with the raw commit linked to its service hash.
+
+
+The latest adaptive short-history trace gives a concrete state-write check for a future Splash port: capture the raw GDN pre/post state at every generated position around the first accepted-prefix mismatch, cross-check each byte hash against that layer's service fingerprint, and keep the MoE input/router weights alongside the owner map. In this Coder run, layer-26 state first changed after position 515 with pre-state exact; GDN `x` already differed and router weights changed, so the observed expert-213 owner flip cannot be assigned as the sole cause.
+
+
+The position-515 IQ3_XXS/IQ4_NL expert-118 capture adds two useful checks for future Splash ports: distinguish the real CPU-pool output from the CUDA verifier's `parts_out` capture, and match the CPU arithmetic selector when running the independent oracle. The initial comparison omitted `STRATA_NATIVE_CPU_Q8_1_DOT=all` and incorrectly suggested a 1.4060% relative-L2 mismatch. With the service mode enabled in the oracle, the direct CPU-pool row matched to relative L2 9.51e-10; same-input CPU and CUDA outputs differed by 0.01352%. Keep each capture's execution path and arithmetic mode explicit before using owner traces to explain downstream state changes.
+
+
+A layer-4 Splash port should preserve a per-expert same-input check even when ownership changes: in this IQ1_M trace, expert 153 changed CPU-to-VRAM but the mode-matched CPU/GPU rows were bit-identical, and the sampled verifier GDN state remained exact. The next layer with an owner change can still diverge numerically, so compare rows per codec and keep the verifier capture path separate from the actual CPU-pool output.
+A layer-17 prefill comparison with the layer-16 targeted CPU selector found
+identical chunk hashes and raw end-of-prompt state between fresh adaptive and
+delayed-control services. This is a useful Splash diagnostic boundary: compare
+full raw state at the same prefill chunk boundaries across fresh service arms,
+then separately trace repeated same-service recovery. Prompt-cache reuse can
+mean later identical requests do not execute prefill again, so absence of
+additional prefill records is not evidence of another equal prefill. The
+verifier-state hook also did not support every selected position in a 505–511
+capture; retain the unsupported cell and narrow the claim to its observed
+position instead of assuming coverage.
+
+
+The layer-30 expert-121/212 follow-up adds a verifier-capture caution: the
+service's captured CPU-pool row and route trace are not interchangeable with
+the verifier's per-expert CUDA `parts_out`. The CPU pool rows matched the
+same-input native oracle, and that oracle's CPU/GPU outputs were bit-identical;
+the verifier's third request row differed, but its actual input activation was
+not captured. Keep that comparison unresolved until both sides have an
+input-linked capture. Do not infer a CUDA arithmetic defect from a mismatch
+against an unproven input tensor.
+
+
+For a future Splash transaction port, an all-layer verifier-input trace at a shared token position can be paired with per-GDN accepted-state hashes to narrow the first changed boundary. In this Coder sequence the adaptive first-to-intermediate verifier inputs first differ at model layer 34, and intermediate-to-recovery at layer 12; delayed control remains bit-identical. The layer agreement is correlation only. Capture raw pre/post state at those GDN layers and cross-check service hashes before assigning a cause. Keep the diagnostic parser strict about tensor finiteness and source/destination offsets; the first all-layer capture version read from an out-of-range source offset and is retained as invalid.
+
+The generated-position mirror ladder gives a practical cross-engine recipe for
+NInfer-derived arithmetic experiments and a future Splash port: capture all
+layer inputs at the actual generated positions, identify equal-input route and
+owner changes, then verify one row through both the service and an independent
+same-input oracle. Here, a combined set of locally tested Q8_1 mirrors moved
+the first position-512 activation difference from layer 27 to 41; adding the
+layer-40 IQ3_S/IQ4_NL mirror moved it to layer 42. The targeted rows and
+sampled GDN boundaries became exact while accepted-prefix hashes still
+changed. Treat each movement as a boundary localization only. Keep request
+history, raw committed state, service hashes and per-layer inputs together;
+local operator parity does not establish transaction parity.
+
+The next generated-position Q8_1 mirror pair extended the same lesson: a
+same-input layer-41 IQ3_XXS/IQ4_NL row was bit-identical under the targeted
+oracle, and all 48 initial/intermediate inputs plus layer-42 raw state matched
+at the sampled position. Yet the intermediate/recovery path first differed
+back at layer 13 and all accepted GDN hashes still differed despite identical
+output tokens. A future Splash integration should test both adjacent request
+transitions and accepted-prefix state at each mirror step; a clean sampled
+boundary does not imply the rest of the state transaction is exact.
+
+The subsequent layer-12/13 boundary capture found `R`, `bo`, `inj2`, and the
+layer-13 first read's `R`/`xn` bit-identical across three same-token requests.
+An apparent layer-13 activation delta in the CPU-pool trace was invalid: the
+recovery row had no CPU-owned experts, so its host activation buffer could be
+stale. Keep an explicit validity bit and do not interpret that row as a tensor
+capture. The authoritative CUDA-side verifier input, every captured layer-13
+GDN intermediate, and raw pre/post layer-13 state are bit-identical across the
+three adaptive requests; the raw state matches service hash ordinal 10. The
+first changed verifier input is layer 15 on the intermediate-to-recovery
+transition. For a future Splash port, compare CUDA-side verifier inputs with
+CPU dispatch rows only when the dispatch actually materializes the host input.
+
+At the latest generated-position checkpoint, owner-specific Q8_1 mirrors made
+position-512 input activations and the following layer-42 raw state exact for
+one adaptive transition. The immediately following transition still first
+differed at layer 13, with layer 11 showing an owner switch and layer 12's
+activation unchanged. Capture the layer-12 recurrent pre/post state before
+attributing the downstream layer-13 input delta; then join each result to the
+service's state hash and the exact accepted token prefix. This ordering is
+portable to a future Splash adapter.
+
+A generated-position layer-12 follow-up found identical verifier route IDs,
+router weights, all ten expert outputs, shared/combined MoE output, and raw
+GDN state while the next layer's input still changed. For a future Splash port,
+this is the point to instrument intermediate GDN outputs and residual/normalizer
+fields rather than repeat the same expert oracle. Keep the result narrow: these
+captures clear only the sampled tensors at one position, not every output path
+or the accepted-prefix transaction.
+
+The seed-20261126 recapture also shows why Splash state traces must preserve
+request history and accepted-prefix position: all selected position-512 CUDA
+verifier inputs and layer-14 raw state were exact even though adaptive state
+hashes differed later at prefixes 10 and 11. The earlier layer-15 localization
+belongs to a different seed/history and should not be treated as a universal
+first-divergence point. Capture the actual positions corresponding to the first
+changed accepted prefixes, and validate host activation buffers before using
+them as cross-backend tensor evidence.
+
+The follow-up at generated positions 521 and 522 found the first changed
+verifier MoE inputs at layers 40 and 41, with QSA state hashes changing at
+layers 43 and 47; sampled layer-14 raw state remained exact. Layer-39
+IQ2_S/IQ4_NL experts 66, 135 and 90 changed owners before that boundary while
+their router IDs stayed fixed. A future Splash trace should keep the selected
+accepted position and request-history transition attached to every tensor, then
+test the changed-owner rows with the exact activation and backend arithmetic
+mode before attributing a later recurrent-state difference.
+
+The current layer-16 expert-118 stage replay gives a useful way to isolate a
+quantized activation seam for a future Splash port: retain the actual
+service-owned row, captured gate/up floats, hidden Q8_1 bytes, and down-stage
+comparison; then replay the accelerator expression and quantizer from the
+captured gate/up values. Here, the CUDA replay reproduced all 60 hidden Q8_1
+blocks exactly, while the CPU row differed only in three FP16 block scales;
+the gate/up dots and CPU down projection on CUDA-produced hidden blocks were
+exact. This ties the sampled operator delta to the hidden activation stage,
+but it is not direct capture of the serving kernel's hidden floats and does
+not establish a general CPU/accelerator drift bound. Preserve that distinction
+when adapting the method to another backend's math intrinsics.
+
+Follow-up midpoint checks on the captured layer-16, layer-31 and layer-39
+hidden blocks show why a generic FP16 tie rule is unsafe: one CPU scale sat at
+the exact midpoint while the accelerator selected the lower half, another
+sat at the midpoint while the accelerator selected the upper half, and a
+third CPU scale was two float32 ULPs above its midpoint. A Splash port should
+compare the actual prequantization maxima and the backend's quantizer inputs
+for each matched activation before choosing an arithmetic fix; changing tie
+direction globally would only move the discrepancy between rows.
+
+The verifier's `verify-moe-parts.bin` capture is copied from `parts_out` after
+CPU pool rows have been copied from mapped host memory and GPU-hit rows have
+been added. Treat it as the actual mixed-owner per-expert tensor consumed by
+the MoE combine, not an independent accelerator oracle. The direct CPU-owner
+JSONL is captured earlier in the pool and serializes nine significant digits;
+join both through request, position, layer, route rank and owner before
+comparing. The [layer-40 cross-check](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/adaptive-generated-position512-layer40-expert114-mirror-state-pair/README.md#verifier-parts-capture-semantics-cross-check)
+matched three CPU rows to the verifier buffer within `5e-10`, consistent with
+that serialization precision.
+
+The fresh-source 64-token run adds two reusable checks. First, align each
+captured dispatch block to the API request that actually produced it: at
+position 511, the short/long/short run retained the initial and recovery short
+blocks, not the initial and long requests. The comparator now records that
+mapping explicitly. Second, compare every accepted-prefix state and each
+per-layer recurrent hash alongside the token IDs. With Q8_1 selected for every
+eligible CPU dot, the delayed control matched all 64 prefixes but adaptive
+recovery still changed 60/64 states, first at prefix 4; the same sampled
+verifier activations and expert IDs were present at position 511 while owners
+changed in 23 layers. For a future Splash port, keep dispatch-to-request
+identity, tensor-validity masks, backend owner, and accepted-prefix state in
+the same report; an all-format arithmetic selector is not evidence that
+migration state is fixed.
+
+The temporary direct-division SwiGLU replay adds another caution for a future
+backend mirror. On one IQ2_S/IQ4_NL activation it changed 408/1,920 hidden
+float values but changed no Q8_1 bytes or final output; on a different row of
+the same pair it removed three hidden-scale mismatches, while the same global
+expression regressed an IQ3_XXS row. Keep such a candidate opt-in while
+comparing the backend's actual packed intermediate and final output on several
+matched activations. An algebraically equivalent formula that passes one
+boundary is not yet a general owner-migration correction.
+
+## 2026-10-21 — Keep model fingerprinting outside Orin runs
+
+A long-prompt cache/context screen preserved the 6-GiB host floor, but its first
+attempt overlapped an agent checksum helper implemented with `Path.read_bytes`
+on the two roughly 29-GB model shards. That process loaded model data into host
+memory and caused the supervisor to abort at 5.78 GiB available. The result was
+confounded and excluded. The clean rerun reused previously recorded hashes and
+all 12 cells passed. For future Strata + Splash campaigns, compute artifact
+hashes before the measurement window with a streaming tool, store them in the
+campaign manifest, and do not launch model-sized reads or other memory-heavy
+metadata work beside a supervised run. An agent-side helper is part of the
+physical-memory load even when it is outside the service cgroup.
+
+## 2026-10-22 — Do not substitute reciprocal precision by name alone
+
+At one captured layer-16 expert row, a small ARM NEON replay compared reciprocal
+estimates with the CUDA `__fdividef` packed Q8_1 output. A raw estimate diverged
+broadly; one Newton refinement matched the FP16 scale field but missed the FP16
+sum field in three blocks, while two refinements reversed those field-level
+results. For a future Splash port, compare the complete packed intermediate
+after each backend arithmetic candidate. Similar instruction names or one
+matching field do not establish codec parity; keep a candidate outside the
+serving path until full packed bytes and accepted-prefix state pass on held-out
+inputs. The current-source layer-31 expert-22 rerun passed its exact hidden
+Q8_1 and output oracle but left the separately captured layer-32 state
+divergence unresolved, showing why local operator parity and state-transaction
+parity must remain separate gates. For cross-factor performance work, a future
+Splash campaign can fit log responses with block fixed effects only after
+confirming model rank, then resample whole randomized blocks for uncertainty.
+Keep the estimand (mean log ratio versus median paired ratio) explicit and make
+the paired block result primary when outlier diagnostics disagree.
+
+## 2026-10-22 — Match the CPU SwiGLU operation order in recovery-sensitive paths
+
+A same-day Coder IQ1_M short→long→short pair isolated the native CPU
+SwiGLU expression while keeping model files, prompt IDs, seed, expert-cache
+settings, adaptive residency policy and capture endpoints fixed. The original
+`g * sigmoid(g) * u` source reproduced the adaptive layer-32 state drift
+(relative L2 0.524 recurrent / 0.916 convolution at accepted position 574) and
+40/64 recovery token differences. The direct form
+`(g / (1 + exp(-g))) * u` yielded 0.0144 / 0.0202 state drift and 0/64 token
+differences. Delayed control was exact in both builds, and raw captures
+matched service accepted-prefix hashes. A separately captured IQ2_S/IQ4_NL
+row also matched the GPU packed hidden output only with direct division. The
+temporary multiply form was removed and the source restored to direct division.
+
+For Strata/NInfer integration, carry this lesson into code promotion: preserve
+the source expression and rounding path alongside quantization and layout
+contracts. Validate a candidate in a full accepted-prefix recovery pair, not
+only an isolated operator row. For a future Splash backend, run the same
+same-day formula pair with its own packed intermediate oracle and state hashes;
+do not copy a CPU/GPU expression assumption across backends. This finding is
+specific to this model, format, CPU path and tested recovery chain, does not
+bound longer chains or other operators, and has no measured performance
+claim. See the paired raw-state reports linked from `STATUS.md`.
+
+## 2026-10-22 — A short recovery match is not a long-chain bound
+
+The direct-division CPU expression eliminated recovery-token differences in the
+64-generated-token pair, but in a reversed-order 128-token pair adaptive
+recovery first differed at output index 47 (73/128 outputs differ). Delayed
+control remained bit-exact. At the selected layer-32 GDN, recurrent/conv
+relative L2 reached 0.3106/0.6531 at endpoint 574 and 0.4537/0.8835 at 638;
+these later states have different accepted token histories and cannot isolate
+the source transition error. For Strata/NInfer work, match run length and
+capture the raw state immediately before the first output mismatch. A future
+Splash port should include that boundary in its first recovery campaign and
+keep backend arithmetic parity separate from long-chain transaction parity.
+
+The 128-token adaptive recovery capture found that the accepted layer-32 GDN
+state already differed at positions 557 and 558 while consumed tokens through
+output index 46 still matched; output index 47 was the first changed token.
+Capture state on both sides of the first output mismatch to distinguish state
+migration drift from later trajectory amplification. A mismatch boundary
+localizes when the trajectories separate, not which earlier layer introduced
+the numerical difference.
+
+## 2026-10-22 — Capture committed recurrent state across model layers
+
+Extending the opt-in committed-state dump to all GDN-bearing model layers
+located the first changed persistent state at layer 22, position 534. Position
+515 remained bit-exact at all 36 GDN layers; the per-layer raw captures matched
+all service hashes. This showed that sampling only a later layer can establish
+drift but conceal its onset. Preserve each record's model-layer identity,
+position, accepted token and raw codec/state bytes; validate the raw bytes
+against the service's per-layer hashes before drawing a layer-order conclusion.
+The compact layer comparison is separate from the 1.4-GiB raw artifact.
+
+For a future Strata/Splash investigation, add an opt-in all-layer capture to the
+backend's commit boundary, keep the default path unchanged, and use the earliest
+changed layer to choose the next independent input/operator oracle. Capture
+overhead can be substantial because synchronizing and copying each persistent
+state is diagnostic work; do not use its timings as performance evidence. A
+first changed committed layer narrows the search but still does not prove which
+operation inside that layer caused the state delta.
+
+A same-position layer-21 capture then found identical verifier input, routes,
+owner kinds, ten expert rows, and combined MoE output across adaptive initial
+and recovery requests. This is useful negative evidence: once a changed input
+boundary is found, capture the entire layer seam before prescribing a CPU/GPU
+mirror. Matching MoE rows move the search beyond the MoE operation. A future
+Splash port should use the same staged approach, keeping
+negative operator checks in the report rather than repeating broader tests
+that have already been excluded for that input.
+
+A same-token all-layer verifier-input capture at position 534 found exact
+inputs through layer 21 and a changed input at layer 22 (relative L2
+`3.7883e-4`). At that selected token, layer-21 GDN, expert and residual probes
+and all five layer-22 fused GR-read fields were exact. A full accepted-prefix
+service-hash scan later found the first observed state divergence at position
+519 in GDN model layer 32. For future backend comparisons, inspect the complete
+accepted-prefix timeline before concentrating on a selected endpoint, then
+capture raw state around the earliest hash transition and validate those bytes
+against the service hashes. A later exact boundary is useful negative evidence
+for that token, but does not locate an earlier cause.
+
+The layer-21 follow-up found its GDN intermediates and state, plus captured
+residual fields through layer 22's first read, bit-exact for the selected
+position-534 token. The five captured layer-22 fused GR-read fields were also
+bit-exact there. A scan of service accepted-prefix hashes across the complete
+128-token recovery instead found its first state divergence earlier, at
+position 519 in GDN model layer 32. A same-binary supervised raw capture
+confirmed exact state through positions 515–518 and a small recurrent-only
+delta at 519; all ten records matched service hashes and delayed control was
+exact. At that token the layer-32 input is the first changed all-layer input,
+while layer-31 `bo` already differs and `R`/`inj2` remain exact. The lesson for
+future Strata/Splash ports is to scan the full accepted-prefix timeline, then
+capture adjacent commit state, verifier input and residual fields together.
+The same-input layer-31 dispatch capture found four CPU-to-CUDA owner changes;
+only expert 22's output row changed, and each service row matched its
+owner-specific independent oracle. A future engine should record owner and
+per-expert rows at the same accepted position, then test any arithmetic mirror
+with full accepted-state recovery. Treat changed downstream rows as effects
+until their input boundary is shown exact, and use delayed control to
+distinguish migration effects from capture or workload drift.
+
+
+### Accepted-prefix gate for arithmetic mirrors
+
+A targeted Strata layer-31 CPU reciprocal-SiLU mirror made one captured expert row bit-identical to its CUDA counterpart and passed an independent same-input oracle, yet worsened the 128-token adaptive recovery chain: first mismatch moved from output index 47 to index 6 and layer-32 committed state was already changed at position 515. Do not promote an operator-local parity result as a persistent-state fix. For a future Strata/Splash integration, qualify owner-specific mirrors on the exact accepted-prefix transaction, compare raw recurrent/convolution state and token history against a same-day delayed control, and repeat on held-out chains. Here, upstream layer-31 router weights and expert parts also differed in the candidate chain, so the row-level finding did not by itself explain the end-to-end regression.
+
+
+The expert-specific mirror follow-up also failed the full adaptive transaction: a reciprocal-SiLU expression filtered to one model layer and expert changed accepted-prefix state earlier than the direct-division reference, despite the owner-specific row oracle. A Strata↔Splash port should therefore treat arithmetic selection as an intervention across the whole session/state lifecycle: track where a change first appears after prompt reuse, migration, or restore, and compare per-layer hashes, raw recurrent/conv bytes, and consumed token IDs. The expert identified at one transition may not explain an earlier state change across requests.
+
+## 2026-10-22 — Adaptive owner changes are part of the state trajectory
+
+A same-seed Coder IQ1_M comparison at layer 21 / position 515 found that an
+opt-in layer-31/expert-22 reciprocal-SiLU selector was associated with expert
+132 moving from CPU to GPU during adaptive recovery. Layer-21 MoE input,
+selected IDs and router weights matched; the expert output and combined MoE
+output did not. The direct-division pair kept expert 132 on CPU with exact
+layer-21 rows and output at that point. This did not fix the broader adaptive
+recovery drift in either arm. For future Strata/NInfer or Strata/Splash work,
+record owner maps beside accepted-prefix state and compare same-input
+owner-specific rows before interpreting downstream state deltas. Owner
+migration can expose a backend arithmetic difference even when routing is
+unchanged; verify the full accepted token/state chain before promoting an
+operator-local mirror.
+
+The follow-up adaptive-choice trace makes the owner transition concrete: after
+88 accepted verifier rows in the first short request, round 88 chooses layer 21
+`132>12` (admit expert 132, evict expert 12); the recovery request later sees
+that residency. This swap was recorded with the experimental layer-31/expert-22
+selector and not in the same-seed direct-division capture. For a future port,
+retain accepted-only swap choices with the accepted token index and raw state
+capture. This pair localizes the immediate backend owner change, while the
+usage-statistic path that led to the choice still needs a different prompt and
+additional runs.
+
+A separate open-response held-out prompt shows why selector decisions must be
+reported per workload. With the selector enabled or disabled, the same-seed
+short–long–short sequence produced identical request token IDs, all 387
+accepted-prefix GDN hash records, and byte-identical layer-21 route, expert-part,
+and combined-output captures. Both adaptive arms migrated expert 132 CPU→GPU
+and had the same recovery drift; the layer-31/expert-22 selector had no observed
+effect on this prompt. Both traces selected expert 132 at round 220, while the
+earlier round-88 `132>12` decision did not recur. Keep the original selector
+finding bounded to its prompt/sequence. For future Strata/Splash work, include a
+no-selector paired control and compare full token/state traces, not only whether
+a chosen owner transition appears in the trace. Decode owner-kind values from
+the backend's own enum; do not assume raw numeric codes transfer across engines.
+
+The two-live batch/MTP follow-up reinforces the same rule for concurrency:
+target-only batch rows can match the serial recurrent state at admission and
+then diverge within the first few decode positions, while generated text stays
+equal for many tokens. For a future Strata/Splash batch port, pair rows by
+prompt identity and committed length, capture per-layer recurrent hashes around
+solo-to-batch handoff, and compare an isolated fresh serial request as well as a
+second request on the same resident server. The latter can follow a different
+state/output path than a fresh process even with zero prompt-cache reuse, so do
+not use request order or slot number as identity. Keep verifier logits and
+committed recurrent state as separate checks; a top-token or final-text match
+does not establish state parity.
+
+## 2026-10-22 — Pair batched state by request identity, not physical slot
+
+A selected-position Coder target-only capture logged two exact prompt-boundary
+states at the same position against physical slot 0 before the concurrent
+requests settled into their batch slots. The earlier layer-6 comparison treated
+that slot as one request across the capture and produced a false large state
+delta. Rechecking all 36 GDN layers against both isolated serial prompt
+controls showed slot 0 closest to prompt 0 and slot 1 closest to prompt 1 at
+positions 71 and 72. At position 72, whole-state relative L2 was 0.01079 and
+0.01942, while 25.0M and 27.8M of 29.4M floats changed; the six-token outputs
+were identical. For a future Strata/Splash batching port, record a request ID
+beside every state sample, treat slot number as a temporary storage address,
+and pair each complete all-layer record by request ID, committed position and
+consumed token. When the serving layer cannot expose request identity, compare
+each state independently against every matching isolated control and report
+ambiguous mappings rather than extending a slot-to-prompt assignment through
+slot reuse. Keep raw arrays local-only and retain compact hashes/deltas in the
+review record.

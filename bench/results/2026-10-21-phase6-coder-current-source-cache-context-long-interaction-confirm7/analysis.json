@@ -1,0 +1,413 @@
+{
+  "passed": true,
+  "complete_blocks": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "block_sources": {
+    "1": "per-cell-scopes/block-01",
+    "2": "per-cell-scopes/block-02",
+    "3": "per-cell-scopes/block-03",
+    "4": "per-cell-scopes/block-04",
+    "5": "per-cell-scopes/block-05",
+    "6": "per-cell-scopes/block-06",
+    "7": "per-cell-scopes/block-07-replacement"
+  },
+  "paired_effects": {
+    "cache_effect_client_total_s_ctx8192": {
+      "paired_block_ratios": [
+        0.8489439909977861,
+        0.9207434275115127,
+        0.9204666391528747,
+        0.9113861239264879,
+        0.9247187594970528,
+        0.9206846724976302,
+        0.84432765371107
+      ],
+      "median_change_percent": 7.953336084712525,
+      "paired_block_bootstrap_95_interval_percent": [
+        7.925657248848728,
+        15.105600900221393
+      ],
+      "ratio_definition": "candidate/baseline; seconds are reported as latency reduction, throughput as increase"
+    },
+    "cache_effect_client_total_s_ctx16384": {
+      "paired_block_ratios": [
+        0.921796137806852,
+        0.931057506711697,
+        0.9272207524345488,
+        0.9276929715445976,
+        0.9229431866748005,
+        0.9227002171342555,
+        0.9199463598616834
+      ],
+      "median_change_percent": 7.705681332519953,
+      "paired_block_bootstrap_95_interval_percent": [
+        7.230702845540238,
+        7.820386219314801
+      ],
+      "ratio_definition": "candidate/baseline; seconds are reported as latency reduction, throughput as increase"
+    },
+    "context_effect_client_total_s_cache1500": {
+      "paired_block_ratios": [
+        0.916181821741481,
+        0.9977945366534232,
+        0.9944688257466064,
+        0.9936682297040796,
+        0.9960692154235916,
+        0.9995619816469113,
+        0.9181921066653229
+      ],
+      "median_change_percent": -0.5531174253393556,
+      "paired_block_bootstrap_95_interval_percent": [
+        -8.180789333467708,
+        -0.2205463346576786
+      ],
+      "ratio_definition": "16K/8K; seconds are reported as latency increase and throughput as increase"
+    },
+    "context_effect_client_total_s_cache3000": {
+      "paired_block_ratios": [
+        0.9948039844389988,
+        1.0089717349575902,
+        1.001765945292805,
+        1.011447298289118,
+        0.9941566410221052,
+        1.0017502029253407,
+        1.0004261763402427
+      ],
+      "median_change_percent": 0.17502029253406715,
+      "paired_block_bootstrap_95_interval_percent": [
+        -0.5196015561001244,
+        0.8971734957590183
+      ],
+      "ratio_definition": "16K/8K; seconds are reported as latency increase and throughput as increase"
+    },
+    "cache_by_context_interaction_client_total_s": {
+      "paired_block_ratio_of_ratios": [
+        1.0858150214638318,
+        1.011201903692172,
+        1.0073377056749064,
+        1.0178923588915922,
+        0.9980798780126208,
+        1.0021891801795262,
+        1.0895608545074258
+      ],
+      "median_interaction_percent": 1.1201903692172,
+      "paired_block_bootstrap_95_interval_percent": [
+        0.21891801795261845,
+        8.58150214638318
+      ],
+      "interpretation": "for seconds, below zero means the cache latency benefit is larger at 16K; for throughput, below zero means 16K context penalty is more reduced at 3000 MiB"
+    },
+    "cache_effect_client_ttft_s_ctx8192": {
+      "paired_block_ratios": [
+        0.8479600996575049,
+        0.9206298819421772,
+        0.9200694078324418,
+        0.9110856303345588,
+        0.9244945846553394,
+        0.9205995908601652,
+        0.843492476629919
+      ],
+      "median_change_percent": 7.993059216755816,
+      "paired_block_bootstrap_95_interval_percent": [
+        7.937011805782279,
+        15.203990034249514
+      ],
+      "ratio_definition": "candidate/baseline; seconds are reported as latency reduction, throughput as increase"
+    },
+    "cache_effect_client_ttft_s_ctx16384": {
+      "paired_block_ratios": [
+        0.9218670154471382,
+        0.9310514074462191,
+        0.9273493278665906,
+        0.9279425728657337,
+        0.9228403091342209,
+        0.9226886674238539,
+        0.9209058840516012
+      ],
+      "median_change_percent": 7.715969086577912,
+      "paired_block_bootstrap_95_interval_percent": [
+        7.205742713426632,
+        7.813298455286177
+      ],
+      "ratio_definition": "candidate/baseline; seconds are reported as latency reduction, throughput as increase"
+    },
+    "context_effect_client_ttft_s_cache1500": {
+      "paired_block_ratios": [
+        0.9150919368248258,
+        0.9976761075801692,
+        0.9940291397024724,
+        0.9932632808899969,
+        0.9959169059547243,
+        0.9995238048929634,
+        0.9162610381678692
+      ],
+      "median_change_percent": -0.597086029752758,
+      "paired_block_bootstrap_95_interval_percent": [
+        -8.37389618321308,
+        -0.23238924198307753
+      ],
+      "ratio_definition": "16K/8K; seconds are reported as latency increase and throughput as increase"
+    },
+    "context_effect_client_ttft_s_cache3000": {
+      "paired_block_ratios": [
+        0.9948499616917996,
+        1.0089697959601136,
+        1.0018942557328987,
+        1.0116406775767832,
+        0.9941348284975554,
+        1.0017919807387727,
+        1.0003529429773814
+      ],
+      "median_change_percent": 0.1791980738772736,
+      "paired_block_bootstrap_95_interval_percent": [
+        -0.5150038308200378,
+        0.8969795960113602
+      ],
+      "ratio_definition": "16K/8K; seconds are reported as latency increase and throughput as increase"
+    },
+    "cache_by_context_interaction_client_ttft_s": {
+      "paired_block_ratio_of_ratios": [
+        1.0871584828336671,
+        1.0113199948301226,
+        1.007912359624367,
+        1.018502039731419,
+        0.9982106163209866,
+        1.0022692564546296,
+        1.091777235205439
+      ],
+      "median_interaction_percent": 1.1319994830122582,
+      "paired_block_bootstrap_95_interval_percent": [
+        0.2269256454629609,
+        8.71584828336671
+      ],
+      "interpretation": "for seconds, below zero means the cache latency benefit is larger at 16K; for throughput, below zero means 16K context penalty is more reduced at 3000 MiB"
+    },
+    "cache_effect_prompt_tps_ctx8192": {
+      "paired_block_ratios": [
+        1.1795039660351287,
+        1.086447810811335,
+        1.0871371906244878,
+        1.0978215512847262,
+        1.0818125845607374,
+        1.08635970327449,
+        1.1857007073640389
+      ],
+      "median_change_percent": 8.713719062448778,
+      "paired_block_bootstrap_95_interval_percent": [
+        8.635970327449005,
+        17.950396603512875
+      ],
+      "ratio_definition": "candidate/baseline; seconds are reported as latency reduction, throughput as increase"
+    },
+    "cache_effect_prompt_tps_ctx16384": {
+      "paired_block_ratios": [
+        1.0847936524373898,
+        1.0740137007502015,
+        1.0785707952194499,
+        1.0778254966973864,
+        1.0837606052905542,
+        1.0839081327030387,
+        1.086304692712191
+      ],
+      "median_change_percent": 8.376060529055419,
+      "paired_block_bootstrap_95_interval_percent": [
+        7.7825496697386365,
+        8.479365243738979
+      ],
+      "ratio_definition": "candidate/baseline; seconds are reported as latency reduction, throughput as increase"
+    },
+    "context_effect_prompt_tps_cache1500": {
+      "paired_block_ratios": [
+        1.0928896609017447,
+        1.0025510142169973,
+        1.0060292370216692,
+        1.0068810033923596,
+        1.004187610771548,
+        1.0004984734062774,
+        1.0915246481448682
+      ],
+      "median_change_percent": 0.6029237021669243,
+      "paired_block_bootstrap_95_interval_percent": [
+        0.2551014216997327,
+        9.152464814486816
+      ],
+      "ratio_definition": "16K/8K; seconds are reported as latency increase and throughput as increase"
+    },
+    "context_effect_prompt_tps_cache3000": {
+      "paired_block_ratios": [
+        1.0051341929318742,
+        0.9910770809745291,
+        0.9981019539633041,
+        0.9885413675169046,
+        1.0059958521530277,
+        0.9982406644993456,
+        1.0000233112172263
+      ],
+      "median_change_percent": -0.17593355006544353,
+      "paired_block_bootstrap_95_interval_percent": [
+        -0.8922919025470932,
+        0.5134192931874226
+      ],
+      "ratio_definition": "16K/8K; seconds are reported as latency increase and throughput as increase"
+    },
+    "cache_by_context_interaction_prompt_tps": {
+      "paired_block_ratio_of_ratios": [
+        0.9197032682169732,
+        0.9885552624457424,
+        0.9921202259669573,
+        0.9817856968066081,
+        1.0018007007476326,
+        0.9977433159900335,
+        0.916171075858749
+      ],
+      "median_interaction_percent": -1.1444737554257567,
+      "paired_block_bootstrap_95_interval_percent": [
+        -8.029673178302676,
+        -0.2256684009966481
+      ],
+      "interpretation": "for seconds, below zero means the cache latency benefit is larger at 16K; for throughput, below zero means 16K context penalty is more reduced at 3000 MiB"
+    },
+    "cache_effect_decode_tps_ctx8192": {
+      "paired_block_ratios": [
+        1.0608944892109677,
+        1.071446216342327,
+        1.0483091787439613,
+        1.0669692273632942,
+        1.061860414749039,
+        1.0788836953533132,
+        1.0827923864011444
+      ],
+      "median_change_percent": 6.696922736329425,
+      "paired_block_bootstrap_95_interval_percent": [
+        6.089448921096774,
+        7.888369535331319
+      ],
+      "ratio_definition": "candidate/baseline; seconds are reported as latency reduction, throughput as increase"
+    },
+    "cache_effect_decode_tps_ctx16384": {
+      "paired_block_ratios": [
+        1.0940845532007863,
+        1.080983803239352,
+        1.0970143104348067,
+        1.1068776594265373,
+        1.07677668424773,
+        1.087272225289895,
+        1.1857694519760085
+      ],
+      "median_change_percent": 9.408455320078634,
+      "paired_block_bootstrap_95_interval_percent": [
+        8.098380323935196,
+        10.687765942653726
+      ],
+      "ratio_definition": "candidate/baseline; seconds are reported as latency reduction, throughput as increase"
+    },
+    "context_effect_decode_tps_cache1500": {
+      "paired_block_ratios": [
+        0.9793564813659171,
+        0.9846635051962466,
+        0.9671248654197651,
+        0.9687437185929648,
+        0.9903297480179771,
+        0.9963942002488511,
+        0.9092294900221729
+      ],
+      "median_change_percent": -2.064351863408287,
+      "paired_block_bootstrap_95_interval_percent": [
+        -3.2875134580234944,
+        -0.967025198202287
+      ],
+      "ratio_definition": "16K/8K; seconds are reported as latency increase and throughput as increase"
+    },
+    "context_effect_decode_tps_cache3000": {
+      "paired_block_ratios": [
+        1.0099956303255406,
+        0.9934285870098707,
+        1.012058120691076,
+        1.0049781683677728,
+        1.0042412049371976,
+        1.0041413583655439,
+        0.9957001615862843
+      ],
+      "median_change_percent": 0.4241204937197596,
+      "paired_block_bootstrap_95_interval_percent": [
+        -0.42998384137157286,
+        0.9995630325540628
+      ],
+      "ratio_definition": "16K/8K; seconds are reported as latency increase and throughput as increase"
+    },
+    "cache_by_context_interaction_decode_tps": {
+      "paired_block_ratio_of_ratios": [
+        1.031284981048873,
+        1.0089016011737708,
+        1.0464606555760598,
+        1.0374035455191761,
+        1.0140472978288924,
+        1.0077751939089548,
+        1.0951032412752062
+      ],
+      "median_interaction_percent": 3.1284981048872895,
+      "paired_block_bootstrap_95_interval_percent": [
+        0.8901601173770812,
+        4.646065557605983
+      ],
+      "interpretation": "for seconds, below zero means the cache latency benefit is larger at 16K; for throughput, below zero means 16K context penalty is more reduced at 3000 MiB"
+    }
+  },
+  "minimum_host_available_gib": 13.929195404052734,
+  "minimum_admission_available_gib": 13.929195404052734,
+  "maximum_cgroup_events": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0
+  },
+  "clock_observations": {
+    "gpu_hz_min_max": [
+      306000000,
+      1300500000
+    ],
+    "cpu_hz_min_max": [
+      729600000,
+      2201600000
+    ],
+    "emc_status_counts": {
+      "unsupported": 18126
+    }
+  },
+  "block_local_dates": {
+    "1": [
+      "2026-10-21"
+    ],
+    "2": [
+      "2026-10-21"
+    ],
+    "3": [
+      "2026-10-21"
+    ],
+    "4": [
+      "2026-10-21"
+    ],
+    "5": [
+      "2026-10-21"
+    ],
+    "6": [
+      "2026-10-21"
+    ],
+    "7": [
+      "2026-10-22"
+    ]
+  },
+  "tegrastats_tj_celsius_min_max": [
+    50.093,
+    60.312
+  ],
+  "errors": []
+}

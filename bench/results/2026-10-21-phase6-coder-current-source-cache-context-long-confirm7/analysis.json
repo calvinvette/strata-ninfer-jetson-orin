@@ -1,0 +1,726 @@
+{
+  "scope": "seven paired randomized blocks; each cell median of three measured requests after one exact-answer warmup; held-out 7501-token task at fixed 16384 configured context",
+  "expected_answer": "EARLY=ALPINE-HARBOR-284, MIDDLE=COBALT-MAPLE-571, LATE=VIOLET-COMET-638, SUM=1493",
+  "model_source": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF@5348543e0147355ac9cbcb031184a3546350988e; IQ1_M",
+  "source_commit": "8e7400fdd91d53b5634aab0923c9bf0a8b7294a5",
+  "binary_sha256": "b672187692408e8abcb48beb6ad80282b01954bae819ec48963ac7c6440e4ec9",
+  "model_files_sha256": {
+    "Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf": "e11083ba855e7666b48ea3f2db6a9c3a20c18751a012cc24f948de91b7087fad",
+    "Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+  },
+  "expected_prompt_tokens": 7501,
+  "expected_completion_tokens": 48,
+  "effects_3000_vs_1500": {
+    "client_ttft_s": {
+      "paired_block_improvement_percent": [
+        6.750537390434275,
+        7.132161938761561,
+        7.131861266008965,
+        7.10197090150605,
+        6.985571383404887,
+        6.978534395553582,
+        7.227669629447164
+      ],
+      "median_improvement_percent": 7.10197090150605,
+      "paired_block_bootstrap_95_interval_percent": [
+        6.978534395553582,
+        7.132161938761561
+      ]
+    },
+    "client_total_s": {
+      "paired_block_improvement_percent": [
+        6.754141471417896,
+        7.149232562213159,
+        7.096821427318756,
+        7.117591520705413,
+        7.028140198246069,
+        6.992103144866757,
+        7.234610192891111
+      ],
+      "median_improvement_percent": 7.096821427318756,
+      "paired_block_bootstrap_95_interval_percent": [
+        6.992103144866757,
+        7.149232562213159
+      ]
+    },
+    "prompt_tps": {
+      "paired_block_improvement_percent": [
+        7.456140350877183,
+        7.456140350877183,
+        7.456140350877183,
+        7.456140350877183,
+        7.456140350877183,
+        7.456140350877183,
+        7.929515418502198
+      ],
+      "median_improvement_percent": 7.456140350877183,
+      "paired_block_bootstrap_95_interval_percent": [
+        7.456140350877183,
+        7.456140350877183
+      ]
+    },
+    "decode_tps": {
+      "paired_block_improvement_percent": [
+        9.166666666666657,
+        9.917355371900838,
+        9.999999999999986,
+        9.166666666666657,
+        11.864406779661007,
+        9.166666666666657,
+        9.166666666666657
+      ],
+      "median_improvement_percent": 9.166666666666657,
+      "paired_block_bootstrap_95_interval_percent": [
+        9.166666666666657,
+        9.999999999999986
+      ]
+    }
+  },
+  "rows": [
+    {
+      "block": 1,
+      "cell": "cache1500-ctx16384",
+      "cache_budget_mib": 1500,
+      "context_tokens": 16384,
+      "request_medians": {
+        "client_ttft_s": 328.5358016740065,
+        "client_total_s": 332.39127218397334,
+        "prompt_tps": 22.8,
+        "decode_tps": 12.0
+      },
+      "expert_slots": 1934,
+      "expert_cache_mib": 3807,
+      "minimum_host_available_gib": 17.78265380859375,
+      "minimum_admission_available_gib": 17.090774536132812,
+      "memory_samples": 1286,
+      "cgroup_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "request_dates": [
+        "2026-10-21"
+      ],
+      "clock_summary": {
+        "gpu_hz": {
+          "min_hz": 306000000,
+          "median_hz": 612000000.0,
+          "max_hz": 1300500000
+        },
+        "cpu_per_core_sample_hz": {
+          "min_hz": 729600000,
+          "median_hz": 806400000.0,
+          "max_hz": 2201600000
+        },
+        "emc_observation_status_counts": {
+          "unsupported": 1286
+        },
+        "samples_with_gpu_clock": 1286,
+        "samples_with_cpu_clocks": 15432
+      }
+    },
+    {
+      "block": 1,
+      "cell": "cache3000-ctx16384",
+      "cache_budget_mib": 3000,
+      "context_tokens": 16384,
+      "request_medians": {
+        "client_ttft_s": 306.3578695410397,
+        "client_total_s": 309.94109542202204,
+        "prompt_tps": 24.5,
+        "decode_tps": 13.1
+      },
+      "expert_slots": 3903,
+      "expert_cache_mib": 7615,
+      "minimum_host_available_gib": 14.182987213134766,
+      "minimum_admission_available_gib": 14.182987213134766,
+      "memory_samples": 1203,
+      "cgroup_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "request_dates": [
+        "2026-10-21"
+      ],
+      "clock_summary": {
+        "gpu_hz": {
+          "min_hz": 306000000,
+          "median_hz": 612000000,
+          "max_hz": 1300500000
+        },
+        "cpu_per_core_sample_hz": {
+          "min_hz": 729600000,
+          "median_hz": 806400000.0,
+          "max_hz": 2201600000
+        },
+        "emc_observation_status_counts": {
+          "unsupported": 1203
+        },
+        "samples_with_gpu_clock": 1203,
+        "samples_with_cpu_clocks": 14436
+      }
+    },
+    {
+      "block": 2,
+      "cell": "cache1500-ctx16384",
+      "cache_budget_mib": 1500,
+      "context_tokens": 16384,
+      "request_medians": {
+        "client_ttft_s": 329.7105345330201,
+        "client_total_s": 333.5688759679906,
+        "prompt_tps": 22.8,
+        "decode_tps": 12.1
+      },
+      "expert_slots": 1934,
+      "expert_cache_mib": 3807,
+      "minimum_host_available_gib": 17.878822326660156,
+      "minimum_admission_available_gib": 16.579174041748047,
+      "memory_samples": 1289,
+      "cgroup_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "request_dates": [
+        "2026-10-21"
+      ],
+      "clock_summary": {
+        "gpu_hz": {
+          "min_hz": 306000000,
+          "median_hz": 612000000,
+          "max_hz": 1300500000
+        },
+        "cpu_per_core_sample_hz": {
+          "min_hz": 729600000,
+          "median_hz": 806400000.0,
+          "max_hz": 2201600000
+        },
+        "emc_observation_status_counts": {
+          "unsupported": 1289
+        },
+        "samples_with_gpu_clock": 1289,
+        "samples_with_cpu_clocks": 15468
+      }
+    },
+    {
+      "block": 2,
+      "cell": "cache3000-ctx16384",
+      "cache_budget_mib": 3000,
+      "context_tokens": 16384,
+      "request_medians": {
+        "client_ttft_s": 306.19504528096877,
+        "client_total_s": 309.7212612698786,
+        "prompt_tps": 24.5,
+        "decode_tps": 13.3
+      },
+      "expert_slots": 3903,
+      "expert_cache_mib": 7615,
+      "minimum_host_available_gib": 14.196208953857422,
+      "minimum_admission_available_gib": 14.196208953857422,
+      "memory_samples": 1202,
+      "cgroup_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "request_dates": [
+        "2026-10-21"
+      ],
+      "clock_summary": {
+        "gpu_hz": {
+          "min_hz": 306000000,
+          "median_hz": 612000000.0,
+          "max_hz": 1300500000
+        },
+        "cpu_per_core_sample_hz": {
+          "min_hz": 729600000,
+          "median_hz": 806400000.0,
+          "max_hz": 2201600000
+        },
+        "emc_observation_status_counts": {
+          "unsupported": 1202
+        },
+        "samples_with_gpu_clock": 1202,
+        "samples_with_cpu_clocks": 14424
+      }
+    },
+    {
+      "block": 3,
+      "cell": "cache1500-ctx16384",
+      "cache_budget_mib": 1500,
+      "context_tokens": 16384,
+      "request_medians": {
+        "client_ttft_s": 329.3680330819916,
+        "client_total_s": 333.24582193698734,
+        "prompt_tps": 22.8,
+        "decode_tps": 12.0
+      },
+      "expert_slots": 1934,
+      "expert_cache_mib": 3807,
+      "minimum_host_available_gib": 17.80288314819336,
+      "minimum_admission_available_gib": 16.470043182373047,
+      "memory_samples": 1296,
+      "cgroup_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "request_dates": [
+        "2026-10-21"
+      ],
+      "clock_summary": {
+        "gpu_hz": {
+          "min_hz": 306000000,
+          "median_hz": 612000000.0,
+          "max_hz": 1300500000
+        },
+        "cpu_per_core_sample_hz": {
+          "min_hz": 729600000,
+          "median_hz": 806400000.0,
+          "max_hz": 2201600000
+        },
+        "emc_observation_status_counts": {
+          "unsupported": 1296
+        },
+        "samples_with_gpu_clock": 1296,
+        "samples_with_cpu_clocks": 15552
+      }
+    },
+    {
+      "block": 3,
+      "cell": "cache3000-ctx16384",
+      "cache_budget_mib": 3000,
+      "context_tokens": 16384,
+      "request_medians": {
+        "client_ttft_s": 305.87796190800145,
+        "client_total_s": 309.5959610401187,
+        "prompt_tps": 24.5,
+        "decode_tps": 13.2
+      },
+      "expert_slots": 3903,
+      "expert_cache_mib": 7615,
+      "minimum_host_available_gib": 14.17086410522461,
+      "minimum_admission_available_gib": 14.17086410522461,
+      "memory_samples": 1231,
+      "cgroup_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "request_dates": [
+        "2026-10-21"
+      ],
+      "clock_summary": {
+        "gpu_hz": {
+          "min_hz": 306000000,
+          "median_hz": 612000000,
+          "max_hz": 1300500000
+        },
+        "cpu_per_core_sample_hz": {
+          "min_hz": 729600000,
+          "median_hz": 806400000.0,
+          "max_hz": 2201600000
+        },
+        "emc_observation_status_counts": {
+          "unsupported": 1231
+        },
+        "samples_with_gpu_clock": 1231,
+        "samples_with_cpu_clocks": 14772
+      }
+    },
+    {
+      "block": 4,
+      "cell": "cache1500-ctx16384",
+      "cache_budget_mib": 1500,
+      "context_tokens": 16384,
+      "request_medians": {
+        "client_ttft_s": 328.99947197688743,
+        "client_total_s": 332.8891633199528,
+        "prompt_tps": 22.8,
+        "decode_tps": 12.0
+      },
+      "expert_slots": 1934,
+      "expert_cache_mib": 3807,
+      "minimum_host_available_gib": 17.7060546875,
+      "minimum_admission_available_gib": 16.872447967529297,
+      "memory_samples": 1295,
+      "cgroup_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "request_dates": [
+        "2026-10-21"
+      ],
+      "clock_summary": {
+        "gpu_hz": {
+          "min_hz": 306000000,
+          "median_hz": 612000000,
+          "max_hz": 1300500000
+        },
+        "cpu_per_core_sample_hz": {
+          "min_hz": 729600000,
+          "median_hz": 806400000.0,
+          "max_hz": 2201600000
+        },
+        "emc_observation_status_counts": {
+          "unsupported": 1295
+        },
+        "samples_with_gpu_clock": 1295,
+        "samples_with_cpu_clocks": 15540
+      }
+    },
+    {
+      "block": 4,
+      "cell": "cache3000-ctx16384",
+      "cache_budget_mib": 3000,
+      "context_tokens": 16384,
+      "request_medians": {
+        "client_ttft_s": 305.6340252109803,
+        "client_total_s": 309.19547245814465,
+        "prompt_tps": 24.5,
+        "decode_tps": 13.1
+      },
+      "expert_slots": 3903,
+      "expert_cache_mib": 7615,
+      "minimum_host_available_gib": 14.140174865722656,
+      "minimum_admission_available_gib": 14.140174865722656,
+      "memory_samples": 1201,
+      "cgroup_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "request_dates": [
+        "2026-10-21"
+      ],
+      "clock_summary": {
+        "gpu_hz": {
+          "min_hz": 306000000,
+          "median_hz": 612000000,
+          "max_hz": 1300500000
+        },
+        "cpu_per_core_sample_hz": {
+          "min_hz": 729600000,
+          "median_hz": 806400000.0,
+          "max_hz": 2201600000
+        },
+        "emc_observation_status_counts": {
+          "unsupported": 1201
+        },
+        "samples_with_gpu_clock": 1201,
+        "samples_with_cpu_clocks": 14412
+      }
+    },
+    {
+      "block": 5,
+      "cell": "cache1500-ctx16384",
+      "cache_budget_mib": 1500,
+      "context_tokens": 16384,
+      "request_medians": {
+        "client_ttft_s": 329.5608804388903,
+        "client_total_s": 333.52557580987923,
+        "prompt_tps": 22.8,
+        "decode_tps": 11.8
+      },
+      "expert_slots": 1934,
+      "expert_cache_mib": 3807,
+      "minimum_host_available_gib": 17.66802215576172,
+      "minimum_admission_available_gib": 15.99660873413086,
+      "memory_samples": 1293,
+      "cgroup_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "request_dates": [
+        "2026-10-21"
+      ],
+      "clock_summary": {
+        "gpu_hz": {
+          "min_hz": 306000000,
+          "median_hz": 612000000,
+          "max_hz": 1300500000
+        },
+        "cpu_per_core_sample_hz": {
+          "min_hz": 729600000,
+          "median_hz": 806400000.0,
+          "max_hz": 2201600000
+        },
+        "emc_observation_status_counts": {
+          "unsupported": 1293
+        },
+        "samples_with_gpu_clock": 1293,
+        "samples_with_cpu_clocks": 15516
+      }
+    },
+    {
+      "block": 5,
+      "cell": "cache3000-ctx16384",
+      "cache_budget_mib": 3000,
+      "context_tokens": 16384,
+      "request_medians": {
+        "client_ttft_s": 306.539169884054,
+        "client_total_s": 310.08493074495345,
+        "prompt_tps": 24.5,
+        "decode_tps": 13.2
+      },
+      "expert_slots": 3903,
+      "expert_cache_mib": 7615,
+      "minimum_host_available_gib": 14.149169921875,
+      "minimum_admission_available_gib": 14.149169921875,
+      "memory_samples": 1211,
+      "cgroup_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "request_dates": [
+        "2026-10-21"
+      ],
+      "clock_summary": {
+        "gpu_hz": {
+          "min_hz": 306000000,
+          "median_hz": 612000000,
+          "max_hz": 1300500000
+        },
+        "cpu_per_core_sample_hz": {
+          "min_hz": 729600000,
+          "median_hz": 806400000.0,
+          "max_hz": 2201600000
+        },
+        "emc_observation_status_counts": {
+          "unsupported": 1211
+        },
+        "samples_with_gpu_clock": 1211,
+        "samples_with_cpu_clocks": 14532
+      }
+    },
+    {
+      "block": 6,
+      "cell": "cache3000-ctx16384",
+      "cache_budget_mib": 3000,
+      "context_tokens": 16384,
+      "request_medians": {
+        "client_ttft_s": 305.73231667792425,
+        "client_total_s": 309.30957260215655,
+        "prompt_tps": 24.5,
+        "decode_tps": 13.1
+      },
+      "expert_slots": 3903,
+      "expert_cache_mib": 7615,
+      "minimum_host_available_gib": 14.023540496826172,
+      "minimum_admission_available_gib": 14.023540496826172,
+      "memory_samples": 1202,
+      "cgroup_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "request_dates": [
+        "2026-10-21"
+      ],
+      "clock_summary": {
+        "gpu_hz": {
+          "min_hz": 306000000,
+          "median_hz": 612000000.0,
+          "max_hz": 1300500000
+        },
+        "cpu_per_core_sample_hz": {
+          "min_hz": 729600000,
+          "median_hz": 806400000.0,
+          "max_hz": 2201600000
+        },
+        "emc_observation_status_counts": {
+          "unsupported": 1202
+        },
+        "samples_with_gpu_clock": 1202,
+        "samples_with_cpu_clocks": 14424
+      }
+    },
+    {
+      "block": 6,
+      "cell": "cache1500-ctx16384",
+      "cache_budget_mib": 1500,
+      "context_tokens": 16384,
+      "request_medians": {
+        "client_ttft_s": 328.6685655738693,
+        "client_total_s": 332.56269957800396,
+        "prompt_tps": 22.8,
+        "decode_tps": 12.0
+      },
+      "expert_slots": 1934,
+      "expert_cache_mib": 3807,
+      "minimum_host_available_gib": 17.755958557128906,
+      "minimum_admission_available_gib": 16.251564025878906,
+      "memory_samples": 1292,
+      "cgroup_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "request_dates": [
+        "2026-10-21"
+      ],
+      "clock_summary": {
+        "gpu_hz": {
+          "min_hz": 306000000,
+          "median_hz": 612000000.0,
+          "max_hz": 1300500000
+        },
+        "cpu_per_core_sample_hz": {
+          "min_hz": 729600000,
+          "median_hz": 806400000.0,
+          "max_hz": 2201600000
+        },
+        "emc_observation_status_counts": {
+          "unsupported": 1292
+        },
+        "samples_with_gpu_clock": 1292,
+        "samples_with_cpu_clocks": 15504
+      }
+    },
+    {
+      "block": 7,
+      "cell": "cache1500-ctx16384",
+      "cache_budget_mib": 1500,
+      "context_tokens": 16384,
+      "request_medians": {
+        "client_ttft_s": 329.9765937239863,
+        "client_total_s": 333.8491248169448,
+        "prompt_tps": 22.7,
+        "decode_tps": 12.0
+      },
+      "expert_slots": 1934,
+      "expert_cache_mib": 3807,
+      "minimum_host_available_gib": 17.88650131225586,
+      "minimum_admission_available_gib": 17.761798858642578,
+      "memory_samples": 1288,
+      "cgroup_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "request_dates": [
+        "2026-10-21"
+      ],
+      "clock_summary": {
+        "gpu_hz": {
+          "min_hz": 306000000,
+          "median_hz": 612000000.0,
+          "max_hz": 1300500000
+        },
+        "cpu_per_core_sample_hz": {
+          "min_hz": 729600000,
+          "median_hz": 806400000.0,
+          "max_hz": 2201600000
+        },
+        "emc_observation_status_counts": {
+          "unsupported": 1288
+        },
+        "samples_with_gpu_clock": 1288,
+        "samples_with_cpu_clocks": 15456
+      }
+    },
+    {
+      "block": 7,
+      "cell": "cache3000-ctx16384",
+      "cache_budget_mib": 3000,
+      "context_tokens": 16384,
+      "request_medians": {
+        "client_ttft_s": 306.1269756751135,
+        "client_total_s": 309.6964420040604,
+        "prompt_tps": 24.5,
+        "decode_tps": 13.1
+      },
+      "expert_slots": 3903,
+      "expert_cache_mib": 7615,
+      "minimum_host_available_gib": 14.0618896484375,
+      "minimum_admission_available_gib": 14.0618896484375,
+      "memory_samples": 1204,
+      "cgroup_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "request_dates": [
+        "2026-10-21"
+      ],
+      "clock_summary": {
+        "gpu_hz": {
+          "min_hz": 306000000,
+          "median_hz": 612000000.0,
+          "max_hz": 1300500000
+        },
+        "cpu_per_core_sample_hz": {
+          "min_hz": 729600000,
+          "median_hz": 806400000.0,
+          "max_hz": 2201600000
+        },
+        "emc_observation_status_counts": {
+          "unsupported": 1204
+        },
+        "samples_with_gpu_clock": 1204,
+        "samples_with_cpu_clocks": 14448
+      }
+    }
+  ],
+  "expert_slots_by_cache": {
+    "1500": [
+      1934
+    ],
+    "3000": [
+      3903
+    ]
+  },
+  "expert_cache_mib_by_cache": {
+    "1500": [
+      3807
+    ],
+    "3000": [
+      7615
+    ]
+  },
+  "minimum_host_available_gib": 14.023540496826172,
+  "minimum_admission_available_gib": 14.023540496826172,
+  "maximum_cgroup_events": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0
+  },
+  "energy": "not measured; raw tegrastats rails retained but not process-energy attribution",
+  "clock_policy": "read-only dynamic CPU/GPU/EMC samples; no clock controls",
+  "errors": [],
+  "passed": true
+}

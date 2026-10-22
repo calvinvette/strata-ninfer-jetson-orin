@@ -1,0 +1,3 @@
+# Aborted preflight cell
+
+The first proposed seven-block, four-cell campaign used three measured 7,501-token requests per fresh service plus one warmup. At the observed prefill rate, that design would take most of a day. It was stopped during its first cell before producing a complete measurement; its partial output is retained here for audit and is excluded from analysis. The process and its own systemd scope were stopped, and no unrelated service was touched. The reduced screen uses one measured request per fresh service across three randomized blocks, followed by a seven-block confirmation only if a contrast warrants it.

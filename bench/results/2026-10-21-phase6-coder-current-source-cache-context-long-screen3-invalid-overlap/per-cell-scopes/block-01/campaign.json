@@ -1,0 +1,62 @@
+{
+  "seed": 2026102181,
+  "cache_values": [
+    1500,
+    3000
+  ],
+  "context_values": [
+    8192,
+    16384
+  ],
+  "planned_cells": 4,
+  "rounds_per_cell": 1,
+  "warmups_per_cell": 1,
+  "scope": "randomized order; fresh service per cell; one measured request plus one warmup; screening only",
+  "started_wall_time_s": 1792597652.6944284,
+  "cells": [
+    {
+      "name": "cache3000-ctx8192",
+      "expert_cache_argument": 3000,
+      "context_tokens": 8192,
+      "order": 0,
+      "status": "pressure_abort",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-screen3/per-cell-scopes/block-01/cache3000-ctx8192/supervisor",
+        "--timeout",
+        "1800",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-screen3/per-cell-scopes/block-01/cache3000-ctx8192/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-screen3/workloads.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-screen3/per-cell-scopes/block-01/cache3000-ctx8192/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace"
+      ],
+      "minimum_available_bytes": 6203957248,
+      "elapsed_s": 158.4252445960883,
+      "reason": "physical/cgroup headroom during execution",
+      "supervisor_returncode": 1,
+      "request_summary": null,
+      "measured_samples": 0
+    }
+  ]
+}

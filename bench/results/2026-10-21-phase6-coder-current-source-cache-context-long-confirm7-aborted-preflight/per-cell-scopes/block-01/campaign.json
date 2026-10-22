@@ -1,0 +1,56 @@
+{
+  "seed": 2026102181,
+  "cache_values": [
+    1500,
+    3000
+  ],
+  "context_values": [
+    8192,
+    16384
+  ],
+  "planned_cells": 4,
+  "rounds_per_cell": 3,
+  "trace_enabled": false,
+  "scope": "randomized order; independent server process per cell; one warmup and three or more measured requests per process; admission and screening evidence only",
+  "started_wall_time_s": 1792597464.417204,
+  "cells": [
+    {
+      "name": "cache3000-ctx8192",
+      "expert_cache_argument": 3000,
+      "context_tokens": 8192,
+      "order": 0,
+      "status": "not_run",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "/usr/bin/python3.12",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-confirm7/per-cell-scopes/block-01/cache3000-ctx8192/supervisor",
+        "--timeout",
+        "1800",
+        "--sample-clocks",
+        "--",
+        "/usr/bin/python3.12",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-confirm7/per-cell-scopes/block-01/cache3000-ctx8192/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-confirm7/workloads.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-confirm7/per-cell-scopes/block-01/cache3000-ctx8192/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "3",
+        "--no-trace"
+      ]
+    }
+  ]
+}

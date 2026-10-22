@@ -1,0 +1,246 @@
+{
+  "model": "log(response) ~ cache[-0.5,+0.5] * context[-0.5,+0.5] + paired-block fixed effects",
+  "observations": 28,
+  "block_count": 7,
+  "parameter_count": 10,
+  "bootstrap": {
+    "unit": "whole randomized four-cell block",
+    "replicates": 10000,
+    "seed": 2026102229
+  },
+  "outcomes": {
+    "client_total_s": {
+      "rank": 10,
+      "full_rank": true,
+      "residual_degrees_of_freedom": 18,
+      "r_squared": 0.8932953205726318,
+      "max_absolute_internally_studentized_residual": 2.7297269323078917,
+      "residual_screen_abs_studentized_lt_3": true,
+      "largest_residual_cells": [
+        {
+          "block": 7,
+          "cache_mib": 1500,
+          "context_tokens": 8192,
+          "studentized_residual": 2.7297269323078917,
+          "log_residual": 0.045751425378571575
+        },
+        {
+          "block": 1,
+          "cache_mib": 1500,
+          "context_tokens": 8192,
+          "studentized_residual": 2.6838194902207952,
+          "log_residual": 0.0449819964345588
+        },
+        {
+          "block": 2,
+          "cache_mib": 1500,
+          "context_tokens": 8192,
+          "studentized_residual": -1.2219585110443336,
+          "log_residual": -0.020480562715659012
+        }
+      ],
+      "terms": {
+        "cache": {
+          "log_coefficient": -0.09283420777413427,
+          "ratio_percent": -8.865541838154268,
+          "paired_block_cluster_bootstrap_95_percent_interval": [
+            -10.190028411659135,
+            -7.650524436805394
+          ]
+        },
+        "context": {
+          "log_coefficient": -0.012727783328099969,
+          "ratio_percent": -1.2647127645860068,
+          "paired_block_cluster_bootstrap_95_percent_interval": [
+            -2.7233214158207786,
+            0.0681970833826151
+          ]
+        },
+        "cache_by_context": {
+          "log_coefficient": 0.029222163312747945,
+          "ratio_percent": 2.965332025956191,
+          "paired_block_cluster_bootstrap_95_percent_interval": [
+            0.5637645252957402,
+            5.673126820134633
+          ]
+        }
+      },
+      "model_warning": "largest residual is below the exploratory 3.0 screen; retain paired-block inference as primary"
+    },
+    "client_ttft_s": {
+      "rank": 10,
+      "full_rank": true,
+      "residual_degrees_of_freedom": 18,
+      "r_squared": 0.8914783034976435,
+      "max_absolute_internally_studentized_residual": 2.735786569884533,
+      "residual_screen_abs_studentized_lt_3": true,
+      "largest_residual_cells": [
+        {
+          "block": 7,
+          "cache_mib": 1500,
+          "context_tokens": 8192,
+          "studentized_residual": 2.735786569884533,
+          "log_residual": 0.046402208516666654
+        },
+        {
+          "block": 1,
+          "cache_mib": 1500,
+          "context_tokens": 8192,
+          "studentized_residual": 2.6801859672543684,
+          "log_residual": 0.045459155873124324
+        },
+        {
+          "block": 2,
+          "cache_mib": 1500,
+          "context_tokens": 8192,
+          "studentized_residual": -1.2249975582675972,
+          "log_residual": -0.020777422024386816
+        }
+      ],
+      "terms": {
+        "cache": {
+          "log_coefficient": -0.09297509275010908,
+          "ratio_percent": -8.878380409700714,
+          "paired_block_cluster_bootstrap_95_percent_interval": [
+            -10.151899523866415,
+            -7.6598601512762095
+          ]
+        },
+        "context": {
+          "log_coefficient": -0.013023868502701319,
+          "ratio_percent": -1.2939424918884224,
+          "paired_block_cluster_bootstrap_95_percent_interval": [
+            -2.72932679240675,
+            0.06009027909412712
+          ]
+        },
+        "cache_by_context": {
+          "log_coefficient": 0.029902933991031562,
+          "ratio_percent": 3.035451669869893,
+          "paired_block_cluster_bootstrap_95_percent_interval": [
+            0.593768224283564,
+            5.73968850261064
+          ]
+        }
+      },
+      "model_warning": "largest residual is below the exploratory 3.0 screen; retain paired-block inference as primary"
+    },
+    "prompt_tps": {
+      "rank": 10,
+      "full_rank": true,
+      "residual_degrees_of_freedom": 18,
+      "r_squared": 0.8917102322912314,
+      "max_absolute_internally_studentized_residual": 2.738146124597238,
+      "residual_screen_abs_studentized_lt_3": true,
+      "largest_residual_cells": [
+        {
+          "block": 7,
+          "cache_mib": 1500,
+          "context_tokens": 8192,
+          "studentized_residual": -2.738146124597238,
+          "log_residual": -0.04646512616888954
+        },
+        {
+          "block": 1,
+          "cache_mib": 1500,
+          "context_tokens": 8192,
+          "studentized_residual": -2.677267372838706,
+          "log_residual": -0.045432040733436097
+        },
+        {
+          "block": 2,
+          "cache_mib": 1500,
+          "context_tokens": 8192,
+          "studentized_residual": 1.2226946195867792,
+          "log_residual": 0.020748585787575102
+        }
+      ],
+      "terms": {
+        "cache": {
+          "log_coefficient": 0.09313244430214786,
+          "ratio_percent": 9.760709744772722,
+          "paired_block_cluster_bootstrap_95_percent_interval": [
+            8.310497946214879,
+            11.369346330687534
+          ]
+        },
+        "context": {
+          "log_coefficient": 0.013104865232416227,
+          "ratio_percent": 1.3191110310380783,
+          "paired_block_cluster_bootstrap_95_percent_interval": [
+            -0.05930066951959079,
+            2.8532517105206434
+          ]
+        },
+        "cache_by_context": {
+          "log_coefficient": -0.029931493976622585,
+          "ratio_percent": -2.9487982809845104,
+          "paired_block_cluster_bootstrap_95_percent_interval": [
+            -5.481684427667788,
+            -0.5916346936005068
+          ]
+        }
+      },
+      "model_warning": "largest residual is below the exploratory 3.0 screen; retain paired-block inference as primary"
+    },
+    "decode_tps": {
+      "rank": 10,
+      "full_rank": true,
+      "residual_degrees_of_freedom": 18,
+      "r_squared": 0.9079414457624486,
+      "max_absolute_internally_studentized_residual": 3.9267399101001366,
+      "residual_screen_abs_studentized_lt_3": false,
+      "largest_residual_cells": [
+        {
+          "block": 7,
+          "cache_mib": 1500,
+          "context_tokens": 16384,
+          "studentized_residual": -3.9267399101001366,
+          "log_residual": -0.05415029884586042
+        },
+        {
+          "block": 7,
+          "cache_mib": 3000,
+          "context_tokens": 8192,
+          "studentized_residual": 1.8466062420162996,
+          "log_residual": 0.025464961302533506
+        },
+        {
+          "block": 7,
+          "cache_mib": 3000,
+          "context_tokens": 16384,
+          "studentized_residual": 1.2817677145495143,
+          "log_residual": 0.01767575810542077
+        }
+      ],
+      "terms": {
+        "cache": {
+          "log_coefficient": 0.08182684947310566,
+          "ratio_percent": 8.52678788547998,
+          "paired_block_cluster_bootstrap_95_percent_interval": [
+            7.424835952968434,
+            10.222220791656046
+          ]
+        },
+        "context": {
+          "log_coefficient": -0.013258890110353796,
+          "ratio_percent": -1.317137822400316,
+          "paired_block_cluster_bootstrap_95_percent_interval": [
+            -2.6017382265963396,
+            -0.44947400235496593
+          ]
+        },
+        "cache_by_context": {
+          "log_coefficient": 0.03347796800692171,
+          "ratio_percent": 3.4044661410486787,
+          "paired_block_cluster_bootstrap_95_percent_interval": [
+            1.6399115723140678,
+            5.736413968565013
+          ]
+        }
+      },
+      "model_warning": "largest residual exceeds the exploratory 3.0 screen; model is diagnostic only, retain paired-block inference as primary"
+    }
+  },
+  "interpretation": "exploratory model diagnostics; paired-block median bootstrap in analysis.json remains primary"
+}

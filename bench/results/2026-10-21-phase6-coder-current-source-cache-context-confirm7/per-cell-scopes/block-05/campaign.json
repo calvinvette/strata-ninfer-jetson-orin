@@ -1,0 +1,122 @@
+{
+  "seed": 2026102105,
+  "cache_values": [
+    1500,
+    3000
+  ],
+  "context_values": [
+    8192
+  ],
+  "planned_cells": 2,
+  "rounds_per_cell": 3,
+  "trace_enabled": false,
+  "scope": "randomized order; independent server process per cell; one warmup and three or more measured requests per process; admission and screening evidence only",
+  "started_wall_time_s": 1792596428.374238,
+  "cells": [
+    {
+      "name": "cache3000-ctx8192",
+      "expert_cache_argument": 3000,
+      "context_tokens": 8192,
+      "order": 0,
+      "status": "pass",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "/usr/bin/python3.12",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-confirm7/per-cell-scopes/block-05/cache3000-ctx8192/supervisor",
+        "--timeout",
+        "1800",
+        "--sample-clocks",
+        "--",
+        "/usr/bin/python3.12",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-confirm7/per-cell-scopes/block-05/cache3000-ctx8192/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-confirm7/workloads.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-confirm7/per-cell-scopes/block-05/cache3000-ctx8192/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "3",
+        "--no-trace"
+      ],
+      "minimum_available_bytes": 15427973120,
+      "elapsed_s": 118.89807876199484,
+      "reason": "command exit; numerical/workload qualification is separate",
+      "supervisor_returncode": 0,
+      "request_summary": [
+        {
+          "cell": "coder-heldout-cache-context-512",
+          "passed_samples": 3,
+          "planned_samples": 3,
+          "median_prompt_per_second": 27.9,
+          "median_predicted_per_second": 13.9
+        }
+      ],
+      "measured_samples": 3
+    },
+    {
+      "name": "cache1500-ctx8192",
+      "expert_cache_argument": 1500,
+      "context_tokens": 8192,
+      "order": 1,
+      "status": "pass",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "/usr/bin/python3.12",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-confirm7/per-cell-scopes/block-05/cache1500-ctx8192/supervisor",
+        "--timeout",
+        "1800",
+        "--sample-clocks",
+        "--",
+        "/usr/bin/python3.12",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-confirm7/per-cell-scopes/block-05/cache1500-ctx8192/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-confirm7/workloads.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-confirm7/per-cell-scopes/block-05/cache1500-ctx8192/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "3",
+        "--no-trace"
+      ],
+      "minimum_available_bytes": 19172421632,
+      "elapsed_s": 128.55537995998748,
+      "reason": "command exit; numerical/workload qualification is separate",
+      "supervisor_returncode": 0,
+      "request_summary": [
+        {
+          "cell": "coder-heldout-cache-context-512",
+          "passed_samples": 3,
+          "planned_samples": 3,
+          "median_prompt_per_second": 24.1,
+          "median_predicted_per_second": 12.6
+        }
+      ],
+      "measured_samples": 3
+    }
+  ],
+  "finished_wall_time_s": 1792596676.8383522
+}

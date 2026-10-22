@@ -1,0 +1,122 @@
+{
+  "seed": 2026102121,
+  "cache_values": [
+    1500,
+    3000
+  ],
+  "context_values": [
+    16384
+  ],
+  "planned_cells": 2,
+  "rounds_per_cell": 3,
+  "trace_enabled": false,
+  "scope": "randomized order; independent server process per cell; one warmup and three or more measured requests per process; admission and screening evidence only",
+  "started_wall_time_s": 1792606162.5065355,
+  "cells": [
+    {
+      "name": "cache1500-ctx16384",
+      "expert_cache_argument": 1500,
+      "context_tokens": 16384,
+      "order": 0,
+      "status": "pass",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "/usr/bin/python3.12",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-confirm7/per-cell-scopes/block-01/cache1500-ctx16384/supervisor",
+        "--timeout",
+        "1800",
+        "--sample-clocks",
+        "--",
+        "/usr/bin/python3.12",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-confirm7/per-cell-scopes/block-01/cache1500-ctx16384/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-confirm7/workloads.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-confirm7/per-cell-scopes/block-01/cache1500-ctx16384/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "3",
+        "--no-trace"
+      ],
+      "minimum_available_bytes": 19093979136,
+      "elapsed_s": 1359.8728193470743,
+      "reason": "command exit; numerical/workload qualification is separate",
+      "supervisor_returncode": 0,
+      "request_summary": [
+        {
+          "cell": "coder-cache-context-heldout-retrieval-arithmetic-near-limit-7501",
+          "passed_samples": 3,
+          "planned_samples": 3,
+          "median_prompt_per_second": 22.8,
+          "median_predicted_per_second": 12.0
+        }
+      ],
+      "measured_samples": 3
+    },
+    {
+      "name": "cache3000-ctx16384",
+      "expert_cache_argument": 3000,
+      "context_tokens": 16384,
+      "order": 1,
+      "status": "pass",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "/usr/bin/python3.12",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-confirm7/per-cell-scopes/block-01/cache3000-ctx16384/supervisor",
+        "--timeout",
+        "1800",
+        "--sample-clocks",
+        "--",
+        "/usr/bin/python3.12",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-confirm7/per-cell-scopes/block-01/cache3000-ctx16384/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-confirm7/workloads.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-confirm7/per-cell-scopes/block-01/cache3000-ctx16384/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "3",
+        "--no-trace"
+      ],
+      "minimum_available_bytes": 15228866560,
+      "elapsed_s": 1271.7492213370278,
+      "reason": "command exit; numerical/workload qualification is separate",
+      "supervisor_returncode": 0,
+      "request_summary": [
+        {
+          "cell": "coder-cache-context-heldout-retrieval-arithmetic-near-limit-7501",
+          "passed_samples": 3,
+          "planned_samples": 3,
+          "median_prompt_per_second": 24.5,
+          "median_predicted_per_second": 13.1
+        }
+      ],
+      "measured_samples": 3
+    }
+  ],
+  "finished_wall_time_s": 1792608795.1747847
+}

@@ -61,7 +61,10 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--cache-values', type=int, nargs='+', default=[3000, 5000])
     parser.add_argument('--context-values', type=int, nargs='+', default=[4096, 8192])
-    parser.add_argument('--rounds', type=int, default=3)
+    parser.add_argument('--rounds', type=int, default=3,
+                        help='measured requests per cell (three for screening; one is valid for seven-block confirmation)')
+    parser.add_argument('--confirmation', action='store_true',
+                        help='allow one measured request per independent block')
     parser.add_argument('--seed', type=int, default=20261011)
     parser.add_argument('--timeout', type=int, default=1800)
     parser.add_argument('--python', type=Path, default=Path(sys.executable),
@@ -73,8 +76,8 @@ def main():
     parser.add_argument('--scope-memory-gib', type=int, default=0,
                         help='run every independent cell in its own systemd MemoryMax scope')
     args = parser.parse_args()
-    if args.rounds < 3 or args.timeout < 1:
-        parser.error('screening requires at least three measured rounds and a positive timeout')
+    if args.rounds < (1 if args.confirmation else 3) or args.timeout < 1:
+        parser.error('screening requires three rounds; confirmation requires one; timeout must be positive')
     if args.scope_memory_gib < 0:
         parser.error('--scope-memory-gib must be zero or positive')
     if len(set(args.cache_values)) != len(args.cache_values) or len(set(args.context_values)) != len(args.context_values):
@@ -91,7 +94,9 @@ def main():
                 'context_values': args.context_values, 'planned_cells': len(cells),
                 'rounds_per_cell': args.rounds,
                 'trace_enabled': not args.no_trace,
-                'scope': 'randomized order; independent server process per cell; one warmup and three or more measured requests per process; admission and screening evidence only',
+                'scope': ('seven-block confirmation; randomized order; independent server process per cell; '
+                          'one warmup and one or more measured requests per process' if args.confirmation else
+                          'randomized order; independent server process per cell; one warmup and three or more measured requests per process; admission and screening evidence only'),
                 'started_wall_time_s': time.time(), 'cells': []}
     manifest = args.output / 'campaign.json'
     write_result(manifest, campaign)

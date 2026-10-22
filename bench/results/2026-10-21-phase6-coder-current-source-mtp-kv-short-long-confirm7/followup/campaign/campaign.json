@@ -1,0 +1,1621 @@
+{
+  "schema": 1,
+  "scope": "single randomized 2\u00d72\u00d72 follow-up block; not a standalone screen",
+  "source_commit": "8e7400fdd91d53b5634aab0923c9bf0a8b7294a5",
+  "binary": "/tmp/strata-ninfer-orin-phase5-cuda/strata",
+  "binary_sha256": "b672187692408e8abcb48beb6ad80282b01954bae819ec48963ac7c6440e4ec9",
+  "model_name": "Current-source Coder IQ1_M MTP x KV short-long confirmation, cache 1500 MiB",
+  "workloads": [
+    "coder-mtp4-heldout-retrieval-arithmetic-512",
+    "coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501"
+  ],
+  "prompt_tokens_requested": {
+    "coder-mtp4-heldout-retrieval-arithmetic-512": 512,
+    "coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501": 7501
+  },
+  "kv_formats": [
+    "fp16",
+    "int8"
+  ],
+  "mtp_windows": [
+    0,
+    4
+  ],
+  "blocks": 1,
+  "expert_cache_budget_override": 1500,
+  "seed": 20261039,
+  "floor_gib": 6,
+  "supervisor_memory_max": "28G",
+  "randomized_design": [
+    {
+      "block": 0,
+      "order": 0,
+      "kv": "fp16",
+      "workload": "coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501",
+      "window": 0
+    },
+    {
+      "block": 0,
+      "order": 1,
+      "kv": "int8",
+      "workload": "coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501",
+      "window": 0
+    },
+    {
+      "block": 0,
+      "order": 2,
+      "kv": "int8",
+      "workload": "coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501",
+      "window": 4
+    },
+    {
+      "block": 0,
+      "order": 3,
+      "kv": "int8",
+      "workload": "coder-mtp4-heldout-retrieval-arithmetic-512",
+      "window": 0
+    },
+    {
+      "block": 0,
+      "order": 4,
+      "kv": "int8",
+      "workload": "coder-mtp4-heldout-retrieval-arithmetic-512",
+      "window": 4
+    },
+    {
+      "block": 0,
+      "order": 5,
+      "kv": "fp16",
+      "workload": "coder-mtp4-heldout-retrieval-arithmetic-512",
+      "window": 0
+    },
+    {
+      "block": 0,
+      "order": 6,
+      "kv": "fp16",
+      "workload": "coder-mtp4-heldout-retrieval-arithmetic-512",
+      "window": 4
+    },
+    {
+      "block": 0,
+      "order": 7,
+      "kv": "fp16",
+      "workload": "coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501",
+      "window": 4
+    }
+  ],
+  "runs": [
+    {
+      "block": 0,
+      "order": 0,
+      "kv": "fp16",
+      "workload": "coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501",
+      "window": 0,
+      "name": "block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-0",
+      "directory": "block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-0",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-0/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-0/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-0/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-0/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_memory_max": "28G",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 376.7480639819987,
+      "minimum_available_bytes": 19330297856,
+      "minimum_admission_available_bytes": 19122802688,
+      "request_status": "pass",
+      "answer": "EARLY=EMBER-VAULT-317, MIDDLE=SILVER-MAPLE-846, LATE=TIDAL-COPPER-529, SUM=1692",
+      "metrics": {
+        "prompt_tps": 22.632141261250823,
+        "decode_tps": 12.027583257604105,
+        "client_total_s": 335.1841117357835,
+        "client_ttft_s": 331.5483504899312,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.185,
+        "logical_file_mb": 35942.3,
+        "prompt_tokens": 7501,
+        "completion_tokens": 45
+      },
+      "engine": {
+        "kv": "fp16",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 0,
+        "spec": 2
+      },
+      "clock_window": {
+        "sample_count": 317,
+        "gpu": {
+          "samples": 317,
+          "min_mhz": 408.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 0,
+      "order": 1,
+      "kv": "int8",
+      "workload": "coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501",
+      "window": 0,
+      "name": "block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-0",
+      "directory": "block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-0",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-0/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-0/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-0/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-0/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_memory_max": "28G",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 376.72957391897216,
+      "minimum_available_bytes": 19439833088,
+      "minimum_admission_available_bytes": 19330842624,
+      "request_status": "pass",
+      "answer": "EARLY=EMBER-VAULT-317, MIDDLE=SILVER-MAPLE-846, LATE=TIDAL-COPPER-529, SUM=1692",
+      "metrics": {
+        "prompt_tps": 22.813586447251527,
+        "decode_tps": 12.11501184578936,
+        "client_total_s": 332.52398573979735,
+        "client_ttft_s": 328.9116307219956,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.184,
+        "logical_file_mb": 35967.9,
+        "prompt_tokens": 7501,
+        "completion_tokens": 45
+      },
+      "engine": {
+        "kv": "int8",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 0,
+        "spec": 2
+      },
+      "clock_window": {
+        "sample_count": 314,
+        "gpu": {
+          "samples": 314,
+          "min_mhz": 408.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 0,
+      "order": 2,
+      "kv": "int8",
+      "workload": "coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501",
+      "window": 4,
+      "name": "block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-4",
+      "directory": "block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-4",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-4/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-4/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-4/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-4/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_memory_max": "28G",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 379.9301216069143,
+      "minimum_available_bytes": 18387853312,
+      "minimum_admission_available_bytes": 18387853312,
+      "request_status": "pass",
+      "answer": "EARLY=EMBER-VAULT-317, MIDDLE=SILVER-MAPLE-846, LATE=TIDAL-COPPER-529, SUM=1692",
+      "metrics": {
+        "prompt_tps": 22.74314946381835,
+        "decode_tps": 11.021577800093072,
+        "client_total_s": 333.9131323429756,
+        "client_ttft_s": 329.9370168270543,
+        "drafted": 42,
+        "accepted": 33,
+        "cache_hit_rate": 0.176,
+        "logical_file_mb": 31196.6,
+        "prompt_tokens": 7501,
+        "completion_tokens": 45
+      },
+      "engine": {
+        "kv": "int8",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 4,
+        "spec": 4
+      },
+      "clock_window": {
+        "sample_count": 315,
+        "gpu": {
+          "samples": 315,
+          "min_mhz": 408.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 0,
+      "order": 3,
+      "kv": "int8",
+      "workload": "coder-mtp4-heldout-retrieval-arithmetic-512",
+      "window": 0,
+      "name": "block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-0",
+      "directory": "block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-0",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-0/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-0/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-0/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-0/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_memory_max": "28G",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 70.81530153984204,
+      "minimum_available_bytes": 19470458880,
+      "minimum_admission_available_bytes": 19470458880,
+      "request_status": "pass",
+      "answer": "EARLY=EMBER-VAULT-317, MIDDLE=SILVER-MAPLE-846, LATE=TIDAL-COPPER-529, SUM=1692",
+      "metrics": {
+        "prompt_tps": 20.278994605470576,
+        "decode_tps": 12.26692836113837,
+        "client_total_s": 28.92173607298173,
+        "client_ttft_s": 25.345730228815228,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.184,
+        "logical_file_mb": 35941.0,
+        "prompt_tokens": 512,
+        "completion_tokens": 45
+      },
+      "engine": {
+        "kv": "int8",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 0,
+        "spec": 2
+      },
+      "clock_window": {
+        "sample_count": 27,
+        "gpu": {
+          "samples": 27,
+          "min_mhz": 408.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 0,
+      "order": 4,
+      "kv": "int8",
+      "workload": "coder-mtp4-heldout-retrieval-arithmetic-512",
+      "window": 4,
+      "name": "block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-4",
+      "directory": "block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-4",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-4/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-4/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-4/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-int8-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-4/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_memory_max": "28G",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 73.90611734287813,
+      "minimum_available_bytes": 18376744960,
+      "minimum_admission_available_bytes": 18376744960,
+      "request_status": "pass",
+      "answer": "EARLY=EMBER-VAULT-317, MIDDLE=SILVER-MAPLE-846, LATE=TIDAL-COPPER-529, SUM=1692",
+      "metrics": {
+        "prompt_tps": 19.383806949397663,
+        "decode_tps": 12.160847475948545,
+        "client_total_s": 30.120246890001,
+        "client_ttft_s": 26.51106075407006,
+        "drafted": 42,
+        "accepted": 33,
+        "cache_hit_rate": 0.177,
+        "logical_file_mb": 31119.8,
+        "prompt_tokens": 512,
+        "completion_tokens": 45
+      },
+      "engine": {
+        "kv": "int8",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 4,
+        "spec": 4
+      },
+      "clock_window": {
+        "sample_count": 29,
+        "gpu": {
+          "samples": 29,
+          "min_mhz": 408.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 0,
+      "order": 5,
+      "kv": "fp16",
+      "workload": "coder-mtp4-heldout-retrieval-arithmetic-512",
+      "window": 0,
+      "name": "block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-0",
+      "directory": "block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-0",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-0/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-0/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-0/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-0/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_memory_max": "28G",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 69.76478528999723,
+      "minimum_available_bytes": 19378712576,
+      "minimum_admission_available_bytes": 19378712576,
+      "request_status": "pass",
+      "answer": "EARLY=EMBER-VAULT-317, MIDDLE=SILVER-MAPLE-846, LATE=TIDAL-COPPER-529, SUM=1692",
+      "metrics": {
+        "prompt_tps": 19.881796506706223,
+        "decode_tps": 11.943943093746682,
+        "client_total_s": 29.527160765836015,
+        "client_ttft_s": 25.85642008204013,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.185,
+        "logical_file_mb": 35915.0,
+        "prompt_tokens": 512,
+        "completion_tokens": 45
+      },
+      "engine": {
+        "kv": "fp16",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 0,
+        "spec": 2
+      },
+      "clock_window": {
+        "sample_count": 28,
+        "gpu": {
+          "samples": 28,
+          "min_mhz": 408.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 0,
+      "order": 6,
+      "kv": "fp16",
+      "workload": "coder-mtp4-heldout-retrieval-arithmetic-512",
+      "window": 4,
+      "name": "block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-4",
+      "directory": "block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-4",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-4/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-4/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-4/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-512-mtp-4/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_memory_max": "28G",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 72.66644287109375,
+      "minimum_available_bytes": 18289897472,
+      "minimum_admission_available_bytes": 18289897472,
+      "request_status": "pass",
+      "answer": "EARLY=EMBER-VAULT-317, MIDDLE=SILVER-MAPLE-846, LATE=TIDAL-COPPER-529, SUM=1692",
+      "metrics": {
+        "prompt_tps": 19.75407717208039,
+        "decode_tps": 12.191487632413102,
+        "client_total_s": 29.616270245052874,
+        "client_ttft_s": 26.015454303938895,
+        "drafted": 42,
+        "accepted": 33,
+        "cache_hit_rate": 0.178,
+        "logical_file_mb": 31130.1,
+        "prompt_tokens": 512,
+        "completion_tokens": 45
+      },
+      "engine": {
+        "kv": "fp16",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 4,
+        "spec": 4
+      },
+      "clock_window": {
+        "sample_count": 28,
+        "gpu": {
+          "samples": 28,
+          "min_mhz": 408.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 0,
+      "order": 7,
+      "kv": "fp16",
+      "workload": "coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501",
+      "window": 4,
+      "name": "block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-4",
+      "directory": "block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-4",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-4/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python3",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-4/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-4/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/followup/campaign/block-00-kv-fp16-workload-coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501-mtp-4/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_memory_max": "28G",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 383.7745516640134,
+      "minimum_available_bytes": 18288922624,
+      "minimum_admission_available_bytes": 18288922624,
+      "request_status": "pass",
+      "answer": "EARLY=EMBER-VAULT-317, MIDDLE=SILVER-MAPLE-846, LATE=TIDAL-COPPER-529, SUM=1692",
+      "metrics": {
+        "prompt_tps": 22.36654172891191,
+        "decode_tps": 10.961707103186203,
+        "client_total_s": 339.4866169060115,
+        "client_ttft_s": 335.49062344105914,
+        "drafted": 42,
+        "accepted": 33,
+        "cache_hit_rate": 0.179,
+        "logical_file_mb": 31165.8,
+        "prompt_tokens": 7501,
+        "completion_tokens": 45
+      },
+      "engine": {
+        "kv": "fp16",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 4,
+        "spec": 4
+      },
+      "clock_window": {
+        "sample_count": 321,
+        "gpu": {
+          "samples": 321,
+          "min_mhz": 306.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    }
+  ],
+  "status": "pass",
+  "memory_scope_mode": "per-arm",
+  "unfiltered_comparisons_do_not_account_for_residency": {
+    "cell_effects": [
+      {
+        "kv_format": "fp16",
+        "workload": "coder-mtp4-heldout-retrieval-arithmetic-512",
+        "paired_blocks": 1,
+        "prompt_tps_mtp4_effect_percent": -0.642393329912383,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_ratios": [
+          0.9935760667008762
+        ],
+        "decode_tps_mtp4_effect_percent": 2.072552897510227,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_ratios": [
+          1.0207255289751023
+        ],
+        "client_ttft_s_mtp4_effect_percent": 0.615066669686537,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_ratios": [
+          1.0061506666968654
+        ],
+        "client_total_s_mtp4_effect_percent": 0.30178817368706756,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_ratios": [
+          1.0030178817368707
+        ]
+      },
+      {
+        "kv_format": "int8",
+        "workload": "coder-mtp4-heldout-retrieval-arithmetic-512",
+        "paired_blocks": 1,
+        "prompt_tps_mtp4_effect_percent": -4.414359160741743,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_ratios": [
+          0.9558564083925826
+        ],
+        "decode_tps_mtp4_effect_percent": -0.8647713760674636,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_ratios": [
+          0.9913522862393254
+        ],
+        "client_ttft_s_mtp4_effect_percent": 4.597739006667023,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_ratios": [
+          1.0459773900666702
+        ],
+        "client_total_s_mtp4_effect_percent": 4.143979510755935,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_ratios": [
+          1.0414397951075594
+        ]
+      },
+      {
+        "kv_format": "fp16",
+        "workload": "coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501",
+        "paired_blocks": 1,
+        "prompt_tps_mtp4_effect_percent": -1.1735501704103202,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_ratios": [
+          0.9882644982958968
+        ],
+        "decode_tps_mtp4_effect_percent": -8.861931209198081,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_ratios": [
+          0.9113806879080192
+        ],
+        "client_ttft_s_mtp4_effect_percent": 1.1890491825106153,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_ratios": [
+          1.0118904918251062
+        ],
+        "client_total_s_mtp4_effect_percent": 1.2836244379087702,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_ratios": [
+          1.0128362443790877
+        ]
+      },
+      {
+        "kv_format": "int8",
+        "workload": "coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501",
+        "paired_blocks": 1,
+        "prompt_tps_mtp4_effect_percent": -0.30875015463279754,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_ratios": [
+          0.996912498453672
+        ],
+        "decode_tps_mtp4_effect_percent": -9.025447598520653,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_ratios": [
+          0.9097455240147935
+        ],
+        "client_ttft_s_mtp4_effect_percent": 0.31175124540530064,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_ratios": [
+          1.003117512454053
+        ],
+        "client_total_s_mtp4_effect_percent": 0.4177583160167142,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_ratios": [
+          1.0041775831601671
+        ]
+      }
+    ],
+    "mtp_by_kv_interactions": [
+      {
+        "workload": "coder-mtp4-heldout-retrieval-arithmetic-512",
+        "paired_blocks": 1,
+        "prompt_tps_median_interaction_percent": -3.796353351539561,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_values_percent": [
+          -3.796353351539561
+        ],
+        "decode_tps_median_interaction_percent": -2.8776827758261514,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_values_percent": [
+          -2.8776827758261514
+        ],
+        "client_ttft_s_median_interaction_percent": 3.9583259931192716,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_values_percent": [
+          3.9583259931192716
+        ],
+        "client_total_s_median_interaction_percent": 3.8306309458965515,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_values_percent": [
+          3.8306309458965515
+        ]
+      },
+      {
+        "workload": "coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501",
+        "paired_blocks": 1,
+        "prompt_tps_median_interaction_percent": 0.8750693941437016,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_values_percent": [
+          0.8750693941437016
+        ],
+        "decode_tps_median_interaction_percent": -0.1794161226939206,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_values_percent": [
+          -0.1794161226939206
+        ],
+        "client_ttft_s_median_interaction_percent": -0.8669890113533585,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_values_percent": [
+          -0.8669890113533585
+        ],
+        "client_total_s_median_interaction_percent": -0.8548925126814266,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_values_percent": [
+          -0.8548925126814266
+        ]
+      }
+    ],
+    "mtp_by_workload_interactions": [
+      {
+        "kv_format": "fp16",
+        "workloads": [
+          "coder-mtp4-heldout-retrieval-arithmetic-512",
+          "coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501"
+        ],
+        "paired_blocks": 1,
+        "prompt_tps_median_interaction_percent": -0.5345910175369006,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_values_percent": [
+          -0.5345910175369006
+        ],
+        "decode_tps_median_interaction_percent": -10.712462651627309,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_values_percent": [
+          -10.712462651627309
+        ],
+        "client_ttft_s_median_interaction_percent": 0.5704737191184694,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_values_percent": [
+          0.5704737191184694
+        ],
+        "client_total_s_median_interaction_percent": 0.9788821137680204,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_values_percent": [
+          0.9788821137680204
+        ]
+      },
+      {
+        "kv_format": "int8",
+        "workloads": [
+          "coder-mtp4-heldout-retrieval-arithmetic-512",
+          "coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501"
+        ],
+        "paired_blocks": 1,
+        "prompt_tps_median_interaction_percent": 4.295215233230643,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_values_percent": [
+          4.295215233230643
+        ],
+        "decode_tps_median_interaction_percent": -8.231863017546015,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_values_percent": [
+          -8.231863017546015
+        ],
+        "client_ttft_s_median_interaction_percent": -4.097591211783779,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_values_percent": [
+          -4.097591211783779
+        ],
+        "client_total_s_median_interaction_percent": -3.5779516129920697,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_values_percent": [
+          -3.5779516129920697
+        ]
+      }
+    ],
+    "three_way_interactions": [
+      {
+        "block": 0,
+        "prompt_tps_three_way_interaction_percent": 4.855764732862156,
+        "decode_tps_three_way_interaction_percent": 2.7782148637415682,
+        "client_ttft_s_three_way_interaction_percent": -4.641585903174317,
+        "client_total_s_three_way_interaction_percent": -4.51266010414545
+      }
+    ],
+    "three_way_summary": {
+      "prompt_tps": {
+        "median_percent": 4.855764732862156,
+        "paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "paired_values_percent": [
+          4.855764732862156
+        ]
+      },
+      "decode_tps": {
+        "median_percent": 2.7782148637415682,
+        "paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "paired_values_percent": [
+          2.7782148637415682
+        ]
+      },
+      "client_ttft_s": {
+        "median_percent": -4.641585903174317,
+        "paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "paired_values_percent": [
+          -4.641585903174317
+        ]
+      },
+      "client_total_s": {
+        "median_percent": -4.51266010414545,
+        "paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "paired_values_percent": [
+          -4.51266010414545
+        ]
+      }
+    }
+  },
+  "comparisons": {
+    "schema": 2,
+    "source_campaign": "8e7400fdd91d53b5634aab0923c9bf0a8b7294a5",
+    "qualification_rule": "timing pairs require passing arms from the same local calendar day, matching KV, actual prompt token count, and identical expert slots/cache MiB; higher interactions require matching residency and date across all contributing cells",
+    "cell_effects": [
+      {
+        "kv": "fp16",
+        "workload": "coder-mtp4-heldout-retrieval-arithmetic-512",
+        "paired_blocks": 1,
+        "paired_block_ids": [
+          0
+        ],
+        "prompt_tps_effect_percent": -0.642393329912383,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_ratios": [
+          0.9935760667008762
+        ],
+        "decode_tps_effect_percent": 2.072552897510227,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_ratios": [
+          1.0207255289751023
+        ],
+        "client_ttft_s_effect_percent": 0.615066669686537,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_ratios": [
+          1.0061506666968654
+        ],
+        "client_total_s_effect_percent": 0.30178817368706756,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_ratios": [
+          1.0030178817368707
+        ]
+      },
+      {
+        "kv": "fp16",
+        "workload": "coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501",
+        "paired_blocks": 1,
+        "paired_block_ids": [
+          0
+        ],
+        "prompt_tps_effect_percent": -1.1735501704103202,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_ratios": [
+          0.9882644982958968
+        ],
+        "decode_tps_effect_percent": -8.861931209198081,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_ratios": [
+          0.9113806879080192
+        ],
+        "client_ttft_s_effect_percent": 1.1890491825106153,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_ratios": [
+          1.0118904918251062
+        ],
+        "client_total_s_effect_percent": 1.2836244379087702,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_ratios": [
+          1.0128362443790877
+        ]
+      },
+      {
+        "kv": "int8",
+        "workload": "coder-mtp4-heldout-retrieval-arithmetic-512",
+        "paired_blocks": 1,
+        "paired_block_ids": [
+          0
+        ],
+        "prompt_tps_effect_percent": -4.414359160741743,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_ratios": [
+          0.9558564083925826
+        ],
+        "decode_tps_effect_percent": -0.8647713760674636,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_ratios": [
+          0.9913522862393254
+        ],
+        "client_ttft_s_effect_percent": 4.597739006667023,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_ratios": [
+          1.0459773900666702
+        ],
+        "client_total_s_effect_percent": 4.143979510755935,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_ratios": [
+          1.0414397951075594
+        ]
+      },
+      {
+        "kv": "int8",
+        "workload": "coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501",
+        "paired_blocks": 1,
+        "paired_block_ids": [
+          0
+        ],
+        "prompt_tps_effect_percent": -0.30875015463279754,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_ratios": [
+          0.996912498453672
+        ],
+        "decode_tps_effect_percent": -9.025447598520653,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_ratios": [
+          0.9097455240147935
+        ],
+        "client_ttft_s_effect_percent": 0.31175124540530064,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_ratios": [
+          1.003117512454053
+        ],
+        "client_total_s_effect_percent": 0.4177583160167142,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_ratios": [
+          1.0041775831601671
+        ]
+      }
+    ],
+    "qualified_cell_pairs": [
+      {
+        "block": 0,
+        "kv": "fp16",
+        "workload": "coder-mtp4-heldout-retrieval-arithmetic-512",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "local_run_date": "2026-10-21",
+        "prompt_tps_ratio": 0.9935760667008762,
+        "decode_tps_ratio": 1.0207255289751023,
+        "client_ttft_s_ratio": 1.0061506666968654,
+        "client_total_s_ratio": 1.0030178817368707,
+        "qualified": true
+      },
+      {
+        "block": 0,
+        "kv": "fp16",
+        "workload": "coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "local_run_date": "2026-10-21",
+        "prompt_tps_ratio": 0.9882644982958968,
+        "decode_tps_ratio": 0.9113806879080192,
+        "client_ttft_s_ratio": 1.0118904918251062,
+        "client_total_s_ratio": 1.0128362443790877,
+        "qualified": true
+      },
+      {
+        "block": 0,
+        "kv": "int8",
+        "workload": "coder-mtp4-heldout-retrieval-arithmetic-512",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "local_run_date": "2026-10-21",
+        "prompt_tps_ratio": 0.9558564083925826,
+        "decode_tps_ratio": 0.9913522862393254,
+        "client_ttft_s_ratio": 1.0459773900666702,
+        "client_total_s_ratio": 1.0414397951075594,
+        "qualified": true
+      },
+      {
+        "block": 0,
+        "kv": "int8",
+        "workload": "coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "local_run_date": "2026-10-21",
+        "prompt_tps_ratio": 0.996912498453672,
+        "decode_tps_ratio": 0.9097455240147935,
+        "client_ttft_s_ratio": 1.003117512454053,
+        "client_total_s_ratio": 1.0041775831601671,
+        "qualified": true
+      }
+    ],
+    "excluded_cell_pairs": [],
+    "mtp_by_kv_interactions": [
+      {
+        "block": 0,
+        "workload": "coder-mtp4-heldout-retrieval-arithmetic-512",
+        "qualified": true,
+        "expert_slots": 1934,
+        "prompt_tps_int8_vs_fp16_interaction_percent": -3.796353351539561,
+        "decode_tps_int8_vs_fp16_interaction_percent": -2.8776827758261514,
+        "client_ttft_s_int8_vs_fp16_interaction_percent": 3.9583259931192716,
+        "client_total_s_int8_vs_fp16_interaction_percent": 3.8306309458965515
+      },
+      {
+        "block": 0,
+        "workload": "coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501",
+        "qualified": true,
+        "expert_slots": 1934,
+        "prompt_tps_int8_vs_fp16_interaction_percent": 0.8750693941437016,
+        "decode_tps_int8_vs_fp16_interaction_percent": -0.1794161226939206,
+        "client_ttft_s_int8_vs_fp16_interaction_percent": -0.8669890113533585,
+        "client_total_s_int8_vs_fp16_interaction_percent": -0.8548925126814266
+      }
+    ],
+    "mtp_by_kv_interaction_summaries": [
+      {
+        "workload": "coder-mtp4-heldout-retrieval-arithmetic-512",
+        "paired_blocks": 1,
+        "paired_block_ids": [
+          0
+        ],
+        "prompt_tps_median_interaction_percent": -3.796353351539561,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_values_percent": [
+          -3.796353351539561
+        ],
+        "decode_tps_median_interaction_percent": -2.8776827758261514,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_values_percent": [
+          -2.8776827758261514
+        ],
+        "client_ttft_s_median_interaction_percent": 3.9583259931192716,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_values_percent": [
+          3.9583259931192716
+        ],
+        "client_total_s_median_interaction_percent": 3.8306309458965515,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_values_percent": [
+          3.8306309458965515
+        ]
+      },
+      {
+        "workload": "coder-mtp4-heldout-retrieval-arithmetic-near-limit-7501",
+        "paired_blocks": 1,
+        "paired_block_ids": [
+          0
+        ],
+        "prompt_tps_median_interaction_percent": 0.8750693941437016,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_values_percent": [
+          0.8750693941437016
+        ],
+        "decode_tps_median_interaction_percent": -0.1794161226939206,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_values_percent": [
+          -0.1794161226939206
+        ],
+        "client_ttft_s_median_interaction_percent": -0.8669890113533585,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_values_percent": [
+          -0.8669890113533585
+        ],
+        "client_total_s_median_interaction_percent": -0.8548925126814266,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_values_percent": [
+          -0.8548925126814266
+        ]
+      }
+    ],
+    "mtp_by_workload_interactions": [
+      {
+        "block": 0,
+        "kv": "fp16",
+        "qualified": true,
+        "expert_slots": 1934,
+        "prompt_tps_long_vs_short_interaction_percent": -0.5345910175369006,
+        "decode_tps_long_vs_short_interaction_percent": -10.712462651627309,
+        "client_ttft_s_long_vs_short_interaction_percent": 0.5704737191184694,
+        "client_total_s_long_vs_short_interaction_percent": 0.9788821137680204
+      },
+      {
+        "block": 0,
+        "kv": "int8",
+        "qualified": true,
+        "expert_slots": 1934,
+        "prompt_tps_long_vs_short_interaction_percent": 4.295215233230643,
+        "decode_tps_long_vs_short_interaction_percent": -8.231863017546015,
+        "client_ttft_s_long_vs_short_interaction_percent": -4.097591211783779,
+        "client_total_s_long_vs_short_interaction_percent": -3.5779516129920697
+      }
+    ],
+    "mtp_by_workload_interaction_summaries": [
+      {
+        "kv": "fp16",
+        "paired_blocks": 1,
+        "paired_block_ids": [
+          0
+        ],
+        "prompt_tps_median_interaction_percent": -0.5345910175369006,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_values_percent": [
+          -0.5345910175369006
+        ],
+        "decode_tps_median_interaction_percent": -10.712462651627309,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_values_percent": [
+          -10.712462651627309
+        ],
+        "client_ttft_s_median_interaction_percent": 0.5704737191184694,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_values_percent": [
+          0.5704737191184694
+        ],
+        "client_total_s_median_interaction_percent": 0.9788821137680204,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_values_percent": [
+          0.9788821137680204
+        ]
+      },
+      {
+        "kv": "int8",
+        "paired_blocks": 1,
+        "paired_block_ids": [
+          0
+        ],
+        "prompt_tps_median_interaction_percent": 4.295215233230643,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_values_percent": [
+          4.295215233230643
+        ],
+        "decode_tps_median_interaction_percent": -8.231863017546015,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_values_percent": [
+          -8.231863017546015
+        ],
+        "client_ttft_s_median_interaction_percent": -4.097591211783779,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_values_percent": [
+          -4.097591211783779
+        ],
+        "client_total_s_median_interaction_percent": -3.5779516129920697,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_values_percent": [
+          -3.5779516129920697
+        ]
+      }
+    ],
+    "three_way_interactions": [
+      {
+        "block": 0,
+        "qualified": true,
+        "prompt_tps_three_way_interaction_percent": 4.855764732862156,
+        "decode_tps_three_way_interaction_percent": 2.7782148637415682,
+        "client_ttft_s_three_way_interaction_percent": -4.641585903174317,
+        "client_total_s_three_way_interaction_percent": -4.51266010414545
+      }
+    ],
+    "three_way_interaction_summary": {
+      "prompt_tps": {
+        "paired_blocks": 1,
+        "median_interaction_percent": 4.855764732862156,
+        "paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "paired_values_percent": [
+          4.855764732862156
+        ]
+      },
+      "decode_tps": {
+        "paired_blocks": 1,
+        "median_interaction_percent": 2.7782148637415682,
+        "paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "paired_values_percent": [
+          2.7782148637415682
+        ]
+      },
+      "client_ttft_s": {
+        "paired_blocks": 1,
+        "median_interaction_percent": -4.641585903174317,
+        "paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "paired_values_percent": [
+          -4.641585903174317
+        ]
+      },
+      "client_total_s": {
+        "paired_blocks": 1,
+        "median_interaction_percent": -4.51266010414545,
+        "paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "paired_values_percent": [
+          -4.51266010414545
+        ]
+      }
+    }
+  },
+  "finished_wall_time_s": 1792594387.3769274
+}
