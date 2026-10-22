@@ -163,6 +163,12 @@ combination or related per-row state without identifying a specific expert or
 operation. Minimum available RAM was 17.465 GiB, with zero cgroup memory events.
 [Compact result](../../bench/results/2026-10-22-phase5-coder-batch-gdn-layer-capture/two-live-layer1-moe-output-summary.json).
 
+A 96-token paired trace repeats the position-71 combined-output delta for
+prompt 1 and reaches the known token-60 mismatch. By positions 118–127, both
+requests already have changed layer-1 state, GDN fields, MoE inputs and shared
+outputs. Minimum available RAM was 17.434 GiB; the added state capture makes
+timing diagnostic only. [Selected-position results](../../bench/results/2026-10-22-phase5-coder-batch-gdn-layer-capture/two-live-layer1-moe-long-chain-summary.json).
+
 ## Near-term direction
 
 1. Continue resolving batch-MTP output divergence: capture earlier layer

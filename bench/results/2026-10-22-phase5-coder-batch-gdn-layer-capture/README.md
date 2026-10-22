@@ -146,6 +146,23 @@ EMC readback was denied. This is correctness evidence, not a performance
 measurement. The compact result is `two-live-layer1-moe-output-summary.json`;
 raw captures remain local.
 
+A longer follow-up captured layer-1 activations, committed layer-1 state and
+shared/combined MoE output at positions 68, 71 and 118–127 while two requests
+ran for 96 tokens. Fresh serial controls and the layer-1 state at each selected
+position mapped physical slot 0 to prompt 1 and slot 1 to prompt 0. Prompt 1's
+layer-1 state was exact at position 71, but `ffn_y` and the combined MoE output
+already differed there (relative L2 `0.00086265`); its MoE input and shared
+output matched. At positions 118–127, both requests had changed layer-1 state,
+GDN fields and MoE inputs; shared and combined MoE outputs also differed. The
+96-token output mismatch for prompt 1 remained at generated token index 60.
+These captures show that the small position-71 combine-boundary difference
+precedes larger later deltas, but do not establish that it causes the token
+mismatch or identify an expert. The run processed 96 windows averaging 1.96
+rows, retained 17.434 GiB minimum available physical RAM, and had zero
+nonzero sampled cgroup event counters. Because state capture adds work, its
+window timing is not performance evidence. See
+`two-live-layer1-moe-long-chain-summary.json`; raw captures remain local.
+
 ## Resources and validation
 
 Minimum available physical RAM and minimum admission availability were both

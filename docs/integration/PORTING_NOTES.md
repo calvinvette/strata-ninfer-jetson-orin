@@ -2722,3 +2722,10 @@ result alone narrows the boundary but cannot distinguish expert arithmetic,
 weight gathering, or accumulation order. Keep the run's all-layer state mapping
 with the output record; repeated prompts can consume the same token at the same
 position while representing different requests.
+
+A longer selected-position trace repeated the early combined-output delta and
+showed both rows with changed upstream GDN/MoE input and shared output by later
+positions. For a Splash investigation, retain both an early boundary and the
+later output-mismatch boundary in one capture, with persistent state sampled at
+those same points. This checks whether the early combined-output delta persists
+as upstream state diverges without confusing correlation with a causal proof.
