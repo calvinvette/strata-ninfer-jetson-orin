@@ -12,13 +12,12 @@ Strata and Splash.
 
 Phases 0–4 are complete for their documented scopes. Phase 7 is complete for
 its bounded Orin qualification matrix. Phases 5 and 6 remain open, so Phase 8
-is also open. Current-source Orin regression checks pass: CTest 132/132 (two
-optional IQ-fixture tests skipped), integration Python discovery 163/163, and
-the focused accepted-prefix, verifier, MTP verifier, batch, and graph-trace
-checks 7/7. The current modified shared source compiles and links for both HIP
-and SYCL on maestro1, with both help invocations exiting successfully. Those
-remote checks are build evidence only, not runtime or Orin performance
-evidence.
+is also open. The latest Orin CUDA regression suite passed 130 tests with two
+optional IQ-fixture tests skipped; integration Python discovery passed 163/163,
+and focused accepted-prefix, verifier, batch and graph tests passed. The latest
+batch graph cap/logging changes still need HIP/SYCL rebuilds because maestro1
+has zero filesystem space. Earlier backend builds are compile/help evidence
+only, not runtime or Orin performance evidence.
 
 ## Performance observed
 
@@ -32,28 +31,22 @@ candidate setting has been promoted to a default.
 | MTP × KV, long Coder task, seven-block confirmation | MTP4 reduced decode throughput about 9% across FP16/INT8 KV; client latency increased about 0.6%/1.0%. | No MTP/KV setting promoted; workload and energy tradeoffs remain. See [STATUS](STATUS.md). |
 | Prefill chunk × expert cache, Q2_0 near-limit retrieval, seven held-out blocks | Chunk 128 reduced median request time 59.54% at 3,000 slots and 59.74% at 3,500 slots; all 28 requests returned the exact 41-token answer after 7,506 prompt tokens. | Cache × chunk interaction interval included zero; no general default. [Report](../../bench/results/2026-10-18-phase6-q2-cache-prefill-heldout-confirm7/README.md) |
 
-The new [batch-MTP graph lifecycle diagnostic](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md)
-admitted eight slots and captured 16 distinct layouts, below the 64-layout
-pool limit, so it did not exercise eviction or recapture. Outputs differed
-from the serial target-only control on 6/8 prompts and from the serial MTP2
-control on 7/8. A same-profile single-live-request follow-up matched serial
-MTP2 exactly, narrowing the mismatch to multi-request interleaving or shared
-batch windows. A two-request run reproduces it: slot 0 matches serial MTP2,
-while slot 1 diverges at token 60. MTP-disabled batch also differs from serial
-target-only at slot 1, and batch-MTP differs from its matched target-only batch
-at that token. The concurrent run retained at least 14.77 GiB available
-physical RAM (11.39 GiB at admission), with zero scoped cgroup OOM events. It
-is a correctness diagnostic, not a throughput comparison. Direct GDN capture
-and a per-layer hash sweep show state equality at selected committed lengths,
-followed by early decode drift: target-only rows first differ at positions 69
-and 72, while the mapped MTP2 row first differs at 76. One target-only request
-still returns identical 96-token text; the other first diverges at token 60.
-At position 127, all 248,320 MTP verifier logits differ from serial and the
-top-two ranking reverses. These are numerical correctness findings, not
-throughput results. One serial process also changed the second prompt relative
-to a fresh process, so state pairing uses the isolated control and that
-request/session behavior needs separate investigation. Batch-MTP remains
-unqualified.
+The [batch-MTP graph lifecycle diagnostic](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md)
+admitted eight slots and captured 16 layouts under the default 64-layout cap,
+so that initial run did not exercise eviction. A separate opt-in cap-1 test
+completed eight concurrent requests and observed 14 LRU evictions and 11
+recaptures across four repeated layout keys; all requests returned six tokens,
+with 16.50 GiB minimum available RAM and zero cgroup memory events. The default
+cap remains 64, confirmed by a no-override run whose six-token single-request
+output matched serial MTP2. The 64-layout capacity itself has not been forced
+past its limit. Outputs in the original eight-prompt batch differed from
+serial controls; a same-profile single-live follow-up matched serial MTP2,
+while a two-request run still diverges at token 60 on slot 1 for MTP-enabled
+and MTP-disabled batches. Full state capture corrected the earlier layer-6
+pairing: at positions 71–72, each batch slot is closest to its corresponding
+isolated serial prompt, but state arrays differ broadly despite equal short
+outputs. At position 127, all 248,320 verifier logits differ and the top-two
+ranking reverses. Batch-MTP remains unqualified; no throughput claim is made.
 
 Correctness work has found a separate adaptive-recovery issue. In a 256-token
 short–short–short Coder IQ1_M chain, adaptive recovery differed on 237/256
@@ -65,8 +58,8 @@ contribution, not all later persistent-state drift. Current-source Coder MTP4
 decode cancellation matched all 11 state fingerprints at four accepted-prefix
 boundaries; early-prefill cancellation also matched all 11 recovery state
 fingerprints. These qualify the tested points, not every cancellation boundary
-or adaptive recovery. Real model graph-pool resize/recapture still needs
-coverage.
+or adaptive recovery. Opt-in cap-1 batch graph eviction/recapture now passes;
+the default 64-layout capacity still needs an over-limit stress run.
 See the [owner transition](../../bench/results/2026-10-22-phase5-coder-longchain-owner-capture/README.md),
 [raw state](../../bench/results/2026-10-22-phase5-coder-long-chain-raw-state-pair-pos767/README.md),
 and [API cancellation](../../bench/results/2026-10-22-phase5-coder-api-cancellation-current-source/README.md)
@@ -74,16 +67,14 @@ records.
 
 ## Near-term direction
 
-1. Continue resolving batch-MTP output divergence before interpreting graph
-   results: capture the MTP2 committed state from prompt boundary through the
-   first divergent decode window, then isolate the first batch recurrence or
-   verifier operation that changes the row. Drive more than 64 distinct
-   layouts to observe actual LRU eviction and recapture.
-   Continue Phase 5 transaction coverage by extending accepted-prefix checks to direct
-   persistent-state and long-chain recovery contracts, widen cancellation
-   boundaries beyond the passing Coder MTP4 decode/prefill points, and test real
-   graph-pool resize with safe recapture. Keep adaptive migration opt-in until
-   long-chain state behavior has a stated and tested contract.
+1. Continue resolving batch-MTP output divergence: capture MTP2 committed state
+   from prompt boundary through its first divergent decode window, then isolate
+   the first recurrence or verifier operation that changes the row. Exercise
+   the default 64-layout capacity past its limit; the opt-in cap-1 eviction and
+   recapture path now passes. Extend accepted-prefix direct-state and long-chain
+   recovery coverage, widen cancellation boundaries beyond the passing Coder
+   MTP4 decode/prefill points, and keep adaptive migration opt-in until its
+   long-chain state contract is bounded.
 2. Continue Phase 6 only on qualified candidates: finish supported interactions,
    held-out confirmation and response-model diagnostics, then report energy and
    Pareto tradeoffs with physical-memory, clock and uncertainty context.
