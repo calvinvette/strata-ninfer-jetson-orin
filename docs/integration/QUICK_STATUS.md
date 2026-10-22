@@ -15,9 +15,10 @@ its bounded Orin qualification matrix. Phases 5 and 6 remain open, so Phase 8
 is also open. The latest Orin CUDA regression suite passed 130 tests with two
 optional IQ-fixture tests skipped; integration Python discovery passed 163/163,
 and focused accepted-prefix, verifier, batch and graph tests passed. The latest
-batch graph cap/logging changes still need HIP/SYCL rebuilds because maestro1
-has zero filesystem space. Earlier backend builds are compile/help evidence
-only, not runtime or Orin performance evidence.
+shared-source changes are being rebuilt for HIP and SYCL in an isolated checkout
+on maestro1's mounted scratch volume; its root filesystem is full, so the
+existing backend build trees are being left intact. Earlier backend builds are
+compile/help evidence only, not runtime or Orin performance evidence.
 
 ## Performance observed
 
