@@ -6,6 +6,23 @@ complete for its bounded Orin qualification matrix under [its closeout]
 (PHASE7_CLOSEOUT.md); Phases 5 and 6 remain open. This records tested cells,
 not general product support.
 
+A [batch-MTP state/logit follow-up](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md)
+captures full verifier rows and committed GDN arrays for the two-live-request
+reproducer. The target-only batch row paired to prompt 0 is bit-identical to
+serial across all 36 GDN layers at the 68-cell prompt boundary. At committed
+position 127 it differs in 28,597,392/29,417,472 state values (relative L2
+0.01044); the first changed layer is layer 1, while one layer remains exact.
+At position 127, serial target-only and two-row target-only logits differ in
+248,319/248,320 values (relative L2 0.03960), and their close top-two scores
+reverse order. Serial MTP2 and batch-MTP differ in all 248,320 logits (relative
+L2 0.02568), also reversing the top-two order. These captures localize both
+state and verifier-row differences after prompt admission, but do not identify
+the upstream operation or prove that GDN drift is the sole cause of the token
+divergence. Full state dumps remain local-only. Candidate ARM64/CUDA rebuilt
+successfully; current shared sources also compiled and linked on maestro1 for
+HIP and SYCL, with no accelerator execution. This is diagnostic evidence, not
+a Phase 5 gate pass or performance result.
+
 A current-source ARM64/CUDA 12.6 Release rebuild completed with two build jobs. The configured CTest suite passed 130 tests with the external one-layer Q2_0 S2 fixture supplied to the two pack-backed tests; two optional IQ-fixture tests skipped because their external fixtures are absent. Integration Python discovery passed 163/163. The NInfer import manifest verified 1,320 imports at pinned revision `b07248f2`; the matrix validator reported 162 proposed cells / 936 paired entries without executing them. These are current regression and specification checks, not Phase 5 or Phase 6 closeout. The initial missing-pack run is retained in the linked regression report.
 
 A fresh [current-worktree regression rerun](../../bench/results/2026-10-22-phase5-current-source-regression/README.md) rebuilt the ARM64/CUDA candidate with two jobs and passed the focused accepted-window, verifier/GDN/KV, graph, Q8_1 and native-expert selection (29/29), plus Python integration discovery (163/163). The full configured CTest suite completed 132 tests with the external one-layer Q2_0 S2 fixture supplied through `STRATA_TEST_EXPERTS_BIN`: 130 passed and two optional IQ-fixture tests skipped. This includes passing `expert_parity` and `pool_test`; the initial missing-pack issue and fixture/source hashes remain documented. The full 48-layer arena-load test remains unrun. This is regression coverage only; Phase 5 accepted-state drift remains unresolved.

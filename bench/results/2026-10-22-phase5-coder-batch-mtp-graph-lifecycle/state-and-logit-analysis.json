@@ -1,0 +1,77 @@
+{
+  "model": "Qwen3.8-Flash-Next-Coder-GGUF-IQ1_M",
+  "hardware": "Jetson AGX Orin, ARM64, CUDA 12.6",
+  "state_capture": {
+    "format": "STGDN01; header followed by raw float state; 36 layers",
+    "prompt0": {
+      "prompt_boundary": {
+        "committed_cells": 68,
+        "batch_slot": 1,
+        "exact_layers": 36,
+        "changed_values": 0,
+        "total_values": 29417472,
+        "max_abs": 0.0,
+        "relative_l2": 0.0,
+        "mean_abs": 0.0
+      },
+      "later_target_only_batch": {
+        "committed_cells": 127,
+        "batch_slot": 1,
+        "exact_layers": 1,
+        "first_different_layer": 1,
+        "changed_values": 28597392,
+        "total_values": 29417472,
+        "max_abs": 0.607868,
+        "relative_l2": 0.0104396,
+        "mean_abs": 0.000400208
+      },
+      "later_mtp2_batch": {
+        "committed_cells": 127,
+        "batch_slot": 0,
+        "exact_layers": 1,
+        "first_different_layer": 1,
+        "changed_values": 28597375,
+        "total_values": 29417472,
+        "max_abs": 0.158606,
+        "relative_l2": 0.00728769,
+        "mean_abs": 0.000306318
+      }
+    },
+    "caveat": "The 68-cell capture was target-only; 127-cell MTP2 is an independent run. Physical slot numbers vary with concurrent admission. Pair by prompt tokens and output, not slot number across runs. Full raw dumps are local-only and excluded from Git."
+  },
+  "logits": {
+    "position": 127,
+    "input_token": 11,
+    "vocabulary": 248320,
+    "serial_target_vs_two_row_target_batch": {
+      "changed_values": 248319,
+      "max_abs": 0.49127769470214844,
+      "relative_l2": 0.03960348715208172,
+      "mean_abs": 0.07165250224646387,
+      "serial_top1": [421, 19.092430114746094],
+      "serial_top2": [11960, 19.085865020751953],
+      "serial_margin": 0.006565093994140625,
+      "batch_top1": [11960, 19.005491256713867],
+      "batch_top2": [421, 19.001211166381836],
+      "batch_margin": 0.00428009033203125
+    },
+    "serial_mtp2_vs_two_row_batch_mtp": {
+      "changed_values": 248320,
+      "max_abs": 0.34313488006591797,
+      "relative_l2": 0.025682899545866313,
+      "mean_abs": 0.04668064903181056,
+      "serial_top1": [11960, 19.085426330566406],
+      "serial_top2": [421, 19.05733108520508],
+      "serial_margin": 0.028095245361328125,
+      "batch_top1": [421, 19.08458709716797],
+      "batch_top2": [11960, 19.051820755004883],
+      "batch_margin": 0.03276634216308594
+    },
+    "interpretation": "At the same input token and position, each captured pair differs numerically and reverses the top-two ordering. This confirms verifier-row differences; it does not identify the upstream operation or prove persistent-state causality."
+  },
+  "measurement_limits": [
+    "Correctness diagnostic only; no latency or speedup claim.",
+    "Dynamic clocks; EMC readback denied; no request-attributed energy.",
+    "Full raw GDN captures are about 112 MiB each and remain local, outside Git."
+  ]
+}

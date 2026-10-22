@@ -15,9 +15,10 @@ its bounded Orin qualification matrix. Phases 5 and 6 remain open, so Phase 8
 is also open. Current-source Orin regression checks pass: CTest 132/132 (two
 optional IQ-fixture tests skipped), integration Python discovery 163/163, and
 the focused accepted-prefix, verifier, MTP verifier, batch, and graph-trace
-checks 7/7. maestro1 provides current HIP build/help evidence; SYCL compiled
-and linked, but its help invocation aborted. Neither remote check is runtime
-or Orin performance evidence.
+checks 7/7. The current modified shared source compiles and links for both HIP
+and SYCL on maestro1, with both help invocations exiting successfully. Those
+remote checks are build evidence only, not runtime or Orin performance
+evidence.
 
 ## Performance observed
 
@@ -42,9 +43,13 @@ while slot 1 diverges at token 60. MTP-disabled batch also differs from serial
 target-only at slot 1, and batch-MTP differs from its matched target-only batch
 at that token. The concurrent run retained at least 14.77 GiB available
 physical RAM (11.39 GiB at admission), with zero scoped cgroup OOM events. It
-is a correctness diagnostic, not a throughput comparison; batch terminal
-persistent-state fingerprints are not currently emitted per slot. Batch-MTP
-remains unqualified.
+is a correctness diagnostic, not a throughput comparison. Direct GDN capture
+shows the target-only row's committed state matches serial bit-for-bit at the
+68-token prompt boundary, then differs by position 127 (relative L2 0.01044).
+At that position, all 248,320 MTP verifier logits differ from serial and the
+top-two ranking reverses. This narrows the mismatch to decode-time batch
+numerics; the responsible operation and MTP state parity are still unknown.
+Batch-MTP remains unqualified.
 
 Correctness work has found a separate adaptive-recovery issue. In a 256-token
 short–short–short Coder IQ1_M chain, adaptive recovery differed on 237/256
@@ -65,11 +70,11 @@ records.
 
 ## Near-term direction
 
-1. Resolve the batch-MTP output divergence before interpreting graph results:
-   expose per-slot terminal state fingerprints, then compare target-only,
-   serial MTP2 and batch-MTP on identical prompts/configuration, then localize
-   the concurrent-window divergence. Drive more than 64 distinct layouts to
-   observe actual LRU eviction and recapture.
+1. Continue resolving batch-MTP output divergence before interpreting graph
+   results: capture the MTP2 committed state from prompt boundary through the
+   first divergent decode window, then isolate the first batch recurrence or
+   verifier operation that changes the row. Drive more than 64 distinct
+   layouts to observe actual LRU eviction and recapture.
    Continue Phase 5 transaction coverage by extending accepted-prefix checks to direct
    persistent-state and long-chain recovery contracts, widen cancellation
    boundaries beyond the passing Coder MTP4 decode/prefill points, and test real

@@ -47,6 +47,30 @@ cgroup OOM events. The evidence narrows the Phase 5 issue to target row/batch
 numerics and MTP verification interaction; it does not yet establish which
 logit, state tensor, or operation causes the argmax change.
 
+The follow-up direct-state capture now localizes the target-only row drift.
+For prompt 0, the batch slot captured at the 68-cell prompt boundary was
+bit-identical to that prompt's serial committed GDN state across all 36 layers
+(29,417,472 floats). At committed position 127, the corresponding batch slot
+and serial prompt-0 state differed in 28,597,392 values, with relative L2
+`0.010440` and maximum absolute difference `0.607868`; one layer remained
+exact. This puts the state divergence after prompt admission and before the
+observed token-60 output divergence. Request-to-physical-slot assignment can
+vary between separate concurrent runs, so the state comparison is paired by
+prompt and observed output, not by assuming a stable slot number. The current
+capture covers the target-only arm; an equivalent MTP2 boundary-to-divergence
+capture and finer first-divergence tracing remain open.
+
+Full GDN dumps (about 112 MiB each) are retained in the local experiment
+workspace for audit and are intentionally excluded from Git. The compact
+state comparison and raw-logit analysis are recorded in `state-and-logit-analysis.json`.
+
+The instrumented ARM64/CUDA candidate rebuilt with two jobs. Focused CTest
+coverage passed 5/5: accepted usage/window, verifier batch parity, captured
+graph trace, and graph lifecycle. maestro1 rebuilt the same shared source for
+HIP and SYCL; both binaries linked and both `--help` checks returned 0. The
+logs and binary hashes are in `backend-builds-maestro1/`. This is x86 build
+evidence only; neither backend was executed on an accelerator.
+
 The target-only serial arm had exactly one terminal persistent-state fingerprint
 per request, and each fingerprint agreed with the independently computed
 committed length and consumed-token tail. The batch engine emitted handoff
@@ -104,6 +128,11 @@ energy was not attributed to individual requests.
   control with MTP disabled.
 - `analysis.json`: offline output, state-coverage, graph-layout and memory
   summary. Rebuild it with `python3 analyze_batch_mtp_graph_lifecycle.py`.
+- `run-position-127-logits-all-slots/` and
+  `state-and-logit-analysis.json`: full verifier-row comparisons and paired
+  committed-state deltas. Full GDN binary captures are local-only.
+- `backend-builds-maestro1/`: exact-source HIP/SYCL build and help logs;
+  compile evidence only.
 - `run-retry/`, `run/`, and earlier supervisor directories preserve failed or
   superseded harness attempts; they are not used for the result above.
 

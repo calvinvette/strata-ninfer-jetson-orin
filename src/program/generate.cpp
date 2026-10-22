@@ -108,6 +108,7 @@
 #include <new>
 #include <charconv>
 #include <cmath>
+#include <cerrno>
 #include <limits>
 #include <cstdio>
 #include <cstdlib>
@@ -120,6 +121,107 @@
 #include <vector>
 
 namespace {
+// Targeted, opt-in capture of verifier head logits for a single absolute model position. The
+// record is binary so a whole vocabulary row can be compared without rounding through text.
+bool trace_verify_logits(strata::core::Verifier& verifier, int row, int slot, int64_t position, int32_t input_token) {
+    static const int64_t trace_position = [] {
+        const char* value = std::getenv("STRATA_LOGITS_TRACE_POSITION");
+        if (value == nullptr) return int64_t{-1};
+        char* end = nullptr;
+        errno = 0;
+        const long long parsed = std::strtoll(value, &end, 10);
+        return errno == 0 && end != value && *end == '\0' ? (int64_t) parsed : int64_t{-1};
+    }();
+    static const int trace_slot = [] {
+        const char* value = std::getenv("STRATA_LOGITS_TRACE_SLOT");
+        if (value == nullptr) return -2;
+        char* end = nullptr;
+        errno = 0;
+        const long parsed = std::strtol(value, &end, 10);
+        return errno == 0 && end != value && *end == '\0' ? (int) parsed : -2;
+    }();
+    const char* path = std::getenv("STRATA_LOGITS_TRACE_PATH");
+    if (path == nullptr || trace_position < 0 || position != trace_position ||
+        (trace_slot != -2 && slot != trace_slot)) return true;
+    const int64_t vocab = verifier.vocab();
+    if (vocab <= 0) return false;
+    std::vector<float> logits((size_t) vocab);
+    if (!verifier.copy_logits(row, logits.data())) return false;
+    FILE* file = std::fopen(path, "ab");
+    if (file == nullptr) {
+        std::fprintf(stderr, "strata logits trace: cannot open %s\n", path);
+        return false;
+    }
+    struct Record {
+        char magic[8];
+        int64_t position;
+        int32_t slot;
+        int32_t row;
+        int32_t input_token;
+        uint32_t reserved;
+        uint64_t vocab;
+    } record{{'S','T','L','O','G','0','1','\0'}, position, slot, row, input_token, 0, (uint64_t) vocab};
+    const bool ok = std::fwrite(&record, sizeof(record), 1, file) == 1 &&
+                    std::fwrite(logits.data(), sizeof(float), logits.size(), file) == logits.size();
+    if (std::fclose(file) != 0) return false;
+    if (!ok) std::fprintf(stderr, "strata logits trace: failed writing %s\n", path);
+    return ok;
+}
+
+bool dump_batch_gdn_state(const strata::core::ModelGeometry& geometry, const strata::core::SessionState& state,
+                          int64_t position, int slot) {
+    static const char* path = std::getenv("STRATA_BATCH_GDN_DUMP_PATH");
+    static const int64_t at = [] {
+        const char* value = std::getenv("STRATA_BATCH_GDN_DUMP_AT");
+        if (value == nullptr) return int64_t{-1};
+        char* end = nullptr;
+        errno = 0;
+        const long long parsed = std::strtoll(value, &end, 10);
+        return errno == 0 && end != value && *end == '\0' ? (int64_t) parsed : int64_t{-1};
+    }();
+    static const int selected_slot = [] {
+        const char* value = std::getenv("STRATA_BATCH_GDN_DUMP_SLOT");
+        if (value == nullptr) return -1;
+        char* end = nullptr;
+        errno = 0;
+        const long parsed = std::strtol(value, &end, 10);
+        return errno == 0 && end != value && *end == '\0' ? (int) parsed : -1;
+    }();
+    if (path == nullptr || at < 0 || position != at || (selected_slot >= 0 && slot != selected_slot)) return true;
+    if (state.gdn_alloc <= 0 || state.gdn_state == nullptr || cudaDeviceSynchronize() != cudaSuccess) return false;
+    strata::core::ConversationStateSizes sizes;
+    std::string error;
+    if (!strata::core::conversation_session_sizes(geometry, state, sizes, error) ||
+        sizes.gdn == 0 || sizes.gdn % (size_t) state.gdn_alloc != 0) {
+        std::fprintf(stderr, "strata batch: GDN dump sizing failed at slot %d position %lld: %s\n",
+                     slot, (long long) position, error.c_str());
+        return false;
+    }
+    const std::string output = std::string(path) + ".slot" + std::to_string(slot);
+    FILE* file = std::fopen(output.c_str(), "wb");
+    if (file == nullptr) {
+        std::fprintf(stderr, "strata batch: cannot open GDN dump %s\n", output.c_str());
+        return false;
+    }
+    struct Header { char magic[8]; uint64_t cells, layers, floats_per_layer; };
+    const Header header{{'S','T','G','D','N','0','1','\0'}, (uint64_t) position,
+                        (uint64_t) state.gdn_alloc,
+                        (uint64_t) (sizes.gdn / (size_t) state.gdn_alloc / sizeof(float))};
+    constexpr size_t chunk = 65536;
+    std::array<uint8_t, chunk> buffer{};
+    bool ok = std::fwrite(&header, sizeof(header), 1, file) == 1;
+    for (size_t offset = 0; ok && offset < sizes.gdn;) {
+        const size_t count = std::min(buffer.size(), sizes.gdn - offset);
+        if (cudaMemcpy(buffer.data(), (const uint8_t*) state.gdn_state + offset, count,
+                       cudaMemcpyDefault) != cudaSuccess || std::fwrite(buffer.data(), 1, count, file) != count)
+            ok = false;
+        offset += count;
+    }
+    if (std::fclose(file) != 0) ok = false;
+    if (!ok) std::fprintf(stderr, "strata batch: failed writing GDN dump %s\n", output.c_str());
+    return ok;
+}
+
 // Windows' WDDM driver model: native Windows, or WSL2 (its GPU goes through /dev/dxg to the Windows driver).  There,
 // pinning a large arena into two CUDA contexts leaves WDDM refusing every later allocation (the 5080 + 3090 rig);
 // a Linux driver has no such limit (#253: the 8 GiB cap cost a 4090 + 3060 split 3x of its prompt speed).
@@ -8669,11 +8771,24 @@ int main(int argc, char** argv) {
                 bt_wait0 = ver.ms_wait; bt_pool0 = ver.ms_pool;
                 bt_miss0 = drive.d.multi_misses; bt_hits0 = drive.d.cache_hits; bt_pcie0 = drive.d.pcie_experts;
             }
+            for (int t = 0; t < A; ++t) {
+                const int b = active[t];
+                const int row = first[t];
+                if (!dump_batch_gdn_state(g, *bslot_ss[0][(size_t) b], pos[row], b)) {
+                    err = "batch GDN state dump failed";
+                    return false;
+                }
+            }
             const Clock::time_point w0 = Clock::now();
             if (!ver.run_slot_rows(rows, S, tok, pos, win_pool_fn, win_pool_user, outb, err) || drive.d.failed) {
                 std::printf("ERR %s\n", drive.d.failed && drive.d.fail ? drive.d.fail : err.c_str());
                 return false;
             }
+            for (int t = 0; t < S; ++t)
+                if (!trace_verify_logits(ver, t, rows[t], pos[t], tok[t])) {
+                    err = "batch verifier logits trace failed";
+                    return false;
+                }
             const Clock::time_point w1 = Clock::now();
             // Accept the proposal only when the target picked it and there is room to emit both tokens.
             std::vector<int> keep(bs.size(), 0);
@@ -11175,6 +11290,11 @@ int main(int argc, char** argv) {
                     std::printf("ERR %s\n", drive.d.failed && drive.d.fail ? drive.d.fail : err.c_str());
                     return 1;
                 }
+                for (int t = 0; t < T; ++t)
+                    if (!trace_verify_logits(ver, t, -1, p + t, window[(size_t) t])) {
+                        std::fprintf(stderr, "strata serve: serial verifier logits trace failed\n");
+                        return 1;
+                    }
                 // Diagnostics (as in generate): STRATA_DUMP_FIRST_LOGITS=<path> writes the logits of each request's first
                 // window to <path>.<n>, so the prompt paths (a peer card's share, a split) can be compared by KL
                 if (first_window) {
