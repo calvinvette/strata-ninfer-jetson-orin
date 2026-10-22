@@ -95,10 +95,11 @@ A fresh, supervised per-layer QSA trace now matches the serial MTP2 control at
 accepted lengths 70, 72 and 74, then differs in all 12 QSA layers at lengths 76
 and 77, starting at model layer 3. Both prompts still match serial for their
 ten generated tokens. Minimum available host/admission memory was 16.55/15.10
-GiB with no cgroup events. This narrows state localization only; the operation
-causing the difference and its relation to later output drift remain unknown.
-The split trace shows both indexer arrays and K/V cache state change across all
-12 layers from model layer 3 by length 76.
+GiB with no cgroup events. The split trace shows both indexer arrays and K/V
+cache state change across all 12 layers from model layer 3 by length 76.
+Per-token K/V/indexer and decoder-compute ablations retain the same divergence,
+so neither batched path alone explains it. The cause and relation to later
+output drift remain unknown.
 See the [batch-MTP report](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
 
 ## Near-term direction

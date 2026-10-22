@@ -278,6 +278,21 @@ therefore reaches both QSA indexer and attention-cache state by length 76, but
 this does not distinguish an upstream input difference from two independent
 state-update errors. The component hashes and raw logs remain local-only.
 
+### Per-token append and decoder ablations (2026-10-22)
+
+Two supervised same-profile repeats disabled one batched path at a time. With
+`STRATA_NO_BATCH_KV_STEP=1`, which uses per-token QSA K/V and indexer appends,
+all component hashes still matched serial at lengths 70, 72 and 74, then both
+indexer and K/V state differed across all 12 QSA layers at lengths 76 and 77.
+With `STRATA_DEC_BATCH=0`, which uses per-token decoder projections and
+updates, the same hash boundary and layer pattern reproduced. Both prompts
+produced the same ten token IDs as their serial controls in both ablations.
+Minimum host/admission availability was 16.73/16.40 GiB for the append
+ablation and 16.59/16.59 GiB for the decoder ablation; both had zero cgroup
+memory events. These negative controls rule out either batched append/update
+or batched decoder compute as the sole cause in this reproducer. The ablations
+were correctness diagnostics, not randomized timing comparisons.
+
 For this final diagnostic source, maestro1 rebuilt HIP from the identical
 `src/program/generate.cpp` SHA256 `9f136bb977fe118fd1f25b5c3312828577b4b301a47d3929fddbe9cb50d06e5f`;
 the HIP binary SHA256 is `904c1a32d9427de12aa635b238dd58f386902022e5218fa9a7551a2f0df7b8b5`,

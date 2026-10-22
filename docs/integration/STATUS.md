@@ -33,6 +33,14 @@ but does not tell whether an upstream input difference or separate update
 errors produce them. The supervised run retained 16.53 GiB minimum host and
 admission availability with zero cgroup events.
 
+Two same-profile negative controls set `STRATA_NO_BATCH_KV_STEP=1` and
+`STRATA_DEC_BATCH=0` separately. Both retain the same exact-through-length-74
+and first-difference-at-76 QSA indexer/KV pattern, with matching ten-token
+outputs. This rules out the batched append path and batched decoder compute as
+the sole cause for this repro. Minimum host/admission availability was at least
+16.40 GiB in both runs, with zero cgroup events. No performance inference is
+drawn from these ablations.
+
 A separate [MTP2 cancellation test](../../bench/results/2026-10-22-phase5-coder-mtp2-cancel-state/README.md)
 passed at five accepted-prefix lengths (48, 50, 51, 53, 55). The canceled
 request's token sequences and all state fingerprints matched two fresh
