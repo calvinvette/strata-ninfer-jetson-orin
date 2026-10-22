@@ -109,6 +109,26 @@ reported 16.47 GiB minimum available RAM; the isolated prompt-1 serial control
 reported 17.24 GiB. Both had zero sampled cgroup memory events. Clocks varied,
 EMC readback was denied, and energy was not request-attributed.
 
+A fresh target-only run captured raw committed GDN arrays at prompt position 67
+and generated positions 71–72 for every available GDN layer. Each request
+emitted the same six tokens as its isolated serial control. The capture showed
+that two prompt-boundary states can be recorded against physical slot 0 before
+the requests occupy batch slots, so the earlier layer-6-only comparison that
+treated a slot as one prompt across the run was invalid. Comparing each later
+batch state against both isolated prompt controls avoids that assumption. At
+position 71, slot 0 was closer to serial prompt 0 (relative L2 0.00940 versus
+0.20284 to prompt 1), and slot 1 was closer to prompt 1 (0.02314 versus 0.20366).
+At position 72 the same assignments held: slot 0 was closer to prompt 0 (0.01079
+versus 0.17960), and slot 1 was closer to prompt 1 (0.01942 versus 0.18092).
+Both selected positions cover all 36 GDN layers. The position-72 states were
+not bit-identical: 25,014,017/29,417,472 and 27,772,427/29,417,472 floats
+changed, respectively. This resolves the apparent large layer-6 delta as a
+bad prompt pairing, while confirming broad committed-state differences despite
+identical short outputs. It does not explain the longer token-60 divergence or
+establish a cause. Raw arrays remain local-only; the all-layer capture retained
+17.69 GiB minimum available RAM, with zero sampled cgroup OOM events. Clocks
+varied, EMC readback was denied, and energy was not request-attributed.
+
 ## Configuration and limits
 
 Model identity: `Qwen3.8-Flash-Next-Coder-GGUF-IQ1_M`, split across the two
@@ -162,6 +182,12 @@ energy was not attributed to individual requests.
   per-layer position sweep and its fresh serial second-prompt control. Hash
   files retain all batch positions; the analysis lists first exact mapping and
   first later divergence per mapped slot.
+- `capture_alllayer_targetonly_commit_state.py`,
+  `analyze_alllayer_targetonly_commit_state.cpp`,
+  `run-alllayer-targetonly-commit-state/`, and
+  `supervisor-alllayer-targetonly-commit-state/`: selected raw all-layer state
+  comparison and memory/clock telemetry. The `.stgcmt` array dumps are
+  local-only.
 - `backend-builds-maestro1/`: exact-source HIP/SYCL build and help logs;
   compile evidence only.
 - `run-retry/`, `run/`, and earlier supervisor directories preserve failed or

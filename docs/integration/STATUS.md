@@ -30,6 +30,22 @@ sources compiled and linked on maestro1 for HIP and SYCL, with both help
 commands exiting 0 and no accelerator execution. This is diagnostic evidence,
 not a Phase 5 gate pass or performance result.
 
+A selected-position raw all-layer committed-state run in the same diagnostic
+bundle clarified prompt-to-slot pairing. Two position-67 prompt-boundary
+captures were both logged against physical slot 0 before the live requests
+settled into slots, invalidating the earlier layer-6-only follow-up's
+assumption that a physical slot represented one prompt throughout. At generated
+position 71, slot 0 was closer to isolated serial prompt 0 (relative L2 0.00940
+versus 0.20284), and slot 1 was closer to prompt 1 (0.02314 versus 0.20366).
+At position 72 the same assignments held (0.01079 versus 0.17960 for slot 0;
+0.01942 versus 0.18092 for slot 1). Both states differed broadly from their
+nearest serial controls even though the six generated tokens matched exactly;
+both positions covered all 36 GDN layers. This supports short-output/state
+divergence but does not explain the longer concurrent token-60 failure. The raw
+capture retained 17.69 GiB minimum available RAM and zero cgroup OOM events.
+Full arrays remain local-only; this is not a performance result or Phase 5
+closeout.
+
 A current-source ARM64/CUDA 12.6 Release rebuild completed with two build jobs. The configured CTest suite passed 130 tests with the external one-layer Q2_0 S2 fixture supplied to the two pack-backed tests; two optional IQ-fixture tests skipped because their external fixtures are absent. Integration Python discovery passed 163/163. The NInfer import manifest verified 1,320 imports at pinned revision `b07248f2`; the matrix validator reported 162 proposed cells / 936 paired entries without executing them. These are current regression and specification checks, not Phase 5 or Phase 6 closeout. The initial missing-pack run is retained in the linked regression report.
 
 A fresh [current-worktree regression rerun](../../bench/results/2026-10-22-phase5-current-source-regression/README.md) rebuilt the ARM64/CUDA candidate with two jobs and passed the focused accepted-window, verifier/GDN/KV, graph, Q8_1 and native-expert selection (29/29), plus Python integration discovery (163/163). The full configured CTest suite completed 132 tests with the external one-layer Q2_0 S2 fixture supplied through `STRATA_TEST_EXPERTS_BIN`: 130 passed and two optional IQ-fixture tests skipped. This includes passing `expert_parity` and `pool_test`; the initial missing-pack issue and fixture/source hashes remain documented. The full 48-layer arena-load test remains unrun. This is regression coverage only; Phase 5 accepted-state drift remains unresolved.
