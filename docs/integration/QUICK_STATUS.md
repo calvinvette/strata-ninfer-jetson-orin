@@ -141,6 +141,12 @@ precedes the visible token change, but the model-wide origin remains unknown.
 The selected positions and captured arrays repeated bit-for-bit in a second
 supervised run; this is bounded to the same prompt pair and build.
 
+At the earlier selected boundary, direct layer-12 committed-state capture found
+slot 0 exact through position 70 and changed at 71 (relative L2 0.00379), while
+slot 1 was already changed at position 68 (0.00822). Layer-12 input `x` changed
+at the same selected positions. Slot 1's earlier onset remains unbounded; see
+the linked capture report for paired state and activation metrics.
+
 ## Near-term direction
 
 1. Continue resolving batch-MTP output divergence: capture earlier layer

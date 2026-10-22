@@ -16,12 +16,16 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--layer', type=int, default=12)
 parser.add_argument('--positions', default=','.join(map(str, range(120, 133))))
+parser.add_argument('--commit-layer', type=int, default=-1,
+                    help='also capture committed recurrent state at this GDN layer')
 args = parser.parse_args()
 positions = [int(value) for value in args.positions.split(',')]
 if positions != sorted(set(positions)) or not positions or positions[0] < 0:
     parser.error('--positions must be sorted unique non-negative integers')
 if args.layer < 0:
     parser.error('--layer must be non-negative')
+if args.commit_layer < -1:
+    parser.error('--commit-layer must be -1 (disabled) or a non-negative GDN layer')
 
 out = args.output.resolve()
 out.mkdir(parents=True, exist_ok=False)
@@ -43,6 +47,10 @@ def make_env(name):
                 'STRATA_VERIFY_DUMP_GDN_POSITIONS': ','.join(map(str, positions)),
                 'STRATA_VERIFY_DUMP_GDN_BATCH': '1',
                 'STRATA_VERIFY_DUMP_GDN_PATH': str((out / f'{name}.stgdiag').resolve())})
+    if args.commit_layer >= 0:
+        env.update({'STRATA_VERIFY_DUMP_GDN_COMMIT_LAYER': str(args.commit_layer),
+                    'STRATA_VERIFY_DUMP_GDN_COMMIT_POSITIONS': ','.join(map(str, positions)),
+                    'STRATA_VERIFY_DUMP_GDN_COMMIT_PATH': str((out / f'{name}.stgcmt').resolve())})
     return env
 
 def generate(engine, prompt):

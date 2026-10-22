@@ -76,6 +76,22 @@ available RAM and zero nonzero sampled cgroup memory events. This confirms
 repeatability for the selected prompt pair and current build, not across other
 prompts or configurations. See `two-live-layer12-repeat-check.json`.
 
+An early-boundary follow-up also captured the directly committed GDN state at
+layer 12 for positions 68–72. Slot 0's state matched its fresh serial control
+through position 70, then differed at position 71 (796,604/817,152 values,
+relative L2 0.003790); its layer-12 input `x` was exact at 70 and changed at 71
+(relative L2 0.009436). Slot 1's state already differed at the first selected
+position 68 (796,640/817,152 values, relative L2 0.008221), and its `x` also
+differed there (relative L2 0.02354). The slot-1 onset is therefore earlier
+than or at 68, outside this capture. Both rows' consumed tokens match their
+serial controls at these positions, and slot 1's first output mismatch remains
+token 60. The overlapping layer-12 activation rows repeated bit-for-bit against
+the activation-only early-boundary run. These are layer-12 state/activation
+comparisons; they do not establish the first changed state across all model
+layers or identify a responsible operation. The supervised run retained 17.49
+GiB minimum available RAM and zero nonzero sampled cgroup memory events. See
+`two-live-early-boundary-summary.json`.
+
 ## Resources and validation
 
 Minimum available physical RAM and minimum admission availability were both
@@ -103,7 +119,7 @@ maestro1 HIP binary SHA256: `594ec3031ad9c3e93ffd6481d981844de47c4b975b8c9c3aa6f
 The backend checks were compile/startup evidence only and do not qualify
 accelerator runtime.
 
-The harnesses and parser are retained as `capture_target_only_gdn_layer.py`,
-`two_live_multrow_layer12.py`, and `compare_layer_capture.py`. Raw `*.stgdiag`
-data, run logs, and supervisor telemetry remain local and are intentionally
-excluded from Git.
+The harnesses and parsers are retained as `capture_target_only_gdn_layer.py`,
+`two_live_multrow_layer12.py`, `compare_layer_capture.py`, and
+`compare_gdn_commit_state.py`. Raw `*.stgdiag`/`*.stgcmt` data, run logs, and
+supervisor telemetry remain local and are intentionally excluded from Git.

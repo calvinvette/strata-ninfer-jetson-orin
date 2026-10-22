@@ -2704,3 +2704,12 @@ fields had changed. For future batch backends, pair by request, position and
 consumed token, then capture the preceding layer boundary and logits as well;
 a changed downstream activation does not identify which earlier shared or
 per-row operation introduced it.
+
+In the same two-live trace, direct committed state at layer 12 stayed exact for
+one slot through position 70 and first changed at 71; the peer already differed
+at its first sampled position 68. This is why future Strata/Splash validation
+should capture selected layer state and the matching verifier activation in the
+same supervised run. Hash-only sweeps identify the sampled state boundary, while
+raw numeric state and activation pairs show the scale and whether the layer's
+input has already changed. Keep request-to-slot mapping explicit and record
+when a boundary capture starts after the first observed divergence.
