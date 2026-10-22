@@ -320,3 +320,20 @@ the HIP binary SHA256 is
 `59fd1a42a4ecbd63ba478cf10af26ba1eee51850955444093d81961f57cf8c63`, and its
 help check exited 0. The SYCL overlay remained unchanged and no-work; its
 current startup limitation above remains.
+
+
+### One-live batch-slot QSA trace after admission (2026-10-22)
+
+A supervised follow-up kept slot 0 in the batch-MTP route after a one-token
+competitor was admitted and finished. Slot 0 generated 96 tokens and slot 1
+generated one; both outputs matched their serial MTP2 controls exactly. The
+batch slot's QSA indexer and K/V hashes matched serial at accepted state
+lengths 70, 72 and 74, then differed in all 12 layers at lengths 76 and 78,
+first at QSA ordinal 0/model layer 3. Minimum available physical host memory
+was 16.77 GiB and minimum admission availability was 13.50 GiB over 112
+samples; cgroup low/high/max/OOM/OOM-kill counters remained zero. This shows
+the persistent-state difference does not require two simultaneously active
+verifier rows. It does not distinguish the solo-to-batch transition from
+batch-slot execution, identify the changed operation, or establish output
+impact beyond this exact 96-token sample. Raw traces remain local-only; the
+concise analyzer output is retained with the local capture.

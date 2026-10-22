@@ -104,6 +104,13 @@ batch slots' QSA hashes mutually matched but differed from serial,
 while their ten-token outputs remained exact.
 See the [batch-MTP report](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
 
+A one-live-after-admission trace further reproduced the persistent-state
+difference after the competing request finished: QSA state matched serial at
+lengths 70/72/74 and differed across all 12 layers at 76/78, while the 96-token
+output matched serial exactly. This shows two active verifier rows are not
+required, but does not isolate transition from batch-slot execution. Phase 5
+remains open.
+
 ## Near-term direction
 
 1. Continue resolving batch-MTP output divergence: repair/extend per-row state

@@ -37,8 +37,9 @@ def main():
     args = parser.parse_args()
     batch_path = args.batch_hashes or args.run / 'batch-qsa-state-hashes.txt'
     serial = {}
-    for slot in (0, 1):
-        for key, values in serial_prefixes(args.run / f'serial-slot-{slot}.log').items():
+    for path in sorted(args.run.glob('serial-slot-*.log')):
+        slot = int(path.stem.rsplit('-', 1)[1])
+        for key, values in serial_prefixes(path).items():
             serial.setdefault(key, []).extend((slot, value) for value in values)
 
     rows = []

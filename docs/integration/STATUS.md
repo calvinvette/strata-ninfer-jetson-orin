@@ -8,6 +8,16 @@ profile under [its closeout](PHASE8_CLOSEOUT.md). Phases 5 and 6 remain open;
 the Phase 8 profile excludes their unresolved adaptive/MTP and broader
 parametric/energy scope. This records tested cells, not general product support.
 
+A supervised one-live-after-admission MTP2 trace now shows the same QSA state
+boundary after the competing one-token request completes: lengths 70/72/74
+match serial, while indexer and K/V hashes differ in all 12 layers at lengths
+76 and 78, first at model layer 3. Slot 0 generated 96 tokens and the short
+competitor one; both outputs exactly matched serial. Minimum host/admission
+availability was 16.77/13.50 GiB with zero cgroup events. This removes the
+need for two simultaneously active verifier rows to reproduce persistent QSA
+drift, but leaves the solo-to-batch transition versus batch-slot execution
+unresolved. Phase 5 remains open. See the [batch-MTP diagnostic](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
+
 The latest [MTP2 position-76 committed-state comparison](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md)
 paired batch and serial rows by token. Prompt 0's 36-layer GDN state differs
 in 26,965,859/29,417,472 floats (relative L2 0.0182307), first at GDN model

@@ -3,6 +3,7 @@
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 import json
+import os
 from pathlib import Path
 import sys
 import threading
@@ -23,13 +24,24 @@ parser.add_argument('--reverse-arrival', action='store_true',
                     help='start the batch requests in reverse prompt order with a 250 ms stagger')
 parser.add_argument('--duplicate-prompt', action='store_true',
                     help='run prompt slot-0 in both requests to check batch row state isolation')
+parser.add_argument('--one-live-after-admission', action='store_true',
+                    help='start slot-0, then admit a one-token slot-1 request so slot-0 continues in batch mode')
+parser.add_argument('--hash-to', type=int, default=76,
+                    help='inclusive final accepted position for batch QSA hashes')
 ARGS = parser.parse_args()
 SERIAL_KV_APPENDS = ARGS.serial_kv_appends
 PER_TOKEN_VERIFY = ARGS.per_token_verify
 REVERSE_ARRIVAL = ARGS.reverse_arrival
 DUPE_PROMPT = ARGS.duplicate_prompt
+ONE_LIVE_AFTER_ADMISSION = ARGS.one_live_after_admission
+if DUPE_PROMPT and ONE_LIVE_AFTER_ADMISSION:
+    parser.error('--duplicate-prompt and --one-live-after-admission are mutually exclusive')
+if REVERSE_ARRIVAL and ONE_LIVE_AFTER_ADMISSION:
+    parser.error('--reverse-arrival and --one-live-after-admission are mutually exclusive')
 OUT = ARGS.output.resolve()
 OUT.mkdir(parents=True, exist_ok=False)
+if ONE_LIVE_AFTER_ADMISSION:
+    os.environ['STRATA_PARALLEL_SOLO'] = '0'
 CFG = json.loads((Path(__file__).resolve().parent / 'config.json').read_text())
 args = list(CFG['args'])
 replace_arg(args, '--spec', '2')
@@ -48,18 +60,30 @@ def arm(name, arm_args, env, requests):
     try:
         if '--batch' in arm_args and engine.batch != 2:
             raise RuntimeError(f'{name}: expected two batch slots, got {engine.batch}')
+        first_token = threading.Event()
         def generate(key):
-            tokens = [x for x in engine.generate(prompts[key], 10, {'temperature': 0}, threading.Event())
-                      if x is not None]
+            limit = (96 if key == 'slot-0' else 1) if ONE_LIVE_AFTER_ADMISSION else 10
+            tokens = []
+            for token in engine.generate(prompts[key], limit, {'temperature': 0}, threading.Event()):
+                if token is not None:
+                    tokens.append(token)
+                    if name == 'batch' and ONE_LIVE_AFTER_ADMISSION and key == 'slot-0':
+                        first_token.set()
             return {'tokens': tokens, 'finish': engine.last.get('finish')}
         if len(requests) == 1:
             return {requests[0]: generate(requests[0])}
         with ThreadPoolExecutor(max_workers=len(requests)) as pool:
-            order = list(reversed(requests)) if REVERSE_ARRIVAL and name == 'batch' else list(requests)
-            futures = {order[0]: pool.submit(generate, order[0])}
-            if REVERSE_ARRIVAL and name == 'batch':
-                time.sleep(0.25)
-            futures[order[1]] = pool.submit(generate, order[1])
+            if name == 'batch' and ONE_LIVE_AFTER_ADMISSION:
+                futures = {'slot-0': pool.submit(generate, 'slot-0')}
+                if not first_token.wait(timeout=120):
+                    raise TimeoutError('slot-0 did not emit a token before the one-live batch admission')
+                futures['slot-1'] = pool.submit(generate, 'slot-1')
+            else:
+                order = list(reversed(requests)) if REVERSE_ARRIVAL and name == 'batch' else list(requests)
+                futures = {order[0]: pool.submit(generate, order[0])}
+                if REVERSE_ARRIVAL and name == 'batch':
+                    time.sleep(0.25)
+                futures[order[1]] = pool.submit(generate, order[1])
             return {key: future.result() for key, future in futures.items()}
     finally:
         engine.close()
@@ -72,7 +96,7 @@ def make_env(name):
                 'STRATA_PREFILL_CPU_SHARE': '0'})
     if name == 'batch':
         env.update({'STRATA_BATCH_QSA_HASH_PATH': str(OUT / 'batch-qsa-state-hashes.txt'),
-                    'STRATA_BATCH_QSA_HASH_FROM': '67', 'STRATA_BATCH_QSA_HASH_TO': '76'})
+                    'STRATA_BATCH_QSA_HASH_FROM': '67', 'STRATA_BATCH_QSA_HASH_TO': str(ARGS.hash_to)})
         if SERIAL_KV_APPENDS:
             env['STRATA_NO_BATCH_KV_STEP'] = '1'
         if PER_TOKEN_VERIFY:
@@ -88,6 +112,8 @@ batch = arm('batch-mtp2', args + ['--batch', '2', '--batch-mtp'], make_env('batc
     'decoder_compute_mode': 'per-token' if PER_TOKEN_VERIFY else 'batched',
     'arrival_order': 'reverse-with-250ms-stagger' if REVERSE_ARRIVAL else 'concurrent',
     'duplicate_prompt': DUPE_PROMPT,
+    'one_live_after_admission': ONE_LIVE_AFTER_ADMISSION,
+    'batch_hash_to_position': ARGS.hash_to,
     'outputs': {'serial': serial, 'batch': batch},
 }, indent=2) + '\n')
 print(json.dumps({arm_name: {key: len(value['tokens']) for key, value in rows.items()}
