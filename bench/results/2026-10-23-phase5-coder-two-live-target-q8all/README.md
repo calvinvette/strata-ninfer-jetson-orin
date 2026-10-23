@@ -207,3 +207,24 @@ corresponding `position-127-state-cache3000/`,
 `all-layer-state-sweep-cache3000/`, `layer24-state-sweep-cache3000/`,
 `state-layer25-position83-cache3000-repeat/`, and
 `joint-state-stage-position83-cache3000/` directories. Phase 5 remains open.
+
+A same-run state-and-stage capture at position 112 refines the boundary on the
+slot-1 stream that first diverges at output index 60. Layer 24 is the first
+changed committed GDN state (relative L2 `8.60e-6`); its recurrent section is
+`2.149e-4` relative L2 and its convolution section is exact. At the same row,
+layer-24 stage `x` and QKV are exact, while `h` is the first changed field
+(relative L2 `9.592e-5`); gate, beta and z are exact. A separate capture sweep
+on the same first-60-token prefix found layer-24 state exact at positions 83 and
+96, then changed at 112. The layer-25 position-83 discrepancy described above
+remains non-reproducible. This localizes where the position-112 state delta is
+visible, without proving which earlier operation or scheduling event introduced
+it. The captured run took 135.0 seconds and retained at least 13.84 GiB physical
+and admission availability, with zero sampled cgroup events. Raw state is local
+with checksums; analysis, stage records and supervisor telemetry are in
+`joint-layer24-position112-cache3000/` and
+`supervisor-joint-layer24-position112-cache3000/`.
+
+The related targeted CUDA checks `gdn_parity`, `verify_parity` and
+`verify_batch_parity` pass (3/3). Those tests verify kernel/operator fixtures;
+they do not cover this full model's request scheduling and integrated batch
+commit sequence.

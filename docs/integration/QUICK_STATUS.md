@@ -342,3 +342,11 @@ state delta at position 83, but repeated and combined captures at that position
 were exact. Separate same-prefix captures at position 127 point to layer-24
 state history and intermediate `h` when output first differs, but do not prove
 causality. Phase 5 remains open.
+
+
+The same-run position-112 capture is the strongest localization so far: layer 24
+first differs in committed GDN state; its inputs and QKV are exact, and `h` is
+the first changed stage. The state delta appears after sampled exact states at
+positions 83 and 96, ahead of slot 1's first changed output at index 60. The
+targeted CUDA parity tests pass but do not cover integrated scheduling. Phase 5
+remains open.

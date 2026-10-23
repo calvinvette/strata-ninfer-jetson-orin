@@ -4473,3 +4473,15 @@ the same token prefix first differed in layer-24 committed state and at
 intermediate `h`; this is consistent localization, not same-run causal proof.
 Large raw state dumps remain local with hashes and derived summaries committed.
 The mismatch remains under investigation; Phase 5 stays open. [Capture notes](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+
+
+A same-run position-112 capture reproduced the target slot's full-sequence
+first-difference boundary. Layer 24 was the first changed committed GDN state
+(relative L2 `8.60e-6`, recurrent `2.149e-4`, convolution exact). At the same
+row, `x` and QKV were exact and `h` was the first changed GDN stage
+(relative L2 `9.592e-5`). The output first differs later at index 60; layer-24
+state was exact at sampled positions 83 and 96 in a separate sweep with the same
+first-60-token prefix. The earlier position-83 layer-25 state delta was not
+reproduced in two combined state/stage captures. The CUDA `gdn_parity`,
+`verify_parity` and `verify_batch_parity` tests pass, but do not cover integrated
+model scheduling. Phase 5 remains open. [Evidence](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
