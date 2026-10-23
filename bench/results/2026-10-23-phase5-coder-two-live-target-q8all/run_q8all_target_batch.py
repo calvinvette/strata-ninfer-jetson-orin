@@ -22,9 +22,16 @@ parser.add_argument("--output", type=Path, default=HERE / "run",
                     help="new directory for raw run logs and summary")
 parser.add_argument("--expert-cache-mib", type=int, default=1500,
                     help="requested shared-RAM expert cache cap")
+parser.add_argument("--generated-tokens", type=int, default=96,
+                    help="tokens generated for each serial and batch request")
+parser.add_argument("--accepted-prefix-trace", action="store_true",
+                    help="hash committed persistent state at each accepted verifier prefix")
 cli = parser.parse_args()
+if cli.generated_tokens < 1:
+    parser.error("--generated-tokens must be positive")
 OUT = cli.output.resolve()
 EXPERT_CACHE_MIB = cli.expert_cache_mib
+GENERATED_TOKENS = cli.generated_tokens
 OUT.mkdir(parents=True, exist_ok=False)
 cfg = json.loads(CONFIG.read_text())
 args = list(cfg["args"])
@@ -43,6 +50,8 @@ env.update({
     "STRATA_STATE_HASH": "1",
     "STRATA_PREFILL_CPU_SHARE": "0",
 })
+if cli.accepted_prefix_trace:
+    env["STRATA_ACCEPTED_PREFIX_TRACE"] = "1"
 
 
 def file_sha256(path):
@@ -54,7 +63,7 @@ def file_sha256(path):
 
 
 def generate(engine, prompt):
-    tokens = [token for token in engine.generate(prompt, 96, {"temperature": 0}, threading.Event())
+    tokens = [token for token in engine.generate(prompt, GENERATED_TOKENS, {"temperature": 0}, threading.Event())
               if token is not None]
     return {"tokens": tokens, "finish": engine.last.get("finish"), "usage": dict(engine.last)}
 
@@ -100,7 +109,7 @@ result = {
                      cfg["args"][cfg["args"].index("--ple-gguf") + 1]],
     "model_shards_sha256": model_shards_sha256,
     "profile": {"live_requests": 2, "batch_slots": 2, "mtp": False, "context": 1024,
-                "expert_cache_mib": EXPERT_CACHE_MIB, "prompt_cache": 6, "generated_tokens": 96,
+                "expert_cache_mib": EXPERT_CACHE_MIB, "prompt_cache": 6, "generated_tokens": GENERATED_TOKENS,
                 "STRATA_NATIVE_CPU_Q8_1_DOT": "all", "STRATA_IQ_MT_MIN": "1"},
     "prompt_token_counts": {name: len(prompt) for name, prompt in prompts.items()},
     "outputs": {name: {"serial": serial[name], "batch": batched[name]} for name in prompts},
@@ -108,6 +117,13 @@ result = {
     "first_mismatch_index": first_mismatch,
     "q8_selector_environment": "STRATA_NATIVE_CPU_Q8_1_DOT=all passed to fresh serial and batch engines",
     "batch_state_hash_records": sum("STATE_HASH " in line for line in log_text.splitlines()),
+    "accepted_prefix_trace_enabled": cli.accepted_prefix_trace,
+    "accepted_prefix_records": {
+        "serial": {name: sum("ACCEPTED_PREFIX " in line for line in
+                              (OUT / f"serial-{name}.log").read_text(errors="replace").splitlines())
+                   for name in prompts},
+        "batch": sum("ACCEPTED_PREFIX " in line for line in log_text.splitlines()),
+    },
     "limits": ["same-input operator parity is not inferred from output equality",
                "terminal batch state hashes are retained in the raw log but not paired by prompt here",
                "single correctness cell; no speed, energy, or general quality claim"],
