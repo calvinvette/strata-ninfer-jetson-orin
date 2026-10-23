@@ -4521,3 +4521,19 @@ layer-23 comparison remains unsupported by the current capture hook; Phase 5
 remains open. Raw boundary records and supervisor telemetry are retained locally
 under `boundary-layer23-position105-cache3000/` and
 `boundary-layer23-position105-cache3000-single-live/`.
+
+A current-binary [Coder IQ1_M adaptive/delayed pair](../../bench/results/2026-10-23-phase5-coder-adaptive-divergence-532-2067/README.md)
+reproduced cross-arm accepted-state divergence before the first changed token:
+state and GDN hashes first differed at position 532 (prefix 21), while token IDs
+first differed at prefix 27. The 2,048-token request emitted the same 64 token
+IDs in both arms, but its state hashes first differed at position 2067. Each
+service's short recovery reproduced its own initial 64 tokens and accepted
+state hashes exactly. A selected MoE trace found ownership changes at layer 5
+before the first changed captured input activation at layer 36 for the short
+request; at long position 2067, ownership first differed at layer 3, input
+activation at layer 41, and expert IDs at layer 43. These are two paired
+same-day reproductions and a focused localization, but they do not isolate the
+first owner-dependent arithmetic or support a performance claim. Phase 5
+remains open. The selected-position helper currently requires at least two
+request blocks at every captured position; the single long-request block was
+validated and compared separately for this report.

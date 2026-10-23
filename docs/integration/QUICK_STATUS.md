@@ -32,6 +32,14 @@ an adaptive CPU-to-CUDA owner change for expert 129. This is narrow correctness
 evidence only; it does not close Phase 5 or establish broad owner parity. See
 the [capture notes](../../bench/results/2026-10-22-phase5-coder-adaptive-all-layer-position-trace/adaptive-layer27-current-source-generated-position515/README.md).
 
+A current-binary Coder IQ1_M adaptive/delayed pair reproduced cross-configuration
+state divergence at accepted position 532; 64-token recovery stayed exact within
+each service. A focused capture found CPU/GPU ownership differences before the
+first changed MoE input activation (layer 36 at short position 532; layer 41 at
+long position 2067), while all long-request output tokens still matched. This
+is localization evidence, not a causal or performance result. Phase 5 remains
+open. [Report](../../bench/results/2026-10-23-phase5-coder-adaptive-divergence-532-2067/README.md).
+
 These results are specific to the tested Orin build, model and workload. No
 candidate setting has been promoted to a default.
 
