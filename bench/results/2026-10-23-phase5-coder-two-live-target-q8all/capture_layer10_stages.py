@@ -17,6 +17,7 @@ p.add_argument('--output', type=Path, required=True)
 p.add_argument('--position', type=int, default=133)
 p.add_argument('--layer', type=int, default=10)
 p.add_argument('--max-tokens', type=int, default=96)
+p.add_argument('--expert-cache-mib', type=int, default=1500)
 opts = p.parse_args()
 out = opts.output.resolve(); out.mkdir(parents=True, exist_ok=False)
 base = Path(__file__).resolve().parent
@@ -25,7 +26,7 @@ args = list(cfg['args'])
 for key in ('--mtp', '--mtp-max-t', '--adapt-every', '--adapt-accepted-only'):
     remove_arg(args, key)
 replace_arg(args, '--spec', '2'); replace_arg(args, '--max-context', '1024')
-replace_arg(args, '--expert-cache', '1500'); replace_arg(args, '--prompt-cache', '6')
+replace_arg(args, '--expert-cache', str(opts.expert_cache_mib)); replace_arg(args, '--prompt-cache', '6')
 prompts = prepared_prompts(cfg, 2)
 
 def env_for(name):
@@ -57,6 +58,7 @@ finally:
 
 result = {'capture_layer': opts.layer, 'position': opts.position, 'max_tokens': opts.max_tokens, 'target_slot': 1,
           'profile': {'live_requests': 2, 'batch_slots': 2, 'mtp': False,
+                      'expert_cache_mib': opts.expert_cache_mib,
                       'STRATA_NATIVE_CPU_Q8_1_DOT': 'all', 'STRATA_IQ_MT_MIN': '1'},
           'prompts': prompts, 'serial_slot_1': serial_out, 'batch': batch_out}
 (out/'result.json').write_text(json.dumps(result, indent=2)+'\n')

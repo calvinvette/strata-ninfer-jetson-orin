@@ -183,3 +183,27 @@ the run took 104.5 seconds. This repeats the local operator-level intervention
 only and does not contradict the full-96-token slot-1 mismatch. Raw data and
 supervisor samples are under `layer9-cache3000-position-83-repeat/` and
 `supervisor-layer9-cache3000-position-83-repeat/`.
+
+Further state tracing under the 3,000 MiB cache cap found variable outcomes
+across fresh two-live runs. In one all-layer sweep, slot 1's state first differed
+at layer 25 at position 83 (token 11), while its generated IDs still matched
+serial for 96 tokens; the same run first differed at layer 25 again at 96 and
+layer 24 at 112. A separate layer-24 sweep was exact at 83/96 and changed at
+112. A repeat capturing layer 25 at 83 was exact, as was a same-run combined
+state-plus-stage capture at that position. In the combined capture every layer's
+committed state and all layer-25 intermediate fields matched. These observations
+show the position-83 state delta is not reproducible and must not be treated as
+the stable divergence boundary.
+
+At position 127, a separate 3,000 MiB run whose slot-1 output first differed
+at index 60 showed its first changed committed state at layer 24, on the same
+input token (`11`); the recurrent and convolution parts both differed. A
+separate stage capture at that position had exact `x`, QKV, gate, beta and `z`,
+with `h` first changed. The two captures share the same serial and batch token
+prefix through index 59, but were not simultaneous; this is consistent evidence,
+not proof of causality. Raw all-layer state dumps remain local. Per-run hashes,
+derived analyses and the small intermediate captures are retained in the
+corresponding `position-127-state-cache3000/`,
+`all-layer-state-sweep-cache3000/`, `layer24-state-sweep-cache3000/`,
+`state-layer25-position83-cache3000-repeat/`, and
+`joint-state-stage-position83-cache3000/` directories. Phase 5 remains open.

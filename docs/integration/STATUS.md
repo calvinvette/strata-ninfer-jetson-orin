@@ -4463,3 +4463,13 @@ intervention: expert 233 stayed on VRAM, routes and all ten expert parts were
 bit-identical between serial and batch, and the combined output remained exact.
 This reinforces only the selected operator cell; the full-length slot-1
 divergence persists. [Raw repeat](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+
+
+Additional 3,000 MiB cache state traces do not establish a stable early state
+boundary: one all-layer run changed layer 25 at position 83 while the token
+stream matched, but a repeated layer-25 capture and a combined state/intermediate
+capture at the same position were exact. At position 127, separate runs with
+the same token prefix first differed in layer-24 committed state and at
+intermediate `h`; this is consistent localization, not same-run causal proof.
+Large raw state dumps remain local with hashes and derived summaries committed.
+The mismatch remains under investigation; Phase 5 stays open. [Capture notes](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).

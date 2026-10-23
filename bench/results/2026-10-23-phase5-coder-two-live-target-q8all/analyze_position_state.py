@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
-"""Compare serial and batch slot-1 committed GDN state at position 133."""
+"""Compare serial and batch slot-1 committed GDN state at a selected position."""
+import argparse
 from array import array
 import json
 from pathlib import Path
 import struct
 
-ROOT = Path(__file__).resolve().parent/'position-133-state'
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--run', type=Path, default=Path(__file__).resolve().parent/'position-133-state')
+parser.add_argument('--position', type=int, default=133)
+parser.add_argument('--output', type=Path, help='analysis JSON path; defaults to <run>/analysis.json')
+args = parser.parse_args()
+ROOT = args.run.resolve()
+POSITION = args.position
 HEADER = struct.Struct('<8sIiqQQii')
 
 def records(path, wanted_slot):
@@ -15,12 +22,12 @@ def records(path, wanted_slot):
             if len(raw) != HEADER.size:
                 raise ValueError(f'{path}: truncated header')
             magic, version, layer, position, recurrent, count, token, slot = HEADER.unpack(raw)
-            if magic != b'STGCMT1\0' or version != 1 or position != 133:
+            if magic != b'STGCMT1\0' or version != 1:
                 raise ValueError(f'{path}: unexpected record')
             payload = f.read(count*4)
             if len(payload) != count*4:
                 raise ValueError(f'{path}: truncated payload')
-            if slot == wanted_slot:
+            if position == POSITION and slot == wanted_slot:
                 values = array('f'); values.frombytes(payload)
                 out[layer] = {'position': position, 'token': token,
                               'recurrent': recurrent, 'values': values}
@@ -49,12 +56,13 @@ for layer in sorted(serial):
                  'whole_state': metrics(0, len(delta)),
                  'recurrent': metrics(0, a['recurrent']),
                  'convolution': metrics(a['recurrent'], len(delta))})
-result = {'position': 133, 'serial_layers': sorted(serial), 'batch_slot': 1,
+result = {'position': POSITION, 'serial_layers': sorted(serial), 'batch_slot': 1,
           'first_changed_layer': next((x['layer'] for x in rows if x['whole_state']['changed_values']), None),
           'comparisons': rows,
           'limits': ['GDN committed-state capture only; other activations and state families are not covered.',
                      'This is one diagnostic cell and does not identify an upstream arithmetic cause.']}
-(ROOT/'analysis.json').write_text(json.dumps(result, indent=2)+'\n')
-print(json.dumps({'position': 133, 'first_changed_layer': result['first_changed_layer'],
+output = args.output.resolve() if args.output else ROOT/'analysis.json'
+output.write_text(json.dumps(result, indent=2)+'\n')
+print(json.dumps({'position': POSITION, 'first_changed_layer': result['first_changed_layer'],
                   'changed_layers': [x['layer'] for x in rows if x['whole_state']['changed_values']],
                   'records': len(rows)}, indent=2))

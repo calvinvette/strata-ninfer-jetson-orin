@@ -335,3 +335,10 @@ did not carry through the full sequence. Phase 5 remains open.
 A repeated exact-input position-83 capture again found bit-identical expert
 parts and combined MoE output at a 3,000 MiB cache, with expert 233 resident on
 VRAM in both paths. The 96-token two-live mismatch persists.
+
+
+The 3,000 MiB sequence investigation is still unsettled. One run found a layer-25
+state delta at position 83, but repeated and combined captures at that position
+were exact. Separate same-prefix captures at position 127 point to layer-24
+state history and intermediate `h` when output first differs, but do not prove
+causality. Phase 5 remains open.
