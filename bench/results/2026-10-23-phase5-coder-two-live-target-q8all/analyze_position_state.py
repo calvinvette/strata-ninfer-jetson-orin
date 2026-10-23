@@ -35,7 +35,10 @@ def records(path, wanted_slot):
                               'recurrent': recurrent, 'values': values}
     return out
 
-serial = records(ROOT/'serial.stgcmt', 0)
+serial_slot_path = ROOT/f'serial-slot-{args.batch_slot}.stgcmt'
+if not serial_slot_path.is_file():
+    serial_slot_path = ROOT/'serial.stgcmt'
+serial = records(serial_slot_path, 0)
 batch = records(ROOT/'batch.stgcmt', args.batch_slot)
 if not serial or set(serial) != set(batch):
     raise ValueError(f'layer mismatch: serial={sorted(serial)} batch={sorted(batch)}')

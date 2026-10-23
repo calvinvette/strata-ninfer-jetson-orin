@@ -23,9 +23,15 @@ p.add_argument('--boundary-layer', type=int,
                help='also capture verifier residual boundary before/after this layer')
 p.add_argument('--batch-live', type=int, choices=(1, 2), default=2,
                help='number of concurrent requests submitted to the batch verifier')
+p.add_argument('--serial-slot', choices=('0', '1', 'both'), default='1',
+               help='serial prompt control(s) to capture; default preserves the slot-1-only run')
+p.add_argument('--generated-tokens', type=int, default=96,
+               help='generated tokens per serial and batch request')
 p.add_argument('--trace-state-hashes', action='store_true',
                help='log accepted-prefix GDN/QSA fingerprints at every committed position')
 opts = p.parse_args()
+if opts.generated_tokens < 1:
+    p.error('--generated-tokens must be positive')
 positions = opts.positions or str(opts.position)
 if opts.boundary_layer is not None and ',' in positions:
     p.error('--boundary-layer currently supports one --position at a time')
@@ -64,14 +70,19 @@ def make_env(name):
     return env
 
 def generate(engine, key):
-    tokens = [int(t) for t in engine.generate(prompts[key], 96, {'temperature': 0}, threading.Event()) if t is not None]
+    tokens = [int(t) for t in engine.generate(prompts[key], opts.generated_tokens, {'temperature': 0}, threading.Event()) if t is not None]
     return {'tokens': tokens, 'finish': engine.last.get('finish')}
 
-serial = StrataEngine(cfg['exe'], args, cwd=cfg.get('cwd'), log=str(out/'serial-slot-1.log'), env=make_env('serial'))
-try:
-    serial_out = generate(serial, 'slot-1')
-finally:
-    serial.close()
+serial_slots = ('slot-0', 'slot-1') if opts.serial_slot == 'both' else (f'slot-{opts.serial_slot}',)
+serial_out = {}
+for key in serial_slots:
+    stem = f'serial-{key}' if opts.serial_slot == 'both' else 'serial'
+    serial = StrataEngine(cfg['exe'], args, cwd=cfg.get('cwd'), log=str(out/f'{stem}.log'),
+                          env=make_env(stem))
+    try:
+        serial_out[key] = generate(serial, key)
+    finally:
+        serial.close()
 
 batch = StrataEngine(cfg['exe'], args+['--batch', '2'], cwd=cfg.get('cwd'),
                      log=str(out/'batch.log'), env=make_env('batch'))
@@ -85,14 +96,18 @@ finally:
     batch.close()
 
 result = {'capture_positions': [int(x) for x in positions.split(',')], 'target_slot': 1,
-          'serial_slot_1': serial_out, 'batch': batch_out, 'prompts': prompts,
+          'serial': serial_out, 'serial_slot_1': serial_out.get('slot-1'),
+          'batch': batch_out, 'prompts': prompts,
           'profile': {'live_requests': opts.batch_live, 'batch_slots': 2, 'mtp': False,
                       'expert_cache_mib': opts.expert_cache_mib,
+                      'generated_tokens': opts.generated_tokens,
+                      'serial_slot_controls': list(serial_slots),
                       'gdn_layer': opts.layer,
                       'stage_layer': opts.stage_layer,
                       'boundary_layer': opts.boundary_layer,
                       'trace_state_hashes': opts.trace_state_hashes,
                       'STRATA_NATIVE_CPU_Q8_1_DOT': 'all', 'STRATA_IQ_MT_MIN': '1'}}
 (out/'result.json').write_text(json.dumps(result, indent=2)+'\n')
-print(json.dumps({'positions': [int(x) for x in positions.split(',')], 'serial_tokens': len(serial_out['tokens']),
+print(json.dumps({'positions': [int(x) for x in positions.split(',')],
+                  'serial_tokens': {key: len(value['tokens']) for key, value in serial_out.items()},
                   'batch_tokens': {k: len(v['tokens']) for k,v in batch_out.items()}}))
