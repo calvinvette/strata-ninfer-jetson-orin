@@ -66,10 +66,19 @@ returned the exact answer with 7,501 prompt tokens and 46 completion tokens:
 | 3,000 | 32 | 537.7 s | 541.1 s | 14.0 | 13.1 |
 | 3,000 | 128 | 167.1 s | 170.4 s | 44.9 | 13.4 |
 
-The two-block partial audit passed. Across blocks 1–2, chunk 128 reduced
-client total time by a median 67.7%/68.5% at cache arguments 1,500/3,000.
-The median cache-by-chunk time interaction was −2.4%. These two-block
-descriptive contrasts do not meet the seven-block confirmation requirement;
-the analyzer therefore emits no confidence intervals for partial campaigns.
-Minimum physical/admission availability across both blocks was 14.26/14.26
-GiB, and cgroup events were zero. Blocks 3–7 remain.
+Randomized block 3 passed all four cells on the distinct archive prompt. Every
+answer was exact (7,501 prompt, 46 completion tokens):
+
+| Requested slots | Chunk | Client TTFT | Client total | Prompt tok/s | Decode tok/s |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 3,000 | 32 | 539.3 s | 542.7 s | 13.9 | 13.2 |
+| 3,000 | 128 | 165.7 s | 169.0 s | 45.3 | 13.3 |
+| 1,500 | 128 | 186.9 s | 190.6 s | 40.2 | 12.1 |
+| 1,500 | 32 | 584.5 s | 588.2 s | 12.8 | 12.0 |
+
+The three-block partial audit passed all twelve cells. Across blocks 1–3,
+chunk 128 reduced median client total time by 67.6%/68.6% at cache arguments
+1,500/3,000; the median cache-by-chunk time interaction was −3.0%. These are
+descriptive partial results; the analyzer suppresses confidence intervals
+until all seven confirmation blocks are present. Minimum physical/admission
+availability was 14.19/14.19 GiB, with zero cgroup events. Blocks 4–7 remain.
