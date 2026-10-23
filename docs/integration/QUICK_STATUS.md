@@ -364,3 +364,9 @@ prior run first changed at 108 with `h`. Output still diverged at index 60.
 Verifier row IDs moved between runs; pairing was confirmed using captured input
 tokens. The cause and stable onset remain unresolved, so this remains
 correctness localization rather than a performance result.
+
+The attempted layer-23 tensor comparison could not capture a two-live batch row:
+the diagnostic supports one-row windows, while both requests were grouped. A
+one-live request used the serial verifier path (header slot `-1`) and is not a
+batch comparison. The QSA-to-layer-24 input boundary remains unlocalized; this
+capture limitation is recorded as unsupported rather than a pass.

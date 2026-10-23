@@ -4509,3 +4509,15 @@ least 14.00 GiB physical/admission availability and had zero sampled cgroup
 events. Raw dumps remain local; per-position analyses and supervisor logs are
 under `layer24-onset-104-108-cache3000-retry/` and
 `supervisor-layer24-onset-104-108-cache3000-retry/`.
+
+A layer-23 boundary capture attempt at position 105 wrote the serial record but
+not a two-live batch record: the verifier's boundary hook supports one-row
+windows, while this pair was grouped into two-row windows. A one-live request
+to a two-slot server produced identical serial/server tokens and boundary bytes,
+but both headers were `slot=-1`, indicating the ordinary serial verifier path;
+this is not batch parity. Minimum available memory was 14.04 GiB in the two-live
+attempt and 14.34 GiB in the one-live control, with no pressure abort. The
+layer-23 comparison remains unsupported by the current capture hook; Phase 5
+remains open. Raw boundary records and supervisor telemetry are retained locally
+under `boundary-layer23-position105-cache3000/` and
+`boundary-layer23-position105-cache3000-single-live/`.

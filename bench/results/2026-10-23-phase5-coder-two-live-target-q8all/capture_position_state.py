@@ -19,10 +19,16 @@ p.add_argument('--positions', help='comma-separated state capture positions; ove
 p.add_argument('--expert-cache-mib', type=int, default=1500)
 p.add_argument('--layer', default='all', help='GDN model layer or all')
 p.add_argument('--stage-layer', type=int, help='also capture GDN intermediate fields for this layer')
+p.add_argument('--boundary-layer', type=int,
+               help='also capture verifier residual boundary before/after this layer')
+p.add_argument('--batch-live', type=int, choices=(1, 2), default=2,
+               help='number of concurrent requests submitted to the batch verifier')
 p.add_argument('--trace-state-hashes', action='store_true',
                help='log accepted-prefix GDN/QSA fingerprints at every committed position')
 opts = p.parse_args()
 positions = opts.positions or str(opts.position)
+if opts.boundary_layer is not None and ',' in positions:
+    p.error('--boundary-layer currently supports one --position at a time')
 out = opts.output.resolve()
 out.mkdir(parents=True, exist_ok=False)
 base = Path(__file__).resolve().parent
@@ -35,6 +41,7 @@ replace_arg(args, '--max-context', '1024')
 replace_arg(args, '--expert-cache', str(opts.expert_cache_mib))
 replace_arg(args, '--prompt-cache', '6')
 prompts = prepared_prompts(cfg, 2)
+batch_prompts = prompts if opts.batch_live == 2 else {'slot-1': prompts['slot-1']}
 
 def make_env(name):
     env = child_env(cfg)
@@ -47,6 +54,10 @@ def make_env(name):
                     'STRATA_VERIFY_DUMP_GDN_PATH': str((out/f'{name}.stgdiag').resolve()),
                     'STRATA_VERIFY_DUMP_GDN_POSITIONS': positions,
                     'STRATA_VERIFY_DUMP_GDN_BATCH': '1'})
+    if opts.boundary_layer is not None:
+        env.update({'STRATA_VERIFY_DUMP_BOUNDARY_LAYER': str(opts.boundary_layer),
+                    'STRATA_VERIFY_DUMP_BOUNDARY_PATH': str((out/f'{name}.stbndy').resolve()),
+                    'STRATA_VERIFY_DUMP_BOUNDARY_POSITION': positions})
     if opts.trace_state_hashes:
         env.update({'STRATA_ACCEPTED_PREFIX_TRACE': '1', 'STRATA_STATE_HASH_GDN': '1',
                     'STRATA_STATE_HASH_QSA_LAYERS': '1'})
@@ -67,18 +78,19 @@ batch = StrataEngine(cfg['exe'], args+['--batch', '2'], cwd=cfg.get('cwd'),
 try:
     if batch.batch != 2:
         raise RuntimeError(f'expected two batch slots, got {batch.batch}')
-    with ThreadPoolExecutor(max_workers=2) as pool:
-        jobs = {key: pool.submit(generate, batch, key) for key in prompts}
+    with ThreadPoolExecutor(max_workers=opts.batch_live) as pool:
+        jobs = {key: pool.submit(generate, batch, key) for key in batch_prompts}
         batch_out = {key: job.result() for key, job in jobs.items()}
 finally:
     batch.close()
 
 result = {'capture_positions': [int(x) for x in positions.split(',')], 'target_slot': 1,
           'serial_slot_1': serial_out, 'batch': batch_out, 'prompts': prompts,
-          'profile': {'live_requests': 2, 'batch_slots': 2, 'mtp': False,
+          'profile': {'live_requests': opts.batch_live, 'batch_slots': 2, 'mtp': False,
                       'expert_cache_mib': opts.expert_cache_mib,
                       'gdn_layer': opts.layer,
                       'stage_layer': opts.stage_layer,
+                      'boundary_layer': opts.boundary_layer,
                       'trace_state_hashes': opts.trace_state_hashes,
                       'STRATA_NATIVE_CPU_Q8_1_DOT': 'all', 'STRATA_IQ_MT_MIN': '1'}}
 (out/'result.json').write_text(json.dumps(result, indent=2)+'\n')

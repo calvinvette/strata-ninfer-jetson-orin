@@ -266,3 +266,25 @@ derived per-position analyses are in
 `supervisor-layer24-onset-104-108-cache3000-retry/`. The varying onset and
 stage indicate this capture is sensitive to run state or scheduling; neither
 run identifies the initiating operation.
+
+### Layer-23 boundary capture attempt
+
+The existing `STBNDY2` hook was enabled at layer 23 / position 105 to compare
+the QSA output boundary with layer 24's input. In the two-live run, it wrote a
+serial record (token 7620) but no batch record: both live rows were grouped in
+two-token batch windows, while this diagnostic currently records one-row
+windows only. The run still showed the target's sequence divergence, but the
+layer-23 tensor comparison is unsupported in this cell. Minimum available
+physical/admission memory was 14.04 GiB; the run took 134.2 seconds.
+
+A follow-up submitted only the target request to a two-slot batch server.
+Serial and server outputs matched all 96 tokens, and the two boundary files
+were byte-identical (SHA256
+`435b7d5a9bd6ace5ccebfd628d71d5771fc5cbb8df6291bd69f6bb14b0685c84`). Both
+records carried `slot=-1`, showing that the single-live request used the
+ordinary serial verifier path; this is not batch-path parity evidence. Minimum
+available memory was 14.34 GiB and elapsed time was 95.2 seconds. Both raw
+captures remain local under `boundary-layer23-position105-cache3000/` and
+`boundary-layer23-position105-cache3000-single-live/`, with supervisor
+telemetry in their matching `supervisor-*` directories. The boundary hook
+needs a one-row batch window to answer the two-live localization question.
