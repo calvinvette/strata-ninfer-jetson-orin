@@ -22,7 +22,8 @@ host availability was 17.47 GiB and minimum effective admission was 11.45 GiB.
 Cgroup low/high/max/OOM/OOM-kill counters were zero. GPU clock observations
 ranged from 306 MHz to 1,300.5 MHz and CPU observations from 729.6 MHz to
 2,201.6 MHz. `tj` ranged from 48.16 to 56.63 °C; EMC readback was unsupported.
-Clocks were dynamic, and energy was not analyzed.
+Clocks were dynamic. A later retrospective named-rail integration is recorded
+in the [energy follow-up](rail-followup/README.md).
 
 | Exact expert slots | Prefill chunk | Median request time | Median prompt rate | Median decode rate |
 | ---: | ---: | ---: | ---: | ---: |
@@ -40,8 +41,9 @@ of −1.22% (−1.83% to +2.07%). At chunk 128 the median effect was −1.73%
 blocks. The cache-by-prefill interaction estimate was −1.18 percentage points
 (−4.70 to +0.04 points), so this confirmation does not establish a cache ×
 prefill interaction. Results concern this held-out retrieval prompt and tested
-Q2_0 profile. They do not establish broad quality, energy, or a general cache
-capacity benefit, and no default or profile changed.
+Q2_0 profile. They do not establish broad quality, process-attributed or
+whole-device energy, or a general cache capacity benefit, and no default or
+profile changed.
 
 The complete per-request data, paired block effects, validation and bootstrap
 intervals are retained in `analysis.json`. Memory and tegrastats telemetry are

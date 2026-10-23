@@ -4717,3 +4717,15 @@ accepted-window, GDN recurrent parity, GDN parity,
 graph registry lifecycle and captured-graph trace. The supervised run retained
 23.73 GiB minimum host availability and recorded zero cgroup events. Raw
 supervisor telemetry remains outside Git.
+
+A retrospective [Q2_0 named-rail energy analysis](../../bench/results/2026-10-18-phase6-q2-cache-prefill-heldout-confirm7/rail-followup/README.md)
+integrated all 28 retained request windows from the seven-block held-out
+cache × prefill confirmation; every window had bracketing telemetry and all
+cells passed. At fixed cache 3,000/3,500 slots, prefill 128 reduced median
+`VIN_SYS_5V0` energy per total token 59.43%/59.41% versus chunk 32, with
+paired block-bootstrap intervals excluding zero. The cache × prefill
+ratio-of-ratios was −1.79% (95% interval −6.99% to +0.68%), so the interaction
+remains unresolved. `VDD_GPU_SOC` and `VDD_CPU_CV` are reported separately.
+These rails include board idle/background activity and are not process or
+whole-device energy. This adds a workload-specific Pareto measure; Phase 6
+remains open for broader energy and response-model coverage.
