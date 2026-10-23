@@ -4711,3 +4711,9 @@ retained 13.37 GiB minimum physical/admission availability with zero cgroup
 events. Focused harness tests passed 12/12. This strengthens one rejection
 and recovery case but does not bound longer chains, other rejection points,
 cancellation or multi-live behavior; Phase 5 remains open.
+
+The current-build transaction and graph CTest selection passed all five tests:
+accepted-window, GDN recurrent parity, GDN parity,
+graph registry lifecycle and captured-graph trace. The supervised run retained
+23.73 GiB minimum host availability and recorded zero cgroup events. Raw
+supervisor telemetry remains outside Git.

@@ -53,5 +53,9 @@ systemd-run --user --scope --collect -p MemoryMax=28G -p IOAccounting=yes \
 
 The harness now captures request counters at every stage, compares the third
 request's state and output, and can require an observed rejected draft. Its
-focused tests passed 12/12; full integration discovery is recorded with the
-commit. Phase 5 remains open for broader adaptive and multi-live qualification.
+focused tests passed 12/12 and the full Python integration suite passed
+166/166. Five current-build CUDA CTests also passed: accepted-window, GDN
+recurrent parity, GDN parity, graph registry lifecycle, and captured-graph
+trace. The CTest supervisor retained 23.73 GiB minimum host availability and
+recorded zero cgroup memory events. Phase 5 remains open for broader adaptive
+and multi-live qualification.

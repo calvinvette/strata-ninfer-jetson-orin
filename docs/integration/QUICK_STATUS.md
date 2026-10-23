@@ -72,6 +72,10 @@ prefix boundaries matched across the three requests for one 512-token Coder
 prompt. This is narrow transaction evidence; long-chain adaptive drift and
 multi-live state/output parity remain open. [Report](../../bench/results/2026-10-23-phase5-coder-mtp-rejection-recovery/README.md).
 
+The matching current-build accepted-window, GDN recurrent/parity and captured
+graph CTests passed 5/5 under the 28 GiB supervisor, with 23.73 GiB minimum
+host availability and no cgroup memory events.
+
 The [batch-MTP graph lifecycle diagnostic](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md)
 admitted eight slots and captured 16 layouts under the default 64-layout cap,
 so that initial run did not exercise eviction. A separate opt-in cap-1 test
