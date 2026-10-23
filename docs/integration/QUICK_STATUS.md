@@ -269,3 +269,9 @@ still switches expert 164 from VRAM to CPU with a same-input, oracle-confirmed
 owner arithmetic difference. This narrows the correctness investigation only;
 it is not performance evidence or a supported profile. The trace joiner now
 rejects owner/verifier route mismatches. [Details](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
+
+A new opt-in IQ3_S/Q2_0 CPU Q8_1 path matches CUDA bit-for-bit for two captured
+layer-21 activations, but adaptive recovery still differs on 254/256 tokens in
+the paired long-chain test. Router weights and committed state already differ
+before the targeted expert output can explain the drift. Phase 5 remains open;
+[details](../../bench/results/2026-10-22-phase5-coder-iq3s-q2_0-layer21-parity-intervention/README.md).

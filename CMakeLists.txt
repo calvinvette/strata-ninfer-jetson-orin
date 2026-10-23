@@ -1506,7 +1506,7 @@ if(STRATA_NATIVE_EXPERTS)
       # down Q4_0 on 42 layers and Q4_1 on 6)
       # q6_K/q8_0: Unsloth UD-Q6_K_XL gate/up Q6_K with Q8_0 down (docs/UNSLOTH_Q6.md). Layer 2 is q8_0/q8_0, already listed.
       set(_strata_parity_pairs q4_K/q5_1 q4_K/q8_0 q5_K/q8_0 q8_0/q8_0 q4_K/q5_0 q5_0/q8_0 q4_0/q4_0 q4_0/q4_1
-                              iq3_xxs/iq4_nl iq2_s/q2_0 iq2_s/iq4_nl iq3_s/iq4_nl iq4_xs/q2_0)
+                              iq3_xxs/iq4_nl iq2_s/q2_0 iq2_s/iq4_nl iq3_s/q2_0 iq3_s/iq4_nl iq4_xs/q2_0)
       if(STRATA_Q6K_EXPERTS)
         list(APPEND _strata_parity_pairs q6_K/q8_0)
       else()   # a pair without GPU kernels (Q6_K gate/up) is refused by native_expert_supported, not run
@@ -1552,6 +1552,14 @@ if(STRATA_NATIVE_EXPERTS)
                COMMAND ${CMAKE_COMMAND} -E env STRATA_NATIVE_CPU_Q8_1_DOT=iq3_xxs/q2_0
                        $<TARGET_FILE:native_expert_parity> --synthetic-windows iq3_xxs/q2_0)
       set_tests_properties(native_expert_parity_iq3_xxs_q2_0_cpu_q8_1_windows PROPERTIES TIMEOUT 300)
+      add_test(NAME native_expert_parity_iq3_s_q2_0_cpu_q8_1_dot
+               COMMAND ${CMAKE_COMMAND} -E env STRATA_NATIVE_CPU_Q8_1_DOT=iq3_s/q2_0
+                       $<TARGET_FILE:native_expert_parity> --synthetic iq3_s/q2_0)
+      set_tests_properties(native_expert_parity_iq3_s_q2_0_cpu_q8_1_dot PROPERTIES TIMEOUT 120)
+      add_test(NAME native_expert_parity_iq3_s_q2_0_cpu_q8_1_windows
+               COMMAND ${CMAKE_COMMAND} -E env STRATA_NATIVE_CPU_Q8_1_DOT=iq3_s/q2_0
+                       $<TARGET_FILE:native_expert_parity> --synthetic-windows iq3_s/q2_0)
+      set_tests_properties(native_expert_parity_iq3_s_q2_0_cpu_q8_1_windows PROPERTIES TIMEOUT 300)
       add_test(NAME native_expert_parity_iq3_s_iq4_nl_cpu_q8_1_dot
                COMMAND ${CMAKE_COMMAND} -E env STRATA_NATIVE_CPU_Q8_1_DOT=iq3_s/iq4_nl
                        $<TARGET_FILE:native_expert_parity> --synthetic iq3_s/iq4_nl)

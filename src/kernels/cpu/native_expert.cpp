@@ -37,7 +37,8 @@ bool q8_1_selector_known_one(const char* selector) {
     if (std::strcmp(selector, "0") == 0 || std::strcmp(selector, "1") == 0 ||
         std::strcmp(selector, "all") == 0 || std::strcmp(selector, "iq2_s/q2_0") == 0 ||
         std::strcmp(selector, "iq2_s/iq4_nl") == 0 || std::strcmp(selector, "iq3_xxs/q2_0") == 0 ||
-        std::strcmp(selector, "iq3_xxs/iq4_nl") == 0 || std::strcmp(selector, "iq3_s/iq4_nl") == 0)
+        std::strcmp(selector, "iq3_xxs/iq4_nl") == 0 || std::strcmp(selector, "iq3_s/q2_0") == 0 ||
+        std::strcmp(selector, "iq3_s/iq4_nl") == 0)
         return true;
     const char* at = std::strstr(selector, "@layer=");
     if (at == nullptr || at == selector) return false;
@@ -50,7 +51,7 @@ bool q8_1_selector_known_one(const char* selector) {
     if (errno == ERANGE || end == n || *end != '\0' || layer > INT_MAX) return false;
     const std::string pair(selector, (size_t) (at - selector));
     return pair == "iq2_s/q2_0" || pair == "iq2_s/iq4_nl" || pair == "iq3_xxs/q2_0" ||
-           pair == "iq3_xxs/iq4_nl" || pair == "iq3_s/iq4_nl";
+           pair == "iq3_xxs/iq4_nl" || pair == "iq3_s/q2_0" || pair == "iq3_s/iq4_nl";
 }
 
 bool q8_1_selector_known(const char* selector) {
@@ -90,14 +91,16 @@ bool q8_1_selector_matches_one(const char* selector, int gu_type, int d_type, in
     const bool iq2_s_iq4_nl = gu_type == GGML_TYPE_IQ2_S && d_type == GGML_TYPE_IQ4_NL;
     const bool iq3_xxs_q2_0 = gu_type == GGML_TYPE_IQ3_XXS && d_type == GGML_TYPE_Q2_0;
     const bool iq3_xxs_iq4_nl = gu_type == GGML_TYPE_IQ3_XXS && d_type == GGML_TYPE_IQ4_NL;
+    const bool iq3_s_q2_0 = gu_type == GGML_TYPE_IQ3_S && d_type == GGML_TYPE_Q2_0;
     const bool iq3_s_iq4_nl = gu_type == GGML_TYPE_IQ3_S && d_type == GGML_TYPE_IQ4_NL;
     const std::string pair = at == nullptr ? selector : std::string(selector, (size_t) (at - selector));
     if (pair == "1" || pair == "all")
-        return iq2_s_q2_0 || iq2_s_iq4_nl || iq3_xxs_q2_0 || iq3_xxs_iq4_nl || iq3_s_iq4_nl;
+        return iq2_s_q2_0 || iq2_s_iq4_nl || iq3_xxs_q2_0 || iq3_xxs_iq4_nl || iq3_s_q2_0 || iq3_s_iq4_nl;
     if (pair == "iq2_s/q2_0") return iq2_s_q2_0;
     if (pair == "iq2_s/iq4_nl") return iq2_s_iq4_nl;
     if (pair == "iq3_xxs/q2_0") return iq3_xxs_q2_0;
     if (pair == "iq3_xxs/iq4_nl") return iq3_xxs_iq4_nl;
+    if (pair == "iq3_s/q2_0") return iq3_s_q2_0;
     if (pair == "iq3_s/iq4_nl") return iq3_s_iq4_nl;
     return false;
 }
@@ -382,7 +385,8 @@ bool q8_1_scalar_dot(const NativeFmt& f) {
                             (f.d_type == GGML_TYPE_Q2_0 || f.d_type == GGML_TYPE_IQ4_NL);
     const bool iq3_xxs_pair = f.gu_type == GGML_TYPE_IQ3_XXS &&
                               (f.d_type == GGML_TYPE_Q2_0 || f.d_type == GGML_TYPE_IQ4_NL);
-    const bool iq3_s_pair = f.gu_type == GGML_TYPE_IQ3_S && f.d_type == GGML_TYPE_IQ4_NL;
+    const bool iq3_s_pair = f.gu_type == GGML_TYPE_IQ3_S &&
+                            (f.d_type == GGML_TYPE_Q2_0 || f.d_type == GGML_TYPE_IQ4_NL);
     return (iq2_s_pair || iq3_xxs_pair || iq3_s_pair) &&
            f.gu_act == GGML_TYPE_Q8_1 && f.d_act == GGML_TYPE_Q8_1;
 }

@@ -1044,6 +1044,7 @@ int check_q8_1_selector_contract() {
         {GGML_TYPE_IQ2_S, GGML_TYPE_IQ4_NL, "iq2_s/iq4_nl"},
         {GGML_TYPE_IQ3_XXS, GGML_TYPE_Q2_0, "iq3_xxs/q2_0"},
         {GGML_TYPE_IQ3_XXS, GGML_TYPE_IQ4_NL, "iq3_xxs/iq4_nl"},
+        {GGML_TYPE_IQ3_S, GGML_TYPE_Q2_0, "iq3_s/q2_0"},
         {GGML_TYPE_IQ3_S, GGML_TYPE_IQ4_NL, "iq3_s/iq4_nl"},
     };
     auto set_selector = [](const char* value) {
@@ -1072,7 +1073,7 @@ int check_q8_1_selector_contract() {
         }
     }
     const char* selectors[] = {"1", "all", "iq2_s/q2_0", "iq2_s/iq4_nl", "iq3_xxs/q2_0",
-                               "iq3_xxs/iq4_nl", "iq3_s/iq4_nl"};
+                               "iq3_xxs/iq4_nl", "iq3_s/q2_0", "iq3_s/iq4_nl"};
     for (const char* selector : selectors) {
         set_selector(selector);
         for (size_t i = 0; i < std::size(pairs); ++i) {
@@ -1347,9 +1348,9 @@ int main(int argc, char** argv) {
                              "       native_expert_parity --q8_1-selector-contract\n"
                              "       STRATA_NATIVE_CPU_Q8_1_DOT=1|all|GU/DOWN[,...] selects expert-pair routes\n"
                              "       native_expert_parity --synthetic GU/DOWN ...   (ggml type names, e.g. q4_K/q5_1)\n"
-                             "       native_expert_parity --synthetic-windows iq2_s/q2_0|iq2_s/iq4_nl|iq3_xxs/q2_0|iq3_xxs/iq4_nl  (Q8_1, widths 1..8)\n"
+                             "       native_expert_parity --synthetic-windows GU/DOWN  (Q8_1, widths 1..8)\n"
                              "       <shard.gguf> --expert E --activation-f32 FILE --windows-1-through-8\n"
-                             "           (real supported IQ2_S/IQ3_XXS expert weights and captured activation, Q8_1)\n"
+                             "           (real supported expert weights and captured activation, Q8_1)\n"
                              "       <shard.gguf> --expert E --activation-f32 MATRIX --activation-rows N --token-width N\n"
                              "           (run distinct captured rows together, N=1..8)\n"
                              "       native_expert_parity --q5_1-min\n"
@@ -1419,7 +1420,7 @@ int main(int argc, char** argv) {
                 if ((gu != GGML_TYPE_IQ2_S && gu != GGML_TYPE_IQ3_XXS && gu != GGML_TYPE_IQ3_S) ||
                     (dn != GGML_TYPE_Q2_0 && dn != GGML_TYPE_IQ4_NL) ||
                     f.gu_act != GGML_TYPE_Q8_1 || f.d_act != GGML_TYPE_Q8_1) {
-                    std::fprintf(stderr, "--synthetic-windows supports iq2_s/q2_0, iq2_s/iq4_nl, iq3_xxs/q2_0, iq3_xxs/iq4_nl or iq3_s/iq4_nl with Q8_1 activations\n");
+                    std::fprintf(stderr, "--synthetic-windows supports IQ2_S/IQ3_XXS/IQ3_S with Q2_0 or IQ4_NL down weights and Q8_1 activations\n");
                     return 2;
                 }
                 failures += check_blob<1>(f, blob, i, "synthetic nt=1", s);

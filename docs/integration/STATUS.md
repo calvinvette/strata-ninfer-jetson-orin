@@ -4396,3 +4396,15 @@ A same-profile [two-live layer-4 capture at positions 68 and 71](../../bench/res
 A same-service current-source [layer-27 owner-transition capture](../../bench/results/2026-10-22-phase5-coder-adaptive-all-layer-position-trace/adaptive-layer27-current-source-generated-position515/README.md) exercised expert 129 changing CPU→CUDA on the third identical request at generated position 515 (`Q8_1_DOT=all`). The verifier activation, route, expert part, shared/combined MoE outputs and generated IDs were exact across repetitions; all 36 committed GDN states were byte-identical across both arms. Minimum physical/admission availability was 13.78 GiB. This narrowly does not reproduce the historical expert-175 report, and does not establish general owner parity or close Phase 5.
 
 A same-profile [expert-248 owner-pair follow-up](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/layer4-expert248-q8-all-owner-pair/README.md) isolates one exact-input layer-4 row at position 68. In the default-selector two-live capture, prompt 1's rank-4 expert 248 changes CPU→CUDA; its input activation, route IDs and router weights match serial. Expert 248 is the only changed part, the shared output is exact, and the combined output differs at relative L2 `0.0028174`. With the independent oracle on that same activation, CPU/GPU outputs differed at relative L2 `0.0113`; `STRATA_NATIVE_CPU_Q8_1_DOT=all` made the isolated outputs bitwise equal. In a separate Q8_1-all two-live capture, prompt 0 has an exact-input rank-1 CPU→CUDA transition for expert 248 and all parts plus combined output are exact. Prompt 1 committed state is bitwise exact at positions 68 and 71; prompt 0 first differs only at layer 30 / position 71, with relative L2 `5.84e-9` and maximum absolute delta `1.27e-7`. Selector cells have different route histories, so they are not a controlled whole-model comparison. One six-token sequence per cell is correctness localization, not performance or quality evidence; Phase 5 remains open.
+
+An opt-in layer-21 IQ3_S/Q2_0 CPU Q8_1 selector now matches CUDA expert output
+bit-for-bit on both the captured initial and intermediate real activations.
+However, a paired 256-token adaptive-cap8 versus delayed-control chain still
+changed recovery on 254/256 tokens and changed accepted persistent-state
+fingerprints. The first two adaptive requests had the same token and top-10
+expert IDs at layer 21/position 515, but their 2,560-value layer input vectors
+already differed (relative L2 0.02186), as did router weights and committed
+layer-22 state. The selected expert arithmetic mismatch is not sufficient to
+explain the recovery drift; the first upstream source remains unknown. This is a
+narrow, opt-in correctness diagnostic with no performance conclusion; Phase 5
+remains open. See the [intervention report](../../bench/results/2026-10-22-phase5-coder-iq3s-q2_0-layer21-parity-intervention/README.md).

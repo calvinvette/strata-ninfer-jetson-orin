@@ -35,7 +35,7 @@ struct NativeFmt {
 bool native_experts_available() noexcept;
 /// Fills `f` for a layer; false (with a reason) when ggml-cpu has no dot product for a type. The opt-in
 /// STRATA_NATIVE_CPU_Q8_1_DOT diagnostic selects CUDA-matching Q8_1 routes for IQ2_S/Q2_0,
-/// IQ2_S/IQ4_NL, IQ3_XXS/Q2_0, IQ3_XXS/IQ4_NL and IQ3_S/IQ4_NL expert pairs (`1` enables all supported pairs; a
+/// IQ2_S/IQ4_NL, IQ3_XXS/Q2_0, IQ3_XXS/IQ4_NL, IQ3_S/Q2_0 and IQ3_S/IQ4_NL expert pairs (`1` enables all supported pairs; a
 /// pair name selects one). A pair may be suffixed with `@layer=N` to scope it to one zero-based model layer. It is not
 /// a default dispatch policy.
 bool native_fmt(int gu_type, int d_type, int64_t n_embd, int64_t n_ff, NativeFmt& f, std::string& err, int layer = -1);
