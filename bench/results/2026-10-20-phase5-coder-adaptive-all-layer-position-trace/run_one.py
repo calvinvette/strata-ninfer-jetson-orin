@@ -35,8 +35,8 @@ def main():
                         help="override the configured verifier window for a prompt-tail localization ablation")
     parser.add_argument("--capture-moe-positions", default="511",
                         help="comma-separated increasing absolute positions for the all-layer expert trace")
-    parser.add_argument("--capture-moe-rows", type=int, default=96,
-                        help="maximum selected all-layer expert rows to retain (1-4096)")
+    parser.add_argument("--capture-moe-rows", type=int, default=192,
+                        help="maximum selected all-layer expert rows to retain (1-4096; default covers four requests)")
     parser.add_argument("--continuations", type=int, default=0,
                         help="extra identical short requests after short/long/short")
     parser.add_argument("--sequence", choices=("short-long-short", "short-short-short"),

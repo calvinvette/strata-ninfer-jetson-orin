@@ -2,6 +2,7 @@
 """Compare same-position expert dispatch inputs and owners across migration arms."""
 import json
 import argparse
+import math
 import re
 from pathlib import Path
 
@@ -47,6 +48,10 @@ def accepted_prefix_gdn_hashes(path, api_requests):
         if "STATE_HASH_GDN " in line:
             pending = [value.lower() for value in line.split("STATE_HASH_GDN ", 1)[1].split()]
             continue
+        if "STATE_HASH_QSA_LAYERS " in line:
+            # The service emits both subsystem fingerprints for the same
+            # accepted position before the ACCEPTED_PREFIX record.
+            continue
         if "ACCEPTED_PREFIX position=" not in line:
             if pending is not None:
                 pending = None
@@ -86,15 +91,41 @@ def compare_gdn_prefixes(before, after):
             "first_different_gdn_ordinals": ordinals}
 
 
+def cpu_activation_valid(row):
+    # GPU-only rows need not populate the host buffer used by this capture.
+    # Infer this for legacy traces that predate the explicit validity field.
+    return row.get("activation_valid", any(owner < 0 for owner in row["route_kind"]))
+
+
+def activation_delta(before, after):
+    if before == after:
+        return {"different_values": 0, "relative_l2": 0.0, "max_abs": 0.0}
+    if len(before) != len(after):
+        raise ValueError("captured activation lengths differ")
+    delta = [a - b for a, b in zip(before, after)]
+    before_norm = math.sqrt(sum(value * value for value in before))
+    return {"different_values": sum(a != b for a, b in zip(before, after)),
+            "relative_l2": math.sqrt(sum(value * value for value in delta)) / before_norm if before_norm else None,
+            "max_abs": max((abs(value) for value in delta), default=0.0)}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run", type=Path, default=RUN)
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--capture-position", type=int,
+                        help="captured verifier position (defaults to the campaign's first position)")
     args = parser.parse_args()
     run = args.run
     campaign = json.loads((run / "campaign.json").read_text())
     if campaign.get("status") != "pass":
         raise ValueError("two-arm campaign did not pass")
+    capture_positions = campaign.get("capture_moe_positions", [511])
+    capture_position = args.capture_position
+    if capture_position is None:
+        capture_position = capture_positions[0]
+    if capture_position not in capture_positions:
+        raise ValueError(f"position {capture_position} was not captured by this campaign")
     inventory = {}
     with Path.home().joinpath("models/strata-orin-validation/pack/native_experts.txt").open() as f:
         for line in f:
@@ -110,28 +141,55 @@ def main():
     arms = {}
     prefix_records = {}
     gdn_prefix_records = {}
+    capture_row_counts = {}
     for arm in ARM_NAMES:
-        path = run / arm / "result/all-layer-position511.jsonl"
+        result_dir = run / arm / "result"
+        path = result_dir / ("all-layer-position511.jsonl" if capture_positions == [511]
+                             else "all-layer-selected-positions.jsonl")
         records = [json.loads(line) for line in path.read_text().splitlines()]
         if not records or records[0].get("format") != "strata-moe-dispatch-v3":
             raise ValueError(f"{arm}: missing current v3 dispatch trace")
-        rows = records[1:]
-        if len(rows) != 96:
-            raise ValueError(f"{arm}: expected 96 initial/recovery rows, found {len(rows)}")
-        initial, recovery = rows[:48], rows[48:]
-        for label, group in (("initial", initial), ("recovery", recovery)):
-            if [row["layer"] for row in group] != list(range(48)) or any(row["position"] != 511 for row in group):
-                raise ValueError(f"{arm}/{label}: did not capture position 511 at each layer in order")
+        api_requests = json.loads((result_dir / "requests.json").read_text())["requests"]
+        if len(api_requests) < 2:
+            raise ValueError(f"{arm}: need at least two requests to compare a recovery transition")
+        rows = [row for row in records[1:] if row["position"] == capture_position]
+        capture_row_counts[arm] = len(rows)
+        eligible = [request for request in api_requests
+                    if capture_position < request["prompt_tokens"] + len(request["ids"])]
+        expected_rows = 48 * len(eligible)
+        if len(rows) != expected_rows:
+            raise ValueError(f"{arm}: position {capture_position} has {len(rows)} captured rows; expected "
+                             f"{expected_rows} for requests reaching this position. A capture limit or "
+                             "prompt-cache reuse may have omitted a request, so initial/recovery cannot "
+                             "be paired safely.")
+        row_groups = [rows[offset:offset + 48] for offset in range(0, len(rows), 48)]
+        if any([row["layer"] for row in group] != list(range(48)) for group in row_groups):
+            raise ValueError(f"{arm}: position {capture_position} did not capture 48 ordered layer rows per request")
+        captured_names = [request["name"] for request in eligible]
+        initial_name = api_requests[0]["name"]
+        recovery_requests = [request for request in api_requests if request["name"] == "short-512-recovery"]
+        if len(recovery_requests) != 1:
+            raise ValueError(f"{arm}: expected one named short-512-recovery request")
+        recovery_name = recovery_requests[0]["name"]
+        if initial_name not in captured_names or recovery_name not in captured_names:
+            raise ValueError(f"{arm}: position {capture_position} was not captured for both initial "
+                             f"({initial_name}) and recovery ({recovery_name}) requests")
+        initial = row_groups[captured_names.index(initial_name)]
+        recovery = row_groups[captured_names.index(recovery_name)]
         by_layer = []
         for before, after in zip(initial, recovery):
             flips = [{"expert": expert, "initial_owner": owner_a, "recovery_owner": owner_b}
                      for expert, owner_a, owner_b in zip(before["ids"], before["route_kind"], after["route_kind"])
                      if owner_a != owner_b]
+            activation_valid = cpu_activation_valid(before) and cpu_activation_valid(after)
             by_layer.append({"layer": before["layer"], **inventory[before["layer"]],
-                             "activation_equal": before["activation"] == after["activation"],
+                             "activation_valid_for_both": activation_valid,
+                             "activation_equal": before["activation"] == after["activation"] if activation_valid else None,
+                             "activation_delta": activation_delta(before["activation"], after["activation"]) if activation_valid else None,
                              "expert_ids_equal": before["ids"] == after["ids"],
                              "owner_flips": flips})
-        differing_activations = [row["layer"] for row in by_layer if not row["activation_equal"]]
+        differing_activations = [row["layer"] for row in by_layer if row["activation_equal"] is False]
+        unknown_activations = [row["layer"] for row in by_layer if not row["activation_valid_for_both"]]
         arm_analysis = json.loads((run / arm / "result/analysis.json").read_text())
         api_requests = json.loads((run / arm / "result/requests.json").read_text())["requests"]
         prefix_records[arm] = accepted_prefixes(run / arm / "result/service.log", api_requests)
@@ -150,8 +208,11 @@ def main():
                      },
                      "within_service_short_recovery_gdn_state": recovery_gdn_comparison,
                      "within_service": {
+                         "compared_requests": [initial_name, recovery_name],
+                         "captured_requests_at_position": captured_names,
                          "first_activation_difference_layer": min(differing_activations) if differing_activations else None,
                          "activation_difference_layers": differing_activations,
+                         "activation_unknown_layers": unknown_activations,
                          "owner_flip_layers": [row["layer"] for row in by_layer if row["owner_flips"]],
                          "layer_rows": by_layer,
                      }}
@@ -164,8 +225,8 @@ def main():
         "scope": "one randomized IQ1_M Coder current-source delayed/adaptive correctness pair",
         "model_repository": campaign["model_repository"], "model_revision": campaign["model_revision"],
         "quantization": campaign["quantization"], "binary_sha256": campaign["binary_sha256"],
-        "repository_head": campaign["repository_head"], "captured_position": 511,
-        "capture_rows_per_arm": 96, "capture_layers": 48,
+        "repository_head": campaign["repository_head"], "captured_position": capture_position,
+        "capture_rows_per_arm": capture_row_counts, "capture_layers": 48,
         "selector": "STRATA_NATIVE_CPU_Q8_1_DOT=all",
         "arms": arms,
         "cross_arm_accepted_prefix_state": {
