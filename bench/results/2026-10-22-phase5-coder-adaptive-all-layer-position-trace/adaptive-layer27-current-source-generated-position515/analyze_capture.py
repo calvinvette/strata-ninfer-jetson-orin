@@ -152,7 +152,12 @@ def main():
         expert_vectors = [row['parts'][rank * WIDTH * 4:(rank + 1) * WIDTH * 4] for row in parts]
         expert_hashes = [hashlib.sha256(row).hexdigest() for row in expert_vectors]
         owner_codes = [row['route_kind'][rank] for row in dispatch]
-        route_state[arm] = {'expert_hashes': expert_hashes, 'owner_codes': owner_codes}
+        route_state[arm] = {
+            'expert_hashes': expert_hashes, 'owner_codes': owner_codes,
+            'activation_hashes': input_summary['sha256'],
+            'route_ids': routes[0]['ids'], 'route_weights': routes[0]['weights'],
+            'token_ids': [row['token_id'] for row in routes],
+        }
         request_doc = json.loads((run / 'requests.json').read_text())['requests']
         ids = [row['ids'] for row in request_doc]
         if len(ids) != 3 or ids[0] != ids[1] or ids[1] != ids[2]:
@@ -172,6 +177,13 @@ def main():
         raise ValueError('adaptive arm did not exercise the expected CPU-to-CUDA owner transition')
     if route_state['delayed-control']['owner_codes'] != [-1, -1, -1]:
         raise ValueError('delayed control did not retain the expected CPU owner')
+    for key in ('activation_hashes', 'route_ids', 'route_weights', 'token_ids', 'expert_hashes'):
+        if route_state['adaptive-cap8'][key] != route_state['delayed-control'][key]:
+            raise ValueError(f'adaptive and delayed {key} differ')
+    for field in ('shared_output', 'combined_output'):
+        if result['arms']['adaptive-cap8'][field]['sha256'] != \
+                result['arms']['delayed-control'][field]['sha256']:
+            raise ValueError(f'adaptive and delayed {field} differ')
     for arm in result['arms'].values():
         if not arm['expert129_parts_bitwise_equal_across_requests'] or \
                 not arm['shared_output']['all_bitwise_equal'] or not arm['combined_output']['all_bitwise_equal'] or \
@@ -180,6 +192,11 @@ def main():
     if result['arms']['adaptive-cap8']['committed_state']['raw_sha256'] != \
             result['arms']['delayed-control']['committed_state']['raw_sha256']:
         raise ValueError('adaptive and delayed committed GDN state captures differ')
+    for arm in result['arms'].values():
+        arm['cross_arm_equal'] = {
+            'activation': True, 'route': True, 'expert129_part': True,
+            'shared_output': True, 'combined_output': True, 'committed_state': True,
+        }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(result, indent=2))
