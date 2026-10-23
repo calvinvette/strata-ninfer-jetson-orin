@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 
-def load_rows(path, positions):
+def load_rows(path, positions, pair_first_last=False):
     records = [json.loads(line) for line in path.read_text().splitlines()]
     if not records or records[0].get("format") != "strata-moe-dispatch-v3":
         raise ValueError(f"{path}: invalid v3 MoE dispatch capture")
@@ -20,16 +20,23 @@ def load_rows(path, positions):
     expected = {(position, layer) for position in positions for layer in range(48)}
     if set(grouped) != expected:
         raise ValueError(f"{path}: expected selected positions × 48 layers; missing/extra keys")
-    if any(len(grouped[key]) != 2 for key in expected):
-        counts = {str(key): len(grouped[key]) for key in expected if len(grouped[key]) != 2}
-        raise ValueError(f"{path}: expected initial/recovery rows for every layer: {counts}")
-    return grouped, records[0]
+    if any((len(grouped[key]) < 2 if pair_first_last else len(grouped[key]) != 2)
+           for key in expected):
+        counts = {str(key): len(grouped[key]) for key in expected
+                  if (len(grouped[key]) < 2 if pair_first_last else len(grouped[key]) != 2)}
+        requirement = "at least two endpoint rows" if pair_first_last else "exactly two rows"
+        raise ValueError(f"{path}: expected {requirement} for every layer: {counts}")
+    selected = {key: [value[0], value[-1]] if pair_first_last else value
+                for key, value in grouped.items()}
+    return selected, records[0], {str(key): len(grouped[key]) for key in expected}
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run", type=Path, required=True)
     parser.add_argument("--positions", type=int, nargs="+", required=True)
+    parser.add_argument("--pair-first-last", action="store_true",
+                        help="compare first and last records at each position/layer, retaining intermediate counts")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.positions != sorted(set(args.positions)) or any(value < 0 for value in args.positions):
@@ -37,10 +44,13 @@ def main():
     campaign = json.loads((args.run / "campaign.json").read_text())
     if campaign.get("status") != "pass" or campaign.get("capture_moe_positions") != args.positions:
         raise ValueError("campaign did not pass with exactly the requested per-layer positions")
+    capture_name = ("all-layer-position511.jsonl" if args.positions == [511]
+                    else "all-layer-selected-positions.jsonl")
     arms = {}
     for arm in ("delayed-control", "adaptive-cap8"):
-        grouped, header = load_rows(args.run / arm / "result/all-layer-selected-positions.jsonl",
-                                    set(args.positions))
+        grouped, header, row_counts = load_rows(
+            args.run / arm / "result" / capture_name,
+            set(args.positions), pair_first_last=args.pair_first_last)
         positions = {}
         for position in args.positions:
             by_layer = []
@@ -63,6 +73,9 @@ def main():
                 "first_activation_difference_layer": activation_diffs[0] if activation_diffs else None,
                 "activation_difference_layers": activation_diffs,
                 "owner_flip_layers": owner_diffs,
+                "observed_rows_per_layer": {
+                    str(layer): row_counts[str((position, layer))] for layer in range(48)
+                },
                 "layer_rows": by_layer,
             }
         arms[arm] = {"header": header, "positions": positions}
@@ -75,7 +88,9 @@ def main():
         "repository_head": campaign["repository_head"],
         "positions": args.positions,
         "arms": arms,
-        "limits": ["dispatch inputs, expert IDs and owners only; no expert-output or persistent-state causality claim"],
+        "limits": ["dispatch inputs, expert IDs and owners only; no expert-output or persistent-state causality claim"] +
+                  (["--pair-first-last compares the first and last rows at each selected position; intermediate rows are counted but not compared"]
+                   if args.pair_first_last else []),
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n")
