@@ -4485,3 +4485,13 @@ first-60-token prefix. The earlier position-83 layer-25 state delta was not
 reproduced in two combined state/stage captures. The CUDA `gdn_parity`,
 `verify_parity` and `verify_batch_parity` tests pass, but do not cover integrated
 model scheduling. Phase 5 remains open. [Evidence](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+
+
+A same-run seven-position sweep narrows the cache-3,000 MiB slot-1 state onset:
+layer-24 state and stage values match serial at positions 96, 100 and 104, then
+first differ at sampled position 108 (input token 13). The first changed stage
+is `h` (relative L2 `5.127e-4`) while `x`, QKV, gate, beta and z remain exact;
+committed recurrent and convolution state both differ. Output first changes at
+index 60. This bounds the sampled layer-24 history change to positions 105–108
+without identifying its cause. Duplicate token rows at position 100 were paired
+by verifier slot. [Raw and analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).

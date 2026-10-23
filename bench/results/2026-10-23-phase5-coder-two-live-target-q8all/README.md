@@ -228,3 +228,23 @@ The related targeted CUDA checks `gdn_parity`, `verify_parity` and
 `verify_batch_parity` pass (3/3). Those tests verify kernel/operator fixtures;
 they do not cover this full model's request scheduling and integrated batch
 commit sequence.
+
+An onset sweep sampled layer-24 committed state and stage fields at positions
+96, 100, 104, 108, 110, 111 and 112 in one fresh 3,000 MiB two-live run.
+The slot-1 stream first differs from serial at output index 60. Layer-24 state
+and all captured stage fields are exact at 96, 100 and 104. At position 108
+(input token 13), `h` is the first changed stage (relative L2 `5.127e-4`);
+`x`, QKV, gate, beta and z are exact. The committed state at that row differs
+in recurrent state (relative L2 `2.960e-4`) and convolution state
+(`1.129e-3`). Later deltas persist through position 111, then partially cancel
+at 112 while remaining nonzero. The first sampled difference is therefore
+between positions 104 and 108 in layer-24 history; this does not identify the
+operation or scheduling event that introduced it. All captures share the
+same run and target slot. Duplicate input tokens at position 100 required
+pairing the intermediate row by verifier slot as well as token and position;
+the analyzer now accepts `--batch-slot` for that case. The run took 146.8
+seconds and retained at least 13.88 GiB physical/admission availability, with
+zero sampled cgroup events. Large state dumps remain local; checksums, seven
+state analyses, seven stage analyses and raw stage captures are under
+`layer24-onset-sweep-cache3000/`; supervisor telemetry is under
+`supervisor-layer24-onset-sweep-cache3000/`.

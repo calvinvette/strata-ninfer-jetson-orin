@@ -350,3 +350,10 @@ the first changed stage. The state delta appears after sampled exact states at
 positions 83 and 96, ahead of slot 1's first changed output at index 60. The
 targeted CUDA parity tests pass but do not cover integrated scheduling. Phase 5
 remains open.
+
+
+A same-run onset sweep found layer-24 state/intermediates exact through position
+104, with the first sampled difference at position 108: `h` changes while
+`x`/QKV/gate/beta/z are exact; recurrent and convolution state then diverge.
+Slot 1's output first changes at index 60 (position 127). The cause remains
+unresolved.

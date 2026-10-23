@@ -11,6 +11,9 @@ parser=argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--run', type=Path, default=Path(__file__).resolve().parent/'layer10-position-133')
 parser.add_argument('--position', type=int, default=133)
 parser.add_argument('--layer', type=int, default=10)
+parser.add_argument('--output', type=Path, help='analysis JSON path; defaults to <run>/analysis.json')
+parser.add_argument('--batch-slot', type=int, default=-1,
+                    help='disambiguate repeated input tokens using the verifier slot; -1 requires a unique match')
 args=parser.parse_args()
 ROOT = args.run.resolve()
 HEADER = struct.Struct('<8sIiiqQQQQQ8q8i8i')
@@ -47,6 +50,8 @@ if len(serial)!=1:
 # The service request names do not define verifier row IDs. Pair the batch row by
 # the input token and absolute position, then report its actual diagnostic slot.
 batch=[x for x in all_rows if x['position']==args.position and x['slot']>=0 and x['token']==serial[0]['token']]
+if args.batch_slot >= 0:
+    batch=[x for x in batch if x['slot']==args.batch_slot]
 if len(batch)!=1:
     raise ValueError(f'expected one batch row for input token {serial[0]["token"]}, got {len(batch)}')
 comparison={}
@@ -65,7 +70,8 @@ result={'layer':args.layer,'position':args.position,'input_token':serial[0]['tok
         'fields':comparison,
         'limits':['Single layer/position diagnostic; does not capture the upstream layer-10 input chain.',
                   'No performance or general correctness claim.']}
-(ROOT/'analysis.json').write_text(json.dumps(result,indent=2)+'\n')
+output = args.output.resolve() if args.output else ROOT/'analysis.json'
+output.write_text(json.dumps(result,indent=2)+'\n')
 print(json.dumps({'layer':args.layer,'position':args.position,'input_token':result['input_token'],'batch_slot':result['batch_slot'],
                   'first_different_field':result['first_different_field'],
                   'fields':{k:{'different_values':v['different_values'],'max_abs':v['max_abs'],
