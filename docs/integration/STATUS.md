@@ -4456,3 +4456,10 @@ expert-233 operator became bit-exact under the larger cache, but full-sequence
 parity did not follow. Minimum physical/admission availability was 13.84 GiB;
 energy was not measured and EMC clock access was denied. Phase 5 remains open.
 [Run details](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+
+
+A second exact-input layer-9 position-83 capture repeated the 3,000 MiB cache
+intervention: expert 233 stayed on VRAM, routes and all ten expert parts were
+bit-identical between serial and batch, and the combined output remained exact.
+This reinforces only the selected operator cell; the full-length slot-1
+divergence persists. [Raw repeat](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).

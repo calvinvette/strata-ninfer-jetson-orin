@@ -330,3 +330,8 @@ The 3,000 MiB cache did not restore full two-live sequence parity: slot 0 matche
 96 tokens, while slot 1 diverged at token 60 (versus 66 in the 1,500 MiB cell).
 The targeted expert-233 output was exact with GPU residency, but that local fix
 did not carry through the full sequence. Phase 5 remains open.
+
+
+A repeated exact-input position-83 capture again found bit-identical expert
+parts and combined MoE output at a 3,000 MiB cache, with expert 233 resident on
+VRAM in both paths. The 96-token two-live mismatch persists.

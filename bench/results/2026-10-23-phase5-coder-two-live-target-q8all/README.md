@@ -173,3 +173,13 @@ python3 tools/integration/run_control.py \
 ```
 
 Phase 5 remains open.
+
+The position-83 3,000 MiB cache capture was repeated with the same activation
+hash (`0475d4464b64ecea6ac2acc7524ce05e8852333500dbd746ffbadec6f6570181`).
+Routes, owner classes, all ten expert parts and the combined MoE output again
+matched bit-for-bit; expert 233 remained on primary VRAM in both arms. Minimum
+physical/admission availability was 13.83 GiB, with zero sampled cgroup events;
+the run took 104.5 seconds. This repeats the local operator-level intervention
+only and does not contradict the full-96-token slot-1 mismatch. Raw data and
+supervisor samples are under `layer9-cache3000-position-83-repeat/` and
+`supervisor-layer9-cache3000-position-83-repeat/`.
