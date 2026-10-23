@@ -4408,3 +4408,13 @@ layer-22 state. The selected expert arithmetic mismatch is not sufficient to
 explain the recovery drift; the first upstream source remains unknown. This is a
 narrow, opt-in correctness diagnostic with no performance conclusion; Phase 5
 remains open. See the [intervention report](../../bench/results/2026-10-22-phase5-coder-iq3s-q2_0-layer21-parity-intervention/README.md).
+
+A separate two-live target-only diagnostic with `STRATA_NATIVE_CPU_Q8_1_DOT=all`
+and a temporary expert-11-first residency profile matched both six-token serial
+outputs. At position 68, expert 248 changed primary-VRAM→CPU ownership on an
+identical activation and route, yet all expert parts and combined output were
+bit-identical. Both prompts also had exact MoE outputs at position 71. One slot's
+committed GDN state first differed at model layer 30 there, at relative L2
+`5.84e-9` and max absolute `1.27e-7`; the other slot remained exact. This is a
+bounded owner-parity result, not a general long-chain or quality bound. Phase 5
+remains open. See the [Q8_1 owner report](../../bench/results/2026-10-22-phase5-coder-e11-first-q8all-two-live/README.md).

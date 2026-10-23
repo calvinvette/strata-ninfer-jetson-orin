@@ -275,3 +275,8 @@ layer-21 activations, but adaptive recovery still differs on 254/256 tokens in
 the paired long-chain test. Router weights and committed state already differ
 before the targeted expert output can explain the drift. Phase 5 remains open;
 [details](../../bench/results/2026-10-22-phase5-coder-iq3s-q2_0-layer21-parity-intervention/README.md).
+
+A separate two-live six-token check with opt-in Q8_1 parity matched both serial
+outputs, including an exact CPU↔GPU expert-248 owner transition. One later GDN
+state differed only at relative L2 `5.84e-9`; the other stayed exact. This
+narrows one case and does not close Phase 5. [Details](../../bench/results/2026-10-22-phase5-coder-e11-first-q8all-two-live/README.md).
