@@ -310,6 +310,17 @@ token 3008, but the top two reversed (2100 versus 5435). This locates the
 changed output at verifier logits while leaving its upstream cause open.
 An all-layer state capture found a tiny first recurrent-state delta at model
 layer 10 (relative L2 `1.09e-7`), which grows by layer 12; the arithmetic cause
-remains unknown. [Full capture report](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+at that later position was unresolved. [Full capture report](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
 Repeated layer-10 traces show the first changed intermediate is the recurrence
 output `y` at relative L2 `7.70e-8`; projected output returns to exact values.
+State is exact through position 82; at position 83, layer-9 MoE expert 233
+switches VRAM→CPU and its owner-specific output accounts for the first
+captured state delta. Same-selector CPU/GPU oracle outputs match their
+respective service parts exactly. Phase 5 remains open.
+
+
+A 3,000 MiB requested expert cache kept layer-9 expert 233 on VRAM for both
+serial and batch at the exact position-83 input. Its ten routed parts and MoE
+output matched bit-for-bit; the 1,500 MiB cell had a CPU owner transition and
+small delta. This is a narrow correctness intervention, not a full-sequence or
+performance result. Phase 5 remains open.

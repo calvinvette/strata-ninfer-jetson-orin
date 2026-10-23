@@ -16,6 +16,7 @@ p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--output', type=Path, required=True)
 p.add_argument('--position', type=int, default=133)
 p.add_argument('--layer', type=int, default=10)
+p.add_argument('--max-tokens', type=int, default=96)
 opts = p.parse_args()
 out = opts.output.resolve(); out.mkdir(parents=True, exist_ok=False)
 base = Path(__file__).resolve().parent
@@ -37,7 +38,7 @@ def env_for(name):
     return e
 
 def generate(engine, key):
-    tokens = [int(t) for t in engine.generate(prompts[key], 96, {'temperature': 0}, threading.Event()) if t is not None]
+    tokens = [int(t) for t in engine.generate(prompts[key], opts.max_tokens, {'temperature': 0}, threading.Event()) if t is not None]
     return {'tokens': tokens, 'finish': engine.last.get('finish')}
 
 serial = StrataEngine(cfg['exe'], args, cwd=cfg.get('cwd'), log=str(out/'serial-slot-1.log'), env=env_for('serial'))
@@ -54,11 +55,11 @@ try:
 finally:
     batch.close()
 
-result = {'capture_layer': opts.layer, 'position': opts.position, 'target_slot': 1,
+result = {'capture_layer': opts.layer, 'position': opts.position, 'max_tokens': opts.max_tokens, 'target_slot': 1,
           'profile': {'live_requests': 2, 'batch_slots': 2, 'mtp': False,
                       'STRATA_NATIVE_CPU_Q8_1_DOT': 'all', 'STRATA_IQ_MT_MIN': '1'},
           'prompts': prompts, 'serial_slot_1': serial_out, 'batch': batch_out}
 (out/'result.json').write_text(json.dumps(result, indent=2)+'\n')
-print(json.dumps({'layer': opts.layer, 'position': opts.position,
+print(json.dumps({'layer': opts.layer, 'position': opts.position, 'max_tokens': opts.max_tokens,
                   'serial_tokens': len(serial_out['tokens']),
                   'batch_tokens': {k:len(v['tokens']) for k,v in batch_out.items()}}))

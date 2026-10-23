@@ -68,6 +68,33 @@ difference from a relevant state-history difference entering the recurrence.
 It is a correctness localization only; no performance or general correctness
 claim follows.
 
+A sparse layer-10 state sweep found position 82 exact and the first recurrent
+state difference at position 83 (input token `11`); convolution state remained
+exact. At position 83, the layer-9 stage capture found its GDN fields and MoE
+input exact, with the first changed field at the final MoE output (`ffn_y`).
+Routes and weights match. Only expert 233's part differs when its owner changes
+from primary VRAM in serial to CPU in batch. Its same-input activation is
+bit-identical (SHA256
+`7ce8c948912b5f39471d5809fae4672f168e0cfc1b1e404be211f3ec600d77b3`). The
+expert part delta is relative L2 `1.1979e-4` (maximum absolute `8.94e-6`); the
+combined MoE output delta is relative L2 `1.3708e-5` (maximum absolute
+`5.87e-7`).
+
+With `STRATA_NATIVE_CPU_Q8_1_DOT=all` also set in the independent
+`native_expert_parity` oracle, the serial service part matched the GPU oracle
+bit-for-bit and the batch service part matched the CPU oracle bit-for-bit. The
+CPU/GPU outputs differ by relative L2 `1.1979e-4` for this activation. This
+attributes the first captured perturbation in this cell to the expert 233
+owner transition. It does not establish the effect across other activations or
+workloads. The initial oracle attempt omitted the selector setting and is
+retained under `layer9-moe-position-83/expert233-oracle/` as a mismatched
+diagnostic; the matched run is under `expert233-oracle-q8all/`.
+
+The raw stage and MoE captures, compact analyses and checksums are in
+`layer9-position-83/`, `layer10-position-83/`, and
+`layer10-state-sweep*/`. The sparse sweep bounds the first state change to
+position 83; Phase 5 remains open.
+
 The run took 278.6 seconds. The supervisor sampled dynamic CPU/GPU clocks and
 tegrastats, but EMC clock access was denied and energy was not measured. Minimum
 physical and admission availability were both 17.54 GiB, above the preserved
@@ -94,3 +121,31 @@ directory. The logits capture's supervisor record is in
 
 This does not establish multi-live correctness, quality, throughput, energy,
 or an operator-level cause. Phase 5 remains open.
+
+A cache-residency intervention repeated the position-83 layer-9 MoE capture
+with a 3,000 MiB requested expert cache and otherwise identical prompts,
+selector, context, batch size and capture position. Expert 233 remained primary
+VRAM in both serial and batch; all ten routed expert parts and routes matched
+bit-for-bit, as did the combined MoE output (2,560/2,560 values; zero delta).
+The 1,500 MiB baseline changed expert 233 from VRAM to CPU only in the batch
+row and showed the small owner-specific difference described above. This is a
+same-input operator-level correctness intervention at one captured position;
+it does not establish full-sequence recovery or a beneficial general cache
+policy. The run took 131.2 seconds, retained at least 13.73 GiB physical and
+admission availability, and sampled zero cgroup memory events. EMC clock
+access was denied; energy was not measured. Data and hashes are in
+`layer9-cache3000-position-83/` and
+`supervisor-layer9-cache3000-position-83/`.
+
+Reproduce the intervention with:
+
+```sh
+python3 tools/integration/run_control.py \
+  --output /tmp/layer9-cache3000-supervised --timeout 2400 --sample-clocks -- \
+  python3 bench/results/2026-10-23-phase5-coder-two-live-target-q8all/capture_layer9_moe.py \
+  --output /tmp/layer9-cache3000 --expert-cache-mib 3000
+python3 bench/results/2026-10-23-phase5-coder-two-live-target-q8all/analyze_layer9_moe.py \
+  --run /tmp/layer9-cache3000
+```
+
+Phase 5 remains open.

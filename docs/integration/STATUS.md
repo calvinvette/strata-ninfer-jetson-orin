@@ -4433,4 +4433,16 @@ At that Q8_1-all cell's first changed row, absolute position 133, the serial and
 
 An all-layer GDN commit capture at that position found the first state change at model layer 10: recurrent relative L2 `1.09e-7` (whole-state `2.72e-9`), with convolution state exact. By layer 12, whole-state relative L2 was `0.00418`. This shows a small state delta before later amplification but does not locate the operation that creates it; the large raw captures remain local and are identified by SHA256. Multi-live correctness remains open.
 
-A repeated model-layer-10 stage capture at position 133 found `x`, QKV, `h`, gate, beta, and `z` exact for the row identified by token `3008`; the first changed field was recurrence output `y` (2,207/6,144 values, maximum delta `8.94e-8`, relative L2 `7.70e-8`). The projected GDN output and FFN fields were exact. This confirms a tiny recurrent-path difference but does not distinguish arithmetic from prior state history. The internal batch row changed from slot 0 to slot 1 across repeats, so the analyzer pairs by position/token and correctly reads field-major STGDIAG5 rows. [Capture and analyzer](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+A repeated model-layer-10 stage capture at position 133 found `x`, QKV, `h`, gate, beta, and `z` exact for the row identified by token `3008`; the first changed field was recurrence output `y` (2,207/6,144 values, maximum delta `8.94e-8`, relative L2 `7.70e-8`). The projected GDN output and FFN fields were exact. That later-position capture alone did not distinguish recurrence arithmetic from prior state history. The internal batch row changed from slot 0 to slot 1 across repeats, so the analyzer pairs by position/token and correctly reads field-major STGDIAG5 rows. [Capture and analyzer](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+
+A sparse layer-10 state sweep found position 82 exact and the first recurrent-state delta at position 83. At that position layer 9's GDN fields and MoE input matched, while its final MoE output differed. Routes and weights were identical; only expert 233's part changed when ownership moved from primary VRAM to CPU. With the Q8_1-all selector also applied to the independent oracle, serial service matched the GPU output bit-for-bit and batch service matched the CPU output bit-for-bit. The expert part relative-L2 delta was `1.1979e-4`; combined MoE output delta was `1.3708e-5`. This localizes the first captured perturbation to one owner-dependent expert contribution for one activation; Phase 5 remains open. [Capture and oracle report](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+
+
+A 3,000 MiB expert-cache intervention repeated the exact layer-9 position-83
+MoE input from the Q8_1-all two-live diagnostic. Expert 233 remained on primary
+VRAM in serial and batch; all routed parts and the combined output were
+bit-identical. The 1,500 MiB baseline had switched that batch owner to CPU and
+produced a small part delta confirmed by same-input native CPU/GPU oracles. This
+shows cache residency removes that selected operator delta in this cell, not
+that it repairs the full sequence or generalizes to other prompts. Phase 5
+remains open. [Capture and measurements](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
