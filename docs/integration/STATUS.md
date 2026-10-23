@@ -4700,3 +4700,14 @@ rejected before the final state matched the MTP-off arm. Minimum physical and
 admission availability were 13.34 GiB, with zero cgroup memory events. This is
 narrow accepted-prefix evidence, not long-chain, cancellation, multi-live or
 performance qualification; Phase 5 remains open.
+
+The continuation probe now includes a third same-engine request after the
+rejection-bearing continuation and can require an observed rejected draft. In
+the [three-request rerun](../../bench/results/2026-10-23-phase5-coder-mtp-rejection-recovery/README.md),
+window 4 accepted 6/9 drafts in the middle request; the following eight-token
+recovery output and main-model state matched MTP off. All shared main-state
+boundaries matched across all three requests (6/6, 4/4 and 3/3). The run
+retained 13.37 GiB minimum physical/admission availability with zero cgroup
+events. Focused harness tests passed 12/12. This strengthens one rejection
+and recovery case but does not bound longer chains, other rejection points,
+cancellation or multi-live behavior; Phase 5 remains open.

@@ -65,12 +65,12 @@ candidate setting has been promoted to a default.
 | Prefill chunk × expert cache, Q2_0 near-limit retrieval, seven held-out blocks | Chunk 128 reduced median request time 59.54% at 3,000 slots and 59.74% at 3,500 slots; all 28 requests returned the exact 41-token answer after 7,506 prompt tokens. | Cache × chunk interaction interval included zero; no general default. [Report](../../bench/results/2026-10-18-phase6-q2-cache-prefill-heldout-confirm7/README.md) |
 | Coder two-live residency profile, three paired screening blocks | Moving layer-9 expert 233 to first rank restored exact 96-token output parity for both live rows on the original pair. Median paired batch throughput changed −1.40% (three-block bootstrap 95% interval −2.17% to +16.66%). | A held-out pair still diverged on slot 1 at token 78 under both base and candidate profiles. No performance promotion or general correctness claim. [Report](../../bench/results/2026-10-23-phase5-coder-layer9-expert233-residency-intervention/README.md) |
 
-A same-engine MTP continuation probe found identical output and main-model
-state at all shared accepted-prefix boundaries for one 512-token Coder prompt.
-Window 4 rejected three of nine proposed drafts during the eight-token
-continuation and still matched the MTP-off final state. This is narrow
-transaction evidence; long-chain adaptive drift and multi-live state/output
-parity remain open. [Report](../../bench/results/2026-10-23-phase5-coder-mtp-same-engine-continuation/README.md).
+A three-request same-engine MTP test required and observed three rejected
+drafts in the middle request, then matched MTP-off output and all main-model
+state fingerprints through a further recovery request. All shared accepted
+prefix boundaries matched across the three requests for one 512-token Coder
+prompt. This is narrow transaction evidence; long-chain adaptive drift and
+multi-live state/output parity remain open. [Report](../../bench/results/2026-10-23-phase5-coder-mtp-rejection-recovery/README.md).
 
 The [batch-MTP graph lifecycle diagnostic](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md)
 admitted eight slots and captured 16 layouts under the default 64-layout cap,

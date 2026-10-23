@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "scope": "single-prompt three-request MTP rejection/recovery correctness; not performance qualification",
+  "passed": true,
+  "prompt_tokens": 512,
+  "prompt_sha256": "ca13a79c83650d0bda01e8db5cc641308e496ff8342cb17471916c8d0a502729",
+  "generated_tokens": {
+    "initial": 12,
+    "rejection_continuation": 8,
+    "recovery": 8
+  },
+  "token_ids_equal": {
+    "initial": true,
+    "rejection_continuation": true,
+    "recovery": true
+  },
+  "token_id_sha256": {
+    "initial": "f02aac37db924df276c36b4faed4fcace634d1f079a011cc312b24f4877bee31",
+    "rejection_continuation": "67c8eb7939d4e1c5d4da75e407bff965190f6d0523b6c2418e3e393857ff98fe",
+    "recovery": "0fb16b0e279968bd25c21ce08fadb8be3c8ce00472d2dba893de3669d7c14674"
+  },
+  "main_state_fields": [
+    "L",
+    "gdn",
+    "ple",
+    "tail",
+    "dead",
+    "pooled",
+    "pooled_full",
+    "kv",
+    "ple_prev"
+  ],
+  "accepted_prefix_comparisons": [
+    {
+      "request": "initial",
+      "shared_generated_prefixes": [
+        1,
+        3,
+        5,
+        7,
+        11,
+        12
+      ],
+      "checked_boundaries": 6,
+      "all_main_state_equal": true
+    },
+    {
+      "request": "rejection-continuation",
+      "shared_generated_prefixes": [
+        1,
+        4,
+        6,
+        8
+      ],
+      "checked_boundaries": 4,
+      "all_main_state_equal": true
+    },
+    {
+      "request": "post-rejection-recovery",
+      "shared_generated_prefixes": [
+        1,
+        5,
+        8
+      ],
+      "checked_boundaries": 3,
+      "all_main_state_equal": true
+    }
+  ],
+  "endpoint_state_equal": {
+    "initial": true,
+    "rejection_continuation": true,
+    "recovery": true
+  },
+  "mtp_window4_rejection_continuation": {
+    "drafts_offered": 9,
+    "drafts_accepted": 6,
+    "drafts_rejected": 3,
+    "decode_ms": 2375.8
+  },
+  "mtp_off_decode_ms": {
+    "rejection_continuation": 4010.2,
+    "recovery": 4004.5
+  },
+  "mtp_window4_decode_ms": {
+    "recovery": 1756.5
+  },
+  "supervisor": {
+    "elapsed_s": 113.974966583075,
+    "samples": 111,
+    "minimum_available_gib": 13.373355865478516,
+    "minimum_admission_available_gib": 13.373355865478516,
+    "cgroup_memory_events": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0
+    },
+    "gpu_clock_mhz_range": [
+      306,
+      1300.5
+    ],
+    "emc": "readback denied",
+    "energy": "not measured"
+  },
+  "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
+  "model_shard_sha256": [
+    "e11083ba855e7666b48ea3f2db6a9c3a20c18751a012cc24f948de91b7087fad",
+    "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+  ],
+  "binary_sha256": "afc710def2ad1c0f0905afa015f5cae3e50063b29d7c4fdd62f186ab21a7358d",
+  "source_revision": "7899a8c91bb7061eac3861d72070a17452fa9256"
+}
