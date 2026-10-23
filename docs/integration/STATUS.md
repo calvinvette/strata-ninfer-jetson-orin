@@ -8,6 +8,14 @@ profile under [its closeout](PHASE8_CLOSEOUT.md). Phases 5 and 6 remain open;
 the Phase 8 profile excludes their unresolved adaptive/MTP and broader
 parametric/energy scope. This records tested cells, not general product support.
 
+The bounded Phase 8 Q2_0 release profile was rechecked on the current candidate
+on 2026-10-22: the 8K-context, 3,000-slot, chunk-128 MTP-off profile passed its
+7,498-token retrieval and same-service recovery check, and the current CUDA
+CTest suite passed 130 tests with two optional IQ fixtures skipped; Python
+integration tests passed 163/163. This is a fresh functional/regression smoke,
+not a repeated performance confirmation and does not widen the Phase 8 support
+scope. See the [smoke report](../../bench/results/2026-10-22-phase8-current-source-q2-profile-smoke/README.md).
+
 A batch-aware `STBNDY2` residual capture and MoE owner trace localized one
 target-only delayed-admission difference at position 119 to layer-11 expert
 arithmetic. The layer-10 boundary and layer-11 MoE input, routes, weights and

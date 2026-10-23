@@ -74,6 +74,11 @@ confirm the owner-specific outputs. The later layer-11 observation was
 downstream of this change, so it is not a cache-only performance comparison.
 Phase 5 remains open.
 
+The current candidate also passed a 2026-10-22 bounded Phase 8 smoke: 7,498-token
+8K-context retrieval plus same-service recovery, 130 CUDA CTests passed with two
+optional fixture skips, and Python integration passed 163/163. This is
+functional regression evidence, not a new timing confirmation. [Report](../../bench/results/2026-10-22-phase8-current-source-q2-profile-smoke/README.md).
+
 A separate two-live trace now connects one owner switch to persistent state:
 at position 71, layer-1 expert 11 moves VRAM→CPU on an exact-matched activation,
 and the first changed committed GDN state is model layer 2. Its weighted part
