@@ -17,6 +17,7 @@ parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--position', type=int, default=68)
 parser.add_argument('--tokens', type=int, default=6)
 parser.add_argument('--moe-layer', type=int, default=4)
+parser.add_argument('--expert-cache-mib', type=int, default=1500)
 args = parser.parse_args()
 out = args.output.resolve()
 out.mkdir(parents=True, exist_ok=False)
@@ -26,7 +27,7 @@ for key in ('--mtp', '--mtp-max-t', '--adapt-every', '--adapt-accepted-only'):
     remove_arg(engine_args, key)
 replace_arg(engine_args, '--spec', '2')
 replace_arg(engine_args, '--max-context', '1024')
-replace_arg(engine_args, '--expert-cache', '1500')
+replace_arg(engine_args, '--expert-cache', str(args.expert_cache_mib))
 replace_arg(engine_args, '--prompt-cache', '6')
 prompts = prepared_prompts(cfg, 2)
 base_env = child_env(cfg)
@@ -88,7 +89,7 @@ finally:
 
 result = {'layer': args.moe_layer, 'moe_position': args.position, 'state_position': args.position,
           'profile': {'live_requests': 2, 'batch_slots': 2, 'mtp': False,
-                      'context': 1024, 'expert_cache_mib': 1500},
+                      'context': 1024, 'expert_cache_mib': args.expert_cache_mib},
           'prompts': prompts, 'serial': serial, 'batch': batch,
           'token_match': {key: serial[key]['tokens'] == batch[key]['tokens'] for key in prompts}}
 (out / 'result.json').write_text(json.dumps(result, indent=2) + '\n')

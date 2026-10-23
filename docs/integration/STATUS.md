@@ -4334,3 +4334,13 @@ bit-for-bit. The aggregate GDN difference at position 71 was 27,762,032 /
 29,417,472 values (relative L2 `0.0231436`). Minimum physical/admission
 availability was 17.445 GiB, with zero cgroup events. This is one correctness
 diagnostic, not a quality or performance result; Phase 5 remains open.
+
+A 3,000 MiB cache-cap repeat still changed layer-1 expert 11 from primary VRAM
+to CPU and reproduced its owner-specific parts with same-input native oracles.
+Within that configuration the serial/batch layer-1 activations and routes were
+exact, but its activation differed from the 1,500 MiB cell, so the two settings
+do not form a same-input numerical comparison. The 3,000 MiB run's first changed
+committed GDN state remained model layer 2; 27,085,131/29,417,472 values
+differed at position 71 (relative L2 `0.00780748`). This does not show that the
+larger cache improves parity. Minimum physical/admission availability was
+13.909 GiB, with zero cgroup events. Phase 5 remains open.

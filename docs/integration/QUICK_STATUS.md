@@ -82,6 +82,11 @@ CUDA/CPU owner oracles pass. Both requests still match their six output tokens.
 At position 68, all 36 GDN states were bit-identical. This is a single short
 correctness trace; Phase 5 remains open. [Details](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
 
+A 3,000 MiB repeat still moves layer-1 expert 11 VRAM→CPU and changes the first
+committed GDN state at layer 2. Its activation differs from the 1,500 MiB cell,
+so the aggregate state delta cannot be used as a cache-size comparison. The
+larger cap did not prevent the selected owner switch; Phase 5 remains open.
+
 Correctness work has found a separate adaptive-recovery issue. In a 256-token
 short–short–short Coder IQ1_M chain, adaptive recovery differed on 237/256
 tokens, while delayed control was bit-exact at captured positions. At position

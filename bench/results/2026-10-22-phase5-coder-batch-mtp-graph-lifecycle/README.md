@@ -622,3 +622,21 @@ path is `capture_two_live_layer4.py` → `pair_two_live_moe_capture.py` → the
 layer/slot-parameterized MoE analyzer and native owner oracle. Full state and
 activation arrays remain local-only. Phase 5 remains open for the wider
 accepted-prefix, cancellation, long-chain and graph/speculation gates.
+
+A same-prompt 3,000 MiB cache-cap diagnostic still moved layer-1 expert 11
+from VRAM in serial to CPU in batch, with exact within-cell activation, routes,
+weights and shared output. Its native owner oracle also matched the service
+parts to CUDA and CPU bit-for-bit. The 1,500 and 3,000 MiB layer-1 activations
+were different across cells (SHA256
+`eaa0fe62b1df4fb89632040b5ef35e936850fb127b062668448c0319a144ebfd` versus
+`b1d62ab2efc4dce24fc7296bfda512fa797c729bb412b679b6d8a0b3a6c9be05`), so their
+output/state deltas are not a same-input cache comparison. Both cells changed
+the first committed GDN state at model layer 2;
+the 3,000 MiB cell changed 27,085,131/29,417,472 state values at position 71
+(relative L2 `0.00780748`). Treat this as evidence that the cap does not prevent
+the selected owner switch, not as evidence that it improves state parity. The
+3,000 MiB run retained 13.909 GiB minimum physical/admission availability with
+zero cgroup events; energy was not measured. Its compact MoE, oracle and state
+analyses are `layer1-position71-cache3000-paired-analysis.json`,
+`layer1-position71-cache3000-owner-oracle/analysis.json`, and
+`two-live-layer1-position71-cache3000-state-analysis.json`.

@@ -2803,3 +2803,10 @@ first changed committed GDN state followed at model layer 2. Both short token
 streams still matched. Capture position 68 was fully state-exact, so this is a
 bounded transition, not proof about other prefixes. The reusable pairer and
 layer/slot-parameterized analyzers are in the [Phase 5 diagnostic](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
+
+A larger cache may alter upstream owner history, so compare selected layer
+inputs across cache-cap cells before interpreting downstream state deltas. Here
+the 1,500 and 3,000 MiB runs had different layer-1 activations at position 71,
+although serial and batch rows were exact within each cell. Expert 11 still
+switched owner in both. The 3,000 MiB result therefore shows that the cap did
+not prevent this switch, but does not estimate its effect on state parity.
