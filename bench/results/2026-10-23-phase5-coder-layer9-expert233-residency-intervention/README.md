@@ -100,3 +100,24 @@ correctness captures. That lifecycle did not match the tested controls, so its
 three pilot timing cells are excluded. The reported screen uses a disposable
 warmup process and fresh measured services. The pilot remains local under
 `/tmp/phase5-e233-perf-screen-3pair/` as a failed harness variant.
+
+### Held-out prompt check
+
+The same candidate profile was then checked on two different prepared tasks:
+remove duplicate strings while preserving order, and debug an intermittent
+timeout. The base and candidate arms both generated 96 tokens per request.
+Both arms matched serial for slot 0 and diverged at slot 1 token 78. The
+slot-1 serial and batch token-sequence hashes are identical between the two
+profile arms, so promoting expert 233 did not change this held-out output.
+
+At positions 80/81, candidate slot 0's committed state first differed at model
+layer 6 (relative L2 `5.35e-9` and `5.59e-9`) despite exact text output; candidate
+slot 1's committed state was still exact at those positions before its later
+token mismatch. The base arm captured layer 0 only and was exact there at both
+positions, so it is not a full-state control. Both supervisors passed, with
+17.82 GiB minimum physical/admission availability and zero cgroup events. This
+held-out pair rejects the profile as a general multi-live correctness fix. It
+does not establish a broader quality bound. Compact identities, output hashes,
+and state comparisons are in
+[`heldout-correctness.json`](heldout-correctness.json); full dumps remain under
+`/tmp/phase5-layer9-expert233-heldout*`.

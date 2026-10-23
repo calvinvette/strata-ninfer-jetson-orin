@@ -4678,3 +4678,13 @@ and admission availability were 17.77/10.59 GiB, with no cgroup events; dynamic
 GPU clocks spanned 306–1,300.5 MHz, EMC readback was denied, and energy was not
 measured. This remains a scoped correctness intervention, not a promoted
 profile.
+
+A [held-out prompt check](../../bench/results/2026-10-23-phase5-coder-layer9-expert233-residency-intervention/README.md)
+tested the expert-233-first profile on two other prepared tasks. Base and
+candidate produced identical slot-1 token sequences and both first diverged
+from serial at token 78; slot 0 matched serial. Thus the profile did not repair
+the held-out multi-live output. In the candidate arm, slot 0 already had a tiny
+layer-6 GDN state delta at positions 80/81 despite exact text, while slot 1's
+state was exact at those sampled positions before its later output mismatch.
+The base arm captured layer 0 only, not full state. This rejects generalizing
+the expert-233 profile from the original prompt pair; Phase 5 remains open.

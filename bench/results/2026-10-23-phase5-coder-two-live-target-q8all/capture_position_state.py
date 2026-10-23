@@ -32,6 +32,8 @@ p.add_argument('--serial-slot', choices=('0', '1', 'both'), default='1',
                help='serial prompt control(s) to capture; default preserves the slot-1-only run')
 p.add_argument('--generated-tokens', type=int, default=96,
                help='generated tokens per serial and batch request')
+p.add_argument('--prompt-offset', type=int, default=0,
+               help='select two consecutive prepared integration prompts starting at this task index')
 p.add_argument('--trace-state-hashes', action='store_true',
                help='log accepted-prefix GDN/QSA fingerprints at every committed position')
 p.add_argument('--trace-batch-gdn-hashes', action='store_true',
@@ -41,6 +43,8 @@ p.add_argument('--batch-gdn-hash-to', type=int, default=4096)
 opts = p.parse_args()
 if opts.generated_tokens < 1:
     p.error('--generated-tokens must be positive')
+if opts.prompt_offset < 0:
+    p.error('--prompt-offset must be nonnegative')
 positions = opts.positions or str(opts.position)
 if opts.boundary_layer is not None and ',' in positions:
     p.error('--boundary-layer currently supports one --position at a time')
@@ -57,7 +61,8 @@ replace_arg(args, '--expert-cache', str(opts.expert_cache_slots))
 if opts.expert_profile is not None:
     replace_arg(args, '--expert-profile', str(opts.expert_profile.resolve()))
 replace_arg(args, '--prompt-cache', '6')
-prompts = prepared_prompts(cfg, 2)
+prepared = prepared_prompts(cfg, opts.prompt_offset + 2)
+prompts = {f'slot-{i}': prepared[f'slot-{opts.prompt_offset + i}'] for i in range(2)}
 batch_prompts = prompts if opts.batch_live == 2 else {'slot-1': prompts['slot-1']}
 
 def make_env(name, is_batch=False):
@@ -140,6 +145,7 @@ result = {'capture_positions': [int(x) for x in positions.split(',')],
           'profile': {'live_requests': opts.batch_live, 'batch_slots': 2, 'mtp': False,
                       'expert_cache_slots': opts.expert_cache_slots,
                       'generated_tokens': opts.generated_tokens,
+                      'prompt_offset': opts.prompt_offset,
                       'serial_slot_controls': list(serial_slots),
                       'gdn_layer': opts.layer,
                       'stage_layer': opts.stage_layer,
