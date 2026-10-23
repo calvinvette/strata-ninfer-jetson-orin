@@ -4688,3 +4688,15 @@ layer-6 GDN state delta at positions 80/81 despite exact text, while slot 1's
 state was exact at those sampled positions before its later output mismatch.
 The base arm captured layer 0 only, not full state. This rejects generalizing
 the expert-233 profile from the original prompt pair; Phase 5 remains open.
+
+A supervised [same-engine MTP continuation probe](../../bench/results/2026-10-23-phase5-coder-mtp-same-engine-continuation/README.md)
+compared MTP off and window 4 on a 512-token Coder IQ1_M prompt. Each arm
+generated 12 tokens, then continued on the same engine with the prompt plus
+those tokens and generated eight more. Outputs and all nine main-model state
+fingerprints matched at six shared initial-response commit boundaries, four
+shared continuation boundaries, and both request endpoints. The continuation
+MTP request accepted 6 of 9 offered drafts, so three proposed drafts were
+rejected before the final state matched the MTP-off arm. Minimum physical and
+admission availability were 13.34 GiB, with zero cgroup memory events. This is
+narrow accepted-prefix evidence, not long-chain, cancellation, multi-live or
+performance qualification; Phase 5 remains open.
