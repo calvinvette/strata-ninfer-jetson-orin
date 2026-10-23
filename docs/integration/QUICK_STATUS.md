@@ -222,6 +222,13 @@ output tokens still matched serial; minimum available RAM was 17.643 GiB.
 
 ## Near-term direction
 
+The latest expert-11-first two-live capture mapped prompt rows through raw
+routes and slot-tagged GDN state at positions 68/71. One row diverged by layer
+5 at position 68; the other was exact then but diverged by layer 6 at position
+71 after an exact layer-4 MoE output. The unmatched row also had changed layer-4
+activation and router weights, so its expert output remains unattributed.
+[Details](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/layer4-profile-e11-first-positions68-71/README.md).
+
 1. Continue resolving batch-MTP output divergence: capture earlier layer
    boundaries and logits around the reproducible multirow drift, then isolate
    the first recurrence or verifier operation that changes the row. Extend

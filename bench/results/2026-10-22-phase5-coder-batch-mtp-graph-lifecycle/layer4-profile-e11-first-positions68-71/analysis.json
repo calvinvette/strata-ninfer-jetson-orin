@@ -1,0 +1,124 @@
+{
+  "scope": "one current-source two-live target-only diagnostic with expert-11-first profile",
+  "position_pair": [
+    68,
+    71
+  ],
+  "model_layer": 4,
+  "profile_sha256": "8a590044b65ae494e3462067cd76878f3b71ca23519c182ac4660d88c6d9f114",
+  "binary_sha256": "9ddadbf089170ff71d89bac75f8a08969ba989d5a67d54fedbd6199a4717959e",
+  "minimum_available_bytes": 18724413440,
+  "minimum_admission_available_bytes": 18724413440,
+  "memory_samples": 53,
+  "maximum_cgroup_events": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0
+  },
+  "token_streams_match_serial_for_both_requests": true,
+  "route_join": {
+    "mapping": {
+      "prompt0": 0,
+      "prompt1": 1
+    },
+    "position68_prompt0_slot_inferred_by_complement": true,
+    "position71_slots_explicit": true,
+    "route_ids_exact_at_both_positions": true,
+    "weights_exact": {
+      "prompt0_position68": true,
+      "prompt0_position71": true,
+      "prompt1_position68": true,
+      "prompt1_position71": false
+    }
+  },
+  "committed_state": {
+    "prompt0_slot0": {
+      "68": {
+        "gdn_layers": 36,
+        "exact_layers": 36,
+        "different_layers": 0,
+        "first_differing_layer": null,
+        "first_difference": null,
+        "layer4_difference": null
+      },
+      "71": {
+        "gdn_layers": 36,
+        "exact_layers": 5,
+        "different_layers": 31,
+        "first_differing_layer": 6,
+        "first_difference": {
+          "values": 817152,
+          "different_values": 796416,
+          "relative_l2": 0.000823132424024493
+        },
+        "layer4_difference": null
+      }
+    },
+    "prompt1_slot1": {
+      "68": {
+        "gdn_layers": 36,
+        "exact_layers": 4,
+        "different_layers": 32,
+        "first_differing_layer": 5,
+        "first_difference": {
+          "values": 817152,
+          "different_values": 796610,
+          "relative_l2": 0.0011928140210150273
+        },
+        "layer4_difference": null
+      },
+      "71": {
+        "gdn_layers": 36,
+        "exact_layers": 3,
+        "different_layers": 33,
+        "first_differing_layer": 4,
+        "first_difference": {
+          "values": 817152,
+          "different_values": 817141,
+          "relative_l2": 0.003735085812849532
+        },
+        "layer4_difference": {
+          "values": 817152,
+          "different_values": 817141,
+          "relative_l2": 0.003735085812849532
+        }
+      }
+    }
+  },
+  "layer4_position71_prompt0": {
+    "activation_exact": true,
+    "expert_ids_and_weights_exact": true,
+    "owner_codes": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      -1,
+      0,
+      0,
+      0,
+      -1
+    ],
+    "expert_parts_exact": true,
+    "shared_and_combined_outputs_exact": true
+  },
+  "layer4_position71_prompt1": {
+    "activation": {
+      "available": true,
+      "exact": false,
+      "delta": {
+        "values": 2560,
+        "different_values": 2560,
+        "relative_l2": 0.004587386394708206
+      }
+    },
+    "route_ids_exact": true,
+    "route_weights_exact": false,
+    "owner_codes_equal": true,
+    "expert_output_comparison": "not attributed because verifier activation differs"
+  },
+  "interpretation_limit": "prompt1 layer-4 activation and route weights differ, so its expert output delta is not attributable. Prompt0 layer-4 input, routes, expert parts and combined output are exact, but later committed state first differs at layer 6. This does not locate all upstream numerical differences or qualify multi-live serving."
+}
