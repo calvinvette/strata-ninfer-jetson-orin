@@ -1,0 +1,447 @@
+{
+  "date": "2026-10-23",
+  "screen_type": "three randomized paired screening blocks; no confirmation or promotion",
+  "design": {
+    "pairing": "same-day, within block, randomized profile order",
+    "warmup": "disposable two-live engine process; measured batch is fresh",
+    "serial_controls": "one fresh engine per prompt; not included in batch metric",
+    "batch_metric": "192 generated tokens divided by wall time from launching two concurrent batch requests until both returned",
+    "trace_hooks": false,
+    "context_tokens": 1024,
+    "prompt_cache_slots": 6,
+    "requested_expert_cache_slots": 1500,
+    "realized_expert_cache_slots": 1934,
+    "realized_expert_cache_gib": 3.72,
+    "mtp": false,
+    "generated_tokens_per_request": 96,
+    "prompt_token_counts": {
+      "slot-0": 68,
+      "slot-1": 68
+    },
+    "thermal_clock_policy": "dynamic; sampled read-only",
+    "energy": "not measured",
+    "prompt_token_sha256": {
+      "slot-0": "4ac27f366607ab67e443dddf25e483d44a3f5c87ae6dee421ab06d7ea618cae7",
+      "slot-1": "47a9fb927ac375b1b03dd7f482c4dcc2ea03abd7f225a5a57604476dce51c219"
+    }
+  },
+  "identity": {
+    "model": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF IQ1_M",
+    "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
+    "binary_sha256": "afc710def2ad1c0f0905afa015f5cae3e50063b29d7c4fdd62f186ab21a7358d",
+    "baseline_profile_sha256": "a514661124d5305effe9c1bcecff7dc069af398b2b19ff9d11628a2cad0a8915",
+    "candidate_profile_sha256": "41595f87b9947df82a492f4868e267013bf1fec8bae538f797a14e2b04ab64f4",
+    "engine_source_commit": "7899a8c91bb7061eac3861d72070a17452fa9256",
+    "repository_head_when_screen_started": "b1280256 (documentation/benchmark harness commits after engine source)"
+  },
+  "paired_effects": [
+    {
+      "block": 1,
+      "baseline_tokens_per_s": 1.778915581391942,
+      "expert233_first_tokens_per_s": 2.07527719508319,
+      "relative_throughput_change_pct": 16.659678333884443
+    },
+    {
+      "block": 2,
+      "baseline_tokens_per_s": 2.089993427082066,
+      "expert233_first_tokens_per_s": 2.0607458934657616,
+      "relative_throughput_change_pct": -1.399407923360696
+    },
+    {
+      "block": 3,
+      "baseline_tokens_per_s": 2.0765563287582287,
+      "expert233_first_tokens_per_s": 2.0315522004916997,
+      "relative_throughput_change_pct": -2.1672481330396343
+    }
+  ],
+  "median_paired_relative_throughput_change_pct": -1.399407923360696,
+  "paired_block_bootstrap_95_interval_pct": [
+    -2.1672481330396343,
+    16.659678333884443
+  ],
+  "baseline_median_tokens_per_s": 2.0765563287582287,
+  "candidate_median_tokens_per_s": 2.0607458934657616,
+  "cells": [
+    {
+      "block": 1,
+      "arm": "baseline",
+      "status": "pass",
+      "batch_wall_s": 107.93092264095321,
+      "batch_tokens_per_s": 1.778915581391942,
+      "per_prompt_batch_elapsed_s": {
+        "slot-0": 107.083480093861,
+        "slot-1": 107.91710480791517
+      },
+      "actual_tokens": {
+        "slot-0": 96,
+        "slot-1": 96
+      },
+      "token_parity": {
+        "slot-0": true,
+        "slot-1": false
+      },
+      "first_mismatch_index": {
+        "slot-0": null,
+        "slot-1": 66
+      },
+      "supervisor_elapsed_s": 281.80584209784865,
+      "minimum_available_gib": 17.774898529052734,
+      "minimum_admission_available_gib": 11.541812896728516,
+      "gpu_clock_mhz_range": [
+        306.0,
+        1300.5
+      ],
+      "cpu_clock_mhz_range": [
+        729.6,
+        2201.6
+      ],
+      "emc_clock": "unsupported: read denied",
+      "engine_batch_summary": {
+        "windows": 96,
+        "average_rows": 1.96,
+        "engine_ms_per_window": 535.49,
+        "engine_wall_ms": 70941.0
+      },
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "sample_count": 274,
+      "junction_temperature_c_range": [
+        55.343,
+        61.656
+      ],
+      "pilot_status": "measured cell pass; candidate correctness checked independently against fresh serial controls",
+      "serial_output_sha256": {
+        "slot-0": "b60a199fef502025541609218384427aba39f2564a2c66b61e9ec93ec9664638",
+        "slot-1": "fd1396853fc82198252a186b3a948f84fd473435daad3cfaa1d0fd0c54699caa"
+      },
+      "batch_output_sha256": {
+        "slot-0": "b60a199fef502025541609218384427aba39f2564a2c66b61e9ec93ec9664638",
+        "slot-1": "1bedf5c92b313dbc2cfd82605383c21c3c5c1757daa6e9c3ba06f8de8c3188b1"
+      }
+    },
+    {
+      "block": 1,
+      "arm": "expert233_first",
+      "status": "pass",
+      "batch_wall_s": 92.51776121999137,
+      "batch_tokens_per_s": 2.07527719508319,
+      "per_prompt_batch_elapsed_s": {
+        "slot-0": 92.51364767714404,
+        "slot-1": 91.44335151999258
+      },
+      "actual_tokens": {
+        "slot-0": 96,
+        "slot-1": 96
+      },
+      "token_parity": {
+        "slot-0": true,
+        "slot-1": true
+      },
+      "first_mismatch_index": {
+        "slot-0": null,
+        "slot-1": null
+      },
+      "supervisor_elapsed_s": 274.77077344292775,
+      "minimum_available_gib": 17.82021713256836,
+      "minimum_admission_available_gib": 11.864994049072266,
+      "gpu_clock_mhz_range": [
+        306.0,
+        1300.5
+      ],
+      "cpu_clock_mhz_range": [
+        729.6,
+        2201.6
+      ],
+      "emc_clock": "unsupported: read denied",
+      "engine_batch_summary": {
+        "windows": 96,
+        "average_rows": 1.96,
+        "engine_ms_per_window": 542.74,
+        "engine_wall_ms": 71652.0
+      },
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "sample_count": 267,
+      "junction_temperature_c_range": [
+        54.187,
+        61.625
+      ],
+      "pilot_status": "measured cell pass; candidate correctness checked independently against fresh serial controls",
+      "serial_output_sha256": {
+        "slot-0": "b60a199fef502025541609218384427aba39f2564a2c66b61e9ec93ec9664638",
+        "slot-1": "fd1396853fc82198252a186b3a948f84fd473435daad3cfaa1d0fd0c54699caa"
+      },
+      "batch_output_sha256": {
+        "slot-0": "b60a199fef502025541609218384427aba39f2564a2c66b61e9ec93ec9664638",
+        "slot-1": "fd1396853fc82198252a186b3a948f84fd473435daad3cfaa1d0fd0c54699caa"
+      }
+    },
+    {
+      "block": 2,
+      "arm": "baseline",
+      "status": "pass",
+      "batch_wall_s": 91.8663176218979,
+      "batch_tokens_per_s": 2.089993427082066,
+      "per_prompt_batch_elapsed_s": {
+        "slot-0": 91.02626623399556,
+        "slot-1": 91.85947141400538
+      },
+      "actual_tokens": {
+        "slot-0": 96,
+        "slot-1": 96
+      },
+      "token_parity": {
+        "slot-0": true,
+        "slot-1": false
+      },
+      "first_mismatch_index": {
+        "slot-0": null,
+        "slot-1": 66
+      },
+      "supervisor_elapsed_s": 270.5186914149672,
+      "minimum_available_gib": 17.815345764160156,
+      "minimum_admission_available_gib": 10.58713150024414,
+      "gpu_clock_mhz_range": [
+        306.0,
+        1300.5
+      ],
+      "cpu_clock_mhz_range": [
+        729.6,
+        2201.6
+      ],
+      "emc_clock": "unsupported: read denied",
+      "engine_batch_summary": {
+        "windows": 96,
+        "average_rows": 1.96,
+        "engine_ms_per_window": 535.29,
+        "engine_wall_ms": 70910.0
+      },
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "sample_count": 263,
+      "junction_temperature_c_range": [
+        55.843,
+        62.25
+      ],
+      "pilot_status": "measured cell pass; candidate correctness checked independently against fresh serial controls",
+      "serial_output_sha256": {
+        "slot-0": "b60a199fef502025541609218384427aba39f2564a2c66b61e9ec93ec9664638",
+        "slot-1": "fd1396853fc82198252a186b3a948f84fd473435daad3cfaa1d0fd0c54699caa"
+      },
+      "batch_output_sha256": {
+        "slot-0": "b60a199fef502025541609218384427aba39f2564a2c66b61e9ec93ec9664638",
+        "slot-1": "1bedf5c92b313dbc2cfd82605383c21c3c5c1757daa6e9c3ba06f8de8c3188b1"
+      }
+    },
+    {
+      "block": 2,
+      "arm": "expert233_first",
+      "status": "pass",
+      "batch_wall_s": 93.17014805600047,
+      "batch_tokens_per_s": 2.0607458934657616,
+      "per_prompt_batch_elapsed_s": {
+        "slot-0": 92.82167446892709,
+        "slot-1": 93.15755302389152
+      },
+      "actual_tokens": {
+        "slot-0": 96,
+        "slot-1": 96
+      },
+      "token_parity": {
+        "slot-0": true,
+        "slot-1": true
+      },
+      "first_mismatch_index": {
+        "slot-0": null,
+        "slot-1": null
+      },
+      "supervisor_elapsed_s": 264.21668446902186,
+      "minimum_available_gib": 17.835430145263672,
+      "minimum_admission_available_gib": 11.822086334228516,
+      "gpu_clock_mhz_range": [
+        306.0,
+        1300.5
+      ],
+      "cpu_clock_mhz_range": [
+        729.6,
+        2201.6
+      ],
+      "emc_clock": "unsupported: read denied",
+      "engine_batch_summary": {
+        "windows": 96,
+        "average_rows": 1.98,
+        "engine_ms_per_window": 553.31,
+        "engine_wall_ms": 72562.0
+      },
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "sample_count": 257,
+      "junction_temperature_c_range": [
+        55.843,
+        62.281
+      ],
+      "pilot_status": "measured cell pass; candidate correctness checked independently against fresh serial controls",
+      "serial_output_sha256": {
+        "slot-0": "b60a199fef502025541609218384427aba39f2564a2c66b61e9ec93ec9664638",
+        "slot-1": "fd1396853fc82198252a186b3a948f84fd473435daad3cfaa1d0fd0c54699caa"
+      },
+      "batch_output_sha256": {
+        "slot-0": "b60a199fef502025541609218384427aba39f2564a2c66b61e9ec93ec9664638",
+        "slot-1": "fd1396853fc82198252a186b3a948f84fd473435daad3cfaa1d0fd0c54699caa"
+      }
+    },
+    {
+      "block": 3,
+      "arm": "baseline",
+      "status": "pass",
+      "batch_wall_s": 92.4607713939622,
+      "batch_tokens_per_s": 2.0765563287582287,
+      "per_prompt_batch_elapsed_s": {
+        "slot-0": 92.4553873159457,
+        "slot-1": 91.38998650899157
+      },
+      "actual_tokens": {
+        "slot-0": 96,
+        "slot-1": 96
+      },
+      "token_parity": {
+        "slot-0": true,
+        "slot-1": false
+      },
+      "first_mismatch_index": {
+        "slot-0": null,
+        "slot-1": 66
+      },
+      "supervisor_elapsed_s": 312.39226627582684,
+      "minimum_available_gib": 17.820842742919922,
+      "minimum_admission_available_gib": 12.052047729492188,
+      "gpu_clock_mhz_range": [
+        306.0,
+        1300.5
+      ],
+      "cpu_clock_mhz_range": [
+        729.6,
+        2201.6
+      ],
+      "emc_clock": "unsupported: read denied",
+      "engine_batch_summary": {
+        "windows": 96,
+        "average_rows": 1.96,
+        "engine_ms_per_window": 539.19,
+        "engine_wall_ms": 71266.0
+      },
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "sample_count": 303,
+      "junction_temperature_c_range": [
+        54.937,
+        61.656
+      ],
+      "pilot_status": "measured cell pass; candidate correctness checked independently against fresh serial controls",
+      "serial_output_sha256": {
+        "slot-0": "b60a199fef502025541609218384427aba39f2564a2c66b61e9ec93ec9664638",
+        "slot-1": "fd1396853fc82198252a186b3a948f84fd473435daad3cfaa1d0fd0c54699caa"
+      },
+      "batch_output_sha256": {
+        "slot-0": "b60a199fef502025541609218384427aba39f2564a2c66b61e9ec93ec9664638",
+        "slot-1": "1bedf5c92b313dbc2cfd82605383c21c3c5c1757daa6e9c3ba06f8de8c3188b1"
+      }
+    },
+    {
+      "block": 3,
+      "arm": "expert233_first",
+      "status": "pass",
+      "batch_wall_s": 94.50901628495194,
+      "batch_tokens_per_s": 2.0315522004916997,
+      "per_prompt_batch_elapsed_s": {
+        "slot-0": 93.65519650094211,
+        "slot-1": 94.50281332316808
+      },
+      "actual_tokens": {
+        "slot-0": 96,
+        "slot-1": 96
+      },
+      "token_parity": {
+        "slot-0": true,
+        "slot-1": true
+      },
+      "first_mismatch_index": {
+        "slot-0": null,
+        "slot-1": null
+      },
+      "supervisor_elapsed_s": 306.4572035470046,
+      "minimum_available_gib": 17.796295166015625,
+      "minimum_admission_available_gib": 11.1307373046875,
+      "gpu_clock_mhz_range": [
+        306.0,
+        1300.5
+      ],
+      "cpu_clock_mhz_range": [
+        729.6,
+        2201.6
+      ],
+      "emc_clock": "unsupported: read denied",
+      "engine_batch_summary": {
+        "windows": 96,
+        "average_rows": 1.96,
+        "engine_ms_per_window": 552.71,
+        "engine_wall_ms": 72590.0
+      },
+      "cgroup_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "sample_count": 297,
+      "junction_temperature_c_range": [
+        54.937,
+        61.875
+      ],
+      "pilot_status": "measured cell pass; candidate correctness checked independently against fresh serial controls",
+      "serial_output_sha256": {
+        "slot-0": "b60a199fef502025541609218384427aba39f2564a2c66b61e9ec93ec9664638",
+        "slot-1": "fd1396853fc82198252a186b3a948f84fd473435daad3cfaa1d0fd0c54699caa"
+      },
+      "batch_output_sha256": {
+        "slot-0": "b60a199fef502025541609218384427aba39f2564a2c66b61e9ec93ec9664638",
+        "slot-1": "fd1396853fc82198252a186b3a948f84fd473435daad3cfaa1d0fd0c54699caa"
+      }
+    }
+  ],
+  "limits": [
+    "Three-block screen only; no performance confirmation.",
+    "Only one prompt pair and 1,024-token configured context.",
+    "Candidate profile exact token parity is checked against each fresh serial control; baseline slot 1 mismatch is retained as a separate correctness outcome.",
+    "The initial reused-engine pilot had request-state contamination and is excluded from timing results.",
+    "No energy measurement; EMC clock readback was denied."
+  ],
+  "candidate_decision": "Do not advance this profile as a performance candidate to seven-block confirmation: median paired throughput change is -1.40%, below the plan\u2019s 5% minimum-effect threshold, and the three-block bootstrap interval includes zero. Keep it as a targeted correctness intervention pending held-out workload/state qualification.",
+  "thermal_scope": "Across six cells, tegrastats junction temperature ranged 54.187\u201362.281 C; clocks remained dynamic."
+}

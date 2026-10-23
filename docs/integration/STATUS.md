@@ -4665,3 +4665,16 @@ supports a bounded residency correction for the observed cell, not a general
 profile or performance claim; the changed ordering may affect other experts.
 Minimum physical/admission availability was 17.84/17.85 GiB; EMC readback was
 unsupported and energy was not measured. Phase 5 remains open.
+
+A randomized [three-block paired timing screen](../../bench/results/2026-10-23-phase5-coder-layer9-expert233-residency-intervention/README.md)
+then compared the base and expert-233-first profiles using a disposable warmup
+service and fresh measured serial/batch processes. Profile batch output matched
+both 96-token serial controls in all three blocks; baseline slot 1 first
+mismatched at token 66 in all three. Paired throughput changes were +16.66%,
+−1.40%, and −2.17%; the median was −1.40% with a coarse three-block bootstrap
+95% interval of −2.17% to +16.66%. The candidate misses the plan's 5% minimum
+speed effect and does not proceed to performance confirmation. Minimum physical
+and admission availability were 17.77/10.59 GiB, with no cgroup events; dynamic
+GPU clocks spanned 306–1,300.5 MHz, EMC readback was denied, and energy was not
+measured. This remains a scoped correctness intervention, not a promoted
+profile.
