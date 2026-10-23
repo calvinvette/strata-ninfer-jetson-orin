@@ -1,6 +1,6 @@
 # Integration status
 
-Updated: 2026-10-22. Phases 1 through 4 are complete for their documented tested
+Updated: 2026-10-23. Phases 1 through 4 are complete for their documented tested
 Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 is
 complete for its bounded Orin qualification matrix under [its closeout]
 (PHASE7_CLOSEOUT.md), and Phase 8 is complete for the bounded Q2_0 release

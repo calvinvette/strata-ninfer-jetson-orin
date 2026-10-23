@@ -1,6 +1,6 @@
 # Quick status
 
-Updated: 2026-10-22
+Updated: 2026-10-23
 
 This is a short orientation to the integration. The [plan](PLAN.md) defines
 phase gates; the detailed [status](STATUS.md) is the evidence record, and the
