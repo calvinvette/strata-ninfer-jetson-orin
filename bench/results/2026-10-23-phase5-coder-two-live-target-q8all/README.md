@@ -577,17 +577,21 @@ To screen host expert-worker scheduling, the original two-live target-only
 comparison was repeated with `--pool-workers 1` for both fresh serial controls
 and the two-slot batch. The Q8_1 selector remained forced to `all`, MTP stayed
 off, both prompts generated 72 tokens, and the expert-cache request was 3,000
-slots. Slot 0 matched; slot 1 still differed, now first at output index 60
-(zero-based). Setting the expert worker count to one therefore does not resolve
-the mismatch. Because this is one run and the onset differs from the earlier
-index-66 run, it does not establish that worker count caused or shifted the
-divergence. Three batch terminal state-hash records were retained but not
-joined to prompts.
+slots. Slot 0 matched; slot 1 first differed at output index 60 (zero-based).
+The same 72-token cell was then repeated with the configured eight workers. It
+produced the same per-prompt match pattern and the same first mismatch index:
+slot 0 matched and slot 1 first differed at index 60. Thus changing the expert
+worker count between one and eight does not change the observed onset in this
+cell. This does not identify the underlying arithmetic or state divergence.
+Each batch retained three terminal state-hash records, but they were not joined
+to prompts.
 
-The supervised run took 506.3 seconds and retained at least 14.17 GiB physical
-and admission availability; cgroup memory events stayed zero. This is a
-correctness diagnostic, not a performance measurement. The harness now accepts
-`--pool-workers` for future paired screens. Raw logs and supervisor telemetry
-remain in the ignored local `run-poolworkers1-72/` and
-`supervisor-poolworkers1-72/` directories; no model or build artifact is
-included in Git. Harness syntax and CLI help checks passed.
+The one-worker supervised run took 506.3 seconds and retained at least 14.17
+GiB physical and admission availability; cgroup memory events stayed zero. The
+eight-worker run took 164.5 seconds and retained at least 14.16 GiB; its cgroup
+memory events also stayed zero. These correctness-harness durations are not
+performance measurements. The harness accepts `--pool-workers` for future
+paired screens. Raw logs and supervisor telemetry remain in ignored local
+`run-poolworkers{1,8}-72/` and `supervisor-poolworkers{1,8}-72/` directories; no
+model or build artifact is included in Git. Harness syntax and CLI help checks
+passed.

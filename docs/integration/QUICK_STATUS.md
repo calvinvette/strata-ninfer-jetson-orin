@@ -446,8 +446,8 @@ Moving expert 218 to rank 0 in a temporary profile kept it on VRAM for serial an
 
 A per-layer GDN hash trace under the expert-218-first profile found prompt 0 first differing at prefix 70 (ordinal 30) and prompt 1 at prefix 82 (ordinal 8), while output slot 1 still first differed at token 66. A direct position-82 state capture instead found prompt 0 first differing at model layer 32; later prompt-1 traces show tiny layer-10 `y`/state deltas with exact layer-9 MoE data. Internal batch row assignment varies between runs, and state onset varies, so the cause is still open. [Analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/expert218-intervention-analysis.json).
 
-A paired screen with `--pool-workers 1` retained slot 0 parity but slot 1 still
-diverged at output index 60 (zero-based). One worker is therefore not a fix for
-the multi-live mismatch; the changed onset from the earlier index-66 run leaves
-its cause unresolved. This supervised correctness run retained 14.17 GiB
-minimum admission availability and had zero cgroup events. [Report](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+A paired 72-token screen at one and eight expert workers produced the same
+pattern: slot 0 matched and slot 1 first diverged at output index 60. Worker
+count did not shift the mismatch in this cell, but its underlying cause remains
+unresolved. Minimum admission availability was 14.17/14.16 GiB with zero
+cgroup events. [Report](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
