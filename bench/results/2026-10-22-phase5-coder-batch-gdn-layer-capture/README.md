@@ -237,15 +237,18 @@ bit-for-bit and the batch CPU part matches the CPU oracle bit-for-bit. The
 CPU/GPU oracle outputs differ in all 2,560 values (relative L2 `0.01335`),
 confirming the selected owner-dependent output change for this row.
 
-A separate exact-input check for prompt 0 exposes an unresolved inconsistency:
-its serial and batch CPU outputs match bit-for-bit, but both differ from the
-same-input `native_expert_parity` CPU, GPU and FP32 outputs (relative L2 about
-`2.19`). The parity tool passes its internal checks; its default one-token and
-three-token CPU outputs are bit-identical. Thus the oracle match is confirmed
-for prompt 1 but not prompt 0, and no general CPU arithmetic conclusion follows.
-The prompt-0 discrepancy needs further investigation. The selected layer-1
-expert-11 blob in `experts.bin` matches the source GGUF tensors byte-for-byte
-(SHA256 `6310f659...bd7b85ae`), ruling out a wrong packed blob for this expert.
+A prompt-0 follow-up used the complete one-token CPU result from
+`native_expert_parity` with an activation whose SHA256 is
+`c505ebecc573356933ae046779205b31af31242d1b60d0eac328ab12f78a2ac5`. Both the
+serial CPU output and batch dispatch 3505 match all 2,560 oracle values after
+float parsing; the largest remaining difference (`5.0e-11`) is JSON decimal
+serialization. The earlier reported relative-L2 difference of about `2.19`
+came from accidentally comparing prompt 0 against an oracle artifact carrying
+prompt 1's activation hash. The prompt-0 CPU oracle discrepancy is resolved as
+a comparison-selection error. This does not explain prompt 1's genuine CPU/GPU
+owner-dependent output difference. The selected layer-1 expert-11 blob in
+`experts.bin` matches the source GGUF tensors byte-for-byte (SHA256
+`6310f659...bd7b85ae`), ruling out a wrong packed blob for this expert.
 The compact per-row results are in `two-live-layer1-expert11-oracle-summary.json`;
 large activations and oracle dumps remain local. The other sampled prompt/position rows do not show
 this owner change. The large CPU-output traces and owner JSONL files remain

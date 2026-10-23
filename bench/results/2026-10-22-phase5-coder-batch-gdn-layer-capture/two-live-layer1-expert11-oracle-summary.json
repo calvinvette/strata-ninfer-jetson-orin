@@ -29,17 +29,17 @@
   "prompt0": {
     "activation_sha256": "c505ebecc573356933ae046779205b31af31242d1b60d0eac328ab12f78a2ac5",
     "serial_batch_cpu_outputs_bit_identical": true,
-    "service_cpu_vs_native_cpu_oracle": {
-      "different_values": 2560,
-      "max_abs": 0.137286703992815,
-      "relative_l2": 2.1946198330305062
+    "serial_cpu_vs_native_single_token_cpu_oracle": {
+      "different_values_after_float_parse": 0,
+      "max_abs_json_serialization_rounding": 4.996814767510571e-11,
+      "oracle_activation_sha256": "c505ebecc573356933ae046779205b31af31242d1b60d0eac328ab12f78a2ac5"
     },
-    "service_cpu_vs_native_gpu_oracle": {
-      "different_values": 2560,
-      "max_abs": 0.13755392651650428,
-      "relative_l2": 2.1961987378467787
+    "batch_cpu_dispatch_3505_vs_native_single_token_cpu_oracle": {
+      "different_values_after_float_parse": 0,
+      "max_abs_json_serialization_rounding": 4.996814767510571e-11,
+      "oracle_activation_sha256": "c505ebecc573356933ae046779205b31af31242d1b60d0eac328ab12f78a2ac5"
     },
-    "interpretation": "The same service CPU result is stable across serial and batch, but differs substantially from the same-input native parity outputs. This row remains unresolved."
+    "correction": "The prior large-difference comparison selected prompt1's oracle activation (SHA256 eaa0fe62...) for prompt0. The exact prompt0 single-token CPU oracle now confirms both serial and batch outputs."
   },
   "packed_blob_vs_GGUF": {
     "layer": 1,
@@ -57,6 +57,11 @@
     "orin_cuda_binary_sha256": "5450b245c313ef81e95647d4bbc0b707447a827f4c0bc1a18d6e85a382a6280b",
     "maestro1_hip_binary_sha256": "4f8fc9018b7520dd2e465683b1541df880c14f0a83dd0072bc764f2f91e89552",
     "maestro1_q8_1_selector_contract": "pass"
+  },
+  "prompt0_followup_oracle": {
+    "directory": "oracle-expert11-serial0-default-single",
+    "output": "layer-1-expert-11-cpu-output-nt1.f32",
+    "binary_sha256": "local raw capture; excluded from Git"
   },
   "raw_captures": "local-only"
 }
