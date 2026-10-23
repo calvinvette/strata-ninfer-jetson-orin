@@ -85,6 +85,12 @@ the client closed its stream. It strengthens one cancellation boundary set;
 adaptive accepted-state drift and the two-live batch mismatch remain open.
 [Report](../../bench/results/2026-10-22-phase5-coder-mtp2-cancel-state/README.md).
 
+Direct raw GDN captures from a 256-token adaptive chain confirm state drift
+before the first recovery-token mismatch: at position 515, 786,405 recurrent
+values and 30,719 convolution values differ, while delayed control stays
+bit-exact through positions 515, 530 and 640. Each raw record matches the
+accepted-prefix service hash. Phase 5 remains open. [Report](../../bench/results/2026-10-22-phase5-coder-long-chain-raw-state-pair-pos767/README.md).
+
 A separate two-live trace now connects one owner switch to persistent state:
 at position 71, layer-1 expert 11 moves VRAM→CPU on an exact-matched activation,
 and the first changed committed GDN state is model layer 2. Its weighted part

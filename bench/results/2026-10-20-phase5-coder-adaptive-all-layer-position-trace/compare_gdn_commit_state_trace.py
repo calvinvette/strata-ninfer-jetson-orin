@@ -110,6 +110,8 @@ def main():
                         help='optional accepted-prefix log for checking raw GDN bytes against per-layer hashes')
     parser.add_argument('--gdn-ordinal', type=int,
                         help='global GDN ordinal represented by this layer-specific capture')
+    parser.add_argument('--service-check-positions', type=int, nargs='+',
+                        help='limit optional service-hash checks to positions that have accepted-prefix hash rows')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     raw, records = read_records(args.state_dump, args.layer)
@@ -162,10 +164,14 @@ def main():
             raise ValueError('position-510 commit does not match the earlier position-511 verifier pre-state')
     if (args.service_log is None) != (args.gdn_ordinal is None):
         parser.error('--service-log and --gdn-ordinal must be supplied together')
+    if args.service_check_positions is not None and args.service_log is None:
+        parser.error('--service-check-positions requires --service-log and --gdn-ordinal')
     if args.gdn_ordinal is not None:
         service = read_service_gdn_hashes(args.service_log)
         checks = []
         for position, group in sorted(by_position.items()):
+            if args.service_check_positions is not None and position not in args.service_check_positions:
+                continue
             service_rows = service.get(position, [])
             if len(service_rows) != len(group):
                 raise ValueError(f'position {position}: {len(group)} raw records but {len(service_rows)} service hashes')
@@ -176,10 +182,13 @@ def main():
                 expected = hashes[args.gdn_ordinal]
                 checks.append({'position': position, 'raw_hash': observed,
                                'service_hash': expected, 'matches': observed == expected})
+        if not checks:
+            raise ValueError('no selected commit positions have service hash rows')
         if not all(row['matches'] for row in checks):
             raise ValueError('raw committed state does not match accepted-prefix service hashes')
         summary['service_hash_crosscheck'] = {
             'gdn_ordinal': args.gdn_ordinal, 'records': len(checks),
+            'checked_positions': sorted({row['position'] for row in checks}),
             'all_match': True, 'checks': checks,
         }
     args.output.parent.mkdir(parents=True, exist_ok=True)

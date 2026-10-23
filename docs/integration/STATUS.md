@@ -25,6 +25,21 @@ availability was 13.18/12.53 GiB with zero cgroup events. This covers the tested
 cancellation boundaries only; Phase 5 remains open. See the
 [cancellation report](../../bench/results/2026-10-22-phase5-coder-mtp2-cancel-state/README.md).
 
+A held-out 256-token short–short–short Coder IQ1_M chain now has direct raw
+layer-22 committed-state comparisons at accepted positions 515, 530 and 640.
+The adaptive recovery state already differs at position 515—before the first
+recovery token changes—in 786,405/786,432 recurrent values (relative L2
+`2.60e-4`) and 30,719/30,720 convolution values (relative L2 `7.86e-4`). By
+position 530 all captured values differ and recovery tokens diverge further.
+The delayed-control initial/intermediate/recovery states are bit-identical at
+all three positions. All nine raw records per arm were checked against the
+service accepted-prefix hash. The adaptive endpoint-767 capture attempt failed
+because the 256-token run ended at 766; the three valid positions were retained
+and verified separately. This confirms long-chain adaptive state drift for this
+workload but does not locate its responsible upstream operation or provide a
+general tolerance. Phase 5 remains open. See the
+[raw-state report](../../bench/results/2026-10-22-phase5-coder-long-chain-raw-state-pair-pos767/README.md).
+
 A batch-aware `STBNDY2` residual capture and MoE owner trace localized one
 target-only delayed-admission difference at position 119 to layer-11 expert
 arithmetic. The layer-10 boundary and layer-11 MoE input, routes, weights and
