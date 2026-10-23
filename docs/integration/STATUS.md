@@ -4801,9 +4801,9 @@ strict analyzer passed with minimum physical/admission availability of
 14.19/14.14 GiB and zero cgroup events. Median paired reductions in client
 total time for chunk 128 were 67.4%/69.6% at the two cache arguments; the
 cache-by-chunk time ratio-of-ratios was −9.8%. This remains three-block
-screening evidence without confidence intervals or a promotion claim; a
-seven-block held-out confirmation is required before recommendation. Phase 6
-remains open.
+screening evidence without confidence intervals or a promotion claim. The
+separate seven-block held-out confirmation completed subsequently and is
+recorded below. Phase 6 remains open.
 
 A separate seven-block confirmation harness now uses a tokenizer-verified
 7,501-token archive with different marker positions and values. Its separate
@@ -4814,11 +4814,14 @@ natural EOS enabled. Earlier strict-length attempts emitted the same exact
 answer but were correctly rejected by the harness for stopping at 46 of 48
 requested tokens. Preflight data are excluded from confirmation statistics.
 The harness computes deterministic paired-block bootstrap intervals.
-Blocks 1–6/7 of the distinct-archive confirmation passed all twenty-four cells.
-Every answer was exact (7,501 prompt, 46 completion tokens). Minimum
-physical/admission availability was 14.19 GiB with zero cgroup events. Across
-these six blocks, chunk-128 median reductions in total time were 67.7%/68.8%
-at cache arguments 1,500/3,000; the median interaction was −3.0%. These are
-descriptive partial results; the analyzer suppresses bootstrap intervals until
-all seven confirmation blocks are present. Block 7 remains, and no
-recommendation is claimed.
+All seven blocks of the distinct-archive Coder IQ1_M confirmation passed all 28
+measured cells. Each response returned the exact 46-token answer after 7,501
+prompt tokens. Chunk 128 lowered median client total time 67.71% (paired-block
+bootstrap 95% interval 67.55%–67.95%) at 1,500 requested slots and 68.72%
+(68.56%–68.85%) at 3,000. The cache-by-chunk time interaction was −3.13%
+(−5.43% to −1.93%). Decode-throughput intervals included zero. Minimum
+physical/admission availability was 14.19/14.19 GiB, with zero cgroup events;
+clocks were dynamic and sampled, energy was not measured. This supports the
+prefill latency effect in this one model/profile/task domain only; it does not
+promote a default or close Phase 6's broader interaction and Pareto/energy
+scope. [Full report and per-block tables](../../bench/results/2026-10-23-phase6-coder-prefill-cache-confirm7/README.md).

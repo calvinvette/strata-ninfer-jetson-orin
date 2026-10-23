@@ -127,4 +127,40 @@ chunk 128 reduced median client total time by 67.7%/68.8% at cache arguments
 1,500/3,000; the median cache-by-chunk time interaction was −3.0%. These remain
 descriptive partial results without confidence intervals. Minimum
 physical/admission availability remained 14.19/14.19 GiB, with zero cgroup
-events. Block 7 remains.
+events.
+
+Randomized block 7 passed its four cells. Each answer was exact with 7,501
+prompt and 46 completion tokens:
+
+| Requested slots | Chunk | Client TTFT | Client total | Prompt tok/s | Decode tok/s |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 3,000 | 128 | 166.7 s | 170.2 s | 45.0 | 13.0 |
+| 1,500 | 128 | 192.2 s | 196.0 s | 39.1 | 11.7 |
+| 1,500 | 32 | 586.2 s | 589.9 s | 12.8 | 12.1 |
+| 3,000 | 32 | 538.0 s | 541.5 s | 13.9 | 13.0 |
+
+## Seven-block result
+
+The complete seven-block audit passed all 28 measured cells. All measured
+responses returned the exact 46-token answer after the expected 7,501-token
+prompt. Deterministic paired-block bootstrap intervals use the seven randomized
+block contrasts (10,000 resamples); requests and tokens within a block were not
+treated as independent replicates.
+
+| Contrast | Median change | Paired-block bootstrap 95% interval |
+| --- | ---: | ---: |
+| Chunk 128 vs 32, 1,500 requested slots, client total time | 67.71% lower | 67.55%–67.95% lower |
+| Chunk 128 vs 32, 3,000 requested slots, client total time | 68.72% lower | 68.56%–68.85% lower |
+| Cache × chunk interaction, client total time | −3.13% | −5.43% to −1.93% |
+| Chunk 128 vs 32, 1,500 slots, decode throughput | −0.81% | −1.65% to +0.83% |
+| Chunk 128 vs 32, 3,000 slots, decode throughput | +0.76% | −0.76% to +1.52% |
+
+The effect is concentrated in prefill/TTFT; decode-throughput intervals include
+zero. Minimum physical and admission availability were both 14.19 GiB and all
+cgroup memory event counters remained zero. Clocks were sampled and dynamic;
+energy was not measured. The cells compare chunk settings and requested cache
+arguments for this Coder IQ1_M model, FP16 KV, MTP-off 8K profile and one held-out
+archive task. This confirms a large latency effect for the tested prefill path,
+not a universal setting or a release-default recommendation. Other Phase 6
+interactions, workload/quality domains and the broader Pareto/energy scope
+remain open.

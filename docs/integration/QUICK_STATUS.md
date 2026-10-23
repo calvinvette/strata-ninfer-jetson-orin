@@ -476,15 +476,16 @@ three randomized blocks: chunk 128 reduced client total time 67.4%/69.6% at
 requested caches 1,500/3,000 slots for a 7,501-token task. The median
 cache-by-chunk time interaction was −9.8%, with minimum physical/admission
 availability 14.19/14.14 GiB and zero cgroup events. This is descriptive
-screening evidence without confidence intervals; seven-block held-out
-confirmation remains necessary before a recommendation. [Report](../../bench/results/2026-10-23-phase6-coder-prefill-cache-screen3/README.md).
+screening evidence without confidence intervals; the distinct seven-block
+held-out confirmation is reported separately below. [Screen report](../../bench/results/2026-10-23-phase6-coder-prefill-cache-screen3/README.md).
 
-A separate seven-block confirmation with a distinct, tokenizer-verified
-7,501-token archive is underway. Its isolated preflight returned the exact
-answer and passed memory guards; the preflight is excluded from confirmation
-statistics. Blocks 1–6/7 passed all twenty-four cells with zero cgroup events
-and at least 14.19 GiB physical/admission availability. Chunk 128 reduced
-median client total time 67.7%/68.8% at requested caches 1,500/3,000; the
-six-block cache-by-chunk interaction was −3.0%. These remain partial descriptive
-results without confidence intervals; block 7 continues. [Confirmation
-design and runner](../../bench/results/2026-10-23-phase6-coder-prefill-cache-confirm7/README.md).
+A seven-block held-out Coder IQ1_M confirmation is complete: all 28 measured
+cells returned the exact 46-token answer for the distinct 7,501-token archive,
+with zero cgroup memory events and at least 14.19 GiB physical/admission
+availability. Chunk 128 lowered client total time 67.71% (95% paired-block
+interval 67.55%–67.95%) at 1,500 requested cache slots and 68.72%
+(68.56%–68.85%) at 3,000; the cache-by-chunk interaction was −3.13%
+(−5.43% to −1.93%). Decode-throughput intervals included zero. This is scoped
+to Coder IQ1_M, FP16 KV, MTP off, 8K and this archive task; no default is
+promoted, and broader Phase 6 interactions and energy/Pareto scope remain open.
+[Full report](../../bench/results/2026-10-23-phase6-coder-prefill-cache-confirm7/README.md).
