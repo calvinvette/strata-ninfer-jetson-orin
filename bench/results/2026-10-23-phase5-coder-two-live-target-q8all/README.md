@@ -595,3 +595,35 @@ paired screens. Raw logs and supervisor telemetry remain in ignored local
 `run-poolworkers{1,8}-72/` and `supervisor-poolworkers{1,8}-72/` directories; no
 model or build artifact is included in Git. Harness syntax and CLI help checks
 passed.
+
+### Narrow layer-22 rank-swap and layer-40 GDN trace
+
+A one-pair profile swap at layer 22 exchanged expert 185 (rank 5,329) with
+expert 199 (rank 2,973), preserving all other ranks (profile SHA256
+`73cfb94256b99e8ba4a658911ed262a784854e33bdb779e3e1329c79d7dc5383`). At
+position 105 / token `7620`, the layer-22 activation, routes, expert parts,
+combined MoE output, and residual boundary were exact between serial and batch.
+This improves on the earlier global rank intervention, which changed other
+expert placements too. The narrow intervention made the complete 96-token
+slot-1 output match, but did not make recurrent state exact: at position 162,
+the first changed GDN allocation was model layer 9 (relative L2 `2.1226e-5`),
+growing to `0.0033527` at layer 22. Therefore token equality is not evidence
+of recurrent-state equality.
+
+At position 105, the narrow intervention's GDN states were exact through layer
+38, and the layer-39 MoE inputs, routes, parts and output plus its following
+boundary were exact. Layer 40's stage capture found `h` as the first changed
+field (relative L2 `8.700e-5`); `x`, `qkv`, gate, beta and z matched. The
+resulting `y` differed by relative L2 `5.879e-5`, and the projected GDN output
+by `0.001079`. This localizes a sampled perturbation to the recurrence path at
+layer 40 after the captured layer-39 boundary. It does not determine whether
+the difference begins in pre-existing recurrent state or in batch-context
+arithmetic within the recurrence. The overall Phase 5 cause remains open.
+
+The multirow `STBNDY2` diagnostic needed for these captures now emits one
+record per selected batch row while preserving its version-2 record layout.
+On Orin, the CUDA service rebuilt and `verify_parity` plus
+`verify_batch_parity` passed (2/2); the Python harnesses passed syntax checks.
+HIP/SYCL rebuild remains pending: maestro1 currently reports 99% root disk use
+with 1.1 GiB free. Its evidence, when available, will be compile/link and
+startup only, not accelerator runtime qualification.

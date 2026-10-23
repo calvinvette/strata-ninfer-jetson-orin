@@ -4757,3 +4757,20 @@ worker count does not shift the observed onset in this cell; the cause remains
 unresolved. Minimum physical/admission availability was 14.17/14.16 GiB with
 zero cgroup events. These are correctness diagnostics, not performance results.
 [Run record](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+
+A one-pair layer-22 expert rank swap (185↔199) preserved the rest of the static
+profile. At position 105, the layer-22 activation, routes, parts, output and
+residual boundary were exact. The full 96-token slot-1 output matched under
+this intervention, but GDN state at position 162 still first differed at layer
+9 (relative L2 `2.1226e-5`), increasing to `0.0033527` at layer 22. At position
+105, layer-39 MoE fields and its following boundary were exact; the first
+changed layer-40 GDN stage field was `h` (relative L2 `8.700e-5`), followed by
+`y` (`5.879e-5`). This localizes one sampled perturbation after the layer-39
+boundary, but does not distinguish a pre-existing recurrent-state delta from
+batch-context arithmetic in the layer-40 recurrence. The opt-in multirow
+`STBNDY2` capture preserves its version-2 record layout and now emits selected
+batch rows. Current Orin CUDA build and focused `verify_parity`/
+`verify_batch_parity` passed (2/2), and the three Python tools passed syntax
+checks. maestro1 remains at 99% disk use (1.1 GiB free), so HIP/SYCL shared-file
+rebuild evidence is pending. No accelerator-runtime claim follows from that
+planned x86 rebuild. Phase 5 remains open. [Capture record](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).

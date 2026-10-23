@@ -451,3 +451,13 @@ pattern: slot 0 matched and slot 1 first diverged at output index 60. Worker
 count did not shift the mismatch in this cell, but its underlying cause remains
 unresolved. Minimum admission availability was 14.17/14.16 GiB with zero
 cgroup events. [Report](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+
+A narrow layer-22 expert-rank swap made the sampled layer-22 MoE and following
+boundary exact, and slot 1's full 96-token output matched. Its recurrent state
+still differed by layer 9 at terminal position 162. At position 105, layer-39
+MoE and its boundary were exact; the first changed sampled stage was layer-40
+GDN `h` (relative L2 `8.700e-5`). This narrows one sampled path but does not
+distinguish pre-existing recurrent state from row-context recurrence arithmetic.
+The opt-in multirow boundary capture passes the focused Orin parity tests;
+maestro1 backend rebuild is pending while its root filesystem remains 99% full.
+Phase 5 remains open. [Trace notes](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).

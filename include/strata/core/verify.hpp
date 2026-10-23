@@ -406,7 +406,8 @@ private:
     int boundary_diag_layer_ = -1;
     int64_t boundary_diag_position_ = -1;
     float* boundary_diag_h_ = nullptr; ///< opt-in residual/hyperconnection boundary snapshots
-    size_t boundary_diag_capacity_ = 0;
+    size_t boundary_diag_capacity_ = 0; ///< bytes in one row's STBNDY2 payload
+    size_t boundary_diag_storage_capacity_ = 0; ///< pinned payload storage for all verifier batch rows
     std::string boundary_diag_path_;
     bool boundary_diag_captured_ = false;
     bool boundary_diag_batch_graph_captured_ = false;

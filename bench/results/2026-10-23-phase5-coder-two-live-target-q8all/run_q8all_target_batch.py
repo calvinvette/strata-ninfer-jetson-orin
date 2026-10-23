@@ -26,6 +26,8 @@ parser.add_argument("--generated-tokens", type=int, default=96,
                     help="tokens generated for each serial and batch request")
 parser.add_argument("--pool-workers", type=int,
                     help="override expert CPU worker count for serial and batch engines")
+parser.add_argument("--expert-profile", type=Path,
+                    help="optional temporary residency profile for a correctness intervention")
 parser.add_argument("--accepted-prefix-trace", action="store_true",
                     help="hash committed persistent state at each accepted verifier prefix")
 cli = parser.parse_args()
@@ -43,6 +45,8 @@ replace_arg(args, "--spec", "2")
 replace_arg(args, "--max-context", "1024")
 replace_arg(args, "--expert-cache", str(EXPERT_CACHE_SLOTS))
 replace_arg(args, "--prompt-cache", "6")
+if cli.expert_profile is not None:
+    replace_arg(args, "--expert-profile", str(cli.expert_profile.resolve()))
 if cli.pool_workers is not None:
     if cli.pool_workers < 1:
         parser.error("--pool-workers must be positive")
@@ -109,6 +113,7 @@ result = {
     "scope": "one supervised two-live target-only batch correctness diagnostic; no performance claim",
     "repository_head": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
     "binary_sha256": file_sha256(cfg["exe"]),
+    "expert_profile_sha256": file_sha256(cli.expert_profile) if cli.expert_profile is not None else None,
     "model_identity": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF IQ1_M",
     "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
     "model_shards": [cfg["args"][cfg["args"].index("--native") + 1],
@@ -117,6 +122,7 @@ result = {
     "profile": {"live_requests": 2, "batch_slots": 2, "mtp": False, "context": 1024,
                 "expert_cache_slots": EXPERT_CACHE_SLOTS, "prompt_cache": 6, "generated_tokens": GENERATED_TOKENS,
                 "pool_workers": cli.pool_workers if cli.pool_workers is not None else "config default",
+                "expert_profile_override": str(cli.expert_profile.resolve()) if cli.expert_profile is not None else None,
                 "STRATA_NATIVE_CPU_Q8_1_DOT": "all", "STRATA_IQ_MT_MIN": "1"},
     "prompt_token_counts": {name: len(prompt) for name, prompt in prompts.items()},
     "outputs": {name: {"serial": serial[name], "batch": batched[name]} for name in prompts},
