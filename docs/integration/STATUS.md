@@ -4792,3 +4792,13 @@ changed captured stage. The first sampled source therefore depends on position;
 this does not explain all two-live drift. The capture retained at least 14.15
 GiB availability with zero cgroup events; EMC readback was unsupported and
 energy was not measured. Phase 5 remains open. [Detailed trace and oracle](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+
+A current-source [Coder IQ1_M prefill-chunk × expert-cache screen](../../bench/results/2026-10-23-phase6-coder-prefill-cache-screen3/README.md)
+completed randomized block 1/3 for chunk sizes 32/128 and requested cache
+arguments 1,500/3,000 slots at 8K context. All four cells returned the exact
+answer with 7,501 prompt and 45 completion tokens. Chunk 128 reduced median
+single-block client total 65.3%/69.6% at the two cache arguments; the
+cache-by-chunk time ratio-of-ratios was −12.5%. Minimum physical/admission
+availability was 14.38/14.14 GiB, with zero cgroup events. This is one-block
+screening only, without uncertainty or a promotion claim; blocks 2/3 remain.
+Phase 6 remains open.

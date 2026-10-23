@@ -470,3 +470,10 @@ CPU exactly. Layer-40 input `x` and committed recurrent state were already
 different at position 104. This supports an earlier owner-dependent
 contribution in this sampled run; the first source is position-dependent and
 the general two-live state drift remains unresolved.
+
+A new current-source Coder IQ1_M prefill-chunk × expert-cache screen passed its
+first randomized block: chunk 128 reduced client total time 65.3%/69.6% at
+requested caches 1,500/3,000 slots for a 7,501-token task. The one-block time
+interaction was −12.5%, with minimum physical/admission availability
+14.38/14.14 GiB and zero cgroup events. This is only screening evidence;
+blocks 2/3 remain. [Report](../../bench/results/2026-10-23-phase6-coder-prefill-cache-screen3/README.md).
