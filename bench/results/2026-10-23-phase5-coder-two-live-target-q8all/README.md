@@ -470,3 +470,22 @@ retained at least 27.43 GiB. Compact results are in
 [`analysis.json`](layer4-moe-layer5-stage-76-77/analysis.json), and
 [`expert218-oracle/analysis.json`](layer4-moe-layer5-stage-76-77/expert218-oracle/analysis.json).
 Raw activations, full MoE parts, state dumps, model files and logs remain local.
+
+### Expert-cache intervention
+
+The same combined layer-4/layer-5 capture was repeated with the requested host
+expert-cache cap raised from 1,500 to 3,000 MiB. At layer 4 / position 77,
+expert 218 still changed from primary VRAM to CPU with the exact same activation
+SHA256 (`10cb6e4961eca2ed9a4b1ecc753080b97a4f40cd10ebd184c54d24e064518932`),
+route IDs and weights. Its expert-part and combined-output deltas were identical
+to the 1,500 MiB capture. Layer 5 again matched every state/stage field at
+position 76, then first differed at `x` and committed state at position 77 with
+the same metrics. Slot 0 matched all 72 serial output IDs. Thus this host cache
+increase does not prevent the layer-4 owner change or its associated downstream
+state/stage difference for this cell. It is not evidence that other cache sizes
+or residency policies cannot help. The run retained at least 14.08 GiB
+physical/admission availability and had zero cgroup events. Compact results are
+in [`layer4-moe-layer5-stage-76-77-cache3000/state-analysis.json`](layer4-moe-layer5-stage-76-77-cache3000/state-analysis.json),
+[`stage77-analysis.json`](layer4-moe-layer5-stage-76-77-cache3000/stage77-analysis.json),
+and [`analysis.json`](layer4-moe-layer5-stage-76-77-cache3000/analysis.json); the
+independent oracle for this identical activation is linked above.

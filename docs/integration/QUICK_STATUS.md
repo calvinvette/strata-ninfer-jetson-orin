@@ -411,3 +411,8 @@ first changed at `x` for the same token/position; layer-5 state was exact at the
 prior sampled position. This strongly supports owner-dependent arithmetic as
 the source entering layer 5, though downstream propagation remains unproven.
 [Details](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+
+Raising the host expert-cache cap to 3,000 MiB left the same layer-4 expert 218
+VRAM→CPU owner change and reproduced the same layer-5 `x`/state delta for the
+same activation. This cache increase does not resolve the measured cell.
+[Details](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).

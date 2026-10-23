@@ -4635,3 +4635,14 @@ is the earliest sampled point), not a cause; Phase 5 remains open. The
 and [report](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md) retain the result.
 
 A same-run [layer-4 owner and layer-5 state/stage capture](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md) now connects the early slot-0 state change at position 77. Layer-5 state and all layer-5 stage fields were exact at position 76. At position 77 / input token `709`, layer-5's first changed stage field was `x` (relative L2 `3.697e-5`), followed by QKV and later fields; its committed GDN state changed (recurrent relative L2 `7.663e-5`, convolution `1.630e-4`). In the same run, layer-4 MoE input activation, routes and weights were exact, but expert 218 rank 2 changed primary-VRAM→CPU ownership. The expert part changed by relative L2 `3.578e-4`; the combined layer-4 MoE output by `1.463e-4`. An independent same-activation `native_expert_parity` oracle matched serial service to its GPU output and batch service to its CPU output bit-for-bit; the oracle CPU/GPU delta was `3.578e-4`. This strongly supports owner-dependent layer-4 arithmetic as the perturbation entering layer 5, but does not prove the full downstream causal path. Slot 0 still matched its 72 serial output IDs in this run. The capture retained 17.85 GiB minimum physical/admission availability, with zero cgroup events; the oracle used no accelerator-runtime claim. This is correctness evidence only and Phase 5 remains open. [State/stage summaries](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer4-moe-layer5-stage-76-77/state-analysis.json), [owner analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer4-moe-layer5-stage-76-77/analysis.json), [independent oracle](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer4-moe-layer5-stage-76-77/expert218-oracle/analysis.json).
+
+A controlled repeat raised the requested host expert-cache cap from 1,500 to
+3,000 MiB while holding model, prompts, selectors and capture positions fixed.
+Expert 218 still changed VRAM→CPU on the identical layer-4 activation hash and
+route, with identical expert and combined-output deltas. Layer-5 state/stage
+again matched at position 76 and first changed at `x`/committed state at
+position 77 with the same metrics. Slot 0 matched all 72 serial output IDs.
+Minimum physical/admission availability was 14.08 GiB with zero cgroup events.
+This excludes that cache-cap increase as a remedy for this owner transition in
+this cell; Phase 5 remains open. [3,000 MiB analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer4-moe-layer5-stage-76-77-cache3000/analysis.json),
+[paired 1,500 MiB analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer4-moe-layer5-stage-76-77/analysis.json).
