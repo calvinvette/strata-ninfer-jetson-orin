@@ -4537,3 +4537,13 @@ first owner-dependent arithmetic or support a performance claim. The analysis
 helper now maps captured positions to prompt/output spans and accepts one
 complete request block, enabling the long-position report. Phase 5 remains
 open.
+
+A supervised [two-live accepted-prefix repeat](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md)
+generated 72 tokens per request with Q8_1-all target-only verification. Slot 0
+matched serial throughout; slot 1 first differed at token 66. The four accepted
+prefix records available before/at slot handoff all matched serial state
+exactly (three slot-0 prefixes, one slot-1 prefix). The batch decode path emitted
+no further accepted-state records, leaving terminal per-slot state unassessed.
+Minimum physical/admission availability was 17.82 GiB, with zero cgroup events;
+this is correctness evidence only. Phase 5 remains open for full per-slot
+committed-state capture and batch numerical localization.

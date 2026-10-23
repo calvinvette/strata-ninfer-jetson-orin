@@ -40,6 +40,11 @@ long position 2067), while all long-request output tokens still matched. This
 is localization evidence, not a causal or performance result. Phase 5 remains
 open. [Report](../../bench/results/2026-10-23-phase5-coder-adaptive-divergence-532-2067/README.md).
 
+A supervised 72-token two-live target-only repeat matched slot 0's serial output
+and first differed at slot 1 token 66. Four captured accepted-prefix states at
+slot handoff matched serial exactly, but the remaining batched decode emitted
+no state trace; terminal per-slot state parity remains unassessed. [Details](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+
 These results are specific to the tested Orin build, model and workload. No
 candidate setting has been promoted to a default.
 

@@ -288,3 +288,37 @@ captures remain local under `boundary-layer23-position105-cache3000/` and
 `boundary-layer23-position105-cache3000-single-live/`, with supervisor
 telemetry in their matching `supervisor-*` directories. The boundary hook
 needs a one-row batch window to answer the two-live localization question.
+
+### Accepted-prefix trace follow-up
+
+A supervised repeat enabled `STRATA_ACCEPTED_PREFIX_TRACE` and generated 72
+tokens per request with the same Q8_1-all, target-only, two-live profile. It
+completed in 233.8 seconds with 17.82 GiB minimum physical/admission
+availability and zero cgroup events. Slot 0 matched its serial control for all
+72 tokens; slot 1 first differed at token 66, again beyond the six-token shared
+opening. This is a correctness run, not a performance measurement.
+
+The batch log contained four accepted-prefix records before/at the two slot
+handoffs. Three mapped to slot 0's generated prefixes 0–2, and one to slot 1's
+prefix 0. All four token IDs and all 11 persistent-state fingerprint fields
+matched their corresponding serial records exactly. This verifies the state
+copied into each slot at those admission boundaries. No accepted-prefix records
+were emitted during the remaining batched decode: 69 slot-0 and 71 slot-1
+generated tokens have no direct batch-state record. Terminal per-slot state
+parity therefore remains unassessed; the early handoff matches do not imply
+full-request parity. See
+[`accepted-prefix-72/analysis.json`](accepted-prefix-72/analysis.json).
+
+Reproduce on the configured Orin checkout with the current candidate:
+
+```sh
+python3 tools/integration/run_control.py \
+  --output bench/results/2026-10-23-phase5-coder-two-live-target-q8all/supervisor-accepted-prefix-72 \
+  --timeout 2400 --interval 1 --sample-clocks \
+  python3 bench/results/2026-10-23-phase5-coder-two-live-target-q8all/run_q8all_target_batch.py \
+  --output bench/results/2026-10-23-phase5-coder-two-live-target-q8all/accepted-prefix-72 \
+  --generated-tokens 72 --accepted-prefix-trace
+python3 bench/results/2026-10-23-phase5-coder-two-live-target-q8all/analyze_accepted_prefix_trace.py \
+  --run bench/results/2026-10-23-phase5-coder-two-live-target-q8all/accepted-prefix-72 \
+  --output bench/results/2026-10-23-phase5-coder-two-live-target-q8all/accepted-prefix-72/analysis.json
+```
