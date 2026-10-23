@@ -4794,13 +4794,13 @@ GiB availability with zero cgroup events; EMC readback was unsupported and
 energy was not measured. Phase 5 remains open. [Detailed trace and oracle](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
 
 A current-source [Coder IQ1_M prefill-chunk × expert-cache screen](../../bench/results/2026-10-23-phase6-coder-prefill-cache-screen3/README.md)
-completed randomized block 1/3 for chunk sizes 32/128 and requested cache
-arguments 1,500/3,000 slots at 8K context. All four cells returned the exact
-answer with 7,501 prompt and 45 completion tokens. Chunk 128 reduced median
-single-block client total 65.3%/69.6% at the two cache arguments; the
-cache-by-chunk time ratio-of-ratios was −12.5%. A second randomized block also
-passed all four cells. Across both blocks, the chunk-128 client-time reduction
-was 66.4%/70.1%; the median time interaction was −11.1%. Minimum
-physical/admission availability across the two blocks was 14.31/14.14 GiB,
-with zero cgroup events. This remains descriptive two-block screening without
-uncertainty or a promotion claim; block 3 remains. Phase 6 remains open.
+completed all three randomized blocks for chunk sizes 32/128 and requested
+cache arguments 1,500/3,000 slots at 8K context. All twelve measured cells
+returned the exact answer with 7,501 prompt and 45 completion tokens. The
+strict analyzer passed with minimum physical/admission availability of
+14.19/14.14 GiB and zero cgroup events. Median paired reductions in client
+total time for chunk 128 were 67.4%/69.6% at the two cache arguments; the
+cache-by-chunk time ratio-of-ratios was −9.8%. This remains three-block
+screening evidence without confidence intervals or a promotion claim; a
+seven-block held-out confirmation is required before recommendation. Phase 6
+remains open.
