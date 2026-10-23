@@ -2769,3 +2769,14 @@ beside each exact activation. A cache-size ablation is interpretable only after
 confirming the upstream layer input is paired; the 3,000 MiB rerun here had
 already diverged before the selected MoE row and cannot answer the cache
 question.
+
+Join a batch owner trace to a native operator oracle with the exact serialized
+service activation. For the three Coder layer-11 experts that moved from VRAM
+to CPU, the delayed serial service outputs matched the native CUDA oracle
+bit-for-bit and the batch outputs matched the native CPU oracle bit-for-bit;
+all 2,560 output values differed between those two operator paths. This
+confirms an owner-dependent expert arithmetic change for the captured rows.
+Record the model's actual per-layer gate/up and down codecs—the selected rows
+here were IQ2_S/IQ4_NL—and compare both operators with a separate float
+calculation over decoded weights. Keep this narrow operator result separate
+from token quality and long-run state qualification.

@@ -1,8 +1,10 @@
 # Phase 5 batch owner follow-up
 
 Date: 2026-10-22. This is a targeted correctness diagnostic on Jetson AGX
-Orin (ARM64, CUDA 12.6), using the Coder IQ1_M model and delayed target-only
-batch schedule recorded in the [batch-MTP experiment](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
+Orin (ARM64, CUDA 12.6), using the Coder IQ1_M snapshot from
+`ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF` at revision
+`5348543e0147355ac9cbcb031184a3546350988e` and the delayed target-only batch
+schedule recorded in the [batch-MTP experiment](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
 It is not a performance result or Phase 5 closeout.
 
 ## Finding
@@ -25,6 +27,22 @@ the same 96 tokens as its serial control and its queued peer emitted one.
 Minimum physical/admission availability was 17.79 GiB and sampled cgroup
 memory events were zero. Clocks were observed dynamically; EMC readback was
 denied and request energy was not measured.
+
+The same three service parts were then joined to `native_expert_parity` using
+their captured activation (SHA256
+`45b5242503845f5fef75c96f68db53ff2dab46d9d85347630e27512077424aaa`). The
+selected experts use IQ2_S gate/up and IQ4_NL down weights. For all three,
+serial service output matched the CUDA operator output bit-for-bit, and batch
+service output matched the CPU operator output bit-for-bit. The CPU and CUDA
+outputs differed in all 2,560 values per expert; relative L1 was 0.849–1.380%
+and relative L2 was 0.844–1.398%. Both paths also passed the tool's float
+reference checks (GGML `to_float` weight decode followed by its separate float
+expert calculation). This confirms the observed expert-part change follows
+the owner-specific arithmetic path on these rows. It does not measure model
+quality or imply that one arithmetic path is preferable. The supervised
+oracle run completed in 2.1 seconds with 25.62 GiB minimum available physical
+memory and zero sampled cgroup memory events; EMC readback was denied and
+energy was not measured.
 
 The ARM64/CUDA candidate rebuilt with one job and passed the focused
 `verify_parity`, `verify_batch_parity` and `spec_verify_parity` tests. Python
@@ -60,9 +78,21 @@ python bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/analyze_t
 ```
 
 The compact selected analyses are `targetonly-qsa-boundary119-batchdiag-analysis.json`,
-`targetonly-layer11-moe-owners-position119-analysis.json`, and
-`targetonly-layer11-moe-owners-cache3000-analysis.json` in the experiment
-directory. Full capture arrays and supervisor logs remain local-only.
+`targetonly-layer11-moe-owners-position119-analysis.json`,
+`targetonly-layer11-moe-owners-cache3000-analysis.json`, and
+`targetonly-layer11-moe-owner-oracle-analysis.json` in the experiment
+directory. The oracle join is reproducible with:
+
+```sh
+OUT=bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/run-owner-oracle
+CAPTURE_RUN=bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/run-targetonly-layer11-moe-owners-position119
+python tools/integration/run_control.py --output "$OUT-supervisor" --timeout 300 --sample-clocks \
+  python bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/run_targetonly_layer11_moe_owner_oracle.py \
+  --run "$CAPTURE_RUN" --output "$OUT"
+```
+
+Full activation/output arrays, parity logs and supervisor samples remain
+local-only.
 
 ## Transfer to another inference backend
 

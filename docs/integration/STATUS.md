@@ -14,6 +14,9 @@ arithmetic. The layer-10 boundary and layer-11 MoE input, routes, weights and
 shared-expert output matched serial; three routed expert parts switched from
 primary VRAM to CPU in the batch row, and their weighted changes accounted for
 the combined-output delta. Slot-0 output still matched all 96 serial tokens.
+A same-input native expert oracle then matched each serial part to its CUDA
+output and each batch part to its CPU output bit-for-bit, confirming the
+owner-specific arithmetic path for all three rows.
 A larger-cache follow-up was unclean because its layer-11 input already
 differed. This is a single-prompt correctness diagnostic; Phase 5 remains open.
 See the [batch-MTP diagnostic](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).

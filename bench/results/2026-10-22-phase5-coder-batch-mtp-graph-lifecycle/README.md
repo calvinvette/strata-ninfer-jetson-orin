@@ -532,3 +532,20 @@ the shared-expert output changed. Treat this cell as an unclean diagnostic,
 not evidence that increasing cache changes expert ownership or fixes the
 observed difference. Full capture arrays and process logs remain local-only;
 the parsers, compact analyses and reproduction harness are retained here.
+
+### Owner-specific expert oracle (2026-10-22)
+
+For the exact layer-11 position-119 activation, the service's serial outputs
+for experts 205, 110 and 90 matched `native_expert_parity` CUDA outputs
+bit-for-bit. The delayed batch outputs for those same experts matched the
+native CPU outputs bit-for-bit. The two operator outputs differed in all
+2,560 values for each expert (relative L1 0.849–1.380%; relative L2
+0.844–1.398%). Their gate/up weights are IQ2_S and down weights IQ4_NL. Both
+operator paths passed the parity tool's separate float expert-reference
+checks using GGML `to_float` decoded weights. This confirms the owner-specific
+arithmetic path for these expert parts, not a model-quality effect. The
+supervised operator-oracle run retained 25.62 GiB minimum physical/admission
+availability and zero cgroup events. It completed in 2.1 seconds; clocks were
+dynamic, EMC readback was denied, and energy was not measured. The compact
+comparison is `targetonly-layer11-moe-owner-oracle-analysis.json`; full
+activation, output arrays and process logs are local-only.
