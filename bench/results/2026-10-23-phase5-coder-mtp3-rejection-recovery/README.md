@@ -23,8 +23,10 @@ measured. Raw request logs, state hashes and supervisor telemetry are retained
 beside this report.
 
 The model is `ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF` IQ1_M. Model
-shard identities are in [`model-sha256.txt`](model-sha256.txt); source and
-binary identities are in [`source-revision.txt`](source-revision.txt) and
+shard identities are in [`model-sha256.txt`](model-sha256.txt); engine source,
+probe source and binary identities are in [`engine-source-revision.txt`](engine-source-revision.txt),
+[`probe-source-revision.txt`](probe-source-revision.txt),
+[`probe-script-sha256.txt`](probe-script-sha256.txt) and
 [`binary-sha256.txt`](binary-sha256.txt). The configuration is copied to
 [`config.json`](config.json). MTP runtime/model data remain under
 `~/models/strata-orin-validation/`.
