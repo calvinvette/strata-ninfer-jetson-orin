@@ -541,3 +541,32 @@ python3 tools/integration/run_control.py \
   --stage-layer 5 --moe-layer 4 --expert-cache-slots 1500 \
   --expert-profile /tmp/phase5-layer4-expert218-first.bin --generated-tokens 72 --serial-slot both
 ```
+
+### Prefix trace of the remaining mismatch under the intervention
+
+A separate 72-token run with the expert-218-first profile traced per-layer GDN
+state hashes on every accepted prefix. Hash-based alignment inferred a batch
+position offset of two for both rows and paired internal batch row 0 to serial
+prompt 0 and row 1 to prompt 1 for that run. Prompt 0's first per-layer hash
+mismatch was at serial prefix position 70 (batch position 72), first at GDN
+allocation ordinal 30 (6/36 allocations differed). Prompt 1's first was at
+serial prefix position 82 (batch position 84), first at ordinal 8 (28/36
+allocations differed). Prompt 0 still matched all 72 output IDs; prompt 1 still
+first differed at output index 66.
+
+A fresh direct all-layer capture at position 82 mapped its internal batch row 0
+to serial prompt 1 and row 1 to prompt 0. Prompt 1's state was exact; prompt 0
+first differed at model layer 32 (whole-state relative L2 `0.001710`). This
+run-local assignment differed from the hash run, reinforcing that verifier row
+IDs cannot stand in for prompt identity. Across later captures, prompt 1's
+layer-10 state was already slightly different at position 131 (relative L2
+`2.752e-9`) and at 132/133 (`2.772e-9`/`2.720e-9`). At positions 131–133,
+layer-9 MoE inputs, routes, parts and combined output were exact; layer-10's
+first changed stage was `y` (max delta `7.45e-8` to `8.94e-8`). The onset varies
+across fresh runs, so these sampled boundaries do not establish a stable first
+operation. The two-live output mismatch and its initiating cause remain open.
+
+These supervised hash/state captures retained at least 17.80 GiB available and
+had zero cgroup memory events. The [compact result](expert218-intervention-analysis.json)
+contains per-run prompt mappings, first differing GDN ordinals, direct model-layer
+state metrics, and links to local raw captures. No timing claim is made.

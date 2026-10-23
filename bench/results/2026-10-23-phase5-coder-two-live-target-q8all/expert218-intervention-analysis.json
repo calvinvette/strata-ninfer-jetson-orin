@@ -134,5 +134,96 @@
     "intervention": "layer4-expert218-first-76-77/",
     "all_layer": "layer31-layer32-profile-e218-first-76-77/",
     "upstream_boundary": "layer30-moe-layer31-stage-profile-e218-first-76-77/"
+  },
+  "remaining_two_live_mismatch_trace": {
+    "scope": "one profile-matched 72-token supervised run with accepted-prefix per-GDN hashes; prompt mapping selected by maximizing exact serial state-hash matches across the two batch rows",
+    "profile_sha256": "b90e5fe744e7dc8434503e1591404ce98f4d68add345f8d0bfc2fc68436e980f",
+    "outputs": {
+      "slot0_matches_72": true,
+      "slot1_matches_72": false,
+      "slot1_first_output_mismatch_index": 66
+    },
+    "hash_alignment": "both batch rows inferred batch-position minus serial-prefix-position offset 2; exact matches select serial controls by hash sequence; row-to-prompt can vary across runs",
+    "per_prompt_first_hash_mismatch": {
+      "batch_row0": {
+        "serial_control": 0,
+        "batch_position": 72,
+        "serial_prefix_position": 70,
+        "first_gdn_allocation_ordinal": 30,
+        "different_of_36": 6
+      },
+      "batch_row1": {
+        "serial_control": 1,
+        "batch_position": 84,
+        "serial_prefix_position": 82,
+        "first_gdn_allocation_ordinal": 8,
+        "different_of_36": 28
+      }
+    },
+    "direct_position82_capture": {
+      "batch_slot_to_serial_control": {
+        "0": 1,
+        "1": 0
+      },
+      "first_state_difference": {
+        "0": null,
+        "1": {
+          "layer": 32,
+          "position": 82,
+          "input_token": 76938,
+          "relative_l2": 0.001709813158151169
+        }
+      },
+      "scope": "one repeat at serial position 82; prompt-to-batch row assignment differs from the hash run, so use each run-local mapping"
+    },
+    "limits": [
+      "Per-layer hash traces identify exact state fingerprints, not float deltas.",
+      "At direct position 82, batch row 0 mapped to serial prompt 1 and was exact; batch row 1 mapped to prompt 0 and first differed at model layer 32. This differs from the per-prefix hash run mapping, confirming that internal row assignment must be re-established for each run.",
+      "The residual mismatch source remains unresolved; Phase 5 stays open."
+    ],
+    "evidence": {
+      "hash_capture": "profile-e218-gdn-prefix-hashes-72/",
+      "hash_analysis": "profile-e218-gdn-prefix-hashes-72/batch-gdn-hash-analysis.json",
+      "position82_capture": "profile-e218-all-state-position82/",
+      "position82_analysis": "profile-e218-all-state-position82/state-analysis.json",
+      "position133_capture": "profile-e218-slot1-boundary-position133/",
+      "position131_133_captures": [
+        "profile-e218-slot1-state-boundary-131-132/",
+        "profile-e218-slot1-prestate-132-133/"
+      ]
+    },
+    "later_layer10_observations": {
+      "position131": {
+        "serial_control": 1,
+        "input_token": 3184,
+        "state_relative_l2": 2.7521200677051296e-09,
+        "first_stage_field": "y",
+        "y_different_values": 2449,
+        "y_max_abs": 1.1920928955078125e-07,
+        "y_relative_l2": 8.988123334598917e-08,
+        "layer9_moe_exact": true
+      },
+      "position132": {
+        "serial_control": 1,
+        "input_token": 864,
+        "state_relative_l2": 2.77177110921514e-09,
+        "first_stage_field": "y",
+        "y_different_values": 2124,
+        "y_max_abs": 7.450580596923828e-08,
+        "y_relative_l2": 7.0132365820199e-08,
+        "layer9_moe_exact": true
+      },
+      "position133": {
+        "serial_control": 1,
+        "input_token": 3008,
+        "state_relative_l2": 2.7196777594214155e-09,
+        "first_stage_field": "y",
+        "y_different_values": 2207,
+        "y_max_abs": 8.940696716308594e-08,
+        "y_relative_l2": 7.701467710791271e-08,
+        "layer9_moe_exact": true
+      },
+      "interpretation": "At these later sampled rows, the first captured difference is in layer-10 recurrence output y; layer-9 MoE records are exact. The recurrent-state onset varies across fresh runs and these rows do not identify the initiating operation."
+    }
   }
 }
