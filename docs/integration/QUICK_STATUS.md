@@ -383,3 +383,9 @@ the diagnostic supports one-row windows, while both requests were grouped. A
 one-live request used the serial verifier path (header slot `-1`) and is not a
 batch comparison. The QSA-to-layer-24 input boundary remains unlocalized; this
 capture limitation is recorded as unsupported rather than a pass.
+
+A terminal GDN capture for slot 0 matched all 72 serial output tokens but first
+showed a committed-state delta at layer 5 (whole-state relative L2
+`2.24e-7`). The batch run retained at least 17.85 GiB physical/admission
+availability and had zero cgroup events. Slot 1's state was not compared after
+its output diverged at token 66. Phase 5 remains open. [Analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/position138-slot0-state-retry/slot0-analysis.json).

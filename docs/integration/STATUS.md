@@ -4547,3 +4547,15 @@ no further accepted-state records, leaving terminal per-slot state unassessed.
 Minimum physical/admission availability was 17.82 GiB, with zero cgroup events;
 this is correctness evidence only. Phase 5 remains open for full per-slot
 committed-state capture and batch numerical localization.
+
+A supervised terminal-state capture after 72 generated tokens per request
+compared slot 0's batch GDN state with a fresh serial control at absolute
+position 138. Slot 0's 72 output IDs all matched, but committed state was exact
+only through layer 4; layer 5 first differed (312,213/817,152 values, maximum
+absolute delta `2.3674e-6`, whole-state relative L2 `2.2442e-7`). Minimum
+physical/admission availability was 17.85 GiB and cgroup memory events were
+zero. Slot 1's state at that position was not compared because its sequence had
+already diverged at token 66. This confirms that output equality for slot 0 in
+this bounded run does not imply terminal persistent-state equality. It is
+correctness localization, not a performance or quality result; Phase 5 remains
+open. See the [capture analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/position138-slot0-state-retry/slot0-analysis.json) and [experiment report](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).

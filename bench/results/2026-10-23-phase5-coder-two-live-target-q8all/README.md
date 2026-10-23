@@ -322,3 +322,20 @@ python3 bench/results/2026-10-23-phase5-coder-two-live-target-q8all/analyze_acce
   --run bench/results/2026-10-23-phase5-coder-two-live-target-q8all/accepted-prefix-72 \
   --output bench/results/2026-10-23-phase5-coder-two-live-target-q8all/accepted-prefix-72/analysis.json
 ```
+
+### Terminal slot-0 committed state
+
+A follow-up captured all GDN layers at absolute position 138 after 72 generated
+tokens, with fresh serial controls for both prompt slots. The supervised capture
+passed in 205.6 seconds, retained at least 17.85 GiB physical/admission
+availability and recorded zero cgroup memory events. Slot 0's token IDs matched
+its serial control for all 72 outputs, including the captured input token at
+position 138. Its committed GDN state was exact through layer 4, then first
+differed at layer 5: 312,213/817,152 values changed (maximum absolute delta
+`2.3674e-6`, whole-state relative L2 `2.2442e-7`; recurrent-state relative L2
+`9.4241e-6`). Deltas grow downstream. This is an exact-output but non-exact
+terminal-state result for slot 0. Slot 1's first changed output is index 66, so
+its state at position 138 is not compared to serial. These captures localize a
+numerical difference; they do not identify its cause or imply a quality or
+performance result. Raw 449 MiB state dumps remain local. The compact analysis
+is in [`position138-slot0-state-retry/slot0-analysis.json`](position138-slot0-state-retry/slot0-analysis.json).
