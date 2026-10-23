@@ -431,6 +431,48 @@ not used in the comparison. The complete raw files (about 674 MiB combined)
 remain local-only. The analyzer groups repeated STGCMT1 records by exact
 position, token and capture occurrence.
 
+### Queued-admission GDN stage check at position 119 (2026-10-22)
+
+A follow-up used a queue-aware harness gate: after the caller consumed slot 0's
+48th output token, it queued the one-token request and resumed slot 0 only after
+the service registered that request as waiting for engine control. This avoids
+holding the shared engine-control loop while waiting for a peer response. The
+engine log shows that two already-in-flight solo tokens completed before
+`STOP` took effect: the solo request ended after 50 output tokens, and slot 0
+then entered the batch path with a 118-token prefix. Thus “48” is the caller-side
+queue trigger; the engine-confirmed solo prefix is 50 generated tokens.
+
+At the common committed position 119 (token 16), the serial and batch GDN stage
+capture at model layer 10 was bit-identical in every recorded field (`x`,
+`qkv`, `h`, gates, beta, `z`, `y`, GDN output and FFN intermediates). At layer
+12, input `x` already differed in all 2,560 values (relative L2 0.00166446,
+maximum absolute difference 0.00342625); downstream fields also differed.
+Both layer-specific runs emitted exactly the same 96 slot-0 tokens as serial,
+and the one-token competitor completed. The layer-10 exact / layer-12 changed
+pair localizes where the observed difference first appears to the interval
+between these captures, which includes model layer 11; it does not isolate that
+layer's operation or prove a quality effect. Each supervisor passed with
+17.78/17.82 GiB minimum physical availability, no cgroup memory events, dynamic
+clocks, unavailable EMC readback, and no energy measurement. Reproduction
+scripts and compact analyzer output are retained; raw STGDIAG5 dumps and full
+logs remain local-only. A separate earlier strict gate waited for the peer's
+output before resuming slot 0 and stalled because the first generator retained
+engine control; it was stopped and is excluded.
+
+Reproduce either layer with the matching `--layer` value, changing `OUT` to a
+new directory for each invocation:
+
+```sh
+OUT=/tmp/strata-targetonly-layer10
+python tools/integration/run_control.py --output "$OUT-supervisor" --timeout 360 --sample-clocks \
+  python bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/capture_targetonly_gdn_layer12_stages.py \
+  --layer 10 --output "$OUT"
+python bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/analyze_targetonly_gdn_layer12_stages.py \
+  --layer 10 --run "$OUT"
+```
+
+The tested executable SHA256 was `6a7c91f2127de4cbeb780c2d602c053c61592a7b97c6b73b222c559bc2acb5cc`.
+
 ### Delayed-admission mode and batched-path controls (2026-10-22)
 
 A target-only run with the same 48-token solo prefix and retained batch slot
