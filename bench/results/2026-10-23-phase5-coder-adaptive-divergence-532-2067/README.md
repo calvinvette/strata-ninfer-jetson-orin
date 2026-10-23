@@ -73,9 +73,19 @@ python3 bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/
 The raw service logs, selected dispatch rows, tegrastats and memory samples stay
 local with the run output. The two small JSON summaries contain accepted-prefix
 hash deltas and selected-layer comparisons for review. The existing
-`compare_selected_positions.py` helper rejects a selected position with only
-one captured request block (position 2067); the 48 rows were checked and
-compared directly for this report. That analyzer limitation does not indicate
-a service or capture failure. This is one model, binary, prompt sequence, and
-hardware run; it makes no performance or energy claim and does not close
-Phase 5.
+`compare_selected_positions.py` initially rejected position 2067 because only
+the long request reaches it. The helper now maps selected positions against
+each request's prompt and generated-token bounds, and accepts a single complete
+48-layer block. Its output is
+[`accepted-prefix-analysis.json`](accepted-prefix-analysis.json); the cross-arm
+first-difference summary is
+[`accepted-prefix-comparison.json`](accepted-prefix-comparison.json).
+
+```sh
+python3 bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/compare_selected_positions.py \
+  --run bench/results/2026-10-23-phase5-coder-adaptive-divergence-532-2067 \
+  --output bench/results/2026-10-23-phase5-coder-adaptive-divergence-532-2067/accepted-prefix-analysis.json
+```
+
+This is one model, binary, prompt sequence, and hardware run; it makes no
+performance or energy claim and does not close Phase 5.

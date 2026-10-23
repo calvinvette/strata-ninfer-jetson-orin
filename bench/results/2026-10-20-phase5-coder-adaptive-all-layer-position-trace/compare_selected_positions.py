@@ -133,22 +133,23 @@ def main():
                     "reason": "no dispatch was recorded at this emitted-token position",
                 }
                 continue
-            if len(rows) % 48 or not 2 <= len(rows) // 48 <= len(api_requests):
-                raise ValueError(f"{arm}/position {position}: expected 2..{len(api_requests)} complete 48-layer request blocks, got {len(rows)} rows")
+            if len(rows) % 48 or not 1 <= len(rows) // 48 <= len(api_requests):
+                raise ValueError(f"{arm}/position {position}: expected 1..{len(api_requests)} complete 48-layer request blocks, got {len(rows)} rows")
             request_blocks = [rows[offset:offset + 48] for offset in range(0, len(rows), 48)]
-            if sequence == "short-long-short" and len(request_blocks) == 2:
-                # A position-511 dispatch is present for both 512-token prompts;
-                # the long prompt has no verifier dispatch at this prompt-tail position.
-                captured_request_indices = [0, 2]
-            elif len(request_blocks) <= len(api_requests):
-                # Short/short/short captures are appended in request order. A
-                # row-cap-limited capture can therefore contain only the first
-                # two requests, which must not be mislabeled as recovery.
-                captured_request_indices = list(range(len(request_blocks)))
-            else:
-                raise ValueError(f"{arm}/position {position}: cannot map capture blocks to requests")
-            if len(captured_request_indices) != len(request_blocks):
-                raise ValueError(f"{arm}/position {position}: capture/request mapping is incomplete")
+            # Dispatch traces contain prompt-tail rows at prompt_tokens - 1,
+            # followed by generated-token rows at their absolute positions.
+            # Use those bounds to map blocks even when only one request reaches
+            # a selected position (for example, a long-prompt decode position).
+            eligible_request_indices = [index for index, request in enumerate(api_requests)
+                                        if position == request["prompt_tokens"] - 1 or
+                                        request["prompt_tokens"] <= position <
+                                        request["prompt_tokens"] + len(request["ids"])]
+            if len(request_blocks) > len(eligible_request_indices):
+                raise ValueError(f"{arm}/position {position}: {len(request_blocks)} capture blocks but only "
+                                 f"{len(eligible_request_indices)} requests span the position")
+            # Captures are appended in request order. A row-cap-limited trace
+            # therefore contains the first N eligible request blocks.
+            captured_request_indices = eligible_request_indices[:len(request_blocks)]
             before, after = request_blocks[0], request_blocks[-1]
             expected_layers = list(range(48))
             if [row["layer"] for row in before] != expected_layers or \

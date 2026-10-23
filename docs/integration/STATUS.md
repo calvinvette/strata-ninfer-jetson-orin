@@ -4533,7 +4533,7 @@ before the first changed captured input activation at layer 36 for the short
 request; at long position 2067, ownership first differed at layer 3, input
 activation at layer 41, and expert IDs at layer 43. These are two paired
 same-day reproductions and a focused localization, but they do not isolate the
-first owner-dependent arithmetic or support a performance claim. Phase 5
-remains open. The selected-position helper currently requires at least two
-request blocks at every captured position; the single long-request block was
-validated and compared separately for this report.
+first owner-dependent arithmetic or support a performance claim. The analysis
+helper now maps captured positions to prompt/output spans and accepts one
+complete request block, enabling the long-position report. Phase 5 remains
+open.
