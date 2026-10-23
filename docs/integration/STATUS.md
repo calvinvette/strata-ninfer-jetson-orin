@@ -4804,3 +4804,11 @@ cache-by-chunk time ratio-of-ratios was −9.8%. This remains three-block
 screening evidence without confidence intervals or a promotion claim; a
 seven-block held-out confirmation is required before recommendation. Phase 6
 remains open.
+
+A separate seven-block confirmation harness now uses a tokenizer-verified
+7,501-token archive with different marker positions and values. Its separate
+cache-1,500/chunk-128 preflight passed twice with the exact answer, 46 output
+tokens, over 14 GiB minimum host and admission availability, and zero cgroup
+events. The preflight allows natural EOS and is excluded from confirmation
+statistics. Randomized block 1/7 is in progress; no confirmation effect is
+claimed. The harness computes deterministic paired-block bootstrap intervals.

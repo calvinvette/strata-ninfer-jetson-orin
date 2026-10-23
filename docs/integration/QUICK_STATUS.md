@@ -478,3 +478,9 @@ cache-by-chunk time interaction was −9.8%, with minimum physical/admission
 availability 14.19/14.14 GiB and zero cgroup events. This is descriptive
 screening evidence without confidence intervals; seven-block held-out
 confirmation remains necessary before a recommendation. [Report](../../bench/results/2026-10-23-phase6-coder-prefill-cache-screen3/README.md).
+
+A separate seven-block confirmation with a distinct, tokenizer-verified
+7,501-token archive is underway. Its isolated preflight returned the exact
+answer and passed memory guards; the preflight is excluded from the seven
+confirmation blocks. No confirmation result is available yet. [Confirmation
+design and runner](../../bench/results/2026-10-23-phase6-coder-prefill-cache-confirm7/README.md).
