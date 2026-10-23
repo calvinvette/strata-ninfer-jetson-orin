@@ -503,3 +503,32 @@ for the append control and 16.86 GiB for the decoder control; sampled cgroup
 events were zero in both. Neither batched append nor batched decoder compute
 alone accounts for the delayed MTP2 onset. These are state diagnostics, not
 performance comparisons; energy was not measured.
+
+### Batch-aware residual and MoE localization (2026-10-22)
+
+The opt-in residual-boundary hook now writes `STBNDY2` records for both serial
+and one-row batch-recursive runs. The version-2 header preserves the physical
+batch slot (`-1` for serial); capture remains limited to target-only `T=1`
+rows. With the same delayed-admission target-only schedule at position 119,
+the captured layer-10 residual, branch, injection, and pre-read fields were
+bit-identical. At layer 11, the batch row first differed in the captured
+post-layer boundary: its branch output changed in 2,560/2,560 values (relative
+L2 0.00443926, max absolute 0.000294242), while the batch-aware MoE capture
+showed identical input activation, route IDs/weights, and shared-expert
+output. Three routed experts
+(205, 110, 90) moved from primary VRAM in serial to CPU in batch; only those
+rank parts changed, and their weighted deltas explained the combined-output
+delta to max residual 5.7e-9. Slot 0 still emitted the same 96 tokens as the
+serial control, while the queued peer emitted one token. Minimum physical and
+admission availability was 17.79 GiB with zero sampled cgroup events. These
+captures localize a numerical difference to owner-dependent expert arithmetic
+for this prompt and schedule; they do not establish a user-visible quality
+effect or a performance effect.
+
+A 3,000 MiB expert-cache-cap follow-up also passed supervision and preserved
+the same output tokens, but is not a valid cache-only comparison: its captured
+MoE input already differed (relative L2 0.00323), route weights changed, and
+the shared-expert output changed. Treat this cell as an unclean diagnostic,
+not evidence that increasing cache changes expert ownership or fixes the
+observed difference. Full capture arrays and process logs remain local-only;
+the parsers, compact analyses and reproduction harness are retained here.

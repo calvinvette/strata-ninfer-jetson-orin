@@ -85,6 +85,17 @@ struct GdnDiagHeaderV5 {
     int32_t tokens[strata::kernels::kVerifyMaxT];
 };
 static_assert(sizeof(GdnDiagHeaderV5) == 196, "STGDIAG5 header layout changed");
+struct BoundaryDiagHeaderV2 {
+    char magic[8];
+    uint32_t version;
+    int32_t layer;
+    int64_t position;
+    uint64_t n_embd;
+    uint64_t hc;
+    int32_t token;
+    int32_t slot;
+};
+static_assert(sizeof(BoundaryDiagHeaderV2) == 48, "STBNDY2 header layout changed");
 struct MoeOutputHeaderV2 {
     char magic[8];
     uint32_t version;
@@ -1383,10 +1394,13 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
     };
     const int tb_[2] = {0, (T + 1) / 2}, te_[2] = {G == 2 ? (T + 1) / 2 : T, T};
     auto boundary_copy = [&](size_t offset_floats, const float* src, size_t floats) -> bool {
-        if (boundary_diag_h_ == nullptr || T != 1 || batch_rec_) return true;
+        if (boundary_diag_h_ == nullptr || T != 1) return true;
         const cudaError_t ce = cudaMemcpyAsync(boundary_diag_h_ + offset_floats, src,
                                                 floats * sizeof(float), cudaMemcpyDeviceToHost, cs);
-        if (ce == cudaSuccess) return true;
+        if (ce == cudaSuccess) {
+            if (batch_rec_) boundary_diag_batch_graph_captured_ = true;
+            return true;
+        }
         err = std::string("verify: could not queue opt-in boundary capture: ") + cudaGetErrorString(ce);
         return false;
     };
@@ -3076,24 +3090,15 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
         }
     }
     if (boundary_diag_h_ != nullptr && T == 1 && !batch_rec_ && pos0 == boundary_diag_position_) {
-        struct BoundaryHeader {
-            char magic[8];
-            uint32_t version;
-            int32_t layer;
-            int64_t position;
-            uint64_t n_embd;
-            uint64_t hc;
-            int32_t token;
-            int32_t reserved;
-        } header{};
-        static_assert(sizeof(BoundaryHeader) == 48, "STBNDY1 header layout changed");
-        std::memcpy(header.magic, "STBNDY1", sizeof(header.magic));
-        header.version = 1;
+        BoundaryDiagHeaderV2 header{};
+        std::memcpy(header.magic, "STBNDY2", sizeof(header.magic));
+        header.version = 2;
         header.layer = boundary_diag_layer_;
         header.position = pos0;
         header.n_embd = (uint64_t) g.n_embd;
         header.hc = (uint64_t) g.hc;
         header.token = tokens[0];
+        header.slot = -1;
         static std::mutex boundary_dump_mutex;
         std::lock_guard<std::mutex> lock(boundary_dump_mutex);
         std::FILE* dump = std::fopen(boundary_diag_path_.c_str(), "ab");
@@ -4023,6 +4028,36 @@ bool Verifier::write_gdn_diag_batch(int T, const int* slots, const int32_t* toke
     return true;
 }
 
+bool Verifier::write_boundary_diag_batch(int T, const int* slots, const int32_t* tokens,
+                                         const int64_t* positions, std::string& err) {
+    if (!boundary_diag_batch_graph_captured_ || boundary_diag_h_ == nullptr || T != 1 ||
+        positions[0] != boundary_diag_position_) return true;
+    BoundaryDiagHeaderV2 header{};
+    std::memcpy(header.magic, "STBNDY2", sizeof(header.magic));
+    header.version = 2;
+    header.layer = boundary_diag_layer_;
+    header.position = positions[0];
+    header.n_embd = (uint64_t) g_->n_embd;
+    header.hc = (uint64_t) g_->hc;
+    header.token = tokens[0];
+    header.slot = slots[0];
+    static std::mutex boundary_batch_dump_mutex;
+    std::lock_guard<std::mutex> lock(boundary_batch_dump_mutex);
+    std::FILE* dump = std::fopen(boundary_diag_path_.c_str(), "ab");
+    bool written = dump != nullptr;
+    if (written) {
+        written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
+                  std::fwrite(boundary_diag_h_, 1, boundary_diag_capacity_, dump) == boundary_diag_capacity_;
+        if (std::fflush(dump) != 0) written = false;
+        if (std::fclose(dump) != 0) written = false;
+    }
+    if (!written) {
+        err = "verify: could not write opt-in batch residual-boundary diagnostic";
+        return false;
+    }
+    return true;
+}
+
 bool Verifier::write_moe_output_diag_batch(int T, const int* slots, const int32_t* tokens,
                                            const int64_t* positions, std::string& err) {
     if (!moe_output_diag_include_batch_ || moe_output_diag_h_ == nullptr || !moe_output_diag_captured_) return true;
@@ -4179,6 +4214,7 @@ bool Verifier::run_slot_rows(const int* rows, int S, const int32_t* tokens, cons
         if (se != cudaSuccess) { err = std::string("verify batch: ") + cudaGetErrorString(se); return false; }
         cudaStreamSynchronize(copy_);
         if (!write_gdn_diag_batch(S, rows, tokens, pos, err)) return false;
+        if (!write_boundary_diag_batch(S, rows, tokens, pos, err)) return false;
         if (!write_moe_output_diag_batch(S, rows, tokens, pos, err)) return false;
         if (!write_moe_route_diag_batch(S, rows, tokens, pos, err)) return false;
         if (!write_moe_parts_diag_batch(S, rows, tokens, pos, err)) return false;
@@ -4244,6 +4280,7 @@ bool Verifier::run_slot_rows(const int* rows, int S, const int32_t* tokens, cons
     if (se != cudaSuccess) { err = std::string("verify batch: ") + cudaGetErrorString(se); return false; }
     cudaStreamSynchronize(copy_);
     if (!write_gdn_diag_batch(S, rows, tokens, pos, err)) return false;
+    if (!write_boundary_diag_batch(S, rows, tokens, pos, err)) return false;
     if (!write_moe_output_diag_batch(S, rows, tokens, pos, err)) return false;
     if (!write_moe_route_diag_batch(S, rows, tokens, pos, err)) return false;
     if (!write_moe_parts_diag_batch(S, rows, tokens, pos, err)) return false;

@@ -8,6 +8,16 @@ profile under [its closeout](PHASE8_CLOSEOUT.md). Phases 5 and 6 remain open;
 the Phase 8 profile excludes their unresolved adaptive/MTP and broader
 parametric/energy scope. This records tested cells, not general product support.
 
+A batch-aware `STBNDY2` residual capture and MoE owner trace localized one
+target-only delayed-admission difference at position 119 to layer-11 expert
+arithmetic. The layer-10 boundary and layer-11 MoE input, routes, weights and
+shared-expert output matched serial; three routed expert parts switched from
+primary VRAM to CPU in the batch row, and their weighted changes accounted for
+the combined-output delta. Slot-0 output still matched all 96 serial tokens.
+A larger-cache follow-up was unclean because its layer-11 input already
+differed. This is a single-prompt correctness diagnostic; Phase 5 remains open.
+See the [batch-MTP diagnostic](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
+
 A supervised one-live-after-admission MTP2 trace now shows the same QSA state
 boundary after the competing one-token request completes: lengths 70/72/74
 match serial, while indexer and K/V hashes differ in all 12 layers at lengths

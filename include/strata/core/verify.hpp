@@ -373,6 +373,8 @@ private:
                                   std::string& err);
     bool write_gdn_diag_batch(int rows, const int* slots, const int32_t* tokens, const int64_t* positions,
                               std::string& err);
+    bool write_boundary_diag_batch(int rows, const int* slots, const int32_t* tokens, const int64_t* positions,
+                                   std::string& err);
     bool write_moe_output_diag_batch(int rows, const int* slots, const int32_t* tokens,
                                      const int64_t* positions, std::string& err);
     bool write_moe_route_diag_batch(int rows, const int* slots, const int32_t* tokens,
@@ -407,6 +409,7 @@ private:
     size_t boundary_diag_capacity_ = 0;
     std::string boundary_diag_path_;
     bool boundary_diag_captured_ = false;
+    bool boundary_diag_batch_graph_captured_ = false;
     int gdn_commit_diag_layer_ = -1;
     std::vector<int64_t> gdn_commit_diag_positions_;
     std::vector<float> gdn_commit_diag_host_;

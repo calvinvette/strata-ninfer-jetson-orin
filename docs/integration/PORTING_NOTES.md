@@ -2755,3 +2755,17 @@ CPU row disagrees with every same-input oracle output despite identical serial
 and batch service results and byte-identical packed/GGUF expert weights. Preserve
 that activation-dependent discrepancy as unresolved; an internal oracle pass
 or one matching row does not settle a different execution input.
+
+For a delayed target-only batch comparison, the batch-recursive verifier path
+may need a dedicated diagnostic writer: the serial residual hook can explicitly
+skip recursive rows. A versioned record should include the physical slot, keep
+its existing serial identity, and be parsed by an independent binary-layout
+checker. At Orin Coder position 119, this enabled a same-input layer-11
+comparison: routes, weights, activation and shared output matched, while three
+expert rows changed from primary VRAM to CPU and their weighted parts explained
+the combined-output delta. A future Strata/Splash investigation should join
+these records by request, position, token and slot, and capture owner metadata
+beside each exact activation. A cache-size ablation is interpretable only after
+confirming the upstream layer input is paired; the 3,000 MiB rerun here had
+already diverged before the selected MoE row and cannot answer the cache
+question.
