@@ -473,6 +473,13 @@ python bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/analyze_t
 
 The tested executable SHA256 was `6a7c91f2127de4cbeb780c2d602c053c61592a7b97c6b73b222c559bc2acb5cc`.
 
+An attempted STBNDY1 residual-boundary follow-up at the same position is
+unsupported by the current hook: its writer explicitly skips `batch_rec_`
+rows. The supervised run passed and produced one serial record but no batch
+record, so there is no paired boundary comparison and no result is inferred
+from that file. Supporting this capture in the batch-recursion path would
+require a separate verifier change and backend rebuilds.
+
 ### Delayed-admission mode and batched-path controls (2026-10-22)
 
 A target-only run with the same 48-token solo prefix and retained batch slot
