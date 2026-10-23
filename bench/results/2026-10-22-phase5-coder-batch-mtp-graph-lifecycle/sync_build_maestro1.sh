@@ -13,4 +13,6 @@ scp "$repo/bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/build
 ssh maestro1 'bash /home/calvin/build_graph_limit.sh'
 out="$repo/bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/backend-builds-maestro1-graph-limit"
 mkdir -p "$out"
-scp -r "maestro1:$remote_root/logs/graph-limit-20261022/." "$out/"
+for file in source-manifest.sha256 hip-build.txt hip-binary.sha256 hip-help.txt sycl-build.txt sycl-binary.sha256 sycl-help.txt result.txt; do
+    scp "maestro1:$remote_root/logs/graph-limit-20261022/$file" "$out/"
+done

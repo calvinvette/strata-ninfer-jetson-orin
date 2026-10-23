@@ -147,12 +147,16 @@ first run's only failure was `pool_test` missing its external S2 fixture, and
 that test passed when the local fixture was supplied through
 `STRATA_TEST_EXPERTS_BIN`.
 
-The ARM64/CUDA
-candidate rebuilt with two jobs and the five focused accepted-window, batch
-parity and graph tests passed. maestro1's filesystem had zero free bytes when
-the HIP/SYCL rebuild was attempted, so those builds remain pending; no changes
-were made to its existing artifacts. `build_maestro1.sh` and `sync_build_maestro1.sh` preserve the source-sync and
-rebuild commands for after space is available.
+The ARM64/CUDA candidate rebuilt with two jobs and the five focused
+accepted-window, batch-parity and graph tests passed. The first maestro1 build
+attempt was blocked by a full root filesystem. After scratch space became
+available, the current `verify.hpp`, `verify.cpp` and `generate.cpp` sources
+were synced and the HIP build completed with one job; the `strata` binary and
+its `--help` check passed. The SYCL build tree reported no work because its
+verifier and generator use the separate `source/sycl` overlay; its existing
+binary's `--help` check passed in the configured oneAPI environment. These are
+x86 compile/CLI checks, not accelerator runtime evidence. Source hashes, logs
+and binary hashes are in `backend-builds-maestro1-graph-limit/`.
 
 ## Configuration and limits
 

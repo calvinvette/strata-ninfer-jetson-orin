@@ -70,6 +70,18 @@ output. This excludes either batched append or decoder compute as the sole
 source in that controlled MTP2 case. MTP is not required for all batch-state
 drift, though it changes the sampled onset and first layer. Phase 5 remains open.
 
+The exact 48-token delayed-admission controls were extended through positions
+116–120 for target-only decode and through 164 for MTP2. Target-only GDN state
+first differed at position 119/model layer 12; MTP2 state first differed at
+position 123/model layer 1 after exact positions 120/121. The two MTP2
+per-token append/decoder ablations retained the first QSA hash difference at
+length 124. All tested 96-token outputs matched serial, but the persistent
+state drift remains unexplained and has no quality bound. maestro1 then
+completed the one-job HIP build for the synced verifier/generator sources and
+the configured `strata --help` check. Its separate SYCL overlay had no pending
+build work and passed its configured help check; neither backend was run on an
+accelerator. Details and logs are in the [batch-MTP report](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
+
 The latest [MTP2 position-76 committed-state comparison](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md)
 paired batch and serial rows by token. Prompt 0's 36-layer GDN state differs
 in 26,965,859/29,417,472 floats (relative L2 0.0182307), first at GDN model
