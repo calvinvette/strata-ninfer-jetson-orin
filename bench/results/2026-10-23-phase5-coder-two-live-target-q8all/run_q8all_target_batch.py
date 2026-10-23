@@ -20,8 +20,8 @@ MODEL_SHA = ROOT / "bench/results/2026-10-21-phase6-coder-current-source-cache-c
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--output", type=Path, default=HERE / "run",
                     help="new directory for raw run logs and summary")
-parser.add_argument("--expert-cache-mib", type=int, default=1500,
-                    help="requested shared-RAM expert cache cap")
+parser.add_argument("--expert-cache-slots", "--expert-cache-mib", type=int, default=1500,
+                    help="requested Strata expert-cache slot count (legacy MiB alias accepted)")
 parser.add_argument("--generated-tokens", type=int, default=96,
                     help="tokens generated for each serial and batch request")
 parser.add_argument("--accepted-prefix-trace", action="store_true",
@@ -30,7 +30,7 @@ cli = parser.parse_args()
 if cli.generated_tokens < 1:
     parser.error("--generated-tokens must be positive")
 OUT = cli.output.resolve()
-EXPERT_CACHE_MIB = cli.expert_cache_mib
+EXPERT_CACHE_SLOTS = cli.expert_cache_slots
 GENERATED_TOKENS = cli.generated_tokens
 OUT.mkdir(parents=True, exist_ok=False)
 cfg = json.loads(CONFIG.read_text())
@@ -39,7 +39,7 @@ for key in ("--mtp", "--mtp-max-t", "--adapt-every", "--adapt-accepted-only"):
     remove_arg(args, key)
 replace_arg(args, "--spec", "2")
 replace_arg(args, "--max-context", "1024")
-replace_arg(args, "--expert-cache", str(EXPERT_CACHE_MIB))
+replace_arg(args, "--expert-cache", str(EXPERT_CACHE_SLOTS))
 replace_arg(args, "--prompt-cache", "6")
 prompts = prepared_prompts(cfg, 2)
 env = child_env(cfg)
@@ -109,7 +109,7 @@ result = {
                      cfg["args"][cfg["args"].index("--ple-gguf") + 1]],
     "model_shards_sha256": model_shards_sha256,
     "profile": {"live_requests": 2, "batch_slots": 2, "mtp": False, "context": 1024,
-                "expert_cache_mib": EXPERT_CACHE_MIB, "prompt_cache": 6, "generated_tokens": GENERATED_TOKENS,
+                "expert_cache_slots": EXPERT_CACHE_SLOTS, "prompt_cache": 6, "generated_tokens": GENERATED_TOKENS,
                 "STRATA_NATIVE_CPU_Q8_1_DOT": "all", "STRATA_IQ_MT_MIN": "1"},
     "prompt_token_counts": {name: len(prompt) for name, prompt in prompts.items()},
     "outputs": {name: {"serial": serial[name], "batch": batched[name]} for name in prompts},

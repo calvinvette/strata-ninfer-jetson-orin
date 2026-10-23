@@ -4280,11 +4280,11 @@ shell error after the final service cell had completed; all cell manifests and
 the campaign analyzer passed, and rerunning the wrapper verified all seven
 blocks without modifying results.
 
-A held-out [seven-block Coder IQ1_M cache × context confirmation](../../bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-interaction-confirm7/README.md) completed 28 measured fresh-service cells: a randomized 2×2 of requested expert-cache arguments 1,500/3,000 MiB and configured contexts 8K/16K, using a held-out 7,501-token retrieval/arithmetic prompt with exact 48-token output. The original block 7 crossed local midnight and is preserved but excluded from inference; a separately randomized same-day replacement supplies the seventh block. The final analyzer passed with no errors, exact-answer/token checks in all cells, 18,126 scoped telemetry samples, and zero cgroup pressure/limit/OOM events. Minimum host and admission availability were both 13.93 GiB.
+A held-out [seven-block Coder IQ1_M cache × context confirmation](../../bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-interaction-confirm7/README.md) completed 28 measured fresh-service cells: a randomized 2×2 of requested expert-cache slot counts 1,500/3,000 and configured contexts 8K/16K, using a held-out 7,501-token retrieval/arithmetic prompt with exact 48-token output. The original block 7 crossed local midnight and is preserved but excluded from inference; a separately randomized same-day replacement supplies the seventh block. The final analyzer passed with no errors, exact-answer/token checks in all cells, 18,126 scoped telemetry samples, and zero cgroup pressure/limit/OOM events. Minimum host and admission availability were both 13.93 GiB.
 
-At 3,000 versus 1,500 MiB, median paired client total latency fell 7.95% at 8K context (95% paired-block bootstrap interval 7.93%–15.11%) and 7.71% at 16K (7.23%–7.82%). Median TTFT fell 7.99% at 8K (7.94%–15.20%) and 7.72% at 16K (7.21%–7.81%). The client-total cache-by-context interaction was +1.12% (95% interval +0.22% to +8.58%); the wide 8K interval reflects block variation, including a 395s measured request at 1,500 MiB/8K. These results apply to the pinned current-source Coder IQ1_M model, MTP-off/FP16-KV profile, and this long held-out task. They do not promote a general serving profile or close Phase 6's other Phase 6 interactions, broader response-model and energy/Pareto work. Clocks were sampled dynamically; EMC frequency was unsupported. Exact model, binary, source and workload identities are pinned in the campaign design.
+At 3,000 versus 1,500 requested expert-cache slots, median paired client total latency fell 7.95% at 8K context (95% paired-block bootstrap interval 7.93%–15.11%) and 7.71% at 16K (7.23%–7.82%). Median TTFT fell 7.99% at 8K (7.94%–15.20%) and 7.72% at 16K (7.21%–7.81%). The client-total cache-by-context interaction was +1.12% (95% interval +0.22% to +8.58%); the wide 8K interval reflects block variation, including a 395s measured request at 1,500 slots/8K. These results apply to the pinned current-source Coder IQ1_M model, MTP-off/FP16-KV profile, and this long held-out task. They do not promote a general serving profile or close Phase 6's other interactions, broader response-model and energy/Pareto work. Clocks were sampled dynamically; EMC frequency was unsupported. Exact model, binary, source and workload identities are pinned in the campaign design.
 
-The [block-adjusted log-response analysis](../../bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-interaction-confirm7/README.md#block-adjusted-log-response-model) of the same 28 cells is full rank (10 parameters, 18 residual degrees of freedom). Its mean-log client-total cache-by-context estimate is +2.97% (whole-block bootstrap interval +0.56% to +5.67%), directionally consistent with the primary paired median ratio-of-ratios of +1.12% (+0.22% to +8.58%). Decode throughput has an internally studentized residual of 3.93 at block 7 / 1,500 MiB / 16K, beyond the exploratory 3.0 screen; the response model remains diagnostic, with the paired-block median bootstrap primary. This adds no energy or serving-default claim; Phase 6 remains open.
+The [block-adjusted log-response analysis](../../bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-interaction-confirm7/README.md#block-adjusted-log-response-model) of the same 28 cells is full rank (10 parameters, 18 residual degrees of freedom). Its mean-log client-total cache-by-context estimate is +2.97% (whole-block bootstrap interval +0.56% to +5.67%), directionally consistent with the primary paired median ratio-of-ratios of +1.12% (+0.22% to +8.58%). Decode throughput has an internally studentized residual of 3.93 at block 7 / 1,500 slots / 16K, beyond the exploratory 3.0 screen; the response model remains diagnostic, with the paired-block median bootstrap primary. This adds no energy or serving-default claim; Phase 6 remains open.
 
 A current-source [direct-division adaptive-state rerun](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/adaptive-direct-division-state-bound-64pos/README.md) completed a randomized same-binary adaptive/control pair on 2026-10-22. It repeated the pinned Coder IQ1_M 512→2,048→512-token request sequence, MTP2, CPU Q8_1 dot selector `all`, and 64 generated tokens per request. Delayed control was bit-exact in committed layer-32 GDN recurrent/conv state at positions 515/534/574 and in all 64 recovery tokens. Adaptive state was exact at 515, then recurrent/conv relative L2 was 0.00527/0.01052 at 534 and 0.01435/0.02024 at 574; all 64 recovery tokens nevertheless matched. Raw captures matched accepted-prefix service hashes. A same-day [multiply-by-sigmoid comparison](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/adaptive-multiply-sigmoid-same-day-state-bound-64pos/README.md) then repeated the same seed, model, prompts, controls, and request sequence with only the CPU SwiGLU expression changed. It reproduced 40/64 recovery-token differences and 0.524/0.916 recurrent/conv relative-L2 drift at position 574; direct division had 0/64 token differences and 0.0144/0.0202 drift. Delayed-control state was exact in both pairs, and all raw captures matched accepted-prefix service hashes. Together with the captured single-row operator oracle, this attributes this scenario's regression to CPU SwiGLU expression ordering. The temporary multiply-expression source was reverted and the direct-division build restored. Both pairs passed with at least 14.21 GiB host/admission availability and zero sampled cgroup memory events. This does not bound longer chains, other models or operators, measure a throughput effect, or close Phase 5.
 
@@ -4367,11 +4367,11 @@ bit-for-bit. The aggregate GDN difference at position 71 was 27,762,032 /
 availability was 17.445 GiB, with zero cgroup events. This is one correctness
 diagnostic, not a quality or performance result; Phase 5 remains open.
 
-A 3,000 MiB cache-cap repeat still changed layer-1 expert 11 from primary VRAM
+A 3,000 slots cache-cap repeat still changed layer-1 expert 11 from primary VRAM
 to CPU and reproduced its owner-specific parts with same-input native oracles.
 Within that configuration the serial/batch layer-1 activations and routes were
-exact, but its activation differed from the 1,500 MiB cell, so the two settings
-do not form a same-input numerical comparison. The 3,000 MiB run's first changed
+exact, but its activation differed from the 1,500 slots cell, so the two settings
+do not form a same-input numerical comparison. The 3,000 slots run's first changed
 committed GDN state remained model layer 2; 27,085,131/29,417,472 values
 differed at position 71 (relative L2 `0.00780748`). This does not show that the
 larger cache improves parity. Minimum physical/admission availability was
@@ -4387,7 +4387,7 @@ VRAM-to-CPU switch for expert 164; independent native owner oracles match both
 service outputs bit-for-bit, with CPU/GPU relative L2 `0.0142044`. This is a
 single diagnostic intervention, not a supported profile or performance result.
 The row-pairer now rejects owner/verifier route-ID disagreement; valid baseline
-and intervention joins pass, while a known cache-3,000 MiB mismatch is
+and intervention joins pass, while a known cache-3,000 slots mismatch is
 rejected. The capture lacks an explicit owner-row slot, which remains a
 limitation. See the [experiment notes](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
 
@@ -4421,9 +4421,9 @@ remains open. See the [Q8_1 owner report](../../bench/results/2026-10-22-phase5-
 
 The new IQ3_S/Q2_0 Q8_1 selector was rebuilt against matching source hashes on maestro1. HIP rebuilt and linked `strata` and `native_expert_parity`; the selector-contract diagnostic and HIP `strata --help` passed. SYCL rebuilt and linked `strata` (20/20 steps), and its `--help` passed after loading the oneAPI runtime. These are x86 compile/startup and CPU-contract checks only, with no accelerator or model execution. See the [backend build record](../../bench/results/2026-10-23-phase5-maestro1-iq3s-q2-selector/README.md).
 
-A retrospective [named-rail energy analysis](../../bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-interaction-confirm7/rail-followup/README.md) integrated tegrastats over all 28 passing measured request windows in the seven-block Coder cache × context confirmation. The median `VIN_SYS_5V0` rail estimate per output token fell 7.42% at 8K (paired block-bootstrap 95% interval 6.88%–11.41% lower) and 7.05% at 16K (6.61%–7.15% lower) with the 3,000 vs 1,500 MiB requested cache. Its cache-by-context ratio-of-ratios was +0.39% (+0.29% to +4.85%). The separately integrated `VDD_GPU_SOC` and `VDD_CPU_CV` rails are also reported. These named rails include idle/background activity, are not process-attributed and are not summed or called whole-device energy; Phase 6 remains open for broader Pareto and energy scope.
+A retrospective [named-rail energy analysis](../../bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-interaction-confirm7/rail-followup/README.md) integrated tegrastats over all 28 passing measured request windows in the seven-block Coder cache × context confirmation. The median `VIN_SYS_5V0` rail estimate per output token fell 7.42% at 8K (paired block-bootstrap 95% interval 6.88%–11.41% lower) and 7.05% at 16K (6.61%–7.15% lower) with the 3,000 vs 1,500 requested expert-cache slots. Its cache-by-context ratio-of-ratios was +0.39% (+0.29% to +4.85%). The separately integrated `VDD_GPU_SOC` and `VDD_CPU_CV` rails are also reported. These named rails include idle/background activity, are not process-attributed and are not summed or called whole-device energy; Phase 6 remains open for broader Pareto and energy scope.
 
-A separate [short-task Coder cache energy analysis](../../bench/results/2026-10-21-phase6-coder-current-source-cache-context-confirm7/rail-followup/README.md) covered 42 passing request windows from seven blocks at fixed 8K context. The median `VIN_SYS_5V0` estimate per output token was 11.19% lower with the larger cache (paired block-bootstrap 95% interval 10.16%–11.45% lower); `VDD_GPU_SOC` and `VDD_CPU_CV` estimates are reported separately. As with the long-task analysis, these are background-contaminated named-rail measures, not process or whole-device energy. This adds a short-task observation but does not establish a general Pareto profile.
+A separate [short-task Coder cache energy analysis](../../bench/results/2026-10-21-phase6-coder-current-source-cache-context-confirm7/rail-followup/README.md) covered 42 passing request windows from seven blocks at fixed 8K context. The median `VIN_SYS_5V0` estimate per output token was 11.19% lower with the larger requested slot count (paired block-bootstrap 95% interval 10.16%–11.45% lower); `VDD_GPU_SOC` and `VDD_CPU_CV` estimates are reported separately. As with the long-task analysis, these are background-contaminated named-rail measures, not process or whole-device energy. This adds a short-task observation but does not establish a general Pareto profile.
 
 A held-out [256-token adaptive short-chain recovery pair](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/adaptive-direct-division-state-bound-128pos/open-response-short-chain-256pos/README.md) extended the same-service short–short–short test with a new seed. Adaptive recovery differed from the initial response at 237/256 token IDs, first at output index 10; accepted-state and per-GDN hashes differed at all 256 prefixes, with the first changed GDN ordinal 17. The delayed-control arm matched all 256 token IDs and state hashes. A selected position-511 trace first shows a changed verifier input at layer 22, but does not capture the full 256-token chain or identify the operation that caused the earlier state drift. Both arms retained at least 14.13 GiB host/admission availability and had zero sampled cgroup memory events. This extends the tested chain length, not a correctness bound; adaptive accepted-state migration remains unqualified and Phase 5 remains open.
 
@@ -4438,19 +4438,19 @@ A repeated model-layer-10 stage capture at position 133 found `x`, QKV, `h`, gat
 A sparse layer-10 state sweep found position 82 exact and the first recurrent-state delta at position 83. At that position layer 9's GDN fields and MoE input matched, while its final MoE output differed. Routes and weights were identical; only expert 233's part changed when ownership moved from primary VRAM to CPU. With the Q8_1-all selector also applied to the independent oracle, serial service matched the GPU output bit-for-bit and batch service matched the CPU output bit-for-bit. The expert part relative-L2 delta was `1.1979e-4`; combined MoE output delta was `1.3708e-5`. This localizes the first captured perturbation to one owner-dependent expert contribution for one activation; Phase 5 remains open. [Capture and oracle report](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
 
 
-A 3,000 MiB expert-cache intervention repeated the exact layer-9 position-83
+A 3,000-slot expert-cache intervention repeated the exact layer-9 position-83
 MoE input from the Q8_1-all two-live diagnostic. Expert 233 remained on primary
 VRAM in serial and batch; all routed parts and the combined output were
-bit-identical. The 1,500 MiB baseline had switched that batch owner to CPU and
+bit-identical. The 1,500-slot baseline had switched that batch owner to CPU and
 produced a small part delta confirmed by same-input native CPU/GPU oracles. This
 shows cache residency removes that selected operator delta in this cell, not
 that it repairs the full sequence or generalizes to other prompts. Phase 5
 remains open. [Capture and measurements](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
 
 
-The full 96-token Q8_1-all two-live run with a 3,000 MiB expert cache matched
-slot 0 to serial but slot 1 first diverged at output index 60. The 1,500 MiB
-cell diverged at index 66; cache settings change owner and token histories, so
+The full 96-token Q8_1-all two-live run with a 3,000-slot expert-cache
+request matched slot 0 to serial but slot 1 first diverged at output index 60.
+The 1,500-slot cell diverged at index 66; cache settings change owner and token histories, so
 those indices are not a causal paired estimate. The selected position-83
 expert-233 operator became bit-exact under the larger cache, but full-sequence
 parity did not follow. Minimum physical/admission availability was 13.84 GiB;
@@ -4458,14 +4458,14 @@ energy was not measured and EMC clock access was denied. Phase 5 remains open.
 [Run details](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
 
 
-A second exact-input layer-9 position-83 capture repeated the 3,000 MiB cache
+A second exact-input layer-9 position-83 capture repeated the 3,000-slot cache
 intervention: expert 233 stayed on VRAM, routes and all ten expert parts were
 bit-identical between serial and batch, and the combined output remained exact.
 This reinforces only the selected operator cell; the full-length slot-1
 divergence persists. [Raw repeat](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
 
 
-Additional 3,000 MiB cache state traces do not establish a stable early state
+Additional 3,000-slot cache state traces do not establish a stable early state
 boundary: one all-layer run changed layer 25 at position 83 while the token
 stream matched, but a repeated layer-25 capture and a combined state/intermediate
 capture at the same position were exact. At position 127, separate runs with
@@ -4487,7 +4487,7 @@ reproduced in two combined state/stage captures. The CUDA `gdn_parity`,
 model scheduling. Phase 5 remains open. [Evidence](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
 
 
-A same-run seven-position sweep narrows the cache-3,000 MiB slot-1 state onset:
+A same-run seven-position sweep narrows the cache-3,000-slot slot-1 state onset:
 layer-24 state and stage values match serial at positions 96, 100 and 104, then
 first differ at sampled position 108 (input token 13). The first changed stage
 is `h` (relative L2 `5.127e-4`) while `x`, QKV, gate, beta and z remain exact;
@@ -4496,7 +4496,7 @@ index 60. This bounds the sampled layer-24 history change to positions 105–108
 without identifying its cause. Duplicate token rows at position 100 were paired
 by verifier slot. [Raw and analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
 
-A supervised 104–108 retry with the same 3,000 MiB cache instead found the
+A supervised 104–108 retry with the same 3,000-slot cache instead found the
 first layer-24 state and stage change at position 105, with `x` first
 (relative L2 `1.252e-3`); `x` was also first at 106, while `h` was first at
 107–108. Position 104 remained exact, and the full request still first
@@ -4636,13 +4636,15 @@ and [report](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/R
 
 A same-run [layer-4 owner and layer-5 state/stage capture](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md) now connects the early slot-0 state change at position 77. Layer-5 state and all layer-5 stage fields were exact at position 76. At position 77 / input token `709`, layer-5's first changed stage field was `x` (relative L2 `3.697e-5`), followed by QKV and later fields; its committed GDN state changed (recurrent relative L2 `7.663e-5`, convolution `1.630e-4`). In the same run, layer-4 MoE input activation, routes and weights were exact, but expert 218 rank 2 changed primary-VRAM→CPU ownership. The expert part changed by relative L2 `3.578e-4`; the combined layer-4 MoE output by `1.463e-4`. An independent same-activation `native_expert_parity` oracle matched serial service to its GPU output and batch service to its CPU output bit-for-bit; the oracle CPU/GPU delta was `3.578e-4`. This strongly supports owner-dependent layer-4 arithmetic as the perturbation entering layer 5, but does not prove the full downstream causal path. Slot 0 still matched its 72 serial output IDs in this run. The capture retained 17.85 GiB minimum physical/admission availability, with zero cgroup events; the oracle used no accelerator-runtime claim. This is correctness evidence only and Phase 5 remains open. [State/stage summaries](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer4-moe-layer5-stage-76-77/state-analysis.json), [owner analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer4-moe-layer5-stage-76-77/analysis.json), [independent oracle](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer4-moe-layer5-stage-76-77/expert218-oracle/analysis.json).
 
-A controlled repeat raised the requested host expert-cache cap from 1,500 to
-3,000 MiB while holding model, prompts, selectors and capture positions fixed.
-Expert 218 still changed VRAM→CPU on the identical layer-4 activation hash and
-route, with identical expert and combined-output deltas. Layer-5 state/stage
+A controlled repeat raised the requested Strata expert-cache slot count from
+1,500 to 3,000 while holding model, prompts, selectors and capture positions
+fixed. The baseline allocated 3.72 GiB to the GPU across 1,934 slots; the repeat
+allocated 7.44 GiB across 3,903 slots. Expert 218 still changed VRAM→CPU on the
+identical layer-4 activation hash and route, with identical expert and
+combined-output deltas. Layer-5 state/stage
 again matched at position 76 and first changed at `x`/committed state at
 position 77 with the same metrics. Slot 0 matched all 72 serial output IDs.
 Minimum physical/admission availability was 14.08 GiB with zero cgroup events.
 This excludes that cache-cap increase as a remedy for this owner transition in
-this cell; Phase 5 remains open. [3,000 MiB analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer4-moe-layer5-stage-76-77-cache3000/analysis.json),
-[paired 1,500 MiB analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer4-moe-layer5-stage-76-77/analysis.json).
+this cell; Phase 5 remains open. [3,000-slot analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer4-moe-layer5-stage-76-77-cache3000/analysis.json),
+[paired 1,500-slot analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer4-moe-layer5-stage-76-77/analysis.json).

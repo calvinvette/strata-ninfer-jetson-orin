@@ -16,7 +16,8 @@ p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--output', type=Path, required=True)
 p.add_argument('--position', type=int, default=133)
 p.add_argument('--positions', help='comma-separated state capture positions; overrides --position')
-p.add_argument('--expert-cache-mib', type=int, default=1500)
+p.add_argument('--expert-cache-slots', '--expert-cache-mib', type=int, default=1500,
+               help='requested Strata expert-cache slot count (legacy MiB alias accepted)')
 p.add_argument('--layer', default='all', help='GDN model layer or all')
 p.add_argument('--stage-layer', type=int, help='also capture GDN intermediate fields for this layer')
 p.add_argument('--moe-layer', type=int, help='also capture MoE route/parts/output and owner records for this layer')
@@ -49,7 +50,7 @@ for key in ('--mtp', '--mtp-max-t', '--adapt-every', '--adapt-accepted-only'):
     remove_arg(args, key)
 replace_arg(args, '--spec', '2')
 replace_arg(args, '--max-context', '1024')
-replace_arg(args, '--expert-cache', str(opts.expert_cache_mib))
+replace_arg(args, '--expert-cache', str(opts.expert_cache_slots))
 replace_arg(args, '--prompt-cache', '6')
 prompts = prepared_prompts(cfg, 2)
 batch_prompts = prompts if opts.batch_live == 2 else {'slot-1': prompts['slot-1']}
@@ -129,7 +130,7 @@ result = {'capture_positions': [int(x) for x in positions.split(',')],
           'serial': serial_out, 'serial_slot_1': serial_out.get('slot-1'),
           'batch': batch_out, 'prompts': prompts,
           'profile': {'live_requests': opts.batch_live, 'batch_slots': 2, 'mtp': False,
-                      'expert_cache_mib': opts.expert_cache_mib,
+                      'expert_cache_slots': opts.expert_cache_slots,
                       'generated_tokens': opts.generated_tokens,
                       'serial_slot_controls': list(serial_slots),
                       'gdn_layer': opts.layer,

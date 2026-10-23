@@ -59,8 +59,8 @@ candidate setting has been promoted to a default.
 
 | Experiment | Measured result | Scope |
 | --- | --- | --- |
-| Expert cache × context, Coder IQ1_M, held-out 7,501-token task, seven same-day blocks | 3,000 vs 1,500 MiB requested cache reduced median client latency 7.95% at 8K context (paired 95% interval 7.93%–15.11%) and 7.71% at 16K (7.23%–7.82%). Cache-by-context interaction was +1.12% (0.22%–8.58%). | MTP off, FP16 KV, exact 48-token answer; one long-task profile. [Report](../../bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-interaction-confirm7/README.md) |
-| Expert cache, short Coder task, seven blocks | 3,000 vs 1,500 MiB reduced median client latency 12.83%; TTFT fell 13.47%, with prompt/decode throughput up 15.77%/10.24%. | Short task only; see [STATUS](STATUS.md). |
+| Expert cache × context, Coder IQ1_M, held-out 7,501-token task, seven same-day blocks | 3,000 vs 1,500 requested expert-cache slots reduced median client latency 7.95% at 8K context (paired 95% interval 7.93%–15.11%) and 7.71% at 16K (7.23%–7.82%). Cache-by-context interaction was +1.12% (0.22%–8.58%). | MTP off, FP16 KV, exact 48-token answer; one long-task profile. [Report](../../bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-interaction-confirm7/README.md) |
+| Expert cache, short Coder task, seven blocks | 3,000 vs 1,500 requested slots reduced median client latency 12.83%; TTFT fell 13.47%, with prompt/decode throughput up 15.77%/10.24%. | Short task only; see [STATUS](STATUS.md). |
 | MTP × prompt length × KV, Coder IQ1_M, seven blocks / 56 arms | On the 7,501-token task, MTP4 reduced decode throughput 9.17% with FP16 KV and 9.24% with INT8; client time rose 0.59% and 1.01%. Short-task effects were smaller and uncertain. | MTP4 was dominated on measured long-task latency and named-rail energy; no default changed. Other Phase 6 factors remain open. [Report](../../bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/README.md) |
 | Prefill chunk × expert cache, Q2_0 near-limit retrieval, seven held-out blocks | Chunk 128 reduced median request time 59.54% at 3,000 slots and 59.74% at 3,500 slots; all 28 requests returned the exact 41-token answer after 7,506 prompt tokens. | Cache × chunk interaction interval included zero; no general default. [Report](../../bench/results/2026-10-18-phase6-q2-cache-prefill-heldout-confirm7/README.md) |
 
@@ -94,7 +94,7 @@ earlier QSA difference. This narrows the observed state onset for one row but
 does not explain the two-live output mismatch or pass Phase 5. See the [state
 follow-up](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
 
-A 3,000 MiB cache-cap correctness diagnostic is now localized one layer
+A 3,000-slot cache correctness diagnostic is now localized one layer
 earlier: layer-10 experts 150 and 2 switch from VRAM to CPU on an otherwise
 bit-identical activation and routing row. Independent same-input oracles
 confirm the owner-specific outputs. The later layer-11 observation was
@@ -126,8 +126,8 @@ CUDA/CPU owner oracles pass. Both requests still match their six output tokens.
 At position 68, all 36 GDN states were bit-identical. This is a single short
 correctness trace; Phase 5 remains open. [Details](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
 
-A 3,000 MiB repeat still moves layer-1 expert 11 VRAM→CPU and changes the first
-committed GDN state at layer 2. Its activation differs from the 1,500 MiB cell,
+A 3,000-slot repeat still moves layer-1 expert 11 VRAM→CPU and changes the first
+committed GDN state at layer 2. Its activation differs from the 1,500-slot cell,
 so the aggregate state delta cannot be used as a cache-size comparison. The
 larger cap did not prevent the selected owner switch; Phase 5 remains open.
 
@@ -341,25 +341,25 @@ captured state delta. Same-selector CPU/GPU oracle outputs match their
 respective service parts exactly. Phase 5 remains open.
 
 
-A 3,000 MiB requested expert cache kept layer-9 expert 233 on VRAM for both
+A 3,000-slot expert-cache request kept layer-9 expert 233 on VRAM for both
 serial and batch at the exact position-83 input. Its ten routed parts and MoE
-output matched bit-for-bit; the 1,500 MiB cell had a CPU owner transition and
+output matched bit-for-bit; the 1,500-slot cell had a CPU owner transition and
 small delta. This is a narrow correctness intervention, not a full-sequence or
 performance result. Phase 5 remains open.
 
 
-The 3,000 MiB cache did not restore full two-live sequence parity: slot 0 matched
-96 tokens, while slot 1 diverged at token 60 (versus 66 in the 1,500 MiB cell).
+The 3,000-slot request did not restore full two-live sequence parity: slot 0 matched
+96 tokens, while slot 1 diverged at token 60 (versus 66 in the 1,500-slot cell).
 The targeted expert-233 output was exact with GPU residency, but that local fix
 did not carry through the full sequence. Phase 5 remains open.
 
 
 A repeated exact-input position-83 capture again found bit-identical expert
-parts and combined MoE output at a 3,000 MiB cache, with expert 233 resident on
+parts and combined MoE output at a 3,000-slot request; expert 233 remained resident on
 VRAM in both paths. The 96-token two-live mismatch persists.
 
 
-The 3,000 MiB sequence investigation is still unsettled. One run found a layer-25
+The 3,000-slot sequence investigation is still unsettled. One run found a layer-25
 state delta at position 83, but repeated and combined captures at that position
 were exact. Separate same-prefix captures at position 127 point to layer-24
 state history and intermediate `h` when output first differs, but do not prove
@@ -412,7 +412,7 @@ prior sampled position. This strongly supports owner-dependent arithmetic as
 the source entering layer 5, though downstream propagation remains unproven.
 [Details](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
 
-Raising the host expert-cache cap to 3,000 MiB left the same layer-4 expert 218
+Raising the requested expert-cache slot count to 3,000 left the same layer-4 expert 218
 VRAM→CPU owner change and reproduced the same layer-5 `x`/state delta for the
 same activation. This cache increase does not resolve the measured cell.
 [Details](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).

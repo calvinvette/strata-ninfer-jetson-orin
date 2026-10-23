@@ -5,8 +5,7 @@ removes the known two-live target-only output mismatch. It does not measure
 performance.
 
 The two fresh serial controls and the two-slot batch used the same prompts and
-engine settings: Coder IQ1_M, MTP disabled, context 1,024, 1,500 MiB requested
-expert cache, prompt cache 6, and 96 generated token IDs per request. Both serial
+engine settings: Coder IQ1_M, MTP disabled, context 1,024, a 1,500-slot expert-cache request, prompt cache 6, and 96 generated token IDs per request. Both serial
 and batch engines received `STRATA_IQ_MT_MIN=1` and the Q8_1 selector setting.
 The binary SHA256 is `afc710def2ad1c0f0905afa015f5cae3e50063b29d7c4fdd62f186ab21a7358d`;
 the source checkout was `b40dcf76b972440306b01a4953d32206e8b316ec`. The model is
@@ -123,11 +122,12 @@ This does not establish multi-live correctness, quality, throughput, energy,
 or an operator-level cause. Phase 5 remains open.
 
 A cache-residency intervention repeated the position-83 layer-9 MoE capture
-with a 3,000 MiB requested expert cache and otherwise identical prompts,
+with a 3,000-slot expert-cache request (3,903 realized slots; 7.44 GiB allocated)
+and otherwise identical prompts,
 selector, context, batch size and capture position. Expert 233 remained primary
 VRAM in both serial and batch; all ten routed expert parts and routes matched
 bit-for-bit, as did the combined MoE output (2,560/2,560 values; zero delta).
-The 1,500 MiB baseline changed expert 233 from VRAM to CPU only in the batch
+The 1,500-slot baseline changed expert 233 from VRAM to CPU only in the batch
 row and showed the small owner-specific difference described above. This is a
 same-input operator-level correctness intervention at one captured position;
 it does not establish full-sequence recovery or a beneficial general cache
@@ -143,16 +143,16 @@ Reproduce the intervention with:
 python3 tools/integration/run_control.py \
   --output /tmp/layer9-cache3000-supervised --timeout 2400 --sample-clocks -- \
   python3 bench/results/2026-10-23-phase5-coder-two-live-target-q8all/capture_layer9_moe.py \
-  --output /tmp/layer9-cache3000 --expert-cache-mib 3000
+  --output /tmp/layer9-cache3000 --expert-cache-slots 3000
 python3 bench/results/2026-10-23-phase5-coder-two-live-target-q8all/analyze_layer9_moe.py \
   --run /tmp/layer9-cache3000
 ```
 
 Phase 5 remains open.
 
-The full 96-token two-live run at a 3,000 MiB cache cap did not restore
-sequence parity: slot 0 matched its serial control, while slot 1 first differed
-at output index 60; both produced 96 IDs. At 1,500 MiB, the corresponding
+The full 96-token two-live run with a 3,000-slot request (3,903 realized
+slots; 7.44 GiB allocated) did not restore sequence parity: slot 0 matched its serial control, while slot 1 first differed
+at output index 60; both produced 96 IDs. At a 1,500-slot request, the corresponding
 Q8_1-all cell first differed at index 66. Because the cache changes expert
 ownership and resulting token history, these onset indices are separate cells,
 not a paired causal comparison. The position-83 expert-233 capture does show
@@ -169,12 +169,12 @@ Reproduce with:
 python3 tools/integration/run_control.py \
   --output /tmp/q8all-cache3000-full96-supervised --timeout 3600 --sample-clocks -- \
   python3 bench/results/2026-10-23-phase5-coder-two-live-target-q8all/run_q8all_target_batch.py \
-  --output /tmp/q8all-cache3000-full96 --expert-cache-mib 3000
+  --output /tmp/q8all-cache3000-full96 --expert-cache-slots 3000
 ```
 
 Phase 5 remains open.
 
-The position-83 3,000 MiB cache capture was repeated with the same activation
+The position-83 3,000-slot cache capture was repeated with the same activation
 hash (`0475d4464b64ecea6ac2acc7524ce05e8852333500dbd746ffbadec6f6570181`).
 Routes, owner classes, all ten expert parts and the combined MoE output again
 matched bit-for-bit; expert 233 remained on primary VRAM in both arms. Minimum
@@ -184,7 +184,7 @@ only and does not contradict the full-96-token slot-1 mismatch. Raw data and
 supervisor samples are under `layer9-cache3000-position-83-repeat/` and
 `supervisor-layer9-cache3000-position-83-repeat/`.
 
-Further state tracing under the 3,000 MiB cache cap found variable outcomes
+Further state tracing under the 3,000-slot cache request found variable outcomes
 across fresh two-live runs. In one all-layer sweep, slot 1's state first differed
 at layer 25 at position 83 (token 11), while its generated IDs still matched
 serial for 96 tokens; the same run first differed at layer 25 again at 96 and
@@ -195,7 +195,7 @@ committed state and all layer-25 intermediate fields matched. These observations
 show the position-83 state delta is not reproducible and must not be treated as
 the stable divergence boundary.
 
-At position 127, a separate 3,000 MiB run whose slot-1 output first differed
+At position 127, a separate 3,000-slot run whose slot-1 output first differed
 at index 60 showed its first changed committed state at layer 24, on the same
 input token (`11`); the recurrent and convolution parts both differed. A
 separate stage capture at that position had exact `x`, QKV, gate, beta and `z`,
@@ -230,7 +230,8 @@ they do not cover this full model's request scheduling and integrated batch
 commit sequence.
 
 An onset sweep sampled layer-24 committed state and stage fields at positions
-96, 100, 104, 108, 110, 111 and 112 in one fresh 3,000 MiB two-live run.
+96, 100, 104, 108, 110, 111 and 112 in one fresh two-live run with a
+3,000-slot expert-cache request.
 The slot-1 stream first differs from serial at output index 60. Layer-24 state
 and all captured stage fields are exact at 96, 100 and 104. At position 108
 (input token 13), `h` is the first changed stage (relative L2 `5.127e-4`);
@@ -473,14 +474,16 @@ Raw activations, full MoE parts, state dumps, model files and logs remain local.
 
 ### Expert-cache intervention
 
-The same combined layer-4/layer-5 capture was repeated with the requested host
-expert-cache cap raised from 1,500 to 3,000 MiB. At layer 4 / position 77,
+The same combined layer-4/layer-5 capture was repeated with the requested
+expert-cache slot count raised from 1,500 to 3,000. The baseline allocated
+3.72 GiB to the GPU across 1,934 slots; the repeat allocated 7.44 GiB across
+3,903 slots. At layer 4 / position 77,
 expert 218 still changed from primary VRAM to CPU with the exact same activation
 SHA256 (`10cb6e4961eca2ed9a4b1ecc753080b97a4f40cd10ebd184c54d24e064518932`),
 route IDs and weights. Its expert-part and combined-output deltas were identical
-to the 1,500 MiB capture. Layer 5 again matched every state/stage field at
+to the 1,500-slot capture. Layer 5 again matched every state/stage field at
 position 76, then first differed at `x` and committed state at position 77 with
-the same metrics. Slot 0 matched all 72 serial output IDs. Thus this host cache
+the same metrics. Slot 0 matched all 72 serial output IDs. Thus this expert-cache
 increase does not prevent the layer-4 owner change or its associated downstream
 state/stage difference for this cell. It is not evidence that other cache sizes
 or residency policies cannot help. The run retained at least 14.08 GiB

@@ -10,13 +10,14 @@ from tools.integration.batch_mtp_graph_lifecycle import prepared_prompts,remove_
 
 p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',type=Path,required=True)
 p.add_argument('--position',type=int,default=83);p.add_argument('--layer',type=int,default=9);p.add_argument('--max-tokens',type=int,default=20)
-p.add_argument('--expert-cache-mib',type=int,default=1500)
+p.add_argument('--expert-cache-slots', '--expert-cache-mib',type=int,default=1500,
+               help='requested Strata expert-cache slot count (legacy MiB alias accepted)')
 o=p.parse_args();out=o.output.resolve();out.mkdir(parents=True,exist_ok=False)
 base=Path(__file__).resolve().parent
 cfg=json.loads((base.parent/'2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/config.json').read_text())
 args=list(cfg['args'])
 for key in ('--mtp','--mtp-max-t','--adapt-every','--adapt-accepted-only'):remove_arg(args,key)
-replace_arg(args,'--spec','2');replace_arg(args,'--max-context','1024');replace_arg(args,'--expert-cache',str(o.expert_cache_mib));replace_arg(args,'--prompt-cache','6')
+replace_arg(args,'--spec','2');replace_arg(args,'--max-context','1024');replace_arg(args,'--expert-cache',str(o.expert_cache_slots));replace_arg(args,'--prompt-cache','6')
 prompts=prepared_prompts(cfg,2)
 def env_for(stem,batch):
  e=child_env(cfg);e.update({'STRATA_NATIVE_CPU_Q8_1_DOT':'all','STRATA_IQ_MT_MIN':'1','STRATA_PREFILL_CPU_SHARE':'0',
@@ -42,7 +43,7 @@ try:
   jobs={k:pool.submit(generate,batch,k) for k in prompts};batch_tokens={k:f.result() for k,f in jobs.items()}
 finally:batch.close()
 result={'layer':o.layer,'position':o.position,'max_tokens':o.max_tokens,'serial_slot_1':serial_tokens,
-        'batch':batch_tokens,'prompts':prompts,'profile':{'live_requests':2,'mtp':False,'expert_cache_mib':o.expert_cache_mib,
+        'batch':batch_tokens,'prompts':prompts,'profile':{'live_requests':2,'mtp':False,'expert_cache_slots':o.expert_cache_slots,
         'STRATA_NATIVE_CPU_Q8_1_DOT':'all','STRATA_IQ_MT_MIN':'1'}}
 (out/'result.json').write_text(json.dumps(result,indent=2)+'\n')
 print(json.dumps({'position':o.position,'serial_tokens':len(serial_tokens),'batch_tokens':{k:len(v) for k,v in batch_tokens.items()}}))

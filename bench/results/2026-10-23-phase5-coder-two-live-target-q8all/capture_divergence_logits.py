@@ -60,7 +60,7 @@ finally:
 
 result = {'capture_position': opts.position, 'target_slot': 1, 'profile': {
     'live_requests': 2, 'batch_slots': 2, 'mtp': False, 'context': 1024,
-    'expert_cache_mib': 1500, 'prompt_cache': 6, 'STRATA_NATIVE_CPU_Q8_1_DOT': 'all',
+    'expert_cache_slots': 1500, 'prompt_cache': 6, 'STRATA_NATIVE_CPU_Q8_1_DOT': 'all',
     'STRATA_IQ_MT_MIN': '1'}, 'prompts': prompts,
     'serial_slot_1': serial_out, 'batch': batch_out}
 (out/'result.json').write_text(json.dumps(result, indent=2)+'\n')

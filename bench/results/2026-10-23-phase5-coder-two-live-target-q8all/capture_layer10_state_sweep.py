@@ -37,7 +37,7 @@ try:
   futures={k:pool.submit(generate,batch,k) for k in prompts};batch_tokens={k:f.result() for k,f in futures.items()}
 finally:batch.close()
 result={'layer':10,'positions':positions,'serial_slot_1':serial_tokens,'batch':batch_tokens,
-        'prompts':prompts,'profile':{'live_requests':2,'mtp':False,'expert_cache_mib':1500,'max_tokens':o.max_tokens,
+        'prompts':prompts,'profile':{'live_requests':2,'mtp':False,'expert_cache_slots':1500,'max_tokens':o.max_tokens,
         'STRATA_NATIVE_CPU_Q8_1_DOT':'all','STRATA_IQ_MT_MIN':'1'}}
 (out/'result.json').write_text(json.dumps(result,indent=2)+'\n')
 print(json.dumps({'positions':positions,'serial_tokens':len(serial_tokens),'batch_tokens':{k:len(v) for k,v in batch_tokens.items()}}))
