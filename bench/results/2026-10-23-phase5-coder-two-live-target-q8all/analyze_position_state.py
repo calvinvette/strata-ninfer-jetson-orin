@@ -12,6 +12,8 @@ parser.add_argument('--position', type=int, default=133)
 parser.add_argument('--output', type=Path, help='analysis JSON path; defaults to <run>/analysis.json')
 parser.add_argument('--batch-slot', type=int, default=1,
                     help='verifier row containing the target service request (internal slots can be reassigned)')
+parser.add_argument('--serial-control', choices=('auto', '0', '1'), default='auto',
+                    help='serial prompt control; auto selects by captured input token')
 args = parser.parse_args()
 ROOT = args.run.resolve()
 POSITION = args.position
@@ -35,11 +37,30 @@ def records(path, wanted_slot):
                               'recurrent': recurrent, 'values': values}
     return out
 
-serial_slot_path = ROOT/f'serial-slot-{args.batch_slot}.stgcmt'
-if not serial_slot_path.is_file():
-    serial_slot_path = ROOT/'serial.stgcmt'
-serial = records(serial_slot_path, 0)
 batch = records(ROOT/'batch.stgcmt', args.batch_slot)
+serial_candidates = {}
+if args.serial_control == 'auto':
+    for control in ('0', '1'):
+        path = ROOT/f'serial-slot-{control}.stgcmt'
+        if path.is_file():
+            serial_candidates[control] = records(path, 0)
+else:
+    path = ROOT/f'serial-slot-{args.serial_control}.stgcmt'
+    if not path.is_file():
+        raise ValueError(f'missing selected serial control: {path}')
+    serial_candidates[args.serial_control] = records(path, 0)
+if not serial_candidates:
+    path = ROOT/'serial.stgcmt'
+    serial_candidates['legacy'] = records(path, 0)
+matching_controls = [control for control, states in serial_candidates.items()
+                     if states and set(states) == set(batch)
+                     and all(states[layer]['token'] == batch[layer]['token'] for layer in states)]
+if len(matching_controls) != 1:
+    details = {key: {layer: row['token'] for layer, row in states.items()}
+               for key, states in serial_candidates.items()}
+    raise ValueError(f'expected one serial control matching batch tokens, got {matching_controls}; {details}')
+serial_control = matching_controls[0]
+serial = serial_candidates[serial_control]
 if not serial or set(serial) != set(batch):
     raise ValueError(f'layer mismatch: serial={sorted(serial)} batch={sorted(batch)}')
 rows = []
@@ -62,6 +83,7 @@ for layer in sorted(serial):
                  'recurrent': metrics(0, a['recurrent']),
                  'convolution': metrics(a['recurrent'], len(delta))})
 result = {'position': POSITION, 'serial_layers': sorted(serial), 'batch_slot': args.batch_slot,
+          'serial_control': serial_control,
           'first_changed_layer': next((x['layer'] for x in rows if x['whole_state']['changed_values']), None),
           'comparisons': rows,
           'limits': ['GDN committed-state capture only; other activations and state families are not covered.',

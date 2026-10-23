@@ -389,3 +389,6 @@ small incoming-state difference from recurrence arithmetic as the source. The
 two prestate summaries are
 [`position84-slot1-prestate/analysis.json`](position84-slot1-prestate/analysis.json)
 and [`position83-slot1-prestate/analysis.json`](position83-slot1-prestate/analysis.json).
+The committed-state analyzer now selects the serial prompt control by captured
+input token and position, independently of the verifier's internal slot ID; the
+two all-layer summaries record the selected serial control.

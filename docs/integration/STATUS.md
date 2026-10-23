@@ -4600,3 +4600,10 @@ not evidence of a stable onset or root cause. Phase 5 remains open. The
 [position-83](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/position83-slot1-prestate/analysis.json)
 and [position-84](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/position84-slot1-prestate/analysis.json)
 prestate records are summarized in the [experiment report](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+
+The selected-position committed-state analyzer now pairs each batch row with the
+serial prompt control by captured position and input token, rather than assuming
+the verifier's internal slot number identifies the prompt. It errors on
+ambiguous control matches. The two retained all-layer summaries were rerun and
+record their selected serial control. This prevents slot reassignment from
+silently pairing different request histories.
