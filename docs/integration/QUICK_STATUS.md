@@ -67,6 +67,13 @@ earlier QSA difference. This narrows the observed state onset for one row but
 does not explain the two-live output mismatch or pass Phase 5. See the [state
 follow-up](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
 
+A 3,000 MiB cache-cap correctness diagnostic is now localized one layer
+earlier: layer-10 experts 150 and 2 switch from VRAM to CPU on an otherwise
+bit-identical activation and routing row. Independent same-input oracles
+confirm the owner-specific outputs. The later layer-11 observation was
+downstream of this change, so it is not a cache-only performance comparison.
+Phase 5 remains open.
+
 Correctness work has found a separate adaptive-recovery issue. In a 256-token
 short–short–short Coder IQ1_M chain, adaptive recovery differed on 237/256
 tokens, while delayed control was bit-exact at captured positions. At position

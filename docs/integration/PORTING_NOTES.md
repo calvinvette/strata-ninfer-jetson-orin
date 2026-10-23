@@ -2784,3 +2784,12 @@ the first committed GDN state change followed at model layer 12; earlier
 captured GDN layers were exact even though all 96 emitted tokens matched.
 Compare accepted persistent state directly in future backend integrations,
 since equal token streams can conceal this kind of numerical transition.
+
+When comparing cache caps, capture the immediately preceding layer boundary
+and the selected MoE row. In the 3,000 MiB follow-up, layer 11 was already
+unpaired because model layer 10 had changed. Layer 10's own activation, route,
+weights and shared path were paired; experts 150 and 2 changed primary
+VRAM→CPU, and their weighted service parts explained the layer output delta.
+Parameterize owner-oracle tooling by layer and derive the selected experts from
+the owner trace. This prevents a downstream mismatch from being mistaken for a
+cache effect and transfers to future Strata/Splash backend comparisons.

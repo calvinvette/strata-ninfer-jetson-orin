@@ -8,6 +8,7 @@ import struct
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--run', type=Path, required=True)
+parser.add_argument('--layer', type=int, default=11)
 parser.add_argument('--position', type=int, default=119)
 parser.add_argument('--output', type=Path, required=True)
 args = parser.parse_args()
@@ -19,7 +20,7 @@ def records(path, magic, kind):
         if len(data) - at < HEADER.size:
             raise ValueError(f'{path}: truncated {kind} header at {at}')
         got_magic, version, layer, count, reserved, width, pos, slot, token = HEADER.unpack_from(data, at)
-        if got_magic != magic or version != 2 or reserved or layer != 11 or count < 1 or (kind == 'output' and count != 1):
+        if got_magic != magic or version != 2 or reserved or layer != args.layer or count < 1 or (kind == 'output' and count != 1):
             raise ValueError(f'{path}: invalid {kind} record at {at}')
         at += HEADER.size
         n = width * count
@@ -62,8 +63,8 @@ serial_outputs = records(args.run / 'moe-output.stmoe', b'MOEOUT02', 'output')
 batch_outputs = [r for r in serial_outputs if r['slot'] == 0 and r['position'] == args.position]
 serial_outputs = [r for r in serial_outputs if r['slot'] < 0 and r['position'] == args.position]
 routes = route_records(args.run / 'moe-routes.jsonl')
-batch_routes = [r for r in routes if r.get('slot') == 0 and r['position'] == args.position]
-serial_routes = [r for r in routes if r.get('slot', -1) < 0 and r['position'] == args.position]
+batch_routes = [r for r in routes if r.get('layer') == args.layer and r.get('slot') == 0 and r['position'] == args.position]
+serial_routes = [r for r in routes if r.get('layer') == args.layer and r.get('slot', -1) < 0 and r['position'] == args.position]
 groups = (serial_parts, batch_parts, serial_outputs, batch_outputs, serial_routes, batch_routes)
 if any(len(group) != 1 for group in groups):
     raise ValueError('expected one matched serial and slot-0 batch route, parts, and output row; counts=' +
@@ -88,7 +89,7 @@ for rank in range(k):
     for i in range(width):
         predicted[i] += br['weights'][rank] * bp['first'][start + i] - sr['weights'][rank] * sp['first'][start + i]
 combined_delta = [b - a for a, b in zip(so['second'], bo['second'])]
-result = {'layer': 11, 'position': args.position, 'token': bp['token'], 'batch_slot': 0,
+result = {'layer': args.layer, 'position': args.position, 'token': bp['token'], 'batch_slot': 0,
           'route_ids_exact': sr['ids'] == br['ids'],
           'route_weights': metrics(sr['weights'], br['weights']),
           'shared_output': metrics(so['first'], bo['first']),
@@ -99,9 +100,9 @@ result = {'layer': 11, 'position': args.position, 'token': bp['token'], 'batch_s
           'combined_delta_explained_residual': metrics(predicted, combined_delta),
           'rank_outputs': rank_metrics}
 serial_owner_rows = [r for r in dispatch_rows(args.run / 'serial.moe-owners.jsonl')
-                     if r['position'] == args.position and r['token_id'] == bp['token']]
+                     if r['layer'] == args.layer and r['position'] == args.position and r['token_id'] == bp['token']]
 batch_owner_rows = [r for r in dispatch_rows(args.run / 'batch.moe-owners.jsonl')
-                    if r['position'] == args.position and r['token_id'] == bp['token']]
+                    if r['layer'] == args.layer and r['position'] == args.position and r['token_id'] == bp['token']]
 if len(serial_owner_rows) == len(batch_owner_rows) == 1:
     serial_owner, batch_owner = serial_owner_rows[0], batch_owner_rows[0]
     owner_labels = {'-1': 'CPU', '0': 'primary VRAM', '1': 'PCIe', '2': 'peer/helper GPU'}

@@ -22,8 +22,14 @@ then first changed at layer 12 (795,789/817,152 values; relative L2 0.00170369);
 all 27 later GDN states differed. Across 36 layers, 21,504,757/29,417,472
 floats changed (relative L2 0.00781353). All 96 generated slot-0 tokens still
 matched serial.
-A larger-cache follow-up was unclean because its layer-11 input already
-differed. This is a single-prompt correctness diagnostic; Phase 5 remains open.
+A 3,000 MiB cache-cap follow-up had already diverged by layer 11. Capturing
+layer 10 localized the first selected owner delta: its input, routes, weights
+and shared output matched serial, while experts 150 and 2 moved primary
+VRAM→CPU. Exact-activation native oracles matched the serial and batch service
+parts to CUDA and CPU respectively; both expert outputs use IQ2_S gate/up and
+Q2_0 down weights. This diagnoses the changed arithmetic path, not a cache
+performance effect. It is a single-prompt correctness diagnostic; Phase 5
+remains open.
 See the [batch-MTP diagnostic](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
 
 A supervised one-live-after-admission MTP2 trace now shows the same QSA state

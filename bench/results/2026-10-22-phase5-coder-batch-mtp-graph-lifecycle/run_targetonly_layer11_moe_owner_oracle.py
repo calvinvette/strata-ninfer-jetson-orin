@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Join captured layer-11 owner outputs to the same-input CPU/GPU/float oracle."""
+"""Join captured layer owner outputs to the same-input CPU/GPU/float oracle."""
 import argparse
 import hashlib
 import json
@@ -13,7 +13,6 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[3]
 HERE = Path(__file__).resolve().parent
 HEADER = struct.Struct('<8sIIIIQqii')
-EXPERTS = (205, 110, 90)
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--run', type=Path, required=True,
@@ -23,6 +22,7 @@ parser.add_argument('--model', type=Path, default=Path.home() / 'models/strata-o
 parser.add_argument('--parity', type=Path, default=ROOT / 'build/integration/candidate/native_expert_parity')
 parser.add_argument('--position', type=int, default=119)
 parser.add_argument('--token', type=int, default=16)
+parser.add_argument('--layer', type=int, default=11)
 args = parser.parse_args()
 out = args.output.resolve()
 out.mkdir(parents=True, exist_ok=False)
@@ -32,7 +32,7 @@ def select_owner(path):
     if not lines or json.loads(lines[0]).get('format') != 'strata-moe-dispatch-v3':
         raise ValueError(f'{path}: invalid MoE dispatch capture')
     rows = [json.loads(line) for line in lines[1:]
-            if json.loads(line).get('layer') == 11
+            if json.loads(line).get('layer') == args.layer
             and json.loads(line).get('position') == args.position
             and json.loads(line).get('token_id') == args.token]
     if len(rows) != 1:
@@ -51,7 +51,7 @@ def select_parts(path, slot):
             raise ValueError(f'{path}: truncated header at {at}')
         magic, version, layer, count, reserved, width, position, row_slot, token = HEADER.unpack_from(data, at)
         at += HEADER.size
-        if magic != b'STMPART2' or version != 2 or reserved or layer != 11 or count < 1:
+        if magic != b'STMPART2' or version != 2 or reserved or layer != args.layer or count < 1:
             raise ValueError(f'{path}: invalid record at {at - HEADER.size}')
         n = count * width
         size = n * 4
@@ -89,8 +89,16 @@ if pack(serial_owner['activation']) != pack(batch_owner['activation']):
     raise ValueError('serial and batch owner captures do not have the exact same f32 activation')
 serial_parts = select_parts(args.run / 'moe-parts.stmparts', -1)
 batch_parts = select_parts(args.run / 'moe-parts.stmparts', 0)
-if serial_parts['width'] != batch_parts['width'] or serial_parts['width'] != 2560 * 10:
+if serial_parts['width'] != batch_parts['width'] or serial_parts['width'] != 2560 * len(serial_owner['ids']):
     raise ValueError('unexpected expert-part width')
+owner_changes = [(rank, expert) for rank, (expert, so, bo) in enumerate(zip(
+    serial_owner['ids'], serial_owner['route_kind'], batch_owner['route_kind']))
+    if so != bo]
+if not owner_changes or any(serial_owner['ids'][rank] != batch_owner['ids'][rank]
+                             or so != 0 or bo != -1
+                             for rank, _ in owner_changes
+                             for so, bo in [(serial_owner['route_kind'][rank], batch_owner['route_kind'][rank])]):
+    raise ValueError(f'expected same-ID primary-VRAM-to-CPU owner changes, got {owner_changes}')
 activation_path = out / 'activation-position119-token16.f32'
 activation_bytes = pack(batch_owner['activation'])
 activation_path.write_bytes(activation_bytes)
@@ -99,11 +107,11 @@ result = {
     'schema': 1,
     'model_repository': 'ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF',
     'model_revision': '5348543e0147355ac9cbcb031184a3546350988e',
-    'model_quantization': 'IQ1_M; selected layer-11 experts use IQ2_S gate/up and IQ4_NL down',
-    'layer': 11,
+    'model_quantization': 'IQ1_M; per-expert codecs recorded by native oracle output',
+    'layer': args.layer,
     'position': args.position,
     'token': args.token,
-    'expert_ids': list(EXPERTS),
+    'expert_ids': [expert for _, expert in owner_changes],
     'activation_bytes': len(activation_bytes),
     'activation_sha256': hashlib.sha256(activation_bytes).hexdigest(),
     'serial_and_batch_activation_bitwise_equal': True,
@@ -114,7 +122,7 @@ result = {
     'model_shard': args.model.name,
     'model_shard_bytes': args.model.stat().st_size,
 }
-for rank, expert in ((4, 205), (5, 110), (7, 90)):
+for rank, expert in owner_changes:
     record = {'rank': rank, 'expert': expert,
               'serial_owner_code': serial_owner['route_kind'][rank],
               'batch_owner_code': batch_owner['route_kind'][rank]}
@@ -124,17 +132,17 @@ for rank, expert in ((4, 205), (5, 110), (7, 90)):
         raise ValueError(f'expert {expert}: expected VRAM->CPU owner change, got {record}')
     serial_service = serial_parts['values'][rank * 2560:(rank + 1) * 2560]
     batch_service = batch_parts['values'][rank * 2560:(rank + 1) * 2560]
-    with tempfile.TemporaryDirectory(prefix=f'strata-layer11-e{expert}-') as temp:
+    with tempfile.TemporaryDirectory(prefix=f'strata-layer{args.layer}-e{expert}-') as temp:
         dump = Path(temp)
         command = [str(args.parity), str(args.model), '--expert', str(expert),
-                   '--activation-f32', str(activation_path), '--dump-f32-dir', str(dump), '11']
+                   '--activation-f32', str(activation_path), '--dump-f32-dir', str(dump), str(args.layer)]
         proc = subprocess.run(command, cwd=ROOT, stdout=subprocess.PIPE,
                               stderr=subprocess.STDOUT, text=True, check=False)
         log = out / f'expert-{expert}-parity.txt'
         log.write_text(proc.stdout)
         if proc.returncode != 0 or 'native_expert_parity: 0 failures' not in proc.stdout:
             raise RuntimeError(f'expert {expert} native parity failed; see {log}')
-        stem = f'layer-11-expert-{expert}'
+        stem = f'layer-{args.layer}-expert-{expert}'
         cpu = struct.unpack('<2560f', (dump / f'{stem}-cpu-output.f32').read_bytes())
         gpu = struct.unpack('<2560f', (dump / f'{stem}-gpu-output.f32').read_bytes())
         reference = struct.unpack('<2560f', (dump / f'{stem}-float-output.f32').read_bytes())

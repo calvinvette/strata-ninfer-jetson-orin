@@ -525,13 +525,20 @@ captures localize a numerical difference to owner-dependent expert arithmetic
 for this prompt and schedule; they do not establish a user-visible quality
 effect or a performance effect.
 
-A 3,000 MiB expert-cache-cap follow-up also passed supervision and preserved
-the same output tokens, but is not a valid cache-only comparison: its captured
-MoE input already differed (relative L2 0.00323), route weights changed, and
-the shared-expert output changed. Treat this cell as an unclean diagnostic,
-not evidence that increasing cache changes expert ownership or fixes the
-observed difference. Full capture arrays and process logs remain local-only;
-the parsers, compact analyses and reproduction harness are retained here.
+A 3,000 MiB expert-cache-cap follow-up also preserved the same output tokens,
+but its layer-11 MoE input had already diverged. A new layer-10 capture found
+that the divergence begins inside layer 10: its MoE input, route IDs/weights,
+and shared-expert output match serial, while experts 150 (rank 3) and 2 (rank
+5) move from primary VRAM to CPU and their weighted parts explain the combined
+output delta (maximum residual `5.16e-9`). Thus the 3,000 MiB cell is still not
+a cache-only performance comparison; it shows the cap changes where
+owner-dependent arithmetic first appears in this workload. At this layer-10
+activation, a same-input oracle matches serial service parts to CUDA and batch
+parts to CPU bit-for-bit. CPU/GPU outputs differ in all 2,560 values (relative
+L2 0.9989% and 1.1411%); both pass the independent decoded-weight float check.
+These are operator diagnostics, not quality or speed evidence. Full capture
+arrays and process logs remain local-only; compact analyses and reproduction
+harnesses are retained here.
 
 ### Owner-specific expert oracle (2026-10-22)
 
@@ -549,6 +556,17 @@ availability and zero cgroup events. It completed in 2.1 seconds; clocks were
 dynamic, EMC readback was denied, and energy was not measured. The compact
 comparison is `targetonly-layer11-moe-owner-oracle-analysis.json`; full
 activation, output arrays and process logs are local-only.
+
+The generalized `run_targetonly_layer11_moe_owner_oracle.py --layer 10` was
+also applied to the 3,000 MiB capture. It selected experts 150 and 2 from the
+owner trace rather than assuming fixed expert IDs, and checked the captured
+activation SHA256 `7a1956cdc36269a5a2d1ed3d9b208ecb099b7e9b26a044036fe1895bc02da75b`.
+The service CPU/GPU outputs again match their respective independent native
+oracles bit-for-bit. The selected experts use IQ2_S gate/up and Q2_0 down
+weights. The supervised oracle run retained 24.22 GiB minimum physical and
+admission availability with zero cgroup events; clocks remained dynamic, EMC
+readback was denied and energy was not measured. Its compact result is
+`cache3000-layer10-owner-oracle/analysis.json`.
 
 ### Committed-state consequence at position 119 (2026-10-22)
 
