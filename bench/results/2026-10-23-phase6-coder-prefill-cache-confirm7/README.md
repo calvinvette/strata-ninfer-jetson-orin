@@ -76,9 +76,20 @@ answer was exact (7,501 prompt, 46 completion tokens):
 | 1,500 | 128 | 186.9 s | 190.6 s | 40.2 | 12.1 |
 | 1,500 | 32 | 584.5 s | 588.2 s | 12.8 | 12.0 |
 
-The three-block partial audit passed all twelve cells. Across blocks 1–3,
-chunk 128 reduced median client total time by 67.6%/68.6% at cache arguments
-1,500/3,000; the median cache-by-chunk time interaction was −3.0%. These are
+Randomized block 4 passed all four cells; each answer was exact with 7,501
+prompt and 46 completion tokens:
+
+| Requested slots | Chunk | Client TTFT | Client total | Prompt tok/s | Decode tok/s |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 1,500 | 32 | 612.1 s | 615.9 s | 12.3 | 12.1 |
+| 3,000 | 128 | 167.0 s | 170.4 s | 44.9 | 13.4 |
+| 3,000 | 32 | 542.7 s | 546.0 s | 13.8 | 13.2 |
+| 1,500 | 128 | 192.2 s | 196.0 s | 39.1 | 11.9 |
+
+The four-block partial audit passed all sixteen cells. Across blocks 1–4,
+chunk 128 reduced median client total time by 67.8%/68.7% at cache arguments
+1,500/3,000; the median cache-by-chunk time interaction was −2.4%. These are
 descriptive partial results; the analyzer suppresses confidence intervals
 until all seven confirmation blocks are present. Minimum physical/admission
-availability was 14.19/14.19 GiB, with zero cgroup events. Blocks 4–7 remain.
+availability across the four blocks was 14.19/14.19 GiB, with zero cgroup
+events. Blocks 5–7 remain.
