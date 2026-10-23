@@ -51,8 +51,10 @@ committed state was GDN layer 12. At layer 12, 785,549/786,432 recurrent
 values changed (relative L2 0.000332829) and 10,240/30,720 convolution values
 changed (relative L2 0.00170454), for 795,789/817,152 combined values
 (relative L2 0.00170369, maximum absolute difference 0.0149361). All 27 later
-GDN layer states also differed. Slot 0 still matched all 96 serial output
-tokens and the competitor returned one. Supervision retained 17.66 GiB minimum
+GDN layer states also differed. Across all 36 layers, 21,504,757/29,417,472
+floats changed (relative L2 0.00781353, maximum absolute difference 0.370022).
+Slot 0 still matched all 96 serial output tokens and the competitor returned
+one. Supervision retained 17.66 GiB minimum
 physical/admission availability over 63 samples with zero cgroup events.
 This shows the selected layer-11 owner-path difference carries into committed
 recurrent state in this run; it does not establish a quality impact or a

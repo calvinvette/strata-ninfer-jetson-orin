@@ -63,16 +63,31 @@ if len(serial) != 36:
     raise ValueError(f'expected the 36 GDN layers, got {len(serial)}')
 
 layers = []
+aggregate_changed = aggregate_values = 0
+aggregate_error_sq = aggregate_reference_sq = 0.0
+aggregate_max_abs = 0.0
 for layer in sorted(serial):
     s, b = serial[layer], batch[layer]
     recurrent = s['recurrent']
+    for a, actual in zip(s['values'], b['values']):
+        delta = float(actual) - float(a)
+        aggregate_changed += delta != 0.0
+        aggregate_values += 1
+        aggregate_error_sq += delta * delta
+        aggregate_reference_sq += float(a) * float(a)
+        aggregate_max_abs = max(aggregate_max_abs, abs(delta))
     layers.append({'layer': layer,
                    'recurrent': compare(s['values'][:recurrent], b['values'][:recurrent]),
                    'convolution': compare(s['values'][recurrent:], b['values'][recurrent:]),
                    'combined': compare(s['values'], b['values'])})
 first = next((x['layer'] for x in layers if x['combined']['different_values']), None)
 result = {'schema': 1, 'position': args.position, 'token': args.token, 'batch_slot': 0,
-          'layers_compared': len(layers), 'first_changed_layer': first, 'layers': layers}
+          'layers_compared': len(layers), 'first_changed_layer': first,
+          'all_layer_state': {'values': aggregate_values, 'different_values': aggregate_changed,
+                              'max_abs': aggregate_max_abs,
+                              'relative_l2': math.sqrt(aggregate_error_sq / aggregate_reference_sq)
+                                             if aggregate_reference_sq else 0.0},
+          'layers': layers}
 args.output.parent.mkdir(parents=True, exist_ok=True)
 args.output.write_text(json.dumps(result, indent=2) + '\n')
 print(json.dumps(result, indent=2))

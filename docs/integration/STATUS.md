@@ -19,7 +19,8 @@ output and each batch part to its CPU output bit-for-bit, confirming the
 owner-specific arithmetic path for all three rows. A paired all-layer capture
 at the same committed position found GDN states exact through model layer 10,
 then first changed at layer 12 (795,789/817,152 values; relative L2 0.00170369);
-all 27 later GDN states differed although all 96 generated slot-0 tokens still
+all 27 later GDN states differed. Across 36 layers, 21,504,757/29,417,472
+floats changed (relative L2 0.00781353). All 96 generated slot-0 tokens still
 matched serial.
 A larger-cache follow-up was unclean because its layer-11 input already
 differed. This is a single-prompt correctness diagnostic; Phase 5 remains open.
