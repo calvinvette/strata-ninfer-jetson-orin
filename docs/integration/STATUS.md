@@ -4809,6 +4809,9 @@ A separate seven-block confirmation harness now uses a tokenizer-verified
 7,501-token archive with different marker positions and values. Its separate
 cache-1,500/chunk-128 preflight passed twice with the exact answer, 46 output
 tokens, over 14 GiB minimum host and admission availability, and zero cgroup
-events. The preflight allows natural EOS and is excluded from confirmation
-statistics. Randomized block 1/7 is in progress; no confirmation effect is
-claimed. The harness computes deterministic paired-block bootstrap intervals.
+events. These are the preflight warmup and measured request; both passed with
+natural EOS enabled. Earlier strict-length attempts emitted the same exact
+answer but were correctly rejected by the harness for stopping at 46 of 48
+requested tokens. Preflight data are excluded from confirmation statistics.
+Randomized block 1/7 is in progress; no confirmation effect is claimed. The
+harness computes deterministic paired-block bootstrap intervals.
