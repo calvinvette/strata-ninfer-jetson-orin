@@ -627,3 +627,38 @@ On Orin, the CUDA service rebuilt and `verify_parity` plus
 HIP/SYCL rebuild remains pending: maestro1 currently reports 99% root disk use
 with 1.1 GiB free. Its evidence, when available, will be compile/link and
 startup only, not accelerator runtime qualification.
+
+### Earlier layer-39 source at position 104
+
+A follow-up paired run captured positions 104 and 105 with both serial controls,
+the layer-39 MoE, its boundary, layer-40 GDN stages and layer-40 committed
+state. At position 104 / token `1332` (batch row 1), layer-39's residual before
+its branch is bit-identical. The first changed boundary field is the layer-39
+branch output: all 2,560 values differ, max absolute delta `5.9921e-6`, relative
+L2 `3.6151e-5`; route IDs and weights match. The owner record shows expert 50
+(rank 9) GPU→CPU and its part is the only changed expert part. The serial owner
+record does not contain a captured activation because that row had no CPU
+expert, so the direct owner log alone is not an input-equality proof.
+
+The independent native expert oracle was run on the captured batch activation
+for layer 39 / expert 50 with `STRATA_NATIVE_CPU_Q8_1_DOT=all`. The service's
+serial part matched the oracle GPU output bit-for-bit; the batch part matched
+the CPU output bit-for-bit. The CPU/GPU part delta was relative L2
+`3.4335e-4`. Together with the exact pre-branch residual and exact route, this
+strongly attributes this sampled branch delta to owner-dependent expert
+arithmetic; it is not a general parity claim. At the same token, layer-40 `x`
+already differs (relative L2 `5.6708e-6`), and its committed recurrent state
+differs by `9.9630e-6`. This shows the position-105 layer-40 `h` delta follows
+an earlier owner-dependent perturbation in this run. At position 105, the
+layer-39 expert parts/output and following boundary are exact, while layer-40
+`x`/`qkv` are exact and `h` differs. Thus the initiating location varies by
+position; this trace identifies one concrete earlier contribution but does
+not explain all two-live drift.
+
+The paired capture completed with at least 14.15 GiB physical/admission
+availability and zero cgroup memory events; EMC clock readback was denied, and
+energy was not measured. The oracle's first invocation failed because its dump
+directory had not been created; the retry with the directory present passed.
+The raw activation, oracle dumps, and supervisor telemetry remain local under
+`expert185-rank-swap199-layer39-position104-boundary/` and its matching
+`supervisor-.../` directory.

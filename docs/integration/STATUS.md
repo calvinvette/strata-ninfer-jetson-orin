@@ -4774,3 +4774,21 @@ batch rows. Current Orin CUDA build and focused `verify_parity`/
 checks. maestro1 remains at 99% disk use (1.1 GiB free), so HIP/SYCL shared-file
 rebuild evidence is pending. No accelerator-runtime claim follows from that
 planned x86 rebuild. Phase 5 remains open. [Capture record](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+
+A paired follow-up at positions 104/105 located an earlier sampled contribution
+under the same narrow rank swap. At layer 39 / position 104 / token `1332`, the
+pre-branch residual, routes and weights were exact, while the branch output
+first differed (relative L2 `3.6151e-5`). Expert 50 (rank 9) was GPU→CPU and
+its part was the only changed expert part. On the captured batch activation,
+`native_expert_parity` matched the serial service part to its GPU output and
+the batch service part to its CPU output bit-for-bit; the CPU/GPU delta was
+`3.4335e-4` relative L2. The serial owner record itself lacks an activation
+because its selected experts were all GPU, so this is strong owner-arithmetic
+attribution supported by the exact pre-branch residual, not an independent
+direct serial-activation comparison. Layer-40 `x` and committed state were
+already changed at position 104 (state recurrent relative L2 `9.9630e-6`); at
+position 105, layer-39 MoE/boundary were exact and layer-40 `h` was the first
+changed captured stage. The first sampled source therefore depends on position;
+this does not explain all two-live drift. The capture retained at least 14.15
+GiB availability with zero cgroup events; EMC readback was unsupported and
+energy was not measured. Phase 5 remains open. [Detailed trace and oracle](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).

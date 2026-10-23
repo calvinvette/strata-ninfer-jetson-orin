@@ -461,3 +461,12 @@ distinguish pre-existing recurrent state from row-context recurrence arithmetic.
 The opt-in multirow boundary capture passes the focused Orin parity tests;
 maestro1 backend rebuild is pending while its root filesystem remains 99% full.
 Phase 5 remains open. [Trace notes](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+
+A same-profile position-104 follow-up found the layer-39 pre-branch residual
+and routes exact, but the branch output changed (relative L2 `3.6151e-5`); only
+expert 50's part changed as it moved GPU→CPU. On that captured activation, an
+independent oracle matched the serial service part to GPU and the batch part to
+CPU exactly. Layer-40 input `x` and committed recurrent state were already
+different at position 104. This supports an earlier owner-dependent
+contribution in this sampled run; the first source is position-dependent and
+the general two-live state drift remains unresolved.
