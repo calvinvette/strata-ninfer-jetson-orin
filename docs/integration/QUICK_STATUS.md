@@ -290,3 +290,8 @@ rail-energy analysis: `VIN_SYS_5V0` per output token was 7.42% lower at 8K and
 7.05% lower at 16K with the larger requested cache. These are background-
 contaminated named-rail estimates, not process or whole-device energy, and do
 not change the profile direction. [Details](../../bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-interaction-confirm7/rail-followup/README.md).
+
+The separate short Coder task's seven-block cache confirmation shows an
+11.19% lower `VIN_SYS_5V0` estimate per output token with the larger cache at
+8K. These request-window rails include idle/background power and are not
+whole-device energy. [Details](../../bench/results/2026-10-21-phase6-coder-current-source-cache-context-confirm7/rail-followup/README.md).
