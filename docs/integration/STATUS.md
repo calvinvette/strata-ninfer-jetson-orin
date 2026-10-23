@@ -4813,5 +4813,10 @@ events. These are the preflight warmup and measured request; both passed with
 natural EOS enabled. Earlier strict-length attempts emitted the same exact
 answer but were correctly rejected by the harness for stopping at 46 of 48
 requested tokens. Preflight data are excluded from confirmation statistics.
-Randomized block 1/7 is in progress; no confirmation effect is claimed. The
-harness computes deterministic paired-block bootstrap intervals.
+The harness computes deterministic paired-block bootstrap intervals.
+The first randomized confirmation block passed all four cells on the distinct
+archive prompt. Every answer was exact (7,501 prompt, 46 completion tokens).
+Minimum physical/admission availability was 14.33 GiB with zero cgroup events.
+Paired chunk-128 reductions in total time were 68.0%/68.6% at cache arguments
+1,500/3,000; the one-block interaction was −1.9%. This is an early descriptive
+block only. Blocks 2–7 remain, and no recommendation is claimed.

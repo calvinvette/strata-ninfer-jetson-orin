@@ -36,7 +36,22 @@ audits and does not satisfy the confirmation gate.
 
 The tokenizer check and a separate preflight passed. Both preflight requests
 returned the exact answer at 7,501 prompt tokens; the natural-stop rule accepts
-the model's 46-token response. The preflight retained over 14 GiB minimum host
-availability, over 14 GiB admission availability, and zero cgroup events. It is
-excluded from confirmation statistics. Block 1 is now running; no confirmation
-performance result or configuration recommendation is yet available.
+the model's 46-token response. The preflight retained 18.04 GiB minimum host
+availability and 17.67 GiB admission availability, with zero cgroup events. It
+is excluded from confirmation statistics.
+
+Randomized block 1 passed all four cells. Each measured request returned the
+exact answer with 7,501 prompt tokens and 46 completion tokens:
+
+| Requested slots | Chunk | Client TTFT | Client total | Prompt tok/s | Decode tok/s |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 1,500 | 128 | 184.1 s | 187.7 s | 40.8 | 12.3 |
+| 3,000 | 128 | 166.8 s | 170.2 s | 45.0 | 13.2 |
+| 3,000 | 32 | 537.8 s | 541.3 s | 13.9 | 13.1 |
+| 1,500 | 32 | 582.1 s | 585.8 s | 12.9 | 12.0 |
+
+Minimum physical/admission availability across block 1 was 14.33/14.33 GiB;
+cgroup events were zero. The one-block paired chunk-128 reductions in client
+total time were 68.0%/68.6% for cache arguments 1,500/3,000. The one-block
+cache-by-chunk time interaction was −1.9%; this is a preliminary descriptive
+contrast and carries no useful uncertainty estimate. Blocks 2–7 remain.

@@ -481,6 +481,8 @@ confirmation remains necessary before a recommendation. [Report](../../bench/res
 
 A separate seven-block confirmation with a distinct, tokenizer-verified
 7,501-token archive is underway. Its isolated preflight returned the exact
-answer and passed memory guards; the preflight is excluded from the seven
-confirmation blocks. No confirmation result is available yet. [Confirmation
-design and runner](../../bench/results/2026-10-23-phase6-coder-prefill-cache-confirm7/README.md).
+answer and passed memory guards; the preflight is excluded from confirmation
+statistics. Block 1/7 passed all four cells with zero cgroup events and at
+least 14.33 GiB host/admission availability. The one-block chunk-128 total-time
+reductions were 68.0%/68.6%; no interaction recommendation is made from one
+block. [Confirmation design and runner](../../bench/results/2026-10-23-phase6-coder-prefill-cache-confirm7/README.md).
