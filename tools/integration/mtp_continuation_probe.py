@@ -36,6 +36,12 @@ def summarize_rejections(first_request, continuation_request, recovery_request):
     }
 
 
+def arm_specs(window):
+    if window not in (2, 3, 4):
+        raise ValueError('MTP window must be 2, 3, or 4')
+    return (('mtp-off', 0), (f'mtp-window{window}', window))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', type=Path, required=True)
@@ -46,6 +52,8 @@ def main():
     parser.add_argument('--continuation-tokens', type=int, default=8)
     parser.add_argument('--recovery-tokens', type=int, default=8,
                         help='tokens generated in a third same-engine request after continuation')
+    parser.add_argument('--mtp-window', type=int, choices=(2, 3, 4), default=4,
+                        help='MTP candidate window compared with MTP off (default: 4)')
     parser.add_argument('--require-rejection', action='store_true',
                         help='fail unless the initial or continuation request rejects a draft before recovery')
     parser.add_argument('--run', action='store_true')
@@ -56,7 +64,7 @@ def main():
     if a.output.exists():
         parser.error('output path already exists')
     if not a.run:
-        print('Dry run: MTP off/window 4, same-engine continuation and post-continuation recovery.')
+        print(f'Dry run: MTP off/window {a.mtp_window}, same-engine continuation and post-continuation recovery.')
         return 0
     tokenizer_path = Path(cfg['tokenizer'])
     tok = load_tokenizer(tokenizer_path)
@@ -75,7 +83,7 @@ def main():
               'recovery_tokens': a.recovery_tokens,
               'require_rejection': a.require_rejection,
               'state_fields': STATE_KEYS, 'arms': [], 'failures': []}
-    for label, window in (('mtp-off', 0), ('mtp-window4', 4)):
+    for label, window in arm_specs(a.mtp_window):
         log = a.output / f'{label}.log'
         engine = StrataEngine(str(a.engine.resolve()), args_for(cfg, window), cwd=cfg.get('cwd'),
                               log=str(log), env=env)

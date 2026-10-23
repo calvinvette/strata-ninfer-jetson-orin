@@ -4,10 +4,17 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools/integration'))
-from mtp_continuation_probe import rejected_drafts, summarize_rejections
+from mtp_continuation_probe import arm_specs, rejected_drafts, summarize_rejections
 
 
 class MtpContinuationProbeTests(unittest.TestCase):
+    def test_window_selects_matching_off_and_candidate_arms(self):
+        self.assertEqual(arm_specs(3), (('mtp-off', 0), ('mtp-window3', 3)))
+
+    def test_window_rejects_unsupported_values(self):
+        with self.assertRaises(ValueError):
+            arm_specs(5)
+
     def test_counts_rejected_drafts(self):
         self.assertEqual(rejected_drafts({'drafts_offered': 9, 'drafts_accepted': 6}), 3)
 

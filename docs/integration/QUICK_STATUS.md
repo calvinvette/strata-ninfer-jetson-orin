@@ -15,7 +15,7 @@ its bounded Orin qualification matrix. Phase 8 is complete for one bounded,
 opt-in Q2_0 release profile; Phases 5 and 6 remain open for unresolved
 accepted-state correctness and broader performance interactions. The full
 Orin CUDA regression suite passed 130 tests with two optional IQ-fixture tests
-skipped; Python integration discovery now passes 168/168. The latest focused
+skipped; Python integration discovery now passes 170/170. The latest focused
 accepted-window, GDN and graph CTest selection passed 5/5. The latest
 seven shared-source files were rebuilt from a fresh isolated snapshot for HIP
 and SYCL on maestro1 with two jobs; both `strata --help` checks returned zero.
@@ -84,6 +84,12 @@ initial request followed by two same-engine continuations. MTP4 rejected 9/15
 drafts; all shared state boundaries and all three outputs matched MTP-off.
 This single prompt does not bound adaptive migration or multi-live decoding.
 [Report](../../bench/results/2026-10-23-phase5-coder-mtp-long-rejection-recovery/README.md).
+
+A short-prompt MTP3 follow-up rejected four drafts before recovery and matched
+MTP-off output and all shared accepted-prefix state fingerprints across three
+same-engine requests. It is one additional transaction case; adaptive long
+chains and multi-live state drift remain open.
+[Report](../../bench/results/2026-10-23-phase5-coder-mtp3-rejection-recovery/README.md).
 
 The matching current-build accepted-window, GDN recurrent/parity and captured
 graph CTests passed 5/5 under the 28 GiB supervisor, with 23.73 GiB minimum

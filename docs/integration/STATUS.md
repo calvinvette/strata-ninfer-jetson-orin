@@ -4835,3 +4835,13 @@ rails are reported separately. These readings include idle/background
 activity, are not process-attributed, and are not summed or whole-device
 energy; they add one workload-specific observation, not a general Pareto
 frontier. [Analysis](../../bench/results/2026-10-23-phase6-coder-prefill-cache-confirm7/rail-followup/README.md).
+
+A current-source MTP3 rejection/recovery probe extended the three-request
+same-engine transaction test. MTP3 rejected three drafts in the initial
+request and one in its continuation before recovery; outputs and every shared
+accepted-prefix state fingerprint matched MTP-off across all three requests.
+This adds one short-prompt MTP3 case only. The continuation harness now accepts
+windows 2, 3 or 4, defaults to 4, and its focused tests pass 7/7. The 111.7s
+supervised run retained 13.337 GiB minimum physical/admission availability,
+with zero cgroup events. Adaptive long-chain and multi-live state behavior
+remain unresolved. [Report](../../bench/results/2026-10-23-phase5-coder-mtp3-rejection-recovery/README.md).
