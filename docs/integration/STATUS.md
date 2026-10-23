@@ -4798,7 +4798,9 @@ completed randomized block 1/3 for chunk sizes 32/128 and requested cache
 arguments 1,500/3,000 slots at 8K context. All four cells returned the exact
 answer with 7,501 prompt and 45 completion tokens. Chunk 128 reduced median
 single-block client total 65.3%/69.6% at the two cache arguments; the
-cache-by-chunk time ratio-of-ratios was −12.5%. Minimum physical/admission
-availability was 14.38/14.14 GiB, with zero cgroup events. This is one-block
-screening only, without uncertainty or a promotion claim; blocks 2/3 remain.
-Phase 6 remains open.
+cache-by-chunk time ratio-of-ratios was −12.5%. A second randomized block also
+passed all four cells. Across both blocks, the chunk-128 client-time reduction
+was 66.4%/70.1%; the median time interaction was −11.1%. Minimum
+physical/admission availability across the two blocks was 14.31/14.14 GiB,
+with zero cgroup events. This remains descriptive two-block screening without
+uncertainty or a promotion claim; block 3 remains. Phase 6 remains open.

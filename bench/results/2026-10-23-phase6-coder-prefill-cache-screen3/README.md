@@ -33,12 +33,14 @@ Raw per-cell requests, logs, telemetry, and analysis remain in the local
 `per-cell-scopes/` tree and are not committed. A seven-block held-out
 confirmation is required before drawing a configuration recommendation.
 
-## Block 1 checkpoint
+## Screening checkpoint: blocks 1–2 of 3
 
-All four randomized cells passed with the exact answer, 7,501 actual prompt
-tokens and 45 generated tokens. The cache realized 1,934 slots (3,807 MiB) for
-the 1,500-slot argument and 3,903 slots (7,615 MiB) for the 3,000-slot
-argument.
+All eight cells across the first two blocks passed. Each returned the exact
+answer with 7,501 prompt tokens and 45 generated tokens. The cache realized
+1,934 slots (3,807 MiB) for the 1,500-slot argument and 3,903 slots (7,615 MiB)
+for the 3,000-slot argument.
+
+Block 1 measured:
 
 | Requested slots | Chunk | Client TTFT | Client total | Prompt tok/s | Decode tok/s |
 | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -47,13 +49,22 @@ argument.
 | 3,000 | 32 | 556.2 s | 559.6 s | 13.5 | 12.9 |
 | 3,000 | 128 | 166.5 s | 169.8 s | 45.1 | 13.1 |
 
-Within this single block, chunk 128 reduced client total time 65.3% at 1,500
-slots and 69.6% at 3,000 slots. Increasing the requested cache reduced total
-time 3.5% at chunk 32 and 15.5% at chunk 128. The observed time interaction
-(ratio-of-ratios) was −12.5%; prompt-rate interaction was +14.0%. Decode-rate
-changes were small (−2.6%/+1.6% for chunk 128 at the two cache settings). These
-are descriptive one-block contrasts, with no confidence interval or promotion
-claim. All cells stayed above the six-GiB floor; minimum physical/admission
-availability was 14.38/14.14 GiB and cgroup pressure/OOM counters were zero.
-The run sampled dynamic clocks; EMC readback was unavailable. Energy was not
-measured. Blocks 2 and 3 remain outstanding.
+Block 2 measured:
+
+| Requested slots | Chunk | Client TTFT | Client total | Prompt tok/s | Decode tok/s |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 3,000 | 32 | 568.5 s | 572.1 s | 13.2 | 12.8 |
+| 3,000 | 128 | 164.6 s | 168.0 s | 45.6 | 13.2 |
+| 1,500 | 128 | 185.6 s | 189.1 s | 40.5 | 11.9 |
+| 1,500 | 32 | 577.4 s | 580.7 s | 13.0 | 12.0 |
+
+Across these two screening blocks, chunk 128 reduced median client total time
+66.4% at 1,500 slots and 70.1% at 3,000. The larger cache reduced total time
+2.5% at chunk 32 and 13.3% at chunk 128. The block time interaction
+(ratio-of-ratios) was −12.5% and −9.8%, median −11.1%; prompt-rate interaction
+was +12.4%. Decode-rate effects from chunk size stayed small (median −1.7% at
+1,500 slots, +2.3% at 3,000). These are descriptive two-block contrasts with
+no confidence intervals or promotion claim. Minimum physical/admission
+availability was 14.31/14.14 GiB, and cgroup pressure/OOM counters were zero.
+Dynamic clocks were sampled; EMC readback was unavailable. Energy was not
+measured. Block 3 remains outstanding.
