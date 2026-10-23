@@ -492,3 +492,52 @@ in [`layer4-moe-layer5-stage-76-77-cache3000/state-analysis.json`](layer4-moe-la
 [`stage77-analysis.json`](layer4-moe-layer5-stage-76-77-cache3000/stage77-analysis.json),
 and [`analysis.json`](layer4-moe-layer5-stage-76-77-cache3000/analysis.json); the
 independent oracle for this identical activation is linked above.
+
+### Expert-218 residency intervention
+
+The layer-4 owner change was tested with a one-pair static profile intervention.
+The Coder profile ranked layer 4 / expert 218 at 8,583; swapping it with rank 0
+created profile SHA256
+`b90e5fe744e7dc8434503e1591404ce98f4d68add345f8d0bfc2fc68436e980f`. The
+profile stayed in `/tmp`; no default or shared model data changed. The request
+used 1,500 expert-cache slots and realized 1,934 slots / 3.72 GiB.
+
+At position 77 / input token `709`, the baseline and intervention have the same
+layer-4 activation SHA256
+(`10cb6e4961eca2ed9a4b1ecc753080b97a4f40cd10ebd184c54d24e064518932`) and the
+same route. In the baseline, expert 218 / rank 2 changes primary VRAM→CPU; its
+part changes at relative L2 `3.578e-4`, and the combined MoE output at
+`1.463e-4`. With expert 218 ranked first, it stays on primary VRAM in both
+serial and batch. All ten expert parts and the combined output are bit-identical.
+Layer-5 stage fields and committed state then match at positions 76 and 77 for
+both prompt slots. This same-input intervention supports the owner-dependent
+layer-4 delta as the source of the baseline's local layer-5 perturbation.
+
+The intervention does not fix the separate full-sequence slot-1 mismatch: slot
+0 matches all 72 serial IDs, while slot 1 first differs at index 66. An all-layer
+state capture at positions 76 and 77 finds slot 1 exact at all 36 GDN layers;
+slot 0 first differs at model layer 32 (relative L2 `0.003421` at position 76,
+`0.002959` at 77), after matching through layer 31. Layer-31 MoE inputs already
+differ at those positions (relative L2 `8.664e-4` and `9.678e-4`), with route
+changes. In the same captures, layer-30 MoE outputs are bit-identical at both
+positions. The remaining slot-0 drift is therefore bounded after the captured
+layer-30 MoE output and before the layer-31 MoE input; its exact operation is
+not identified. Phase 5 remains open.
+
+This was correctness instrumentation only. The full state capture retained at
+least 17.77 GiB physical/admission availability and had zero cgroup events; EMC
+readback was unsupported and energy was not measured. The [compact intervention
+analysis](expert218-intervention-analysis.json) links to the local raw capture
+directories and records model, binary, profile, and supervisor identities.
+Recreate the temporary ranking and the principal capture with:
+
+```sh
+python3 bench/results/2026-10-23-phase5-coder-two-live-target-q8all/make_expert_first_profile.py \
+  --layer 4 --expert 218 --output /tmp/phase5-layer4-expert218-first.bin
+python3 tools/integration/run_control.py \
+  --output /tmp/phase5-layer4-expert218-first-supervisor --timeout 3600 --sample-clocks -- \
+  python3 bench/results/2026-10-23-phase5-coder-two-live-target-q8all/capture_position_state.py \
+  --output /tmp/phase5-layer4-expert218-first --positions 76,77 --layer 5 \
+  --stage-layer 5 --moe-layer 4 --expert-cache-slots 1500 \
+  --expert-profile /tmp/phase5-layer4-expert218-first.bin --generated-tokens 72 --serial-slot both
+```

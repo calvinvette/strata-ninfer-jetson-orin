@@ -14,6 +14,8 @@ parser.add_argument('--layer', type=int, default=10)
 parser.add_argument('--output', type=Path, help='analysis JSON path; defaults to <run>/analysis.json')
 parser.add_argument('--batch-slot', type=int, default=-1,
                     help='disambiguate repeated input tokens using the verifier slot; -1 requires a unique match')
+parser.add_argument('--serial-control', type=int, choices=(0,1), default=1,
+                    help='serial prompt control; used when serial-slot-N capture files exist')
 args=parser.parse_args()
 ROOT = args.run.resolve()
 HEADER = struct.Struct('<8sIiiqQQQQQ8q8i8i')
@@ -43,7 +45,9 @@ def records(path):
         off+=rows*(4*n+2*c+2*hv+2*zv)*4
     return out
 
-all_rows=records(ROOT/'serial.stgdiag')+records(ROOT/'batch.stgdiag')
+serial_path=ROOT/f'serial-slot-{args.serial_control}.stgdiag'
+if not serial_path.is_file(): serial_path=ROOT/'serial.stgdiag'
+all_rows=records(serial_path)+records(ROOT/'batch.stgdiag')
 serial=[x for x in all_rows if x['position']==args.position and x['slot']==-1]
 if len(serial)!=1:
     raise ValueError(f'expected one serial row, got {len(serial)}')

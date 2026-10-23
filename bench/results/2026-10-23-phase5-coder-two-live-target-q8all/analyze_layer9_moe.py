@@ -7,6 +7,9 @@ from pathlib import Path
 p=argparse.ArgumentParser(description=__doc__);p.add_argument('--run',type=Path,required=True)
 p.add_argument('--layer',type=int,default=9);p.add_argument('--position',type=int,default=83)
 p.add_argument('--batch-slot',type=int,default=-1)
+p.add_argument('--serial-control',type=int,choices=(0,1),default=1,
+               help='serial prompt control; used when serial-slot-N capture files exist')
+p.add_argument('--output',type=Path,help='analysis JSON path; defaults to <run>/analysis.json')
 args=p.parse_args();root=args.run.resolve();H=struct.Struct('<8sIIIIQqii')
 def read_blob(path,magic):
  data=path.read_bytes();off=0;out=[]
@@ -37,7 +40,8 @@ def arm(stem, expected_token=None):
  outs=[r for r in outs if r['position']==args.position and r['token']==routes[0]['token_id']] if routes else []
  if len(routes)!=1 or len(parts)!=1 or len(outs)!=1:raise ValueError(f'{stem}: route/parts/output counts {len(routes)}/{len(parts)}/{len(outs)}')
  return routes[0],parts[0],outs[0],jsonrows(root/f'{stem}.owners.jsonl')
-sr,sp,so,sowners=arm('serial')
+serial_stem=f'serial-slot-{args.serial_control}' if (root/f'serial-slot-{args.serial_control}.routes.jsonl').is_file() else 'serial'
+sr,sp,so,sowners=arm(serial_stem)
 br,bp,bo,bowners=arm('batch',sr['token_id'])
 if sp['k']!=bp['k'] or sp['width']!=bp['width']:raise ValueError('part geometry mismatch')
 k,w=sp['k'],sp['width']; per=[]
@@ -46,22 +50,27 @@ bo_row=next((x for x in bowners if x.get('layer')==args.layer and x.get('positio
 if so_row is None or bo_row is None:raise ValueError('could not pair owner records by route and token')
 pack_activation=lambda x:struct.pack(f'<{len(x)}f',*x)
 activation_exact=pack_activation(so_row['activation'])==pack_activation(bo_row['activation'])
-if not activation_exact:raise ValueError('same-position route activations differ')
+activation_delta=metrics(pack_activation(so_row['activation']),pack_activation(bo_row['activation']))
 for i in range(k):per.append({'expert_id':sr['ids'][i], 'rank':i,
  'serial_owner_code':so_row['route_kind'][i],'batch_owner_code':bo_row['route_kind'][i],
  'owner_changed':so_row['route_kind'][i]!=bo_row['route_kind'][i],
  'serial_vs_batch':metrics(sp['payload'][i*w*4:(i+1)*w*4],bp['payload'][i*w*4:(i+1)*w*4])})
-result={'layer':args.layer,'position':args.position,'token':sr['token_id'],'serial_route':sr,'batch_route':br,
+result={'layer':args.layer,'position':args.position,'token':sr['token_id'],'serial_control':args.serial_control,
+ 'serial_route':sr,'batch_route':br,
  'routes_equal':sr['ids']==br['ids'] and sr['weights']==br['weights'],
  'expert_parts_bit_identical':sp['payload']==bp['payload'],'per_expert_parts':per,
  'combined_output':metrics(so['payload'],bo['payload']),
  'owner_attribution':{'serial_route_kind':so_row['route_kind'],'batch_route_kind':bo_row['route_kind'],
   'same_input_activation_bitwise_equal':activation_exact,
+  'input_activation_delta':activation_delta,
+  'owner_arithmetic_attribution_valid':activation_exact and sr['ids']==br['ids'] and sr['weights']==br['weights'],
   'activation_sha256':hashlib.sha256(pack_activation(so_row['activation'])).hexdigest(),
   'serial_row':{'row':so_row['row'],'stream_row':so_row['stream_row'],'n_tok':so_row['n_tok']},
   'batch_row':{'row':bo_row['row'],'stream_row':bo_row['stream_row'],'n_tok':bo_row['n_tok']}},
- 'limits':['Only one captured token/position; no general claim.','Owner rows are raw attribution records and are not assigned to a prompt without an exact token/route match.']}
-(root/'analysis.json').write_text(json.dumps(result,indent=2)+'\n')
+ 'limits':['Only one captured token/position; no general claim.',
+  'Owner-dependent arithmetic attribution requires bit-identical input activation and route; otherwise part deltas also include input/route differences.',
+  'Owner rows are raw attribution records and are not assigned to a prompt without an exact token/route match.']}
+(args.output.resolve() if args.output else root/'analysis.json').write_text(json.dumps(result,indent=2)+'\n')
 print(json.dumps({'routes_equal':result['routes_equal'],'expert_parts_bit_identical':result['expert_parts_bit_identical'],
                   'combined_output':result['combined_output'],'owner_attribution':result['owner_attribution'],
                   'changed_experts':[x for x in per if x['owner_changed'] or x['serial_vs_batch']['different_values']]},indent=2))

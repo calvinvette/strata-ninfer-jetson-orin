@@ -416,3 +416,5 @@ Raising the requested expert-cache slot count to 3,000 left the same layer-4 exp
 VRAM→CPU owner change and reproduced the same layer-5 `x`/state delta for the
 same activation. This cache increase does not resolve the measured cell.
 [Details](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+
+Moving expert 218 to rank 0 in a temporary profile kept it on VRAM for serial and batch at the exact same position-77 activation; its parts, combined MoE output, and layer-5 stage/state were then bit-identical. This repairs that local state perturbation, but not the separate slot-1 sequence mismatch (first difference at 66). At positions 76/77 slot 0 first differs later at model layer 32; layer-30 MoE output is exact while layer-31 MoE input already differs. Phase 5 remains open. [Intervention analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/expert218-intervention-analysis.json).

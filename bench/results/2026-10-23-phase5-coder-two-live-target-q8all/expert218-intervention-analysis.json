@@ -1,0 +1,138 @@
+{
+  "schema": 1,
+  "scope": "single supervised Orin correctness intervention with two serial controls and two-live target-only batch; no performance claim",
+  "model": {
+    "id": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+    "revision": "5348543e0147355ac9cbcb031184a3546350988e",
+    "quantization": "IQ1_M"
+  },
+  "binary_sha256": "afc710def2ad1c0f0905afa015f5cae3e50063b29d7c4fdd62f186ab21a7358d",
+  "source_commit": "e5bcddfa150d03609b87b4a30895535b51566f1e",
+  "profile_intervention": {
+    "base": "data/expert-profile-coder.bin",
+    "layer": 4,
+    "expert": 218,
+    "prior_rank": 8583,
+    "new_rank": 0,
+    "sha256": "b90e5fe744e7dc8434503e1591404ce98f4d68add345f8d0bfc2fc68436e980f",
+    "temporary_path": "/tmp/phase5-layer4-expert218-first.bin",
+    "expert_cache_requested_slots": 1500,
+    "expert_cache_realized_slots": 1934,
+    "gpu_allocated_gib": 3.72
+  },
+  "baseline_layer4_position77": {
+    "token": 709,
+    "activation_sha256": "10cb6e4961eca2ed9a4b1ecc753080b97a4f40cd10ebd184c54d24e064518932",
+    "same_activation_and_route": true,
+    "expert_id": 218,
+    "rank": 2,
+    "serial_owner_code": 0,
+    "batch_owner_code": -1,
+    "expert_part": {
+      "values": 2560,
+      "different_values": 2560,
+      "max_abs": 4.4267624616622925e-05,
+      "relative_l2": 0.00035778306917639354
+    },
+    "combined_moe": {
+      "values": 2560,
+      "different_values": 2560,
+      "max_abs": 7.100403308868408e-06,
+      "relative_l2": 0.00014634179290624958
+    },
+    "layer5_stage_first_changed_field": "x",
+    "layer5_x_relative_l2": 3.697e-05,
+    "layer5_state_recurrent_relative_l2": 7.663e-05,
+    "layer5_state_convolution_relative_l2": 0.000162975
+  },
+  "intervention_layer4_position77": {
+    "token": 709,
+    "activation_sha256": "10cb6e4961eca2ed9a4b1ecc753080b97a4f40cd10ebd184c54d24e064518932",
+    "same_activation_sha256_as_baseline": true,
+    "routes_equal": true,
+    "expert218_serial_owner_code": 0,
+    "expert218_batch_owner_code": 0,
+    "expert_parts_bit_identical": true,
+    "combined_moe": {
+      "values": 2560,
+      "different_values": 0,
+      "max_abs": 0.0,
+      "relative_l2": 0.0
+    },
+    "layer5_stage_first_changed_field": null,
+    "layer5_state_exact_positions_76_77": true
+  },
+  "intervention_sequence": {
+    "serial_token_counts": {
+      "slot-0": 72,
+      "slot-1": 72
+    },
+    "batch_token_counts": {
+      "slot-0": 72,
+      "slot-1": 72
+    },
+    "slot0_exact_72_ids": true,
+    "slot1_exact_72_ids": false,
+    "slot1_first_mismatch_index": 66
+  },
+  "later_state_boundary": {
+    "position76_and77": "slot 0 first differs at model layer 32; all captured layers through 31 are exact. Slot 1 matches all 36 captured GDN states at both positions.",
+    "slot0_layer32_state_relative_l2": {
+      "76": 0.0034208138074890006,
+      "77": 0.0029591654127164545
+    },
+    "layer31_moe_inputs_differ": {
+      "position76": {
+        "values": 2560,
+        "different_values": 2560,
+        "max_abs": 0.003820657730102539,
+        "relative_l2": 0.0008663798008585148
+      },
+      "position77": {
+        "values": 2560,
+        "different_values": 2560,
+        "max_abs": 0.0027234554290771484,
+        "relative_l2": 0.0009678064455062794
+      }
+    },
+    "layer31_moe_routes_equal": {
+      "position76": false,
+      "position77": false
+    },
+    "layer31_moe_combined_output_relative_l2": {
+      "position76": 0.007304773501709432,
+      "position77": 0.008320445065575997
+    },
+    "layer30_moe_combined_output_bit_identical": {
+      "position76": true,
+      "position77": true
+    },
+    "interpretation": "The remaining slot-0 activation/state delta is bounded after the captured layer-30 MoE output and before the layer-31 MoE input; the exact operation is not identified."
+  },
+  "supervisor": {
+    "minimum_available_bytes": 19083247616,
+    "minimum_available_gib": 17.77,
+    "cgroup_events": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0
+    },
+    "emc_clock": "unsupported: permission denied",
+    "energy": "not measured"
+  },
+  "limits": [
+    "This is a targeted residency-profile intervention, not a supported serving profile.",
+    "It removes the selected layer-4 expert-218 owner-dependent part delta and associated layer-5 state/stage delta for this activation, but does not restore slot-1 full-sequence output parity.",
+    "Later slot-0 state drift remains; Phase 5 is open.",
+    "Instrumented durations are correctness diagnostics, not timing evidence.",
+    "Raw tensors, model files and logs remain local; summaries and SHA256 identities are retained."
+  ],
+  "evidence": {
+    "baseline": "layer4-moe-layer5-stage-76-77/",
+    "intervention": "layer4-expert218-first-76-77/",
+    "all_layer": "layer31-layer32-profile-e218-first-76-77/",
+    "upstream_boundary": "layer30-moe-layer31-stage-profile-e218-first-76-77/"
+  }
+}
