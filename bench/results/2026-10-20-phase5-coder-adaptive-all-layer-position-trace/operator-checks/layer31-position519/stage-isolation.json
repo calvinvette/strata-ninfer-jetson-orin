@@ -3,11 +3,17 @@
   "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
   "variant": "IQ1_M",
   "candidate_binary_sha256": "14afd1a4b953e176a88d7812bddcdf2beb65944bb5795beaf0f37e5834a496aa",
-  "native_expert_parity_sha256": "b89863837260a2267e719ac8ab4dc2abcbf5221b194ff76b802a16e2f21d7836",
+  "native_expert_parity_sha256": "9e6ad8034ba6ff8d2d4ff58fb03371a6a6775bc6bcd72ccbd7c7392d19c9861b",
   "captured_activation_sha256": "bf609469743a057a07de8b514bf616399e84fe79fc84f71ca643cfe9f950e824",
   "expert": "layer 31 expert 22 (IQ3_XXS gate/up, IQ4_NL down)",
   "input_q8_1_equal": true,
   "input_q8_1_sha256": "ad7638010d5a5314ea29ee674d79898c36188e34e806d1848cfa116aa8de768f",
+  "mode0_gate_up_dot_comparison": {
+    "independent_scalar_iq3_xxs_q8_1_vs_cuda": "bitwise equal",
+    "gate_values": 1920,
+    "up_values": 1920,
+    "log": "stage-isolation-mode0.txt"
+  },
   "hidden_q8_1_blocks": 60,
   "hidden_q8_1_differing_blocks": 3,
   "hidden_quantized_codes_differing_bytes": 0,
@@ -43,6 +49,9 @@
       "quantized_codes_equal": true
     }
   ],
-  "same_gpu_hidden_down_projection": "CPU IQ4_NL down on CUDA-produced hidden Q8_1 matched grouped CUDA output bit-for-bit (0/7680 words differ), as reported in stage-isolation.txt",
-  "qualification": "The harness intermediate float arrays for fused gate/up are not interpreted as valid; only the Q8_1 block captures and downstream replay are used."
+  "default_cuda_hidden_q8_1_sha256": "91db5eb4713bafc7b5b7caad9491661e87ee02c89cebc3d6f2189dcf566525c0",
+  "mode0_cuda_hidden_q8_1_sha256": "91db5eb4713bafc7b5b7caad9491661e87ee02c89cebc3d6f2189dcf566525c0",
+  "default_vs_mode0_cuda_hidden_q8_1_equal": true,
+  "same_gpu_hidden_down_projection": "CPU IQ4_NL down on CUDA-produced hidden Q8_1 matched grouped CUDA output bit-for-bit (0/7680 words differ).",
+  "qualification": "Gate/up float-stage arrays are compared only in explicit STRATA_EXP_MODE=0 mode. Default Orin mode (CUDA mode 0) produced identical CUDA hidden Q8_1 bytes."
 }
