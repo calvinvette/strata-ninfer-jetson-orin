@@ -549,3 +549,19 @@ availability and zero cgroup events. It completed in 2.1 seconds; clocks were
 dynamic, EMC readback was denied, and energy was not measured. The compact
 comparison is `targetonly-layer11-moe-owner-oracle-analysis.json`; full
 activation, output arrays and process logs are local-only.
+
+### Committed-state consequence at position 119 (2026-10-22)
+
+The same delayed target-only serial/batch pair also captured all committed GDN
+layers at position 119/token 16. The nine captured GDN states through model
+layer 10 were bit-identical; layer 12 was the first changed state after the
+layer-11 MoE owner-path delta. At layer 12, 785,549/786,432 recurrent values
+and 10,240/30,720 convolution values changed; combined, 795,789/817,152
+values differ (relative L2 0.00170369, maximum absolute 0.0149361). Every one
+of the 27 later GDN layer states also differed. Slot 0 still emitted its
+serial-matching 96 tokens and the queued peer emitted one. Minimum
+physical/admission availability was 17.66 GiB across 63 supervisor samples,
+with zero cgroup events. This is direct committed-state evidence for one
+delayed target-only sequence, not a long-chain or quality bound. The compact
+analysis is `targetonly-layer11-all-gdn-commit-state-analysis.json`; the raw
+paired state captures remain local-only.

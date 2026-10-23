@@ -44,6 +44,22 @@ oracle run completed in 2.1 seconds with 25.62 GiB minimum available physical
 memory and zero sampled cgroup memory events; EMC readback was denied and
 energy was not measured.
 
+An all-layer committed-state capture under the same delayed target-only
+schedule directly measured the persistent-state consequence. All nine sampled
+GDN layers through model layer 10 were bit-identical; the first changed
+committed state was GDN layer 12. At layer 12, 785,549/786,432 recurrent
+values changed (relative L2 0.000332829) and 10,240/30,720 convolution values
+changed (relative L2 0.00170454), for 795,789/817,152 combined values
+(relative L2 0.00170369, maximum absolute difference 0.0149361). All 27 later
+GDN layer states also differed. Slot 0 still matched all 96 serial output
+tokens and the competitor returned one. Supervision retained 17.66 GiB minimum
+physical/admission availability over 63 samples with zero cgroup events.
+This shows the selected layer-11 owner-path difference carries into committed
+recurrent state in this run; it does not establish a quality impact or a
+long-chain bound. The compact per-layer analysis is
+`targetonly-layer11-all-gdn-commit-state-analysis.json`; the 224 MiB paired
+state dump and full telemetry remain local-only.
+
 The ARM64/CUDA candidate rebuilt with one job and passed the focused
 `verify_parity`, `verify_batch_parity` and `spec_verify_parity` tests. Python
 integration discovery passed 163/163 tests. On maestro1, HIP compiled/linked
@@ -70,17 +86,21 @@ Run the controlled capture on the configured Orin checkout:
 OUT=bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/run-owner-followup
 python tools/integration/run_control.py --output "$OUT-supervisor" --timeout 420 --sample-clocks \
   python bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/capture_targetonly_gdn_layer12_stages.py \
-  --layer 12 --boundary-layer 11 --moe-layer 11 --output "$OUT"
+  --layer 12 --boundary-layer 11 --moe-layer 11 --all-layer-commit-state --output "$OUT"
 python bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/analyze_targetonly_residual_boundary.py \
   --capture "$OUT/boundary.stbndy" --layer 11 --position 119 --output "$OUT-boundary.json"
 python bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/analyze_targetonly_layer11_moe.py \
   --run "$OUT" --position 119 --output "$OUT-moe.json"
+python bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/analyze_targetonly_all_gdn_commit_state.py \
+  --serial "$OUT/serial-committed-gdn.stgcmt" --batch "$OUT/batch-committed-gdn.stgcmt" \
+  --position 119 --token 16 --output "$OUT-committed-state.json"
 ```
 
 The compact selected analyses are `targetonly-qsa-boundary119-batchdiag-analysis.json`,
 `targetonly-layer11-moe-owners-position119-analysis.json`,
 `targetonly-layer11-moe-owners-cache3000-analysis.json`, and
-`targetonly-layer11-moe-owner-oracle-analysis.json` in the experiment
+`targetonly-layer11-moe-owner-oracle-analysis.json`,
+`targetonly-layer11-all-gdn-commit-state-analysis.json` in the experiment
 directory. The oracle join is reproducible with:
 
 ```sh

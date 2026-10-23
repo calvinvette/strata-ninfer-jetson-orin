@@ -21,6 +21,8 @@ parser.add_argument('--boundary-layer', type=int,
 parser.add_argument('--moe-layer', type=int,
                     help='also capture batch-aware routing, expert parts, and MoE output at this layer')
 parser.add_argument('--expert-cache-mib', type=int, default=1500)
+parser.add_argument('--all-layer-commit-state', action='store_true',
+                    help='also capture every committed GDN layer at position 119')
 args = parser.parse_args()
 out = args.output.resolve()
 out.mkdir(parents=True, exist_ok=False)
@@ -44,6 +46,12 @@ def make_env(name):
         'STRATA_VERIFY_DUMP_GDN_POSITIONS': '119',
         'STRATA_VERIFY_DUMP_GDN_BATCH': '1',
     })
+    if args.all_layer_commit_state:
+        env.update({
+            'STRATA_VERIFY_DUMP_GDN_COMMIT_LAYER': 'all',
+            'STRATA_VERIFY_DUMP_GDN_COMMIT_POSITIONS': '119',
+            'STRATA_VERIFY_DUMP_GDN_COMMIT_PATH': str((out / f'{name}-committed-gdn.stgcmt').resolve()),
+        })
     if args.boundary_layer is not None:
         env.update({
             'STRATA_VERIFY_DUMP_BOUNDARY_LAYER': str(args.boundary_layer),
@@ -113,6 +121,7 @@ finally:
 
 result = {'capture_layer': args.layer, 'position': 119, 'admit_after_tokens': 48,
           'expert_cache_mib': args.expert_cache_mib,
+          'all_layer_commit_state': args.all_layer_commit_state,
           'slot0_paused_until_competitor_queued_for_control': True,
           'prompts': prompts,
           'outputs': {'serial-slot-0': serial, 'batch': batch},

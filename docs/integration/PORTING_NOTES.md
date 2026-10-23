@@ -2779,4 +2779,8 @@ confirms an owner-dependent expert arithmetic change for the captured rows.
 Record the model's actual per-layer gate/up and down codecs—the selected rows
 here were IQ2_S/IQ4_NL—and compare both operators with a separate float
 calculation over decoded weights. Keep this narrow operator result separate
-from token quality and long-run state qualification.
+from token quality and long-run state qualification. In the same delayed row,
+the first committed GDN state change followed at model layer 12; earlier
+captured GDN layers were exact even though all 96 emitted tokens matched.
+Compare accepted persistent state directly in future backend integrations,
+since equal token streams can conceal this kind of numerical transition.

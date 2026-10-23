@@ -16,7 +16,11 @@ primary VRAM to CPU in the batch row, and their weighted changes accounted for
 the combined-output delta. Slot-0 output still matched all 96 serial tokens.
 A same-input native expert oracle then matched each serial part to its CUDA
 output and each batch part to its CPU output bit-for-bit, confirming the
-owner-specific arithmetic path for all three rows.
+owner-specific arithmetic path for all three rows. A paired all-layer capture
+at the same committed position found GDN states exact through model layer 10,
+then first changed at layer 12 (795,789/817,152 values; relative L2 0.00170369);
+all 27 later GDN states differed although all 96 generated slot-0 tokens still
+matched serial.
 A larger-cache follow-up was unclean because its layer-11 input already
 differed. This is a single-prompt correctness diagnostic; Phase 5 remains open.
 See the [batch-MTP diagnostic](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
