@@ -421,3 +421,17 @@ summaries are in [`position80-slot0-all-state/slot0-analysis.json`](position80-s
 [`position80-slot0-all-state/slot1-analysis.json`](position80-slot0-all-state/slot1-analysis.json),
 and both `layer10-state-sweep-80-84*/analysis.json` files. The raw state dumps
 remain local.
+
+A targeted model-layer-5 state sweep at positions 78–80 found slot 0 already
+different at the earliest sampled position, 78 (whole-state relative L2
+`1.646e-4`; recurrent `9.551e-5`, convolution `1.646e-4`). At 79 the whole
+state remained different (`1.666e-4`); at 80 the convolution section was exact
+again while recurrent state remained different (`5.415e-5`). Slot 1 was bitwise
+exact at all three positions. Both requests still generated 72 IDs; slot 0
+matched serial throughout and slot 1 first differed at index 66. The position-80
+layer-5 state metrics match the separate all-layer capture. This places the
+slot-0 layer-5 state difference before position 78 in this run; no earlier
+position was sampled, and its upstream cause is unknown. The supervised run
+took 197.2 seconds, retained at least 17.87 GiB physical/admission availability
+and had zero cgroup events. See
+[`layer5-state-sweep-78-80/analysis.json`](layer5-state-sweep-78-80/analysis.json).

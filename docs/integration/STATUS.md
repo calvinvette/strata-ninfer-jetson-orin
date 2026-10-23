@@ -4622,3 +4622,14 @@ repeatable state-correctness findings, not performance evidence or causal
 attribution; Phase 5 remains open. See the [sweep analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer10-state-sweep-80-84/analysis.json),
 [repeat](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer10-state-sweep-80-84-repeat/analysis.json),
 and [all-layer capture](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/position80-slot0-all-state/slot0-analysis.json).
+
+A targeted layer-5 state sweep at positions 78–80 found slot 0 already differed
+at position 78 (whole-state relative L2 `1.646e-4`, recurrent `9.551e-5`,
+convolution `1.646e-4`); at 80, convolution state was exact again while
+recurrent relative L2 remained `5.415e-5`. Slot 1 was exact for all three
+positions. Slot 0's 72 output IDs still matched serial, while slot 1's first
+output difference remained at index 66. The position-80 layer-5 state agrees
+with the separate all-layer capture. This is a left-censored onset (position 78
+is the earliest sampled point), not a cause; Phase 5 remains open. The
+[analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer5-state-sweep-78-80/analysis.json)
+and [report](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md) retain the result.

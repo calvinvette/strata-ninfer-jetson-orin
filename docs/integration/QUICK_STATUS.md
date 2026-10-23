@@ -399,4 +399,7 @@ returned all 72 serial output IDs, but its layer-10 state differed from position
 GDN state at layer 5 (recurrent relative L2 `5.41e-5`); slot 1 was exact at
 position 80. The repeated sweep reproduced the same metrics, so multi-live
 persistent-state parity remains unresolved even when output tokens match.
+An additional layer-5 sweep sampled positions 78–80 and found slot-0 recurrent
+state already differed at position 78 (`9.55e-5` relative L2); at position 80,
+the convolution section matched again while recurrent state remained changed.
 [Details](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
