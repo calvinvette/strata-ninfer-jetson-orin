@@ -1,0 +1,48 @@
+# Two-live target-only batch with Q8_1 selector forced to all
+
+This supervised Orin diagnostic tests whether forcing `STRATA_NATIVE_CPU_Q8_1_DOT=all`
+removes the known two-live target-only output mismatch. It does not measure
+performance.
+
+The two fresh serial controls and the two-slot batch used the same prompts and
+engine settings: Coder IQ1_M, MTP disabled, context 1,024, 1,500 MiB requested
+expert cache, prompt cache 6, and 96 generated token IDs per request. Both serial
+and batch engines received `STRATA_IQ_MT_MIN=1` and the Q8_1 selector setting.
+The binary SHA256 is `afc710def2ad1c0f0905afa015f5cae3e50063b29d7c4fdd62f186ab21a7358d`;
+the source checkout was `b40dcf76b972440306b01a4953d32206e8b316ec`. The model is
+`ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF`, revision
+`5348543e0147355ac9cbcb031184a3546350988e`, IQ1_M. Shard checksums are copied
+from the repository's existing model manifest; this run did not rehash the
+29-GiB model files.
+
+Slot 0 matched its serial token IDs across all 96 outputs. Slot 1 first differed
+at output index 66 (zero-based), although both returned 96 IDs. The earlier
+default-selector diagnostic first differed near index 60, but it is a separate
+selector/configuration cell, so the onset difference does not establish a cause.
+Three terminal batch `STATE_HASH` records are present in the raw engine log but
+were not joined to prompts; persistent-state parity is therefore unassessed.
+
+The run took 278.6 seconds. The supervisor sampled dynamic CPU/GPU clocks and
+tegrastats, but EMC clock access was denied and energy was not measured. Minimum
+physical and admission availability were both 17.54 GiB, above the preserved
+6-GiB host floor; sampled cgroup memory events were all zero. These values
+describe this one correctness run only.
+
+Reproduce with:
+
+```sh
+python3 tools/integration/run_control.py \
+  --output /tmp/q8all-target-batch-supervised \
+  --timeout 2400 --sample-clocks -- \
+  python3 bench/results/2026-10-23-phase5-coder-two-live-target-q8all/run_q8all_target_batch.py \
+  --output /tmp/q8all-target-batch-raw
+```
+
+The selected report files are `run/result.json`, the three engine logs in
+`run/`, and the supervisor's `result.json`, `memory.jsonl`, and `tegrastats.txt`
+in `supervisor-attempt-02/`. The runner refuses to overwrite an output
+directory. It consumes the already downloaded model under
+`~/models/strata-orin-validation/`; it downloads nothing.
+
+This does not establish multi-live correctness, quality, throughput, energy,
+or an operator-level cause. Phase 5 remains open.

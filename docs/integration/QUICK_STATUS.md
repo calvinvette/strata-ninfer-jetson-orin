@@ -299,3 +299,8 @@ A held-out 256-token adaptive short-chain recovery test differed from the
 initial output at 237 positions and had changed accepted-state hashes at every
 prefix; the delayed control stayed exact. This extends the known mismatch but
 does not bound it or locate its cause. [Details](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/adaptive-direct-division-state-bound-128pos/open-response-short-chain-256pos/README.md).
+
+A two-live target-only check with Q8_1 forced to `all` matched slot 0 for 96
+tokens but slot 1 first differed at index 66. Minimum physical/admission
+availability was 17.54 GiB. This single correctness cell does not identify the
+cause or qualify performance; [details](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
