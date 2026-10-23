@@ -162,6 +162,7 @@ def main():
         ids = [row['ids'] for row in request_doc]
         if len(ids) != 3 or ids[0] != ids[1] or ids[1] != ids[2]:
             raise ValueError(f'{arm}: generated token IDs differ across repeated prompts')
+        route_state[arm]['generated_ids'] = ids[0]
         result['arms'][arm] = {
             'requests': 3, 'generated_tokens_each': len(ids[0]),
             'generated_ids_bitwise_equal_across_requests': True,
@@ -177,7 +178,7 @@ def main():
         raise ValueError('adaptive arm did not exercise the expected CPU-to-CUDA owner transition')
     if route_state['delayed-control']['owner_codes'] != [-1, -1, -1]:
         raise ValueError('delayed control did not retain the expected CPU owner')
-    for key in ('activation_hashes', 'route_ids', 'route_weights', 'token_ids', 'expert_hashes'):
+    for key in ('activation_hashes', 'route_ids', 'route_weights', 'token_ids', 'generated_ids', 'expert_hashes'):
         if route_state['adaptive-cap8'][key] != route_state['delayed-control'][key]:
             raise ValueError(f'adaptive and delayed {key} differ')
     for field in ('shared_output', 'combined_output'):
@@ -194,7 +195,7 @@ def main():
         raise ValueError('adaptive and delayed committed GDN state captures differ')
     for arm in result['arms'].values():
         arm['cross_arm_equal'] = {
-            'activation': True, 'route': True, 'expert129_part': True,
+            'activation': True, 'route': True, 'expert129_part': True, 'generated_ids': True,
             'shared_output': True, 'combined_output': True, 'committed_state': True,
         }
     args.output.parent.mkdir(parents=True, exist_ok=True)
