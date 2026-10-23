@@ -2810,3 +2810,14 @@ the 1,500 and 3,000 MiB runs had different layer-1 activations at position 71,
 although serial and batch rows were exact within each cell. Expert 11 still
 switched owner in both. The 3,000 MiB result therefore shows that the cap did
 not prevent this switch, but does not estimate its effect on state parity.
+
+An owner change is a reason to compare the selected operator output, not itself
+evidence of changed numerics. At current-source Coder layer 27 / generated
+position 515, expert 129 moved CPU→CUDA on an identical activation under
+`Q8_1_DOT=all`; the expert part, combined MoE output, emitted tokens and all 36
+committed GDN states were bit-identical across the repeated requests. This
+narrow case does not generalize to other codecs, layers or activations: other
+owner transitions in this integration produced measurable output and state
+deltas. Keep exact activation, route, owner and per-expert output together in
+future Strata/Splash traces, then validate committed recurrent state directly.
+See the [position-515 capture](../../bench/results/2026-10-22-phase5-coder-adaptive-all-layer-position-trace/adaptive-layer27-current-source-generated-position515/README.md).
