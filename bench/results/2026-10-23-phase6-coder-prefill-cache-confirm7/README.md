@@ -164,3 +164,17 @@ archive task. This confirms a large latency effect for the tested prefill path,
 not a universal setting or a release-default recommendation. Other Phase 6
 interactions, workload/quality domains and the broader Pareto/energy scope
 remain open.
+
+### Retrospective named-rail estimate
+
+The retained tegrastats samples also support a retrospective rail analysis in
+[`rail-followup`](rail-followup/README.md). It integrates power over each of
+the 28 measured request windows; all 28 windows had supported bracketing
+samples. `VIN_SYS_5V0` energy per output token was 66.27% lower with chunk 128
+at 1,500 requested slots (paired-block bootstrap 95% interval 66.00%–66.50%
+lower) and 67.15% lower at 3,000 (66.92%–67.29% lower). The cache-by-chunk
+interaction was −3.38% (−4.11% to −1.95%). GPU and CPU named rails are reported
+separately in the follow-up. These estimates include idle/background activity,
+are not process-attributed, and are neither summed nor whole-device energy.
+This adds an energy observation for the same workload; it does not establish
+an energy Pareto frontier.

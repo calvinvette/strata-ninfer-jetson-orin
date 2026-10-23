@@ -4825,3 +4825,13 @@ clocks were dynamic and sampled, energy was not measured. This supports the
 prefill latency effect in this one model/profile/task domain only; it does not
 promote a default or close Phase 6's broader interaction and Pareto/energy
 scope. [Full report and per-block tables](../../bench/results/2026-10-23-phase6-coder-prefill-cache-confirm7/README.md).
+
+A retrospective named-rail analysis integrated all 28 Coder prefill/cache
+request windows with supported bracketing tegrastats samples. Median
+`VIN_SYS_5V0` energy per output token was 66.27%/67.15% lower with chunk 128
+at requested caches 1,500/3,000; the cache-by-chunk interaction was −3.38%
+(paired-block bootstrap 95% interval −4.11% to −1.95%). GPU and CPU named
+rails are reported separately. These readings include idle/background
+activity, are not process-attributed, and are not summed or whole-device
+energy; they add one workload-specific observation, not a general Pareto
+frontier. [Analysis](../../bench/results/2026-10-23-phase6-coder-prefill-cache-confirm7/rail-followup/README.md).

@@ -489,3 +489,7 @@ interval 67.55%–67.95%) at 1,500 requested cache slots and 68.72%
 to Coder IQ1_M, FP16 KV, MTP off, 8K and this archive task; no default is
 promoted, and broader Phase 6 interactions and energy/Pareto scope remain open.
 [Full report](../../bench/results/2026-10-23-phase6-coder-prefill-cache-confirm7/README.md).
+Retrospective `VIN_SYS_5V0` energy per output token was 66.27%/67.15% lower
+with chunk 128 at the two cache settings, but the named rail includes idle and
+background activity and is not process-attributed or whole-device energy.
+[Rail analysis](../../bench/results/2026-10-23-phase6-coder-prefill-cache-confirm7/rail-followup/README.md).
