@@ -16,6 +16,15 @@ integration tests passed 163/163. This is a fresh functional/regression smoke,
 not a repeated performance confirmation and does not widen the Phase 8 support
 scope. See the [smoke report](../../bench/results/2026-10-22-phase8-current-source-q2-profile-smoke/README.md).
 
+A current-source Coder IQ1_M MTP2 cancellation check also passed: after five
+visible deltas, eight tokens had committed across five accepted-prefix states
+(lengths 48, 50, 51, 53 and 55). Two fresh exact-length controls matched every
+token sequence and recorded persistent-state fingerprint; the canceled service
+then returned the expected recovery response. Minimum host/admission
+availability was 13.18/12.53 GiB with zero cgroup events. This covers the tested
+cancellation boundaries only; Phase 5 remains open. See the
+[cancellation report](../../bench/results/2026-10-22-phase5-coder-mtp2-cancel-state/README.md).
+
 A batch-aware `STBNDY2` residual capture and MoE owner trace localized one
 target-only delayed-admission difference at position 119 to layer-11 expert
 arithmetic. The layer-10 boundary and layer-11 MoE input, routes, weights and

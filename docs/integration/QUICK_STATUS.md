@@ -79,6 +79,12 @@ The current candidate also passed a 2026-10-22 bounded Phase 8 smoke: 7,498-toke
 optional fixture skips, and Python integration passed 163/163. This is
 functional regression evidence, not a new timing confirmation. [Report](../../bench/results/2026-10-22-phase8-current-source-q2-profile-smoke/README.md).
 
+A separate current-source MTP2 cancellation test matched all five committed
+prefixes against two fresh references and recovered on the same service after
+the client closed its stream. It strengthens one cancellation boundary set;
+adaptive accepted-state drift and the two-live batch mismatch remain open.
+[Report](../../bench/results/2026-10-22-phase5-coder-mtp2-cancel-state/README.md).
+
 A separate two-live trace now connects one owner switch to persistent state:
 at position 71, layer-1 expert 11 moves VRAM→CPU on an exact-matched activation,
 and the first changed committed GDN state is model layer 2. Its weighted part
