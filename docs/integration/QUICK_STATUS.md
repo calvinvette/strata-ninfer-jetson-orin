@@ -284,3 +284,9 @@ narrows one case and does not close Phase 5. [Details](../../bench/results/2026-
 The new shared CPU selector also rebuilt for HIP and SYCL on maestro1, with both
 service help checks and the HIP selector-contract check passing. This is x86
 compile/startup evidence only. [Build record](../../bench/results/2026-10-23-phase5-maestro1-iq3s-q2-selector/README.md).
+
+The seven-block Coder cache × context confirmation also has a new retrospective
+rail-energy analysis: `VIN_SYS_5V0` per output token was 7.42% lower at 8K and
+7.05% lower at 16K with the larger requested cache. These are background-
+contaminated named-rail estimates, not process or whole-device energy, and do
+not change the profile direction. [Details](../../bench/results/2026-10-21-phase6-coder-current-source-cache-context-long-interaction-confirm7/rail-followup/README.md).
