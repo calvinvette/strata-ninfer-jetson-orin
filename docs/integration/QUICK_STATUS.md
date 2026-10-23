@@ -308,3 +308,6 @@ cause or qualify performance; [details](../../bench/results/2026-10-23-phase5-co
 The follow-up captured that row's logits at position 133: both arms used input
 token 3008, but the top two reversed (2100 versus 5435). This locates the
 changed output at verifier logits while leaving its upstream cause open.
+An all-layer state capture found a tiny first recurrent-state delta at model
+layer 10 (relative L2 `1.09e-7`), which grows by layer 12; the arithmetic cause
+remains unknown. [Full capture report](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).

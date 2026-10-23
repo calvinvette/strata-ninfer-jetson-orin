@@ -35,6 +35,20 @@ with zero sampled cgroup memory events. Capture and comparison commands are in
 `capture_divergence_logits.py` and `analyze_divergence_logits.py`; raw rows and
 analysis are under `logits-position-133/`.
 
+An all-layer committed-GDN capture at the same position found the first state
+difference at model layer 10, on input token `3008`. At that layer 320,613 of
+817,152 saved values differ, but the maximum absolute delta is only
+`8.94e-8` (whole-state relative L2 `2.72e-9`); all 30,720 convolution values
+are exact. At layer 12, whole-state relative L2 has grown to `0.00418` and
+817,149 values differ. Thus the earliest captured divergence is in recurrent
+state at layer 10, while the logits analysis shows the eventual output-rank
+change at position 133. This does not identify the arithmetic operation that
+introduced the small state delta. The state run retained at least 17.52 GiB
+physical/admission availability with zero sampled cgroup events. The 113 MiB
+serial and 225 MiB batch state dumps remain local because of their size; their
+SHA256 hashes and the derived layer-by-layer comparison are retained in
+`position-133-state/`.
+
 The run took 278.6 seconds. The supervisor sampled dynamic CPU/GPU clocks and
 tegrastats, but EMC clock access was denied and energy was not measured. Minimum
 physical and admission availability were both 17.54 GiB, above the preserved
@@ -55,7 +69,8 @@ The selected report files are `run/result.json`, the three engine logs in
 `run/`, and the supervisor's `result.json`, `memory.jsonl`, and `tegrastats.txt`
 in `supervisor-attempt-02/`. The runner refuses to overwrite an output
 directory. The logits capture's supervisor record is in
-`supervisor-logits-position-133/`. The runner consumes the already downloaded model under
+`supervisor-logits-position-133/`; the state capture's is in
+`supervisor-state-position-133/`. The runner consumes the already downloaded model under
 `~/models/strata-orin-validation/`; it downloads nothing.
 
 This does not establish multi-live correctness, quality, throughput, energy,

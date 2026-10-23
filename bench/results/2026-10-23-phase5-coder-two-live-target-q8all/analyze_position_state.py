@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+"""Compare serial and batch slot-1 committed GDN state at position 133."""
+from array import array
+import json
+from pathlib import Path
+import struct
+
+ROOT = Path(__file__).resolve().parent/'position-133-state'
+HEADER = struct.Struct('<8sIiqQQii')
+
+def records(path, wanted_slot):
+    out = {}
+    with path.open('rb') as f:
+        while raw := f.read(HEADER.size):
+            if len(raw) != HEADER.size:
+                raise ValueError(f'{path}: truncated header')
+            magic, version, layer, position, recurrent, count, token, slot = HEADER.unpack(raw)
+            if magic != b'STGCMT1\0' or version != 1 or position != 133:
+                raise ValueError(f'{path}: unexpected record')
+            payload = f.read(count*4)
+            if len(payload) != count*4:
+                raise ValueError(f'{path}: truncated payload')
+            if slot == wanted_slot:
+                values = array('f'); values.frombytes(payload)
+                out[layer] = {'position': position, 'token': token,
+                              'recurrent': recurrent, 'values': values}
+    return out
+
+serial = records(ROOT/'serial.stgcmt', 0)
+batch = records(ROOT/'batch.stgcmt', 1)
+if not serial or set(serial) != set(batch):
+    raise ValueError(f'layer mismatch: serial={sorted(serial)} batch={sorted(batch)}')
+rows = []
+for layer in sorted(serial):
+    a, b = serial[layer], batch[layer]
+    if a['token'] != b['token']:
+        raise ValueError(f'layer {layer}: input token differs {a["token"]} vs {b["token"]}')
+    delta = [x-y for x,y in zip(a['values'], b['values'])]
+    def metrics(start, end):
+        ds = delta[start:end]
+        av = a['values'][start:end]
+        changed = sum(x != 0 for x in ds)
+        sum_sq = sum(x*x for x in ds)
+        norm_sq = sum(x*x for x in av)
+        return {'changed_values': changed, 'total_values': len(ds),
+                'max_abs': max(map(abs, ds), default=0.0),
+                'relative_l2': (sum_sq/norm_sq)**0.5 if norm_sq else 0.0}
+    rows.append({'layer': layer, 'input_token': a['token'],
+                 'whole_state': metrics(0, len(delta)),
+                 'recurrent': metrics(0, a['recurrent']),
+                 'convolution': metrics(a['recurrent'], len(delta))})
+result = {'position': 133, 'serial_layers': sorted(serial), 'batch_slot': 1,
+          'first_changed_layer': next((x['layer'] for x in rows if x['whole_state']['changed_values']), None),
+          'comparisons': rows,
+          'limits': ['GDN committed-state capture only; other activations and state families are not covered.',
+                     'This is one diagnostic cell and does not identify an upstream arithmetic cause.']}
+(ROOT/'analysis.json').write_text(json.dumps(result, indent=2)+'\n')
+print(json.dumps({'position': 133, 'first_changed_layer': result['first_changed_layer'],
+                  'changed_layers': [x['layer'] for x in rows if x['whole_state']['changed_values']],
+                  'records': len(rows)}, indent=2))
