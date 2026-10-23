@@ -585,3 +585,40 @@ with zero cgroup events. This is direct committed-state evidence for one
 delayed target-only sequence, not a long-chain or quality bound. The compact
 analysis is `targetonly-layer11-all-gdn-commit-state-analysis.json`; the raw
 paired state captures remain local-only.
+
+### Two-live earliest captured state transition (2026-10-22)
+
+A paired six-token target-only run captured every GDN state and the layer-4 MoE
+row. At position 68, both requests' layer-4 activation, routes, expert parts,
+and all 36 committed GDN layer states matched their fresh serial controls
+bit-for-bit. At position 71, prompt 1 still emitted the same six tokens as its
+serial control, but its first changed committed GDN state was model layer 2.
+There, 796,072/817,152 values changed (relative L2 `0.00070708`, maximum
+absolute `0.00521875`). Across all 36 GDN layers, 27,762,032/29,417,472 values
+differed (relative L2 `0.0231436`, maximum absolute `0.556067`).
+
+The same position-71 run captured the preceding layer-1 MoE row. Its input
+activation (SHA256
+`eaa0fe62b1df4fb89632040b5ef35e936850fb127b062668448c0319a144ebfd`), ten route
+IDs, router weights and shared-expert output were exact. Only rank 8 / expert
+11 changed; its owner moved from primary VRAM in serial to CPU in batch. The
+expert part differed in all 2,560 values (relative L2 `0.0133599`). Its
+weighted delta accounts for the combined MoE output change to maximum residual
+`3.23e-9`. On this exact activation the serial service part matched the native
+CUDA oracle and the batch part matched the native CPU oracle bit-for-bit; the
+owner outputs differed by relative L2 `0.0133513`. This directly links the
+selected expert-owner arithmetic change to the first changed recurrent state
+in this run, while not establishing a user-visible quality or performance
+effect.
+
+The paired capture retained at least 17.445 GiB physical/admission
+availability and zero sampled cgroup events; clocks were dynamic, EMC readback
+was denied, and energy was not measured. Compact results are
+`two-live-position68-state-exact-summary.json`,
+`two-live-layer1-position71-state-analysis.json`,
+`layer1-position71-paired-reproduction-analysis.json`, and
+`layer1-position71-owner-oracle-reproduction/analysis.json`. The reproduction
+path is `capture_two_live_layer4.py` → `pair_two_live_moe_capture.py` → the
+layer/slot-parameterized MoE analyzer and native owner oracle. Full state and
+activation arrays remain local-only. Phase 5 remains open for the wider
+accepted-prefix, cancellation, long-chain and graph/speculation gates.

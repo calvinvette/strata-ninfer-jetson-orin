@@ -4321,3 +4321,16 @@ A further [dispatch-owner follow-up](../../bench/results/2026-10-22-phase5-coder
 The [expert-11 oracle follow-up](../../bench/results/2026-10-22-phase5-coder-batch-gdn-layer-capture/README.md) confirms prompt 1's owner-dependent output on the exact activation: serial GPU matches the independent GPU oracle bit-for-bit, and batch CPU matches the CPU oracle bit-for-bit (the CPU/GPU rows differ by relative L2 `0.01335`). For prompt 0, the exact single-token CPU oracle matches both the serial CPU output and batch dispatch 3505 to JSON serialization precision (`5.0e-11`). The earlier reported relative-L2 difference about `2.19` used prompt 1's oracle activation by mistake and is withdrawn. The selected expert-11 pack blob matches the source GGUF byte-for-byte. Prompt 1's CPU/GPU arithmetic difference and the broader state-transition qualification remain open; Phase 5 stays open.
 
 A queue-aware target-only capture reproduced exact layer-10 GDN stages and a layer-12 input difference at committed position 119, token 16. The harness queued its competitor after caller-observed output token 48; engine logs show two in-flight solo tokens completed before `STOP`, so the actual solo prefix was 50 outputs (118 total prompt-plus-output tokens). At layer 12, all 2,560 input values differed (relative L2 `0.00166446`, maximum absolute `0.00342625`); layer 10 and every captured field were bit-identical. Both arms matched 96 serial output tokens, and the peer completed. The interval includes model layer 11 but this does not isolate an operation or establish quality impact. Each supervised run retained at least 17.78 GiB physical availability with zero cgroup events. Details and scripts are in the [batch-MTP diagnostic](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md). The integration unit suite passed 163 tests. Phase 5 remains open.
+
+A paired two-live six-token diagnostic advances the boundary localization. Both
+requests matched all 36 serial GDN states at position 68. At position 71, prompt
+1's first changed committed GDN state was model layer 2 (796,072/817,152 values,
+relative L2 `0.00070708`), while its emitted tokens still matched. In that same
+run, layer-1 inputs, route IDs/weights and shared output were exact; rank 8 /
+expert 11 alone changed from primary VRAM to CPU and its weighted part delta
+explained the combined MoE output to `3.23e-9` maximum residual. A same-input
+native oracle matched the serial service part to CUDA and the batch part to CPU
+bit-for-bit. The aggregate GDN difference at position 71 was 27,762,032 /
+29,417,472 values (relative L2 `0.0231436`). Minimum physical/admission
+availability was 17.445 GiB, with zero cgroup events. This is one correctness
+diagnostic, not a quality or performance result; Phase 5 remains open.

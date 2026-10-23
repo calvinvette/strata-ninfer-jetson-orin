@@ -12,6 +12,7 @@ parser.add_argument('--serial', type=Path, required=True)
 parser.add_argument('--batch', type=Path, required=True)
 parser.add_argument('--position', type=int, default=119)
 parser.add_argument('--token', type=int, default=16)
+parser.add_argument('--slot', type=int, default=0)
 parser.add_argument('--output', type=Path, required=True)
 args = parser.parse_args()
 
@@ -42,18 +43,17 @@ def compare(reference, actual):
             'max_abs': max(map(abs, diffs), default=0.0),
             'relative_l2': math.sqrt(math.fsum(float(d) * d for d in diffs)) / norm if norm else 0.0}
 
-def select(path, label):
+def select(path, label, expected_slot):
     records = [r for r in read_records(path)
-               if r['position'] == args.position and r['token'] == args.token]
-    if any(r['slot'] != 0 for r in records):
-        raise ValueError(f'{label}: expected physical slot 0 in every record')
+               if r['position'] == args.position and r['token'] == args.token
+               and r['slot'] == expected_slot]
     selected = {r['layer']: r for r in records}
     if len(selected) != len(records):
         raise ValueError(f'{label}: duplicate layer records')
     return selected
 
-serial = select(args.serial, 'serial')
-batch = select(args.batch, 'batch')
+serial = select(args.serial, 'serial', 0)
+batch = select(args.batch, 'batch', args.slot)
 if not serial or serial.keys() != batch.keys():
     raise ValueError(f'missing/unpaired layer records: serial={sorted(serial)}, batch={sorted(batch)}')
 if any(serial[layer]['recurrent'] != batch[layer]['recurrent'] or
@@ -81,7 +81,7 @@ for layer in sorted(serial):
                    'convolution': compare(s['values'][recurrent:], b['values'][recurrent:]),
                    'combined': compare(s['values'], b['values'])})
 first = next((x['layer'] for x in layers if x['combined']['different_values']), None)
-result = {'schema': 1, 'position': args.position, 'token': args.token, 'batch_slot': 0,
+result = {'schema': 1, 'position': args.position, 'token': args.token, 'batch_slot': args.slot,
           'layers_compared': len(layers), 'first_changed_layer': first,
           'all_layer_state': {'values': aggregate_values, 'different_values': aggregate_changed,
                               'max_abs': aggregate_max_abs,

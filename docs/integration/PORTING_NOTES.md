@@ -2793,3 +2793,13 @@ VRAM→CPU, and their weighted service parts explained the layer output delta.
 Parameterize owner-oracle tooling by layer and derive the selected experts from
 the owner trace. This prevents a downstream mismatch from being mistaken for a
 cache effect and transfers to future Strata/Splash backend comparisons.
+
+For multi-live Strata/Splash state debugging, join each batch row to its serial
+control by exact activation bytes, token and position, then include the physical
+slot when selecting captured parts and state. A two-live Coder run at position
+71 matched layer-1 activation, routes and shared output; expert 11 alone changed
+owners (VRAM→CPU), its weighted delta accounted for the combined output, and the
+first changed committed GDN state followed at model layer 2. Both short token
+streams still matched. Capture position 68 was fully state-exact, so this is a
+bounded transition, not proof about other prefixes. The reusable pairer and
+layer/slot-parameterized analyzers are in the [Phase 5 diagnostic](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).

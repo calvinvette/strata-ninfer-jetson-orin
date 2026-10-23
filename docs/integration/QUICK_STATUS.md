@@ -74,6 +74,14 @@ confirm the owner-specific outputs. The later layer-11 observation was
 downstream of this change, so it is not a cache-only performance comparison.
 Phase 5 remains open.
 
+A separate two-live trace now connects one owner switch to persistent state:
+at position 71, layer-1 expert 11 moves VRAM→CPU on an exact-matched activation,
+and the first changed committed GDN state is model layer 2. Its weighted part
+delta explains the combined MoE output to `3.23e-9` maximum residual; exact
+CUDA/CPU owner oracles pass. Both requests still match their six output tokens.
+At position 68, all 36 GDN states were bit-identical. This is a single short
+correctness trace; Phase 5 remains open. [Details](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
+
 Correctness work has found a separate adaptive-recovery issue. In a 256-token
 short–short–short Coder IQ1_M chain, adaptive recovery differed on 237/256
 tokens, while delayed control was bit-exact at captured positions. At position

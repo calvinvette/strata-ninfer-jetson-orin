@@ -23,6 +23,7 @@ parser.add_argument('--parity', type=Path, default=ROOT / 'build/integration/can
 parser.add_argument('--position', type=int, default=119)
 parser.add_argument('--token', type=int, default=16)
 parser.add_argument('--layer', type=int, default=11)
+parser.add_argument('--slot', type=int, default=0)
 args = parser.parse_args()
 out = args.output.resolve()
 out.mkdir(parents=True, exist_ok=False)
@@ -88,7 +89,7 @@ batch_owner = select_owner(args.run / 'batch.moe-owners.jsonl')
 if pack(serial_owner['activation']) != pack(batch_owner['activation']):
     raise ValueError('serial and batch owner captures do not have the exact same f32 activation')
 serial_parts = select_parts(args.run / 'moe-parts.stmparts', -1)
-batch_parts = select_parts(args.run / 'moe-parts.stmparts', 0)
+batch_parts = select_parts(args.run / 'moe-parts.stmparts', args.slot)
 if serial_parts['width'] != batch_parts['width'] or serial_parts['width'] != 2560 * len(serial_owner['ids']):
     raise ValueError('unexpected expert-part width')
 owner_changes = [(rank, expert) for rank, (expert, so, bo) in enumerate(zip(
@@ -117,6 +118,7 @@ result = {
     'serial_and_batch_activation_bitwise_equal': True,
     'expected_serial_owners': 'primary VRAM',
     'expected_batch_owners': 'CPU',
+    'batch_slot': args.slot,
     'experts': {},
     'parity_binary_sha256': hashlib.sha256(args.parity.read_bytes()).hexdigest(),
     'model_shard': args.model.name,
