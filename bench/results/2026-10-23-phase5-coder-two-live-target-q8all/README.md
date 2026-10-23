@@ -49,6 +49,25 @@ serial and 225 MiB batch state dumps remain local because of their size; their
 SHA256 hashes and the derived layer-by-layer comparison are retained in
 `position-133-state/`.
 
+A layer-10 stage capture at position 133 was repeated. For the row with input
+token `3008`, both captures agree exactly with serial through `x`, QKV, `h`,
+gate, beta and `z`. The first difference is the GDN recurrence output `y`:
+2,207/6,144 values, maximum absolute delta `8.94e-8`, relative L2 `7.70e-8`.
+The projected GDN output and subsequent captured FFN values are exact. This
+matches the tiny recurrent-state difference and rules out a large QKV input or
+projection error in this cell. The batch row's internal slot was 0 in the first
+capture and 1 in the repeat, while its token identity stayed the same; row
+assignment can change, so comparisons pair by absolute position and input
+token. The two-row STGDIAG5 payload is field-major; the retained analyzer reads
+the row slices from each field block. Raw stage dumps and their hashes are in
+`layer10-position-133/` and `layer10-position-133-repeat/`. The separate serial
+slot-0 stage capture is retained under `layer10-serial-slot0/`.
+
+The stage evidence still does not distinguish a tiny recurrence arithmetic
+difference from a relevant state-history difference entering the recurrence.
+It is a correctness localization only; no performance or general correctness
+claim follows.
+
 The run took 278.6 seconds. The supervisor sampled dynamic CPU/GPU clocks and
 tegrastats, but EMC clock access was denied and energy was not measured. Minimum
 physical and admission availability were both 17.54 GiB, above the preserved

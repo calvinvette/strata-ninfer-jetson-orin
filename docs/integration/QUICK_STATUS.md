@@ -311,3 +311,5 @@ changed output at verifier logits while leaving its upstream cause open.
 An all-layer state capture found a tiny first recurrent-state delta at model
 layer 10 (relative L2 `1.09e-7`), which grows by layer 12; the arithmetic cause
 remains unknown. [Full capture report](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+Repeated layer-10 traces show the first changed intermediate is the recurrence
+output `y` at relative L2 `7.70e-8`; projected output returns to exact values.
