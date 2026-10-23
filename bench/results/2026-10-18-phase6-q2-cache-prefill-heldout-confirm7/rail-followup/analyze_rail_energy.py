@@ -12,6 +12,11 @@ from request_telemetry import rails_from_lines, window_energy
 from summarize_controls import interval
 
 BASE = Path(__file__).resolve().parents[1]
+campaign_summary = json.loads((BASE / 'analysis.json').read_text())
+summary_by_cell = {
+    (int(row['block'].removeprefix('block-')), row['cache_slots'], row['prefill_chunk']): row
+    for row in campaign_summary['cells']
+}
 rows = []
 unsupported = []
 for cell in sorted(BASE.glob('block-*/*')):
@@ -28,6 +33,12 @@ for cell in sorted(BASE.glob('block-*/*')):
     if len(measured) != 1 or measured[0]['status'] != 'pass':
         raise RuntimeError(f'{cell}: expected exactly one passing measured request')
     request = measured[0]
+    engine_requests = request.get('metrics_after', {}).get('requests', [])
+    engine_request = [row for row in engine_requests
+                      if row.get('prompt_tokens') == 7506 and row.get('output_tokens') == 41]
+    if len(engine_request) != 1:
+        raise RuntimeError(f'{cell}: missing unique matching measured engine request counters')
+    engine_request = engine_request[0]
     with gzip.open(cell / 'supervisor/memory.jsonl.gz', 'rt') as stream:
         memory = [json.loads(line) for line in stream if line.strip()]
     with gzip.open(cell / 'supervisor/tegrastats.txt.gz', 'rt') as stream:
@@ -45,12 +56,19 @@ for cell in sorted(BASE.glob('block-*/*')):
         unsupported.append({'block': block, 'cell': cell.name, **estimate})
         continue
     output_tokens = request['response']['usage']['completion_tokens']
+    summary = summary_by_cell[(block, cache, chunk)]
     rows.append({
         'block': block, 'cache_slots': cache, 'prefill_chunk': chunk,
         'request_seconds': request['request_end_monotonic_s'] - request['request_start_monotonic_s'],
         'prompt_tokens': request['response']['usage']['prompt_tokens'],
         'completion_tokens': output_tokens,
         'total_tokens': request['response']['usage']['prompt_tokens'] + output_tokens,
+        'ttft_seconds': request['stream_observation']['first_visible_delta_s'],
+        'client_total_seconds': request['client_elapsed_s'],
+        'decode_tokens_per_second': summary['decode_tok_s'],
+        'minimum_host_availability_gib': summary['minimum_available_bytes'] / (1024 ** 3),
+        'actual_expert_slots': summary['actual_expert_slots'],
+        'logical_file_read_mb': engine_request['file_mb'],
         'joules_by_named_rail': estimate['joules_by_named_rail'],
         'joules_per_output_token_by_named_rail': {
             rail: joules / output_tokens for rail, joules in estimate['joules_by_named_rail'].items()},
@@ -149,6 +167,50 @@ report = {
     'blocks': 7, 'prompt_tokens_each': 7506, 'completion_tokens_each': 41,
     'factors': {'cache_slots': [3000, 3500], 'prefill_chunk': [32, 128]},
     'named_rail_request_windows': rows, 'paired_effects': effects, 'paired_interactions': interactions,
+}
+
+profiles = []
+for cache, chunk in ((3000, 32), (3000, 128), (3500, 32), (3500, 128)):
+    block_rows = [row for row in rows if row['cache_slots'] == cache and row['prefill_chunk'] == chunk]
+    if len(block_rows) != 7:
+        raise RuntimeError(f'incomplete profile cell cache={cache}, chunk={chunk}')
+    profiles.append({
+        'cache_slots': cache, 'prefill_chunk': chunk, 'blocks': len(block_rows),
+        'quality': 'exact held-out 41-token answer in all seven blocks',
+        'median_ttft_seconds': statistics.median(row['ttft_seconds'] for row in block_rows),
+        'median_client_total_seconds': statistics.median(row['client_total_seconds'] for row in block_rows),
+        'median_decode_tokens_per_second': statistics.median(row['decode_tokens_per_second'] for row in block_rows),
+        'minimum_observed_host_availability_gib': min(row['minimum_host_availability_gib'] for row in block_rows),
+        'median_actual_expert_slots': statistics.median(row['actual_expert_slots'] for row in block_rows),
+        'median_vin_sys_5v0_j_per_total_token': statistics.median(
+            row['joules_per_total_token_by_named_rail']['VIN_SYS_5V0'] for row in block_rows),
+        'median_logical_file_read_mb': statistics.median(row['logical_file_read_mb'] for row in block_rows),
+    })
+
+def dominates(a, b):
+    a_values = (a['median_ttft_seconds'], a['median_client_total_seconds'],
+                -a['median_decode_tokens_per_second'],
+                -a['minimum_observed_host_availability_gib'],
+                a['median_vin_sys_5v0_j_per_total_token'], a['median_logical_file_read_mb'])
+    b_values = (b['median_ttft_seconds'], b['median_client_total_seconds'],
+                -b['median_decode_tokens_per_second'],
+                -b['minimum_observed_host_availability_gib'],
+                b['median_vin_sys_5v0_j_per_total_token'], b['median_logical_file_read_mb'])
+    return all(x <= y for x, y in zip(a_values, b_values)) and any(x < y for x, y in zip(a_values, b_values))
+
+for profile in profiles:
+    profile['pareto_nondominated'] = not any(dominates(other, profile) for other in profiles if other is not profile)
+report['descriptive_profile_pareto'] = {
+    'dimensions': ['TTFT seconds (min)', 'client total seconds (min)',
+                   'decode tokens/s (max)', 'minimum observed host availability GiB (max)',
+                   'VIN_SYS_5V0 joules per total input+output token (min)',
+                   'engine logical file-read MB per request (min)'],
+    'quality_constraint': 'exact held-out answer in every measured block',
+    'file_read_scope': 'engine logical mapped-file bytes; not physical device I/O',
+    'energy_scope': report['scope'],
+    'profiles': profiles,
+    'interpretation': ('Descriptive medians and worst observed headroom for this held-out task. '
+                       'Pareto membership is not a profile promotion or universal ranking.'),
 }
 out = Path(__file__).with_name('rail-energy-analysis.json')
 out.write_text(json.dumps(report, indent=2) + '\n')

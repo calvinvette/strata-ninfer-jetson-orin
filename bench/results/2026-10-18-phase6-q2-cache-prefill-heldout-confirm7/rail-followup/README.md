@@ -32,6 +32,29 @@ includes board idle/background activity. These are not process-attributed
 energy, are not summed into a whole-device total, and support no universal
 energy-per-token claim. This is a Q2_0 model/workload/profile result only.
 
+## Descriptive Pareto view
+
+The follow-up also combines the seven-block medians for TTFT, client total
+time, decode rate, minimum observed host availability, `VIN_SYS_5V0` energy
+per total token, and engine logical mapped-file bytes. All 28 cells returned
+the exact answer. Every profile is nondominated across these selected
+dimensions; the table is descriptive and does not substitute for the paired
+latency intervals in the parent report.
+
+| Expert slots | Prefill chunk | Median TTFT (s) | Median request (s) | Decode (tok/s) | Minimum host available (GiB) | `VIN_SYS_5V0` (J/total token) | Logical file reads (MB/request) |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 3,000 | 32 | 668.0 | 673.1 | 7.2 | 18.16 | 0.592 | 10,113.6 |
+| 3,000 | 128 | 267.6 | 273.3 | 7.2 | 18.10 | 0.241 | 10,094.3 |
+| 3,500 | 32 | 659.6 | 664.8 | 7.2 | 17.49 | 0.583 | 9,790.2 |
+| 3,500 | 128 | 263.0 | 268.2 | 7.2 | 17.47 | 0.237 | 9,704.4 |
+
+The larger cache was slightly faster and had fewer engine logical file reads,
+with less host availability. Chunk 128 lowered latency and named-rail energy,
+with a small reduction in worst observed host availability. `file_mb` is an
+engine logical mapped-file counter, not physical disk traffic; per-request
+physical disk I/O was not attributed. The Pareto set is scoped to these four
+cells and the tested held-out task.
+
 Reproduce from the repository root:
 
 ```sh

@@ -64,6 +64,12 @@ candidate setting has been promoted to a default.
 | MTP × prompt length × KV, Coder IQ1_M, seven blocks / 56 arms | On the 7,501-token task, MTP4 reduced decode throughput 9.17% with FP16 KV and 9.24% with INT8; client time rose 0.59% and 1.01%. Short-task effects were smaller and uncertain. | MTP4 was dominated on measured long-task latency and named-rail energy; no default changed. Other Phase 6 factors remain open. [Report](../../bench/results/2026-10-21-phase6-coder-current-source-mtp-kv-short-long-confirm7/README.md) |
 | Prefill chunk × expert cache, Q2_0 near-limit retrieval, seven held-out blocks | Chunk 128 reduced median request time 59.54% at 3,000 slots and 59.74% at 3,500 slots; all 28 requests returned the exact 41-token answer after 7,506 prompt tokens. | Cache × chunk interaction interval included zero; no general default. [Report](../../bench/results/2026-10-18-phase6-q2-cache-prefill-heldout-confirm7/README.md) |
 | Named-rail energy for the same Q2_0 cache × prefill campaign | Chunk 128 lowered `VIN_SYS_5V0` median energy per total token 59.43% at 3,000 slots and 59.41% at 3,500; cache × prefill interaction interval included zero. | Retrospective request-window rail integration, includes idle/background activity; not process-attributed or whole-device energy. [Analysis](../../bench/results/2026-10-18-phase6-q2-cache-prefill-heldout-confirm7/rail-followup/README.md) |
+
+The four-cell descriptive Pareto view keeps all profiles nondominated across
+latency, decode, observed host availability, named-rail energy, and logical
+file reads. Higher cache and larger prefill chunk trade lower latency/energy
+for slightly lower observed host availability; physical disk I/O is not
+attributed. This does not promote a default.
 | Coder two-live residency profile, three paired screening blocks | Moving layer-9 expert 233 to first rank restored exact 96-token output parity for both live rows on the original pair. Median paired batch throughput changed −1.40% (three-block bootstrap 95% interval −2.17% to +16.66%). | A held-out pair still diverged on slot 1 at token 78 under both base and candidate profiles. No performance promotion or general correctness claim. [Report](../../bench/results/2026-10-23-phase5-coder-layer9-expert233-residency-intervention/README.md) |
 
 A three-request same-engine MTP test required and observed three rejected

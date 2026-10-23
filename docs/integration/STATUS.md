@@ -4729,3 +4729,10 @@ remains unresolved. `VDD_GPU_SOC` and `VDD_CPU_CV` are reported separately.
 These rails include board idle/background activity and are not process or
 whole-device energy. This adds a workload-specific Pareto measure; Phase 6
 remains open for broader energy and response-model coverage.
+
+The same analysis now includes a descriptive four-cell Pareto view using
+median TTFT, request time, decode rate, named-rail energy, logical mapped-file
+reads and worst observed host availability. All four tested configurations
+are nondominated under those dimensions and each retained the exact answer.
+This leaves a cache/chunk versus host-availability choice for this task; the
+logical file counter is not physical disk I/O, and no profile was promoted.
