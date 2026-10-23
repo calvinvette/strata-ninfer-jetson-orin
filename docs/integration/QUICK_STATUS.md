@@ -47,8 +47,10 @@ no prefix trace. A later full-state capture matched slot 0's 72 output tokens
 but found a terminal GDN delta from layer 5 (whole-state relative L2
 `2.24e-7`); a per-prefix hash scan found earlier divergence at batch position
 75 for slot 0 and 84 for slot 1. Slot 1's terminal state was not paired after
-its output diverged. These are correctness localization results, not performance
-evidence. [Details](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+its output diverged. A direct capture at slot 1 position 84 found layer 10
+recurrent-state drift (`1.88e-7` relative L2), with `y` the first changed
+stage field and later captured fields exact. These are correctness localization
+results, not performance evidence. [Details](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
 
 These results are specific to the tested Orin build, model and workload. No
 candidate setting has been promoted to a default.

@@ -359,3 +359,19 @@ is not serving-performance evidence. Minimum physical/admission availability
 was 17.80 GiB with zero cgroup events. Raw traces remain local; the
 [aligned summary](prefix-gdn-hashes/batch-gdn-hash-analysis.json) and the
 `analyze_batch_gdn_hashes.py` helper are retained.
+
+A separate supervised all-layer state capture at absolute position 84 directly
+confirmed slot 1's hash onset at model layer 10 for input token `1608`. The
+convolution state was exact; 517,556/786,432 recurrent values differed, with
+maximum absolute delta `8.94e-8` and recurrent relative L2 `1.88e-7`. A focused
+layer-10 stage capture of the same position/token found `x`, QKV, `h`, gate,
+beta and `z` exact; `y` was the first changed field (3,810/6,144 values,
+maximum delta `1.64e-7`, relative L2 `1.41e-7`). `gdn_out`, `ffn_x` and
+`ffn_y` were exact in that capture. Thus the early persistent-state difference
+is associated with a small recurrence-output delta while the selected layer's
+downstream fields and generated token remain exact. It does not establish what
+later causes slot 1's token-66 mismatch. The all-layer capture took 213.1
+seconds (minimum availability 17.85 GiB); the focused stage run took 144.4
+seconds (17.81 GiB minimum). Both had zero cgroup events. Analysis files are
+[`position84-slot1-state/slot1-analysis.json`](position84-slot1-state/slot1-analysis.json)
+and [`position84-slot1-stage10/stage-analysis.json`](position84-slot1-stage10/stage-analysis.json).

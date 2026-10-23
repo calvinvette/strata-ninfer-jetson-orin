@@ -4572,3 +4572,17 @@ summarized above. Hash instrumentation increased elapsed time to 318.4 seconds,
 so this is not performance evidence. Minimum physical/admission availability
 was 17.80 GiB with zero cgroup events. Phase 5 remains open. See the [hash
 analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/prefix-gdn-hashes/batch-gdn-hash-analysis.json) and [capture report](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+
+To resolve slot 1's earliest per-prefix hash change, a separate direct capture
+at position 84 compared its persistent state to a fresh serial control. Layer 10
+was first changed on input token `1608`; the convolution state was exact, while
+517,556/786,432 recurrent values differed (maximum absolute delta `8.94e-8`,
+relative L2 `1.88e-7`). A focused capture at the same position/token found the
+GDN stage fields through `z` exact and recurrence output `y` first changed
+(3,810/6,144 values, maximum `1.64e-7`, relative L2 `1.41e-7`); captured
+`gdn_out` and FFN fields were exact. This is an early numerical-state finding,
+not an explanation for the later token-66 mismatch. The all-layer and stage
+runs retained at least 17.85 and 17.81 GiB physical/admission availability,
+respectively, with zero cgroup events. Phase 5 remains open. See the
+[position-84 state](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/position84-slot1-state/slot1-analysis.json),
+[stage analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/position84-slot1-stage10/stage-analysis.json) and [report](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
