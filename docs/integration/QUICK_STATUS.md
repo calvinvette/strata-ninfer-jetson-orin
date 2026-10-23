@@ -49,8 +49,10 @@ but found a terminal GDN delta from layer 5 (whole-state relative L2
 75 for slot 0 and 84 for slot 1. Slot 1's terminal state was not paired after
 its output diverged. A direct capture at slot 1 position 84 found layer 10
 recurrent-state drift (`1.88e-7` relative L2), with `y` the first changed
-stage field and later captured fields exact. These are correctness localization
-results, not performance evidence. [Details](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+stage field and later captured fields exact. The incoming state was already
+different there; another run found drift at position 83, so the onset varies
+between runs and its cause remains unresolved. These are correctness
+localization results, not performance evidence. [Details](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
 
 These results are specific to the tested Orin build, model and workload. No
 candidate setting has been promoted to a default.

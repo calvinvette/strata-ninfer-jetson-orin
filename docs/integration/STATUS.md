@@ -4586,3 +4586,17 @@ runs retained at least 17.85 and 17.81 GiB physical/admission availability,
 respectively, with zero cgroup events. Phase 5 remains open. See the
 [position-84 state](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/position84-slot1-state/slot1-analysis.json),
 [stage analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/position84-slot1-stage10/stage-analysis.json) and [report](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+
+The layer-10 prestate diagnostic was extended to selected positions and repeated
+for slot 1 at position 84 (input token `1608`) and position 83 (token `11`). In
+both separate runs, the incoming recurrent state already differed from its
+serial control (relative L2 `1.88e-7` and `2.31e-7`, respectively), while
+convolution state was exact. The position-83 observation precedes the
+position-84 onset in the independent hash scan, so the onset varies across runs;
+the difference cannot be assigned to the position-84 recurrence operation.
+Internal scheduler slot changed between runs, and the comparison was recovered
+by matching captured input token. These are small state-drift localizations,
+not evidence of a stable onset or root cause. Phase 5 remains open. The
+[position-83](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/position83-slot1-prestate/analysis.json)
+and [position-84](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/position84-slot1-prestate/analysis.json)
+prestate records are summarized in the [experiment report](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).

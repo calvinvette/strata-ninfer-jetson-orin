@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Capture layer-10 committed state after position 132 before the changed row."""
+"""Capture layer-10 committed state at a selected accepted position."""
 import argparse
 import json
 from concurrent.futures import ThreadPoolExecutor
@@ -13,6 +13,8 @@ from serve.server import StrataEngine,child_env
 from tools.integration.batch_mtp_graph_lifecycle import prepared_prompts,remove_arg,replace_arg
 
 p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',type=Path,required=True)
+p.add_argument('--position',type=int,default=132)
+p.add_argument('--generated-tokens',type=int,default=96)
 opts=p.parse_args();out=opts.output.resolve();out.mkdir(parents=True,exist_ok=False)
 base=Path(__file__).resolve().parent
 cfg=json.loads((base.parent/'2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/config.json').read_text())
@@ -23,11 +25,11 @@ prompts=prepared_prompts(cfg,2)
 
 def env_for(name):
  e=child_env(cfg);e.update({'STRATA_NATIVE_CPU_Q8_1_DOT':'all','STRATA_IQ_MT_MIN':'1','STRATA_PREFILL_CPU_SHARE':'0',
-  'STRATA_VERIFY_DUMP_GDN_COMMIT_LAYER':'10','STRATA_VERIFY_DUMP_GDN_COMMIT_POSITIONS':'132',
+  'STRATA_VERIFY_DUMP_GDN_COMMIT_LAYER':'10','STRATA_VERIFY_DUMP_GDN_COMMIT_POSITIONS':str(opts.position),
   'STRATA_VERIFY_DUMP_GDN_COMMIT_PATH':str((out/f'{name}.stgcmt').resolve())});return e
 
 def generate(engine,key):
- return [int(t) for t in engine.generate(prompts[key],96,{'temperature':0},threading.Event()) if t is not None]
+ return [int(t) for t in engine.generate(prompts[key],opts.generated_tokens,{'temperature':0},threading.Event()) if t is not None]
 
 serial=StrataEngine(cfg['exe'],args,cwd=cfg.get('cwd'),log=str(out/'serial-slot-1.log'),env=env_for('serial'))
 try: serial_tokens=generate(serial,'slot-1')
@@ -38,7 +40,8 @@ try:
  with ThreadPoolExecutor(max_workers=2) as pool:
   futures={key:pool.submit(generate,batch,key) for key in prompts};batch_tokens={key:future.result() for key,future in futures.items()}
 finally: batch.close()
-result={'layer':10,'captured_position':132,'next_position':133,'serial_slot_1':serial_tokens,
-        'batch':batch_tokens,'profile':{'live_requests':2,'mtp':False,'STRATA_NATIVE_CPU_Q8_1_DOT':'all','STRATA_IQ_MT_MIN':'1'}}
+result={'layer':10,'captured_position':opts.position,'next_position':opts.position+1,'serial_slot_1':serial_tokens,
+        'batch':batch_tokens,'profile':{'live_requests':2,'mtp':False,'generated_tokens':opts.generated_tokens,
+        'STRATA_NATIVE_CPU_Q8_1_DOT':'all','STRATA_IQ_MT_MIN':'1'}}
 (out/'result.json').write_text(json.dumps(result,indent=2)+'\n')
-print(json.dumps({'position':132,'serial_tokens':len(serial_tokens),'batch_tokens':{k:len(v) for k,v in batch_tokens.items()}}))
+print(json.dumps({'position':opts.position,'serial_tokens':len(serial_tokens),'batch_tokens':{k:len(v) for k,v in batch_tokens.items()}}))

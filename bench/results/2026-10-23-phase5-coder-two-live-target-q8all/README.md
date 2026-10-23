@@ -375,3 +375,17 @@ seconds (minimum availability 17.85 GiB); the focused stage run took 144.4
 seconds (17.81 GiB minimum). Both had zero cgroup events. Analysis files are
 [`position84-slot1-state/slot1-analysis.json`](position84-slot1-state/slot1-analysis.json)
 and [`position84-slot1-stage10/stage-analysis.json`](position84-slot1-stage10/stage-analysis.json).
+
+The layer-10 prestate hook was then repeated at positions 84 and 83, pairing
+each batch row by input token because scheduler slot assignment changed between
+runs. At position 84 / token `1608`, the incoming recurrent state already has
+the same small delta (relative L2 `1.88e-7`) as the captured committed state;
+convolution state is exact. At position 83 / token `11` in a separate run,
+layer-10 recurrent state was also already different (relative L2 `2.31e-7`,
+maximum delta `1.19e-7`), with convolution state exact. This earlier onset in a
+separate run means position 84 is not a stable onset. Together with the exact
+stage inputs through `z` and differing `y`, the captures do not distinguish a
+small incoming-state difference from recurrence arithmetic as the source. The
+two prestate summaries are
+[`position84-slot1-prestate/analysis.json`](position84-slot1-prestate/analysis.json)
+and [`position83-slot1-prestate/analysis.json`](position83-slot1-prestate/analysis.json).
