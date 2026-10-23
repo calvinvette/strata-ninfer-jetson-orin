@@ -24,6 +24,8 @@ parser.add_argument("--expert-cache-slots", "--expert-cache-mib", type=int, defa
                     help="requested Strata expert-cache slot count (legacy MiB alias accepted)")
 parser.add_argument("--generated-tokens", type=int, default=96,
                     help="tokens generated for each serial and batch request")
+parser.add_argument("--pool-workers", type=int,
+                    help="override expert CPU worker count for serial and batch engines")
 parser.add_argument("--accepted-prefix-trace", action="store_true",
                     help="hash committed persistent state at each accepted verifier prefix")
 cli = parser.parse_args()
@@ -41,6 +43,10 @@ replace_arg(args, "--spec", "2")
 replace_arg(args, "--max-context", "1024")
 replace_arg(args, "--expert-cache", str(EXPERT_CACHE_SLOTS))
 replace_arg(args, "--prompt-cache", "6")
+if cli.pool_workers is not None:
+    if cli.pool_workers < 1:
+        parser.error("--pool-workers must be positive")
+    replace_arg(args, "--pool-workers", str(cli.pool_workers))
 prompts = prepared_prompts(cfg, 2)
 env = child_env(cfg)
 env.update({
@@ -110,6 +116,7 @@ result = {
     "model_shards_sha256": model_shards_sha256,
     "profile": {"live_requests": 2, "batch_slots": 2, "mtp": False, "context": 1024,
                 "expert_cache_slots": EXPERT_CACHE_SLOTS, "prompt_cache": 6, "generated_tokens": GENERATED_TOKENS,
+                "pool_workers": cli.pool_workers if cli.pool_workers is not None else "config default",
                 "STRATA_NATIVE_CPU_Q8_1_DOT": "all", "STRATA_IQ_MT_MIN": "1"},
     "prompt_token_counts": {name: len(prompt) for name, prompt in prompts.items()},
     "outputs": {name: {"serial": serial[name], "batch": batched[name]} for name in prompts},

@@ -4749,3 +4749,11 @@ the corrected guard accepts a rejection before recovery and passes. This adds
 one long-context single-live transaction case but does not bound adaptive
 migration, other rejection points, cancellation or multi-live behavior.
 Phase 5 remains open. The full Python integration suite now passes 168/168.
+
+A two-live target-only Coder IQ1_M screen with `--pool-workers 1` on both fresh
+serial controls and batch still diverged for slot 1 (first output mismatch at
+index 60); slot 0 matched. This rules out one expert worker as a sufficient
+fix, but the changed onset versus the earlier index-66 run does not establish
+causality. The 506.3-second supervised run retained 14.17 GiB minimum physical
+and admission availability with zero cgroup events. It is correctness evidence,
+not performance evidence. [Run record](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
