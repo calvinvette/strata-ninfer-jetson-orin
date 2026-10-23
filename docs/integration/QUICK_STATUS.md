@@ -229,6 +229,17 @@ routes and slot-tagged GDN state at positions 68/71. One row diverged by layer
 activation and router weights, so its expert output remains unattributed.
 [Details](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/layer4-profile-e11-first-positions68-71/README.md).
 
+A follow-up isolates the position-68 expert-248 owner transition. On the same
+activation, the independent CPU/GPU oracle differs at relative L2 `0.0113` by
+default and is bitwise equal with `STRATA_NATIVE_CPU_Q8_1_DOT=all`. The default
+two-live service row changes only expert 248's part (combined output relative
+L2 `0.0028174`); in the separate Q8_1-all service cell the same expert's
+CPU→CUDA transition has exact parts and combined output. State stays exact for
+one request through position 71; the other has only a tiny first difference
+at layer 30 (relative L2 `5.84e-9`). Different route histories between selector
+cells prevent a whole-model causal claim. Phase 5 remains open.
+[Details](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/layer4-expert248-q8-all-owner-pair/README.md).
+
 1. Continue resolving batch-MTP output divergence: capture earlier layer
    boundaries and logits around the reproducible multirow drift, then isolate
    the first recurrence or verifier operation that changes the row. Extend
