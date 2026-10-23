@@ -85,11 +85,13 @@ drafts; all shared state boundaries and all three outputs matched MTP-off.
 This single prompt does not bound adaptive migration or multi-live decoding.
 [Report](../../bench/results/2026-10-23-phase5-coder-mtp-long-rejection-recovery/README.md).
 
-A short-prompt MTP3 follow-up rejected four drafts before recovery and matched
-MTP-off output and all shared accepted-prefix state fingerprints across three
-same-engine requests. It is one additional transaction case; adaptive long
-chains and multi-live state drift remain open.
-[Report](../../bench/results/2026-10-23-phase5-coder-mtp3-rejection-recovery/README.md).
+A short-prompt and a 7,501-token MTP3 follow-up both matched MTP-off outputs
+and all shared main-model state fingerprints across three same-engine requests.
+MTP3 rejected drafts before recovery in both cells; the near-limit run retained
+13.283 GiB minimum physical/admission availability. These add two transaction
+cases, not an adaptive-chain or multi-live bound.
+[Short](../../bench/results/2026-10-23-phase5-coder-mtp3-rejection-recovery/README.md),
+[near-limit](../../bench/results/2026-10-23-phase5-coder-mtp3-long-rejection-recovery/README.md).
 
 The matching current-build accepted-window, GDN recurrent/parity and captured
 graph CTests passed 5/5 under the 28 GiB supervisor, with 23.73 GiB minimum

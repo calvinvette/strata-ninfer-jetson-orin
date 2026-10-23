@@ -4845,3 +4845,12 @@ windows 2, 3 or 4, defaults to 4, and its focused tests pass 7/7. The 111.7s
 supervised run retained 13.337 GiB minimum physical/admission availability,
 with zero cgroup events. Adaptive long-chain and multi-live state behavior
 remain unresolved. [Report](../../bench/results/2026-10-23-phase5-coder-mtp3-rejection-recovery/README.md).
+
+The same MTP3 accepted-prefix comparison also passed on the exact 7,501-token
+Coder prompt at 8K context. MTP3 rejected four initial drafts and two more in
+the continuation; generated tokens and all shared main-model state fingerprints
+matched MTP-off through the eight-token recovery request. The supervised run
+lasted 526.7s and retained 13.283 GiB minimum physical/admission availability,
+with zero cgroup events. This is one near-limit transaction case, not a bound
+on adaptive long chains, cancellation or multi-live execution.
+[Report](../../bench/results/2026-10-23-phase5-coder-mtp3-long-rejection-recovery/README.md).
