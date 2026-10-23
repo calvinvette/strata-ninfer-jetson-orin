@@ -324,3 +324,9 @@ serial and batch at the exact position-83 input. Its ten routed parts and MoE
 output matched bit-for-bit; the 1,500 MiB cell had a CPU owner transition and
 small delta. This is a narrow correctness intervention, not a full-sequence or
 performance result. Phase 5 remains open.
+
+
+The 3,000 MiB cache did not restore full two-live sequence parity: slot 0 matched
+96 tokens, while slot 1 diverged at token 60 (versus 66 in the 1,500 MiB cell).
+The targeted expert-233 output was exact with GPU residency, but that local fix
+did not carry through the full sequence. Phase 5 remains open.

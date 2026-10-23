@@ -149,3 +149,27 @@ python3 bench/results/2026-10-23-phase5-coder-two-live-target-q8all/analyze_laye
 ```
 
 Phase 5 remains open.
+
+The full 96-token two-live run at a 3,000 MiB cache cap did not restore
+sequence parity: slot 0 matched its serial control, while slot 1 first differed
+at output index 60; both produced 96 IDs. At 1,500 MiB, the corresponding
+Q8_1-all cell first differed at index 66. Because the cache changes expert
+ownership and resulting token history, these onset indices are separate cells,
+not a paired causal comparison. The position-83 expert-233 capture does show
+that the selected operator output becomes exact when that expert remains on
+GPU, but this is insufficient to establish full-sequence recovery. The run
+took 338.6 seconds and retained at least 13.84 GiB physical/admission
+availability, with zero sampled cgroup events. EMC access was denied and energy
+was not measured. Raw streams, logs and result are under `run-cache3000-full96/`;
+supervisor telemetry is under `supervisor-cache3000-full96/`.
+
+Reproduce with:
+
+```sh
+python3 tools/integration/run_control.py \
+  --output /tmp/q8all-cache3000-full96-supervised --timeout 3600 --sample-clocks -- \
+  python3 bench/results/2026-10-23-phase5-coder-two-live-target-q8all/run_q8all_target_batch.py \
+  --output /tmp/q8all-cache3000-full96 --expert-cache-mib 3000
+```
+
+Phase 5 remains open.

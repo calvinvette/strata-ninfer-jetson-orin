@@ -4446,3 +4446,13 @@ produced a small part delta confirmed by same-input native CPU/GPU oracles. This
 shows cache residency removes that selected operator delta in this cell, not
 that it repairs the full sequence or generalizes to other prompts. Phase 5
 remains open. [Capture and measurements](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+
+
+The full 96-token Q8_1-all two-live run with a 3,000 MiB expert cache matched
+slot 0 to serial but slot 1 first diverged at output index 60. The 1,500 MiB
+cell diverged at index 66; cache settings change owner and token histories, so
+those indices are not a causal paired estimate. The selected position-83
+expert-233 operator became bit-exact under the larger cache, but full-sequence
+parity did not follow. Minimum physical/admission availability was 13.84 GiB;
+energy was not measured and EMC clock access was denied. Phase 5 remains open.
+[Run details](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
