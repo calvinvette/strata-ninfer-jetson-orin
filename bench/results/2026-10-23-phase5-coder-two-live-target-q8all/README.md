@@ -248,3 +248,21 @@ zero sampled cgroup events. Large state dumps remain local; checksums, seven
 state analyses, seven stage analyses and raw stage captures are under
 `layer24-onset-sweep-cache3000/`; supervisor telemetry is under
 `supervisor-layer24-onset-sweep-cache3000/`.
+
+A supervised retry sampled every position 104–108 with the same cache and
+two-live target-only setup. It again matched layer-24 state at 104, but this
+run already differed at 105: `x` was the first changed stage (relative L2
+`1.252e-3`), so QKV and later fields were also different. At 106, `x` remained
+first changed; at 107–108, `x` returned to exact while `h` differed. This does
+not reproduce the later onset and `h`-first pattern from the seven-position
+sweep. The verifier's internal batch row was 1 for the target request in this
+run (confirmed by its input-token header); row IDs are reassigned between runs,
+so analyses must pair on the captured token and per-run row mapping. The full
+96-token request still first diverged at output index 60. This run took 150.0
+seconds, retained at least 14.00 GiB physical/admission availability, and had
+zero sampled cgroup events. Large raw state and stage dumps remain local; the
+derived per-position analyses are in
+`layer24-onset-104-108-cache3000-retry/` and supervisor telemetry is in
+`supervisor-layer24-onset-104-108-cache3000-retry/`. The varying onset and
+stage indicate this capture is sensitive to run state or scheduling; neither
+run identifies the initiating operation.

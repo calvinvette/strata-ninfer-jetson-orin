@@ -4495,3 +4495,17 @@ committed recurrent and convolution state both differ. Output first changes at
 index 60. This bounds the sampled layer-24 history change to positions 105–108
 without identifying its cause. Duplicate token rows at position 100 were paired
 by verifier slot. [Raw and analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+
+A supervised 104–108 retry with the same 3,000 MiB cache instead found the
+first layer-24 state and stage change at position 105, with `x` first
+(relative L2 `1.252e-3`); `x` was also first at 106, while `h` was first at
+107–108. Position 104 remained exact, and the full request still first
+diverged at output index 60. The target request used internal verifier row 1
+in this run; row assignment changes between runs and must be paired using the
+captured token as well as the recorded row. The prior seven-position run
+found its first difference at 108 and `h` first. These captures therefore do
+not establish a stable onset or initiating operation. The retry retained at
+least 14.00 GiB physical/admission availability and had zero sampled cgroup
+events. Raw dumps remain local; per-position analyses and supervisor logs are
+under `layer24-onset-104-108-cache3000-retry/` and
+`supervisor-layer24-onset-104-108-cache3000-retry/`.

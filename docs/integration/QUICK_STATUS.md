@@ -357,3 +357,10 @@ A same-run onset sweep found layer-24 state/intermediates exact through position
 `x`/QKV/gate/beta/z are exact; recurrent and convolution state then diverge.
 Slot 1's output first changes at index 60 (position 127). The cause remains
 unresolved.
+
+A supervised repeat of the 104–108 layer-24 sweep changed state earlier than
+the prior run: first at 105 with `x` changed, then `h` first at 107–108. The
+prior run first changed at 108 with `h`. Output still diverged at index 60.
+Verifier row IDs moved between runs; pairing was confirmed using captured input
+tokens. The cause and stable onset remain unresolved, so this remains
+correctness localization rather than a performance result.

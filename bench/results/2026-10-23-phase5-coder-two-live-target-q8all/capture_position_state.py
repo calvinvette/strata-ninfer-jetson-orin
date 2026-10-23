@@ -19,6 +19,8 @@ p.add_argument('--positions', help='comma-separated state capture positions; ove
 p.add_argument('--expert-cache-mib', type=int, default=1500)
 p.add_argument('--layer', default='all', help='GDN model layer or all')
 p.add_argument('--stage-layer', type=int, help='also capture GDN intermediate fields for this layer')
+p.add_argument('--trace-state-hashes', action='store_true',
+               help='log accepted-prefix GDN/QSA fingerprints at every committed position')
 opts = p.parse_args()
 positions = opts.positions or str(opts.position)
 out = opts.output.resolve()
@@ -45,6 +47,9 @@ def make_env(name):
                     'STRATA_VERIFY_DUMP_GDN_PATH': str((out/f'{name}.stgdiag').resolve()),
                     'STRATA_VERIFY_DUMP_GDN_POSITIONS': positions,
                     'STRATA_VERIFY_DUMP_GDN_BATCH': '1'})
+    if opts.trace_state_hashes:
+        env.update({'STRATA_ACCEPTED_PREFIX_TRACE': '1', 'STRATA_STATE_HASH_GDN': '1',
+                    'STRATA_STATE_HASH_QSA_LAYERS': '1'})
     return env
 
 def generate(engine, key):
@@ -74,6 +79,7 @@ result = {'capture_positions': [int(x) for x in positions.split(',')], 'target_s
                       'expert_cache_mib': opts.expert_cache_mib,
                       'gdn_layer': opts.layer,
                       'stage_layer': opts.stage_layer,
+                      'trace_state_hashes': opts.trace_state_hashes,
                       'STRATA_NATIVE_CPU_Q8_1_DOT': 'all', 'STRATA_IQ_MT_MIN': '1'}}
 (out/'result.json').write_text(json.dumps(result, indent=2)+'\n')
 print(json.dumps({'positions': [int(x) for x in positions.split(',')], 'serial_tokens': len(serial_out['tokens']),

@@ -10,6 +10,8 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--run', type=Path, default=Path(__file__).resolve().parent/'position-133-state')
 parser.add_argument('--position', type=int, default=133)
 parser.add_argument('--output', type=Path, help='analysis JSON path; defaults to <run>/analysis.json')
+parser.add_argument('--batch-slot', type=int, default=1,
+                    help='verifier row containing the target service request (internal slots can be reassigned)')
 args = parser.parse_args()
 ROOT = args.run.resolve()
 POSITION = args.position
@@ -34,7 +36,7 @@ def records(path, wanted_slot):
     return out
 
 serial = records(ROOT/'serial.stgcmt', 0)
-batch = records(ROOT/'batch.stgcmt', 1)
+batch = records(ROOT/'batch.stgcmt', args.batch_slot)
 if not serial or set(serial) != set(batch):
     raise ValueError(f'layer mismatch: serial={sorted(serial)} batch={sorted(batch)}')
 rows = []
@@ -56,7 +58,7 @@ for layer in sorted(serial):
                  'whole_state': metrics(0, len(delta)),
                  'recurrent': metrics(0, a['recurrent']),
                  'convolution': metrics(a['recurrent'], len(delta))})
-result = {'position': POSITION, 'serial_layers': sorted(serial), 'batch_slot': 1,
+result = {'position': POSITION, 'serial_layers': sorted(serial), 'batch_slot': args.batch_slot,
           'first_changed_layer': next((x['layer'] for x in rows if x['whole_state']['changed_values']), None),
           'comparisons': rows,
           'limits': ['GDN committed-state capture only; other activations and state families are not covered.',
