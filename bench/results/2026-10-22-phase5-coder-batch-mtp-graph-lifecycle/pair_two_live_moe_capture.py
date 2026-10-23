@@ -59,6 +59,11 @@ for path, slot in ((capture / f'{serial_stem}.routes.jsonl', None),
     if len(selected) != 1:
         raise ValueError(f'{path}: expected one route record, got {len(selected)}')
     route_pair.extend(selected)
+for label, owner, route in (('serial', serial_owner, route_pair[0]),
+                            ('batch', batch_owner, route_pair[1])):
+    if owner['ids'] != route['ids']:
+        raise ValueError(f'{label}: owner and verifier route IDs disagree for the selected activation/slot; '
+                         'the row pair is unsupported')
 (output / 'moe-routes.jsonl').write_text(
     json.dumps(route_header, separators=(',', ':')) + '\n' +
     '\n'.join(json.dumps(r, separators=(',', ':')) for r in route_pair) + '\n')

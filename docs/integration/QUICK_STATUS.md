@@ -221,3 +221,10 @@ A dispatch-owner follow-up maps the selected layer-1 position-71 Coder row exact
 
 
 The same-input native expert oracle confirms the prompt-1 owner transition (serial GPU and batch CPU outputs each match their owner-specific oracle exactly). Prompt 0's serial CPU output and batch CPU dispatch 3505 both match the exact single-token CPU oracle, to JSON serialization precision (`5.0e-11`). The earlier reported 2.19 relative-L2 difference compared against prompt 1's oracle activation by mistake. Prompt 1's CPU/GPU difference remains real for that activation and needs broader numerical qualification.
+
+A temporary expert-11-first residency profile made the paired layer-1 MoE
+output exact and moved the first changed committed GDN state to layer 4. Layer 2
+still switches expert 164 from VRAM to CPU with a same-input, oracle-confirmed
+owner arithmetic difference. This narrows the correctness investigation only;
+it is not performance evidence or a supported profile. The trace joiner now
+rejects owner/verifier route mismatches. [Details](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).

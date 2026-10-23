@@ -640,3 +640,24 @@ zero cgroup events; energy was not measured. Its compact MoE, oracle and state
 analyses are `layer1-position71-cache3000-paired-analysis.json`,
 `layer1-position71-cache3000-owner-oracle/analysis.json`, and
 `two-live-layer1-position71-cache3000-state-analysis.json`.
+
+A temporary profile diagnostic promoted layer-1 expert 11 to the first
+residency rank (profile SHA256
+`8a590044b65ae494e3462067cd76878f3b71ca23519c182ac4660d88c6d9f114`; profile
+file stayed under `/tmp`). With a 1,500 MiB cache, prompt 1 / slot 1's layer-1
+activation, routes, expert parts and combined output then matched its serial
+control exactly. The first changed committed GDN state moved to model layer 4
+(26,965,948/29,417,472 values changed across all layers; relative L2
+`0.0165191`). At layer 2, expert 164 still changed from primary VRAM to CPU on
+an exact-matched activation and routes; independent native oracles matched the
+serial CUDA and batch CPU service outputs bit-for-bit, while those owner outputs
+differed by relative L2 `0.0142044`. This one-factor intervention narrows the
+diagnostic path but is not a supported profile or a performance comparison.
+Other attempted profile/cache combinations produced route/owner ID
+disagreements and are excluded as unsupported joins.
+
+The row-pairing script now checks that captured owner expert IDs agree with the
+verifier route record for both serial and batch rows. It accepts the baseline
+and expert-11-first prompt-1/slot-1 pairs and rejects a known mismatched
+cache-3,000 MiB layer-2 join. This guard prevents unsupported owner/output
+attribution; the capture format still does not record a slot in owner rows.

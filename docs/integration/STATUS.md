@@ -4344,3 +4344,17 @@ committed GDN state remained model layer 2; 27,085,131/29,417,472 values
 differed at position 71 (relative L2 `0.00780748`). This does not show that the
 larger cache improves parity. Minimum physical/admission availability was
 13.909 GiB, with zero cgroup events. Phase 5 remains open.
+
+A temporary residency-profile intervention promotes layer-1 expert 11 to the
+first profile rank (profile SHA256
+`8a590044b65ae494e3462067cd76878f3b71ca23519c182ac4660d88c6d9f114`; stored
+only under `/tmp`). For prompt 1 / slot 1, the layer-1 MoE parts and combined
+output then match the serial control exactly, and the first changed committed
+GDN state moves from model layer 2 to layer 4. Layer 2 still has an exact-input
+VRAM-to-CPU switch for expert 164; independent native owner oracles match both
+service outputs bit-for-bit, with CPU/GPU relative L2 `0.0142044`. This is a
+single diagnostic intervention, not a supported profile or performance result.
+The row-pairer now rejects owner/verifier route-ID disagreement; valid baseline
+and intervention joins pass, while a known cache-3,000 MiB mismatch is
+rejected. The capture lacks an explicit owner-row slot, which remains a
+limitation. See the [experiment notes](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
