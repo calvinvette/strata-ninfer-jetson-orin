@@ -339,3 +339,23 @@ its state at position 138 is not compared to serial. These captures localize a
 numerical difference; they do not identify its cause or imply a quality or
 performance result. Raw 449 MiB state dumps remain local. The compact analysis
 is in [`position138-slot0-state-retry/slot0-analysis.json`](position138-slot0-state-retry/slot0-analysis.json).
+
+### Accepted-position GDN hash scan
+
+The capture harness can also enable the existing batch per-GDN-allocation hash
+hook. A supervised repeat produced 140 batch hash rows (69 for slot 0 and 71
+for slot 1) and serial per-layer GDN hashes. For both slots,
+five or more exact initial hash matches independently selected the same
+position alignment: batch position = serial accepted-prefix position + 2.
+After alignment, slot 0 first differs at batch position 75 / serial prefix 73,
+with 12 of 36 GDN allocation hashes changed beginning at allocation ordinal
+24. Slot 1 first differs at batch position 84 / serial prefix 82, with 28 of 36
+changed beginning at ordinal 8. These are hash-localization points, not direct
+tensor comparisons or causal attribution. In particular, ordinal numbers are
+allocation order and the scan hashes the full allocated GDN region. The same run
+also directly captured terminal slot-0 state at position 138, as described
+above. Hash instrumentation increased the supervised run to 318.4 seconds; this
+is not serving-performance evidence. Minimum physical/admission availability
+was 17.80 GiB with zero cgroup events. Raw traces remain local; the
+[aligned summary](prefix-gdn-hashes/batch-gdn-hash-analysis.json) and the
+`analyze_batch_gdn_hashes.py` helper are retained.

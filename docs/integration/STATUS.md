@@ -4559,3 +4559,16 @@ already diverged at token 66. This confirms that output equality for slot 0 in
 this bounded run does not imply terminal persistent-state equality. It is
 correctness localization, not a performance or quality result; Phase 5 remains
 open. See the [capture analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/position138-slot0-state-retry/slot0-analysis.json) and [experiment report](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+
+A follow-up enabled the existing opt-in per-allocation batch GDN hash hook for
+all verifier positions during the 72-token two-live run. The 140 batch records
+align to serial accepted-prefix GDN arrays at a consistent two-position offset,
+with five exact initial matches for slot 0 and 15 for slot 1. The first hash
+mismatch is batch position 75 / serial prefix 73 at allocation ordinal 24 for
+slot 0, and position 84 / prefix 82 at ordinal 8 for slot 1. The hook hashes
+full allocated GDN regions; ordinal findings are hashes, not direct tensor
+comparisons. The same run directly captured slot 0's terminal state as
+summarized above. Hash instrumentation increased elapsed time to 318.4 seconds,
+so this is not performance evidence. Minimum physical/admission availability
+was 17.80 GiB with zero cgroup events. Phase 5 remains open. See the [hash
+analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/prefix-gdn-hashes/batch-gdn-hash-analysis.json) and [capture report](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).

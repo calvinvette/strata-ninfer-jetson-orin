@@ -43,7 +43,12 @@ open. [Report](../../bench/results/2026-10-23-phase5-coder-adaptive-divergence-5
 A supervised 72-token two-live target-only repeat matched slot 0's serial output
 and first differed at slot 1 token 66. Four captured accepted-prefix states at
 slot handoff matched serial exactly, but the remaining batched decode emitted
-no state trace; terminal per-slot state parity remains unassessed. [Details](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+no prefix trace. A later full-state capture matched slot 0's 72 output tokens
+but found a terminal GDN delta from layer 5 (whole-state relative L2
+`2.24e-7`); a per-prefix hash scan found earlier divergence at batch position
+75 for slot 0 and 84 for slot 1. Slot 1's terminal state was not paired after
+its output diverged. These are correctness localization results, not performance
+evidence. [Details](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
 
 These results are specific to the tested Orin build, model and workload. No
 candidate setting has been promoted to a default.
@@ -383,9 +388,3 @@ the diagnostic supports one-row windows, while both requests were grouped. A
 one-live request used the serial verifier path (header slot `-1`) and is not a
 batch comparison. The QSA-to-layer-24 input boundary remains unlocalized; this
 capture limitation is recorded as unsupported rather than a pass.
-
-A terminal GDN capture for slot 0 matched all 72 serial output tokens but first
-showed a committed-state delta at layer 5 (whole-state relative L2
-`2.24e-7`). The batch run retained at least 17.85 GiB physical/admission
-availability and had zero cgroup events. Slot 1's state was not compared after
-its output diverged at token 66. Phase 5 remains open. [Analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/position138-slot0-state-retry/slot0-analysis.json).

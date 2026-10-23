@@ -29,6 +29,10 @@ p.add_argument('--generated-tokens', type=int, default=96,
                help='generated tokens per serial and batch request')
 p.add_argument('--trace-state-hashes', action='store_true',
                help='log accepted-prefix GDN/QSA fingerprints at every committed position')
+p.add_argument('--trace-batch-gdn-hashes', action='store_true',
+               help='hash committed batch GDN allocations at each verifier position')
+p.add_argument('--batch-gdn-hash-from', type=int, default=0)
+p.add_argument('--batch-gdn-hash-to', type=int, default=4096)
 opts = p.parse_args()
 if opts.generated_tokens < 1:
     p.error('--generated-tokens must be positive')
@@ -67,6 +71,10 @@ def make_env(name):
     if opts.trace_state_hashes:
         env.update({'STRATA_ACCEPTED_PREFIX_TRACE': '1', 'STRATA_STATE_HASH_GDN': '1',
                     'STRATA_STATE_HASH_QSA_LAYERS': '1'})
+    if opts.trace_batch_gdn_hashes:
+        env.update({'STRATA_BATCH_GDN_HASH_PATH': str((out/f'{name}.batch-gdn-hashes.txt').resolve()),
+                    'STRATA_BATCH_GDN_HASH_FROM': str(opts.batch_gdn_hash_from),
+                    'STRATA_BATCH_GDN_HASH_TO': str(opts.batch_gdn_hash_to)})
     return env
 
 def generate(engine, key):
@@ -106,6 +114,8 @@ result = {'capture_positions': [int(x) for x in positions.split(',')], 'target_s
                       'stage_layer': opts.stage_layer,
                       'boundary_layer': opts.boundary_layer,
                       'trace_state_hashes': opts.trace_state_hashes,
+                      'trace_batch_gdn_hashes': opts.trace_batch_gdn_hashes,
+                      'batch_gdn_hash_range': [opts.batch_gdn_hash_from, opts.batch_gdn_hash_to],
                       'STRATA_NATIVE_CPU_Q8_1_DOT': 'all', 'STRATA_IQ_MT_MIN': '1'}}
 (out/'result.json').write_text(json.dumps(result, indent=2)+'\n')
 print(json.dumps({'positions': [int(x) for x in positions.split(',')],
