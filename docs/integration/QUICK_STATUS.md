@@ -280,3 +280,7 @@ A separate two-live six-token check with opt-in Q8_1 parity matched both serial
 outputs, including an exact CPU↔GPU expert-248 owner transition. One later GDN
 state differed only at relative L2 `5.84e-9`; the other stayed exact. This
 narrows one case and does not close Phase 5. [Details](../../bench/results/2026-10-22-phase5-coder-e11-first-q8all-two-live/README.md).
+
+The new shared CPU selector also rebuilt for HIP and SYCL on maestro1, with both
+service help checks and the HIP selector-contract check passing. This is x86
+compile/startup evidence only. [Build record](../../bench/results/2026-10-23-phase5-maestro1-iq3s-q2-selector/README.md).

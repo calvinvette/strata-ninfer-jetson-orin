@@ -4418,3 +4418,5 @@ committed GDN state first differed at model layer 30 there, at relative L2
 `5.84e-9` and max absolute `1.27e-7`; the other slot remained exact. This is a
 bounded owner-parity result, not a general long-chain or quality bound. Phase 5
 remains open. See the [Q8_1 owner report](../../bench/results/2026-10-22-phase5-coder-e11-first-q8all-two-live/README.md).
+
+The new IQ3_S/Q2_0 Q8_1 selector was rebuilt against matching source hashes on maestro1. HIP rebuilt and linked `strata` and `native_expert_parity`; the selector-contract diagnostic and HIP `strata --help` passed. SYCL rebuilt and linked `strata` (20/20 steps), and its `--help` passed after loading the oneAPI runtime. These are x86 compile/startup and CPU-contract checks only, with no accelerator or model execution. See the [backend build record](../../bench/results/2026-10-23-phase5-maestro1-iq3s-q2-selector/README.md).
