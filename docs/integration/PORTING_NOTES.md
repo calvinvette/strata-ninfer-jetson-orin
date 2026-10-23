@@ -34,6 +34,17 @@ layer inputs/outputs across multiple accepted positions, and compare the
 accepted persistent state directly. Do not treat a local operator match as
 proof of full-sequence state parity.
 
+The [IQ3_S/Q2_0 layer-21 follow-up](../../bench/results/2026-10-22-phase5-coder-iq3s-q2_0-layer21-parity-intervention/README.md)
+adds a pair that CUDA and the CPU implementation both support but the existing
+opt-in selector had omitted. The CPU Q8_1 path matched CUDA bit-for-bit on two
+captured real activations; in the adaptive run, the layer input already differed
+in all 2,560 values before the selected expert operation. For future Splash
+work, enumerate exact gate/up and down formats from the model tensors, then
+qualify each fallback pair on identical serialized activation bytes. Keep
+selectors opt-in and layer/pair-scoped, and compare upstream layer inputs,
+router weights, weighted MoE outputs and committed state before assigning a
+long-chain mismatch to one expert kernel.
+
 A current-source follow-up makes the owner-path rule more specific. At Coder
 layer 16, the captured service CPU rows for experts 118 and 39 matched their
 same-input CPU Q8_1 oracles exactly. Expert 118 still differed from the CUDA
