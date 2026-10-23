@@ -482,7 +482,9 @@ confirmation remains necessary before a recommendation. [Report](../../bench/res
 A separate seven-block confirmation with a distinct, tokenizer-verified
 7,501-token archive is underway. Its isolated preflight returned the exact
 answer and passed memory guards; the preflight is excluded from confirmation
-statistics. Block 1/7 passed all four cells with zero cgroup events and at
-least 14.33 GiB host/admission availability. The one-block chunk-128 total-time
-reductions were 68.0%/68.6%; no interaction recommendation is made from one
-block. [Confirmation design and runner](../../bench/results/2026-10-23-phase6-coder-prefill-cache-confirm7/README.md).
+statistics. Blocks 1–2/7 passed all eight cells with zero cgroup events and
+at least 14.26 GiB host/admission availability. Chunk 128 reduced median
+client total time 67.7%/68.5% at requested caches 1,500/3,000; the two-block
+cache-by-chunk interaction was −2.4%. These remain partial descriptive
+results without confidence intervals; blocks 3–7 continue. [Confirmation
+design and runner](../../bench/results/2026-10-23-phase6-coder-prefill-cache-confirm7/README.md).

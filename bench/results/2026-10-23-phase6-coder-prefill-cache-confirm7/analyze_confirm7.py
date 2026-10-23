@@ -137,7 +137,7 @@ def main():
     rng = random.Random(2026102327)
     for contrast in contrasts:
         values = contrast.get('block_changes_percent', contrast.get('block_ratio_of_ratios_change_percent', []))
-        if len(values) >= 2:
+        if block_count >= 7 and len(values) >= 7:
             draws = [median([rng.choice(values) for _ in values]) for _ in range(10000)]
             draws.sort()
             contrast['paired_block_bootstrap_95_percent_interval'] = [draws[249], draws[9749]]

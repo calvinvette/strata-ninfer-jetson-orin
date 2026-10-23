@@ -4814,9 +4814,11 @@ natural EOS enabled. Earlier strict-length attempts emitted the same exact
 answer but were correctly rejected by the harness for stopping at 46 of 48
 requested tokens. Preflight data are excluded from confirmation statistics.
 The harness computes deterministic paired-block bootstrap intervals.
-The first randomized confirmation block passed all four cells on the distinct
-archive prompt. Every answer was exact (7,501 prompt, 46 completion tokens).
-Minimum physical/admission availability was 14.33 GiB with zero cgroup events.
-Paired chunk-128 reductions in total time were 68.0%/68.6% at cache arguments
-1,500/3,000; the one-block interaction was −1.9%. This is an early descriptive
-block only. Blocks 2–7 remain, and no recommendation is claimed.
+The first two randomized confirmation blocks passed all eight cells on the
+distinct archive prompt. Every answer was exact (7,501 prompt, 46 completion
+tokens). Minimum physical/admission availability was 14.26 GiB with zero
+cgroup events. Across these two blocks, chunk-128 median reductions in total
+time were 67.7%/68.5% at cache arguments 1,500/3,000; the median interaction
+was −2.4%. These are descriptive partial results; the analyzer suppresses
+bootstrap intervals until all seven confirmation blocks are present. Blocks
+3–7 remain, and no recommendation is claimed.
