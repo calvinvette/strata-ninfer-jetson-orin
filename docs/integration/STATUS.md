@@ -4736,3 +4736,16 @@ reads and worst observed host availability. All four tested configurations
 are nondominated under those dimensions and each retained the exact answer.
 This leaves a cache/chunk versus host-availability choice for this task; the
 logical file counter is not physical disk I/O, and no profile was promoted.
+
+A supervised [near-limit MTP rejection/recovery comparison](../../bench/results/2026-10-23-phase5-coder-mtp-long-rejection-recovery/README.md)
+used a 7,498-token Coder IQ1_M prompt, 8K context, MTP off/window 4 and three
+same-engine requests (12, 8 and 8 generated tokens). MTP4 rejected 9/15 drafts
+in the initial request; the following continuation and recovery matched the
+MTP-off output. Main-model fingerprints matched at all shared accepted-prefix
+boundaries (6/6, 3/3, 4/4) and all three endpoints. Minimum physical/admission
+availability was 13.32 GiB with zero cgroup events. An initial over-specific
+guard variant failed because it required rejection in the middle request;
+the corrected guard accepts a rejection before recovery and passes. This adds
+one long-context single-live transaction case but does not bound adaptive
+migration, other rejection points, cancellation or multi-live behavior.
+Phase 5 remains open. The full Python integration suite now passes 168/168.

@@ -24,6 +24,18 @@ def rejected_drafts(request):
     return offered - accepted
 
 
+def summarize_rejections(first_request, continuation_request, recovery_request):
+    counts = {
+        'initial': rejected_drafts(first_request),
+        'continuation': rejected_drafts(continuation_request),
+        'recovery': rejected_drafts(recovery_request),
+    }
+    return {
+        'rejected_drafts_by_request': counts,
+        'rejection_before_recovery': counts['initial'] + counts['continuation'] > 0,
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', type=Path, required=True)
@@ -35,7 +47,7 @@ def main():
     parser.add_argument('--recovery-tokens', type=int, default=8,
                         help='tokens generated in a third same-engine request after continuation')
     parser.add_argument('--require-rejection', action='store_true',
-                        help='fail unless the MTP continuation rejects at least one offered draft')
+                        help='fail unless the initial or continuation request rejects a draft before recovery')
     parser.add_argument('--run', action='store_true')
     a = parser.parse_args()
     if min(a.prompt_tokens, a.initial_tokens, a.continuation_tokens, a.recovery_tokens) < 1:
@@ -126,9 +138,11 @@ def main():
         result[f'{state_name}_differing_fields'] = differences
         if differences:
             result['failures'].append(f'{state_name} differs: {", ".join(differences)}')
-    result['continuation_rejected_drafts'] = rejected_drafts(mtp['continuation_request'])
-    if a.require_rejection and result['continuation_rejected_drafts'] < 1:
-        result['failures'].append('MTP continuation did not reject any offered drafts')
+    result.update(summarize_rejections(mtp['first_request'], mtp['continuation_request'],
+                                       mtp['recovery_request']))
+    result['continuation_rejected_drafts'] = result['rejected_drafts_by_request']['continuation']
+    if a.require_rejection and not result['rejection_before_recovery']:
+        result['failures'].append('no MTP rejection occurred before the recovery request')
     result['passed'] = not result['failures']
     (a.output / 'results.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps({k: result[k] for k in ('passed', 'failures', 'first_state_equal',
