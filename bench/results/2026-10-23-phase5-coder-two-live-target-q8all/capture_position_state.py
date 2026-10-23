@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Capture committed GDN states at position 133 under Q8_1-all selection."""
+"""Capture selected persistent state and optional stage/MoE diagnostics under Q8_1-all selection."""
 import argparse
 import json
 from concurrent.futures import ThreadPoolExecutor
@@ -19,6 +19,7 @@ p.add_argument('--positions', help='comma-separated state capture positions; ove
 p.add_argument('--expert-cache-mib', type=int, default=1500)
 p.add_argument('--layer', default='all', help='GDN model layer or all')
 p.add_argument('--stage-layer', type=int, help='also capture GDN intermediate fields for this layer')
+p.add_argument('--moe-layer', type=int, help='also capture MoE route/parts/output and owner records for this layer')
 p.add_argument('--boundary-layer', type=int,
                help='also capture verifier residual boundary before/after this layer')
 p.add_argument('--batch-live', type=int, choices=(1, 2), default=2,
@@ -53,7 +54,7 @@ replace_arg(args, '--prompt-cache', '6')
 prompts = prepared_prompts(cfg, 2)
 batch_prompts = prompts if opts.batch_live == 2 else {'slot-1': prompts['slot-1']}
 
-def make_env(name):
+def make_env(name, is_batch=False):
     env = child_env(cfg)
     env.update({'STRATA_NATIVE_CPU_Q8_1_DOT': 'all', 'STRATA_IQ_MT_MIN': '1',
                 'STRATA_PREFILL_CPU_SHARE': '0', 'STRATA_VERIFY_DUMP_GDN_COMMIT_LAYER': str(opts.layer),
@@ -64,6 +65,25 @@ def make_env(name):
                     'STRATA_VERIFY_DUMP_GDN_PATH': str((out/f'{name}.stgdiag').resolve()),
                     'STRATA_VERIFY_DUMP_GDN_POSITIONS': positions,
                     'STRATA_VERIFY_DUMP_GDN_BATCH': '1'})
+    if opts.moe_layer is not None:
+        env.update({'STRATA_VERIFY_DUMP_MOE_ROUTE_LAYER': str(opts.moe_layer),
+                    'STRATA_VERIFY_DUMP_MOE_ROUTE_POSITIONS': positions,
+                    'STRATA_VERIFY_DUMP_MOE_ROUTE_BATCH': '1',
+                    'STRATA_VERIFY_DUMP_MOE_ROUTE_PATH': str((out/f'{name}.routes.jsonl').resolve()),
+                    'STRATA_VERIFY_DUMP_MOE_PARTS_LAYER': str(opts.moe_layer),
+                    'STRATA_VERIFY_DUMP_MOE_PARTS_POSITIONS': positions,
+                    'STRATA_VERIFY_DUMP_MOE_PARTS_BATCH': '1',
+                    'STRATA_VERIFY_DUMP_MOE_PARTS_PATH': str((out/f'{name}.parts.stmparts').resolve()),
+                    'STRATA_VERIFY_DUMP_MOE_OUTPUT_LAYER': str(opts.moe_layer),
+                    'STRATA_VERIFY_DUMP_MOE_OUTPUT_POSITIONS': positions,
+                    'STRATA_VERIFY_DUMP_MOE_OUTPUT_BATCH': '1',
+                    'STRATA_VERIFY_DUMP_MOE_OUTPUT_PATH': str((out/f'{name}.output.stmoe').resolve()),
+                    'STRATA_CAPTURE_MOE_LAYER': str(opts.moe_layer),
+                    'STRATA_CAPTURE_MOE_POSITIONS': positions,
+                    'STRATA_CAPTURE_MOE_ROWS': '64',
+                    'STRATA_CAPTURE_MOE_PATH': str((out/f'{name}.owners.jsonl').resolve())})
+        if is_batch:
+            env['STRATA_INTEGRATION_TRACE'] = '1'
     if opts.boundary_layer is not None:
         env.update({'STRATA_VERIFY_DUMP_BOUNDARY_LAYER': str(opts.boundary_layer),
                     'STRATA_VERIFY_DUMP_BOUNDARY_PATH': str((out/f'{name}.stbndy').resolve()),
@@ -93,7 +113,7 @@ for key in serial_slots:
         serial.close()
 
 batch = StrataEngine(cfg['exe'], args+['--batch', '2'], cwd=cfg.get('cwd'),
-                     log=str(out/'batch.log'), env=make_env('batch'))
+                     log=str(out/'batch.log'), env=make_env('batch', is_batch=True))
 try:
     if batch.batch != 2:
         raise RuntimeError(f'expected two batch slots, got {batch.batch}')
@@ -103,7 +123,9 @@ try:
 finally:
     batch.close()
 
-result = {'capture_positions': [int(x) for x in positions.split(',')], 'target_slot': 1,
+result = {'capture_positions': [int(x) for x in positions.split(',')],
+          'target_slot': None if opts.serial_slot == 'both' else int(opts.serial_slot),
+          'serial_control': opts.serial_slot,
           'serial': serial_out, 'serial_slot_1': serial_out.get('slot-1'),
           'batch': batch_out, 'prompts': prompts,
           'profile': {'live_requests': opts.batch_live, 'batch_slots': 2, 'mtp': False,
@@ -112,6 +134,7 @@ result = {'capture_positions': [int(x) for x in positions.split(',')], 'target_s
                       'serial_slot_controls': list(serial_slots),
                       'gdn_layer': opts.layer,
                       'stage_layer': opts.stage_layer,
+                      'moe_layer': opts.moe_layer,
                       'boundary_layer': opts.boundary_layer,
                       'trace_state_hashes': opts.trace_state_hashes,
                       'trace_batch_gdn_hashes': opts.trace_batch_gdn_hashes,

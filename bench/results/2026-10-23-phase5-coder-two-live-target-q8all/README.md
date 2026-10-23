@@ -435,3 +435,38 @@ position was sampled, and its upstream cause is unknown. The supervised run
 took 197.2 seconds, retained at least 17.87 GiB physical/admission availability
 and had zero cgroup events. See
 [`layer5-state-sweep-78-80/analysis.json`](layer5-state-sweep-78-80/analysis.json).
+
+### Same-run layer-4 owner change and layer-5 state onset
+
+A combined capture paired layer-5 state at positions 76–77, layer-5 stage fields,
+and layer-4 MoE expert parts/owners at position 77. At position 76, layer-5
+state and every stage field matched serial exactly. At position 77, the layer-5
+GDN state first differed for input token `709` (whole-state relative L2
+`1.629e-4`; recurrent `7.663e-5`, convolution `1.630e-4`). Its stage's first
+changed field was `x` (2,556/2,560 values, relative L2 `3.697e-5`); QKV and
+later fields then differed. This locates the change before the layer-5 GDN
+projection/recurrence.
+
+At the same token and position, layer-4 routes, weights and MoE input activation
+were bit-exact between serial and batch. Expert 218 (rank 2) changed from primary
+VRAM (owner code 0) to CPU (code -1); it was the only changed expert part. Its
+service output differed at relative L2 `3.578e-4` (maximum `4.427e-5`), and the
+combined layer-4 MoE output differed at relative L2 `1.463e-4` (maximum
+`7.100e-6`). With the same captured activation, the independent native expert
+oracle reproduced the serial service part bit-for-bit with its GPU output and
+the batch service part bit-for-bit with its CPU output. The oracle CPU/GPU
+outputs differ at relative L2 `3.578e-4`; both are about 1.15% from the float
+reference. These paired records support owner-dependent layer-4 arithmetic as
+the likely perturbation entering layer 5. The downstream propagation is not
+separated from the rest of the network by an intervention, so this is strong
+localization rather than a complete causal proof.
+
+In this run, slot 0 still matched all 72 serial output IDs. The supervised
+capture took 133.9 seconds, retained at least 17.85 GiB physical/admission
+availability and had zero cgroup events. The oracle took 2.1 seconds and
+retained at least 27.43 GiB. Compact results are in
+[`layer4-moe-layer5-stage-76-77/state-analysis.json`](layer4-moe-layer5-stage-76-77/state-analysis.json),
+[`stage77-analysis.json`](layer4-moe-layer5-stage-76-77/stage77-analysis.json),
+[`analysis.json`](layer4-moe-layer5-stage-76-77/analysis.json), and
+[`expert218-oracle/analysis.json`](layer4-moe-layer5-stage-76-77/expert218-oracle/analysis.json).
+Raw activations, full MoE parts, state dumps, model files and logs remain local.

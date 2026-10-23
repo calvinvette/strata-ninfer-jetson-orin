@@ -10,6 +10,7 @@ import struct
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--run', type=Path, required=True)
 p.add_argument('--layer', type=int, required=True)
+p.add_argument('--batch-slot', type=int, help='restrict analysis to an internal batch slot')
 p.add_argument('--output', type=Path, required=True)
 a = p.parse_args()
 header = struct.Struct('<8sIiqQQii')
@@ -32,16 +33,22 @@ def read(path):
     return records
 
 root = a.run.resolve()
-serial = {control: read(root / f'serial-slot-{control}.stgcmt') for control in (0, 1)}
+serial = {control: read(root / f'serial-slot-{control}.stgcmt') for control in (0, 1)
+          if (root / f'serial-slot-{control}.stgcmt').is_file()}
+if not serial and (root / 'serial.stgcmt').is_file():
+    serial['single'] = read(root / 'serial.stgcmt')
 batch = read(root / 'batch.stgcmt')
+if a.batch_slot is not None:
+    batch = {key: value for key, value in batch.items() if key[0] == a.batch_slot}
 summary = {'layer': a.layer, 'slot_mapping': {}, 'positions': []}
 for batch_slot in sorted({slot for slot, _ in batch}):
     br = {pos: rec for (slot, pos), rec in batch.items() if slot == batch_slot}
     matches = {control: [pos for pos, rec in br.items()
                          if (0, pos) in serial[control] and serial[control][(0, pos)]['token'] == rec['token']]
-               for control in (0, 1)}
+               for control in serial}
     ranked = sorted(matches, key=lambda control: len(matches[control]), reverse=True)
-    if not matches or len(matches[ranked[0]]) < 2 or (len(matches[ranked[0]]) == len(matches[ranked[1]])):
+    if (not matches or len(matches[ranked[0]]) < 2 or
+            (len(ranked) > 1 and len(matches[ranked[0]]) == len(matches[ranked[1]]))):
         raise ValueError(f'batch slot {batch_slot}: cannot uniquely map serial controls: '
                          f'{ {str(k): len(v) for k, v in matches.items()} }')
     control = ranked[0]

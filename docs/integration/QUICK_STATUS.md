@@ -403,3 +403,11 @@ An additional layer-5 sweep sampled positions 78–80 and found slot-0 recurrent
 state already differed at position 78 (`9.55e-5` relative L2); at position 80,
 the convolution section matched again while recurrent state remained changed.
 [Details](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+
+A same-run capture localized an early slot-0 perturbation: layer-4 expert 218
+moved VRAM→CPU with exact inputs/routes, and the independent oracle matched each
+service output to its corresponding GPU/CPU result. The following layer-5 stage
+first changed at `x` for the same token/position; layer-5 state was exact at the
+prior sampled position. This strongly supports owner-dependent arithmetic as
+the source entering layer 5, though downstream propagation remains unproven.
+[Details](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
