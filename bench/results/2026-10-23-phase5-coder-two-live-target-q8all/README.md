@@ -392,3 +392,32 @@ and [`position83-slot1-prestate/analysis.json`](position83-slot1-prestate/analys
 The committed-state analyzer now selects the serial prompt control by captured
 input token and position, independently of the verifier's internal slot ID; the
 two all-layer summaries record the selected serial control.
+
+### Slot-0 state sweep at positions 80–84
+
+Two fresh supervised runs captured layer-10 committed state at positions
+80–84. Both runs paired each batch slot with its serial prompt by the full
+captured position/token sequence and reproduced the same state metrics. Slot 0
+matched all 72 serial output IDs in both runs, while its layer-10 state already
+differed at position 80 (whole-state relative L2 `5.83e-3`; recurrent `3.14e-3`,
+convolution `5.83e-3`). At positions 81–84, whole-state relative L2 remained
+between `6.12e-3` and `1.03e-2`. Slot 1 was exact at positions 80–82 in these
+layer-10 sweeps, then showed a small recurrent delta at position 83 (relative
+L2 `2.31e-7`), which persisted at 84. Its token output first differed at
+index 66. The repeated sweep took 180.5 and 178.2 seconds, with minimum
+physical/admission availability 17.85 and 17.87 GiB and zero cgroup events.
+These are diagnostics, not performance results.
+
+A separate all-layer capture at position 80 found slot 0's earliest changed
+GDN layer was model layer 5: 785,808/786,432 recurrent values differed
+(relative L2 `5.41e-5`, max absolute `1.79e-5`), while convolution state was
+exact. The state delta grew by layer 10 as above. Slot 1 was exact across all
+captured GDN layers at position 80. Slot 0 still matched all 72 output IDs;
+slot 1 later first differed at index 66. This establishes an early persistent
+state mismatch for slot 0 despite exact generated text in this run, but does
+not locate its upstream cause. The all-layer run took 189.8 seconds, retained
+at least 17.83 GiB availability and had zero cgroup memory events. Compact
+summaries are in [`position80-slot0-all-state/slot0-analysis.json`](position80-slot0-all-state/slot0-analysis.json),
+[`position80-slot0-all-state/slot1-analysis.json`](position80-slot0-all-state/slot1-analysis.json),
+and both `layer10-state-sweep-80-84*/analysis.json` files. The raw state dumps
+remain local.

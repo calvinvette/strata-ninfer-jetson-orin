@@ -4607,3 +4607,18 @@ the verifier's internal slot number identifies the prompt. It errors on
 ambiguous control matches. The two retained all-layer summaries were rerun and
 record their selected serial control. This prevents slot reassignment from
 silently pairing different request histories.
+
+Two supervised, same-profile layer-10 sweeps at absolute positions 80–84
+reproduced identical per-position state metrics. Slot 0 matched all 72 serial
+output IDs but already had layer-10 state drift at position 80 (whole-state
+relative L2 `5.83e-3`); slot 1 was exact at positions 80–82 and first showed a
+small layer-10 recurrent delta at 83. A separate all-layer capture at position
+80 found slot 0's first changed GDN layer was model layer 5, with recurrent
+relative L2 `5.41e-5`, maximum delta `1.79e-5`, and exact convolution state.
+Slot 1 was exact at every captured GDN layer at position 80. Slot 1's token
+sequence later first diverged at index 66. Runs retained at least 17.83 GiB
+physical/admission availability and had no sampled cgroup events. These are
+repeatable state-correctness findings, not performance evidence or causal
+attribution; Phase 5 remains open. See the [sweep analysis](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer10-state-sweep-80-84/analysis.json),
+[repeat](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer10-state-sweep-80-84-repeat/analysis.json),
+and [all-layer capture](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/position80-slot0-all-state/slot0-analysis.json).

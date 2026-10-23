@@ -392,3 +392,11 @@ the diagnostic supports one-row windows, while both requests were grouped. A
 one-live request used the serial verifier path (header slot `-1`) and is not a
 batch comparison. The QSA-to-layer-24 input boundary remains unlocalized; this
 capture limitation is recorded as unsupported rather than a pass.
+
+A repeated positions-80–84 state sweep found a larger slot-0 mismatch: it
+returned all 72 serial output IDs, but its layer-10 state differed from position
+80 (relative L2 `5.83e-3`). A same-run all-layer capture found the first changed
+GDN state at layer 5 (recurrent relative L2 `5.41e-5`); slot 1 was exact at
+position 80. The repeated sweep reproduced the same metrics, so multi-live
+persistent-state parity remains unresolved even when output tokens match.
+[Details](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
