@@ -92,4 +92,22 @@ chunk 128 reduced median client total time by 67.8%/68.7% at cache arguments
 descriptive partial results; the analyzer suppresses confidence intervals
 until all seven confirmation blocks are present. Minimum physical/admission
 availability across the four blocks was 14.19/14.19 GiB, with zero cgroup
-events. Blocks 5–7 remain.
+events.
+
+Randomized block 5 passed all four cells; each answer was exact with 7,501
+prompt and 46 completion tokens:
+
+| Requested slots | Chunk | Client TTFT | Client total | Prompt tok/s | Decode tok/s |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 1,500 | 32 | 584.5 s | 588.2 s | 12.8 | 12.3 |
+| 1,500 | 128 | 186.2 s | 189.9 s | 40.3 | 12.2 |
+| 3,000 | 128 | 166.4 s | 169.8 s | 45.1 | 13.1 |
+| 3,000 | 32 | 568.3 s | 571.7 s | 13.2 | 13.2 |
+
+The five-block partial audit passed all twenty cells. Across blocks 1–5,
+chunk 128 reduced median client total time by 67.7%/68.8% at cache arguments
+1,500/3,000; the median cache-by-chunk time interaction was −3.0%. These are
+descriptive partial results; the analyzer suppresses confidence intervals
+until all seven confirmation blocks are present. Minimum physical/admission
+availability remained 14.19/14.19 GiB, with zero cgroup events. Blocks 6–7
+remain.
