@@ -21,7 +21,6 @@ seven shared-source files were rebuilt from a fresh isolated snapshot for HIP
 and SYCL on maestro1 with two jobs; both `strata --help` checks returned zero.
 This is x86 compile/link and CLI-startup evidence only, not accelerator runtime
 or Orin performance evidence. Build/source hashes are in the linked backend
-or Orin performance evidence. Build/source hashes are in the linked backend
 record in [STATUS](STATUS.md). See the [Phase 8 closeout](PHASE8_CLOSEOUT.md)
 for the exact release scope and exclusions.
 
@@ -295,3 +294,8 @@ The separate short Coder task's seven-block cache confirmation shows an
 11.19% lower `VIN_SYS_5V0` estimate per output token with the larger cache at
 8K. These request-window rails include idle/background power and are not
 whole-device energy. [Details](../../bench/results/2026-10-21-phase6-coder-current-source-cache-context-confirm7/rail-followup/README.md).
+
+A held-out 256-token adaptive short-chain recovery test differed from the
+initial output at 237 positions and had changed accepted-state hashes at every
+prefix; the delayed control stayed exact. This extends the known mismatch but
+does not bound it or locate its cause. [Details](../../bench/results/2026-10-20-phase5-coder-adaptive-all-layer-position-trace/adaptive-direct-division-state-bound-128pos/open-response-short-chain-256pos/README.md).
