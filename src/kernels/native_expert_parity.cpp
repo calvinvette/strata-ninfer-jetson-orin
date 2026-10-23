@@ -587,6 +587,7 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
             // against its row of the N-token call above, bit for bit, gate/up and down
             size_t gu_diff = 0, dn_diff = 0;
             std::vector<float> one_ff(FF), one_out(H);
+            std::vector<uint8_t> one_h(ggml_row_size((ggml_type) f.d_act, FF));
             // the N-token gate/up rows again: the throughput loops above overwrote ff with other kernels' rows
             for (int k = 0; k < N; ++k) ffp[k] = ff[k].data();
             cpu::native_gu_rows(f, blob.data(), a, N, ffp, 0, (int) FF);
@@ -595,10 +596,22 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
                 float* f1[1] = {one_ff.data()};
                 cpu::native_gu_rows(f, blob.data(), a1, 1, f1, 0, (int) FF);
                 for (int64_t r = 0; r < FF; ++r) gu_diff += std::memcmp(&one_ff[r], &ff[k][r], 4) != 0;
-                const void* h1[1] = {hp[k]};
+                cpu::native_quant_h(f, one_ff.data(), one_h.data());
+                const void* h1[1] = {one_h.data()};
                 float* o1[1] = {one_out.data()};
                 cpu::native_down_rows(f, blob.data(), h1, 1, o1, 0, (int) H);
                 for (int64_t r = 0; r < H; ++r) dn_diff += std::memcmp(&one_out[r], &got_c[k * H + r], 4) != 0;
+                if (k == 0 && !dump_f32_dir.empty()) {
+                    std::string stem = label;
+                    std::replace(stem.begin(), stem.end(), ' ', '-');
+                    const std::string path = dump_f32_dir + "/" + stem + "-cpu-output-nt1.f32";
+                    std::ofstream out(path, std::ios::binary);
+                    if (!out || !out.write(reinterpret_cast<const char*>(one_out.data()), H * sizeof(float))) {
+                        std::fprintf(stderr, "%s: cannot write single-token parity dump %s\n",
+                                     label.c_str(), path.c_str());
+                        return 1;
+                    }
+                }
             }
             std::printf("          width invariance (1 vs %d tokens): gate/up %zu, down %zu rows differ\n", N,
                         gu_diff, dn_diff);
@@ -1516,7 +1529,12 @@ int main(int argc, char** argv) {
                                  label.c_str());
                     return 2;
                 }
-                failures += check_blob<1>(f, blob, l, label + " nt=1", s, &service_activation);
+                // The single-token result is the relevant CPU baseline for a
+                // routed expert that appears once in a verifier window. Dump
+                // that exact row when requested so it can be compared with a
+                // service-side owner capture, rather than the later N-token
+                // row written by the default check_blob<3> path.
+                failures += check_blob<1>(f, blob, l, label + " nt=1", s, &service_activation, dump_f32_dir);
                 failures += check_blob<2>(f, blob, l, label + " nt=2", s, &service_activation);
                 failures += check_blob<3>(f, blob, l, label + " nt=3", s, &service_activation);
                 failures += check_blob<4>(f, blob, l, label + " nt=4", s, &service_activation);

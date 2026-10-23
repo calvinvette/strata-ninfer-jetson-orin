@@ -2748,9 +2748,10 @@ limits and avoid treating an owner transition alone as proof of its numerical
 cause.
 
 
-Qualify an oracle against a captured service output on the exact same activation
-and format pair before using it to explain an owner transition. An oracle can
-pass its own internal parity tests yet still disagree substantially with the
-active service dispatch; in that case preserve the failed cross-path comparison
-as an explicit unsupported cell and inspect weight-source/format and execution
-contracts before attributing the difference to CPU versus GPU arithmetic.
+Qualify an oracle on each exact service activation before generalizing an
+owner result. In the Coder probe, prompt 1's serial GPU and batch CPU outputs
+match their owner-specific native oracle rows exactly, while a separate prompt-0
+CPU row disagrees with every same-input oracle output despite identical serial
+and batch service results and byte-identical packed/GGUF expert weights. Preserve
+that activation-dependent discrepancy as unresolved; an internal oracle pass
+or one matching row does not settle a different execution input.

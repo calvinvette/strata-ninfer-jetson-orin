@@ -231,16 +231,23 @@ serial control to CPU in the batch dispatch (dispatch 3601). The captured CPU
 owner output for that exact dispatch agrees with the batch expert-part vector
 to maximum absolute difference `5.0e-11` (JSON decimal serialization rounding).
 This associates the previously isolated part delta with a CPU/GPU owner change;
-it does not establish why the backend outputs differ or prove a causal link to
-the later token-60 mismatch. A follow-up same-input check found a limitation in
-the available oracle: on the prompt-0 row, serial and batch CPU outputs are
-bit-identical, but both differ from `native_expert_parity`'s CPU, GPU and FP32
-reference outputs (relative L2 about `2.19`). The oracle process passed its
-internal tests, but its output is not qualified against this service dispatch.
-Do not use this oracle result to explain the expert-11 delta. The activation
-hash, exact comparison and failed cross-path match are summarized in
-`two-live-layer1-expert11-oracle-summary.json`; raw activation and oracle dumps
-remain local. The other sampled prompt/position rows do not show
+it does not prove a causal link to the later token-60 mismatch. On the exact
+prompt-1 activation, the serial GPU part matches the independent GPU oracle
+bit-for-bit and the batch CPU part matches the CPU oracle bit-for-bit. The
+CPU/GPU oracle outputs differ in all 2,560 values (relative L2 `0.01335`),
+confirming the selected owner-dependent output change for this row.
+
+A separate exact-input check for prompt 0 exposes an unresolved inconsistency:
+its serial and batch CPU outputs match bit-for-bit, but both differ from the
+same-input `native_expert_parity` CPU, GPU and FP32 outputs (relative L2 about
+`2.19`). The parity tool passes its internal checks; its default one-token and
+three-token CPU outputs are bit-identical. Thus the oracle match is confirmed
+for prompt 1 but not prompt 0, and no general CPU arithmetic conclusion follows.
+The prompt-0 discrepancy needs further investigation. The selected layer-1
+expert-11 blob in `experts.bin` matches the source GGUF tensors byte-for-byte
+(SHA256 `6310f659...bd7b85ae`), ruling out a wrong packed blob for this expert.
+The compact per-row results are in `two-live-layer1-expert11-oracle-summary.json`;
+large activations and oracle dumps remain local. The other sampled prompt/position rows do not show
 this owner change. The large CPU-output traces and owner JSONL files remain
 local and are excluded from Git. The opt-in capture switch and exact row join
 are reproducible with `two_live_multrow_layer12.py --capture-moe-owners` and

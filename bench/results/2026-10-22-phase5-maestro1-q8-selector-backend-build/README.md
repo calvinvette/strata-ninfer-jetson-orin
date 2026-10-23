@@ -65,3 +65,27 @@ The fresh logs and toolchain build trees remain on maestro1 scratch. The Intel
 environment emitted advisory setup warnings; the help process still exited 0.
 No accelerator runtime, model execution or performance was tested. This is
 x86_64 compile/link and CLI-startup evidence only.
+
+
+## One-token native oracle output dump — 2026-10-22
+
+`native_expert_parity` now emits a reconstructed single-token CPU output when
+`--dump-f32-dir` is used. The 1-vs-N-token check requantizes the one-token
+gate/up result before its down projection, then checks the complete output. The
+current Orin CUDA target rebuilt successfully; the real Coder expert-11
+checks passed on both captured activations, including the 1-vs-3-token output
+check. The focused `native_expert_parity_iq2_s_q2_0_cpu_q8_1_windows` CTest passed
+(1/1), and the Q8_1 1–8 window contract passed on the same model. The one-token
+CPU result matches the three-token diagnostic result bit-for-bit.
+
+The changed source SHA256 is
+`b22cc3722da428c5881dd9c265b829e167f2fcd2864b4a4938556ad4943ded30`; the Orin
+CUDA diagnostic binary SHA256 is
+`5450b245c313ef81e95647d4bbc0b707447a827f4c0bc1a18d6e85a382a6280b`. The same
+source hash was copied to maestro1's isolated source snapshot; its HIP
+`native_expert_parity` target rebuilt and linked with two jobs (HIP binary
+SHA256 `4f8fc9018b7520dd2e465683b1541df880c14f0a83dd0072bc764f2f91e89552`). The
+HIP CPU-only Q8_1 selector contract passed. This source file is in the
+CUDA/HIP-only parity target; the SYCL-only configuration does not build that
+target. These are build and diagnostic checks, not accelerator-runtime or
+performance evidence. Full output and hash records are in `logs/`.
