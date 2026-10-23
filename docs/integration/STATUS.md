@@ -4390,3 +4390,5 @@ The row-pairer now rejects owner/verifier route-ID disagreement; valid baseline
 and intervention joins pass, while a known cache-3,000 MiB mismatch is
 rejected. The capture lacks an explicit owner-row slot, which remains a
 limitation. See the [experiment notes](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
+
+A same-service current-source [layer-27 owner-transition capture](../../bench/results/2026-10-22-phase5-coder-adaptive-all-layer-position-trace/adaptive-layer27-current-source-generated-position515/README.md) exercised expert 129 changing CPU→CUDA on the third identical request at generated position 515 (`Q8_1_DOT=all`). The verifier activation, route, expert part, shared/combined MoE outputs and generated IDs were exact across repetitions; all 36 committed GDN states were byte-identical across both arms. Minimum physical/admission availability was 13.78 GiB. This narrowly does not reproduce the historical expert-175 report, and does not establish general owner parity or close Phase 5.

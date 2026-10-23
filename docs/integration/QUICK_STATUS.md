@@ -27,6 +27,12 @@ for the exact release scope and exclusions.
 
 ## Performance observed
 
+A current-source owner-transition diagnostic at layer 27 / generated position
+515 found exact selected expert output and all-layer committed GDN state across
+an adaptive CPU-to-CUDA owner change for expert 129. This is narrow correctness
+evidence only; it does not close Phase 5 or establish broad owner parity. See
+the [capture notes](../../bench/results/2026-10-22-phase5-coder-adaptive-all-layer-position-trace/adaptive-layer27-current-source-generated-position515/README.md).
+
 These results are specific to the tested Orin build, model and workload. No
 candidate setting has been promoted to a default.
 
