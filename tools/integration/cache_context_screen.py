@@ -1,4 +1,4 @@
-"""Run randomized cache-cap/context cells with three measured requests per process."""
+"""Run randomized cache/context cells: three requests per screening cell, one per confirmation block."""
 import argparse
 import json
 from pathlib import Path

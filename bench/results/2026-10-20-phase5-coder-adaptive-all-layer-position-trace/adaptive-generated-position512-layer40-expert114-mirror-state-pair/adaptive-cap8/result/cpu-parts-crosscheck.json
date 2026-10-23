@@ -1,0 +1,51 @@
+{
+  "scope": "direct CPU pool outputs versus the same service verifier's assembled per-expert parts",
+  "model_identity": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF IQ1_M",
+  "layer": 40,
+  "position": 512,
+  "ordered_short_request_dispatches": [
+    88,
+    664,
+    1240
+  ],
+  "parts_capture_semantics": "Verifier copies parts_out after CPU rows are copied from the mapped pool buffer and GPU hit rows are added; these are the actual mixed-owner service parts consumed by MoE combine.",
+  "cpu_rows_checked": 3,
+  "comparisons": [
+    {
+      "dispatch": 88,
+      "layer": 40,
+      "position": 512,
+      "token_id": 760,
+      "expert": 207,
+      "route_rank": 4,
+      "different_serialized_values": 2560,
+      "max_abs_difference": 4.998092634211915e-10,
+      "relative_l2_difference": 1.7140622888483142e-09,
+      "note": "CPU JSONL uses 9 significant digits; verifier-parts stores FP32 bytes."
+    },
+    {
+      "dispatch": 88,
+      "layer": 40,
+      "position": 512,
+      "token_id": 760,
+      "expert": 114,
+      "route_rank": 5,
+      "different_serialized_values": 2560,
+      "max_abs_difference": 4.988441465458848e-10,
+      "relative_l2_difference": 1.6885360121304203e-09,
+      "note": "CPU JSONL uses 9 significant digits; verifier-parts stores FP32 bytes."
+    },
+    {
+      "dispatch": 88,
+      "layer": 40,
+      "position": 512,
+      "token_id": 760,
+      "expert": 113,
+      "route_rank": 6,
+      "different_serialized_values": 2560,
+      "max_abs_difference": 4.989395008259123e-10,
+      "relative_l2_difference": 1.325323998967675e-09,
+      "note": "CPU JSONL uses 9 significant digits; verifier-parts stores FP32 bytes."
+    }
+  ]
+}

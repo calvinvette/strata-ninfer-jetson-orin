@@ -69,6 +69,18 @@ in [the 64-token campaign](reproduction-q8-cuda-input-quantizer-long64/README.md
 This remains correctness evidence for one model/configuration; adaptive
 migration is still opt-in and Phase 5 remains open.
 
+A current-source rerun with binary `081212f0…` extended the same request pattern
+to 64 generated tokens and compared accepted-prefix states directly. Delayed
+control matched all initial/recovery short states and token IDs. Adaptive
+recovery differed from its initial short request at 40/64 token IDs, first at
+output index 23 (accepted position 534). Its state first differed at accepted
+position 515 (prefix index 4), with GDN ordinals 13–35 changed; 60/64 recovery
+states differed. Both 28-GiB supervisors passed with zero cgroup memory events
+and minimum host/admission availability of 13.97/14.34 GiB. See the
+[current-source report](adaptive-current-081212f0-long64/README.md) and its raw
+accepted-prefix analysis. This is one current-binary diagnostic and does not
+establish a general drift bound.
+
 The follow-up [multi-position capture](adaptive-state-prefix8-capture/README.md)
 then localized the first accepted-state mismatch to prefix 8, logged after
 verifier position 519. The first changed GDN fingerprint is ordinal 24 (model
@@ -210,6 +222,18 @@ rejected during native-pack argument validation (`--spec T` requires `T >= 2`);
 it loaded no model and collected no state. The unsupported cell is retained in
 `layer26-gdn-spec1-state-trace/`. Resolving the per-token transition requires a
 capture inside the supported two-token window.
+Phase 5 remains open.
+
+The [layer-33 expert-57 operator diagnostic](adaptive-layer33-q8-mirror-diagnostic/README.md)
+then captured all three request rows and found identical adaptive layer-33
+input, route IDs and weights while expert 57 moved CPU-to-VRAM. The default
+standalone CPU/CUDA expert outputs differed by 1.32% relative L2; the targeted
+Q8_1 CPU selector made this isolated output bit-identical. Applying that
+selector in the service did not restore adaptive GDN state: the raw layer-33
+post-state still changed while its pre-state matched. The same-prompt requests
+used `--prompt-cache 0`, so live-session and batch-slot reuse are disabled for
+this experiment. The operator gap is closed for the captured activation, but
+its relationship to the continuing service-state mismatch is not established.
 Phase 5 remains open.
 
 The next accepted-state capture sampled layer 26 after every committed verifier
@@ -444,3 +468,336 @@ opt-in, and makes no performance claim. The current-source 18-test Orin
 selection and 163 Python integration tests passed, and current-source HIP and
 SYCL builds/CLI checks are recorded in
 [`backend/maestro1-current-q8quant-2026-10-19/`](backend/maestro1-current-q8quant-2026-10-19/README.md).
+
+A later direct-division replay on this same layer-3 expert-182 activation
+changed 408/1,920 reconstructed hidden floats but left its Q8_1 bytes and final
+expert output unchanged; the packed result remained bit-identical to CUDA.
+The parity helper's reciprocal-form float assertion failed, so this is a
+diagnostic comparison rather than a passing parity test. Combined with the
+layer-39 improvement and layer-31 regression under the same global expression,
+it does not justify changing SwiGLU arithmetic generally. The source was
+restored; see the [layer-3 replay](layer3-generated-position520/operator-checks/expert182-q8_1-mirror/direct-silu-division/README.md).
+
+## Prompt-tail owner trace through layers 12 and 13
+
+The [layer-12 owner follow-up](adaptive-layer1-3-4-6-8-9-10-11-combined-mirror-layer12-prompt-tail505-511-pair/README.md)
+found IQ3_XXS/Q2_0 experts 73 and 141 migrating CPU-to-GPU. Their valid
+same-input native-oracle rows match the service. Layer-12 recurrent state at
+position 511 remains exact across adaptive initial/recovery despite `ffn_y`
+intermediate differences at three selected positions. The [layer-12 mirror
+follow-up](adaptive-layer1-3-4-6-8-9-10-11-12-mirror-layer13-prompt-tail505-511-pair/README.md)
+makes captured layer-12 GDN intermediates and state exact, then reveals IQ2_S/Q2_0
+expert 147 migrating at layer 13 for all seven selected positions. Its seven
+single-row oracle joins also match the service. Recovery token IDs match in this
+12-token run, while all accepted-prefix states differ. The [layer-13 mirror
+follow-up](adaptive-layer1-3-4-6-8-9-10-11-12-13-mirror-layer14-prompt-tail505-511-pair/README.md)
+makes the selected layer-14 MoE, GDN intermediates and raw state exact, but
+adaptive recovery token IDs then differ at all 12 positions. The dispatch trace
+shows an IQ2_S/IQ4_NL expert-250 owner flip at layer 15, position 505, which is
+verified by a same-input single-row oracle joined to the service CPU/GPU rows.
+The [layer-15 mirror follow-up](adaptive-layer1-3-4-6-8-9-10-11-12-13-15-mirror-layer16-prompt-tail505-511-pair/README.md)
+then exposed 21 layer-16 owner rows across experts 118, 220, 39, and 30. All
+same-input native oracle rows match the service. Layer-16 raw state at accepted
+position 511 remains exact across recovery, while `ffn_y` changes and the first
+captured activation difference moves to layer 17. The [layer-16 mirror
+follow-up](adaptive-layer1-3-4-6-8-9-10-11-12-13-15-16-mirror-layer17-prompt-tail505-511-pair/README.md)
+makes selected layer-16 state and layer-17 outputs exact. Recovery tokens then
+match, but accepted-prefix state still differs from prefix 0; the first captured
+activation difference moves to layer 20, where the dispatch trace shows
+expert 221 changing owner at layer 19. The [layer-19 mirror follow-up](adaptive-layer1-3-4-6-8-9-10-11-12-13-15-16-19-mirror-layer20-21-prompt-tail505-511-pair/README.md)
+validates expert 221 at four positions and makes layer-20 GDN intermediates,
+raw state, and layer-21 MoE outputs exact. Accepted-prefix state still differs;
+the next selected activation differences are at layers 25–28. The trace shows
+expert 173 changing owner at layer 24 at positions 507 and 511, with same-input
+oracles matching both service rows. The [layer-24 capture](adaptive-layer1-3-4-6-8-9-10-11-12-13-15-16-19-mirror-layer24-prompt-tail505-511-pair/README.md)
+found its GDN input/state and next-layer boundary changed, but adaptive
+initial/recovery dispatch already differed by layer 3, so it could not isolate
+the layer-24 row. A second randomized [layer-24 repeat](adaptive-layer1-3-4-6-8-9-10-11-12-13-15-16-19-24-mirror-layer25-repeat2-pair/README.md)
+reproduced that layer-3 first activation difference at all seven selected
+positions and the 12/12 adaptive token and state mismatch; delayed control
+remained exact. A cross-request adaptive-history effect is plausible but not
+isolated. These findings remain narrow correctness diagnostics and do not
+qualify adaptive state transactions.
+
+The [layer-2 boundary capture](adaptive-layer1-3-4-6-8-9-10-11-12-13-15-16-19-24-mirror-layer2-boundary-pair/README.md)
+then found an IQ2_S/IQ4_NL expert-62 CPU/GPU owner flip at all seven positions.
+Its service row alone changed among the ten routed experts, and the combined
+MoE output changed; layer-2 GDN first differed at `ffn_y`, while raw recurrent
+and convolution state at accepted position 511 remained exact. This makes the
+layer-2 owner-dependent row a concrete candidate for the layer-3 input shift,
+but the exact adaptive rows still need a direct independent-oracle join. A
+follow-up with the layer-2 mirror enabled made the selected layer-2 expert rows,
+combined output, GDN fields and position-511 state exact. Full adaptive recovery
+still differs, with the next captured activation at layer 6 for positions
+506–511 and layer 27 for position 505. The [mirror result](adaptive-layer1-2-3-4-6-8-9-10-11-12-13-15-16-19-24-mirror-layer3-boundary-pair/README.md)
+is a local boundary result only; the layer-5 transition is the next target.
+
+With layer 2 mirrored, the [layer-5 capture](adaptive-layer1-2-3-4-6-8-9-10-11-12-13-15-16-19-24-mirror-layer5-boundary-pair/README.md)
+found expert 26 changing CPU-to-GPU at positions 506–511 with matching inputs,
+routes and weights. Its service row matched the corresponding independent
+native CPU/GPU oracle exactly; the two oracle outputs differ by 1.4092% relative
+L2. Layer-5 GDN first changed at `ffn_y` at those positions while raw state at
+accepted position 511 stayed exact. The layer-5 selector follow-up is next;
+adaptive recovery still differs at all 12 tokens and accepted states.
+
+Adding the layer-5 rule made its selected rows, GDN fields, and position-511
+raw state exact, and adaptive recovery token IDs then matched all 12 positions.
+Accepted-state hashes still differ at every prefix. The [layer-5 mirror
+result](adaptive-layer1-2-3-4-5-6-8-9-10-11-12-13-15-16-19-24-mirror-layer6-boundary-pair/README.md)
+moves the earliest selected activation to layer 19 at positions 506–511 and
+layer 27 at position 505. Expert 110 at layer 18 changes owner on the first
+branch; its same-input standalone oracle is retained, but still needs a direct
+service-row join.
+
+The direct [layer-18 service capture](adaptive-layer1-2-3-4-5-6-8-9-10-11-12-13-15-16-18-19-24-layer18-owner-capture-pair/README.md)
+confirmed IQ3_XXS/IQ4_NL expert 110 as the only changed routed row at positions
+506–511. Its same-input oracle matches both service owner rows bit-for-bit, with
+a 1.5597% CPU/GPU relative-L2 difference. Layer-18 GDN first changes at
+`ffn_y`, while sampled raw state at position 511 remains exact. Tokens still
+match all 12 positions; accepted-state hashes still differ at all prefixes.
+
+
+## Request-history control: three short requests
+
+The [short/short/short history control](adaptive-short-short-short-history-control/README.md) tests whether the intermediate long request is required. In a randomized same-service pair, adaptive accepted-state and GDN hashes first differed at prefix 4 between the initial and intermediate short requests. The intermediate and recovery requests matched state, GDN and token IDs exactly. Delayed control remained exact. The repeated short/long/short pair showed the same state-prefix pattern. Thus the long request is not necessary for this observed adaptive divergence; the source of the state difference remains unlocalized. At captured positions 505–511, activation inputs and expert IDs matched across initial/recovery, while adaptive owner placement differed. These are correctness diagnostics, not a migration fix or performance result.
+
+
+The [generated-position follow-up](adaptive-short-short-short-generated-positions512-523/README.md) captured positions 512–522 across the same three short requests (position 523 had no following dispatch). Adaptive state first differed between the initial and intermediate request at accepted prefix 4, then matched between intermediate and recovery; delayed control stayed exact. The first selected initial-to-intermediate activation difference was layer 27 at generated position 512, with expert IDs equal and owners differing at layers 26 and 27. This is a candidate boundary for the next exact-row/state capture, not causal attribution.
+
+
+
+The [position-515 layer-16/layer-17 follow-up](adaptive-short-short-short-layer16-owner-layer17-state-position515/README.md)
+joined the CPU-to-VRAM owner change for expert 118 with layer-17 GDN state.
+Layer-17 raw pre-state matched before position 515 and post-state differed;
+the delayed control and the second-to-third adaptive transition stayed exact.
+The first direct-oracle comparison used the default CPU arithmetic mode and
+was not comparable to the service setting. A mode-matched rerun with
+`STRATA_NATIVE_CPU_Q8_1_DOT=all` matched the actual CPU-pool row to relative L2
+9.51e-10; the same-input CPU/GPU rows differed by 0.01352% for expert 118.
+Expert 39, the other migrating row, was bit-identical across CPU/GPU oracle.
+The weighted owner-transition estimate is 1.36e-5 L2 and comes from expert
+118 alone. The verifier-parts buffer is the verifier's assembled per-expert
+buffer after CPU rows are copied and GPU-hit rows are added; it is the
+mixed-owner data consumed by weighted combine, not an independent CUDA oracle.
+A later same-service [cross-check](adaptive-generated-position512-layer40-expert114-mirror-state-pair/README.md#verifier-parts-capture-semantics-cross-check)
+matched direct CPU rows to that buffer within JSON serialization precision.
+The layer-17 input/router weights already differ, so this validates selected
+rows but does not isolate the downstream state change. Phase 5 remains open.
+
+
+The [position-515 layer-4 follow-up](adaptive-short-short-short-layer4-owner-gdn-position515/README.md) then checked the earliest selected owner change: expert 153 moved CPU-to-VRAM with identical input, and the mode-matched CPU owner output matched the CUDA oracle bit-for-bit. Its weighted row delta was zero, and the separate CUDA verifier's layer-4 GDN intermediates and raw state were exact. This clears that row as a measured numerical difference in the captured cell, while keeping the verifier/owner execution paths distinct. Layer 16 remains the first selected owner transition with a measured CPU/GPU difference; its relationship to the later layer-17 state write is still not isolated.
+The [layer-16 targeted-selector prefill trace](adaptive-layer16-q8-targeted-prefill-state/README.md)
+compared the first actual prefill in fresh adaptive and delayed-control
+services. Layer-17 GDN chunk hashes matched at boundaries 64–505, and the raw
+end-of-prompt recurrent and convolution state matched across all 817,152 values
+bit-for-bit. Later identical prompts reused cached work, so this does not
+resolve same-service adaptive history divergence. An attempted positions
+505–511 verifier-state capture retained unsupported hook coverage (only
+position 511 was observed); the paired run stopped before its delayed-control
+arm. Phase 5 remains open.
+
+
+The [layer-30 selected-expert and layer-32 state capture](adaptive-layer8-13-16-24-28-29-30-q8-targeted-no-cache-layer32-state511/README.md)
+joined experts 121 and 212 to their actual CPU-pool rows and independent
+same-input oracles. CPU service rows match the CPU oracle bit-for-bit, and the
+same-input oracle CPU/GPU outputs are also bit-identical. The assembled
+verifier-parts row for request 3 does not match that oracle, but its exact
+verifier activation was not captured, so this comparison is unresolved rather
+than a parity failure. The layer-32 accepted-state trace still changes between adaptive
+intermediate and recovery requests even though the position-511 pre-state
+matches. Phase 5 remains open.
+
+
+The corrected [all-layer verifier-input trace](adaptive-no-cache-verifier-input-all-layers-corrected/README.md) captured 48 layer inputs for each of three no-cache short requests. Adaptive first-to-intermediate input divergence began at layer 34; intermediate-to-recovery first diverged at layer 12. The direct [layer-12/layer-34 state follow-up](adaptive-no-cache-gdn-state-layers12-34/README.md) now confirms the pre/post raw state at both boundaries and matches each post-state hash to the service GDN hash. For each adaptive transition, pre-state matches and post-state changes at the corresponding layer; delayed control remains exact. This confirms that the state difference follows the already-divergent layer input, but does not identify why that input changed or prove a migrating expert caused it. The initial all-layer capture remains invalid because its diagnostic source offset was wrong. Phase 5 remains open.
+
+
+The latest [layer-31 expert-155 follow-up](adaptive-layer11-27-31-mirror-layer32-state-pair/README.md)
+joined the CPU/GPU owner migration to an independent same-input oracle. With
+layers 11 and 27 already mirrored, layer-31 expert 155 (IQ3_XXS/IQ4_NL) changed
+owner on the same activation and route. Its layer-specific Q8_1 mirror made the
+service rows and combined layer-31 output bit-identical and restored the
+captured layer-32 raw GDN state across three same-service requests. Adaptive
+accepted-state fingerprints still differed at all 12 prefixes, and the first
+captured activation change moved to layer 33; the delayed control stayed exact.
+This narrows another local boundary but does not qualify adaptive migration or
+performance.
+
+A later [layer-33 expert-57 oracle and Q8_1 mirror](adaptive-layer33-q8-mirror-diagnostic/README.md)
+closed the isolated CPU/CUDA operator difference for its captured activation,
+but not the service-state mismatch. The corrected all-layer trace found first
+activation differences at layer 34 then layer 12 in the baseline adaptive
+transitions; with the layer-33 Q8_1 selector they moved to layer 33 then layer
+32. The raw layer-33 state still changed after adaptive requests, while delayed
+control was exact. This localizes the next diagnostic boundary without
+establishing a cause. Phase 5 remains open.
+
+A [combined tested Q8_1 mirror screen through layer 33](adaptive-combined-tested-q8-mirrors-layers1-33/README.md) exercised the prior same-input oracle-checked rules together. Delayed-control outputs, all 48 position-511 activations, and GDN hashes stayed exact. In adaptive-cap8 the first two requests had the same tokens and position-511 activations; exact layer-32 raw state and the targeted layer-33 expert/combined output also matched. Yet accepted GDN hashes began differing at generated prefix 1, and recovery diverged from intermediate at the final six output tokens. Across intermediate-to-recovery at position 511, first changed activation was layer 33. This moves the next capture into generated positions; it does not establish that mirroring the selected prompt-tail rows fixes the accepted-prefix transaction. Phase 5 remains open.
+
+A [generated-position 512 layer-26 owner trace](adaptive-generated-position512-layer26-expert213-mirror-state-pair/README.md)
+then captured layer-26 expert 213 moving CPU-to-VRAM on identical input. Its
+IQ2_S/IQ4_NL default CPU/CUDA oracle outputs differed by 1.49% relative L2;
+the targeted Q8_1 path matched bitwise and its service CPU row matched the
+oracle. Adding this rule made the layer-26 state exact through the first
+adaptive transition and moved the first position-512 activation difference
+from layer 27 to layer 41. The trace exposed layer-40 expert 114 (IQ3_S/IQ4_NL)
+on identical input with an independent 1.33% CPU/CUDA delta; its Q8_1 oracle
+matched bitwise. Recovery state still diverged, so layer 40 is the next
+service-level mirror target and Phase 5 remains open. The all-layer 512–522
+captures with the combined prior rules are documented in
+[their generated-position report](adaptive-combined-tested-q8-mirrors-generated-positions512-522/README.md).
+
+The [layer-40 expert-114 mirror pair](adaptive-generated-position512-layer40-expert114-mirror-state-pair/README.md)
+then checked the next equal-input CPU-to-VRAM transition (IQ3_S/IQ4_NL). Its
+same-input default CPU/CUDA delta was 1.33%; the targeted Q8_1 oracle matched
+bitwise and the actual service CPU row matched the oracle within relative L2
+1.69e-9. Adding this rule made layer-40 raw state exact through the first
+adaptive transition and moved the first changed position-512 activation to
+layer 42. The recovery transition still changes state, with accepted GDN hashes
+different at every prefix despite matching 12 token IDs. Phase 5 remains open.
+
+The [layer-41 expert-171 mirror pair](adaptive-generated-position512-layer41-expert171-mirror-state-pair/README.md)
+then found another equal-input owner switch, this time IQ3_XXS/IQ4_NL at
+position 512. Its default CPU/CUDA delta was 1.21%; the Q8_1 oracle matched
+bitwise and the actual service row matched that oracle within relative L2
+1.61e-9. With the rule enabled, all 48 captured initial/intermediate inputs at
+position 512 matched, and raw layer-42 GDN state was exact across that
+transition. The intermediate/recovery transition first diverged at layer 13;
+accepted GDN hashes still differed at every initial/recovery prefix despite
+matching 12 output tokens. Phase 5 remains open.
+
+The [layer-41 expert-171 mirror](adaptive-generated-position512-layer41-expert171-mirror-state-pair/README.md)
+then extended that boundary. The same-input CPU/CUDA difference was 1.21%
+relative L2, while the targeted Q8_1 oracle was bit-identical and the service
+CPU row matched within relative L2 1.61e-9. Initial/intermediate inputs at
+position 512 and raw layer-42 state were exact; the next request-history
+transition still first diverged at layer 13 and state hashes differed across
+all initial/recovery prefixes despite identical token IDs. The [layer-12 raw
+state follow-up](adaptive-generated-position512-layer12-state-after-layer41-mirror-pair/README.md)
+is sampling that earlier boundary.
+
+The [layer-12 raw-state and verifier-MoE capture](adaptive-generated-position512-layer12-state-after-layer41-mirror-pair/README.md)
+then sampled the transition whose first changed input was layer 13. At position
+512, all ten layer-12 expert parts, router IDs/weights, shared and combined
+outputs were bit-identical, and raw layer-12 GDN pre/post state matched across
+all three requests and to service hash ordinal 9. A later [layer-13 verifier,
+GDN and raw-state capture](adaptive-generated-position512-layer13-gdn-state-and-input/README.md)
+confirmed the layer-13 input, GDN intermediates and state were also exact. It
+corrected an apparent activation delta from the CPU-pool trace: the recovery
+row had no CPU-owned experts, so the host activation was stale. The first
+changed authoritative verifier input on intermediate-to-recovery is layer 15.
+
+The follow-up [position-512 layer-15 recapture](adaptive-generated-position512-layer15-gdn14-recapture-retry-countfix/README.md)
+found the selected layer-14 inputs and raw state exact, with accepted-state
+hashes differing only at prefixes 10–11. A multi-position [521/522 verifier
+and QSA trace](adaptive-generated-positions512-521-522-layer14-state/README.md)
+then found adaptive initial-to-intermediate inputs first differing at layers
+40/41 and QSA state hashes at layers 43/47; delayed control remained exact.
+Layer-39 IQ2_S/IQ4_NL owner changes are under a targeted Q8_1 mirror check.
+
+A current-source [position-515 dispatch capture](adaptive-current-081212f0-position515/README.md)
+reproduced the accepted-state mismatch. Adaptive recovery first diverged at
+prefix 4 and GDN ordinal 13 (model layer 17); delayed control matched. The
+first valid changed captured expert input was layer 18 (relative L2 0.0035630),
+with matching layer-18 expert IDs and owners. Layer-17 host activation was
+invalid in this capture. A follow-up [raw layer-17 verifier capture](adaptive-current-081212f0-layer17-position515/README.md)
+found identical pre-state but an already-different `x` input (relative L2
+`7.7344e-6`); the post-state then differed broadly. This localizes the change
+before layer-17 recurrence, without identifying which upstream operation
+changed `x`. Phase 5 remains open.
+
+A current-binary [service CPU-output capture](adaptive-current-081212f0-layer16-service-cpu-output/README.md)
+joins the same activation to actual service rows and independent CPU/CUDA
+oracles. Experts 118 and 39 match their CPU oracle exactly; only expert 118
+differs from its CUDA oracle (relative L2 `1.35199e-4`). Both experts change
+from CPU to VRAM ownership on recovery. This identifies an owner-dependent
+contributor for this sampled layer-17 state delta, while its complete
+combined-output effect and general correction remain unqualified.
+
+A [direct-division SwiGLU trial](adaptive-current-081212f0-layer17-position515/division-formula-trial/README.md)
+on the same expert-118 activation left the CPU row and CUDA delta unchanged.
+Independent stage checks retained exact gate/up dots and CPU down-projection
+parity on CUDA hidden blocks, with 3/60 hidden-block scales differing. The
+candidate failed the reciprocal-form independent reconstruction and was
+rejected; the source and parity target were restored. This does not provide a
+layer-16 correction.
+
+The randomized [64-token layer-17 raw-state follow-up](adaptive-current-081212f0-layer17-common-prefix-samples/README.md)
+confirmed this boundary over the longer recovery sequence. Adaptive per-GDN
+hashes first differ at accepted position 515 (model layer 17), before the first
+generated-token mismatch at position 534. The sampled layer-17 pre-state is
+exact at position 515 but post-state differs in 785,280/786,432 recurrent
+values and 10,232/30,720 convolution values; delayed control remains bit-
+identical through all four sampled positions. This confirms the earlier
+eight-token `x`-input localization without identifying the upstream operator.
+The initial sample request for position 575 was correctly rejected as
+uncaptured and is retained as a failed cell. Phase 5 remains open.
+
+A current-binary [layer-16 to layer-17 boundary capture](adaptive-current-081212f0-layer16-to17-position515/README.md)
+joins the adaptive state change to one changing expert row. At accepted
+position 515, layer-16 input, token, expert IDs and router weights match across
+initial/recovery. The shared output and nine expert rows match; only expert 118
+changes, and the combined MoE output differs (relative L2 `2.50977e-5`). The
+next layer's first changed GDN field is `x` (relative L2 `7.73436e-6`) with an
+identical pre-state and changed post-state. A same-binary dispatch trace and
+same-input oracle identify expert 118's CPU-to-VRAM owner transition and its
+CPU/GPU arithmetic difference. Delayed control is exact. This strongly
+identifies an owner-dependent contributor for this sample, without proving a
+general correction; Phase 5 remains open.
+
+The [layer-16 residual-boundary follow-up](adaptive-current-081212f0-layer16-boundary-position515/README.md)
+recorded the transfer of that MoE delta. At position 515, adaptive post-layer
+`bo` differs in 2,557/2,560 values, while residual `R` and `inj2` before the
+next read stay exact. The subsequent `xn` changes in 8,898/10,240 values
+(relative L2 `6.09090e-6`), followed by layer-17 GDN `x` and raw-state changes.
+Delayed control remains exact in all captured fields. The analyzer was fixed to
+handle two-record captures and rerun successfully; both service arms passed.
+This strengthens localization for one transition but does not establish a
+general correction or error bound. Phase 5 remains open.
+
+The short-only [layer-27 owner transition and layer-28 state capture](adaptive-layer24-short-short-short-no-cache-layer27-state28-pair/README.md)
+joins three repeated requests to an independent same-input expert oracle.
+Adaptive layer 27 moves expert 175 from CPU to CUDA with unchanged activation,
+expert IDs and router weights; each service row matches its owner-specific
+oracle, and the combined MoE output changes. Delayed control remains exact.
+The following layer-28 `x` input is the first changed intermediate, then the
+accepted GDN state differs in adaptive mode, with raw hashes matching service
+telemetry. The intermediate-to-recovery layer-28 trace is exact. This verifies
+an owner-dependent contributor for the sampled transition but does not close
+the full drift cause or bound. Phase 5 remains open.
+
+A second [seed-20261079 reproducibility pair](adaptive-layer24-short-short-short-no-cache-layer27-state28-seed20261079-pair/README.md)
+reproduced the seed-20261078 route, verifier input, expert parts, combined
+output and layer-28 committed-state captures byte for byte. Since the prompts
+and greedy outputs are fixed, this confirms reproducibility rather than adding
+an independent randomized workload sample. Phase 5 remains open.
+
+The [layer-27-to-33 owner-mirror chain](adaptive-layer27-33-q8-mirror-chain.md)
+tested exact-input Q8_1 interventions at layers 27, 28, 29, 30 and 33. The
+targeted rows match their CPU/CUDA oracles where the verifier input matches the
+oracle activation, but no selector chain restored accepted-prefix state
+equality. Some selector chains also changed recovery token IDs. The report
+distinguishes two-row dispatch traces from three-request verifier captures; no
+default changed. Phase 5 remains open.
+The latest [fresh-source Q8_1 all-dot long-chain pair](adaptive-current-source-q8-all-long64-pair/README.md)
+rebuilt the service from the current working tree and rechecked 64-token
+accepted-prefix state across short/long/short recovery. Delayed control matched
+all 64 prefixes; adaptive state first diverged at prefix 4 and differed at
+60/64 prefixes, while recovery token IDs differed at 40/64 positions. Thus the
+all-dot selector remains insufficient to bound migration drift. Both arms
+passed memory supervision with at least 13.78 GiB host/admission availability.
+
+The earlier layer-27–33 chain's 96-row dispatch capture was followed by a
+[144-row, three-request recapture](adaptive-layer27-33-q8-mirror-all-three-dispatch-state28-pair/README.md).
+It confirms identical initial-to-intermediate activations and expert IDs but
+owner changes at ten layers; the next transition first changes activation at
+layer 32. The third adaptive layer-33 verifier input is now explicitly
+captured and does not match the oracle input. Adaptive accepted-state hashes
+still differ at all 12 prefixes.
+
+The [layer-11 expert-201 post-SwiGLU replay](operator-checks/layer11-position515/expert201/README.md)
+further isolates its three changed Q8_1 code bytes: multiplying by a computed
+sigmoid reproduces the CPU codes, while the CUDA direct-division expression
+reproduces the captured GPU codes under both tested code quantizers. Both host
+replays use `std::exp`, so this demonstrates the operation-order effect for
+this row without claiming general equivalence to CUDA `__expf` or a fix for
+accepted-state migration.

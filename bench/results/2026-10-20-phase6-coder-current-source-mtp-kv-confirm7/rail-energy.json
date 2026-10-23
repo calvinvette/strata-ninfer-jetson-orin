@@ -1,0 +1,930 @@
+{
+  "scope": "Separate named tegrastats rails integrated over each API request window; includes board idle/background and is not process-attributed; rails are not summed.",
+  "method": "Piecewise-linear integration of instantaneous mW at one-second wall timestamps; request ends must be bracketed and gaps over 2.5 seconds are unsupported.",
+  "planned_requests": 28,
+  "estimated_windows": 28,
+  "unsupported_windows": 0,
+  "per_condition_medians": [
+    {
+      "condition": "fp16-mtp0",
+      "rail": "VDD_CPU_CV",
+      "estimated_blocks": 7,
+      "median_joules_per_output_token": 1.9012768697034532
+    },
+    {
+      "condition": "fp16-mtp0",
+      "rail": "VDD_GPU_SOC",
+      "estimated_blocks": 7,
+      "median_joules_per_output_token": 6.133462735616637
+    },
+    {
+      "condition": "fp16-mtp0",
+      "rail": "VIN_SYS_5V0",
+      "estimated_blocks": 7,
+      "median_joules_per_output_token": 4.696761511694751
+    },
+    {
+      "condition": "fp16-mtp4",
+      "rail": "VDD_CPU_CV",
+      "estimated_blocks": 7,
+      "median_joules_per_output_token": 2.0346976102113326
+    },
+    {
+      "condition": "fp16-mtp4",
+      "rail": "VDD_GPU_SOC",
+      "estimated_blocks": 7,
+      "median_joules_per_output_token": 5.748483058786461
+    },
+    {
+      "condition": "fp16-mtp4",
+      "rail": "VIN_SYS_5V0",
+      "estimated_blocks": 7,
+      "median_joules_per_output_token": 4.664529588326337
+    },
+    {
+      "condition": "int8-mtp0",
+      "rail": "VDD_CPU_CV",
+      "estimated_blocks": 7,
+      "median_joules_per_output_token": 1.9174718395931836
+    },
+    {
+      "condition": "int8-mtp0",
+      "rail": "VDD_GPU_SOC",
+      "estimated_blocks": 7,
+      "median_joules_per_output_token": 6.078009074047052
+    },
+    {
+      "condition": "int8-mtp0",
+      "rail": "VIN_SYS_5V0",
+      "estimated_blocks": 7,
+      "median_joules_per_output_token": 4.707935829160775
+    },
+    {
+      "condition": "int8-mtp4",
+      "rail": "VDD_CPU_CV",
+      "estimated_blocks": 7,
+      "median_joules_per_output_token": 2.0510648749542395
+    },
+    {
+      "condition": "int8-mtp4",
+      "rail": "VDD_GPU_SOC",
+      "estimated_blocks": 7,
+      "median_joules_per_output_token": 5.758058967349499
+    },
+    {
+      "condition": "int8-mtp4",
+      "rail": "VIN_SYS_5V0",
+      "estimated_blocks": 7,
+      "median_joules_per_output_token": 4.6083453724460535
+    }
+  ],
+  "paired_contrasts": [
+    {
+      "rail": "VDD_CPU_CV",
+      "contrast": "mtp4_vs_mtp0_fp16",
+      "paired_blocks": 7,
+      "block_effects_percent": [
+        25.052678041337128,
+        9.971157809445463,
+        0.18238651279309792,
+        4.048964841977698,
+        9.04181214353259,
+        4.894377225148827,
+        1.0447571038364023
+      ],
+      "median_percent": 4.894377225148827,
+      "paired_block_bootstrap_95pct_percent": [
+        1.0447571038364023,
+        9.971157809445463
+      ]
+    },
+    {
+      "rail": "VDD_CPU_CV",
+      "contrast": "mtp4_vs_mtp0_int8",
+      "paired_blocks": 7,
+      "block_effects_percent": [
+        2.846385356292358,
+        13.783152267632094,
+        3.706232861236547,
+        4.6900044545088,
+        13.582174808961934,
+        14.105898177390142,
+        -6.579023451239818
+      ],
+      "median_percent": 4.6900044545088,
+      "paired_block_bootstrap_95pct_percent": [
+        2.846385356292358,
+        13.783152267632094
+      ]
+    },
+    {
+      "rail": "VDD_CPU_CV",
+      "contrast": "int8_vs_fp16_mtp0",
+      "paired_blocks": 7,
+      "block_effects_percent": [
+        10.085818902931942,
+        1.831680949099046,
+        0.8281581550896533,
+        -4.013306465479804,
+        -2.0096320027465198,
+        -0.6472398693285863,
+        7.085047585906401
+      ],
+      "median_percent": 0.8281581550896533,
+      "paired_block_bootstrap_95pct_percent": [
+        -2.0096320027465198,
+        7.085047585906401
+      ]
+    },
+    {
+      "rail": "VDD_CPU_CV",
+      "contrast": "int8_vs_fp16_mtp4",
+      "paired_blocks": 7,
+      "block_effects_percent": [
+        -9.462726184789084,
+        5.361531968021871,
+        4.374719075653455,
+        -3.421938036923511,
+        2.0705625545556883,
+        8.077632290809134,
+        -0.9944701142143186
+      ],
+      "median_percent": 2.0705625545556883,
+      "paired_block_bootstrap_95pct_percent": [
+        -3.421938036923511,
+        5.361531968021871
+      ]
+    },
+    {
+      "rail": "VDD_CPU_CV",
+      "contrast": "mtp_by_kv_interaction_fp16_minus_int8_percentage_points",
+      "paired_blocks": 7,
+      "block_effects_percentage_points": [
+        22.20629268504477,
+        -3.8119944581866303,
+        -3.523846348443449,
+        -0.6410396125311024,
+        -4.540362665429344,
+        -9.211520952241315,
+        7.6237805550762205
+      ],
+      "median_percentage_points": -3.523846348443449,
+      "paired_block_bootstrap_95pct_percentage_points": [
+        -4.540362665429344,
+        7.6237805550762205
+      ]
+    },
+    {
+      "rail": "VDD_GPU_SOC",
+      "contrast": "mtp4_vs_mtp0_fp16",
+      "paired_blocks": 7,
+      "block_effects_percent": [
+        -4.33702143762229,
+        -6.30811046129277,
+        -7.343816436828876,
+        -5.431371810356755,
+        -5.994535917194533,
+        -6.026051713418646,
+        -7.1225025787023055
+      ],
+      "median_percent": -6.026051713418646,
+      "paired_block_bootstrap_95pct_percent": [
+        -7.1225025787023055,
+        -5.431371810356755
+      ]
+    },
+    {
+      "rail": "VDD_GPU_SOC",
+      "contrast": "mtp4_vs_mtp0_int8",
+      "paired_blocks": 7,
+      "block_effects_percent": [
+        -7.227113251893769,
+        -3.4402690736902164,
+        -5.968813680387674,
+        -5.935117152531422,
+        -4.7542860742858295,
+        3.1209541550955233,
+        -16.898655666375983
+      ],
+      "median_percent": -5.935117152531422,
+      "paired_block_bootstrap_95pct_percent": [
+        -7.227113251893769,
+        -3.4402690736902164
+      ]
+    },
+    {
+      "rail": "VDD_GPU_SOC",
+      "contrast": "int8_vs_fp16_mtp0",
+      "paired_blocks": 7,
+      "block_effects_percent": [
+        1.5209541137970017,
+        -1.0051974100736216,
+        -1.813996172845489,
+        -1.0583325455092774,
+        -0.7401450597308679,
+        0.3223554073401136,
+        10.215595986901139
+      ],
+      "median_percent": -0.7401450597308679,
+      "paired_block_bootstrap_95pct_percent": [
+        -1.0583325455092774,
+        1.5209541137970017
+      ]
+    },
+    {
+      "rail": "VDD_GPU_SOC",
+      "contrast": "int8_vs_fp16_mtp4",
+      "paired_blocks": 7,
+      "block_effects_percent": [
+        -1.546114075701177,
+        2.024962333984548,
+        -0.35693177935857134,
+        -1.5853720625385925,
+        0.569427960283897,
+        10.08728696960306,
+        -1.385540660112583
+      ],
+      "median_percent": -0.35693177935857134,
+      "paired_block_bootstrap_95pct_percent": [
+        -1.546114075701177,
+        2.024962333984548
+      ]
+    },
+    {
+      "rail": "VDD_GPU_SOC",
+      "contrast": "mtp_by_kv_interaction_fp16_minus_int8_percentage_points",
+      "paired_blocks": 7,
+      "block_effects_percentage_points": [
+        2.8900918142714787,
+        -2.867841387602554,
+        -1.3750027564412015,
+        0.5037453421746667,
+        -1.2402498429087032,
+        -9.147005868514169,
+        9.776153087673677
+      ],
+      "median_percentage_points": -1.2402498429087032,
+      "paired_block_bootstrap_95pct_percentage_points": [
+        -2.867841387602554,
+        2.8900918142714787
+      ]
+    },
+    {
+      "rail": "VIN_SYS_5V0",
+      "contrast": "mtp4_vs_mtp0_fp16",
+      "paired_blocks": 7,
+      "block_effects_percent": [
+        3.219839118584189,
+        -2.5485752332464973,
+        -0.048904301811913964,
+        0.6778650215928828,
+        -0.34221391766698916,
+        1.2251732711970664,
+        -2.618757648004466
+      ],
+      "median_percent": -0.048904301811913964,
+      "paired_block_bootstrap_95pct_percent": [
+        -2.5485752332464973,
+        1.2251732711970664
+      ]
+    },
+    {
+      "rail": "VIN_SYS_5V0",
+      "contrast": "mtp4_vs_mtp0_int8",
+      "paired_blocks": 7,
+      "block_effects_percent": [
+        -2.554219824366122,
+        1.282802762404378,
+        -1.6940476222804368,
+        -3.046561041277307,
+        -2.2049163795268334,
+        5.6053909443154915,
+        -10.07559801287099
+      ],
+      "median_percent": -2.2049163795268334,
+      "paired_block_bootstrap_95pct_percent": [
+        -3.046561041277307,
+        1.282802762404378
+      ]
+    },
+    {
+      "rail": "VIN_SYS_5V0",
+      "contrast": "int8_vs_fp16_mtp0",
+      "paired_blocks": 7,
+      "block_effects_percent": [
+        -0.23418677764641682,
+        -1.1968002863546934,
+        0.44883680362142186,
+        -0.7089332060580711,
+        1.2018698502760605,
+        1.752331688296782,
+        8.225985218836618
+      ],
+      "median_percent": 0.44883680362142186,
+      "paired_block_bootstrap_95pct_percent": [
+        -0.7089332060580711,
+        1.752331688296782
+      ]
+    },
+    {
+      "rail": "VIN_SYS_5V0",
+      "contrast": "int8_vs_fp16_mtp4",
+      "paired_blocks": 7,
+      "block_effects_percent": [
+        -5.815029481493694,
+        2.687723784881957,
+        -1.2044990779111475,
+        -4.382056756087948,
+        -0.6896930624219144,
+        6.155360570727031,
+        -0.06127704662297617
+      ],
+      "median_percent": -0.6896930624219144,
+      "paired_block_bootstrap_95pct_percent": [
+        -4.382056756087948,
+        2.687723784881957
+      ]
+    },
+    {
+      "rail": "VIN_SYS_5V0",
+      "contrast": "mtp_by_kv_interaction_fp16_minus_int8_percentage_points",
+      "paired_blocks": 7,
+      "block_effects_percentage_points": [
+        5.774058942950311,
+        -3.8313779956508753,
+        1.6451433204685229,
+        3.7244260628701897,
+        1.8627024618598442,
+        -4.380217673118425,
+        7.456840364866524
+      ],
+      "median_percentage_points": 1.8627024618598442,
+      "paired_block_bootstrap_95pct_percentage_points": [
+        -3.8313779956508753,
+        5.774058942950311
+      ]
+    }
+  ],
+  "per_arm": [
+    {
+      "block": 0,
+      "condition": "fp16-mtp0",
+      "kv": "fp16",
+      "mtp_window": 0,
+      "request_seconds": 29.79956166492775,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 275.11347385052443,
+        "VDD_CPU_CV": 81.52137592073862,
+        "VIN_SYS_5V0": 214.3614981085329
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 6.113632752233876,
+        "VDD_CPU_CV": 1.8115861315719692,
+        "VIN_SYS_5V0": 4.763588846856287
+      }
+    },
+    {
+      "block": 0,
+      "condition": "fp16-mtp4",
+      "kv": "fp16",
+      "mtp_window": 4,
+      "request_seconds": 32.18618560885079,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 263.1817435118398,
+        "VDD_CPU_CV": 101.94466376502939,
+        "VIN_SYS_5V0": 221.26359347981455
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 5.848483189151995,
+        "VDD_CPU_CV": 2.2654369725562087,
+        "VIN_SYS_5V0": 4.916968743995879
+      }
+    },
+    {
+      "block": 0,
+      "condition": "int8-mtp0",
+      "kv": "int8",
+      "mtp_window": 0,
+      "request_seconds": 29.801249152049422,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 279.2978235486638,
+        "VDD_CPU_CV": 89.74347426328269,
+        "VIN_SYS_5V0": 213.85949182359795
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 6.206618301081418,
+        "VDD_CPU_CV": 1.9942994280729487,
+        "VIN_SYS_5V0": 4.75243315163551
+      }
+    },
+    {
+      "block": 0,
+      "condition": "int8-mtp4",
+      "kv": "int8",
+      "mtp_window": 4,
+      "request_seconds": 29.835547138936818,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 259.11265353072747,
+        "VDD_CPU_CV": 92.29791937294077,
+        "VIN_SYS_5V0": 208.39705028715096
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 5.758058967349499,
+        "VDD_CPU_CV": 2.0510648749542395,
+        "VIN_SYS_5V0": 4.631045561936688
+      }
+    },
+    {
+      "block": 1,
+      "condition": "fp16-mtp0",
+      "kv": "fp16",
+      "mtp_window": 0,
+      "request_seconds": 29.675719290971756,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 276.0983249660268,
+        "VDD_CPU_CV": 83.48111837068225,
+        "VIN_SYS_5V0": 213.18822020957447
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 6.135518332578373,
+        "VDD_CPU_CV": 1.855135963792939,
+        "VIN_SYS_5V0": 4.73751600465721
+      }
+    },
+    {
+      "block": 1,
+      "condition": "fp16-mtp4",
+      "kv": "fp16",
+      "mtp_window": 4,
+      "request_seconds": 29.846818194026127,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 258.68173764539074,
+        "VDD_CPU_CV": 91.80515242451294,
+        "VIN_SYS_5V0": 207.75495802911425
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 5.748483058786461,
+        "VDD_CPU_CV": 2.04011449832251,
+        "VIN_SYS_5V0": 4.616776845091428
+      }
+    },
+    {
+      "block": 1,
+      "condition": "int8-mtp0",
+      "kv": "int8",
+      "mtp_window": 0,
+      "request_seconds": 29.31881048483774,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 273.3229917542116,
+        "VDD_CPU_CV": 85.01022611197286,
+        "VIN_SYS_5V0": 210.63678297963182
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 6.0738442612047026,
+        "VDD_CPU_CV": 1.889116135821619,
+        "VIN_SYS_5V0": 4.680817399547374
+      }
+    },
+    {
+      "block": 1,
+      "condition": "int8-mtp4",
+      "kv": "int8",
+      "mtp_window": 4,
+      "request_seconds": 30.600478353910148,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 263.9199453976066,
+        "VDD_CPU_CV": 96.72731502004441,
+        "VIN_SYS_5V0": 213.33883745033427
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 5.864887675502369,
+        "VDD_CPU_CV": 2.1494958893343203,
+        "VIN_SYS_5V0": 4.740863054451872
+      }
+    },
+    {
+      "block": 2,
+      "condition": "fp16-mtp0",
+      "kv": "fp16",
+      "mtp_window": 0,
+      "request_seconds": 28.919492778135464,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 278.5635402919563,
+        "VDD_CPU_CV": 85.5574591366554,
+        "VIN_SYS_5V0": 210.00653370375238
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 6.190300895376807,
+        "VDD_CPU_CV": 1.9012768697034532,
+        "VIN_SYS_5V0": 4.666811860083386
+      }
+    },
+    {
+      "block": 2,
+      "condition": "fp16-mtp4",
+      "kv": "fp16",
+      "mtp_window": 4,
+      "request_seconds": 30.028525293106213,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 258.1063452329832,
+        "VDD_CPU_CV": 85.71350440280912,
+        "VIN_SYS_5V0": 209.90383147468515
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 5.7356965607329595,
+        "VDD_CPU_CV": 1.9047445422846472,
+        "VIN_SYS_5V0": 4.664529588326337
+      }
+    },
+    {
+      "block": 2,
+      "condition": "int8-mtp0",
+      "kv": "int8",
+      "mtp_window": 0,
+      "request_seconds": 29.36834421590902,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 273.5104083321173,
+        "VDD_CPU_CV": 86.2660102117831,
+        "VIN_SYS_5V0": 210.94912031702444
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 6.078009074047052,
+        "VDD_CPU_CV": 1.9170224491507355,
+        "VIN_SYS_5V0": 4.687758229267209
+      }
+    },
+    {
+      "block": 2,
+      "condition": "int8-mtp4",
+      "kv": "int8",
+      "mtp_window": 4,
+      "request_seconds": 29.638717532157898,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 257.1850816623057,
+        "VDD_CPU_CV": 89.46322943032987,
+        "VIN_SYS_5V0": 207.3755417600724
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 5.7152240369401275,
+        "VDD_CPU_CV": 1.9880717651184416,
+        "VIN_SYS_5V0": 4.6083453724460535
+      }
+    },
+    {
+      "block": 3,
+      "condition": "fp16-mtp0",
+      "kv": "fp16",
+      "mtp_window": 0,
+      "request_seconds": 29.420521643944085,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 276.24652497542434,
+        "VDD_CPU_CV": 89.89395259319114,
+        "VIN_SYS_5V0": 213.17555859454083
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 6.1388116661205405,
+        "VDD_CPU_CV": 1.9976433909598033,
+        "VIN_SYS_5V0": 4.73723463543424
+      }
+    },
+    {
+      "block": 3,
+      "condition": "fp16-mtp4",
+      "kv": "fp16",
+      "mtp_window": 4,
+      "request_seconds": 30.920624434016645,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 261.242549090819,
+        "VDD_CPU_CV": 93.53372712875355,
+        "VIN_SYS_5V0": 214.62060114083846
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 5.805389979795978,
+        "VDD_CPU_CV": 2.0785272695278567,
+        "VIN_SYS_5V0": 4.769346692018632
+      }
+    },
+    {
+      "block": 3,
+      "condition": "int8-mtp0",
+      "kv": "int8",
+      "mtp_window": 0,
+      "request_seconds": 29.368882389971986,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 273.322918095771,
+        "VDD_CPU_CV": 86.28623278169326,
+        "VIN_SYS_5V0": 211.66428627246435
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 6.073842624350466,
+        "VDD_CPU_CV": 1.9174718395931836,
+        "VIN_SYS_5V0": 4.703650806054763
+      }
+    },
+    {
+      "block": 3,
+      "condition": "int8-mtp4",
+      "kv": "int8",
+      "mtp_window": 4,
+      "request_seconds": 29.14810557104647,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 257.1008827020695,
+        "VDD_CPU_CV": 90.3330609427825,
+        "VIN_SYS_5V0": 205.21580458858978
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 5.713352948934878,
+        "VDD_CPU_CV": 2.0074013542840556,
+        "VIN_SYS_5V0": 4.560351213079773
+      }
+    },
+    {
+      "block": 4,
+      "condition": "fp16-mtp0",
+      "kv": "fp16",
+      "mtp_window": 0,
+      "request_seconds": 28.968523179879412,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 275.415625974142,
+        "VDD_CPU_CV": 82.97388756743865,
+        "VIN_SYS_5V0": 209.34110469072223
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 6.120347243869823,
+        "VDD_CPU_CV": 1.8438641681653034,
+        "VIN_SYS_5V0": 4.652024548682716
+      }
+    },
+    {
+      "block": 4,
+      "condition": "fp16-mtp4",
+      "kv": "fp16",
+      "mtp_window": 4,
+      "request_seconds": 29.652208948973566,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 258.90573735355593,
+        "VDD_CPU_CV": 90.4762306094724,
+        "VIN_SYS_5V0": 208.62471029507276
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 5.753460830079021,
+        "VDD_CPU_CV": 2.01058290243272,
+        "VIN_SYS_5V0": 4.636104673223839
+      }
+    },
+    {
+      "block": 4,
+      "condition": "int8-mtp0",
+      "kv": "int8",
+      "mtp_window": 0,
+      "request_seconds": 29.54134275112301,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 273.37715082476757,
+        "VDD_CPU_CV": 81.30641776896049,
+        "VIN_SYS_5V0": 211.85711231223485
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 6.075047796105946,
+        "VDD_CPU_CV": 1.8068092837546774,
+        "VIN_SYS_5V0": 4.707935829160775
+      }
+    },
+    {
+      "block": 4,
+      "condition": "int8-mtp4",
+      "kv": "int8",
+      "mtp_window": 4,
+      "request_seconds": 29.352786720031872,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 260.38001901282627,
+        "VDD_CPU_CV": 92.34959756124559,
+        "VIN_SYS_5V0": 207.18584014166981
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 5.786222644729473,
+        "VDD_CPU_CV": 2.052213279138791,
+        "VIN_SYS_5V0": 4.604129780925996
+      }
+    },
+    {
+      "block": 5,
+      "condition": "fp16-mtp0",
+      "kv": "fp16",
+      "mtp_window": 0,
+      "request_seconds": 28.909522652160376,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 274.5870688590839,
+        "VDD_CPU_CV": 87.2891330132782,
+        "VIN_SYS_5V0": 208.99424636657142
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 6.101934863535198,
+        "VDD_CPU_CV": 1.9397585114061824,
+        "VIN_SYS_5V0": 4.644316585923809
+      }
+    },
+    {
+      "block": 5,
+      "condition": "fp16-mtp4",
+      "kv": "fp16",
+      "mtp_window": 4,
+      "request_seconds": 30.49681248003617,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 258.04031009127505,
+        "VDD_CPU_CV": 91.56139245950996,
+        "VIN_SYS_5V0": 211.55478801139438
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 5.734229113139445,
+        "VDD_CPU_CV": 2.0346976102113326,
+        "VIN_SYS_5V0": 4.7012175113643195
+      }
+    },
+    {
+      "block": 5,
+      "condition": "int8-mtp0",
+      "kv": "int8",
+      "mtp_window": 0,
+      "request_seconds": 29.599942005006596,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 275.47221512340786,
+        "VDD_CPU_CV": 86.724162942825,
+        "VIN_SYS_5V0": 212.6565187723699
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 6.121604780520174,
+        "VDD_CPU_CV": 1.9272036209516668,
+        "VIN_SYS_5V0": 4.725700417163775
+      }
+    },
+    {
+      "block": 5,
+      "condition": "int8-mtp4",
+      "kv": "int8",
+      "mtp_window": 4,
+      "request_seconds": 33.260192792862654,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 284.06957666743557,
+        "VDD_CPU_CV": 98.95738506273382,
+        "VIN_SYS_5V0": 224.5767480181329
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 6.312657259276346,
+        "VDD_CPU_CV": 2.199053001394085,
+        "VIN_SYS_5V0": 4.990594400402953
+      }
+    },
+    {
+      "block": 6,
+      "condition": "fp16-mtp0",
+      "kv": "fp16",
+      "mtp_window": 0,
+      "request_seconds": 29.36105329892598,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 276.00582310274865,
+        "VDD_CPU_CV": 86.79545421001981,
+        "VIN_SYS_5V0": 211.3542680262638
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 6.133462735616637,
+        "VDD_CPU_CV": 1.9287878713337736,
+        "VIN_SYS_5V0": 4.696761511694751
+      }
+    },
+    {
+      "block": 6,
+      "condition": "fp16-mtp4",
+      "kv": "fp16",
+      "mtp_window": 4,
+      "request_seconds": 29.381898691877723,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 256.34730123488686,
+        "VDD_CPU_CV": 87.70225588368606,
+        "VIN_SYS_5V0": 205.81941196794216
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 5.696606694108596,
+        "VDD_CPU_CV": 1.948939019637468,
+        "VIN_SYS_5V0": 4.573764710398715
+      }
+    },
+    {
+      "block": 6,
+      "condition": "int8-mtp0",
+      "kv": "int8",
+      "mtp_window": 0,
+      "request_seconds": 33.33953243889846,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 304.2014628912465,
+        "VDD_CPU_CV": 92.94495344320332,
+        "VIN_SYS_5V0": 228.7402388734846
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 6.7600325086943664,
+        "VDD_CPU_CV": 2.0654434098489625,
+        "VIN_SYS_5V0": 5.083116419410769
+      }
+    },
+    {
+      "block": 6,
+      "condition": "int8-mtp4",
+      "kv": "int8",
+      "mtp_window": 4,
+      "request_seconds": 29.356286813970655,
+      "output_tokens": 45,
+      "status": "estimated",
+      "reason": null,
+      "joules_by_named_rail": {
+        "VDD_GPU_SOC": 252.7955051451762,
+        "VDD_CPU_CV": 86.83008315943104,
+        "VIN_SYS_5V0": 205.69329191091143
+      },
+      "joules_per_output_token_by_named_rail": {
+        "VDD_GPU_SOC": 5.617677892115027,
+        "VDD_CPU_CV": 1.929557403542912,
+        "VIN_SYS_5V0": 4.570962042464698
+      }
+    }
+  ]
+}

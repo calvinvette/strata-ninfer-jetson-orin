@@ -1,0 +1,19 @@
+--- a/src/kernels/cpu/native_expert.cpp
++++ b/src/kernels/cpu/native_expert.cpp
+@@ -506,10 +506,12 @@
+                                  f.gu_type == GGML_TYPE_IQ3_XXS ? q8_1_iq3_xxs_cuda_dot : q8_1_iq3_s_cuda_dot;
+                 const float g = dot(gr, xq, (int) f.n_embd);
+                 const float u = dot(ur, xq, (int) f.n_embd);
+-                // The reciprocal form is bit-sensitive after Q8_1 hidden quantization: replacing it with the
+-                // algebraically equivalent division can move a block's FP16 scale by one representable value.
+-                const float sigmoid = 1.f / (1.f + std::exp(-g));
+-                ff[t][r] = (g * sigmoid) * u;
++                if (f.gu_type == GGML_TYPE_IQ2_S && f.d_type == GGML_TYPE_IQ4_NL) {
++                    ff[t][r] = (g / (1.f + std::exp(-g))) * u;
++                } else {
++                    const float sigmoid = 1.f / (1.f + std::exp(-g));
++                    ff[t][r] = (g * sigmoid) * u;
++                }
+             }
+         }
+         return;

@@ -72,12 +72,11 @@ isolation and broader supported-format coverage.
 
 A same-input [Q8_1 stage-isolation check](../operator-checks/layer31-position519/README.md)
 compared expert 22 through the independent native-expert harness. CPU and CUDA
-input Q8_1 blocks were byte-identical. After gate/up and SwiGLU, 3/60 hidden
-Q8_1 blocks differed only in the FP16 `d` scale by one representable step; their
-sum scales and all integer codes matched. Replaying down projection on the
-CUDA-produced hidden blocks made CPU IQ4_NL output bit-identical to grouped CUDA
-(0/7,680 words differed). This localizes the operator mismatch to gate/up
-output before hidden quantization. It does not yet distinguish CUDA fast
-divide/exp/SwiGLU arithmetic from another gate/up scheduling detail. Auxiliary
-float-stage buffers from the fused kernel are not valid captures and are
-excluded from this interpretation.
+input Q8_1 blocks and all captured mode-0 gate/up dot values matched bitwise.
+After SwiGLU, 3/60 hidden Q8_1 blocks differed only in the FP16 `d` scale by
+one representable step; their sum scales and integer codes matched. The default
+Orin CUDA mode produced the same hidden Q8_1 bytes as explicit mode 0. Replaying
+down projection on those CUDA-produced hidden blocks made CPU IQ4_NL output
+bit-identical to grouped CUDA (0/7,680 words differed). This localizes the
+operator mismatch to SwiGLU output or its hidden quantization scale; the exact
+arithmetic operation remains unisolated.
