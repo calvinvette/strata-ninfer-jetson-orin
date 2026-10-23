@@ -22,6 +22,19 @@ selector/configuration cell, so the onset difference does not establish a cause.
 Three terminal batch `STATE_HASH` records are present in the raw engine log but
 were not joined to prompts; persistent-state parity is therefore unassessed.
 
+A follow-up captured verifier logits at absolute position 133, the row that
+emits slot 1's first differing token. The serial and batch rows receive the
+same input token ID (`3008`), but all 248,320 logits differ (relative L2
+`0.03150`, maximum absolute difference `0.4373`). The top two reverse order:
+serial ranks token 2100 at `22.9859` over 5435 at `22.9068`, while batch ranks
+5435 at `23.0309` over 2100 at `22.9599`. The output comparison confirms those
+are the differing token IDs at index 66. This localizes the first output change
+to verifier logits, but not the preceding layer or operation. The capture took
+191.5 seconds and retained at least 17.44 GiB physical/admission availability,
+with zero sampled cgroup memory events. Capture and comparison commands are in
+`capture_divergence_logits.py` and `analyze_divergence_logits.py`; raw rows and
+analysis are under `logits-position-133/`.
+
 The run took 278.6 seconds. The supervisor sampled dynamic CPU/GPU clocks and
 tegrastats, but EMC clock access was denied and energy was not measured. Minimum
 physical and admission availability were both 17.54 GiB, above the preserved
@@ -41,7 +54,8 @@ python3 tools/integration/run_control.py \
 The selected report files are `run/result.json`, the three engine logs in
 `run/`, and the supervisor's `result.json`, `memory.jsonl`, and `tegrastats.txt`
 in `supervisor-attempt-02/`. The runner refuses to overwrite an output
-directory. It consumes the already downloaded model under
+directory. The logits capture's supervisor record is in
+`supervisor-logits-position-133/`. The runner consumes the already downloaded model under
 `~/models/strata-orin-validation/`; it downloads nothing.
 
 This does not establish multi-live correctness, quality, throughput, energy,

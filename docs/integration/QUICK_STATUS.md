@@ -304,3 +304,7 @@ A two-live target-only check with Q8_1 forced to `all` matched slot 0 for 96
 tokens but slot 1 first differed at index 66. Minimum physical/admission
 availability was 17.54 GiB. This single correctness cell does not identify the
 cause or qualify performance; [details](../../bench/results/2026-10-23-phase5-coder-two-live-target-q8all/README.md).
+
+The follow-up captured that row's logits at position 133: both arms used input
+token 3008, but the top two reversed (2100 versus 5435). This locates the
+changed output at verifier logits while leaving its upstream cause open.

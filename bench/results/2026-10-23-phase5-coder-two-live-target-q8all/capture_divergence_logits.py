@@ -1,0 +1,69 @@
+#!/usr/bin/env python3
+"""Capture the slot-1 verifier row at the Q8_1-all first mismatch position."""
+import argparse
+import json
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+import sys
+import threading
+
+ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(ROOT))
+from serve.server import StrataEngine, child_env
+from tools.integration.batch_mtp_graph_lifecycle import prepared_prompts, remove_arg, replace_arg
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--output', type=Path, required=True)
+parser.add_argument('--position', type=int, default=133)
+opts = parser.parse_args()
+out = opts.output.resolve()
+out.mkdir(parents=True, exist_ok=False)
+base = Path(__file__).resolve().parent
+cfg = json.loads((base.parent / '2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/config.json').read_text())
+args = list(cfg['args'])
+for key in ('--mtp', '--mtp-max-t', '--adapt-every', '--adapt-accepted-only'):
+    remove_arg(args, key)
+replace_arg(args, '--spec', '2')
+replace_arg(args, '--max-context', '1024')
+replace_arg(args, '--expert-cache', '1500')
+replace_arg(args, '--prompt-cache', '6')
+prompts = prepared_prompts(cfg, 2)
+
+def make_env(name):
+    env = child_env(cfg)
+    env.update({'STRATA_NATIVE_CPU_Q8_1_DOT': 'all', 'STRATA_IQ_MT_MIN': '1',
+                'STRATA_PREFILL_CPU_SHARE': '0', 'STRATA_LOGITS_TRACE_POSITION': str(opts.position),
+                'STRATA_LOGITS_TRACE_SLOT': '-2',
+                'STRATA_LOGITS_TRACE_PATH': str((out / f'{name}.bin').resolve())})
+    return env
+
+def generate(engine, key):
+    tokens = [int(t) for t in engine.generate(prompts[key], 96, {'temperature': 0}, threading.Event()) if t is not None]
+    return {'tokens': tokens, 'finish': engine.last.get('finish')}
+
+serial = StrataEngine(cfg['exe'], args, cwd=cfg.get('cwd'), log=str(out/'serial-slot-1.log'), env=make_env('serial'))
+try:
+    serial_out = generate(serial, 'slot-1')
+finally:
+    serial.close()
+
+batch = StrataEngine(cfg['exe'], args+['--batch', '2'], cwd=cfg.get('cwd'),
+                     log=str(out/'batch.log'), env=make_env('batch'))
+try:
+    if batch.batch != 2:
+        raise RuntimeError(f'expected two batch slots, got {batch.batch}')
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        jobs = {key: pool.submit(generate, batch, key) for key in prompts}
+        batch_out = {key: job.result() for key, job in jobs.items()}
+finally:
+    batch.close()
+
+result = {'capture_position': opts.position, 'target_slot': 1, 'profile': {
+    'live_requests': 2, 'batch_slots': 2, 'mtp': False, 'context': 1024,
+    'expert_cache_mib': 1500, 'prompt_cache': 6, 'STRATA_NATIVE_CPU_Q8_1_DOT': 'all',
+    'STRATA_IQ_MT_MIN': '1'}, 'prompts': prompts,
+    'serial_slot_1': serial_out, 'batch': batch_out}
+(out/'result.json').write_text(json.dumps(result, indent=2)+'\n')
+print(json.dumps({'capture_position': opts.position,
+                  'serial_tokens': len(serial_out['tokens']),
+                  'batch_tokens': {k: len(v['tokens']) for k, v in batch_out.items()}}))
