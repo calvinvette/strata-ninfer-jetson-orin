@@ -300,6 +300,46 @@ qualify a profile or default. The 72-token capture took 286.88 seconds; the
 availability, with no cgroup pressure/OOM events. Clocks varied dynamically;
 EMC readback was denied; energy was not analyzed.
 
+#### Committed-state alignment at positions 103–105
+
+A follow-up captured all GDN committed-state layers at model positions 103 and
+105 in the same 128-token GR-V3 run. Both serial and two-live output streams
+matched exactly (120 and 128 generated tokens). The batch and serial rows had
+the same token at each compared absolute model position. At position 103, all
+36 GDN states were bit-identical. At position 105 (token 7620), the first
+changed state was model layer 20: 796,266/817,152 values changed, maximum
+absolute delta `0.0031543`, relative L2 `1.8271e-4`; its recurrent and
+convolution portions had relative L2 `9.4160e-5` and `1.8276e-4`. A separate
+same-profile capture at position 104 also found layer 20 as the first changed
+state. These captures bound the sampled onset to the layer-20 boundary around
+positions 103–105, but do not isolate the operation.
+
+At the same-position p105 stage capture, layer-20 `x`, `qkv`, `gate`, `beta`
+and `z` were exact; `h` was the first changed field (relative L2
+`1.7037e-4`). `gdn_out` and `ffn_y` were downstream deltas (relative L2
+`1.6631e-3` and `7.2968e-3`). The focused convolution+L2 test passes for equal
+history/input at every verifier window and split, so it does not identify a
+local kernel arithmetic defect; divergent convolution history or an upstream
+state/input difference remains possible.
+
+The accepted-prefix hash labels need a separate interpretation. Source inspection
+shows batch GDN hashes are sampled before `ver.run_slot_rows()` (before that
+window updates state), while the serial `ACCEPTED_PREFIX` hash is sampled after
+commit. Thus the hash analyzer's batch-p105 / serial-prefix-103 match is not a
+pair of committed states at those numeric positions. A direct attempted
+cross-position dump comparison was rejected by the new analyzer because the
+captured tokens differ (serial p103: 27379; batch p105: 7620). Comparing the
+committed dumps at equal model position instead checks equal token and state
+boundary: p103 was exact and p105 first changed at layer 20. This clarifies the
+sampling boundary without invalidating the hash records at their own stages.
+
+The repeat took 427.29 seconds and retained 17.68 GiB minimum physical
+availability with zero cgroup OOM events. Binary SHA256 was
+`ad4b2354fe98f0e4128cf9a9ed70488fef362207dd1f7e94555a8ba35d8985df`; temporary
+expert-profile SHA256 remained `e495a29eb202f0918388e79e33b24691295c3b898ef1118c1a4491beafa0ebf8`.
+The full dump and compact analyses remain local; the reusable position-aware
+analyzer is `tools/integration/compare_gdn_commit_state.py`.
+
 ### GDN layer-20 follow-up and verifier convolution parity
 
 Two additional 128-token `STRATA_GR_V3=1` captures sampled layer-20 and layer-19

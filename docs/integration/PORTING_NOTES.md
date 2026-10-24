@@ -3009,3 +3009,15 @@ end-to-end output parity. Adjacent numeric snapshots must also be compared in
 the same coordinate system: absolute model positions and accepted-prefix
 aligned states (batch p versus serial p-2 here) are different comparisons.
 [Focused test and trace report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#gdn-layer-20-follow-up-and-verifier-convolution-parity).
+
+When comparing committed state across a speculative path, pair the binary
+records by model position and committed token, and record whether each hash is
+sampled before or after the verifier window. The batch per-window GDN hash is
+sampled before verification, while the serial accepted-prefix hash follows
+commit; an inferred offset between those labels cannot be applied directly to
+post-commit numeric dumps. `tools/integration/compare_gdn_commit_state.py`
+supports separate serial/batch positions and rejects token mismatches, avoiding
+false numeric comparisons. In the Orin capture, matching post-commit states
+were exact at p103 and first differed at layer 20 by p105, with layer-20 input
+and QKV exact but `h` changed. Carry this distinction into future Splash/NInfer
+state analyzers. [Observed example](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#committed-state-alignment-at-positions-103105).

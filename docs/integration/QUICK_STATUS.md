@@ -766,3 +766,10 @@ new model-width verifier convolution parity test passed all T=1..8 windows and
 split offsets; no kernel change was needed. Phase 5 multi-live persistent-state
 drift is still open, as are broader Phase 6 interaction/energy gates. [CTest
 report](../../bench/results/2026-10-24-orin-cuda-functional-ctest/README.md).
+
+A token-aligned GR-V3 state capture now shows all 36 committed GDN layers exact
+at model position 103, then layer 20 first changed at position 105 while both
+outputs remained exact. Layer-20 `x` and `qkv` matched at p105; `h` was the
+first changed stage field. The earlier batch-hash/serial-prefix offset compared
+pre-window batch state with post-commit serial state, so those labels are not
+the same numeric boundary. [Analysis](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#committed-state-alignment-at-positions-103105).

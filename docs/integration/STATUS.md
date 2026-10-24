@@ -5216,6 +5216,18 @@ functional kernel coverage, not resolution of the multi-live accepted-state
 drift. Maestro1 HIP/SYCL builds remain pending available scratch storage.
 Phase 5 remains open. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#gdn-layer-20-follow-up-and-verifier-convolution-parity).
 
+A new position-paired committed-state capture resolves that coordinate ambiguity
+for the sampled token stream: serial and batch outputs were exact, and all 36
+GDN layers were bit-identical at model position 103. At position 105, where the
+captured token also matched, first changed state was layer 20 (relative L2
+`1.8271e-4`). The layer-20 stage had exact `x`/`qkv`, with `h` first different
+(`1.7037e-4`); downstream `gdn_out` was `1.6631e-3`. A separate same-profile
+position-104 capture also first changed at layer 20. This localizes the sampled
+state onset to that boundary around positions 103–105, without naming the
+operation. The hash trace samples batch state before its window and serial
+state after commit, so its batch-p105 / serial-prefix-103 match is a different
+sampling boundary from these post-commit numeric dumps. [Aligned capture and analyzer](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#committed-state-alignment-at-positions-103105).
+
 The current Orin candidate CTest suite ran all 135 registered cases serially:
 132 passed, two IQ-fixture tests skipped, and `pool_test` could not open its
 default `pack/full/experts.bin`. The pool test then passed with the existing
