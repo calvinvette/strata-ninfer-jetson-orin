@@ -1,0 +1,1663 @@
+{
+  "schema": 1,
+  "scope": "randomized blocked 2\u00d72 MTP-window \u00d7 KV-format screen on one held-out workload",
+  "source_commit": "465056c6db218f096c54833d1fed9eca0244cc0a",
+  "binary": "/home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/candidate/strata",
+  "binary_sha256": "1f44e7e3713faf9d1e1fee688a69ce5960e21d40c1d0d6071e9831dea53316d6",
+  "model_name": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+  "workloads": [
+    "coder-mtp-retrieval-short-512"
+  ],
+  "prompt_tokens_requested": {
+    "coder-mtp-retrieval-short-512": 512
+  },
+  "kv_formats": [
+    "fp16",
+    "int8"
+  ],
+  "mtp_windows": [
+    0,
+    3
+  ],
+  "blocks": 3,
+  "expert_cache_budget_override": null,
+  "seed": 20261027,
+  "floor_gib": 6,
+  "supervisor_memory_max": "28G",
+  "randomized_design": [
+    {
+      "block": 0,
+      "order": 0,
+      "kv": "fp16",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 3
+    },
+    {
+      "block": 0,
+      "order": 1,
+      "kv": "fp16",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 0
+    },
+    {
+      "block": 0,
+      "order": 2,
+      "kv": "int8",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 0
+    },
+    {
+      "block": 0,
+      "order": 3,
+      "kv": "int8",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 3
+    },
+    {
+      "block": 1,
+      "order": 0,
+      "kv": "fp16",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 3
+    },
+    {
+      "block": 1,
+      "order": 1,
+      "kv": "int8",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 3
+    },
+    {
+      "block": 1,
+      "order": 2,
+      "kv": "fp16",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 0
+    },
+    {
+      "block": 1,
+      "order": 3,
+      "kv": "int8",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 0
+    },
+    {
+      "block": 2,
+      "order": 0,
+      "kv": "fp16",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 0
+    },
+    {
+      "block": 2,
+      "order": 1,
+      "kv": "int8",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 3
+    },
+    {
+      "block": 2,
+      "order": 2,
+      "kv": "fp16",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 3
+    },
+    {
+      "block": 2,
+      "order": 3,
+      "kv": "int8",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 0
+    }
+  ],
+  "runs": [
+    {
+      "block": 0,
+      "order": 0,
+      "kv": "fp16",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 3,
+      "name": "block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-3",
+      "directory": "block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-3",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-3/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-3/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-3/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-3/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-heldout-workload-confirm7-cache1500/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_memory_max": "28G",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 73.92820407194085,
+      "minimum_available_bytes": 18251395072,
+      "minimum_admission_available_bytes": 18251395072,
+      "request_status": "pass",
+      "answer": "EARLY=CITRUS-AXLE-431, MIDDLE=MARBLE-THICKET-782, LATE=OXIDE-KITE-265, SUM=1478",
+      "metrics": {
+        "prompt_tps": 19.23076923076923,
+        "decode_tps": 13.032748246124836,
+        "client_total_s": 30.239714149851352,
+        "client_ttft_s": 26.72695521195419,
+        "drafted": 34,
+        "accepted": 31,
+        "cache_hit_rate": 0.173,
+        "logical_file_mb": 31653.2,
+        "prompt_tokens": 512,
+        "completion_tokens": 47
+      },
+      "engine": {
+        "kv": "fp16",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 3,
+        "spec": 3
+      },
+      "clock_window": {
+        "sample_count": 29,
+        "gpu": {
+          "samples": 29,
+          "min_mhz": 408.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 0,
+      "order": 1,
+      "kv": "fp16",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 0,
+      "name": "block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0",
+      "directory": "block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-heldout-workload-confirm7-cache1500/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_memory_max": "28G",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 71.94558462081477,
+      "minimum_available_bytes": 19359301632,
+      "minimum_admission_available_bytes": 19359301632,
+      "request_status": "pass",
+      "answer": "EARLY=CITRUS-AXLE-431, MIDDLE=MARBLE-THICKET-782, LATE=OXIDE-KITE-265, SUM=1478",
+      "metrics": {
+        "prompt_tps": 19.306620813442233,
+        "decode_tps": 12.068921243869244,
+        "client_total_s": 30.42114036087878,
+        "client_ttft_s": 26.62472170498222,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.177,
+        "logical_file_mb": 37930.3,
+        "prompt_tokens": 512,
+        "completion_tokens": 47
+      },
+      "engine": {
+        "kv": "fp16",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 0,
+        "spec": 2
+      },
+      "clock_window": {
+        "sample_count": 29,
+        "gpu": {
+          "samples": 29,
+          "min_mhz": 408.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 0,
+      "order": 2,
+      "kv": "int8",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 0,
+      "name": "block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0",
+      "directory": "block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-heldout-workload-confirm7-cache1500/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_memory_max": "28G",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 69.79389370512217,
+      "minimum_available_bytes": 19426971648,
+      "minimum_admission_available_bytes": 19426971648,
+      "request_status": "pass",
+      "answer": "EARLY=CITRUS-AXLE-431, MIDDLE=MARBLE-THICKET-782, LATE=OXIDE-KITE-265, SUM=1478",
+      "metrics": {
+        "prompt_tps": 20.205926808765902,
+        "decode_tps": 12.12152473306855,
+        "client_total_s": 29.22179141989909,
+        "client_ttft_s": 25.445322019048035,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.177,
+        "logical_file_mb": 37931.3,
+        "prompt_tokens": 512,
+        "completion_tokens": 47
+      },
+      "engine": {
+        "kv": "int8",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 0,
+        "spec": 2
+      },
+      "clock_window": {
+        "sample_count": 28,
+        "gpu": {
+          "samples": 28,
+          "min_mhz": 408.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 0,
+      "order": 3,
+      "kv": "int8",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 3,
+      "name": "block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-3",
+      "directory": "block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-3",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-3/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-3/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-3/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-00-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-3/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-heldout-workload-confirm7-cache1500/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_memory_max": "28G",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 74.47375233704224,
+      "minimum_available_bytes": 18341785600,
+      "minimum_admission_available_bytes": 18341785600,
+      "request_status": "pass",
+      "answer": "EARLY=CITRUS-AXLE-431, MIDDLE=MARBLE-THICKET-782, LATE=OXIDE-KITE-265, SUM=1478",
+      "metrics": {
+        "prompt_tps": 19.231491567441687,
+        "decode_tps": 13.03563999445292,
+        "client_total_s": 30.23779501207173,
+        "client_ttft_s": 26.734329459024593,
+        "drafted": 34,
+        "accepted": 31,
+        "cache_hit_rate": 0.176,
+        "logical_file_mb": 31592.1,
+        "prompt_tokens": 512,
+        "completion_tokens": 47
+      },
+      "engine": {
+        "kv": "int8",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 3,
+        "spec": 3
+      },
+      "clock_window": {
+        "sample_count": 29,
+        "gpu": {
+          "samples": 29,
+          "min_mhz": 408.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 1,
+      "order": 0,
+      "kv": "fp16",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 3,
+      "name": "block-01-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-3",
+      "directory": "block-01-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-3",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-01-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-3/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-01-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-3/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-01-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-3/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-01-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-3/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-heldout-workload-confirm7-cache1500/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_memory_max": "28G",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 75.50297281704843,
+      "minimum_available_bytes": 18268057600,
+      "minimum_admission_available_bytes": 18268057600,
+      "request_status": "pass",
+      "answer": "EARLY=CITRUS-AXLE-431, MIDDLE=MARBLE-THICKET-782, LATE=OXIDE-KITE-265, SUM=1478",
+      "metrics": {
+        "prompt_tps": 18.997439798152204,
+        "decode_tps": 13.03889474560284,
+        "client_total_s": 30.5656586389523,
+        "client_ttft_s": 27.05163416895084,
+        "drafted": 34,
+        "accepted": 31,
+        "cache_hit_rate": 0.173,
+        "logical_file_mb": 31653.2,
+        "prompt_tokens": 512,
+        "completion_tokens": 47
+      },
+      "engine": {
+        "kv": "fp16",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 3,
+        "spec": 3
+      },
+      "clock_window": {
+        "sample_count": 29,
+        "gpu": {
+          "samples": 29,
+          "min_mhz": 306.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 1,
+      "order": 1,
+      "kv": "int8",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 3,
+      "name": "block-01-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-3",
+      "directory": "block-01-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-3",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-01-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-3/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-01-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-3/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-01-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-3/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-01-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-3/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-heldout-workload-confirm7-cache1500/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_memory_max": "28G",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 73.28080710791983,
+      "minimum_available_bytes": 18327007232,
+      "minimum_admission_available_bytes": 18327007232,
+      "request_status": "pass",
+      "answer": "EARLY=CITRUS-AXLE-431, MIDDLE=MARBLE-THICKET-782, LATE=OXIDE-KITE-265, SUM=1478",
+      "metrics": {
+        "prompt_tps": 19.37053333282889,
+        "decode_tps": 13.20410169967692,
+        "client_total_s": 30.000635005999357,
+        "client_ttft_s": 26.52906263084151,
+        "drafted": 34,
+        "accepted": 31,
+        "cache_hit_rate": 0.176,
+        "logical_file_mb": 31592.1,
+        "prompt_tokens": 512,
+        "completion_tokens": 47
+      },
+      "engine": {
+        "kv": "int8",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 3,
+        "spec": 3
+      },
+      "clock_window": {
+        "sample_count": 28,
+        "gpu": {
+          "samples": 28,
+          "min_mhz": 306.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 1,
+      "order": 2,
+      "kv": "fp16",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 0,
+      "name": "block-01-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0",
+      "directory": "block-01-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-01-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-01-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-01-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-01-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-heldout-workload-confirm7-cache1500/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_memory_max": "28G",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 72.45297047193162,
+      "minimum_available_bytes": 19350347776,
+      "minimum_admission_available_bytes": 19350347776,
+      "request_status": "pass",
+      "answer": "EARLY=CITRUS-AXLE-431, MIDDLE=MARBLE-THICKET-782, LATE=OXIDE-KITE-265, SUM=1478",
+      "metrics": {
+        "prompt_tps": 19.107757301626396,
+        "decode_tps": 12.097500707832488,
+        "client_total_s": 30.685909213963896,
+        "client_ttft_s": 26.90690872911364,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.177,
+        "logical_file_mb": 37930.3,
+        "prompt_tokens": 512,
+        "completion_tokens": 47
+      },
+      "engine": {
+        "kv": "fp16",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 0,
+        "spec": 2
+      },
+      "clock_window": {
+        "sample_count": 30,
+        "gpu": {
+          "samples": 30,
+          "min_mhz": 306.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 1,
+      "order": 3,
+      "kv": "int8",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 0,
+      "name": "block-01-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0",
+      "directory": "block-01-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-01-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-01-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-01-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-01-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-heldout-workload-confirm7-cache1500/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_memory_max": "28G",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 71.98744005593471,
+      "minimum_available_bytes": 19429801984,
+      "minimum_admission_available_bytes": 19429801984,
+      "request_status": "pass",
+      "answer": "EARLY=CITRUS-AXLE-431, MIDDLE=MARBLE-THICKET-782, LATE=OXIDE-KITE-265, SUM=1478",
+      "metrics": {
+        "prompt_tps": 19.740063461219645,
+        "decode_tps": 12.203988367262152,
+        "client_total_s": 29.795713888015598,
+        "client_ttft_s": 26.035410741809756,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.177,
+        "logical_file_mb": 37931.3,
+        "prompt_tokens": 512,
+        "completion_tokens": 47
+      },
+      "engine": {
+        "kv": "int8",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 0,
+        "spec": 2
+      },
+      "clock_window": {
+        "sample_count": 29,
+        "gpu": {
+          "samples": 29,
+          "min_mhz": 408.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 2,
+      "order": 0,
+      "kv": "fp16",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 0,
+      "name": "block-02-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0",
+      "directory": "block-02-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-02-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-02-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-02-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-02-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-heldout-workload-confirm7-cache1500/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_memory_max": "28G",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 71.83750723395497,
+      "minimum_available_bytes": 19336036352,
+      "minimum_admission_available_bytes": 19336036352,
+      "request_status": "pass",
+      "answer": "EARLY=CITRUS-AXLE-431, MIDDLE=MARBLE-THICKET-782, LATE=OXIDE-KITE-265, SUM=1478",
+      "metrics": {
+        "prompt_tps": 19.56154627910353,
+        "decode_tps": 12.14313396202041,
+        "client_total_s": 30.04973302502185,
+        "client_ttft_s": 26.279467136133462,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.177,
+        "logical_file_mb": 37930.3,
+        "prompt_tokens": 512,
+        "completion_tokens": 47
+      },
+      "engine": {
+        "kv": "fp16",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 0,
+        "spec": 2
+      },
+      "clock_window": {
+        "sample_count": 28,
+        "gpu": {
+          "samples": 28,
+          "min_mhz": 408.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 2,
+      "order": 1,
+      "kv": "int8",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 3,
+      "name": "block-02-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-3",
+      "directory": "block-02-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-3",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-02-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-3/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-02-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-3/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-02-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-3/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-02-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-3/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-heldout-workload-confirm7-cache1500/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_memory_max": "28G",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 75.61174827907234,
+      "minimum_available_bytes": 18378739712,
+      "minimum_admission_available_bytes": 18378739712,
+      "request_status": "pass",
+      "answer": "EARLY=CITRUS-AXLE-431, MIDDLE=MARBLE-THICKET-782, LATE=OXIDE-KITE-265, SUM=1478",
+      "metrics": {
+        "prompt_tps": 19.422410882619598,
+        "decode_tps": 13.070441335965961,
+        "client_total_s": 29.966303195105866,
+        "client_ttft_s": 26.46726784412749,
+        "drafted": 34,
+        "accepted": 31,
+        "cache_hit_rate": 0.176,
+        "logical_file_mb": 31592.1,
+        "prompt_tokens": 512,
+        "completion_tokens": 47
+      },
+      "engine": {
+        "kv": "int8",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 3,
+        "spec": 3
+      },
+      "clock_window": {
+        "sample_count": 28,
+        "gpu": {
+          "samples": 28,
+          "min_mhz": 408.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 2,
+      "order": 2,
+      "kv": "fp16",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 3,
+      "name": "block-02-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-3",
+      "directory": "block-02-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-3",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-02-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-3/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-02-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-3/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-02-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-3/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-02-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-3/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-heldout-workload-confirm7-cache1500/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_memory_max": "28G",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 75.35767796705477,
+      "minimum_available_bytes": 18268037120,
+      "minimum_admission_available_bytes": 18268037120,
+      "request_status": "pass",
+      "answer": "EARLY=CITRUS-AXLE-431, MIDDLE=MARBLE-THICKET-782, LATE=OXIDE-KITE-265, SUM=1478",
+      "metrics": {
+        "prompt_tps": 19.153361564590224,
+        "decode_tps": 13.026968596690596,
+        "client_total_s": 30.348476614104584,
+        "client_ttft_s": 26.83105119992979,
+        "drafted": 34,
+        "accepted": 31,
+        "cache_hit_rate": 0.173,
+        "logical_file_mb": 31653.2,
+        "prompt_tokens": 512,
+        "completion_tokens": 47
+      },
+      "engine": {
+        "kv": "fp16",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 3,
+        "spec": 3
+      },
+      "clock_window": {
+        "sample_count": 29,
+        "gpu": {
+          "samples": 29,
+          "min_mhz": 306.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    },
+    {
+      "block": 2,
+      "order": 3,
+      "kv": "int8",
+      "workload": "coder-mtp-retrieval-short-512",
+      "window": 0,
+      "name": "block-02-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0",
+      "directory": "block-02-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--collect",
+        "-p",
+        "MemoryMax=28G",
+        "-p",
+        "IOAccounting=yes",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/run_control.py",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-02-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0/supervisor",
+        "--timeout",
+        "1800",
+        "--interval",
+        "1",
+        "--sample-clocks",
+        "--",
+        "/home/calvin/.local/python/bin/python",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/tools/integration/api_control_block.py",
+        "--config",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-02-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0/config.json",
+        "--workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-02-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0/workload.json",
+        "--output",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/block-02-kv-int8-workload-coder-mtp-retrieval-short-512-mtp-0/requests.json",
+        "--variant",
+        "candidate",
+        "--rounds",
+        "1",
+        "--no-trace",
+        "--warmup-workloads",
+        "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-17-phase6-coder-mtp-kv-heldout-workload-confirm7-cache1500/warmup-workloads.json"
+      ],
+      "status": "pass",
+      "supervisor_memory_max": "28G",
+      "supervisor_status": "pass",
+      "supervisor_returncode": 0,
+      "elapsed_s": 71.79205779195763,
+      "minimum_available_bytes": 19439714304,
+      "minimum_admission_available_bytes": 19439714304,
+      "request_status": "pass",
+      "answer": "EARLY=CITRUS-AXLE-431, MIDDLE=MARBLE-THICKET-782, LATE=OXIDE-KITE-265, SUM=1478",
+      "metrics": {
+        "prompt_tps": 19.403200012126998,
+        "decode_tps": 12.114338737531252,
+        "client_total_s": 30.271924815140665,
+        "client_ttft_s": 26.49658370297402,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.177,
+        "logical_file_mb": 37931.3,
+        "prompt_tokens": 512,
+        "completion_tokens": 47
+      },
+      "engine": {
+        "kv": "int8",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "mtp_max": 0,
+        "spec": 2
+      },
+      "clock_window": {
+        "sample_count": 29,
+        "gpu": {
+          "samples": 29,
+          "min_mhz": 306.0,
+          "max_mhz": 1300.5
+        },
+        "emc": {
+          "samples": 0,
+          "min_mhz": null,
+          "max_mhz": null
+        }
+      }
+    }
+  ],
+  "status": "pass",
+  "memory_scope_mode": "per-arm",
+  "unfiltered_comparisons_do_not_account_for_residency": {
+    "cell_effects": [
+      {
+        "kv_format": "fp16",
+        "workload": "coder-mtp-retrieval-short-512",
+        "paired_blocks": 3,
+        "prompt_tps_mtp3_effect_percent": -0.5773440688656928,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          -2.086668961079763,
+          -0.3928786057692313
+        ],
+        "prompt_tps_paired_ratios": [
+          0.9960712139423077,
+          0.9942265593113431,
+          0.9791333103892024
+        ],
+        "decode_tps_mtp3_effect_percent": 7.781723353492764,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          7.278472241470113,
+          7.986024457199892
+        ],
+        "decode_tps_paired_ratios": [
+          1.079860244571999,
+          1.0778172335349276,
+          1.0727847224147011
+        ],
+        "client_ttft_s_mtp3_effect_percent": 0.5378746451115246,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          0.38397962654701523,
+          2.098916469420775
+        ],
+        "client_ttft_s_paired_ratios": [
+          1.0038397962654702,
+          1.0053787464511152,
+          1.0209891646942078
+        ],
+        "client_total_s_mtp3_effect_percent": -0.39187554839299477,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          -0.5963820188040647,
+          0.9941638710532885
+        ],
+        "client_total_s_paired_ratios": [
+          0.9940361798119594,
+          0.99608124451607,
+          1.0099416387105329
+        ]
+      },
+      {
+        "kv_format": "int8",
+        "workload": "coder-mtp-retrieval-short-512",
+        "paired_blocks": 3,
+        "prompt_tps_mtp3_effect_percent": -1.871980447867927,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          -4.822521879577812,
+          0.09900877422586163
+        ],
+        "prompt_tps_paired_ratios": [
+          0.9517747812042219,
+          0.9812801955213207,
+          1.0009900877422586
+        ],
+        "decode_tps_mtp3_effect_percent": 7.892321810951364,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          7.541256413812247,
+          8.194971203820757
+        ],
+        "decode_tps_paired_ratios": [
+          1.0754125641381225,
+          1.0819497120382076,
+          1.0789232181095136
+        ],
+        "client_ttft_s_mtp3_effect_percent": 1.8960787441659521,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          -0.11064014582090609,
+          5.065793386350648
+        ],
+        "client_ttft_s_paired_ratios": [
+          1.0506579338635065,
+          1.0189607874416595,
+          0.9988935985417909
+        ],
+        "client_total_s_mtp3_effect_percent": 0.6877536774380966,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          -1.0095876687759908,
+          3.4768696332585947
+        ],
+        "client_total_s_paired_ratios": [
+          1.034768696332586,
+          1.006877536774381,
+          0.9899041233122401
+        ]
+      }
+    ],
+    "mtp_by_kv_interactions": [
+      {
+        "workload": "coder-mtp-retrieval-short-512",
+        "paired_blocks": 3,
+        "prompt_tps_median_interaction_percent": -1.3021542895604865,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          -4.447115037364336,
+          2.2322575609615702
+        ],
+        "prompt_tps_paired_values_percent": [
+          -4.447115037364336,
+          -1.3021542895604865,
+          2.2322575609615702
+        ],
+        "decode_tps_median_interaction_percent": 0.38341180440459866,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          -0.4118755604008095,
+          0.5722020053562593
+        ],
+        "decode_tps_paired_values_percent": [
+          -0.4118755604008095,
+          0.38341180440459866,
+          0.5722020053562593
+        ],
+        "client_ttft_s_median_interaction_percent": 1.3509377474397066,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          -2.164133265707535,
+          4.663905313597971
+        ],
+        "client_ttft_s_paired_values_percent": [
+          4.663905313597971,
+          1.3509377474397066,
+          -2.164133265707535
+        ],
+        "client_total_s_median_interaction_percent": 1.0838766734892369,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          -1.9840270596107046,
+          4.097689535639626
+        ],
+        "client_total_s_paired_values_percent": [
+          4.097689535639626,
+          1.0838766734892369,
+          -1.9840270596107046
+        ]
+      }
+    ],
+    "mtp_by_workload_interactions": [],
+    "three_way_interactions": []
+  },
+  "comparisons": {
+    "schema": 2,
+    "source_campaign": "465056c6db218f096c54833d1fed9eca0244cc0a",
+    "qualification_rule": "timing pairs require passing arms from the same local calendar day, matching KV, actual prompt token count, and identical expert slots/cache MiB; higher interactions require matching residency and date across all contributing cells",
+    "cell_effects": [
+      {
+        "kv": "fp16",
+        "workload": "coder-mtp-retrieval-short-512",
+        "paired_blocks": 3,
+        "paired_block_ids": [
+          0,
+          1,
+          2
+        ],
+        "prompt_tps_effect_percent": -0.5773440688656928,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          -2.086668961079763,
+          -0.3928786057692313
+        ],
+        "prompt_tps_paired_ratios": [
+          0.9960712139423077,
+          0.9942265593113431,
+          0.9791333103892024
+        ],
+        "decode_tps_effect_percent": 7.781723353492764,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          7.278472241470113,
+          7.986024457199892
+        ],
+        "decode_tps_paired_ratios": [
+          1.079860244571999,
+          1.0778172335349276,
+          1.0727847224147011
+        ],
+        "client_ttft_s_effect_percent": 0.5378746451115246,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          0.38397962654701523,
+          2.098916469420775
+        ],
+        "client_ttft_s_paired_ratios": [
+          1.0038397962654702,
+          1.0053787464511152,
+          1.0209891646942078
+        ],
+        "client_total_s_effect_percent": -0.39187554839299477,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          -0.5963820188040647,
+          0.9941638710532885
+        ],
+        "client_total_s_paired_ratios": [
+          0.9940361798119594,
+          0.99608124451607,
+          1.0099416387105329
+        ]
+      },
+      {
+        "kv": "int8",
+        "workload": "coder-mtp-retrieval-short-512",
+        "paired_blocks": 3,
+        "paired_block_ids": [
+          0,
+          1,
+          2
+        ],
+        "prompt_tps_effect_percent": -1.871980447867927,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          -4.822521879577812,
+          0.09900877422586163
+        ],
+        "prompt_tps_paired_ratios": [
+          0.9517747812042219,
+          0.9812801955213207,
+          1.0009900877422586
+        ],
+        "decode_tps_effect_percent": 7.892321810951364,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          7.541256413812247,
+          8.194971203820757
+        ],
+        "decode_tps_paired_ratios": [
+          1.0754125641381225,
+          1.0819497120382076,
+          1.0789232181095136
+        ],
+        "client_ttft_s_effect_percent": 1.8960787441659521,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          -0.11064014582090609,
+          5.065793386350648
+        ],
+        "client_ttft_s_paired_ratios": [
+          1.0506579338635065,
+          1.0189607874416595,
+          0.9988935985417909
+        ],
+        "client_total_s_effect_percent": 0.6877536774380966,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          -1.0095876687759908,
+          3.4768696332585947
+        ],
+        "client_total_s_paired_ratios": [
+          1.034768696332586,
+          1.006877536774381,
+          0.9899041233122401
+        ]
+      }
+    ],
+    "qualified_cell_pairs": [
+      {
+        "block": 0,
+        "kv": "fp16",
+        "workload": "coder-mtp-retrieval-short-512",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "local_run_date": "2026-10-23",
+        "prompt_tps_ratio": 0.9960712139423077,
+        "decode_tps_ratio": 1.079860244571999,
+        "client_ttft_s_ratio": 1.0038397962654702,
+        "client_total_s_ratio": 0.9940361798119594,
+        "qualified": true
+      },
+      {
+        "block": 0,
+        "kv": "int8",
+        "workload": "coder-mtp-retrieval-short-512",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "local_run_date": "2026-10-23",
+        "prompt_tps_ratio": 0.9517747812042219,
+        "decode_tps_ratio": 1.0754125641381225,
+        "client_ttft_s_ratio": 1.0506579338635065,
+        "client_total_s_ratio": 1.034768696332586,
+        "qualified": true
+      },
+      {
+        "block": 1,
+        "kv": "fp16",
+        "workload": "coder-mtp-retrieval-short-512",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "local_run_date": "2026-10-23",
+        "prompt_tps_ratio": 0.9942265593113431,
+        "decode_tps_ratio": 1.0778172335349276,
+        "client_ttft_s_ratio": 1.0053787464511152,
+        "client_total_s_ratio": 0.99608124451607,
+        "qualified": true
+      },
+      {
+        "block": 1,
+        "kv": "int8",
+        "workload": "coder-mtp-retrieval-short-512",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "local_run_date": "2026-10-23",
+        "prompt_tps_ratio": 0.9812801955213207,
+        "decode_tps_ratio": 1.0819497120382076,
+        "client_ttft_s_ratio": 1.0189607874416595,
+        "client_total_s_ratio": 1.006877536774381,
+        "qualified": true
+      },
+      {
+        "block": 2,
+        "kv": "fp16",
+        "workload": "coder-mtp-retrieval-short-512",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "local_run_date": "2026-10-23",
+        "prompt_tps_ratio": 0.9791333103892024,
+        "decode_tps_ratio": 1.0727847224147011,
+        "client_ttft_s_ratio": 1.0209891646942078,
+        "client_total_s_ratio": 1.0099416387105329,
+        "qualified": true
+      },
+      {
+        "block": 2,
+        "kv": "int8",
+        "workload": "coder-mtp-retrieval-short-512",
+        "expert_slots": 1934,
+        "expert_cache_mib": 3807,
+        "local_run_date": "2026-10-23",
+        "prompt_tps_ratio": 1.0009900877422586,
+        "decode_tps_ratio": 1.0789232181095136,
+        "client_ttft_s_ratio": 0.9988935985417909,
+        "client_total_s_ratio": 0.9899041233122401,
+        "qualified": true
+      }
+    ],
+    "excluded_cell_pairs": [],
+    "mtp_by_kv_interactions": [
+      {
+        "block": 0,
+        "workload": "coder-mtp-retrieval-short-512",
+        "qualified": true,
+        "expert_slots": 1934,
+        "prompt_tps_int8_vs_fp16_interaction_percent": -4.447115037364336,
+        "decode_tps_int8_vs_fp16_interaction_percent": -0.4118755604008095,
+        "client_ttft_s_int8_vs_fp16_interaction_percent": 4.663905313597971,
+        "client_total_s_int8_vs_fp16_interaction_percent": 4.097689535639626
+      },
+      {
+        "block": 1,
+        "workload": "coder-mtp-retrieval-short-512",
+        "qualified": true,
+        "expert_slots": 1934,
+        "prompt_tps_int8_vs_fp16_interaction_percent": -1.3021542895604865,
+        "decode_tps_int8_vs_fp16_interaction_percent": 0.38341180440459866,
+        "client_ttft_s_int8_vs_fp16_interaction_percent": 1.3509377474397066,
+        "client_total_s_int8_vs_fp16_interaction_percent": 1.0838766734892369
+      },
+      {
+        "block": 2,
+        "workload": "coder-mtp-retrieval-short-512",
+        "qualified": true,
+        "expert_slots": 1934,
+        "prompt_tps_int8_vs_fp16_interaction_percent": 2.2322575609615702,
+        "decode_tps_int8_vs_fp16_interaction_percent": 0.5722020053562593,
+        "client_ttft_s_int8_vs_fp16_interaction_percent": -2.164133265707535,
+        "client_total_s_int8_vs_fp16_interaction_percent": -1.9840270596107046
+      }
+    ],
+    "mtp_by_kv_interaction_summaries": [
+      {
+        "workload": "coder-mtp-retrieval-short-512",
+        "paired_blocks": 3,
+        "paired_block_ids": [
+          0,
+          1,
+          2
+        ],
+        "prompt_tps_median_interaction_percent": -1.3021542895604865,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          -4.447115037364336,
+          2.2322575609615702
+        ],
+        "prompt_tps_paired_values_percent": [
+          -4.447115037364336,
+          -1.3021542895604865,
+          2.2322575609615702
+        ],
+        "decode_tps_median_interaction_percent": 0.38341180440459866,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          -0.4118755604008095,
+          0.5722020053562593
+        ],
+        "decode_tps_paired_values_percent": [
+          -0.4118755604008095,
+          0.38341180440459866,
+          0.5722020053562593
+        ],
+        "client_ttft_s_median_interaction_percent": 1.3509377474397066,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          -2.164133265707535,
+          4.663905313597971
+        ],
+        "client_ttft_s_paired_values_percent": [
+          4.663905313597971,
+          1.3509377474397066,
+          -2.164133265707535
+        ],
+        "client_total_s_median_interaction_percent": 1.0838766734892369,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          -1.9840270596107046,
+          4.097689535639626
+        ],
+        "client_total_s_paired_values_percent": [
+          4.097689535639626,
+          1.0838766734892369,
+          -1.9840270596107046
+        ]
+      }
+    ],
+    "mtp_by_workload_interactions": [],
+    "mtp_by_workload_interaction_summaries": [
+      {
+        "kv": "fp16",
+        "paired_blocks": 0,
+        "paired_block_ids": [],
+        "prompt_tps_median_interaction_percent": null,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_values_percent": [],
+        "decode_tps_median_interaction_percent": null,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_values_percent": [],
+        "client_ttft_s_median_interaction_percent": null,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_values_percent": [],
+        "client_total_s_median_interaction_percent": null,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_values_percent": []
+      },
+      {
+        "kv": "int8",
+        "paired_blocks": 0,
+        "paired_block_ids": [],
+        "prompt_tps_median_interaction_percent": null,
+        "prompt_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "prompt_tps_paired_values_percent": [],
+        "decode_tps_median_interaction_percent": null,
+        "decode_tps_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "decode_tps_paired_values_percent": [],
+        "client_ttft_s_median_interaction_percent": null,
+        "client_ttft_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_ttft_s_paired_values_percent": [],
+        "client_total_s_median_interaction_percent": null,
+        "client_total_s_paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "client_total_s_paired_values_percent": []
+      }
+    ],
+    "three_way_interactions": [],
+    "three_way_interaction_summary": {
+      "prompt_tps": {
+        "paired_blocks": 0,
+        "median_interaction_percent": null,
+        "paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "paired_values_percent": []
+      },
+      "decode_tps": {
+        "paired_blocks": 0,
+        "median_interaction_percent": null,
+        "paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "paired_values_percent": []
+      },
+      "client_ttft_s": {
+        "paired_blocks": 0,
+        "median_interaction_percent": null,
+        "paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "paired_values_percent": []
+      },
+      "client_total_s": {
+        "paired_blocks": 0,
+        "median_interaction_percent": null,
+        "paired_bootstrap_95_interval_percent": [
+          null,
+          null
+        ],
+        "paired_values_percent": []
+      }
+    }
+  },
+  "finished_wall_time_s": 1792808689.9911544
+}

@@ -544,3 +544,8 @@ Current-source MTP3 state parity also passed for 64 generated tokens: identical
 token IDs and all nine state fields at 31 shared commit boundaries and final
 state. It covers the deterministic harness prompt only.
 [Report](../../bench/results/2026-10-23-phase5-coder-mtp3-accepted-prefix-64/README.md).
+
+A three-block factorial MTP3 × FP16/INT8 KV screen passed all 12 short-task
+cells. MTP3 decode gains were 7.78% and 7.89%; the MTP-by-KV interaction
+interval included zero. The screen covers one held-out 512-token workload only.
+[Report](../../bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/README.md).

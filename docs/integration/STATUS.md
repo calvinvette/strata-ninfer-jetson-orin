@@ -4922,3 +4922,14 @@ MTP-off, with all nine state hashes equal at 31 shared commits and final
 state; 33/60 drafts were accepted. This probe uses the generic prefix harness,
 not the retrieved-key workload, and does not close adaptive-chain or multi-live
 correctness. [Report](../../bench/results/2026-10-23-phase5-coder-mtp3-accepted-prefix-64/README.md).
+
+The generalized factorial runner enabled a current-source three-block MTP3 ×
+KV screen on the held-out 512-token Coder retrieval task. All 12 cells matched
+the independent expected answer and runtime KV/residency checks. MTP3 decode
+throughput improved 7.78% under FP16 KV (95% interval +7.28% to +7.99%) and
+7.89% under INT8 KV (+7.54% to +8.19%). The MTP-by-KV decode interaction was
++0.38% (interval -0.41% to +0.57%), with no detectable interaction in this
+screen. Minimum physical availability was 17.00 GiB and cgroup memory events
+were zero. Three blocks on one short task are screening evidence only; broader
+Phase 5 state and Phase 6 interaction/energy gates remain open. [Report and raw
+traces](../../bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/README.md).
