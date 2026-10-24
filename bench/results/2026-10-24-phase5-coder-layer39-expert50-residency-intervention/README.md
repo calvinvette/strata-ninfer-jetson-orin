@@ -56,5 +56,17 @@ The original layer-39 capture tied expert 50's CPU/GPU output delta to one
 local branch perturbation. This profile-level test shows that promoting that
 expert keeps it GPU-owned but does not recover the complete two-live output;
 the instrumented follow-up also found layer-39 inputs/routes already unpaired.
+A separate accepted-prefix trace under the same profile paired by token and
+position. In the 72-token hash scan, the batch row mapped to prompt 1 matched
+serial through batch position 83 / serial prefix 81, then first differed at
+batch position 84 / serial prefix 82 (28/36 GDN allocations). A 24-token direct
+state capture at position 84 found the first changed GDN state at model layer
+10 for that row (relative L2 `4.52e-9`); the other prompt's batch row first
+differed at layer 5 (relative L2 `9.55e-7`). The direct captures are a separate
+run from the hash scan. They show tiny persistent-state movement before the
+later slot-1 output mismatch despite protecting expert 50, but do not identify
+the initiating operation. Compact hash and direct-state analyses are retained;
+large state dumps and telemetry remain local.
+
 The broader multi-live state/output cause remains open; see the
 [diagnostic series](../../2026-10-23-phase5-coder-two-live-target-q8all/README.md).
