@@ -35,5 +35,5 @@ qualification target for this Orin/model cell, not a general support claim.
 
 Reopen Phase 8 if the selected model, source, binary, configuration or excluded
 feature set changes, or if new evidence contradicts this bounded profile. The
-overall integration plan remains active for unresolved Phase 5 and Phase 6
-gates; this closeout does not mark those gates passed.
+integration plan is complete for the tested scopes documented in the Phase 5
+and Phase 6 closeouts. Unsupported domains remain excluded.

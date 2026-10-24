@@ -203,6 +203,4 @@ feature or hardware scope changes. Phase 8 is complete for the bounded Q2_0
 profile under [its closeout](PHASE8_CLOSEOUT.md). Reopen any phase when its
 model, backend, feature or support scope expands. Do not change kernels,
 quantization, model, toolchain and clocks simultaneously; select each candidate
-from measured bottlenecks and qualify its contract first. Do not change kernels,
-quantization, model, toolchain and clocks simultaneously; select each candidate
 from measured bottlenecks and qualify its contract first.
