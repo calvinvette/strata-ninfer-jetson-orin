@@ -131,14 +131,17 @@ For multi-live comparisons, a runtime's physical batch slot may not preserve
 request submission order. In a two-request Coder capture, batch slot 0 mapped
 to serial control 1 and slot 1 mapped to serial control 0. Exact token streams
 and per-layer state hashes recovered the mapping; pairing slot numbers by
-assumption produced invalid comparisons. A later same-activation owner trace
-matched the GPU-owned service expert part to the CUDA oracle and the CPU-owned
-part to the CPU oracle, with layer-10 stage values exact before the changed
-layer-11 MoE part and layer-12 input/state. The captures are consistent with
-the downstream explanation but were separate runs. In a future Splash adapter,
-record request IDs and physical slots independently, verify alignment from
-state hashes and token histories, and retain a same-run boundary before making
-a causal claim. See the [exp2f boundary report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md).
+assumption produced invalid comparisons. Batch-to-prompt assignment also
+varied between runs, so it must be recovered for each capture. A final
+same-run trace matched all layer-10 fields at positions 87 and 88, then found
+expert 114's layer-11 output changed when ownership moved GPU→CPU despite an
+identical activation and route. All GDN states were exact at positions 86 and
+87; layer 12 first differed at position 88. A same-activation oracle replay
+matched the serial part to CUDA and the batch part to CPU bitwise. In a future
+Splash adapter, record request IDs and physical slots independently, verify
+alignment from state hashes and token histories, and retain an adjacent
+same-run boundary plus the exact operator input before making a causal claim.
+See the [exp2f boundary report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md).
 
 A later same-position Coder trace shows why the residual/hyperconnection
 components should be captured separately. At generated position 515, the first

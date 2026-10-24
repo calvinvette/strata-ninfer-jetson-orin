@@ -5079,15 +5079,17 @@ A slot-aware [layer-10/11 boundary follow-up](../../bench/results/2026-10-24-pha
 resolved a reversed batch-row assignment by mapping exact GDN hashes and token
 sequences to serial controls. For prompt 1, layer-10 stages matched at
 positions 87 and 88; layer-11 routes, activation, all expert parts and output
-matched at position 87. At position 88, expert 114 moved GPU→CPU with an
-identical route and activation. Its part was the only changed expert result,
-and a same-activation `native_expert_parity` replay matched the serial service
-part to GPU and the batch service part to CPU bit-for-bit (CPU/GPU relative L2
-`4.12515e-4`). A separate boundary run found a changed layer-12 input `x` and
-committed state at position 88. This supports an owner-dependent arithmetic
-explanation for the sampled upstream delta, but separate captures do not prove
-the complete causal chain or bound long-chain state drift. Outputs remained
-exact for the measured 32-token follow-up; Phase 5 remains open.
+matched at position 87. A final same-run capture found all 36 GDN states exact
+at positions 86 and 87, then layer 12 first changed at position 88
+(782,395/817,152 values; relative L2 `9.27875e-5`). At that same position,
+expert 114 moved GPU→CPU with identical route and activation; it was the only
+changed expert part. The independent same-activation parity replay matched the
+serial service part to GPU and batch service part to CPU bitwise (CPU/GPU
+relative L2 `4.12515e-4`). This strongly localizes the sampled state movement
+to the owner-specific layer-11 delta, but does not bound long-chain drift or
+establish quality impact/general parity. Both requests emitted 32 exact tokens.
+The run retained 17.71 GiB minimum physical availability with zero cgroup
+pressure/OOM events. Phase 5 remains open.
 
 At slot 1 / position 89, a slot-aware MoE comparison found matching layer-9
 routes and input activation. Expert 233 changed GPU→CPU owner, but its exp2f

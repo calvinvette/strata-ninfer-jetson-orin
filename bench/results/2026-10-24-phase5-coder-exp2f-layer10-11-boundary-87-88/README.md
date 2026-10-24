@@ -35,7 +35,7 @@ reference, weight decode checks, and width-invariance checks passed. This
 isolates the captured part difference to the owner-specific CPU/GPU arithmetic
 for this activation and expert.
 
-A separate same-profile boundary capture at position 88 found the first layer
+A prior separate same-profile boundary capture at position 88 found the first layer
 12 stage difference in its input `x` (2,554/2,560 values, relative L2
 `2.36056e-5`), followed by changed layer-12 committed GDN state (782,395 /
 817,152 values, relative L2 `9.27875e-5`). Together with the exact layer-10
@@ -46,6 +46,33 @@ pair and one position; it does not establish quality impact, a bound on later
 state drift, or a general CPU/GPU preference. The 32-token batch and serial
 outputs in the QSA follow-up were exact, but that does not establish long-chain
 state parity.
+
+## Same-run boundary replication
+
+A final supervised capture recorded layer-10 stages, layer-11 routes/parts,
+and every GDN commit state together at positions 86, 87 and 88. Its hash and
+token-sequence mapping was batch slot 0 → serial control 0 and batch slot 1 →
+serial control 1; both requests emitted 32/32 tokens identical to their
+serial controls. For prompt 1 / batch slot 1, every captured GDN layer state
+was bit-identical at positions 86 and 87. At position 88, layer 12 was the
+first changed state (782,395/817,152 values; relative L2 `9.27875e-5`),
+followed by later GDN layers. Layer-10 fields were bit-identical at positions
+87 and 88. Layer-11 routes, input activation and all expert parts/output were
+bit-identical at position 87. At position 88, routes and activation remained
+bit-identical; expert 114 GPU→CPU was the only changed part, with relative L2
+`4.12504e-4`, and the combined MoE output changed at relative L2
+`6.80979e-5`.
+
+The independent parity replay on the exact position-88 activation (same SHA256
+as above) again matched serial service to the GPU oracle and batch service to
+the CPU oracle bitwise. The one-run boundary brackets the first observed
+state change between positions 87 and 88, immediately after the position-88
+owner-specific MoE delta. This strongly localizes the sampled state movement
+to that boundary. It does not establish long-chain drift bounds, quality
+impact, other owner transitions, or general parity. The capture completed in
+207.4 seconds with 17.71 GiB minimum available physical memory and zero cgroup
+pressure/OOM events; GPU clocks were observed dynamically, EMC readback was
+denied, and energy was not analyzed.
 
 The supervised batch capture passed its six-GiB physical-memory guard and
 retained 17.70 GiB minimum available physical memory, with zero sampled cgroup
@@ -59,7 +86,9 @@ changed.
 The raw capture and full oracle dumps remain local and ignored. Compact paired
 analyses are `stage10-slot0-prompt1-position-{87,88}.json`,
 `moe11-slot0-prompt1-position-{87,88}.json`, and the supervisor records under
-this directory. The source capture is `capture/`.
+this directory. The final one-run paired analyses are `final-stage10-slot1-`,
+`final-moe11-slot1-`, and `final-state-slot1-` for positions 86–88; the source
+capture is `capture-final-boundary-86-87-88/`.
 
 The activation can be extracted from batch owner row 0 at layer 11 / position
 88 / token 3010 in `capture/batch.owners.jsonl`. Run the parity tool under
