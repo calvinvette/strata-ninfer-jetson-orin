@@ -656,3 +656,12 @@ The MTP4 accepted-prefix state check now also passes 256 generated tokens and
 nine state fields matched at final state and 115 / 157 shared commit boundaries.
 This covers uninterrupted generation only; multi-live state drift remains
 unresolved. [Report](../../bench/results/2026-10-24-phase5-coder-mtp4-accepted-prefix-long-chain/README.md).
+
+The same-profile 128-token two-live exp2f replay still matched both serial
+outputs (120 and 128 tokens), while accepted-prefix state first differed at
+batch positions 75 and 89. Direct snapshots found slot 0 first changed at GDN
+layer 32 / position 75 (relative L2 0.003175); slot 1 was exact at position 75
+and first changed at layer 12 / position 89 (relative L2 `9.16e-5`). Minimum
+physical availability was 17.73 GiB, with zero cgroup pressure/OOM events.
+Output parity therefore still does not establish multi-live state parity; no
+profile is qualified. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-boundary-state-pair/README.md).

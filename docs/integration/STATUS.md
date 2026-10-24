@@ -5064,6 +5064,17 @@ does not qualify long-context behavior, where the separate three-block MTP4
 screen found lower decode throughput. Phase 5/6 remain open and MTP4 is not
 promoted to a default.
 
+A same-profile [128-token two-live exp2f state-boundary capture](../../bench/results/2026-10-24-phase5-coder-exp2f-boundary-state-pair/README.md)
+preserved both serial token outputs (120 and 128 tokens), but direct accepted-
+prefix hashes first differed at batch positions 75 and 89. Direct all-layer
+state captures found slot 0 first changed at layer 32 at position 75
+(806,878/817,152 values; relative L2 0.003175); slot 1 remained exact at that
+position, then first changed at layer 12 at position 89 (794,637/817,152;
+relative L2 `9.16e-5`). Minimum physical availability was 17.73 GiB with zero
+cgroup pressure/OOM events. This extends the prior hash-only trace but does not
+identify the cause of later drift or qualify the exp2f candidate/profile.
+Phase 5 remains open.
+
 The MTP4 accepted-prefix comparison was extended to 256 tokens and a 512-token
 allowance on the deterministic Coder prompt. MTP-off and MTP4 matched all token
 IDs, all nine final persistent-state fields and every shared commit boundary:

@@ -1,0 +1,88 @@
+{
+  "experiment": "two-live exp2f expert-233 accepted-prefix boundary state",
+  "date": "2026-10-24",
+  "source_commit": "62bb83b23aca6b94fdc28a6787a91c30bdb27198",
+  "binary_sha256": "ad4b2354fe98f0e4128cf9a9ed70488fef362207dd1f7e94555a8ba35d8985df",
+  "model": "Qwen3.8-Flash-Next-Coder-GGUF-IQ1_M-Orin-validation",
+  "model_artifact_revision": "5348543e0147355ac9cbcb031184a3546350988e",
+  "profile_sha256": "1f03ed71cdac371e07480a3b4473e93be5cdfc9afb910f2fdac8491ac555502e",
+  "profile": {
+    "live_requests": 2,
+    "expert_cache_slots": 1500,
+    "exp2f_silu_layer": 9,
+    "exp2f_silu_expert": 233,
+    "positions": [
+      75,
+      89
+    ],
+    "generated_token_allowance": 128,
+    "expert_233_residency_rank": 12287
+  },
+  "output_tokens": {
+    "slot-0": 120,
+    "slot-1": 128
+  },
+  "output_matches_serial": {
+    "slot-0": true,
+    "slot-1": true
+  },
+  "accepted_prefix_hashes": {
+    "slot-0": {
+      "serial_control": 0,
+      "position_offset": 2,
+      "compared_positions": 117,
+      "first_mismatch": {
+        "batch_position": 75,
+        "serial_prefix_position": 73,
+        "first_gdn_allocation_ordinal": 24,
+        "different_gdn_allocations": 12,
+        "total_gdn_allocations": 36
+      }
+    },
+    "slot-1": {
+      "serial_control": 1,
+      "position_offset": 2,
+      "compared_positions": 126,
+      "first_mismatch": {
+        "batch_position": 89,
+        "serial_prefix_position": 87,
+        "first_gdn_allocation_ordinal": 9,
+        "different_gdn_allocations": 27,
+        "total_gdn_allocations": 36
+      }
+    }
+  },
+  "direct_state_snapshots": {
+    "slot-0": {
+      "position": 75,
+      "first_different_layer": 32,
+      "changed_values": 806878,
+      "total_values": 817152,
+      "relative_l2": 0.003175019158925515
+    },
+    "slot-1": {
+      "position": 75,
+      "matches_all_layers": true
+    },
+    "slot-1_at_position_89": {
+      "first_different_layer": 12,
+      "changed_values": 794637,
+      "total_values": 817152,
+      "relative_l2": 9.159714897539368e-05
+    }
+  },
+  "supervisor": {
+    "status": "pass",
+    "elapsed_seconds": 458.81,
+    "minimum_available_bytes": 19040899072,
+    "minimum_available_gib": 17.73,
+    "memory_pressure_or_oom_events": 0,
+    "gpu_clock_mhz_observed_range": [
+      306,
+      1300.5
+    ],
+    "emc_clock": "unavailable: permission denied",
+    "energy": "not analyzed; raw tegrastats rail data remains local"
+  },
+  "qualification": "Correctness diagnostic on one prompt pair only. Output equality does not imply persistent-state equality; no default or profile is qualified."
+}
