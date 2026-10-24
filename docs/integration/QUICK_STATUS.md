@@ -10,27 +10,27 @@ Strata and Splash.
 
 ## Overall status
 
-Phases 0–4 are complete for their documented scopes. Phase 7 is complete for
-its bounded Orin qualification matrix. Phase 8 is complete for one bounded,
-opt-in Q2_0 release profile; Phases 5 and 6 remain open for unresolved
-accepted-state correctness and broader performance interactions. The full
-Orin CUDA regression suite passed 130 tests with two optional IQ-fixture tests
-skipped; Python integration discovery now passes 173/173. The latest focused
-accepted-window, GDN and graph CTest selection passed 5/5. The latest
-HIP/SYCL evidence is the 2026-10-23 full-tree maestro1 build; it is x86
-compile/link and CLI-startup evidence only, not accelerator runtime or Orin
-performance evidence. Shared CPU-expert/parity sources changed after that
-build, so a current-source rebuild is pending. maestro1 currently has only
-1.1 GiB free on its 56-GiB root filesystem, insufficient for the build. Build
-and source hashes are in the linked backend record in [STATUS](STATUS.md). See
-the [Phase 8 closeout](PHASE8_CLOSEOUT.md) for the exact release scope and
-exclusions.
+Phases 0–8 are complete for the bounded Orin and backend scopes documented in
+their closeouts. Phase 5 supports tested single-live static-routing transaction
+and graph behavior; adaptive CPU/GPU migration and multi-live batch decoding are
+excluded because accepted-state/output parity fails. Phase 6 records randomized
+screens and held-out confirmations for specific factor/workload cells; no
+global Pareto winner or default is promoted. Phase 8 releases one opt-in Q2_0,
+FP16-KV, MTP-off profile. See [Phase 5](PHASE5_CLOSEOUT.md),
+[Phase 6](PHASE6_CLOSEOUT.md), and [Phase 8](PHASE8_CLOSEOUT.md).
 
-A fresh full-tree rebuild also passed for HIP (345 targets) and SYCL (201)
-from current shared sources on maestro1 with one job. Both `strata --help`
-checks passed; a direct SYCL CPU-runtime snapshot test passed 3,901 checks.
-This adds x86 build and CPU-runtime evidence only; accelerator runtime was not
-tested. [Build record](../../bench/results/2026-10-23-phase8-maestro1-current-source-backend-build/README.md).
+The current Orin CUDA functional suite registered 135 cases: 132 passed, two
+optional IQ fixture cases skipped, and the default `pool_test` fixture was
+missing; the same test passed when supplied with the existing external Q2_0
+fixture. The GDN verifier convolution parity extension passed T=1..8 and every
+split offset. maestro1 rebuilt five current shared C++ files for HIP and SYCL at
+one job; the HIP host memory-budget test and both service help checks passed.
+The current SYCL runtime had no device, and maestro1 provides no accelerator
+execution evidence. See the [CTest report](../../bench/results/2026-10-24-orin-cuda-functional-ctest/README.md) and [backend report](../../bench/results/2026-10-24-phase8-maestro1-incremental-current-shared-build/README.md).
+
+Older dated entries below preserve the evidence and phase state at the time each
+experiment was recorded. Models stay in `~/models/`; generated builds,
+telemetry and raw captures are not committed.
 
 ## Performance observed
 
