@@ -2871,3 +2871,14 @@ runtime KV/residency for every arm, and separate decode from TTFT/total time.
 Three blocks are screening evidence only; do not promote an MTP window from a
 single workload or combine request timing with unintegrated board rails. See
 the [factorial report](../../bench/results/2026-10-23-phase6-coder-mtp3-kv-length-screen3/README.md).
+
+The same three-block Orin factorial integrated named tegrastats rails over all
+24 API request windows. On its 512-token task, MTP3 used about 7% fewer
+`VDD_GPU_SOC` joules per output token, about 4–5% more `VDD_CPU_CV`, and about
+3% fewer `VIN_SYS_5V0` (the FP16 system-rail interval included zero). At 7,501
+tokens, system-rail energy/token rose about 0.5%. This is a useful Splash
+measurement design: join same-day paired request boundaries to sampled rails,
+retain each rail separately, and account for prompt-length interactions. The
+rails include idle/background activity and are neither process-attributed nor
+additive total-device energy; three blocks do not establish a Pareto point.
+See the factorial report's rail follow-up and retained integration script.

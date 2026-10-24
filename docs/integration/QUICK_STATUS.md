@@ -559,3 +559,11 @@ found ~8.4% higher decode on the 512-token task but 3.5–4.7% lower decode on
 the 7,501-token task; total long-request time rose under 0.7%. The broad MTP ×
 workload effect is clear in this screen, while the three-way interaction interval
 includes zero. [Report](../../bench/results/2026-10-23-phase6-coder-mtp3-kv-length-screen3/README.md).
+
+Named tegrastats rail energy was integrated for all 24 request windows. On the
+short task, MTP3 reduced GPU/SOC rail joules per output token by about 7% while
+raising CPU rail use about 4–5%; the system rail was down about 3%, with the
+FP16 interval crossing zero. On the near-limit task, system-rail energy/token
+rose about 0.5% for both KV formats. These are three-block rail estimates that
+include idle/background load; they are not process-attributed or summed device
+energy. Phase 6 energy/Pareto work remains open. [Report](../../bench/results/2026-10-23-phase6-coder-mtp3-kv-length-screen3/README.md).

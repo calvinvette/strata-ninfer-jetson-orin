@@ -36,6 +36,38 @@ this was not sustained thermal qualification.
 
 ## Identity and limits
 
+## Named-rail energy follow-up
+
+The request windows were retrospectively integrated against bracketed
+one-second tegrastats samples. All 24/24 windows were estimable. Each rail is
+reported separately; these readings include idle/background activity, are not
+process-attributed, and must not be summed or described as whole-device energy.
+The comparison below is MTP3 versus MTP-off joules per output token across
+three paired blocks; intervals are paired bootstrap 95% intervals.
+
+| KV | Prompt | Rail | Median change | 95% interval |
+| --- | --- | --- | ---: | ---: |
+| FP16 | 512 | VDD_CPU_CV | +4.80% | +0.53% to +10.31% |
+| FP16 | 512 | VDD_GPU_SOC | -7.37% | -7.66% to -6.59% |
+| FP16 | 512 | VIN_SYS_5V0 | -3.23% | -4.67% to +1.65% |
+| INT8 | 512 | VDD_CPU_CV | +4.14% | +2.61% to +8.87% |
+| INT8 | 512 | VDD_GPU_SOC | -7.00% | -7.34% to -6.38% |
+| INT8 | 512 | VIN_SYS_5V0 | -3.32% | -3.57% to -0.94% |
+| FP16 | 7,501 | VDD_CPU_CV | +1.04% | +0.88% to +3.71% |
+| FP16 | 7,501 | VDD_GPU_SOC | -0.22% | -0.69% to +0.04% |
+| FP16 | 7,501 | VIN_SYS_5V0 | +0.52% | +0.48% to +0.84% |
+| INT8 | 7,501 | VDD_CPU_CV | +4.31% | +3.12% to +5.36% |
+| INT8 | 7,501 | VDD_GPU_SOC | -0.36% | -0.64% to -0.09% |
+| INT8 | 7,501 | VIN_SYS_5V0 | +0.49% | +0.40% to +0.57% |
+
+Short-prompt GPU-rail energy per output token fell while CPU-rail energy rose;
+the named system rail was lower but its FP16 interval includes zero. At 7,501
+tokens, system-rail energy per output token rose about 0.5% in both KV modes.
+This supports the observed workload-length dependence, but is a small-screen
+energy result, not a Pareto conclusion or sustained-power qualification. Raw
+request estimates, paired rows and the reproducible integrator are in
+`rail-energy.json`, `rail-energy-pairs.csv` and `analyze_rail_energy.py`.
+
 - Source HEAD at campaign launch: `83e2d80166675d94540c5217189458e3eeebcb67`.
   The MTP3-capable factorial runner was implemented in `465056c6`.
 - Device: Orin AGX, native aarch64, CUDA runtime path, shared physical RAM.

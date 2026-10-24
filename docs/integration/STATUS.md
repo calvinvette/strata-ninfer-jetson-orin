@@ -4950,3 +4950,13 @@ request total time rose only 0.51% and 0.67% because prefill dominated. Minimum
 physical/admission availability was 16.98/16.83 GiB with zero sampled cgroup
 memory events. This is a three-block screen, not held-out confirmation, state
 qualification or a default change. [Report and raw campaign](../../bench/results/2026-10-23-phase6-coder-mtp3-kv-length-screen3/README.md).
+
+Retrospective named-rail integration succeeded for all 24 request windows in
+that campaign. On the 512-token prompt, MTP3 changed joules/output-token by
+-7.00% to -7.37% on `VDD_GPU_SOC`, +4.14% to +4.80% on `VDD_CPU_CV`, and
+-3.23% to -3.32% on `VIN_SYS_5V0` (the FP16 system-rail interval includes zero).
+At 7,501 tokens, `VIN_SYS_5V0` rose +0.49% to +0.52% in both KV modes. These
+three-block estimates include idle/background load, are not process-attributed,
+and remain separate by rail; they are neither summed device energy nor a Pareto
+or sustained-power result. Phase 6 energy/Pareto work remains open.
+[Rail report and raw integrations](../../bench/results/2026-10-23-phase6-coder-mtp3-kv-length-screen3/README.md).
