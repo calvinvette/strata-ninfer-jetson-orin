@@ -32,6 +32,13 @@ tested. [Build record](../../bench/results/2026-10-23-phase8-maestro1-current-so
 
 ## Performance observed
 
+A current Phase 5 two-live diagnostic found a local owner-dependent change at
+Coder layer 9 / expert 233. Promoting that expert to GPU residency restored
+exact 72-token output parity on the original prompt pair and one held-out pair,
+but direct terminal GDN state still differed at layers 5 and 12; another held-out
+prompt already differed at layer 6. This temporary profile is not qualified and
+no default changed. [Intervention evidence](../../bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/README.md).
+
 A seven-block held-out 7,501-token confirmation passed all 28 MTP-off/MTP3 ×
 FP16/INT8 KV arms. MTP3 reduced decode throughput 5.49% (FP16) and 4.19%
 (INT8), while total request time rose 0.67% and 0.89%. The named-rail follow-up
