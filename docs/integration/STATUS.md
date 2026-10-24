@@ -4915,3 +4915,10 @@ IDs matched MTP-off, and all nine persistent-state fields matched at each of 31
 shared accepted-prefix boundaries and at final state. This is one bounded
 transaction case, not a long-chain adaptive-state or multi-live qualification.
 [Report and raw traces](../../bench/results/2026-10-23-phase5-coder-mtp3-accepted-prefix-64/README.md).
+
+A current-source MTP3 accepted-prefix check also passed after the performance
+screens: on an exact 512-token deterministic prompt, 64 generated IDs matched
+MTP-off, with all nine state hashes equal at 31 shared commits and final
+state; 33/60 drafts were accepted. This probe uses the generic prefix harness,
+not the retrieved-key workload, and does not close adaptive-chain or multi-live
+correctness. [Report](../../bench/results/2026-10-23-phase5-coder-mtp3-accepted-prefix-64/README.md).

@@ -538,3 +538,9 @@ An MTP3 accepted-prefix probe matched MTP-off token IDs and all persistent-state
 fingerprints at 31 shared commit boundaries over a 64-token chain (33/60 drafts
 accepted). This is a bounded transaction check; adaptive long-chain and
 multi-live correctness remain open. [Report](../../bench/results/2026-10-23-phase5-coder-mtp3-accepted-prefix-64/README.md).
+
+
+Current-source MTP3 state parity also passed for 64 generated tokens: identical
+token IDs and all nine state fields at 31 shared commit boundaries and final
+state. It covers the deterministic harness prompt only.
+[Report](../../bench/results/2026-10-23-phase5-coder-mtp3-accepted-prefix-64/README.md).
