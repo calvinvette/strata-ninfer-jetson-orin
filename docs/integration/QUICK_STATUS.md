@@ -756,3 +756,13 @@ outputs (120-token stop and 128 tokens), but accepted-prefix state hashes still
 first changed at positions 100 and 105. This delays the earlier mismatch and
 fixes the output divergence in this prompt pair, but does not close the
 long-chain state gate or qualify a profile. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#strata_gr_v3-1-boundary-intervention-and-128-token-extension).
+
+The current Orin CTest run completed 132/135 registered cases, with two
+fixture-dependent IQ tests skipped and `pool_test` unable to find its default
+`pack/full/experts.bin`. Supplying the existing one-layer Q2_0 fixture through
+`STRATA_TEST_EXPERTS_BIN` made the pool test pass its serial parity, completion
+and repeated-batch checks. Minimum physical availability was 19.19 GiB. The
+new model-width verifier convolution parity test passed all T=1..8 windows and
+split offsets; no kernel change was needed. Phase 5 multi-live persistent-state
+drift is still open, as are broader Phase 6 interaction/energy gates. [CTest
+report](../../bench/results/2026-10-24-orin-cuda-functional-ctest/README.md).

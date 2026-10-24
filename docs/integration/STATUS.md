@@ -5215,3 +5215,13 @@ split `t_begin`, plus the existing 44 history-commit prefixes. This is
 functional kernel coverage, not resolution of the multi-live accepted-state
 drift. Maestro1 HIP/SYCL builds remain pending available scratch storage.
 Phase 5 remains open. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#gdn-layer-20-follow-up-and-verifier-convolution-parity).
+
+The current Orin candidate CTest suite ran all 135 registered cases serially:
+132 passed, two IQ-fixture tests skipped, and `pool_test` could not open its
+default `pack/full/experts.bin`. The pool test then passed with the existing
+one-layer Q2_0 fixture supplied through `STRATA_TEST_EXPERTS_BIN`, including
+serial output parity, exactly-once job completion and 200 repeated batches.
+The run retained 19.19 GiB minimum physical/admission availability and no cgroup
+OOM events. The focused verifier convolution test is included and passed. This
+is functional coverage, not a performance result; configure the missing
+default fixture before treating the unmodified CTest suite as clean. [Report](../../bench/results/2026-10-24-orin-cuda-functional-ctest/README.md).
