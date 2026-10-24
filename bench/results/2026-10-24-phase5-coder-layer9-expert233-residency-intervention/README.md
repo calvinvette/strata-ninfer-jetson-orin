@@ -99,3 +99,23 @@ The rank-0 intervention repaired the original sampled output pair and also
 returned exact output on one held-out pair, but neither pair had full terminal
 state parity. Other state mismatches remain, and this does not qualify a profile
 or close Phase 5. Multi-live committed-state behavior remains open.
+
+## Operator-stage follow-up
+
+The exact position-83 service activation was replayed through the independent
+native expert parity harness with CUDA gate/up stages enabled. CPU-mirror and
+CUDA Q8_1 input bytes matched, and all 1,920 gate plus 1,920 up values matched
+bit-for-bit. After SwiGLU, 3 of 60 hidden Q8_1 blocks differed: blocks 4, 24
+and 44 had a different fp16 `d` scale, while their stored sums and all integer
+codes matched. The CPU IQ4_NL down operator fed CUDA's hidden Q8_1 blocks
+reproduced the grouped CUDA output bit-for-bit. Thus this sample's CPU/GPU
+output difference enters between the matching gate/up rows and hidden Q8_1
+input to down projection. An opt-in reciprocal-SiLU CPU expression left the
+same three blocks and output delta; the device exponential/rounding path is a
+candidate for further investigation, not an established cause. This remains
+one operator sample, not a state-parity qualification.
+
+The compact result is `operator-stage-analysis.json`. Large per-stage f32 and
+Q8_1 dumps and the captured activation remain in `/tmp`; they are not Git
+artifacts. Reproduction used the candidate `native_expert_parity` binary and
+the environment/activation path recorded in the JSON.

@@ -2935,3 +2935,14 @@ differed on all 2,560 values for this IQ2_S/IQ4_NL row. In future Strata/Splash
 work, preserve an analyzer that joins the binary service part to the correct
 owner-specific oracle by route and activation; owner labels alone do not prove
 that arithmetic changed. [Oracle pairer and result](../../bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/README.md).
+
+A follow-up stage replay on that exact activation found the CPU/CUDA Q8_1 input
+bytes and IQ2_S gate/up outputs bit-identical. Only 3/60 hidden Q8_1 block
+scales differed after SwiGLU; the block sums and integer codes matched, and
+CPU IQ4_NL down on CUDA's hidden blocks reproduced the CUDA output exactly.
+Changing the CPU SiLU expression to reciprocal form did not remove those three
+blocks. For future Strata/Splash ports, instrument the activation-function and
+quantization seam before porting an owner-specific arithmetic mirror; matching
+the large matrix operators is not enough to establish full-path parity. Keep
+the device exponential/rounding explanation provisional until independently
+tested. [Stage-level summary](../../bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/operator-stage-analysis.json).

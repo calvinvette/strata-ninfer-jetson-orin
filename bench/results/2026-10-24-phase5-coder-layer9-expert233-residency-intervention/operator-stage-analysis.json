@@ -1,0 +1,43 @@
+{
+  "scope": "one exact captured activation; layer 9 expert 233; IQ2_S gate/up and IQ4_NL down",
+  "activation": {
+    "f32_sha256": "7ce8c948912b5f39471d5809fae4672f168e0cfc1b1e404be211f3ec600d77b3",
+    "cpu_vs_cuda_q8_1_bytes_equal": true,
+    "cpu_q8_1_sha256": "dbfe492650bd6151546f8a6c6c13fbd84a40beb610301aca3073056c262c278d",
+    "cuda_q8_1_sha256": "dbfe492650bd6151546f8a6c6c13fbd84a40beb610301aca3073056c262c278d"
+  },
+  "gate_up": {
+    "cpu_mirror_vs_cuda": "bit-identical",
+    "gate_values": 1920,
+    "up_values": 1920
+  },
+  "hidden_q8_1": {
+    "blocks": 60,
+    "default_cpu_silu_differing_blocks": [4, 24, 44],
+    "reciprocal_cpu_silu_differing_blocks": [4, 24, 44],
+    "differing_fields": "fp16 d scale only; stored sum and all 32 integer codes match in each block",
+    "default_and_reciprocal_have_same_block_result": true
+  },
+  "down_projection": {
+    "cpu_iq4_nl_on_cuda_hidden_vs_cuda_grouped": "bit-identical",
+    "values": 2560
+  },
+  "final_operator_output": {
+    "cpu_vs_cuda_values_different": 2560,
+    "max_absolute_difference": 8.940696716308594e-06,
+    "relative_l2": 0.00011979325270233452,
+    "default_and_reciprocal_cpu_silu_same_result": true
+  },
+  "interpretation": [
+    "For this activation, the difference first appears after exact gate/up values and before/downstream of hidden Q8_1 quantization.",
+    "The CPU/CUDA exponential and rounding path is a candidate explanation, not established as the root cause.",
+    "This is a single operator sample and does not qualify persistent-state parity or a runtime profile."
+  ],
+  "reproduction": {
+    "binary_sha256": "74c7d2fcc02cc11090a339a129e07ec208add89fa3600d28931a4a02b06cd7a3",
+    "command_env": "STRATA_NATIVE_CPU_Q8_1_DOT=iq2_s/iq4_nl@layer=9 STRATA_PARITY_DUMP_HIDDEN_Q8_1=1 STRATA_PARITY_COMPARE_HIDDEN_Q8_1=1 STRATA_EXP_MODE=0",
+    "binary": "build/integration/candidate/native_expert_parity",
+    "activation_path": "/tmp/coder-iq1m-layer9-expert233-position83-activation.f32",
+    "activation_path_is_local": true
+  }
+}
