@@ -2895,3 +2895,12 @@ block bootstrap as primary. For future Splash studies, repeat the same held-out
 long task and retain exact runtime KV/residency checks, request-window rail
 integration, and explicit residual diagnostics. Do not infer system energy by
 summing these rails. [Raw campaign and scripts](../../bench/results/2026-10-24-phase6-coder-mtp3-kv-heldout-long-confirm7/README.md).
+
+
+A Coder two-live test that promoted the layer-39 expert-50 cache rank from
+7,781 to 0 still diverged from the isolated serial output at the same slot-1
+token index 66. Because this run lacked owner and committed-state pairing, do
+not attribute the unchanged mismatch to a failed owner intervention. A future
+Strata/Splash investigation should capture exact row activation, owner, expert
+output and accepted state in the same run, then test a residency change against
+those joined records. [Intervention record](../../bench/results/2026-10-24-phase5-coder-layer39-expert50-residency-intervention/README.md).

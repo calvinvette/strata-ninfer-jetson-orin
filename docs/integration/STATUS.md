@@ -4979,3 +4979,6 @@ and admission availability were both 16.925 GiB; GPU clocks varied from
 306–1300.5 MHz and EMC readback was unavailable. This confirms the long-prompt
 MTP3 slowdown on this held-out workload; it does not close Phase 6's worker/
 transfer, graph/speculation or Pareto work. [Full report and raw data](../../bench/results/2026-10-24-phase6-coder-mtp3-kv-heldout-long-confirm7/README.md).
+
+
+A targeted [layer-39 expert-50 residency intervention](../../bench/results/2026-10-24-phase5-coder-layer39-expert50-residency-intervention/README.md) moved the Coder IQ1_M profile entry from rank 7,781 to rank 0 and repeated the two-live 72-token target-only diagnostic. Slot 0 remained exact; slot 1 still first differed at token index 66, matching the baseline. The run did not capture paired committed state or owner records, so it does not establish whether the specific residency switch was prevented. Minimum physical/admission availability was 17.757 GiB with no sampled cgroup pressure events. The single-expert intervention did not rescue output parity; Phase 5 remains open.
