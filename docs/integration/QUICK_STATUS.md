@@ -53,7 +53,9 @@ faster by 2.72% at four workers and 1.94% at eight. The worker × transfer
 interaction interval included zero. One 8-worker/mapped decode-time outlier is
 retained and documented. Minimum physical/admission availability was
 13.99/9.60 GiB with zero cgroup events. No setting changed; this is one bounded
-workload result. [Confirmation](../../bench/results/2026-10-24-phase6-coder-worker-transfer-confirm7/README.md),
+workload result. Retrospective named-rail integration found a small system-rail
+energy/token decrease for `pread` at four workers, while CPU/CV rail energy
+increased; rails include background load and are not summed. [Confirmation](../../bench/results/2026-10-24-phase6-coder-worker-transfer-confirm7/README.md),
 [screen](../../bench/results/2026-10-24-phase6-coder-worker-transfer-screen3/README.md).
 
 A current-source owner-transition diagnostic at layer 27 / generated position

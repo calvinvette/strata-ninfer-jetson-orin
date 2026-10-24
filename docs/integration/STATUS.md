@@ -15,8 +15,12 @@ Four workers were slower than eight by median 7.36% for mapped and 6.50% for
 The worker × transfer interaction interval included zero. One 8-worker/mapped
 decode outlier (22.5 s versus 3.5–3.7 s in its other blocks) is retained and
 unexplained. Minimum physical/admission availability was 13.99/9.60 GiB with
-zero cgroup events. This supports a bounded workload signal only; no default
-changed and Phase 6 remains open.
+zero cgroup events. Retrospective named-rail integration found `pread` reduced
+median `VIN_SYS_5V0` joules/output-token by 1.28% at four workers
+(95% interval −1.86% to −1.17%) and 1.02% at eight (−1.56% to +0.07%), while
+the CPU/CV rail rose; readings include background load and rails are not
+summed. This supports bounded workload signals only; no default changed and
+Phase 6 remains open.
 
 The bounded Phase 8 Q2_0 release profile was rechecked on the current candidate
 on 2026-10-22: the 8K-context, 3,000-slot, chunk-128 MTP-off profile passed its
@@ -5012,4 +5016,4 @@ A stage-level replay of that exact activation narrowed the sampled difference: C
 
 An offline quantizer probe on those captured GPU gate/up rows compared host `expf` and `exp2f(-g*log2(e))` with division. Host `exp2f` produced the exact 60 packed hidden Q8_1 blocks for this activation, though 264/1,920 hidden float values still differed from CUDA (max `2.98e-8`). This is a one-sample candidate observation; it is not CUDA `__expf`, has not been tested on held-out activations, and does not justify a CPU runtime change. The CUDA parity harness now retains the actual hidden f32 stage when using the explicit separate path. Phase 5 remains open.
 
-A three-block randomized [Coder IQ1_M worker × transfer screen](../../bench/results/2026-10-24-phase6-coder-worker-transfer-screen3/README.md) passed all 12 cells at 512 prompt tokens, 45 generated tokens, 3,903 actual cache slots, and fixed 8K/FP16/MTP-off/chunk-128 settings. Under mapped reads, four workers took 6.43%, 6.84%, and 13.97% longer than eight workers in each paired block; under `pread`, the paired differences changed sign. Minimum physical/admission availability was 13.88/9.12 GiB with zero cgroup memory events. This is screening evidence only; a seven-block held-out Coder confirmation is the next step. Phase 6 remains open.
+A three-block randomized [Coder IQ1_M worker × transfer screen](../../bench/results/2026-10-24-phase6-coder-worker-transfer-screen3/README.md) passed all 12 cells at 512 prompt tokens, 45 generated tokens, 3,903 actual cache slots, and fixed 8K/FP16/MTP-off/chunk-128 settings. Under mapped reads, four workers took 6.43%, 6.84%, and 13.97% longer than eight workers in each paired block; under `pread`, the paired differences changed sign. Minimum physical/admission availability was 13.88/9.12 GiB with zero cgroup memory events. The held-out seven-block [confirmation](../../bench/results/2026-10-24-phase6-coder-worker-transfer-confirm7/README.md) found four workers slower in both read modes and a modest `pread` advantage, with no supported interaction. Both are workload-scoped evidence; Phase 6 remains open.

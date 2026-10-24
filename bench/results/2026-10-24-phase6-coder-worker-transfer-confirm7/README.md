@@ -40,13 +40,27 @@ behavior, energy or sustained service.
 The 1,742-second supervised run used a 28-GiB cgroup cap and no clock controls.
 Minimum physical and admission availability were 13.99/9.60 GiB; cgroup
 memory event counters stayed at zero. GPU/CPU clocks were observed dynamically;
-EMC clock readback was denied. Energy was not measured. Model files remain in
-`~/models/strata-orin-validation/`.
+EMC clock readback was denied. A retrospective one-second tegrastats integration
+estimated each request's named rails. Median joules/output-token for
+`VDD_CPU_CV` / `VDD_GPU_SOC` / `VIN_SYS_5V0` were 1.46 / 4.77 / 3.10 at four
+workers with mapped reads; 1.58 / 4.74 / 3.06 at four workers with `pread`;
+1.65 / 4.50 / 2.95 at eight workers with mapped reads; and 1.75 / 4.54 / 2.92
+at eight workers with `pread`. The four-worker versus eight-worker CPU-rail
+effect was −10.66% mapped and −9.33% `pread`; GPU/SOC and system-rail effects
+went the other way. `pread` reduced system-rail joules/token by median 1.28%
+at four workers (95% interval −1.86% to −1.17%) and 1.02% at eight workers
+(−1.56% to +0.07%). The interaction intervals included zero. These rails
+include background/idle energy, are not process-attributed and are not summed;
+one-second sampling also limits request-window precision. The results are
+rail-specific observations, not whole-board energy or a Pareto winner. Model
+files remain in `~/models/strata-orin-validation/`.
 
 Binary SHA256, source commit, model revision, workload identity, seed, all cell
 timings and paired bootstrap intervals are recorded in `design.json`,
-`config.json` and `campaign/results.json`. Raw service logs and supervisor
-telemetry remain local.
+`config.json` and `campaign/results.json`. `analyze_named_rails.py` performs the
+retrospective integration; `named-rail-energy.json` contains its per-request
+estimates and paired summaries. Raw service logs and supervisor telemetry
+remain local.
 
 Reproduce on Orin from the repository root:
 
