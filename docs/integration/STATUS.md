@@ -4885,3 +4885,14 @@ sampled cgroup memory events. This narrows timing uncertainty for that one
 prompt only: it is not held-out prompt confirmation, does not check persistent
 state in this no-trace campaign, and does not promote a default. Phase 5/6
 remain open. [Report and raw traces](../../bench/results/2026-10-23-phase6-coder-mtp3-window-paired7-same-prompt/README.md).
+
+A three-block randomized MTP-off/MTP3 screen on the 7,501-token Coder
+retrieval workload passed all six cells with paired response-content parity.
+MTP3 drafted 34 and accepted 28 tokens per request, but median decode throughput
+was 6.01% lower (paired bootstrap 95% interval 5.56%–6.08% lower); median TTFT
+and total request time rose 0.62% and 0.67%. This contrasts with +4.34% decode
+throughput on the 512-token prompt, suggesting workload-length dependence in
+this setup. Minimum observed physical availability was 16.93 GiB; cgroup
+memory events remained zero. The screen is not held-out confirmation, state
+qualification, thermal steady-state evidence or a default change. [Report and
+raw traces](../../bench/results/2026-10-23-phase6-coder-mtp3-window-long-screen3/README.md).

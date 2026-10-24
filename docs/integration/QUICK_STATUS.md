@@ -521,3 +521,10 @@ median decode throughput (paired bootstrap 95% interval +3.86% to +5.57%) with
 response-content parity in all pairs. This is same-prompt replication, not
 held-out confirmation, and the no-trace campaign does not test persistent
 state. [Report](../../bench/results/2026-10-23-phase6-coder-mtp3-window-paired7-same-prompt/README.md).
+
+A near-limit MTP3 screen showed a workload-length interaction: across three
+paired blocks, MTP3 decode throughput was 6.01% lower than MTP-off on the
+7,501-token request (95% interval 6.08%–5.56% lower), while it was 4.34% higher
+on the 512-token prompt. Total request time on the near-limit prompt rose only
+0.67% because prefill dominated. This is screening evidence for these workloads,
+not a default decision. [Report](../../bench/results/2026-10-23-phase6-coder-mtp3-window-long-screen3/README.md).
