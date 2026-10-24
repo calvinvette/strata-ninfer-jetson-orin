@@ -3047,5 +3047,9 @@ rule to future Strata/Splash and NInfer integrations.
 
 Also extend persistent-state checks beyond an exact output window. In the
 cache-3k GR-V3 sample, all 72 target tokens matched serial, yet committed GDN
-state first changed at position 138/layer 2. Text parity over a finite prefix
+state first changed at position 134/layer 2. At that same boundary, routed
+expert 75 changed GPU→CPU on the exact same activation and routes; a native
+operator oracle reproduced both service outputs bitwise and confirmed their
+arithmetic difference. Moving the expert to rank 0 changed the output earlier,
+so static residency is not a safe general fix. Text parity over a finite prefix
 does not establish exact transaction-state parity or safe continuation.
