@@ -5255,3 +5255,11 @@ at token 66 after moving to slot 0, while original prompt 0 remains exact in
 slot 1. Layer-19 MoE output at p104 and all 36 committed GDN states at matched
 p105/token 7620 are exact. The local repair is reproducible under slot reversal,
 but the later prompt-specific divergence remains unexplained. [Experiment](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#expert-137-residency-intervention-with-reversed-logical-slots).
+
+A follow-up current-source rebuild on maestro1 applied the five shared C++ files
+changed since the 2026-10-23 backend snapshot to a separate source copy. HIP and
+SYCL incremental builds completed at one job; HIP `strata --help` and
+`shared_memory_budget_test` passed, as did SYCL `strata --help`. No accelerator
+runtime was exercised. The current SYCL runtime test could not find a device;
+its older CPU-device result remains separate. Build inputs and limitations are
+recorded in the [maestro1 report](../../bench/results/2026-10-24-phase8-maestro1-incremental-current-shared-build/README.md).

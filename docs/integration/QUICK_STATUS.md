@@ -786,3 +786,9 @@ slot-independent; the later token-66 mismatch follows original prompt 1, while
 original prompt 0 stays exact. All GDN state remains exact through matched
 position 105 in this 72-token pair. The cause of later prompt-specific drift is
 still open. [Details](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#expert-137-residency-intervention-with-reversed-logical-slots).
+
+Phase 8 portability follow-up: the five shared C++ files changed since the
+previous maestro1 snapshot rebuilt successfully for HIP and SYCL at one job.
+HIP's host memory-budget CTest passed; both service help checks passed. The
+current SYCL runtime had no available device, so this adds no accelerator
+execution evidence. [Build record](../../bench/results/2026-10-24-phase8-maestro1-incremental-current-shared-build/README.md).
