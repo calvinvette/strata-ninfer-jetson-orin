@@ -5034,3 +5034,14 @@ pressure events. GPU clocks varied dynamically from 306 to 1,300.5 MHz; EMC
 readback and energy analysis were unavailable. This is a three-block screen on
 fixed prompts, not held-out confirmation or persistent-state qualification;
 MTP4 is not promoted. Phase 5 and Phase 6 remain open.
+
+A current-source [MTP4 accepted-prefix probe](../../bench/results/2026-10-24-phase5-coder-mtp4-accepted-prefix-64/README.md)
+compared the deterministic 512-token Coder prompt with MTP off and MTP4 for 64
+generated tokens. Token IDs and all nine persistent-state fingerprints matched
+at final state and all 29 shared accepted-prefix boundaries; MTP4 offered 84
+drafts and accepted 35. Minimum physical/admission availability was 16.98 GiB.
+This reproduces the earlier bounded MTP3 transaction check for one prompt and
+chain length, but does not qualify longer chains, cancellation, adaptive
+migration or multi-live state. An initial attempt used an MTP-off config with
+no draft path and was excluded; the corrected run used the MTP4 config. Phase 5
+remains open.

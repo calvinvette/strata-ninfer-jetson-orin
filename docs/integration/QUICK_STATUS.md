@@ -630,3 +630,12 @@ The workload-length tradeoff argues against a global MTP4 choice. Minimum
 physical/effective admission availability was 16.83/15.69 GiB; no energy
 analysis was performed. This is screening evidence on fixed prompts, not
 held-out confirmation. [Report](../../bench/results/2026-10-24-phase6-coder-mtp4-kv-heldout-length-screen3/README.md).
+
+### Latest Phase 5 check: MTP4 accepted-prefix state
+
+With the correct draft-model config loaded, a 64-token MTP4 run matched MTP-off
+token IDs and all nine persistent-state fields at final state and 29 shared
+commit boundaries (35 of 84 drafts accepted). This extends the deterministic
+transaction check from MTP3 to MTP4 for one 512-token prompt; multi-live and
+long-chain state gates remain open. An initial config-selection error that
+loaded no draft model was excluded. [Report](../../bench/results/2026-10-24-phase5-coder-mtp4-accepted-prefix-64/README.md).
