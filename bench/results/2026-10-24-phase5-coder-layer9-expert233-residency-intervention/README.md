@@ -174,24 +174,36 @@ An opt-in CPU selector was then added for a selected model layer and optional
 expert ID: `STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_LAYER` and
 `STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_EXPERT`. It only affects the native CPU
 Q8_1 activation path and leaves defaults unchanged. A two-live 72-token
-service replay used a diagnostic profile with expert 233 at rank 12,287
-(profile SHA-256 `1f03ed71cdac371e07480a3b4473e93be5cdfc9afb910f2fdac8491ac555502e`).
-The captured batch row at layer 9 / position 83 routed expert 233 to CPU
-(owner code `-1`); its exact activation is the original seven-row sample
-`7ce8c948…d77b3`. The serial row remained GPU-owned. Both output sequences
-matched the existing rank-0 residency run. The direct committed GDN state at
-position 83 reproduced the same prompt-specific results: slot 1 was bit-
-identical, while slot 0 first differed at layer 5.
+service replay was paired with a no-selector control using the same diagnostic
+profile, with expert 233 at rank 12,287 (profile SHA-256
+`1f03ed71cdac371e07480a3b4473e93be5cdfc9afb910f2fdac8491ac555502e`). Both
+runs routed expert 233 to CPU in the batch row and GPU in serial at layer 9 /
+position 83; the batch route IDs, weights and activation were identical. The
+activation is the original seven-row sample `7ce8c948…d77b3`. Only the
+exp2f selector changed. The captured CPU expert part changed in all 2,560
+values (max absolute `8.94e-6`, relative L2 `1.198e-4`), matching the
+independent owner-oracle delta. The selected CPU oracle returned zero failures:
+all 60 hidden Q8_1 blocks and all 2,560 down-output values matched CUDA. The
+captured service CPU expert part matched that selected CPU oracle bit-for-bit
+(SHA-256 `cff8f354…f26061c`). The parity harness now reconstructs hidden f32
+with the selected expression, so it does not misclassify the candidate as a
+failure against the default `expf` path.
 
-The full accepted-prefix trace still first diverged at batch position 75 for
-slot 0 and position 89 for slot 1, exactly as in the rank-0 run. Thus the
-targeted CPU service branch executed and reproduced the sampled output and
-prompt-specific state results, but did not resolve later multi-live state
-drift. No default was
-changed and Phase 5 remains open. To reproduce, rebuild `strata`, use
+The no-selector batch output first differed from serial at token 66 for slot 1;
+the exp2f batch output matched all 72 serial tokens. Slot 0's output stayed
+unchanged. At position 83, slot 1's committed GDN state changed from first
+differing at layer 10 in control to bit-identical with exp2f; slot 0 remained
+first-different at layer 5. In accepted-prefix hashes, slot 1's first mismatch
+moved from batch position 84 (28/36 GDN allocations) to position 89 (27/36);
+slot 0 still first mismatched at position 75 (12/36). The candidate therefore
+repairs this sampled output mismatch and delays, but does not eliminate, later
+state drift. No default was changed; Phase 5 remains open. To reproduce, rebuild
+`strata`, use
 `capture_position_state.py --exp2f-silu-layer 9 --exp2f-silu-expert 233`
 with the Coder settings from the run record, and place expert 233 outside the
-initial GPU residency set to exercise the CPU branch. The large `.stgcmt`,
+initial GPU residency set. Omit these two variables for the paired control.
+The prior rank-0 residency arm is a separate regression check, not the
+same-profile control. The large `.stgcmt`,
 `.stgdiag`, `.stmoe`, and `.stmparts` captures remain local and are not Git
 artifacts. `exp2f-service-analysis.json` keeps compact source/profile/binary
 hashes, route evidence, output comparisons, and accepted-prefix mismatch

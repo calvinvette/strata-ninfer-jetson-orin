@@ -1,12 +1,12 @@
 {
   "schema": 1,
   "scope": "Opt-in host exp2f SiLU service-path diagnostic for layer 9 / expert 233; two-live Coder IQ1_M, 72 generated tokens.",
-  "source_commit": "cb8ed9980c685e4d5077dcdf8707017f22e111ba",
+  "source_commit": "4b324adee10a96259860a20e928d47c0afe61cc4",
   "source_sha256": {
     "include/strata/kernels/cpu/native_expert.hpp": "08096702f380c5f1c7f15c7c87aaf9c87b6b8526568744b9cd9bae543b779ffc",
     "src/kernels/cpu/native_expert.cpp": "a953a7df61b17612897ad71df6139f8870b180683300e6ee61a5da676fbd7ae0",
     "src/kernels/cpu/pool.cpp": "41c22c698f6c92449148eb70af3ab438b8354f012ae6aed92db407c6665d7a8a",
-    "src/kernels/native_expert_parity.cpp": "1c40734575398e098aab120d2d156f4d1dc5f62a8b11925aabe7f490a6eb33bd"
+    "src/kernels/native_expert_parity.cpp": "8eae93adf46655775dbdb9d41d9236dbf4178a472fcfbe2b4f293a523d582171"
   },
   "strata_binary_sha256": "ad4b2354fe98f0e4128cf9a9ed70488fef362207dd1f7e94555a8ba35d8985df",
   "profile_sha256": "1f03ed71cdac371e07480a3b4473e93be5cdfc9afb910f2fdac8491ac555502e",
@@ -61,10 +61,10 @@
   },
   "notes": [
     "Owner code -1 is CPU and 0 is GPU.",
-    "The layer-9/position-83 row is one of seven exact activation rows in activation-rounding-sweep.json; the exp2f oracle matches CUDA hidden Q8_1 and CPU down output on all seven.",
-    "Rank-0 run is a different residency profile, not a same-profile paired control. Equality is a bounded regression observation.",
-    "Position-83 state matches the rank-0 run per prompt: slot 0 first differs at layer 5; slot 1 is exact. Accepted-prefix mismatch locations are unchanged.",
-    "No default changed. This does not close Phase 5 or establish whole-model CPU/GPU parity. Large tensor captures are local only."
+    "The same-profile control and candidate use identical profile SHA, route IDs, route weights and position-83 batch activation; only the candidate sets the exp2f selector. The layer-9/position-83 activation is one of seven exact oracle rows; exp2f reproduces CUDA hidden Q8_1 and CPU down output on all seven.",
+    "Under this paired diagnostic, candidate batch output matches serial for slot 1 (control first differs at token 66); slot 0 output is unchanged. Position-83 GDN state becomes exact for slot 1 (control first differs at layer 10); slot 0 remains first-different at layer 5.",
+    "The first accepted-prefix GDN mismatch moves from batch position 84 to 89 for slot 1, but remains at position 75 for slot 0. The candidate improves this sampled path but does not bound full persistent state or close Phase 5.",
+    "The prior rank-0 run is retained as a separate bounded regression comparison, not the same-profile control. No default changed. Large tensor captures remain local only."
   ],
   "build_and_test_evidence": {
     "cuda_orin": {
@@ -96,5 +96,295 @@
       "result": "compiled and linked with MKLROOT and LIBRARY_PATH set to installed oneAPI MKL 2026.1",
       "runtime": "strata --help unavailable: no SYCL device on maestro1"
     }
+  },
+  "same_profile_control": {
+    "profile_sha256": "1f03ed71cdac371e07480a3b4473e93be5cdfc9afb910f2fdac8491ac555502e",
+    "environment_exp2f_silu": null,
+    "position83_route": {
+      "owner_code_batch": -1,
+      "owner_code_serial": 0,
+      "activation_sha256": "7ce8c948912b5f39471d5809fae4672f168e0cfc1b1e404be211f3ec600d77b3",
+      "route_and_activation_match_candidate": true,
+      "expert_part_matches_candidate": false,
+      "expert_part_different_values": 2560,
+      "expert_part_max_abs_delta": 8.940696716308594e-06,
+      "expert_part_relative_l2_delta": 0.00011979565294441891
+    },
+    "outputs": {
+      "slot-0": {
+        "serial_tokens_identical_control_candidate": true,
+        "batch_tokens_identical_control_candidate": true,
+        "batch_first_token_difference_control_candidate": null,
+        "candidate_batch_equals_serial": true
+      },
+      "slot-1": {
+        "serial_tokens_identical_control_candidate": true,
+        "batch_tokens_identical_control_candidate": false,
+        "batch_first_token_difference_control_candidate": 66,
+        "candidate_batch_equals_serial": true
+      }
+    },
+    "position83_state_first_changed_layer": {
+      "slot-0": {
+        "same_profile_control_first_changed_layer": 5,
+        "exp2f_candidate_first_changed_layer": 5
+      },
+      "slot-1": {
+        "same_profile_control_first_changed_layer": 10,
+        "exp2f_candidate_first_changed_layer": null
+      }
+    },
+    "accepted_prefix_hashes": {
+      "slot-0": {
+        "same_profile_control": {
+          "serial_control": 0,
+          "inferred_position_offset": 2,
+          "compared_positions": 69,
+          "exact_positions": [
+            {
+              "batch_position": 70,
+              "serial_prefix_position": 68
+            },
+            {
+              "batch_position": 71,
+              "serial_prefix_position": 69
+            },
+            {
+              "batch_position": 72,
+              "serial_prefix_position": 70
+            },
+            {
+              "batch_position": 73,
+              "serial_prefix_position": 71
+            },
+            {
+              "batch_position": 74,
+              "serial_prefix_position": 72
+            }
+          ],
+          "first_mismatch": {
+            "batch_position": 75,
+            "serial_prefix_position": 73,
+            "first_gdn_allocation_ordinal": 24,
+            "different_gdn_allocations": 12,
+            "total_gdn_allocations": 36
+          }
+        },
+        "exp2f_candidate": {
+          "serial_control": 0,
+          "inferred_position_offset": 2,
+          "compared_positions": 69,
+          "exact_positions": [
+            {
+              "batch_position": 70,
+              "serial_prefix_position": 68
+            },
+            {
+              "batch_position": 71,
+              "serial_prefix_position": 69
+            },
+            {
+              "batch_position": 72,
+              "serial_prefix_position": 70
+            },
+            {
+              "batch_position": 73,
+              "serial_prefix_position": 71
+            },
+            {
+              "batch_position": 74,
+              "serial_prefix_position": 72
+            }
+          ],
+          "first_mismatch": {
+            "batch_position": 75,
+            "serial_prefix_position": 73,
+            "first_gdn_allocation_ordinal": 24,
+            "different_gdn_allocations": 12,
+            "total_gdn_allocations": 36
+          }
+        }
+      },
+      "slot-1": {
+        "same_profile_control": {
+          "serial_control": 1,
+          "inferred_position_offset": 2,
+          "compared_positions": 70,
+          "exact_positions": [
+            {
+              "batch_position": 69,
+              "serial_prefix_position": 67
+            },
+            {
+              "batch_position": 70,
+              "serial_prefix_position": 68
+            },
+            {
+              "batch_position": 71,
+              "serial_prefix_position": 69
+            },
+            {
+              "batch_position": 72,
+              "serial_prefix_position": 70
+            },
+            {
+              "batch_position": 73,
+              "serial_prefix_position": 71
+            },
+            {
+              "batch_position": 74,
+              "serial_prefix_position": 72
+            },
+            {
+              "batch_position": 75,
+              "serial_prefix_position": 73
+            },
+            {
+              "batch_position": 76,
+              "serial_prefix_position": 74
+            },
+            {
+              "batch_position": 77,
+              "serial_prefix_position": 75
+            },
+            {
+              "batch_position": 78,
+              "serial_prefix_position": 76
+            },
+            {
+              "batch_position": 79,
+              "serial_prefix_position": 77
+            },
+            {
+              "batch_position": 80,
+              "serial_prefix_position": 78
+            },
+            {
+              "batch_position": 81,
+              "serial_prefix_position": 79
+            },
+            {
+              "batch_position": 82,
+              "serial_prefix_position": 80
+            },
+            {
+              "batch_position": 83,
+              "serial_prefix_position": 81
+            }
+          ],
+          "first_mismatch": {
+            "batch_position": 84,
+            "serial_prefix_position": 82,
+            "first_gdn_allocation_ordinal": 8,
+            "different_gdn_allocations": 28,
+            "total_gdn_allocations": 36
+          }
+        },
+        "exp2f_candidate": {
+          "serial_control": 1,
+          "inferred_position_offset": 2,
+          "compared_positions": 70,
+          "exact_positions": [
+            {
+              "batch_position": 69,
+              "serial_prefix_position": 67
+            },
+            {
+              "batch_position": 70,
+              "serial_prefix_position": 68
+            },
+            {
+              "batch_position": 71,
+              "serial_prefix_position": 69
+            },
+            {
+              "batch_position": 72,
+              "serial_prefix_position": 70
+            },
+            {
+              "batch_position": 73,
+              "serial_prefix_position": 71
+            },
+            {
+              "batch_position": 74,
+              "serial_prefix_position": 72
+            },
+            {
+              "batch_position": 75,
+              "serial_prefix_position": 73
+            },
+            {
+              "batch_position": 76,
+              "serial_prefix_position": 74
+            },
+            {
+              "batch_position": 77,
+              "serial_prefix_position": 75
+            },
+            {
+              "batch_position": 78,
+              "serial_prefix_position": 76
+            },
+            {
+              "batch_position": 79,
+              "serial_prefix_position": 77
+            },
+            {
+              "batch_position": 80,
+              "serial_prefix_position": 78
+            },
+            {
+              "batch_position": 81,
+              "serial_prefix_position": 79
+            },
+            {
+              "batch_position": 82,
+              "serial_prefix_position": 80
+            },
+            {
+              "batch_position": 83,
+              "serial_prefix_position": 81
+            },
+            {
+              "batch_position": 84,
+              "serial_prefix_position": 82
+            },
+            {
+              "batch_position": 85,
+              "serial_prefix_position": 83
+            },
+            {
+              "batch_position": 86,
+              "serial_prefix_position": 84
+            },
+            {
+              "batch_position": 87,
+              "serial_prefix_position": 85
+            },
+            {
+              "batch_position": 88,
+              "serial_prefix_position": 86
+            }
+          ],
+          "first_mismatch": {
+            "batch_position": 89,
+            "serial_prefix_position": 87,
+            "first_gdn_allocation_ordinal": 9,
+            "different_gdn_allocations": 27,
+            "total_gdn_allocations": 36
+          }
+        }
+      }
+    }
+  },
+  "native_expert_parity_binary_sha256": "70ef263ef83cf4d492c18c35561827ccd08ab663a91c1bd4681fed02f327eff5",
+  "selected_cpu_oracle": {
+    "activation_sha256": "7ce8c948912b5f39471d5809fae4672f168e0cfc1b1e404be211f3ec600d77b3",
+    "native_expert_parity_returncode": 0,
+    "independent_hidden_f32_reconstruction_mismatches": 0,
+    "cpu_vs_cuda_hidden_q8_1_blocks_different": 0,
+    "cpu_down_vs_cuda_output_words_different": 0,
+    "service_cpu_expert_part_equals_selected_cpu_oracle_bitwise": true,
+    "service_and_oracle_part_sha256": "cff8f354e1ab1e584ce7998e39713dbd4f1587abb73e1154f58698596f26061c"
   }
 }

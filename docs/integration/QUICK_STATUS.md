@@ -606,8 +606,13 @@ Seven captured activations had exact CPU/CUDA gate/up outputs. Default CPU
 SwiGLU matched CUDA's packed hidden Q8_1 and final output on six; an opt-in host
 exp2f candidate matched on all seven. In a two-live 72-token service replay,
 expert 233 was confirmed CPU-owned at layer 9 / position 83. The direct
-committed GDN state reproduced the previous run's prompt-specific results
-(slot 1 exact; slot 0 first differed at layer 5), and both output sequences
-matched the previous rank-0 run. Later accepted-prefix state divergence was
-unchanged (batch positions 75 and 89), so Phase 5 remains open. Details and
+committed GDN state matched serial for slot 1 (same-profile control first
+differed at layer 10); slot 0 still first differed at layer 5. With identical
+CPU ownership, route, weights and activation, the no-selector batch output
+first differed at token 66 for slot 1, while the exp2f candidate matched all
+72 serial tokens. Its first accepted-prefix mismatch moved from batch position
+84 to 89; slot 0 remained at 75. This repairs one output mismatch and delays
+but does not eliminate state drift, so Phase 5 remains open. The selected CPU
+oracle matched CUDA's hidden Q8_1 and down outputs, and the captured service
+expert part matched that oracle bit-for-bit. Details and
 limits are in the [experiment report](../../bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/README.md).

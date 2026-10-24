@@ -477,10 +477,17 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
                         const size_t at = (size_t) token * FF + (size_t) row;
                         cpu_gate_snapshot[at] = g;
                         cpu_up_snapshot[at] = u;
-                        // Mirror native_gu_rows' operation order. Rewriting this as
-                        // g * (1 / (1 + exp(-g))) changes float rounding and makes
-                        // this independent reconstruction report false mismatches.
-                        const float h = (g / (1.f + std::exp(-g))) * u;
+                        // Mirror the selected native_gu_rows operation order. The
+                        // exp2f route is a distinct opt-in candidate and must not
+                        // be judged against the default expf expression.
+                        float h;
+                        if (f.q8_1_exp2f_silu) {
+                            constexpr float kLog2E = 1.4426950408889634f;
+                            const float e = std::exp2((-g) * kLog2E);
+                            h = (g / (1.f + e)) * u;
+                        } else {
+                            h = (g / (1.f + std::exp(-g))) * u;
+                        }
                         reconstructed_differences += std::memcmp(&h, &cpu_hidden_snapshot[at], sizeof(float)) != 0;
                     }
                 }
