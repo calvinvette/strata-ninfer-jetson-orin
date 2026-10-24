@@ -703,3 +703,12 @@ position 89 to 99. The two-live output still diverged at token 60 for one
 logical slot. This local residency intervention does not qualify a profile or
 close Phase 5. maestro1 still has only 1.1 GiB free, blocking current-source
 HIP/SYCL rebuilds. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#expert-114-rank-0-residency-intervention).
+
+A second supervised 72-token run with expert 114 at rank 0 reproduced the
+accepted-prefix GDN hash onset: the prompt paired to serial control 1 first
+changed at batch position 99 / serial prefix 97 (18/36 allocations), while the
+other prompt first changed at position 75. Both runs' output records had slot 0
+exact and slot 1 first differing at token 60. This replicates the sampled
+pattern but still provides no state-drift or quality bound. The replication
+retained 17.74 GiB minimum physical availability with no cgroup pressure/OOM
+events. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#expert-114-rank-0-residency-intervention).

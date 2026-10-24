@@ -5134,3 +5134,13 @@ differed at output token 60. The run retained 17.74 GiB minimum physical
 availability with no cgroup pressure/OOM events. This local intervention
 delayed one state mismatch but did not establish long-chain parity or qualify
 a profile. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#expert-114-rank-0-residency-intervention). Phase 5 remains open.
+
+A second supervised 72-token run with the expert-114 rank-0 profile reproduced
+the accepted-prefix pattern after remapping batch rows by exact token/state
+hashes. The prompt paired to serial control 1 first changed at batch position
+99 / serial prefix 97 (18/36 GDN allocations); the other prompt first changed
+at position 75 / prefix 73 (12/36). Both output records again showed slot 0
+exact and slot 1 first differing at token 60. Minimum physical availability
+was 17.74 GiB, with no cgroup pressure/OOM events. This repeats the sampled
+onset but does not bound numeric drift or quality. Phase 5 remains open. See
+the [experiment report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#expert-114-rank-0-residency-intervention).

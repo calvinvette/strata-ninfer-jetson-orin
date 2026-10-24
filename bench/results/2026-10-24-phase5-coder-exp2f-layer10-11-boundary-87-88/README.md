@@ -149,3 +149,14 @@ transition and delayed one later hash mismatch, but it did not prevent state
 drift or one logical slot's output mismatch. It may also change residency for
 other experts. This is a diagnostic result, not evidence for a global
 CPU/GPU ownership preference or a serving profile; no default changed.
+
+A same-profile supervised replication repeated the 72-token run. Exact-hash
+alignment again mapped the target prompt (serial control 1) to a different
+physical batch row; its first GDN mismatch was again batch position 99 / serial
+prefix 97, with 18/36 allocations changed. The other prompt first differed at
+position 75 / prefix 73, with 12/36 allocations changed. Both runs' logical
+output records again had slot 0 exact and slot 1 first differing at token 60.
+The replication took 354.55 seconds, retained 17.74 GiB minimum physical
+availability, and recorded no cgroup pressure/OOM events. This reproduces the
+sampled onset under this profile, but the persistent-state changes still have
+no numerical drift or quality bound.
