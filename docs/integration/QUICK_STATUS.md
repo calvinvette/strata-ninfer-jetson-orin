@@ -695,3 +695,11 @@ rails. All four settings are nondominated because latency, CPU/CV and GPU/SOC
 rail tradeoffs cross; these rails include background activity and are not
 whole-device energy. Per-cell headroom and physical disk traffic were not
 retained, so this does not select a serving profile. [Table](../../bench/results/2026-10-24-phase6-coder-worker-transfer-confirm7/README.md#workload-specific-pareto-view).
+
+A temporary Coder IQ1_M profile moved layer-11 expert 114 to rank 0. Its
+targeted prompt's layer-10/11 outputs and all committed GDN state matched at
+position 88, and the 72-token accepted-prefix mismatch moved from batch
+position 89 to 99. The two-live output still diverged at token 60 for one
+logical slot. This local residency intervention does not qualify a profile or
+close Phase 5. maestro1 still has only 1.1 GiB free, blocking current-source
+HIP/SYCL rebuilds. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#expert-114-rank-0-residency-intervention).

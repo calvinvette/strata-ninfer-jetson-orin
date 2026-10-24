@@ -119,3 +119,33 @@ part from `serial-slot-1.parts.stmparts` and `batch.parts.stmparts` against
 Phase 5 remains open for accepted-prefix state contracts, broader migration
 and recovery coverage, and a bounded long-chain contract. No selector or
 default profile was changed.
+
+## Expert-114 rank-0 residency intervention
+
+A diagnostic profile moved layer-11 expert 114 from rank 9,412 to rank 0
+(profile SHA256
+`e495a29eb202f0918388e79e33b24691295c3b898ef1118c1a4491beafa0ebf8`).
+With this profile, the 32-token two-live capture returned exact outputs for
+both slots. For the prompt mapped to physical batch slot 0 in that run, all
+captured GDN states at positions 86, 87 and 88 were exact; layer-10 fields and
+layer-11 routes, activation, expert parts and combined output were also exact
+at position 88. Expert 114 remained GPU-owned. The other observed CPU owner
+changes at that row did not change their expert outputs.
+
+The 72-token supervised repeat passed, but the intervention did not provide
+long-chain parity: logical slot 0 stayed exact and logical slot 1 first
+differed at output token 60. The dynamically assigned physical batch row for
+the targeted prompt differed between captures, so row-level comparisons were
+paired from each run's token/hash mapping. At position 88 the targeted prompt
+still had exact layer-10 stage fields, layer-11 routes/activation/parts/output,
+and all 36 committed GDN states. Its accepted-prefix GDN hash first diverged
+later, at batch position 99 (serial prefix 97), ten positions later than the
+baseline profile's first observed mismatch at batch position 89 (serial prefix
+87). The 72-token run took 317.51 seconds and retained 17.74 GiB minimum
+physical availability, with no sampled cgroup pressure/OOM events.
+
+This targeted static residency change repaired the sampled position-88 owner
+transition and delayed one later hash mismatch, but it did not prevent state
+drift or one logical slot's output mismatch. It may also change residency for
+other experts. This is a diagnostic result, not evidence for a global
+CPU/GPU ownership preference or a serving profile; no default changed.

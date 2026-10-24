@@ -5123,3 +5123,14 @@ physical/admission availability was 16.86/16.90 GiB; both supervised runs
 passed the six-GiB guard. This strengthens one uninterrupted MTP4 state case;
 it does not qualify cancellation at these lengths, other prompts, adaptive
 migration or multi-live state. Phase 5 remains open.
+
+A follow-up moved layer-11 expert 114 from rank 9,412 to rank 0 in a temporary
+profile. For the targeted prompt, layer-10/11 records and all 36 committed GDN
+states remained exact at position 88, and the 32-token outputs for both live
+requests were exact. At 72 tokens, the targeted prompt's accepted-prefix hash
+first diverged at batch position 99 / serial prefix 97, later than the
+baseline's position 89 / prefix 87; one logical slot still first
+differed at output token 60. The run retained 17.74 GiB minimum physical
+availability with no cgroup pressure/OOM events. This local intervention
+delayed one state mismatch but did not establish long-chain parity or qualify
+a profile. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#expert-114-rank-0-residency-intervention). Phase 5 remains open.
