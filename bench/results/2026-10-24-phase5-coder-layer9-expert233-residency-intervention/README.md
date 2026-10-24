@@ -63,6 +63,30 @@ with `--position 83 --layer all --serial-slot both --generated-tokens 72
 --stage-layer 10 --trace-state-hashes --trace-batch-gdn-hashes`. The profile was
 generated with `make_expert_first_profile.py --layer 9 --expert 233`.
 
-The next correctness check is a held-out prompt pair with the same profile and
-joined accepted-prefix state/owner captures. Phase 5 remains open until
-multi-live committed-state behavior is explained or bounded.
+## Held-out prompt pair
+
+The same rank-0 profile was checked on the next two prepared integration
+prompts (65 and 66 prompt tokens), with 72 generated tokens per row. Both batch
+outputs matched their isolated serial controls exactly. This is one held-out
+correctness pair; it does not establish quality or general multi-live support.
+
+The accepted-prefix state was not fully paired. At position 83, direct all-layer
+state comparison was bit-identical for prompt 3, while prompt 2 first differed
+at GDN layer 6. The per-prefix hash trace found the first mismatch for prompt 2
+at batch position 75 / serial prefix 73 (18/36 allocations) and for prompt 3 at
+batch position 86 / serial prefix 84 (7/36 allocations). For prompt 3 at layer
+9 / position 83, expert 233 was not routed. For prompt 2, layer-9 route and
+activation were already unpaired, so the sample cannot verify the intervention
+there. The held-out pair therefore confirms output parity while also showing
+persistent-state drift under the profile.
+
+The supervised run passed with minimum physical/admission availability
+17.745 GiB. Compact artifacts are under `heldout-pair-2-3/`: `result.json`,
+`hash-analysis.json`, `state-batch0-prompt3.json`, and
+`state-batch1-prompt2.json`; selected layer-9 analyses are retained as well.
+Raw tensor dumps and telemetry remain local.
+
+The rank-0 intervention repaired the original sampled output pair and also
+returned exact output on one held-out pair, but neither pair had full terminal
+state parity. Other state mismatches remain, and this does not qualify a profile
+or close Phase 5. Multi-live committed-state behavior remains open.

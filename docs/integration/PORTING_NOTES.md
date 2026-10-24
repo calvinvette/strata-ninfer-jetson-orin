@@ -2916,3 +2916,13 @@ Strata/Splash: join exact activation, owner and expert part, then compare both
 accepted outputs and persistent state through completion. A single resident
 expert can repair one observed path without establishing multi-live state
 parity. [Raw analysis](../../bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/README.md).
+
+
+A held-out pair under the temporary layer-9 expert-233 residency profile also
+matched 72 output tokens per request, but accepted GDN state hashes diverged
+for both prompts, at different prefixes; one already differed directly at layer
+6. The target expert was not selected in one sampled held-out row, and the other
+row's layer-9 input was unpaired. For Splash follow-up, repeat the owner/state
+intervention on multiple prompts while joining exact route and activation
+records; exact final text alone does not transfer a state-parity claim.
+[Held-out report](../../bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/README.md).
