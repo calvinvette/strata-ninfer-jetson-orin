@@ -5165,3 +5165,15 @@ all 2,560 outputs. In that same capture the prompt's accepted-prefix GDN hash
 first changed at batch position 99 / serial prefix 97. This supports another
 owner-specific local perturbation but does not establish the sole cause of
 state drift or bound quality. Phase 5 remains open. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#layer-23-owner-transition-in-the-rank-0-intervention).
+
+A same-profile position-75 trace for the prompt paired to serial control 0
+found all layer-30 stage fields exact, then a changed layer-31 MoE activation
+(relative L2 `5.2730e-4`) and changed routes before expert execution. Ownership
+was unchanged; all expert parts and combined output differed (relative L2
+`0.006014`). The same run's direct GDN snapshot first differed at model layer
+32. This localizes the sampled divergence to the boundary after layer 30 and
+before layer-31 expert computation, without identifying the operation. At
+layer 4, expert 218 changed GPU→CPU on exact routes/input but its part and MoE
+output remained exact. No layer-3 stage dump was produced, so that requested
+cell is unsupported. The capture retained 17.73 GiB minimum physical
+availability with zero cgroup events. Phase 5 remains open. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#earlier-prompt-layer-3031-boundary).

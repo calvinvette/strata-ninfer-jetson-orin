@@ -728,3 +728,12 @@ accepted-prefix GDN hash first changed at batch position 99. The independent
 native oracle matched service GPU/CPU parts bitwise to their respective
 oracles. This is a second sampled owner-specific perturbation, not a complete
 cause or quality bound. [Analysis](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#layer-23-owner-transition-in-the-rank-0-intervention).
+
+For the earlier prompt, the same-profile position-75 trace found layer-30 stage
+fields exact, then layer-31 MoE activation and routes already differed before
+expert execution (activation relative L2 `5.27e-4`; owners unchanged). The
+combined layer-31 output differed by `0.006014`, followed by first numeric GDN
+difference at layer 32. Layer-4 expert 218 also changed owner at this position
+but its exact-input output stayed bit-identical. The responsible layer-30/31
+boundary operation remains unknown; a requested layer-3 stage dump was not
+available. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#earlier-prompt-layer-3031-boundary).

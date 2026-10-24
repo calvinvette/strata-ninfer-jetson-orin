@@ -218,3 +218,27 @@ no cgroup events. The oracle passed in 1.07 seconds with 26.84 GiB minimum
 availability. The first two oracle invocations were harness setup failures
 (an unsupported `--` argument and then a missing dump directory); the final
 corrected oracle run passed. No accelerator default or profile changed.
+
+## Earlier prompt: layer-30/31 boundary
+
+A same-profile capture at batch position 75 mapped physical row 0 to serial
+control 0 by the exact per-layer hash trace. The direct committed-state
+comparison at this same position first differed at GDN model layer 32. At
+layer 30, every captured stage field was bit-identical. At layer 31, however,
+the MoE input activation already differed in all 2,560 values (max absolute
+`0.0018873`, relative L2 `5.2730e-4`), and the routed expert IDs differed.
+All ten expert parts and the combined layer-31 output therefore differed;
+expert ownership codes were unchanged across the two rows. The combined
+output relative L2 was `0.006014`. Because the input activation and route were
+not equal, this is not an owner-arithmetic comparison. It places the sampled
+change between the exact layer-30 stage and the layer-31 MoE input, before
+expert execution, followed by changed GDN state at layer 32. It does not name
+the responsible operation.
+
+In the separate layer-4 check at the same position, routes and input activation
+were exact. Expert 218 moved GPU→CPU but its part and combined layer-4 output
+remained bit-identical. The layer-3 stage dump was requested but no `.stgdiag`
+file was emitted, so that stage comparison is unsupported. The layer-30/31
+capture passed in 287.03 seconds with 17.73 GiB minimum physical availability
+and zero cgroup pressure/OOM events. This is a diagnostic run, not a performance
+result.
