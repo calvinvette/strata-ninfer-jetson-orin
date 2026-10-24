@@ -1,0 +1,2570 @@
+{
+  "variant": "candidate",
+  "health": {
+    "status": "ok",
+    "max_context": 8192,
+    "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+    "images": false,
+    "api_key": false,
+    "loaded": true,
+    "service": "strata"
+  },
+  "checks": [
+    {
+      "cell": "warmup-512",
+      "round": -1,
+      "warmup": true,
+      "status": "pass",
+      "reason": "workload completed; not a numerical qualification",
+      "wall_time_s": 1792822645.7084317,
+      "request_start_monotonic_s": 2091815.282165727,
+      "response": {
+        "id": "chatcmpl-b34c6d0e892d4e6e965b09fb",
+        "object": "chat.completion.chunk",
+        "created": 1792822645,
+        "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+        "choices": [
+          {
+            "message": {
+              "content": "Processor",
+              "reasoning_content": ""
+            }
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 512,
+          "completion_tokens": 1,
+          "total_tokens": 513,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 512,
+          "prompt_ms": 57744.2,
+          "prompt_per_token_ms": 112.782,
+          "prompt_per_second": 8.9,
+          "predicted_n": 1,
+          "predicted_ms": 166.5,
+          "predicted_per_token_ms": 166.5,
+          "predicted_per_second": 6.0,
+          "draft_n": 0,
+          "draft_n_accepted": 0
+        }
+      },
+      "stream_observation": {
+        "first_visible_delta_s": 57.918923432938755,
+        "events": [
+          {
+            "elapsed_s": 0.006797902984544635,
+            "event": {
+              "id": "chatcmpl-b34c6d0e892d4e6e965b09fb",
+              "object": "chat.completion.chunk",
+              "created": 1792822645,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "role": "assistant",
+                    "content": ""
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 57.918923432938755,
+            "event": {
+              "id": "chatcmpl-b34c6d0e892d4e6e965b09fb",
+              "object": "chat.completion.chunk",
+              "created": 1792822645,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "Processor"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 57.91946219909005,
+            "event": {
+              "id": "chatcmpl-b34c6d0e892d4e6e965b09fb",
+              "object": "chat.completion.chunk",
+              "created": 1792822645,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {},
+                  "finish_reason": "length"
+                }
+              ],
+              "usage": {
+                "prompt_tokens": 512,
+                "completion_tokens": 1,
+                "total_tokens": 513,
+                "prompt_tokens_details": {
+                  "cached_tokens": 0
+                }
+              },
+              "timings": {
+                "cache_n": 0,
+                "prompt_n": 512,
+                "prompt_ms": 57744.2,
+                "prompt_per_token_ms": 112.782,
+                "prompt_per_second": 8.9,
+                "predicted_n": 1,
+                "predicted_ms": 166.5,
+                "predicted_per_token_ms": 166.5,
+                "predicted_per_second": 6.0,
+                "draft_n": 0,
+                "draft_n_accepted": 0
+              }
+            }
+          }
+        ],
+        "scope": "client TTFT to first nonempty content/reasoning delta; chunk timestamps, not token timestamps"
+      },
+      "request_end_monotonic_s": 2091873.201786353,
+      "client_elapsed_s": 57.919620625907555,
+      "metrics_after": {
+        "engine": {
+          "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+          "max_context": 8192,
+          "images": false,
+          "version": "0.1.41",
+          "context": 8192,
+          "kv": "fp16",
+          "kv_resident": 0,
+          "expert_slots": 1934,
+          "expert_cache_mib": 3807,
+          "expert_slots_primary": 1934,
+          "expert_cache_primary_mib": 3807,
+          "spec": 3,
+          "mtp_max": 3,
+          "lookup": 0,
+          "vram_free_mib": 17517,
+          "cvec": 0,
+          "arena_mib": 0,
+          "pool_workers": 8,
+          "pcie_frac": "0.55",
+          "spec_min_p": "0.00",
+          "conversation_cache_mib": 0,
+          "conversation_cache_slots": 4,
+          "conversation_cache_min_free_mib": 2560,
+          "tail_role_token": -1,
+          "vram_elastic": 0,
+          "engine": "0.1.41"
+        },
+        "live": {
+          "state": "idle",
+          "queued": 0,
+          "phase": null,
+          "prompt_tokens": null,
+          "prompt_read": null,
+          "prompt_total": null,
+          "generated": null,
+          "max_tokens": null,
+          "elapsed_s": null,
+          "tok_s": null,
+          "tok_s_mean": null,
+          "prefill_tok_s_mean": null,
+          "tok_s_window_s": null
+        },
+        "requests": [
+          {
+            "projection": null,
+            "time": 1792822645.7172868,
+            "duration_s": 57.9,
+            "finish": "length",
+            "prompt_tokens": 512,
+            "reused": 0,
+            "output_tokens": 1,
+            "prompt_total": 512,
+            "prompt_read": 512,
+            "reasoning_recoveries": 0,
+            "reasoning_repeat_coverage": 0.0,
+            "engine_generated": 1,
+            "prompt_ms": 57744.2,
+            "decode_ms": 166.5,
+            "decode_tok_s": 6.0,
+            "hit_rate": 0.308,
+            "pcie_share": 0.0,
+            "ram_blobs": 0,
+            "file_blobs": 0,
+            "file_mb": 677.3,
+            "drafts_offered": 0,
+            "drafts_accepted": 0
+          }
+        ],
+        "conversation_cache": {
+          "enabled": false,
+          "budget_mib": 0,
+          "slots": 4,
+          "parked": 0,
+          "bytes": 0,
+          "evictions": 0,
+          "parks": 0,
+          "restores": 0,
+          "last_event": null,
+          "last_tokens": null,
+          "last_at": null,
+          "requests": 1,
+          "requests_reused": 0,
+          "reused_tokens": 0,
+          "prompt_tokens": 512,
+          "last_reused": 0,
+          "last_prompt": 512
+        },
+        "requests_kept": 1,
+        "totals": {
+          "since": 1792822645.039479,
+          "requests": 1,
+          "prompt_tokens": 512,
+          "reused": 0,
+          "output_tokens": 1,
+          "prompt_ms": 57744.2,
+          "decode_ms": 166.5,
+          "drafts_offered": 0,
+          "drafts_accepted": 0
+        },
+        "hardware": {
+          "gpu_temp": null,
+          "gpu_power": null,
+          "gpu_power_limit": null,
+          "gpu_pcie_gen": null,
+          "gpu_pcie_gen_max": null,
+          "gpu_pcie_width": null,
+          "gpu_pcie_rx_mb": null,
+          "gpu_pcie_tx_mb": null,
+          "cpu": 10.592160133444539,
+          "ram_used": 13880397824,
+          "ram_total": 32187883520,
+          "disk_read_mb": null,
+          "disk_write_mb": null,
+          "tok_s": 0.0,
+          "tok_s_mean": 0,
+          "prefill_tok_s_mean": 8.7
+        },
+        "hardware_static": {
+          "gpu_name": "Orin (nvgpu)",
+          "gpu_count": 1,
+          "gpu_note": null,
+          "cpu_name": "ARMv8 Processor rev 1 (v8l)",
+          "cores": null,
+          "threads": 12,
+          "psutil": false
+        },
+        "history": {
+          "gpu_util": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "gpu_mem_used": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "gpu_temp": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "gpu_power": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "gpu_pcie_rx_mb": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "cpu": [
+            25.0,
+            7.68,
+            10.36,
+            12.7,
+            10.11,
+            12.09,
+            11.2,
+            8.67,
+            9.43,
+            9.99,
+            9.51,
+            9.73,
+            9.58,
+            9.51,
+            9.51,
+            9.73,
+            9.51,
+            9.66,
+            9.42,
+            9.65,
+            9.42,
+            9.51,
+            9.49,
+            9.23,
+            9.42,
+            9.51,
+            9.49,
+            9.91,
+            10.1,
+            9.52,
+            9.27,
+            11.52,
+            10.84,
+            9.42,
+            9.83,
+            9.18,
+            9.18,
+            8.42,
+            10.77,
+            10.13,
+            8.08,
+            8.85,
+            8.01,
+            7.01,
+            7.78,
+            6.5,
+            7.42,
+            7.1,
+            8.02,
+            8.91,
+            8.6,
+            8.24,
+            10.14,
+            11.72,
+            11.44,
+            11.02,
+            11.28,
+            9.94,
+            10.59
+          ],
+          "ram_used": [
+            13808439296,
+            13959831552,
+            13961117696,
+            13963149312,
+            13957431296,
+            13911932928,
+            13884878848,
+            13888602112,
+            13888921600,
+            13888872448,
+            13888864256,
+            13888851968,
+            13888827392,
+            13888823296,
+            13888802816,
+            13888503808,
+            13888663552,
+            13888663552,
+            13888569344,
+            13888569344,
+            13888557056,
+            13888548864,
+            13888536576,
+            13888782336,
+            13888782336,
+            13888708608,
+            13888708608,
+            13882298368,
+            13876142080,
+            13876142080,
+            13875937280,
+            13885091840,
+            13887565824,
+            13887565824,
+            13892870144,
+            13892857856,
+            13892845568,
+            13891129344,
+            13888520192,
+            13887029248,
+            13886525440,
+            13883047936,
+            13886504960,
+            13886078976,
+            13886939136,
+            13886943232,
+            13887389696,
+            13887295488,
+            13886439424,
+            13887037440,
+            13886689280,
+            13887746048,
+            13887647744,
+            13888503808,
+            13887664128,
+            13888045056,
+            13884874752,
+            13882466304,
+            13880397824
+          ],
+          "disk_read_mb": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tok_s": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prefill_tok_s_mean": [
+            0.0,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            10.9,
+            3.3,
+            3.3,
+            3.3,
+            4.6,
+            4.6,
+            5.8,
+            5.8,
+            6.9,
+            6.9,
+            8.0,
+            8.0,
+            8.0,
+            8.7,
+            8.7,
+            8.7,
+            8.7,
+            8.7,
+            8.7,
+            8.7
+          ]
+        },
+        "time": 1792822703.6314082
+      }
+    },
+    {
+      "cell": "coder-cache-context-heldout-retrieval-arithmetic-near-limit-7501",
+      "round": 0,
+      "warmup": false,
+      "status": "pass",
+      "reason": "workload completed; not a numerical qualification",
+      "wall_time_s": 1792822703.6354876,
+      "request_start_monotonic_s": 2091873.209061559,
+      "response": {
+        "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+        "object": "chat.completion.chunk",
+        "created": 1792822703,
+        "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+        "choices": [
+          {
+            "message": {
+              "content": "EARLY=EMBER-VAULT-317, MIDDLE=SILVER-MAPLE-846, LATE=TIDAL-COPPER-529, SUM=1692",
+              "reasoning_content": ""
+            }
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 7501,
+          "completion_tokens": 45,
+          "total_tokens": 7546,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 7501,
+          "prompt_ms": 334032.5,
+          "prompt_per_token_ms": 44.532,
+          "prompt_per_second": 22.5,
+          "predicted_n": 45,
+          "predicted_ms": 3936.9,
+          "predicted_per_token_ms": 87.487,
+          "predicted_per_second": 11.4,
+          "draft_n": 34,
+          "draft_n_accepted": 28
+        }
+      },
+      "stream_observation": {
+        "first_visible_delta_s": 334.15815489995293,
+        "events": [
+          {
+            "elapsed_s": 0.01197357289493084,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "role": "assistant",
+                    "content": ""
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 334.15815489995293,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "EAR"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 334.659197706962,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "LY"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 334.65926074492745,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "="
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 334.6593614460435,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "EMBER"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 334.87368725589477,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "-"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 334.87377589405514,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "VA"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 334.87386510684155,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "ULT"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 335.08045831904747,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "-"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 335.08051351690665,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "3"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 335.0805804268457,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "1"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 335.28498010500334,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "7"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 335.28504317603074,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": ","
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 335.28512931684963,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": " M"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 335.49838581704535,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "IDDLE"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 335.719936050009,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "=S"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 335.93464441085234,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "IL"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 335.934744119877,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "VER"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 335.9348466768861,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "-M"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 336.1462942720391,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "AP"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 336.14638934098184,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "LE"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 336.146473499015,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "-"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 336.35045280703343,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "8"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 336.3505056698341,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "4"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 336.35057446802966,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "6"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 336.5551411518827,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": ","
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 336.55519919795915,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": " L"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 336.55526146898046,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "ATE"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 336.7617639990058,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "=T"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 336.9637810969725,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "ID"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 336.96386704593897,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "AL"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 336.96397565095685,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "-C"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 337.16949558700435,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "OP"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 337.1695552649908,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "PER"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 337.16963433404453,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "-"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 337.3689127948601,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "5"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 337.3689674169291,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "2"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 337.36902018403634,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "9"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 337.57460069586523,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": ","
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 337.574631158961,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": " SUM"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 337.5746672539972,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "="
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 337.7845524039585,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "1"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 337.7846073459368,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "6"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 337.784625713015,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "9"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 337.9849630878307,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {
+                    "content": "2"
+                  },
+                  "finish_reason": null
+                }
+              ]
+            }
+          },
+          {
+            "elapsed_s": 337.986568414839,
+            "event": {
+              "id": "chatcmpl-655ae8b5ff2c48f2862075d1",
+              "object": "chat.completion.chunk",
+              "created": 1792822703,
+              "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+              "choices": [
+                {
+                  "index": 0,
+                  "delta": {},
+                  "finish_reason": "stop"
+                }
+              ],
+              "usage": {
+                "prompt_tokens": 7501,
+                "completion_tokens": 45,
+                "total_tokens": 7546,
+                "prompt_tokens_details": {
+                  "cached_tokens": 0
+                }
+              },
+              "timings": {
+                "cache_n": 0,
+                "prompt_n": 7501,
+                "prompt_ms": 334032.5,
+                "prompt_per_token_ms": 44.532,
+                "prompt_per_second": 22.5,
+                "predicted_n": 45,
+                "predicted_ms": 3936.9,
+                "predicted_per_token_ms": 87.487,
+                "predicted_per_second": 11.4,
+                "draft_n": 34,
+                "draft_n_accepted": 28
+              }
+            }
+          }
+        ],
+        "scope": "client TTFT to first nonempty content/reasoning delta; chunk timestamps, not token timestamps"
+      },
+      "request_end_monotonic_s": 2092211.195758385,
+      "client_elapsed_s": 337.9866968258284,
+      "metrics_after": {
+        "engine": {
+          "model": "Coder IQ1_M with upstream base-checkpoint MTP; held-out MTP x KV x prompt-length confirmation at matched 1500 MiB expert cache",
+          "max_context": 8192,
+          "images": false,
+          "version": "0.1.41",
+          "context": 8192,
+          "kv": "fp16",
+          "kv_resident": 0,
+          "expert_slots": 1934,
+          "expert_cache_mib": 3807,
+          "expert_slots_primary": 1934,
+          "expert_cache_primary_mib": 3807,
+          "spec": 3,
+          "mtp_max": 3,
+          "lookup": 0,
+          "vram_free_mib": 17517,
+          "cvec": 0,
+          "arena_mib": 0,
+          "pool_workers": 8,
+          "pcie_frac": "0.55",
+          "spec_min_p": "0.00",
+          "conversation_cache_mib": 0,
+          "conversation_cache_slots": 4,
+          "conversation_cache_min_free_mib": 2560,
+          "tail_role_token": -1,
+          "vram_elastic": 0,
+          "engine": "0.1.41"
+        },
+        "live": {
+          "state": "idle",
+          "queued": 0,
+          "phase": null,
+          "prompt_tokens": null,
+          "prompt_read": null,
+          "prompt_total": null,
+          "generated": null,
+          "max_tokens": null,
+          "elapsed_s": null,
+          "tok_s": null,
+          "tok_s_mean": null,
+          "prefill_tok_s_mean": null,
+          "tok_s_window_s": null
+        },
+        "requests": [
+          {
+            "projection": null,
+            "time": 1792822703.649374,
+            "duration_s": 338.0,
+            "finish": "stop",
+            "prompt_tokens": 7501,
+            "reused": 0,
+            "output_tokens": 45,
+            "prompt_total": 7501,
+            "prompt_read": 7501,
+            "reasoning_recoveries": 0,
+            "reasoning_repeat_coverage": 0.0,
+            "engine_generated": 45,
+            "prompt_ms": 334032.5,
+            "decode_ms": 3936.9,
+            "decode_tok_s": 11.4,
+            "hit_rate": 0.183,
+            "pcie_share": 0.0,
+            "ram_blobs": 0,
+            "file_blobs": 0,
+            "file_mb": 31442.1,
+            "drafts_offered": 34,
+            "drafts_accepted": 28
+          },
+          {
+            "projection": null,
+            "time": 1792822645.7172868,
+            "duration_s": 57.9,
+            "finish": "length",
+            "prompt_tokens": 512,
+            "reused": 0,
+            "output_tokens": 1,
+            "prompt_total": 512,
+            "prompt_read": 512,
+            "reasoning_recoveries": 0,
+            "reasoning_repeat_coverage": 0.0,
+            "engine_generated": 1,
+            "prompt_ms": 57744.2,
+            "decode_ms": 166.5,
+            "decode_tok_s": 6.0,
+            "hit_rate": 0.308,
+            "pcie_share": 0.0,
+            "ram_blobs": 0,
+            "file_blobs": 0,
+            "file_mb": 677.3,
+            "drafts_offered": 0,
+            "drafts_accepted": 0
+          }
+        ],
+        "conversation_cache": {
+          "enabled": false,
+          "budget_mib": 0,
+          "slots": 4,
+          "parked": 0,
+          "bytes": 0,
+          "evictions": 0,
+          "parks": 0,
+          "restores": 0,
+          "last_event": null,
+          "last_tokens": null,
+          "last_at": null,
+          "requests": 2,
+          "requests_reused": 0,
+          "reused_tokens": 0,
+          "prompt_tokens": 8013,
+          "last_reused": 0,
+          "last_prompt": 7501
+        },
+        "requests_kept": 2,
+        "totals": {
+          "since": 1792822645.039479,
+          "requests": 2,
+          "prompt_tokens": 8013,
+          "reused": 0,
+          "output_tokens": 46,
+          "prompt_ms": 391776.7,
+          "decode_ms": 4103.4,
+          "drafts_offered": 34,
+          "drafts_accepted": 28
+        },
+        "hardware": {
+          "gpu_temp": null,
+          "gpu_power": null,
+          "gpu_power_limit": null,
+          "gpu_pcie_gen": null,
+          "gpu_pcie_gen_max": null,
+          "gpu_pcie_width": null,
+          "gpu_pcie_rx_mb": null,
+          "gpu_pcie_tx_mb": null,
+          "cpu": 75.5,
+          "ram_used": 13194883072,
+          "ram_total": 32187883520,
+          "disk_read_mb": null,
+          "disk_write_mb": null,
+          "tok_s": 12.209445757258697,
+          "tok_s_mean": 10.669557760036133,
+          "prefill_tok_s_mean": 0.0
+        },
+        "hardware_static": {
+          "gpu_name": "Orin (nvgpu)",
+          "gpu_count": 1,
+          "gpu_note": null,
+          "cpu_name": "ARMv8 Processor rev 1 (v8l)",
+          "cores": null,
+          "threads": 12,
+          "psutil": false
+        },
+        "history": {
+          "gpu_util": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "gpu_mem_used": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "gpu_temp": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "gpu_power": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "gpu_pcie_rx_mb": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "cpu": [
+            7.24,
+            7.08,
+            6.92,
+            7.1,
+            6.93,
+            7.01,
+            7.35,
+            6.92,
+            6.93,
+            6.83,
+            7.08,
+            6.93,
+            7.02,
+            8.18,
+            7.34,
+            7.17,
+            10.59,
+            8.36,
+            7.67,
+            11.18,
+            7.34,
+            7.2,
+            8.42,
+            7.43,
+            7.34,
+            6.93,
+            7.18,
+            6.42,
+            7.08,
+            7.17,
+            6.92,
+            8.09,
+            7.09,
+            6.9,
+            7.11,
+            7.08,
+            6.93,
+            7.25,
+            7.15,
+            6.93,
+            7.33,
+            6.84,
+            7.17,
+            7.24,
+            7.17,
+            6.83,
+            7.4,
+            7.08,
+            7.1,
+            7.32,
+            16.64,
+            17.28,
+            13.95,
+            8.92,
+            9.58,
+            10.45,
+            7.67,
+            59.03,
+            76.07,
+            75.5
+          ],
+          "ram_used": [
+            13304537088,
+            13304614912,
+            13304393728,
+            13304496128,
+            13304455168,
+            13303980032,
+            13303783424,
+            13303857152,
+            13303767040,
+            13303656448,
+            13303918592,
+            13303787520,
+            13304037376,
+            13291421696,
+            13291868160,
+            13291540480,
+            13266505728,
+            13260034048,
+            13259227136,
+            13252833280,
+            13252845568,
+            13257519104,
+            13267636224,
+            13267849216,
+            13273038848,
+            13272829952,
+            13272793088,
+            13272932352,
+            13272780800,
+            13272768512,
+            13272633344,
+            13268905984,
+            13266694144,
+            13266644992,
+            13266583552,
+            13266571264,
+            13266563072,
+            13266550784,
+            13266612224,
+            13266984960,
+            13266984960,
+            13266903040,
+            13266866176,
+            13266841600,
+            13266853888,
+            13267030016,
+            13266808832,
+            13269569536,
+            13269458944,
+            13269446656,
+            13219270656,
+            13169385472,
+            13145665536,
+            13139271680,
+            13141635072,
+            13156212736,
+            13154439168,
+            13199613952,
+            13195173888,
+            13194883072
+          ],
+          "disk_read_mb": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tok_s": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            8.36,
+            9.56,
+            12.21
+          ],
+          "prefill_tok_s_mean": [
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.7,
+            22.6,
+            22.6,
+            22.5,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "time": 1792823041.626019
+      }
+    }
+  ],
+  "replication_scope": "requests within one server process; screening only",
+  "timing_scope": "client total and API times (rounded); stream records client first-visible-delta TTFT when enabled",
+  "qualification": "no paired effect or speedup claimed by this single-variant adapter",
+  "summary": [
+    {
+      "cell": "coder-cache-context-heldout-retrieval-arithmetic-near-limit-7501",
+      "passed_samples": 1,
+      "planned_samples": 1,
+      "median_prompt_per_second": 22.5,
+      "median_predicted_per_second": 11.4
+    }
+  ]
+}

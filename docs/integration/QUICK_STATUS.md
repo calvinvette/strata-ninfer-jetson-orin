@@ -1,6 +1,6 @@
 # Quick status
 
-Updated: 2026-10-23
+Updated: 2026-10-24
 
 This is a short orientation to the integration. The [plan](PLAN.md) defines
 phase gates; the detailed [status](STATUS.md) is the evidence record, and the
@@ -31,6 +31,13 @@ This adds x86 build and CPU-runtime evidence only; accelerator runtime was not
 tested. [Build record](../../bench/results/2026-10-23-phase8-maestro1-current-source-backend-build/README.md).
 
 ## Performance observed
+
+A seven-block held-out 7,501-token confirmation passed all 28 MTP-off/MTP3 ×
+FP16/INT8 KV arms. MTP3 reduced decode throughput 5.49% (FP16) and 4.19%
+(INT8), while total request time rose 0.67% and 0.89%. The named-rail follow-up
+found higher CPU/CV energy/token and small lower GPU/SOC energy/token; system
+rail intervals included zero. The response model has residual outliers, so the
+paired bootstrap is primary. No default changes. [Report](../../bench/results/2026-10-24-phase6-coder-mtp3-kv-heldout-long-confirm7/README.md).
 
 A current-source owner-transition diagnostic at layer 27 / generated position
 515 found exact selected expert output and all-layer committed GDN state across

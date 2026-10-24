@@ -1,6 +1,6 @@
 # Integration status
 
-Updated: 2026-10-23. Phases 1 through 4 are complete for their documented tested
+Updated: 2026-10-24. Phases 1 through 4 are complete for their documented tested
 Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 is
 complete for its bounded Orin qualification matrix under [its closeout]
 (PHASE7_CLOSEOUT.md), and Phase 8 is complete for the bounded Q2_0 release
@@ -4960,3 +4960,22 @@ three-block estimates include idle/background load, are not process-attributed,
 and remain separate by rail; they are neither summed device energy nor a Pareto
 or sustained-power result. Phase 6 energy/Pareto work remains open.
 [Rail report and raw integrations](../../bench/results/2026-10-23-phase6-coder-mtp3-kv-length-screen3/README.md).
+
+
+A seven-block held-out Phase 6 confirmation completed 28/28 randomized
+MTP-off/MTP3 × FP16/INT8 KV arms on a distinct 7,501-token retrieval/arithmetic
+task. Every arm returned the expected exact answer and passed actual KV, expert
+cache and MTP-window checks. MTP3 reduced decode throughput 5.49% (95% paired
+block interval −5.78% to −4.59%) with FP16 KV and 4.19% (−5.26% to −3.37%)
+with INT8; total request time rose 0.67% and 0.89%. The decode MTP×KV interaction
+was +0.69% (+0.33% to +1.75%), while total-time interaction included zero.
+Named-rail integration succeeded for all 28 request windows; it found CPU/CV
+energy per output token up 4.18%/5.11%, GPU/SOC down 0.42%/0.27%, and system
+rail changes +0.27%/+0.58% for FP16/INT8. These rails include background load
+and are not additive or process-attributed. The exploratory log response model
+is full rank but has multiple absolute standardized residuals above 3, so paired
+block bootstrap remains primary and no setting is promoted. Minimum physical
+and admission availability were both 16.925 GiB; GPU clocks varied from
+306–1300.5 MHz and EMC readback was unavailable. This confirms the long-prompt
+MTP3 slowdown on this held-out workload; it does not close Phase 6's worker/
+transfer, graph/speculation or Pareto work. [Full report and raw data](../../bench/results/2026-10-24-phase6-coder-mtp3-kv-heldout-long-confirm7/README.md).

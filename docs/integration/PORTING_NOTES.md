@@ -2882,3 +2882,16 @@ retain each rail separately, and account for prompt-length interactions. The
 rails include idle/background activity and are neither process-attributed nor
 additive total-device energy; three blocks do not establish a Pareto point.
 See the factorial report's rail follow-up and retained integration script.
+
+
+A seven-block held-out Orin MTP3 × FP16/INT8 KV confirmation on a second
+7,501-token retrieval/arithmetic prompt again found lower decode throughput
+with MTP3 (−5.49% FP16, −4.19% INT8) and slightly higher request time
+(+0.67%, +0.89%). Named tegrastats integration found CPU/CV energy per output
+token higher by 4–5%, GPU/SOC lower by about 0.3–0.4%, and system-rail change
+uncertain. The log-scale fixed-block response model was full rank, but residuals
+above three standard deviations make its intervals exploratory; retain paired
+block bootstrap as primary. For future Splash studies, repeat the same held-out
+long task and retain exact runtime KV/residency checks, request-window rail
+integration, and explicit residual diagnostics. Do not infer system energy by
+summing these rails. [Raw campaign and scripts](../../bench/results/2026-10-24-phase6-coder-mtp3-kv-heldout-long-confirm7/README.md).
