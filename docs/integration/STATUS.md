@@ -5063,3 +5063,13 @@ analyzed. This confirms a short-task decode effect on one held-out prompt; it
 does not qualify long-context behavior, where the separate three-block MTP4
 screen found lower decode throughput. Phase 5/6 remain open and MTP4 is not
 promoted to a default.
+
+The MTP4 accepted-prefix comparison was extended to 256 tokens and a 512-token
+allowance on the deterministic Coder prompt. MTP-off and MTP4 matched all token
+IDs, all nine final persistent-state fields and every shared commit boundary:
+115 boundaries through 256 tokens, then 157 boundaries through a natural stop
+at token 348. MTP4 accepted 142/342 and 194/468 drafts, respectively. Minimum
+physical/admission availability was 16.86/16.90 GiB; both supervised runs
+passed the six-GiB guard. This strengthens one uninterrupted MTP4 state case;
+it does not qualify cancellation at these lengths, other prompts, adaptive
+migration or multi-live state. Phase 5 remains open.

@@ -650,3 +650,9 @@ near-limit screen found an MTP4 decode slowdown, so no default is promoted.
 One low-throughput FP16 control outlier is retained; the exploratory response
 model had large residuals, so paired bootstrap estimates remain primary. Energy
 was not analyzed. [Report](../../bench/results/2026-10-24-phase6-coder-mtp4-heldout-short-confirm7/README.md).
+
+The MTP4 accepted-prefix state check now also passes 256 generated tokens and
+348 tokens to natural EOS from the same deterministic prompt. Token IDs and all
+nine state fields matched at final state and 115 / 157 shared commit boundaries.
+This covers uninterrupted generation only; multi-live state drift remains
+unresolved. [Report](../../bench/results/2026-10-24-phase5-coder-mtp4-accepted-prefix-long-chain/README.md).
