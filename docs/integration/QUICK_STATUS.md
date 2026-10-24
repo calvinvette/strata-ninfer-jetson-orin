@@ -553,3 +553,9 @@ interval included zero. The screen covers one held-out 512-token workload only.
 The factorial runner was generalized from MTP4-only to windows 2, 3 and 4 with
 a selected-window summary label. Its focused suite passes 12/12; the full
 Python integration suite now passes 173/173.
+
+The full three-block MTP3 × KV × prompt-length screen passed all 24 cells. It
+found ~8.4% higher decode on the 512-token task but 3.5–4.7% lower decode on
+the 7,501-token task; total long-request time rose under 0.7%. The broad MTP ×
+workload effect is clear in this screen, while the three-way interaction interval
+includes zero. [Report](../../bench/results/2026-10-23-phase6-coder-mtp3-kv-length-screen3/README.md).

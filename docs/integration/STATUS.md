@@ -4938,3 +4938,15 @@ The MTP × KV factorial runner now accepts MTP-off paired with window 2, 3 or 4
 and names candidate effects by the selected window. Its 12 focused unit tests
 pass, and full Python integration discovery passes 173/173 after this change.
 This enables testing MTP3 × KV without changing default runtime behavior.
+
+The full randomized three-block MTP-off/MTP3 × FP16/INT8 KV × short/near-limit
+prompt screen passed all 24 cells and independent retrieval-answer checks.
+MTP3 decode deltas were +8.42% (95% interval +7.62% to +9.48%) on 512-token
+FP16 KV, +8.47% (+6.00% to +9.00%) on 512-token INT8 KV, -3.53% (-3.73% to
+-3.34%) on 7,501-token FP16 KV, and -4.73% (-4.98% to -4.18%) on 7,501-token
+INT8 KV. The MTP × workload decode interaction was -10.84% for FP16 KV and
+-12.40% for INT8 KV; the three-way interaction interval included zero. Long
+request total time rose only 0.51% and 0.67% because prefill dominated. Minimum
+physical/admission availability was 16.98/16.83 GiB with zero sampled cgroup
+memory events. This is a three-block screen, not held-out confirmation, state
+qualification or a default change. [Report and raw campaign](../../bench/results/2026-10-23-phase6-coder-mtp3-kv-length-screen3/README.md).
