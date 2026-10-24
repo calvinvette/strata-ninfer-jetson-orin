@@ -5075,6 +5075,20 @@ cgroup pressure/OOM events. This extends the prior hash-only trace but does not
 identify the cause of later drift or qualify the exp2f candidate/profile.
 Phase 5 remains open.
 
+A slot-aware [layer-10/11 boundary follow-up](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md)
+resolved a reversed batch-row assignment by mapping exact GDN hashes and token
+sequences to serial controls. For prompt 1, layer-10 stages matched at
+positions 87 and 88; layer-11 routes, activation, all expert parts and output
+matched at position 87. At position 88, expert 114 moved GPU→CPU with an
+identical route and activation. Its part was the only changed expert result,
+and a same-activation `native_expert_parity` replay matched the serial service
+part to GPU and the batch service part to CPU bit-for-bit (CPU/GPU relative L2
+`4.12515e-4`). A separate boundary run found a changed layer-12 input `x` and
+committed state at position 88. This supports an owner-dependent arithmetic
+explanation for the sampled upstream delta, but separate captures do not prove
+the complete causal chain or bound long-chain state drift. Outputs remained
+exact for the measured 32-token follow-up; Phase 5 remains open.
+
 At slot 1 / position 89, a slot-aware MoE comparison found matching layer-9
 routes and input activation. Expert 233 changed GPU→CPU owner, but its exp2f
 service part, all ten expert parts and combined MoE output matched bitwise; all
