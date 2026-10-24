@@ -515,3 +515,9 @@ MTP3 showed +5.24% median decode throughput; MTP4 was effectively flat. MTP2
 had a large -57.96% outlier, so no MTP2 timing conclusion is supported. This
 is screening only, not a default or broad quality/state claim.
 [Report](../../bench/results/2026-10-23-phase6-coder-mtp-window-screen3-current/README.md).
+
+A seven-block MTP-off/MTP3 replication on the same 512-token prompt gave +4.34%
+median decode throughput (paired bootstrap 95% interval +3.86% to +5.57%) with
+response-content parity in all pairs. This is same-prompt replication, not
+held-out confirmation, and the no-trace campaign does not test persistent
+state. [Report](../../bench/results/2026-10-23-phase6-coder-mtp3-window-paired7-same-prompt/README.md).

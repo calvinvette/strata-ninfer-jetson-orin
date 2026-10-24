@@ -4875,3 +4875,13 @@ physical availability was above the 6 GiB floor, with zero sampled cgroup
 memory events. This is only a screening result for one prompt and is neither
 quality/state qualification nor a promoted default. Follow with held-out
 confirmation and continue Phase 5/6 gates. [Report and raw traces](../../bench/results/2026-10-23-phase6-coder-mtp-window-screen3-current/README.md).
+
+A seven-block randomized MTP-off/MTP3 replication on the same 512-token Coder
+prompt as the preceding screen passed all 14 cells with paired response content
+parity. Median paired decode throughput was +4.34% (bootstrap 95% interval
++3.86% to +5.57%); MTP3 drafted 34 and accepted 28 tokens in every measured
+request. Minimum observed physical availability was 16.79 GiB, with zero
+sampled cgroup memory events. This narrows timing uncertainty for that one
+prompt only: it is not held-out prompt confirmation, does not check persistent
+state in this no-trace campaign, and does not promote a default. Phase 5/6
+remain open. [Report and raw traces](../../bench/results/2026-10-23-phase6-coder-mtp3-window-paired7-same-prompt/README.md).
