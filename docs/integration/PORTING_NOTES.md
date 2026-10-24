@@ -2904,3 +2904,15 @@ not attribute the unchanged mismatch to a failed owner intervention. A future
 Strata/Splash investigation should capture exact row activation, owner, expert
 output and accepted state in the same run, then test a residency change against
 those joined records. [Intervention record](../../bench/results/2026-10-24-phase5-coder-layer39-expert50-residency-intervention/README.md).
+
+
+A temporary Coder IQ1_M profile promoted layer-9 expert 233 to rank 0. On the
+sampled exact activation, this kept it GPU-owned in serial and batch and made
+its expert part, layer-9 MoE output and following layer-10 stage/state exact;
+the baseline CPU/GPU owner change had produced a measurable local delta. Both
+two-live 72-token outputs then matched serial, yet terminal committed GDN state
+still differed at layers 5 and 12. This is a useful intervention pattern for
+Strata/Splash: join exact activation, owner and expert part, then compare both
+accepted outputs and persistent state through completion. A single resident
+expert can repair one observed path without establishing multi-live state
+parity. [Raw analysis](../../bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/README.md).

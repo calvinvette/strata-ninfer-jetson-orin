@@ -1,0 +1,68 @@
+# Layer-9 expert-233 residency intervention
+
+## Result
+
+This single-pair Coder IQ1_M two-live diagnostic moved layer 9 / expert 233
+from static residency rank 3,130 to rank 0 in a temporary profile. Both 72-token
+batch outputs matched their isolated serial controls exactly. This changes the
+previous two-live result, where slot 1 first differed at token 66.
+
+At layer 9 / position 83 / input token 11, the serial and batch route IDs,
+weights and 2,560-value activation were exact. Under the intervention expert
+233 was GPU-owned in both paths; all ten expert parts and the combined MoE
+output were bit-identical. The following layer-10 stage and committed state
+were also exact for prompt 1 at that position. In the matching baseline capture,
+expert 233 had moved GPU→CPU, its part differed on the identical activation,
+the combined MoE output changed in 2,555/2,560 values (relative L2
+`1.371e-5`), and layer-10 `x` changed. This paired intervention supports that
+owner transition as one cause of the sampled position-83 perturbation.
+
+The intervention does not establish multi-live state parity. At terminal
+position 138 after 72 identical output tokens, direct GDN comparison found
+prompt 0 first differed at model layer 5 and prompt 1 at layer 12. Prompt 1's
+recurrent state at layer 10 was exact at that endpoint. Hash traces from the
+72-token intervention run first diverged at batch position 75 / serial prefix
+73 for prompt 0, and at batch position 89 / prefix 87 for prompt 1. The static
+profile therefore restored output parity for this prompt pair while persistent
+state still drifted. Other owner changes and recurrence arithmetic remain
+possible contributors.
+
+This is correctness evidence from one prompt pair, not an accepted-state
+qualification, performance result, quality claim, or profile recommendation.
+No default or shared model data changed.
+
+## Resources and identity
+
+The supervised terminal capture passed with minimum physical and admission
+availability 17.72 GiB and zero sampled cgroup pressure events. The clocks were
+observed dynamically; EMC readback was denied. Instrumented durations are not
+performance measurements.
+
+- Candidate binary SHA256:
+  `1f44e7e3713faf9d1e1fee688a69ce5960e21d40c1d0d6071e9831dea53316d6`.
+- Coder IQ1_M artifact revision: `5348543e0147355ac9cbcb031184a3546350988e`.
+- Temporary profile SHA256:
+  `41595f87b9947df82a492f4868e267013bf1fec8bae538f797a14e2b04ab64f4`.
+- Model shards remain under `~/models/strata-orin-validation/`.
+
+Compact retained evidence:
+
+- `run/result.json`: output tokens, profile and artifact identity.
+- `run/hash-analysis.json`: prompt-mapped per-prefix GDN hash comparison.
+- `run/moe-slot1.json`, `run/stage-slot1.json`: position-83 owner, part,
+  output and stage comparisons.
+- `terminal-position138/result.json` and `state-slot{0,1}.json`: direct terminal
+  committed-state comparisons.
+- Large raw state dumps, engine logs and supervisor telemetry remain local and
+  are not included in Git.
+
+The capture used `tools/integration/run_control.py` around
+`bench/results/2026-10-23-phase5-coder-two-live-target-q8all/capture_position_state.py`
+with `--position 83 --layer all --serial-slot both --generated-tokens 72
+--expert-profile /tmp/strata-coder-layer9-expert233-first.bin --moe-layer 9
+--stage-layer 10 --trace-state-hashes --trace-batch-gdn-hashes`. The profile was
+generated with `make_expert_first_profile.py --layer 9 --expert 233`.
+
+The next correctness check is a held-out prompt pair with the same profile and
+joined accepted-prefix state/owner captures. Phase 5 remains open until
+multi-live committed-state behavior is explained or bounded.
