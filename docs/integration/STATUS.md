@@ -76,6 +76,7 @@ parts to CUDA and CPU respectively; both expert outputs use IQ2_S gate/up and
 Q2_0 down weights. This diagnoses the changed arithmetic path, not a cache
 performance effect. It is a single-prompt correctness diagnostic; Phase 5
 remains open.
+
 See the [batch-MTP diagnostic](../../bench/results/2026-10-22-phase5-coder-batch-mtp-graph-lifecycle/README.md).
 
 A supervised one-live-after-admission MTP2 trace now shows the same QSA state
@@ -5045,3 +5046,20 @@ chain length, but does not qualify longer chains, cancellation, adaptive
 migration or multi-live state. An initial attempt used an MTP-off config with
 no draft path and was excluded; the corrected run used the MTP4 config. Phase 5
 remains open.
+
+A seven-block [MTP-off/MTP4 × FP16/INT8 KV held-out confirmation](../../bench/results/2026-10-24-phase6-coder-mtp4-heldout-short-confirm7/README.md)
+completed 28/28 randomized short-task cells and passed every exact retrieval
+answer check. On the distinct 512-token prompt, MTP4 improved decode throughput
+13.22% with FP16 KV (95% paired interval +11.92% to +15.28%) and 13.72% with
+INT8 KV (+13.51% to +14.41%). Total time was unresolved for FP16 (−1.07%,
+−2.88% to +0.65%) and improved 1.43% for INT8 (−1.82% to −0.10%). The
+decode MTP4 × KV interaction interval included zero. One FP16 MTP-off arm had
+a retained low-decode outlier (5.15 tok/s, 36.19 s total); its clocks varied
+dynamically, and no cause is established. The full-rank response model had
+standardized residuals above 3 for decode and total time, so paired-block
+bootstrap intervals remain primary. Minimum physical/effective admission
+availability was 16.84 GiB with no cgroup memory events. Energy was not
+analyzed. This confirms a short-task decode effect on one held-out prompt; it
+does not qualify long-context behavior, where the separate three-block MTP4
+screen found lower decode throughput. Phase 5/6 remain open and MTP4 is not
+promoted to a default.

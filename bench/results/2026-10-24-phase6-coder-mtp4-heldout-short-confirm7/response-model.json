@@ -1,0 +1,394 @@
+{
+  "schema": 1,
+  "model_scope": "Single 512-token held-out retrieval/arithmetic workload; MTP off/4 x FP16/INT8 KV; seven randomized blocks.",
+  "transformation": "Natural logarithm of positive client prompt throughput, decode throughput, TTFT seconds, and total request seconds.",
+  "coded_factors": {
+    "mtp": {
+      "off": -0.5,
+      "candidate": 0.5
+    },
+    "kv": {
+      "fp16": -0.5,
+      "int8": 0.5
+    }
+  },
+  "block_effects": "Six fixed block indicators; treatment x block variation remains in residuals.",
+  "confidence_intervals": "Model-based 95% t intervals with 18 residual degrees of freedom (t=2.100922), exponentiated to percent change.",
+  "design_rank": 10,
+  "parameter_count": 10,
+  "residual_degrees_of_freedom": 18,
+  "metrics": {
+    "prompt_tps": {
+      "factor_effects": {
+        "mtp_effect": {
+          "log_coefficient": -0.004765882338001459,
+          "standard_error": 0.003619960781604073,
+          "percent_effect": -0.4754543541047429,
+          "model_95_interval_percent": [
+            -1.2294929644004582,
+            0.28434077443595385
+          ]
+        },
+        "kv_effect": {
+          "log_coefficient": -0.004359048947185957,
+          "standard_error": 0.003619960781604073,
+          "percent_effect": -0.4349562082898384,
+          "model_95_interval_percent": [
+            -1.1893016490803987,
+            0.32514809316599447
+          ]
+        },
+        "mtp_by_kv_interaction": {
+          "log_coefficient": 0.002490230285778962,
+          "standard_error": 0.007239921563208146,
+          "percent_effect": 0.24933334845755883,
+          "model_95_interval_percent": [
+            -1.2639719387567139,
+            1.7858327314571154
+          ]
+        }
+      },
+      "diagnostics": {
+        "observations": 28,
+        "parameters": 10,
+        "rank": 10,
+        "residual_degrees_of_freedom": 18,
+        "r_squared_log_response": 0.7091696062586502,
+        "rmse_log_response": 0.007679096448904785,
+        "residual_sigma_log_response": 0.009577515983931376,
+        "max_abs_standardized_residual": 1.5589431136897207,
+        "largest_residual_run": {
+          "run": "block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0",
+          "block": 0,
+          "kv": "fp16",
+          "mtp_window": 0,
+          "standardized_residual": 1.5589431136897207
+        },
+        "standardized_residuals_by_block": {
+          "0": [
+            -0.5501694789816985,
+            -0.09348342182505699,
+            1.5589431136897207,
+            -0.9152902128831969
+          ],
+          "1": [
+            0.7229296278117346,
+            1.502757010802295,
+            -1.0483916701520157,
+            -1.1772949684618748
+          ],
+          "2": [
+            -0.631977854367322,
+            0.029843436549683154,
+            1.4301387892556305,
+            -0.8280043714378527
+          ],
+          "3": [
+            0.4048406872817343,
+            -0.2497733298045429,
+            0.20396412897580724,
+            -0.3590314864527204
+          ],
+          "4": [
+            0.675024516647665,
+            0.33540695354976396,
+            0.05916547092974072,
+            -1.0695969411269843
+          ],
+          "5": [
+            1.0159473449598282,
+            0.03447035649043095,
+            -0.3551491849667122,
+            -0.695268516483315
+          ],
+          "6": [
+            0.5607704173516105,
+            -0.20115085651382406,
+            -1.1411496951254023,
+            0.781530134287755
+          ]
+        },
+        "fit_formula": "log(response) ~ block fixed effects + MTP + KV + MTP:KV"
+      }
+    },
+    "decode_tps": {
+      "factor_effects": {
+        "mtp_effect": {
+          "log_coefficient": 0.18476684565115065,
+          "standard_error": 0.06027036113585337,
+          "percent_effect": 20.293793721727127,
+          "model_95_interval_percent": [
+            5.986709479372521,
+            36.53218294112388
+          ]
+        },
+        "kv_effect": {
+          "log_coefficient": 0.0639548135658707,
+          "standard_error": 0.06027036113585337,
+          "percent_effect": 6.6044226935917605,
+          "model_95_interval_percent": [
+            -6.074522818867544,
+            20.994891683306307
+          ]
+        },
+        "mtp_by_kv_interaction": {
+          "log_coefficient": -0.10794447875024901,
+          "standard_error": 0.12054072227170674,
+          "percent_effect": -10.23225647800572,
+          "model_95_interval_percent": [
+            -30.315420523326797,
+            15.638895112053163
+          ]
+        }
+      },
+      "diagnostics": {
+        "observations": 28,
+        "parameters": 10,
+        "rank": 10,
+        "residual_degrees_of_freedom": 18,
+        "r_squared_log_response": 0.49495121821226573,
+        "rmse_log_response": 0.1278527431911722,
+        "residual_sigma_log_response": 0.15946038699352041,
+        "max_abs_standardized_residual": 3.393339520593714,
+        "largest_residual_run": {
+          "run": "block-04-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0",
+          "block": 4,
+          "kv": "fp16",
+          "mtp_window": 0,
+          "standardized_residual": -3.393339520593714
+        },
+        "standardized_residuals_by_block": {
+          "0": [
+            -0.15872612308122364,
+            -0.2302757878134086,
+            0.6320648525429252,
+            -0.24306294164829575
+          ],
+          "1": [
+            0.6106965981696266,
+            -0.20396670261958147,
+            -0.2986012522125505,
+            -0.10812864333748345
+          ],
+          "2": [
+            -0.16175490606538903,
+            -0.13750497053811025,
+            -0.1958440468775713,
+            0.4951039234810761
+          ],
+          "3": [
+            -0.15260407705439408,
+            0.45307407910051783,
+            -0.15725442305963508,
+            -0.14321557898647475
+          ],
+          "4": [
+            1.111363165126475,
+            1.1634827334302222,
+            1.1184936220370292,
+            -3.393339520593714
+          ],
+          "5": [
+            -0.15844793840845434,
+            -0.327939751979878,
+            -0.17263615729517967,
+            0.6590238476835204
+          ],
+          "6": [
+            0.5433762196160686,
+            -0.17525097970645634,
+            -0.19693796996566174,
+            -0.17118726994393388
+          ]
+        },
+        "fit_formula": "log(response) ~ block fixed effects + MTP + KV + MTP:KV"
+      }
+    },
+    "client_ttft_s": {
+      "factor_effects": {
+        "mtp_effect": {
+          "log_coefficient": 0.00461367596113368,
+          "standard_error": 0.0036128030879574637,
+          "percent_effect": 0.4624335350756237,
+          "model_95_interval_percent": [
+            -0.2972116020281468,
+            1.227866481563633
+          ]
+        },
+        "kv_effect": {
+          "log_coefficient": 0.0043291640523880825,
+          "standard_error": 0.0036128030879574637,
+          "percent_effect": 0.43385484203535274,
+          "model_95_interval_percent": [
+            -0.3255741977230775,
+            1.1990700447115588
+          ]
+        },
+        "mtp_by_kv_interaction": {
+          "log_coefficient": -0.0025261433272606914,
+          "standard_error": 0.0072256061759149275,
+          "percent_effect": -0.25229553122317894,
+          "model_95_interval_percent": [
+            -1.7550738003041189,
+            1.273469599504251
+          ]
+        }
+      },
+      "diagnostics": {
+        "observations": 28,
+        "parameters": 10,
+        "rank": 10,
+        "residual_degrees_of_freedom": 18,
+        "r_squared_log_response": 0.7090546374706903,
+        "rmse_log_response": 0.007663912687759265,
+        "residual_sigma_log_response": 0.009558578506581662,
+        "max_abs_standardized_residual": 1.5280992078648725,
+        "largest_residual_run": {
+          "run": "block-00-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0",
+          "block": 0,
+          "kv": "fp16",
+          "mtp_window": 0,
+          "standardized_residual": -1.5280992078648725
+        },
+        "standardized_residuals_by_block": {
+          "0": [
+            0.5401167926429157,
+            0.09258674610463713,
+            -1.5280992078648725,
+            0.8953956691170873
+          ],
+          "1": [
+            -0.741767741371188,
+            -1.5006360296796275,
+            1.0633901036031095,
+            1.1790136674474736
+          ],
+          "2": [
+            0.6608628858759381,
+            -0.04865765847713624,
+            -1.454574819303414,
+            0.8423695919043334
+          ],
+          "3": [
+            -0.40516139156945485,
+            0.27309888125742565,
+            -0.20128147666221965,
+            0.33334398697406303
+          ],
+          "4": [
+            -0.658343819560597,
+            -0.35707259226337995,
+            -0.026577553178926627,
+            1.041993965002764
+          ],
+          "5": [
+            -1.0341612512840352,
+            -0.024710011266520768,
+            0.36918597366667194,
+            0.6896852888837911
+          ],
+          "6": [
+            -0.5772807778124397,
+            0.19189331522769482,
+            1.144337341595403,
+            -0.758949879010751
+          ]
+        },
+        "fit_formula": "log(response) ~ block fixed effects + MTP + KV + MTP:KV"
+      }
+    },
+    "client_total_s": {
+      "factor_effects": {
+        "mtp_effect": {
+          "log_coefficient": -0.021924439204567818,
+          "standard_error": 0.0124434826166272,
+          "percent_effect": -2.1685845545836413,
+          "model_95_interval_percent": [
+            -4.6930285750425575,
+            0.422725693152759
+          ]
+        },
+        "kv_effect": {
+          "log_coefficient": -0.00764610147631222,
+          "standard_error": 0.0124434826166272,
+          "percent_effect": -0.7616944402393799,
+          "model_95_interval_percent": [
+            -3.3224418845057557,
+            1.8668808184767904
+          ]
+        },
+        "mtp_by_kv_interaction": {
+          "log_coefficient": 0.018505276900826866,
+          "standard_error": 0.0248869652332544,
+          "percent_effect": 1.8677560615854238,
+          "model_95_interval_percent": [
+            -3.3216112282039245,
+            7.335670948313933
+          ]
+        }
+      },
+      "diagnostics": {
+        "observations": 28,
+        "parameters": 10,
+        "rank": 10,
+        "residual_degrees_of_freedom": 18,
+        "r_squared_log_response": 0.460851190822413,
+        "rmse_log_response": 0.026396612819382048,
+        "residual_sigma_log_response": 0.032922360447150856,
+        "max_abs_standardized_residual": 3.2918483606590616,
+        "largest_residual_run": {
+          "run": "block-04-kv-fp16-workload-coder-mtp-retrieval-short-512-mtp-0",
+          "block": 4,
+          "kv": "fp16",
+          "mtp_window": 0,
+          "standardized_residual": 3.2918483606590616
+        },
+        "standardized_residuals_by_block": {
+          "0": [
+            0.28694980608818377,
+            0.22299408871560472,
+            -0.9370616500258274,
+            0.42711775522210643
+          ],
+          "1": [
+            -0.7172147505400277,
+            -0.20950176089510972,
+            0.4990203399825719,
+            0.42769617145257904
+          ],
+          "2": [
+            0.3084467178011271,
+            0.136078996024245,
+            -0.19180862595638565,
+            -0.25271708786899993
+          ],
+          "3": [
+            0.04126301172605916,
+            -0.3683222392362051,
+            0.09654142727520025,
+            0.23051780023490526
+          ],
+          "4": [
+            -1.166349151175614,
+            -1.1127459076982231,
+            -1.0127533017852242,
+            3.2918483606590616
+          ],
+          "5": [
+            -0.10440564289224263,
+            0.2371905025709854,
+            0.24912254907457715,
+            -0.3819074087533064
+          ],
+          "6": [
+            -0.6346252242346814,
+            0.21146243590378902,
+            0.4669901844746355,
+            -0.04382739614375661
+          ]
+        },
+        "fit_formula": "log(response) ~ block fixed effects + MTP + KV + MTP:KV"
+      }
+    }
+  }
+}

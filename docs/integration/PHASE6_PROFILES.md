@@ -88,3 +88,11 @@ zero as prefill dominated. This length-dependent tradeoff supports leaving MTP
 off in the selected Q2_0 serving profile. It does not qualify MTP4 on held-out
 prompts or persistent state, and it contributes no energy-per-token measurement.
 Phase 6 remains open.
+
+A seven-block [held-out 512-token confirmation](../../bench/results/2026-10-24-phase6-coder-mtp4-heldout-short-confirm7/README.md)
+then found MTP4 decode throughput gains of 13.22% with FP16 KV and 13.72% with
+INT8 KV; both paired intervals excluded zero. TTFT intervals included zero, and
+client total improved 1.43% with INT8 KV but was unresolved with FP16. The
+MTP4 × KV interaction interval included zero. This distinct prompt confirms the
+short-task decode result only; the separate near-limit slowdown remains, and
+energy/Pareto evidence is absent. The selected profile remains MTP-off.

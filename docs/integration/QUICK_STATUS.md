@@ -639,3 +639,14 @@ commit boundaries (35 of 84 drafts accepted). This extends the deterministic
 transaction check from MTP3 to MTP4 for one 512-token prompt; multi-live and
 long-chain state gates remain open. An initial config-selection error that
 loaded no draft model was excluded. [Report](../../bench/results/2026-10-24-phase5-coder-mtp4-accepted-prefix-64/README.md).
+
+### Latest Phase 6 check: held-out MTP4 short-task confirmation
+
+Seven randomized paired blocks on a distinct 512-token Coder retrieval prompt
+passed all 28 answer checks. MTP4 improved decode throughput 13.22% with FP16
+KV and 13.72% with INT8 KV; the KV interaction interval included zero. Total
+time improved slightly with INT8 KV and was unresolved with FP16. The separate
+near-limit screen found an MTP4 decode slowdown, so no default is promoted.
+One low-throughput FP16 control outlier is retained; the exploratory response
+model had large residuals, so paired bootstrap estimates remain primary. Energy
+was not analyzed. [Report](../../bench/results/2026-10-24-phase6-coder-mtp4-heldout-short-confirm7/README.md).
