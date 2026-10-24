@@ -46,11 +46,15 @@ found higher CPU/CV energy/token and small lower GPU/SOC energy/token; system
 rail intervals included zero. The response model has residual outliers, so the
 paired bootstrap is primary. No default changes. [Report](../../bench/results/2026-10-24-phase6-coder-mtp3-kv-heldout-long-confirm7/README.md).
 
-A three-block Coder IQ1_M worker × transfer screen passed all 12 cells. Eight
-workers consistently beat four on mapped reads by 6–14% request time, but the
-worker effect changed sign under `pread`. Memory headroom stayed above 9.1 GiB
-at admission and cgroup pressure counters stayed zero. The held-out seven-block
-confirmation is pending. [Screen report](../../bench/results/2026-10-24-phase6-coder-worker-transfer-screen3/README.md).
+A seven-block held-out Coder IQ1_M worker × transfer confirmation passed all 28
+cells with identical output hashes and 3,903 actual cache slots. Four workers
+were slower than eight by median 7.36% mapped and 6.50% `pread`; `pread` was
+faster by 2.72% at four workers and 1.94% at eight. The worker × transfer
+interaction interval included zero. One 8-worker/mapped decode-time outlier is
+retained and documented. Minimum physical/admission availability was
+13.99/9.60 GiB with zero cgroup events. No setting changed; this is one bounded
+workload result. [Confirmation](../../bench/results/2026-10-24-phase6-coder-worker-transfer-confirm7/README.md),
+[screen](../../bench/results/2026-10-24-phase6-coder-worker-transfer-screen3/README.md).
 
 A current-source owner-transition diagnostic at layer 27 / generated position
 515 found exact selected expert output and all-layer committed GDN state across

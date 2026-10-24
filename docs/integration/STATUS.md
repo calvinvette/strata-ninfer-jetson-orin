@@ -8,6 +8,16 @@ profile under [its closeout](PHASE8_CLOSEOUT.md). Phases 5 and 6 remain open;
 the Phase 8 profile excludes their unresolved adaptive/MTP and broader
 parametric/energy scope. This records tested cells, not general product support.
 
+The held-out seven-block Coder IQ1_M [worker × transfer confirmation](../../bench/results/2026-10-24-phase6-coder-worker-transfer-confirm7/README.md)
+passed all 28 cells with identical outputs and 3,903 actual expert-cache slots.
+Four workers were slower than eight by median 7.36% for mapped and 6.50% for
+`pread`; `pread` reduced request time by 2.72% at four workers and 1.94% at eight.
+The worker × transfer interaction interval included zero. One 8-worker/mapped
+decode outlier (22.5 s versus 3.5–3.7 s in its other blocks) is retained and
+unexplained. Minimum physical/admission availability was 13.99/9.60 GiB with
+zero cgroup events. This supports a bounded workload signal only; no default
+changed and Phase 6 remains open.
+
 The bounded Phase 8 Q2_0 release profile was rechecked on the current candidate
 on 2026-10-22: the 8K-context, 3,000-slot, chunk-128 MTP-off profile passed its
 7,498-token retrieval and same-service recovery check, and the current CUDA
