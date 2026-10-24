@@ -5020,3 +5020,17 @@ A stage-level replay of that exact activation narrowed the sampled difference: C
 An offline quantizer probe on those captured GPU gate/up rows compared host `expf` and `exp2f(-g*log2(e))` with division. Host `exp2f` produced the exact 60 packed hidden Q8_1 blocks for the original activation, though 264/1,920 hidden float values still differed from CUDA (max `2.98e-8`). A second exact held-out layer-9/expert-233 activation also produced matching CPU/GPU gate/up, hidden Q8_1 and final operator outputs; both host candidates packed all hidden blocks exactly. That replay exposed a false failure in the parity utility's independent hidden-f32 check: it used reciprocal multiplication while the CPU helper uses division. After matching operation order, the rebuilt CUDA utility passes both activation replays; the HIP target compiled/linked and `strata --help` passed on maestro1, without accelerator execution. This confirms the owner delta is activation-dependent for these two samples, not that a host exponential matches CUDA generally. No serving change is justified. See the [held-out stage analysis](../../bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/heldout-silu-activation-analysis.json). Phase 5 remains open.
 
 A three-block randomized [Coder IQ1_M worker × transfer screen](../../bench/results/2026-10-24-phase6-coder-worker-transfer-screen3/README.md) passed all 12 cells at 512 prompt tokens, 45 generated tokens, 3,903 actual cache slots, and fixed 8K/FP16/MTP-off/chunk-128 settings. Under mapped reads, four workers took 6.43%, 6.84%, and 13.97% longer than eight workers in each paired block; under `pread`, the paired differences changed sign. Minimum physical/admission availability was 13.88/9.12 GiB with zero cgroup memory events. The held-out seven-block [confirmation](../../bench/results/2026-10-24-phase6-coder-worker-transfer-confirm7/README.md) found four workers slower in both read modes and a modest `pread` advantage, with no supported interaction. Both are workload-scoped evidence; Phase 6 remains open.
+
+A randomized three-block [MTP-off/MTP4 × FP16/INT8 KV × prompt-length
+screen](../../bench/results/2026-10-24-phase6-coder-mtp4-kv-heldout-length-screen3/README.md)
+passed all 24 expected-answer checks, with 12 qualified same-day paired
+comparisons. On the 512-token retrieval prompt, MTP4 decode throughput improved
+10.29% (FP16 KV) and 11.35% (INT8 KV); paired client-total intervals included
+zero. On the 7,501-token near-limit prompt, decode throughput fell 10.95% and
+8.80%, respectively, while total-time intervals again included zero. Each MTP4
+short arm accepted 34/39 drafted tokens; each long arm accepted 33/42. Minimum
+physical/effective admission availability was 16.83/15.69 GiB with no cgroup
+pressure events. GPU clocks varied dynamically from 306 to 1,300.5 MHz; EMC
+readback and energy analysis were unavailable. This is a three-block screen on
+fixed prompts, not held-out confirmation or persistent-state qualification;
+MTP4 is not promoted. Phase 5 and Phase 6 remain open.

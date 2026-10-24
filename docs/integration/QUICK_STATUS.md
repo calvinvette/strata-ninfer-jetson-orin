@@ -619,3 +619,14 @@ same prompt pair, not held-out confirmation. The selected CPU oracle matched
 CUDA's hidden Q8_1 and down outputs, and the captured service
 expert part matched that oracle bit-for-bit. Details and
 limits are in the [experiment report](../../bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/README.md).
+
+### Latest Phase 6 check: MTP4 × KV × workload screen
+
+A randomized three-block MTP-off/MTP4 screen passed all 24 cells for FP16 and
+INT8 KV on 512-token and 7,501-token Coder IQ1_M retrieval prompts. MTP4 raised
+decode throughput by 10–11% on the short prompt but lowered it by 9–11% on the
+near-limit prompt; client-total intervals included zero in all four cells.
+The workload-length tradeoff argues against a global MTP4 choice. Minimum
+physical/effective admission availability was 16.83/15.69 GiB; no energy
+analysis was performed. This is screening evidence on fixed prompts, not
+held-out confirmation. [Report](../../bench/results/2026-10-24-phase6-coder-mtp4-kv-heldout-length-screen3/README.md).

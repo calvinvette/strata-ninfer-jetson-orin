@@ -75,3 +75,16 @@ They do not cover other task types or other context sizes on the selected
 profile. Do not promote a default until those checks, process-relevant energy
 evidence and the broader Phase 6 interaction gates are complete. Phase 6 and
 Phase 7 remain open.
+
+## MTP4 screening result
+
+A randomized three-block [MTP-off/MTP4 × FP16/INT8 KV × short/near-limit
+screen](../../bench/results/2026-10-24-phase6-coder-mtp4-kv-heldout-length-screen3/README.md)
+passed all 24 answer checks. On the 512-token task MTP4 improved decode
+throughput by 10.29% with FP16 KV and 11.35% with INT8 KV, while client total
+time was statistically unresolved. On the 7,501-token task MTP4 reduced decode
+throughput by 10.95% and 8.80%, respectively; total-time intervals included
+zero as prefill dominated. This length-dependent tradeoff supports leaving MTP
+off in the selected Q2_0 serving profile. It does not qualify MTP4 on held-out
+prompts or persistent state, and it contributes no energy-per-token measurement.
+Phase 6 remains open.
