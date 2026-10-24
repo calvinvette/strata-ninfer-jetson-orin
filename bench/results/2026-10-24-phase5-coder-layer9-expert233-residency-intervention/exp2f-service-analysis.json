@@ -444,5 +444,65 @@
       "The repeat reproduces the first paired run for this same prompt pair; it is repeatability evidence, not an independent held-out prompt.",
       "Slot 1 control output first differs at token 66; candidate output matches serial for all 72 tokens. State at position 83 changes from first difference layer 10 to exact. First prefix mismatch moves 84 to 89. Slot 0 output remains exact and state first differs at layer 5 / prefix mismatch position 75."
     ]
+  },
+  "long128_same_profile_comparison": {
+    "order": "candidate, then no-selector control",
+    "profile_sha256": "1f03ed71cdac371e07480a3b4473e93be5cdfc9afb910f2fdac8491ac555502e",
+    "route_and_activation_at_layer9_position83_identical": true,
+    "activation_sha256": "7ce8c948912b5f39471d5809fae4672f168e0cfc1b1e404be211f3ec600d77b3",
+    "outputs_and_state": {
+      "slot-0": {
+        "control_first_changed_layer": 5,
+        "candidate_first_changed_layer": 5,
+        "control_first_prefix_mismatch": {
+          "batch_position": 72,
+          "serial_prefix_position": 70,
+          "first_gdn_allocation_ordinal": 30,
+          "different_gdn_allocations": 6,
+          "total_gdn_allocations": 36
+        },
+        "candidate_first_prefix_mismatch": {
+          "batch_position": 75,
+          "serial_prefix_position": 73,
+          "first_gdn_allocation_ordinal": 24,
+          "different_gdn_allocations": 12,
+          "total_gdn_allocations": 36
+        },
+        "control_batch_matches_serial": true,
+        "candidate_batch_matches_serial": true,
+        "control_token_count": 120,
+        "candidate_token_count": 120,
+        "batch_first_token_difference_control_vs_candidate": null
+      },
+      "slot-1": {
+        "control_first_changed_layer": 10,
+        "candidate_first_changed_layer": null,
+        "control_first_prefix_mismatch": {
+          "batch_position": 84,
+          "serial_prefix_position": 82,
+          "first_gdn_allocation_ordinal": 8,
+          "different_gdn_allocations": 28,
+          "total_gdn_allocations": 36
+        },
+        "candidate_first_prefix_mismatch": {
+          "batch_position": 89,
+          "serial_prefix_position": 87,
+          "first_gdn_allocation_ordinal": 9,
+          "different_gdn_allocations": 27,
+          "total_gdn_allocations": 36
+        },
+        "control_batch_matches_serial": false,
+        "candidate_batch_matches_serial": true,
+        "control_token_count": 128,
+        "candidate_token_count": 128,
+        "batch_first_token_difference_control_vs_candidate": 66
+      }
+    },
+    "notes": [
+      "Two live requests, 128 requested generated tokens, 1500 expert-cache slots, same Coder prompts/profile as the 72-token comparison. Slot 0 naturally stopped after 120 tokens in both arms.",
+      "Slot 1 candidate output matches all 128 serial tokens; no-selector batch diverges at token 66.",
+      "The slot-1 position-83 state remains exact only locally; accepted-prefix state mismatch is delayed from batch position 84 to 89 and persists through the longer run. Slot 0 remains output exact and state divergence first appears around the same early boundary, with a small observed onset shift (72 to 75) between runs.",
+      "Same prompt repeat only; it is not held-out prompt confirmation or a general multi-live state bound."
+    ]
   }
 }

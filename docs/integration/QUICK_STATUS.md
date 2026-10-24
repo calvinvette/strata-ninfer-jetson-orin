@@ -613,8 +613,9 @@ first differed at token 66 for slot 1, while the exp2f candidate matched all
 72 serial tokens. Its first accepted-prefix mismatch moved from batch position
 84 to 89; slot 0 remained at 75. This repairs one output mismatch and delays
 but does not eliminate state drift, so Phase 5 remains open. A reversed-order
-repeat on the same prompt pair reproduced the route, token and state results.
-The selected CPU
-oracle matched CUDA's hidden Q8_1 and down outputs, and the captured service
+repeat reproduced the result; a same-profile 128-token run kept slot 1's output
+exact while the first state mismatch still arrived at position 89. This is the
+same prompt pair, not held-out confirmation. The selected CPU oracle matched
+CUDA's hidden Q8_1 and down outputs, and the captured service
 expert part matched that oracle bit-for-bit. Details and
 limits are in the [experiment report](../../bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/README.md).

@@ -211,6 +211,13 @@ locations. A reversed-order repeat (candidate before control) reproduced the
 same exact route and activation, slot-1 token-66 baseline divergence, candidate
 72-token match, position-83 state result, and 84→89 prefix-mismatch shift. This
 is a repeat on the same prompt pair, not independent prompt confirmation. The
+same-profile comparison then extended to 128 requested tokens. Slot 1 still
+matched all 128 serial tokens with exp2f; the no-selector batch diverged at
+token 66. Slot 1's first accepted-prefix mismatch still moved 84→89, so the
+state drift persisted beyond the local output repair. Slot 0 matched all 120
+tokens through natural EOS in both arms; its first state-hash mismatch varied
+slightly between batch positions 72 and 75. This does not bound general
+multi-live state behavior. The
 CUDA `native_expert_parity` and `strata` targets rebuilt. The Orin CTest
 selector contract and synthetic IQ2_S/IQ4_NL Q8_1 dot/window tests passed 3/3.
 HIP `strata` and
