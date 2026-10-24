@@ -5204,3 +5204,14 @@ position snapshots showed later numeric state differences as well. The
 candidate improves this prompt pair but does not eliminate persistent-state
 drift; it lacks held-out quality and performance confirmation and is not
 promoted. Phase 5 remains open. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#strata_gr_v3-1-boundary-intervention-and-128-token-extension).
+
+The 128-token follow-up sampled layer 20 at adjacent batch positions 104/105.
+Same-absolute-position snapshots differed, but they do not align to the
+accepted-prefix mapping (batch p to serial prefix p-2); no causal first operator
+is identified. At p105, layer-19 MoE inputs/routes/parts/output remained exact
+despite three owner changes. A focused `gdn_parity` case passed bitwise on Orin
+CUDA for verifier convolution+L2 at model channel width, all T=1..8 and every
+split `t_begin`, plus the existing 44 history-commit prefixes. This is
+functional kernel coverage, not resolution of the multi-live accepted-state
+drift. Maestro1 HIP/SYCL builds remain pending available scratch storage.
+Phase 5 remains open. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#gdn-layer-20-follow-up-and-verifier-convolution-parity).

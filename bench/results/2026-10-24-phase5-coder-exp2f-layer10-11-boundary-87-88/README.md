@@ -299,3 +299,36 @@ qualify a profile or default. The 72-token capture took 286.88 seconds; the
 128-token capture took 484.45 seconds and retained 17.69 GiB minimum physical
 availability, with no cgroup pressure/OOM events. Clocks varied dynamically;
 EMC readback was denied; energy was not analyzed.
+
+### GDN layer-20 follow-up and verifier convolution parity
+
+Two additional 128-token `STRATA_GR_V3=1` captures sampled layer-20 and layer-19
+MoE around the control-1 accepted-prefix hash onset (batch position 105 / serial
+prefix 103). In both, layer-19 MoE inputs, routes, expert parts and combined
+output were exact despite three owner changes. The adjacent-position capture
+also sampled batch position 104. Direct state comparison by *same absolute
+position* first reported layer 20 changed at both positions; at 104 the first
+different captured layer-20 stage field was `x` (relative L2 `1.872e-5`), while
+at 105 it was `h` (`1.704e-4`) and `x`/`qkv` were exact. At 105 the changed
+downstream fields included `gdn_out` (relative L2 `1.663e-3`) and `ffn_y`
+(`7.297e-3`). These observations do not isolate the operator responsible.
+Crucially, these are same-absolute-position comparisons; the accepted-prefix
+hash pairing compares batch position p with serial prefix p-2. The numeric
+snapshots therefore are not equivalent aligned accepted-prefix pairs and must
+not be read as the accepted-state onset or a causal first-difference trace.
+The accepted-prefix hash onset remained p100/prefix98 for control 0 and
+p105/prefix103 for control 1; output tokens remained exact in this 128-token
+run. The adjacent capture took 422.58 seconds and retained 17.64 GiB minimum
+physical availability with no cgroup events.
+
+To close a focused functional coverage gap, `gdn_parity` now compares
+`gdn_conv_l2_multi` against the ordinary state-advancing single-token kernel for
+the model channel width (10,240), all verifier windows T=1..8, and each split
+`t_begin` position. The supervised Orin CUDA run passed bitwise for both the
+whole-window and split calls at every T; the existing accepted-prefix history
+check also passed all 44 `(T, keep)` combinations. An initial test-harness run
+incorrectly advanced the reference history twice (the single-token kernel
+already commits it); that harness mistake was corrected, with no kernel change.
+The complete `gdn_parity` executable then reported zero failures. Build used
+`-j1`; the supervisor recorded 26.25 GB minimum physical availability and no
+pressure events. HIP/SYCL builds remain pending maestro1 scratch-space recovery.

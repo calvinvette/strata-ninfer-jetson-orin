@@ -351,6 +351,60 @@ int main(int argc, char** argv) {
         cudaFree(d_history); cudaFree(d_qkv); cudaFree(d_keep);
     }
 
+    // ================= 2c. verifier conv+L2 window parity =================
+    // The verifier's multi-token convolution must produce the same h[t] as the ordinary single-token path with
+    // the history advanced through each preceding token. Exercise the model channel width, each supported window,
+    // and nonzero t_begin calls used by split verifier groups.
+    {
+        const int C = 10240, qk_heads = 16, max_t = strata::kernels::kVerifyMaxT;
+        const float eps = 1e-6f;
+        std::vector<float> initial((size_t) C * 3), qkv((size_t) max_t * C), conv_w((size_t) C * 4);
+        for (auto& x : initial) x = gauss(rng) * 0.25f;
+        for (auto& x : qkv) x = gauss(rng) * 0.25f;
+        for (auto& x : conv_w) x = gauss(rng) * 0.2f;
+        float *d_multi_hist = nullptr, *d_single_hist = nullptr, *d_qkv = nullptr, *d_w = nullptr;
+        float *d_multi = nullptr, *d_single = nullptr, *d_split = nullptr;
+        check(cudaMalloc(&d_multi_hist, initial.size() * sizeof(float)), "verify conv multi history");
+        check(cudaMalloc(&d_single_hist, initial.size() * sizeof(float)), "verify conv single history");
+        check(cudaMalloc(&d_qkv, qkv.size() * sizeof(float)), "verify conv qkv");
+        check(cudaMalloc(&d_w, conv_w.size() * sizeof(float)), "verify conv weights");
+        check(cudaMalloc(&d_multi, qkv.size() * sizeof(float)), "verify conv multi output");
+        check(cudaMalloc(&d_single, qkv.size() * sizeof(float)), "verify conv single output");
+        check(cudaMalloc(&d_split, qkv.size() * sizeof(float)), "verify conv split output");
+        check(cudaMemcpy(d_qkv, qkv.data(), qkv.size() * sizeof(float), cudaMemcpyHostToDevice), "verify conv upload qkv");
+        check(cudaMemcpy(d_w, conv_w.data(), conv_w.size() * sizeof(float), cudaMemcpyHostToDevice), "verify conv upload weights");
+        int failures = 0;
+        for (int T = 1; T <= max_t; ++T) {
+            check(cudaMemcpy(d_multi_hist, initial.data(), initial.size() * sizeof(float), cudaMemcpyHostToDevice),
+                  "verify conv reset multi history");
+            check(cudaMemcpy(d_single_hist, initial.data(), initial.size() * sizeof(float), cudaMemcpyHostToDevice),
+                  "verify conv reset single history");
+            strata::kernels::gdn_conv_l2_multi(d_multi_hist, d_qkv, d_w, d_multi, C, qk_heads, eps, T, nullptr);
+            for (int t = 0; t < T; ++t) {
+                strata::kernels::fused_gdn_conv_l2(d_single_hist, d_qkv + (size_t) t * C, d_w,
+                                                   d_single + (size_t) t * C, C, qk_heads, eps, nullptr);
+                strata::kernels::gdn_conv_l2_multi(d_multi_hist, d_qkv, d_w, d_split, C, qk_heads, eps, 1, nullptr,
+                                                   t, false);
+            }
+            check(cudaDeviceSynchronize(), "verify conv window synchronize");
+            std::vector<float> got_multi((size_t) T * C), got_single((size_t) T * C), got_split((size_t) T * C);
+            check(cudaMemcpy(got_multi.data(), d_multi, got_multi.size() * sizeof(float), cudaMemcpyDeviceToHost),
+                  "verify conv read multi output");
+            check(cudaMemcpy(got_single.data(), d_single, got_single.size() * sizeof(float), cudaMemcpyDeviceToHost),
+                  "verify conv read single output");
+            check(cudaMemcpy(got_split.data(), d_split, got_split.size() * sizeof(float), cudaMemcpyDeviceToHost),
+                  "verify conv read split output");
+            const bool single_equal = std::memcmp(got_multi.data(), got_single.data(), got_multi.size() * sizeof(float)) == 0;
+            const bool split_equal = std::memcmp(got_multi.data(), got_split.data(), got_multi.size() * sizeof(float)) == 0;
+            std::printf("  verifier conv+L2 T=%d: single-token %s, split t_begin %s\n", T,
+                        single_equal ? "bitwise" : "*** FAIL ***", split_equal ? "bitwise" : "*** FAIL ***");
+            failures += !single_equal + !split_equal;
+        }
+        if (failures) bad += failures;
+        cudaFree(d_multi_hist); cudaFree(d_single_hist); cudaFree(d_qkv); cudaFree(d_w);
+        cudaFree(d_multi); cudaFree(d_single); cudaFree(d_split);
+    }
+
     // ================= 3. l2_norm =================
     {
         const int rows = 16, cols = 128;

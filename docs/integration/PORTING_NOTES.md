@@ -2998,3 +2998,14 @@ kernel-path intervention, independent serial output controls, and continued
 accepted-prefix state checks after any local repair. Qualify latency and
 held-out prompts separately before selecting a default.
 [Diagnostic report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#strata_gr_v3-1-boundary-intervention-and-128-token-extension).
+
+The verifier's convolution+L2 path has a separate `gdn_parity` check against
+the state-advancing single-token implementation. Test the full supported
+window (T=1..8) and each split `t_begin`; the Orin CUDA check was bitwise at
+10,240 channels. Preserve a split-window case in future backend ports, since
+testing only the unsplit call misses a distinct indexing contract. This test
+checks local kernel parity; it does not establish verifier state acceptance or
+end-to-end output parity. Adjacent numeric snapshots must also be compared in
+the same coordinate system: absolute model positions and accepted-prefix
+aligned states (batch p versus serial p-2 here) are different comparisons.
+[Focused test and trace report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#gdn-layer-20-follow-up-and-verifier-convolution-parity).
