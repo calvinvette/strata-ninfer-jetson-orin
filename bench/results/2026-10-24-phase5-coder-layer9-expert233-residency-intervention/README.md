@@ -14,8 +14,15 @@ output were bit-identical. The following layer-10 stage and committed state
 were also exact for prompt 1 at that position. In the matching baseline capture,
 expert 233 had moved GPU→CPU, its part differed on the identical activation,
 the combined MoE output changed in 2,555/2,560 values (relative L2
-`1.371e-5`), and layer-10 `x` changed. This paired intervention supports that
-owner transition as one cause of the sampled position-83 perturbation.
+`1.371e-5`), and layer-10 `x` changed. An independent native expert oracle was then run on the exact captured
+activation and weights (IQ2_S gate/up, IQ4_NL down). It matched the serial
+service part to the GPU output and the batch service part to the CPU output
+bit-for-bit. The oracle CPU/GPU outputs differed in all 2,560 values (maximum
+absolute delta `8.94e-6`, relative L2 `1.198e-4`; each was about 0.99% from the
+float reference). This paired oracle supports owner-dependent arithmetic as
+one cause of the sampled position-83 perturbation. The retained
+`analyze_owner_oracle.py` checks exact routing, activation, service parts and
+oracle outputs; its summary is `owner-oracle-analysis.json`.
 
 The intervention does not establish multi-live state parity. At terminal
 position 138 after 72 identical output tokens, direct GDN comparison found
@@ -49,6 +56,8 @@ Compact retained evidence:
 
 - `run/result.json`: output tokens, profile and artifact identity.
 - `run/hash-analysis.json`: prompt-mapped per-prefix GDN hash comparison.
+- `owner-oracle-analysis.json`: same-input service-to-CPU/GPU oracle pairing;
+  `analyze_owner_oracle.py` is the reusable parser and checker.
 - `run/moe-slot1.json`, `run/stage-slot1.json`: position-83 owner, part,
   output and stage comparisons.
 - `terminal-position138/result.json` and `state-slot{0,1}.json`: direct terminal

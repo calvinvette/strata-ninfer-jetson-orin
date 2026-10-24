@@ -2926,3 +2926,12 @@ row's layer-9 input was unpaired. For Splash follow-up, repeat the owner/state
 intervention on multiple prompts while joining exact route and activation
 records; exact final text alone does not transfer a state-parity claim.
 [Held-out report](../../bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/README.md).
+
+
+The Coder layer-9 expert-233 owner capture was independently checked using the
+exact service activation and packed weights: the serial part matched the GPU
+oracle and the batch part matched the CPU oracle bit-for-bit. CPU/GPU output
+differed on all 2,560 values for this IQ2_S/IQ4_NL row. In future Strata/Splash
+work, preserve an analyzer that joins the binary service part to the correct
+owner-specific oracle by route and activation; owner labels alone do not prove
+that arithmetic changed. [Oracle pairer and result](../../bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/README.md).
