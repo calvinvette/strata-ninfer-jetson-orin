@@ -7,10 +7,14 @@ Coder IQ1_M expert profile that moved model layer 39 / expert 50 from baseline
 rank 7,781 to rank 0. The intervention did not restore full output parity:
 slot 0 matched its isolated serial control for all 72 tokens; slot 1 first
 differed at output index 66, matching the onset in the prior baseline cell.
-This is a failed rescue attempt. The harness did not capture paired committed
-state for this run, so it says nothing about terminal state parity or whether
-this profile prevented the specific owner switch observed in the earlier
-position-104 capture.
+This is a failed rescue attempt. The first run did not capture paired committed state. A second instrumented
+run confirmed expert 50 was GPU-owned in both serial and batch at the sampled
+position, so the intended local residency was achieved. But the layer-39 routes
+differed and the serial/batch input activations already differed in all 2,560
+values (max absolute delta 0.10295, relative L2 0.02819). The branch parts are
+therefore not a same-input comparison. This capture shows that the upstream
+divergence precedes layer 39 in this run; it does not establish terminal-state
+parity or attribute the full output mismatch.
 
 The single diagnostic completed successfully under `run_control.py`; minimum
 physical/admission availability was 17.757 GiB with no sampled cgroup pressure
@@ -31,9 +35,11 @@ correctness evidence only, not a performance, energy, or quality result.
   MTP off, two live rows, 1,500 requested cache slots, Q8_1 CPU selector forced
   to `all`, default pool-worker count, 1,024 context.
 
-The compact machine-readable result is `run/result.json`; raw server logs and
-supervisor samples are local under `run/` and `supervisor/` and were not added
-to Git. Reproduce the profile and run from the repository root with:
+The compact machine-readable results are `run/result.json` and
+`layer39-position104/analysis.json`. The reusable capture harness is
+`capture_layer39.py`. Raw server logs, activation/part dumps and supervisor
+samples are local under `run/`, `layer39-position104/` and `supervisor/`; they
+were not added to Git. Reproduce the profile and run from the repository root with:
 
 ```sh
 python3 bench/results/2026-10-23-phase5-coder-two-live-target-q8all/make_expert_first_profile.py \
@@ -47,7 +53,8 @@ python3 tools/integration/run_control.py \
 ```
 
 The original layer-39 capture tied expert 50's CPU/GPU output delta to one
-local branch perturbation. This profile-level test shows that protecting that
-one expert's ranking alone does not recover the complete two-live output. The
-broader multi-live state/output cause remains open; see the
+local branch perturbation. This profile-level test shows that promoting that
+expert keeps it GPU-owned but does not recover the complete two-live output;
+the instrumented follow-up also found layer-39 inputs/routes already unpaired.
+The broader multi-live state/output cause remains open; see the
 [diagnostic series](../../2026-10-23-phase5-coder-two-live-target-q8all/README.md).
