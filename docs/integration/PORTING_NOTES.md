@@ -3037,3 +3037,10 @@ rank intervention, the token-66 mismatch followed the prompt through slot
 reversal, while the corrected layer-19 output and committed GDN state through
 p105 remained exact. This distinguishes prompt-specific long-chain behavior
 from a logical-slot-specific symptom; it does not identify the downstream cause.
+
+Physical batch-slot assignment can reverse across repeated runs. In the
+cache-3k Coder investigation, pairing rows by slot number gave a false token
+mismatch; matching each row to its serial token sequence identified the correct
+prompt. Verify token identity at the captured position before comparing state
+or logits, and record the per-run physical-to-logical mapping. Apply this same
+rule to future Strata/Splash and NInfer integrations.
