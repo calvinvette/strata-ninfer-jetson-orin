@@ -5082,6 +5082,16 @@ captured layer-10 GDN stage fields also matched. The first direct committed
 state change is at layer 12. This excludes differences in the sampled layer-9
 expert output and layer-10 stage, without locating the intervening change.
 
+The follow-up [batch QSA state trace](../../bench/results/2026-10-24-phase5-coder-exp2f-layer11-position89/README.md)
+found slot 0 QSA indexer/KV hashes first differ at position 74 in model layers
+31, 35, 39, 43 and 47; slot 1 first differs at position 88 in layers 15, 19,
+23, 27, 31, 35, 39, 43 and 47. Both rows' 32-token outputs still match
+serial. The slot-1 GDN state first differs at layer 12 / position 89. Its
+layer-11 MoE routes, activation, all expert parts and combined output match
+serial despite several owner changes. This shows QSA-state divergence within
+the same diagnostic, without identifying a cause or proving a causal link to
+the GDN change. Phase 5 remains open.
+
 The MTP4 accepted-prefix comparison was extended to 256 tokens and a 512-token
 allowance on the deterministic Coder prompt. MTP-off and MTP4 matched all token
 IDs, all nine final persistent-state fields and every shared commit boundary:

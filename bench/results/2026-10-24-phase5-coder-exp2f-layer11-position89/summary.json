@@ -1,0 +1,75 @@
+{
+  "experiment": "two-live exp2f QSA/GDN state boundary",
+  "date": "2026-10-24",
+  "runtime_source_commit": "d93b48f0",
+  "binary_sha256": "ad4b2354fe98f0e4128cf9a9ed70488fef362207dd1f7e94555a8ba35d8985df",
+  "model": "Qwen3.8-Flash-Next-Coder-GGUF-IQ1_M-Orin-validation",
+  "model_artifact_revision": "5348543e0147355ac9cbcb031184a3546350988e",
+  "expert_profile_sha256": "1f03ed71cdac371e07480a3b4473e93be5cdfc9afb910f2fdac8491ac555502e",
+  "profile": {
+    "live_requests": 2,
+    "expert_cache_slots": 1500,
+    "expert_233_residency_rank": 12287,
+    "exp2f_silu_layer": 9,
+    "exp2f_silu_expert": 233,
+    "generated_tokens": 32,
+    "batch_qsa_hash_range": [67, 100]
+  },
+  "outputs_match_serial": {"slot-0": true, "slot-1": true},
+  "qsa_state": {
+    "slot-0": {
+      "serial_control": 0,
+      "position_offset": 0,
+      "compared_positions": 29,
+      "exact_positions": 4,
+      "first_mismatch": {
+        "batch_position": 74,
+        "serial_prefix_position": 74,
+        "token_id": 264,
+        "different_model_layers": [31, 35, 39, 43, 47],
+        "changed_components": ["indexer", "kv"]
+      }
+    },
+    "slot-1": {
+      "serial_control": 1,
+      "position_offset": 0,
+      "compared_positions": 31,
+      "exact_positions": 20,
+      "first_mismatch": {
+        "batch_position": 88,
+        "serial_prefix_position": 88,
+        "token_id": 1149,
+        "different_model_layers": [15, 19, 23, 27, 31, 35, 39, 43, 47],
+        "changed_components": ["indexer", "kv"]
+      }
+    }
+  },
+  "direct_gdn_state": {
+    "slot": 1,
+    "position": 89,
+    "first_changed_layer": 12,
+    "changed_values": 794637,
+    "total_values": 817152,
+    "relative_l2": 0.00009159714897539368
+  },
+  "layer11_moe": {
+    "position": 89,
+    "slot": 1,
+    "routes_equal": true,
+    "activation_bit_identical": true,
+    "all_expert_parts_bit_identical": true,
+    "combined_output_bit_identical": true,
+    "gpu_to_cpu_changed_experts": [185, 45, 201, 255]
+  },
+  "supervisor": {
+    "status": "pass",
+    "elapsed_seconds": 206.35,
+    "minimum_available_bytes": 19139235840,
+    "minimum_available_gib": 17.82,
+    "memory_pressure_or_oom_events": 0,
+    "gpu_clock_mhz_observed_range": [306, 1300.5],
+    "emc_clock": "unavailable: permission denied",
+    "energy": "not analyzed"
+  },
+  "qualification": "One-prompt-pair correctness diagnostic. Output equality does not imply QSA/GDN state equality; no profile or default is qualified."
+}

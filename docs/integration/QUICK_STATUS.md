@@ -667,3 +667,9 @@ Output parity therefore still does not establish multi-live state parity; no
 profile is qualified. At slot 1 / position 89, routes, activation, layer-9
 expert parts/MoE output and layer-10 stage fields matched serial even though
 expert 233 moved GPU→CPU; state first differed at layer 12. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-boundary-state-pair/README.md).
+
+An opt-in QSA hash trace found slot 0 first differed at position 74 in layers
+31/35/39/43/47 and slot 1 at position 88 in layers 15/19/23/27/31/35/39/43/47,
+across both indexer and KV state. Both 32-token outputs remained exact; slot 1
+GDN state first differed at layer 12 / position 89. This locates additional
+state boundaries but not their cause. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer11-position89/README.md).

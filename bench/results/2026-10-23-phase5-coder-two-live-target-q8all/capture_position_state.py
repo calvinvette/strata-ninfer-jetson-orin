@@ -44,6 +44,10 @@ p.add_argument('--trace-batch-gdn-hashes', action='store_true',
                help='hash committed batch GDN allocations at each verifier position')
 p.add_argument('--batch-gdn-hash-from', type=int, default=0)
 p.add_argument('--batch-gdn-hash-to', type=int, default=4096)
+p.add_argument('--trace-batch-qsa-hashes', action='store_true',
+               help='hash committed batch QSA allocations at each accepted position')
+p.add_argument('--batch-qsa-hash-from', type=int, default=0)
+p.add_argument('--batch-qsa-hash-to', type=int, default=4096)
 opts = p.parse_args()
 if opts.generated_tokens < 1:
     p.error('--generated-tokens must be positive')
@@ -116,6 +120,10 @@ def make_env(name, is_batch=False):
         env.update({'STRATA_BATCH_GDN_HASH_PATH': str((out/f'{name}.batch-gdn-hashes.txt').resolve()),
                     'STRATA_BATCH_GDN_HASH_FROM': str(opts.batch_gdn_hash_from),
                     'STRATA_BATCH_GDN_HASH_TO': str(opts.batch_gdn_hash_to)})
+    if opts.trace_batch_qsa_hashes:
+        env.update({'STRATA_BATCH_QSA_HASH_PATH': str((out/f'{name}.batch-qsa-hashes.txt').resolve()),
+                    'STRATA_BATCH_QSA_HASH_FROM': str(opts.batch_qsa_hash_from),
+                    'STRATA_BATCH_QSA_HASH_TO': str(opts.batch_qsa_hash_to)})
     return env
 
 def generate(engine, key):
@@ -164,6 +172,8 @@ result = {'capture_positions': [int(x) for x in positions.split(',')],
                       'trace_state_hashes': opts.trace_state_hashes,
                       'trace_batch_gdn_hashes': opts.trace_batch_gdn_hashes,
                       'batch_gdn_hash_range': [opts.batch_gdn_hash_from, opts.batch_gdn_hash_to],
+                      'trace_batch_qsa_hashes': opts.trace_batch_qsa_hashes,
+                      'batch_qsa_hash_range': [opts.batch_qsa_hash_from, opts.batch_qsa_hash_to],
                       'STRATA_NATIVE_CPU_Q8_1_DOT': 'all', 'STRATA_IQ_MT_MIN': '1'}}
 result['exp2f_silu'] = ({'layer': opts.exp2f_silu_layer,
                          'expert': opts.exp2f_silu_expert}
