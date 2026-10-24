@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "scope": "three-block randomized screening; one fixed Coder API workload per fresh service after same-token-count warmup",
+  "source_commit": "2e749727a78b51b71ed0031732ba495e6195d8ce",
+  "strata_binary_sha256": "1f44e7e3713faf9d1e1fee688a69ce5960e21d40c1d0d6071e9831dea53316d6",
+  "model": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF IQ1_M; revision 5348543e0147355ac9cbcb031184a3546350988e",
+  "model_files": "~/models/strata-orin-validation/Coder-GGUF/IQ1_M/",
+  "prompt_source": "bench/results/2026-10-21-phase6-coder-current-source-cache-context-screen3/workloads.json",
+  "prompt_source_sha256": "41f57bd2b76692e4edc5a63153a8f073b100b5b3663894d531d68a926078b86a",
+  "prompt_id": "coder-mtp4-heldout-retrieval-arithmetic-512",
+  "prompt_tokens": 512,
+  "profile": {
+    "context": 8192,
+    "expert_cache_slots": 3000,
+    "prefill_chunk": 128,
+    "kv": "FP16",
+    "mtp": "off",
+    "expert_pool": "CPU worker count varied"
+  },
+  "factors": {
+    "workers": [
+      4,
+      8
+    ],
+    "transfer_mode": [
+      "mapped",
+      "pread"
+    ]
+  },
+  "repetitions": 3,
+  "seed": 2026102424,
+  "warmups": 1,
+  "measured_requests_per_cell": 1,
+  "memory_max": "28G",
+  "minimum_physical_headroom_gib": 6,
+  "clock_controls": "none; sample read-only",
+  "energy": "not measured in screening"
+}
