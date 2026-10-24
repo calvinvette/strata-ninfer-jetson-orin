@@ -712,3 +712,10 @@ exact and slot 1 first differing at token 60. This replicates the sampled
 pattern but still provides no state-drift or quality bound. The replication
 retained 17.74 GiB minimum physical availability with no cgroup pressure/OOM
 events. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#expert-114-rank-0-residency-intervention).
+
+Direct numeric GDN snapshots at positions 98/99 under the same profile show
+state drift before the token-60 output mismatch: the prompt mapped to serial
+control 0 first differs at layer 5 (relative L2 `4.18e-7` at position 98),
+and control 1 at layer 24 (`8.67e-5`). These same-position captures do not
+identify the upstream operation or bound quality impact. Minimum physical
+availability was 17.65 GiB with no cgroup pressure/OOM events. [Details](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#numeric-state-at-the-later-divergence).

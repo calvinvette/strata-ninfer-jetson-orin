@@ -5144,3 +5144,13 @@ exact and slot 1 first differing at token 60. Minimum physical availability
 was 17.74 GiB, with no cgroup pressure/OOM events. This repeats the sampled
 onset but does not bound numeric drift or quality. Phase 5 remains open. See
 the [experiment report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#expert-114-rank-0-residency-intervention).
+
+A same-profile numeric capture at positions 98/99 found GDN state movement
+before the first output-token mismatch at index 60. For the prompt paired to
+serial control 0, the first changed layer was model layer 5 at both positions
+(relative L2 `4.18e-7` / `4.09e-7`). For control 1, it was layer 24
+(`8.67e-5` / `9.16e-5`); at position 99, 794,497/817,152 values differed in
+that layer. The capture retained 17.65 GiB minimum physical availability and
+recorded no cgroup pressure/OOM events. This confirms pre-output numeric state
+drift in these two rows but does not identify its first operation or establish
+a quality bound. Phase 5 remains open. See the [numeric analysis](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#numeric-state-at-the-later-divergence).

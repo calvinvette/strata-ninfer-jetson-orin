@@ -160,3 +160,27 @@ The replication took 354.55 seconds, retained 17.74 GiB minimum physical
 availability, and recorded no cgroup pressure/OOM events. This reproduces the
 sampled onset under this profile, but the persistent-state changes still have
 no numerical drift or quality bound.
+
+## Numeric state at the later divergence
+
+A supervised follow-up captured every GDN commit at absolute positions 98 and
+99 under the same expert-114 rank-0 profile. Exact token/hash alignment mapped
+batch rows 0 and 1 to serial controls 0 and 1 for this run. At both captured
+positions, row 0 / control 0 first differed at model layer 5: at position 98,
+479,628/817,152 values differed (relative L2 `4.18e-7`, max absolute
+`5.07e-6`); at position 99, 476,632 values differed (relative L2
+`4.09e-7`, max absolute `5.04e-6`). Row 1 / control 1 first differed at
+model layer 24: at position 98, 786,404 values differed (relative L2
+`8.67e-5`, max absolute `0.0014014`); at position 99, 794,497 values differed
+(relative L2 `9.16e-5`, same maximum absolute difference). Later GDN layers
+also differed in both rows.
+
+These snapshots precede the first output-token mismatch at index 60 (prompt
+length 68). They show numeric recurrent-state differences before that output
+mismatch, while the accepted-prefix hash trace places the respective first
+hash changes at batch positions 75 and 99. The captures are same-absolute-
+position snapshots; they do not identify the operation that first caused the
+numeric change or bound its quality impact. The supervised capture took
+314.81 seconds, retained 17.65 GiB minimum physical availability, and had no
+cgroup pressure/OOM events. GPU clocks were observed dynamically; EMC readback
+was denied and energy was not analyzed.
