@@ -4908,3 +4908,10 @@ latency is not established. Minimum physical/admission availability was 16.85
 GiB with no sampled cgroup memory events. This held-out prompt supports a
 workload-specific decode result only; no persistent state was recorded and no
 default is promoted. [Report and raw traces](../../bench/results/2026-10-23-phase6-coder-mtp3-heldout-retrieval-confirm7/README.md).
+
+A focused MTP3 accepted-prefix parity probe generated 64 tokens from a
+512-token deterministic context. MTP3 accepted 33 of 60 offered drafts. Token
+IDs matched MTP-off, and all nine persistent-state fields matched at each of 31
+shared accepted-prefix boundaries and at final state. This is one bounded
+transaction case, not a long-chain adaptive-state or multi-live qualification.
+[Report and raw traces](../../bench/results/2026-10-23-phase5-coder-mtp3-accepted-prefix-64/README.md).

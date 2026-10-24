@@ -533,3 +533,8 @@ A seven-block held-out retrieval confirmation returned the exact expected
 answer in all 14 MTP-off/MTP3 cells. MTP3 decode throughput improved 10.25%
 median (95% interval +8.98% to +10.49%), though two MTP3 cells had severe
 prefill/TTFT outliers; stable end-to-end latency is not established. [Report](../../bench/results/2026-10-23-phase6-coder-mtp3-heldout-retrieval-confirm7/README.md).
+
+An MTP3 accepted-prefix probe matched MTP-off token IDs and all persistent-state
+fingerprints at 31 shared commit boundaries over a 64-token chain (33/60 drafts
+accepted). This is a bounded transaction check; adaptive long-chain and
+multi-live correctness remain open. [Report](../../bench/results/2026-10-23-phase5-coder-mtp3-accepted-prefix-64/README.md).
