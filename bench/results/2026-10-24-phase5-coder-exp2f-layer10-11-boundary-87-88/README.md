@@ -184,3 +184,37 @@ numeric change or bound its quality impact. The supervised capture took
 314.81 seconds, retained 17.65 GiB minimum physical availability, and had no
 cgroup pressure/OOM events. GPU clocks were observed dynamically; EMC readback
 was denied and energy was not analyzed.
+
+## Layer-23 owner transition in the rank-0 intervention
+
+A separate same-profile capture sampled layer-22 stages and layer-23 MoE at
+positions 98/99. At position 98 for the prompt paired to serial control 1,
+all ten layer-22 stage fields (`x`, `qkv`, `h`, `gate`, `beta`, `z`, `y`,
+`gdn_out`, `ffn_x`, `ffn_y`) were bit-identical. Layer-23 routes and the
+2,560-value input activation were also exact. Expert 191 at rank 5 moved
+GPU→CPU; it was the only expert part with a numerical difference (all 2,560
+values; max absolute `3.0525e-5`, relative L2 `1.74245e-4`). Five other owner
+changes at this row did not change their parts. The combined layer-23 MoE
+output changed in 2,557/2,560 values (max absolute `1.9521e-6`, relative L2
+`2.10527e-5`). The same capture's accepted-prefix hash trace first changed
+for this prompt at batch position 99 / serial prefix 97, with 18/36 GDN
+allocations changed.
+
+The independent `native_expert_parity` replay used activation SHA256
+`6c203aa62019f86efebdb91edc9455518daf20ed8812a30b365e46a818373039` and the
+layer-23/expert-191 IQ2_S/IQ4_NL weights. The captured serial part matched the
+CUDA oracle bitwise; the batch part matched the CPU oracle bitwise. CPU/GPU
+oracle outputs differed in all 2,560 values (max absolute `3.0525e-5`, relative
+L2 `1.74245e-4`). CPU/CUDA Q8_1 gate/up inputs and outputs matched; hidden Q8_1
+differed in 3/60 scale bytes, and CPU down on CUDA hidden blocks reproduced
+the CUDA output bitwise. This independently attributes the sampled expert
+part delta to owner-specific arithmetic. It does not prove that this is the
+only cause of later recurrent drift or establish a quality impact.
+
+The direct numeric position-98/99 state snapshots described above came from a
+separate run with the same profile and workload. The layer-22/23 capture
+completed in 288.00 seconds with 17.74 GiB minimum physical availability and
+no cgroup events. The oracle passed in 1.07 seconds with 26.84 GiB minimum
+availability. The first two oracle invocations were harness setup failures
+(an unsupported `--` argument and then a missing dump directory); the final
+corrected oracle run passed. No accelerator default or profile changed.

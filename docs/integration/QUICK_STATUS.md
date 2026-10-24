@@ -719,3 +719,12 @@ control 0 first differs at layer 5 (relative L2 `4.18e-7` at position 98),
 and control 1 at layer 24 (`8.67e-5`). These same-position captures do not
 identify the upstream operation or bound quality impact. Minimum physical
 availability was 17.65 GiB with no cgroup pressure/OOM events. [Details](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#numeric-state-at-the-later-divergence).
+
+A new same-profile trace found another local owner delta before persistent
+state drift: layer-22 stages matched exactly; at layer 23, routes and activation
+matched, while expert 191 moved GPU→CPU and was the only changed expert part
+(relative L2 `1.74e-4`). The combined MoE output changed by `2.11e-5`; the
+accepted-prefix GDN hash first changed at batch position 99. The independent
+native oracle matched service GPU/CPU parts bitwise to their respective
+oracles. This is a second sampled owner-specific perturbation, not a complete
+cause or quality bound. [Analysis](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#layer-23-owner-transition-in-the-rank-0-intervention).

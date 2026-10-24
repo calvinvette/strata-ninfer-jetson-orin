@@ -5154,3 +5154,14 @@ that layer. The capture retained 17.65 GiB minimum physical availability and
 recorded no cgroup pressure/OOM events. This confirms pre-output numeric state
 drift in these two rows but does not identify its first operation or establish
 a quality bound. Phase 5 remains open. See the [numeric analysis](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#numeric-state-at-the-later-divergence).
+
+A same-profile layer-22/23 capture found all layer-22 stage fields exact at
+position 98. At layer 23, the prompt paired to serial control 1 had exact
+routes and activation; expert 191 moved GPU→CPU and was the only changed part
+(max absolute `3.0525e-5`, relative L2 `1.74245e-4`). The combined MoE output
+changed by relative L2 `2.10527e-5`. The exact-activation native oracle matched
+serial service to CUDA and batch service to CPU bitwise; CPU/GPU differed in
+all 2,560 outputs. In that same capture the prompt's accepted-prefix GDN hash
+first changed at batch position 99 / serial prefix 97. This supports another
+owner-specific local perturbation but does not establish the sole cause of
+state drift or bound quality. Phase 5 remains open. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#layer-23-owner-transition-in-the-rank-0-intervention).
