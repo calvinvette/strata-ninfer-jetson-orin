@@ -528,3 +528,8 @@ paired blocks, MTP3 decode throughput was 6.01% lower than MTP-off on the
 on the 512-token prompt. Total request time on the near-limit prompt rose only
 0.67% because prefill dominated. This is screening evidence for these workloads,
 not a default decision. [Report](../../bench/results/2026-10-23-phase6-coder-mtp3-window-long-screen3/README.md).
+
+A seven-block held-out retrieval confirmation returned the exact expected
+answer in all 14 MTP-off/MTP3 cells. MTP3 decode throughput improved 10.25%
+median (95% interval +8.98% to +10.49%), though two MTP3 cells had severe
+prefill/TTFT outliers; stable end-to-end latency is not established. [Report](../../bench/results/2026-10-23-phase6-coder-mtp3-heldout-retrieval-confirm7/README.md).

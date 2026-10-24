@@ -4896,3 +4896,15 @@ this setup. Minimum observed physical availability was 16.93 GiB; cgroup
 memory events remained zero. The screen is not held-out confirmation, state
 qualification, thermal steady-state evidence or a default change. [Report and
 raw traces](../../bench/results/2026-10-23-phase6-coder-mtp3-window-long-screen3/README.md).
+
+A seven-block randomized MTP-off/MTP3 confirmation on a distinct 512-token
+Coder retrieval/arithmetic prompt passed all 14 cells. Every output exactly
+matched the expected three marker codes and sum, and each paired response
+matched. MTP3 drafted 34 and accepted 31 tokens per request; paired decode
+throughput improved a median 10.25% (bootstrap 95% interval +8.98% to +10.49%).
+Two MTP3 arms had large retained prefill outliers (+116.97% and +99.61% TTFT),
+so despite median TTFT -0.41% and median total time -1.42%, stable end-to-end
+latency is not established. Minimum physical/admission availability was 16.85
+GiB with no sampled cgroup memory events. This held-out prompt supports a
+workload-specific decode result only; no persistent state was recorded and no
+default is promoted. [Report and raw traces](../../bench/results/2026-10-23-phase6-coder-mtp3-heldout-retrieval-confirm7/README.md).
