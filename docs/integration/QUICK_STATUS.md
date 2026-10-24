@@ -507,3 +507,11 @@ Retrospective `VIN_SYS_5V0` energy per output token was 66.27%/67.15% lower
 with chunk 128 at the two cache settings, but the named rail includes idle and
 background activity and is not process-attributed or whole-device energy.
 [Rail analysis](../../bench/results/2026-10-23-phase6-coder-prefill-cache-confirm7/rail-followup/README.md).
+
+
+A new three-block current-source MTP window screen (off/2/3/4) on one short
+Coder IQ1_M retrieval prompt passed all 12 cells with paired output parity.
+MTP3 showed +5.24% median decode throughput; MTP4 was effectively flat. MTP2
+had a large -57.96% outlier, so no MTP2 timing conclusion is supported. This
+is screening only, not a default or broad quality/state claim.
+[Report](../../bench/results/2026-10-23-phase6-coder-mtp-window-screen3-current/README.md).

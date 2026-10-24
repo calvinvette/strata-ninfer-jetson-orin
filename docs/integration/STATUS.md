@@ -4864,3 +4864,14 @@ lasted 526.7s and retained 13.283 GiB minimum physical/admission availability,
 with zero cgroup events. This is one near-limit transaction case, not a bound
 on adaptive long chains, cancellation or multi-live execution.
 [Report](../../bench/results/2026-10-23-phase5-coder-mtp3-long-rejection-recovery/README.md).
+
+A current-source three-block randomized screen compared MTP off/2/3/4 on one
+512-token held-out Coder IQ1_M retrieval workload. All 12 cells passed and
+paired outputs matched. MTP3's median decode delta was +5.24% (three paired
+values +3.75%, +6.14%, +5.24%); MTP4 was effectively flat at -0.11%. MTP2's
+median was +1.57%, but one cell fell 57.96%, leaving a wide interval; the
+outlier is retained and no conclusion is drawn for MTP2. Minimum observed
+physical availability was above the 6 GiB floor, with zero sampled cgroup
+memory events. This is only a screening result for one prompt and is neither
+quality/state qualification nor a promoted default. Follow with held-out
+confirmation and continue Phase 5/6 gates. [Report and raw traces](../../bench/results/2026-10-23-phase6-coder-mtp-window-screen3-current/README.md).
