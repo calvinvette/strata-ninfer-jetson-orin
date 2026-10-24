@@ -2945,4 +2945,8 @@ blocks. For future Strata/Splash ports, instrument the activation-function and
 quantization seam before porting an owner-specific arithmetic mirror; matching
 the large matrix operators is not enough to establish full-path parity. Keep
 the device exponential/rounding explanation provisional until independently
-tested. [Stage-level summary](../../bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/operator-stage-analysis.json).
+tested. An offline host `exp2f(-g*log2(e))` quotient reproduced the packed Q8_1
+bytes on that one activation, while still differing from CUDA's hidden f32
+values. Since that is not CUDA `__expf` and no held-out activation was checked,
+retain the result as an experiment direction only. [Stage-level summary and
+analyzer](../../bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/operator-stage-analysis.json).

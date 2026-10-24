@@ -13,10 +13,23 @@
   },
   "hidden_q8_1": {
     "blocks": 60,
+    "cuda_separate_vs_fused_service_bytes_equal": true,
+    "cuda_q8_1_sha256": "9811b192c4094984913726dc87894aa3152faa9003f316ff0f829ffe941bfd1c",
+    "cuda_hidden_f32_sha256": "6c67124aa14f7b2308ef4d5c4878ea5de7dd885582a4a597eeb02f4fb40619b8",
     "default_cpu_silu_differing_blocks": [4, 24, 44],
     "reciprocal_cpu_silu_differing_blocks": [4, 24, 44],
     "differing_fields": "fp16 d scale only; stored sum and all 32 integer codes match in each block",
-    "default_and_reciprocal_have_same_block_result": true
+    "default_and_reciprocal_have_same_block_result": true,
+    "cpu_quotient_vs_cuda_hidden_f32": {
+      "different_values": 258,
+      "max_abs": 2.9802322387695312e-08,
+      "relative_l2": 4.0033292103953064e-08
+    },
+    "cpu_reciprocal_vs_cuda_hidden_f32": {
+      "different_values": 588,
+      "max_abs": 5.960464477539063e-08,
+      "relative_l2": 6.617446994370281e-08
+    }
   },
   "down_projection": {
     "cpu_iq4_nl_on_cuda_hidden_vs_cuda_grouped": "bit-identical",
@@ -28,14 +41,22 @@
     "relative_l2": 0.00011979325270233452,
     "default_and_reciprocal_cpu_silu_same_result": true
   },
+  "offline_host_exp2f_quotient_candidate": {
+    "expression": "g / (1 + exp2f(-g * log2(e))) * up",
+    "packed_hidden_q8_1_matches_cuda_all_blocks": true,
+    "packed_hidden_q8_1_sha256": "9811b192c4094984913726dc87894aa3152faa9003f316ff0f829ffe941bfd1c",
+    "cuda_hidden_float_values_still_different": 264,
+    "max_abs_hidden_float_delta": 2.9802322387695312e-08,
+    "interpretation": "one activation produced matching packed Q8_1 blocks; the host libm approximation is not CUDA __expf and is not a serving-path or general parity result"
+  },
   "interpretation": [
     "For this activation, the difference first appears after exact gate/up values and before/downstream of hidden Q8_1 quantization.",
     "The CPU/CUDA exponential and rounding path is a candidate explanation, not established as the root cause.",
     "This is a single operator sample and does not qualify persistent-state parity or a runtime profile."
   ],
   "reproduction": {
-    "binary_sha256": "74c7d2fcc02cc11090a339a129e07ec208add89fa3600d28931a4a02b06cd7a3",
-    "command_env": "STRATA_NATIVE_CPU_Q8_1_DOT=iq2_s/iq4_nl@layer=9 STRATA_PARITY_DUMP_HIDDEN_Q8_1=1 STRATA_PARITY_COMPARE_HIDDEN_Q8_1=1 STRATA_EXP_MODE=0",
+    "binary_sha256": "e2e7edf21f7fd69fb99d3c069f1febff48a64b519aaaaa0d79e54b2a8a122df5",
+    "command_env": "STRATA_GROUPED_V1=1 STRATA_NATIVE_CPU_Q8_1_DOT=iq2_s/iq4_nl@layer=9 STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_LAYER=9 STRATA_PARITY_DUMP_HIDDEN_Q8_1=1 STRATA_PARITY_COMPARE_HIDDEN_Q8_1=1 STRATA_EXP_MODE=0",
     "binary": "build/integration/candidate/native_expert_parity",
     "activation_path": "/tmp/coder-iq1m-layer9-expert233-position83-activation.f32",
     "activation_path_is_local": true

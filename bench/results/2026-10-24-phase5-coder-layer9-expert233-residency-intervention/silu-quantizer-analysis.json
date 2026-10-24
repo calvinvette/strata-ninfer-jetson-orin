@@ -1,0 +1,59 @@
+{
+  "scope": "captured single layer/expert activation; diagnostic candidates only",
+  "python": "3.12.11",
+  "libm": "libm.so.6 expf/exp2f",
+  "files": {
+    "gate": {
+      "path": "/tmp/coder-iq1m-layer9-expert233-stage-oracle-stored-h/layer-9-expert-233--gpu-gate.f32",
+      "sha256": "ee2c148a4c66a948994b230c75d405ec589a5b23be4abc5fa6ac361317b2e776"
+    },
+    "up": {
+      "path": "/tmp/coder-iq1m-layer9-expert233-stage-oracle-stored-h/layer-9-expert-233--gpu-up.f32",
+      "sha256": "e7bed424b51de68b0ef2308c0eb6503a99d167b15470bc50e40283c84a6f7917"
+    },
+    "cuda_hidden_q8": {
+      "path": "/tmp/coder-iq1m-layer9-expert233-stage-oracle-stored-h/layer-9-expert-233--gpu-hidden.q8_1",
+      "sha256": "9811b192c4094984913726dc87894aa3152faa9003f316ff0f829ffe941bfd1c"
+    },
+    "cuda_hidden_f32": {
+      "path": "/tmp/coder-iq1m-layer9-expert233-stage-oracle-stored-h/layer-9-expert-233--gpu-hidden.f32",
+      "sha256": "6c67124aa14f7b2308ef4d5c4878ea5de7dd885582a4a597eeb02f4fb40619b8"
+    }
+  },
+  "values": 1920,
+  "variants": {
+    "libm_expf": {
+      "different_cuda_hidden_f32_values": 258,
+      "max_abs_hidden_f32_delta": 2.9802322387695312e-08,
+      "relative_l2_hidden_f32_delta": 4.0033292103953064e-08,
+      "different_q8_1_blocks": [
+        4,
+        24,
+        44
+      ],
+      "q8_1_field_block_mismatches": {
+        "d_scale_blocks": 3,
+        "sum_blocks": 0,
+        "code_blocks": 0
+      },
+      "packed_q8_1_sha256": "5e5f025d46815a457adefe82b8f7a9e5f43824f89d0cb7354ef6dfce01ae88fa"
+    },
+    "host_exp2f_log2e": {
+      "different_cuda_hidden_f32_values": 264,
+      "max_abs_hidden_f32_delta": 2.9802322387695312e-08,
+      "relative_l2_hidden_f32_delta": 3.65449062328862e-08,
+      "different_q8_1_blocks": [],
+      "q8_1_field_block_mismatches": {
+        "d_scale_blocks": 0,
+        "sum_blocks": 0,
+        "code_blocks": 0
+      },
+      "packed_q8_1_sha256": "9811b192c4094984913726dc87894aa3152faa9003f316ff0f829ffe941bfd1c"
+    }
+  },
+  "limits": [
+    "A host libm exp2f result is not the CUDA __expf implementation.",
+    "One activation cannot establish parity or quality across prompts, layers, compilers or backends.",
+    "The script does not change a serving path or recommend a default."
+  ]
+}

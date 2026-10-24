@@ -772,9 +772,11 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
                     cudaMemcpy(gpu_hq.data(), (const uint8_t*) dscr + hq_offset, nbytes, cudaMemcpyDeviceToHost);
                     if (std::getenv("STRATA_PARITY_DUMP_HIDDEN_Q8_1") != nullptr && !dump_f32_dir.empty()) {
                         std::vector<float> gpu_gate((size_t) N * FF), gpu_up((size_t) N * FF);
+                        std::vector<float> gpu_hidden((size_t) N * FF);
                         std::vector<uint8_t> gpu_activation((size_t) N * ggml_row_size(GGML_TYPE_Q8_1, H));
                         cudaMemcpy(gpu_gate.data(), dscr, fbytes, cudaMemcpyDeviceToHost);
                         cudaMemcpy(gpu_up.data(), (const uint8_t*) dscr + fa, fbytes, cudaMemcpyDeviceToHost);
+                        cudaMemcpy(gpu_hidden.data(), (const uint8_t*) dscr + 2 * fa, fbytes, cudaMemcpyDeviceToHost);
                         cudaMemcpy(gpu_activation.data(), dxq, gpu_activation.size(), cudaMemcpyDeviceToHost);
                         std::vector<float> cpu_gate_gpuq((size_t) N * FF), cpu_up_gpuq((size_t) N * FF);
                         std::vector<float> cpu_hidden_gpuq((size_t) N * FF);
@@ -812,6 +814,7 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
                         };
                         if (cpu_hidden_snapshot.size() != (size_t) N * FF ||
                             cpu_activation_snapshot.size() != gpu_activation.size() ||
+                            !write_dump("-gpu-hidden.f32", gpu_hidden.data(), fbytes) ||
                             !write_dump("-cpu-hidden-on-gpu-activation.f32", cpu_hidden_gpuq.data(), fbytes) ||
                             !write_dump("-cpu-activation.q8_1", cpu_activation_snapshot.data(),
                                         cpu_activation_snapshot.size()) ||

@@ -115,6 +115,17 @@ same three blocks and output delta; the device exponential/rounding path is a
 candidate for further investigation, not an established cause. This remains
 one operator sample, not a state-parity qualification.
 
+The parity harness now dumps the CUDA hidden f32 values when the separately
+stored SwiGLU path is selected (`STRATA_GROUPED_V1=1`). On this activation the
+default CPU quotient expression differs from CUDA in 258/1,920 hidden floats
+(max `2.98e-8`); the reciprocal expression differs in 588 (max `5.96e-8`). An
+offline host `exp2f(-g * log2(e))` quotient probe produced all 60 packed Q8_1
+blocks exactly, while 264 hidden f32 values still differed. That host-libm
+candidate is not CUDA `__expf`, and this one activation gives no basis to add a
+serving option or infer cross-prompt parity. The retained
+`analyze_silu_quantizer.py` and `silu-quantizer-analysis.json` record the
+offline comparison. Raw stage files remain local.
+
 The compact result is `operator-stage-analysis.json`. Large per-stage f32 and
 Q8_1 dumps and the captured activation remain in `/tmp`; they are not Git
 artifacts. Reproduction used the candidate `native_expert_parity` binary and
