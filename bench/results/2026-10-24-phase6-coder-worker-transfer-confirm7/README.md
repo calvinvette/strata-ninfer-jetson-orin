@@ -58,6 +58,31 @@ one-second sampling also limits request-window precision. The results are
 rail-specific observations, not whole-board energy or a Pareto winner. Model
 files remain in `~/models/strata-orin-validation/`.
 
+## Workload-specific Pareto view
+
+The seven-block cell medians form a four-point nondominated set when minimizing
+TTFT, client request time, decode duration and each named rail's joules per
+output token. All four cells passed the exact-answer task and returned the
+same 47-token answer hash.
+
+| Workers / transfer | n | TTFT ms | Request ms | Decode ms | CPU/CV J/token | GPU/SOC J/token | SYS 5V J/token |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 4 / mapped | 7 | 15,116 | 19,770 | 4,726 | 1.457 | 4.767 | 3.103 |
+| 4 / `pread` | 7 | 14,653 | 19,281 | 4,697 | 1.585 | 4.735 | 3.063 |
+| 8 / mapped | 7 | 14,955 | 18,470 | 3,588 | 1.647 | 4.498 | 2.952 |
+| 8 / `pread` | 7 | 14,519 | 18,154 | 3,704 | 1.752 | 4.542 | 2.916 |
+
+No cell dominates another across all of these dimensions: fewer workers lower
+CPU/CV rail use, while eight workers improve decode/request time and lower
+GPU/SOC energy; `pread` and mapped reads trade TTFT/request time against decode
+duration or CPU/CV energy. Named rails include idle/background load and are
+not whole-board energy. Per-cell physical headroom was not retained in the
+campaign result (the combined run minimum was 13.99 GiB physical and 9.60 GiB
+admission), and physical disk traffic is unavailable. Runtime logical
+expert-read counters are not physical disk bytes, so neither is used as a
+Pareto axis. This is a workload-specific descriptive frontier, not a serving
+profile recommendation.
+
 Binary SHA256, source commit, model revision, workload identity, seed, all cell
 timings and paired bootstrap intervals are recorded in `design.json`,
 `config.json` and `campaign/results.json`. `analyze_named_rails.py` performs the

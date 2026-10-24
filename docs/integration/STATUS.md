@@ -19,8 +19,11 @@ zero cgroup events. Retrospective named-rail integration found `pread` reduced
 median `VIN_SYS_5V0` joules/output-token by 1.28% at four workers
 (95% interval −1.86% to −1.17%) and 1.02% at eight (−1.56% to +0.07%), while
 the CPU/CV rail rose; readings include background load and rails are not
-summed. This supports bounded workload signals only; no default changed and
-Phase 6 remains open.
+summed. The descriptive four-cell TTFT/request/decode plus named-rail view
+leaves every worker/transfer setting nondominated; per-cell headroom and
+physical disk traffic are unavailable, so this is not a serving frontier or
+promotion basis. This supports bounded workload signals only; no default
+changed and Phase 6 remains open. See the [Pareto table](../../bench/results/2026-10-24-phase6-coder-worker-transfer-confirm7/README.md#workload-specific-pareto-view).
 
 The bounded Phase 8 Q2_0 release profile was rechecked on the current candidate
 on 2026-10-22: the 8K-context, 3,000-slot, chunk-128 MTP-off profile passed its
@@ -5087,7 +5090,10 @@ changed expert part. The independent same-activation parity replay matched the
 serial service part to GPU and batch service part to CPU bitwise (CPU/GPU
 relative L2 `4.12515e-4`). This strongly localizes the sampled state movement
 to the owner-specific layer-11 delta, but does not bound long-chain drift or
-establish quality impact/general parity. Both requests emitted 32 exact tokens.
+establish quality impact/general parity. A same-input offline exp2f-SiLU check
+still differed in 3/60 hidden quantization blocks and all expert output values,
+so it is not a correction for this expert sample. Both requests emitted 32
+exact tokens.
 The run retained 17.71 GiB minimum physical availability with zero cgroup
 pressure/OOM events. Phase 5 remains open.
 

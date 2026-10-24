@@ -74,6 +74,15 @@ impact, other owner transitions, or general parity. The capture completed in
 pressure/OOM events; GPU clocks were observed dynamically, EMC readback was
 denied, and energy was not analyzed.
 
+An offline operator replay on this exact activation checked a possible host
+exp2f-SiLU correction. CPU/CUDA Q8_1 activation and IQ2_S gate/up outputs
+matched bitwise, and CPU IQ4_NL down on the CUDA hidden Q8_1 values reproduced
+the grouped CUDA result bitwise. The ordinary CPU hidden quantization differed
+from CUDA in 3/60 blocks (three code bytes; no scale or sum-byte differences).
+The independent host-exp2f candidate still differed from CUDA in 3/60 hidden
+blocks and all 7,680 down-output words (relative L2 `4.13e-4`). This one-sample
+candidate does not justify enabling exp2f for expert 114.
+
 The supervised batch capture passed its six-GiB physical-memory guard and
 retained 17.70 GiB minimum available physical memory, with zero sampled cgroup
 pressure/OOM events. The supervised oracle passed in 1.07 seconds and retained
