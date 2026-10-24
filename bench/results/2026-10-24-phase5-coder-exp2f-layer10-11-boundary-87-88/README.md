@@ -267,3 +267,35 @@ Thus this kernel-specialization flag did not repair the sampled boundary. The
 single diagnostic run took 317.67 seconds with 17.66 GiB minimum physical
 availability and no cgroup events. Instrumented run durations are not a
 performance comparison; no default changed.
+
+## `STRATA_GR_V3=1` boundary intervention and 128-token extension
+
+The existing opt-in two-kernel fused hyperconnection read (`STRATA_GR_V3=1`)
+was tested with the same expert-114 rank-0 profile, model and prompt pair. In a
+72-token capture, both outputs matched their serial controls. At position 75
+for the prompt paired to serial control 0, layer-30 stage fields, layer-31
+routes/input activation/all expert parts/combined output and all 36 GDN state
+records were bit-identical. This changes the earlier baseline observation at
+that position: without GR-V3, the layer-31 activation and routes differed and
+GDN state first differed at layer 32.
+
+The 128-token extension reproduced exact position-75 parity at those same
+boundaries. Both output streams matched their serial controls: one stopped
+identically at 120 tokens and the other matched all 128 requested tokens.
+Persistent state parity still failed later. Exact hash alignment found the
+first mismatch at batch position 100 / serial prefix 98 for control 0 (9/36
+GDN allocations changed) and position 105 / prefix 103 for control 1 (21/36).
+Direct same-absolute-position snapshots found the first changed GDN layer was
+36 at position 99 and 100 for control 0, and layer 20 at position 105 for
+control 1. Those numeric snapshots use absolute model positions, while the
+hash report uses accepted-prefix alignment; keep the coordinate definitions
+separate when comparing the values. The accepted-prefix hash onset repeated
+at the same positions in the separate 72-token run.
+
+This is a promising opt-in local/state and output improvement for this prompt
+pair, but it delays rather than eliminates later state drift. It has no held-out
+prompt, quality, sustained-service or performance confirmation and does not
+qualify a profile or default. The 72-token capture took 286.88 seconds; the
+128-token capture took 484.45 seconds and retained 17.69 GiB minimum physical
+availability, with no cgroup pressure/OOM events. Clocks varied dynamically;
+EMC readback was denied; energy was not analyzed.

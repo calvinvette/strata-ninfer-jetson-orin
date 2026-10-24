@@ -2982,3 +2982,19 @@ candidate, not a portability recommendation: test multiple independent
 activations, use a paired same-profile service control, join the returned
 service tensor to the independent oracle, and keep checking committed state
 past the local repair. [Paired report and compact analyses](../../bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/README.md).
+
+### Fused hyperconnection reads and accepted-state checks
+
+On the Orin Coder IQ1_M two-live diagnostic, the existing opt-in CUDA
+`STRATA_GR_V3=1` two-kernel fused hyperconnection read restored exact
+layer-30/31 and committed GDN state at one sampled position, and a 128-token
+run matched both isolated serial outputs. Accepted-prefix GDN hashes still
+changed later at batch positions 100 and 105. The generic `STRATA_NO_MULTI_GR`
+specialization did not change the earlier layer-31 input delta in its separate
+screen. This is a workload-scoped Strata result, not a reason to port a CUDA
+kernel into Splash. For future Strata/Splash work, preserve the useful test
+shape: exact input/route/state pairing at the block boundary, a one-factor
+kernel-path intervention, independent serial output controls, and continued
+accepted-prefix state checks after any local repair. Qualify latency and
+held-out prompts separately before selecting a default.
+[Diagnostic report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#strata_gr_v3-1-boundary-intervention-and-128-token-extension).

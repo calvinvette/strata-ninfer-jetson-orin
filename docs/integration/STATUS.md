@@ -5193,3 +5193,14 @@ slot-1 output mismatch at token 60 unchanged. The observed memory minimum was
 17.66 GiB with no cgroup pressure/OOM events. This excludes that diagnostic
 kernel-specialization choice as a repair for this sampled boundary; no
 performance conclusion is drawn. Phase 5 remains open. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#strata_no_multi_gr-diagnostic-ablation).
+
+The existing opt-in `STRATA_GR_V3=1` fused hyperconnection read changed this
+sample materially: layer-30/31 captures and all GDN state were exact at
+position 75, and both 72-token outputs matched. A 128-token extension matched
+both serial outputs (one stop at 120, the other 128 tokens) and reproduced the
+position-75 boundary parity, but accepted-prefix hashes first differed later
+at batch position 100 / prefix 98 and position 105 / prefix 103. Same-absolute-
+position snapshots showed later numeric state differences as well. The
+candidate improves this prompt pair but does not eliminate persistent-state
+drift; it lacks held-out quality and performance confirmation and is not
+promoted. Phase 5 remains open. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#strata_gr_v3-1-boundary-intervention-and-128-token-extension).

@@ -748,3 +748,11 @@ The `STRATA_NO_MULTI_GR=1` single-factor ablation left the position-75
 layer-31 activation/routes, layer-32 first changed GDN layer, and token-60
 output mismatch unchanged. This kernel-specialization flag does not repair the
 sampled state boundary; no speed inference is made. [Run and paired analysis](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#strata_no_multi_gr-diagnostic-ablation).
+
+The opt-in `STRATA_GR_V3=1` fused hyperconnection read is promising in this
+sample. At position 75 it restored exact layer-30/31 fields and GDN state; both
+72-token outputs matched. A 128-token extension again matched both serial
+outputs (120-token stop and 128 tokens), but accepted-prefix state hashes still
+first changed at positions 100 and 105. This delays the earlier mismatch and
+fixes the output divergence in this prompt pair, but does not close the
+long-chain state gate or qualify a profile. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#strata_gr_v3-1-boundary-intervention-and-128-token-extension).
