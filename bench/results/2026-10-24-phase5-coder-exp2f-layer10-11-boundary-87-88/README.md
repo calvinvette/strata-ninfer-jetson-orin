@@ -79,9 +79,17 @@ exp2f-SiLU correction. CPU/CUDA Q8_1 activation and IQ2_S gate/up outputs
 matched bitwise, and CPU IQ4_NL down on the CUDA hidden Q8_1 values reproduced
 the grouped CUDA result bitwise. The ordinary CPU hidden quantization differed
 from CUDA in 3/60 blocks (three code bytes; no scale or sum-byte differences).
-The independent host-exp2f candidate still differed from CUDA in 3/60 hidden
-blocks and all 7,680 down-output words (relative L2 `4.13e-4`). This one-sample
-candidate does not justify enabling exp2f for expert 114.
+Independent host `expf` and host `exp2f` quantizer probes both missed the same
+CUDA blocks (11, 31 and 51). The parity harness's host-exp2f candidate still
+differed in all 7,680 down-output words (relative L2 `4.13e-4`). This
+one-sample result does not justify enabling exp2f for expert 114.
+
+The Orin runtime and parity binaries were SHA256
+`ad4b2354fe98f0e4128cf9a9ed70488fef362207dd1f7e94555a8ba35d8985df` and
+`70ef263ef83cf4d492c18c35561827ccd08ab663a91c1bd4681fed02f327eff5`.
+The parity source revision was `4b324ade`; the temporary expert profile SHA256
+was `1f03ed71cdac371e07480a3b4473e93be5cdfc9afb910f2fdac8491ac555502e`.
+Model shards remain in `~/models/`.
 
 The supervised batch capture passed its six-GiB physical-memory guard and
 retained 17.70 GiB minimum available physical memory, with zero sampled cgroup
