@@ -1,0 +1,71 @@
+{
+  "scope": "Held-out batch route activation at Coder IQ1_M layer 9, expert 233, position 83; independent CPU/GPU native operator replay. The captured service owner was GPU; this is not evidence of a CPU-owned service row.",
+  "activation_sha256": "b426c044fec3546f75fa28c38cfde8253874c234548c5719c5fd42471ffc56cf",
+  "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
+  "native_expert_parity_returncode": 1,
+  "native_expert_parity_diagnostic_failure": "independent Q8_1 gate/up reconstruction vs native float hidden differs in 369/1,920 words; packed CPU/GPU hidden Q8_1 and expert outputs nevertheless match bitwise.",
+  "cpu_gpu_gate_values_equal": true,
+  "cpu_gpu_up_values_equal": true,
+  "cpu_gpu_hidden_q8_1_equal": true,
+  "cpu_gpu_expert_output_equal": true,
+  "cpu_hidden_float_sha256": "ae7650af4dfe8d980b1059ff1b50631672a4c17a4c43a2422a4d3359d03771ac",
+  "gpu_hidden_float_sha256": "0ca0fe944e2ec3bc36cd09713acbed9c954efeb88803301e859f7734b09dd3a4",
+  "cpu_hidden_q8_1_sha256": "2e4db7d5d2f9818cb3b18c1c381ad145d3f26d2d5feb4c4aec74d16d5ef359ef",
+  "gpu_hidden_q8_1_sha256": "2e4db7d5d2f9818cb3b18c1c381ad145d3f26d2d5feb4c4aec74d16d5ef359ef",
+  "gpu_gate_sha256": "3c91efc23342f7796efe2bbb57c875b75a45af0185a4800c5cd2f3e222ae0671",
+  "gpu_up_sha256": "75631f1fdbc7236a095f2b92ed79270a6b6903115d08cd3fbc8d71faed60e852",
+  "gate_up_reconstruction_vs_cpu_hidden_float_mismatches": 369,
+  "packed_hidden_q8_1_blocks": 60,
+  "interpretation": "Unlike the original position-83 sample, this second activation has exact CPU/GPU gate/up and packed hidden Q8_1 plus exact final expert output. Host libm expf and exp2f candidates also pack all 60 blocks identically to CUDA. This supports activation-dependent numerical behavior, not universal owner parity or an exp2f runtime change.",
+  "reproduction_command": [
+    "/home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/candidate/native_expert_parity",
+    "/home/calvin/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+    "--expert",
+    "233",
+    "--activation-f32",
+    "/tmp/coder-layer9-expert233-heldout-activation.f32",
+    "--dump-f32-dir",
+    "/tmp/coder-layer9-expert233-heldout-oracle",
+    "9"
+  ],
+  "capture_log": "/tmp/coder-layer9-expert233-heldout-parity.txt (local)",
+  "offline_host_quantizer_candidates": {
+    "scope": "captured single layer/expert activation; diagnostic candidates only",
+    "variants": {
+      "libm_expf": {
+        "different_cuda_hidden_f32_values": 234,
+        "max_abs_hidden_f32_delta": 2.9802322387695312e-08,
+        "relative_l2_hidden_f32_delta": 4.078145756375955e-08,
+        "different_q8_1_blocks": [],
+        "q8_1_field_block_mismatches": {
+          "d_scale_blocks": 0,
+          "sum_blocks": 0,
+          "code_blocks": 0
+        },
+        "packed_q8_1_sha256": "2e4db7d5d2f9818cb3b18c1c381ad145d3f26d2d5feb4c4aec74d16d5ef359ef"
+      },
+      "host_exp2f_log2e": {
+        "different_cuda_hidden_f32_values": 270,
+        "max_abs_hidden_f32_delta": 2.9802322387695312e-08,
+        "relative_l2_hidden_f32_delta": 3.793146094770872e-08,
+        "different_q8_1_blocks": [],
+        "q8_1_field_block_mismatches": {
+          "d_scale_blocks": 0,
+          "sum_blocks": 0,
+          "code_blocks": 0
+        },
+        "packed_q8_1_sha256": "2e4db7d5d2f9818cb3b18c1c381ad145d3f26d2d5feb4c4aec74d16d5ef359ef"
+      }
+    },
+    "limits": [
+      "A host libm exp2f result is not the CUDA __expf implementation.",
+      "One activation cannot establish parity or quality across prompts, layers, compilers or backends.",
+      "The script does not change a serving path or recommend a default."
+    ]
+  },
+  "cpu_gpu_hidden_float32": {
+    "different_values": 234,
+    "max_abs": 2.9802322387695312e-08,
+    "relative_l2": 4.078145756375954e-08
+  }
+}

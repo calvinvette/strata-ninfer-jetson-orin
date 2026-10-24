@@ -130,3 +130,26 @@ The compact result is `operator-stage-analysis.json`. Large per-stage f32 and
 Q8_1 dumps and the captured activation remain in `/tmp`; they are not Git
 artifacts. Reproduction used the candidate `native_expert_parity` binary and
 the environment/activation path recorded in the JSON.
+
+## Held-out activation stage check
+
+A second exact route/activation sample from the held-out prompt pair was
+captured at layer 9, position 83, with expert 233 routed. The temporary profile
+kept it GPU-owned in the service; we replayed that same activation through the
+native CPU/GPU oracle rather than treating it as a CPU-owned service row. CPU
+and GPU gate/up outputs, packed hidden Q8_1 (60/60 blocks), and final expert
+output matched bit-for-bit. Their hidden f32 values differed in 234/1,920
+positions (max absolute `2.98e-8`, relative L2 `4.08e-8`). Both host `libm`
+`expf` and `exp2f(-g*log2(e))` candidates also produced the same packed hidden
+Q8_1 bytes as CUDA on this sample; neither candidate is a serving change.
+
+The parity executable returned one diagnostic failure because an independent
+float gate/up reconstruction differed from the native hidden f32 row in
+369/1,920 words. Its relevant CPU/GPU Q8_1 and final-output comparisons still
+passed. This strict float-intermediate mismatch is retained and limits the
+interpretation; it is not counted as a full parity-test pass. The contrasting
+original sample had three hidden scale-block differences and an owner-output
+delta, so these two activations show sample-dependent operator behavior, not
+general CPU/GPU parity. Compact hashes and the command are in
+`heldout-silu-activation-analysis.json`; raw activation and stage files remain
+in `/tmp`.

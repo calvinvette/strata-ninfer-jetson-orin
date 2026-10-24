@@ -38,6 +38,10 @@ exact 72-token output parity on the original prompt pair and one held-out pair,
 but direct terminal GDN state still differed at layers 5 and 12; another held-out
 prompt already differed at layer 6. This temporary profile is not qualified and
 no default changed. [Intervention evidence](../../bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/README.md).
+On a second held-out layer-9/expert-233 activation, native CPU/GPU gate/up,
+hidden Q8_1 and expert outputs were exact; the earlier owner's output delta
+therefore depends on activation. A strict f32 intermediate reconstruction
+check still failed, so this remains a narrow diagnostic, not broad owner parity.
 
 A seven-block held-out 7,501-token confirmation passed all 28 MTP-off/MTP3 ×
 FP16/INT8 KV arms. MTP3 reduced decode throughput 5.49% (FP16) and 4.19%
