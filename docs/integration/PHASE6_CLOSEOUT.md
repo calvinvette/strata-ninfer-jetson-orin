@@ -17,15 +17,18 @@ No universal response model, Pareto winner, or runtime default is promoted.
 ## Pareto and energy limits
 
 The worker×transfer confirmation produced a four-point nondominated set across
-TTFT, request time, decode duration, and three named tegrastats rails. The
-cache×chunk confirmation also has a four-cell descriptive view. These are
-workload-specific choices with different latency and rail tradeoffs, not a
-global product frontier. The Coder worker campaign did not retain per-cell
-headroom or physical disk bytes. Named rails include board idle/background
-activity; they are neither process-attributed nor summed into whole-device
-energy. The Coder long MTP3 exploratory log response model had large residuals,
-so paired block bootstrap remains primary and the model is not used for
-selection.
+TTFT, request time, decode duration, sampled physical headroom, host NVMe
+device-wide read deltas, and three named tegrastats rails. Per-cell host
+headroom and request-aligned `nvme0n1` sector deltas were recovered from the
+retained one-second supervisor telemetry; the method and values are recorded
+in that campaign report. Device deltas include concurrent system I/O and are
+not process-attributed. The cache×chunk confirmation also has a four-cell
+descriptive view. These are workload-specific choices with different latency
+and rail tradeoffs, not a global product frontier. Named rails include board
+idle/background activity; they are neither process-attributed nor summed into
+whole-device energy. The Coder long MTP3 exploratory log response model had
+large residuals, so paired block bootstrap remains primary and the model is
+not used for selection.
 
 The tested domains meet the plan's bounded screening, held-out, uncertainty,
 interaction and Pareto reporting requirements. Untested quantizations,

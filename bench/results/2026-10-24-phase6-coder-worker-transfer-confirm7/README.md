@@ -58,30 +58,47 @@ one-second sampling also limits request-window precision. The results are
 rail-specific observations, not whole-board energy or a Pareto winner. Model
 files remain in `~/models/strata-orin-validation/`.
 
+The retained one-second supervisor samples also allow retrospective per-cell
+physical telemetry. Within each non-warmup request's observed streaming
+interval, the minimum sampled host `MemAvailable` was 14.09–14.35 GiB across
+the 28 cells. Per-cell minima across the seven blocks were 14.28, 14.22, 14.32
+and 14.09 GiB for 4/mapped, 4/`pread`, 8/mapped and 8/`pread`, respectively.
+For host NVMe device `nvme0n1`, read-sector deltas divided by the Linux 512-byte
+sector unit yielded median device-wide read traffic of 3.595, 3.576, 3.554
+and 3.471 GB per request in that same order; median write deltas were 0.002,
+0.003, 0.003 and 0.002 GB. Endpoint samples were at most 0.53 seconds from
+the request start/end. These are host-device deltas aligned to a request, not
+process-attributed I/O; concurrent host activity and kernel read-ahead remain
+in scope. They replace logical expert-read counters as the physical-traffic
+measurement, but do not isolate model-file traffic.
+The full 28-row extraction and grouped summaries are in
+[`request-physical-telemetry.json`](request-physical-telemetry.json), generated
+by [`analyze_request_telemetry.py`](analyze_request_telemetry.py).
+
 ## Workload-specific Pareto view
 
-The seven-block cell medians form a four-point nondominated set when minimizing
-TTFT, client request time, decode duration and each named rail's joules per
-output token. All four cells passed the exact-answer task and returned the
-same 47-token answer hash.
+The seven-block cell summaries form a four-point nondominated set across TTFT,
+median and maximum-of-seven request time, decode duration, sampled physical
+headroom, host NVMe read traffic and each named rail's joules per output token.
+All four cells passed the exact-answer task and returned the same 47-token
+answer hash. With seven observations, the reported p95 uses the maximum
+observation and is descriptive rather than a stable tail estimate.
 
-| Workers / transfer | n | TTFT ms | Request ms | Decode ms | CPU/CV J/token | GPU/SOC J/token | SYS 5V J/token |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 4 / mapped | 7 | 15,116 | 19,770 | 4,726 | 1.457 | 4.767 | 3.103 |
-| 4 / `pread` | 7 | 14,653 | 19,281 | 4,697 | 1.585 | 4.735 | 3.063 |
-| 8 / mapped | 7 | 14,955 | 18,470 | 3,588 | 1.647 | 4.498 | 2.952 |
-| 8 / `pread` | 7 | 14,519 | 18,154 | 3,704 | 1.752 | 4.542 | 2.916 |
+| Workers / transfer | n | TTFT ms | Request ms | p95 request ms | Decode ms | Host headroom min GiB | NVMe read GB/request | CPU/CV J/token | GPU/SOC J/token | SYS 5V J/token |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 4 / mapped | 7 | 15,116 | 19,780 | 20,129 | 4,726 | 14.28 | 3.595 | 1.457 | 4.767 | 3.103 |
+| 4 / `pread` | 7 | 14,653 | 19,292 | 19,703 | 4,697 | 14.22 | 3.576 | 1.585 | 4.735 | 3.063 |
+| 8 / mapped | 7 | 14,955 | 18,480 | 37,408 | 3,588 | 14.32 | 3.554 | 1.647 | 4.498 | 2.952 |
+| 8 / `pread` | 7 | 14,519 | 18,164 | 19,501 | 3,704 | 14.09 | 3.471 | 1.752 | 4.542 | 2.916 |
 
-No cell dominates another across all of these dimensions: fewer workers lower
+No cell dominates another across these dimensions: fewer workers lower
 CPU/CV rail use, while eight workers improve decode/request time and lower
 GPU/SOC energy; `pread` and mapped reads trade TTFT/request time against decode
-duration or CPU/CV energy. Named rails include idle/background load and are
-not whole-board energy. Per-cell physical headroom was not retained in the
-campaign result (the combined run minimum was 13.99 GiB physical and 9.60 GiB
-admission), and physical disk traffic is unavailable. Runtime logical
-expert-read counters are not physical disk bytes, so neither is used as a
-Pareto axis. This is a workload-specific descriptive frontier, not a serving
-profile recommendation.
+duration, CPU/CV energy, sampled physical headroom and device read traffic.
+Named rails include idle/background load and are not whole-board energy. The
+NVMe axis is device-wide and approximate at request boundaries, so it supports
+only this bounded workload comparison. This is a workload-specific descriptive
+frontier, not a serving profile recommendation.
 
 Binary SHA256, source commit, model revision, workload identity, seed, all cell
 timings and paired bootstrap intervals are recorded in `design.json`,
