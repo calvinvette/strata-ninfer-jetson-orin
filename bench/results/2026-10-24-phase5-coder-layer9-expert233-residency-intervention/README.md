@@ -211,8 +211,9 @@ locations. A reversed-order repeat (candidate before control) reproduced the
 same exact route and activation, slot-1 token-66 baseline divergence, candidate
 72-token match, position-83 state result, and 84→89 prefix-mismatch shift. This
 is a repeat on the same prompt pair, not independent prompt confirmation. The
-CUDA `native_expert_parity` and `strata` targets rebuilt, and
-`native_expert_parity_q8_1_selector_contract` passed on Orin. HIP `strata` and
+CUDA `native_expert_parity` and `strata` targets rebuilt. The Orin CTest
+selector contract and synthetic IQ2_S/IQ4_NL Q8_1 dot/window tests passed 3/3.
+HIP `strata` and
 `native_expert_parity` targets built on maestro1; `strata --help` and the
 selector-contract command passed with the ROCm library path. SYCL `strata` and
 `native_expert_parity` compiled and linked on maestro1 after setting the
