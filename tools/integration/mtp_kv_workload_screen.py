@@ -38,6 +38,11 @@ def replace_option(args, name, value):
     return result
 
 
+def validate_factors(windows, kvs):
+    if windows[0] != 0 or windows[1] not in (2, 3, 4) or kvs != ['fp16', 'int8']:
+        raise ValueError('use MTP windows 0/2, 0/3, or 0/4 and KV formats fp16/int8')
+
+
 def stable_arm_name(block, kv, workload, window):
     return f"block-{block:02d}-kv-{kv}-workload-{workload}-mtp-{window}"
 
@@ -106,7 +111,7 @@ def summarize_factorial(rows, workloads, kvs, windows, seed):
             summary = {'kv_format': kv, 'workload': workload, 'paired_blocks': len(paired)}
             for name in metrics_names:
                 ratios = [p[name + '_ratio'] for p in paired]
-                summary[name + '_mtp4_effect_percent'] = (statistics.median(ratios) - 1) * 100
+                summary[name + f'_mtp{windows[-1]}_effect_percent'] = (statistics.median(ratios) - 1) * 100
                 interval = bootstrap_interval(
                     ratios, seed + len(result['cell_effects']) * 101 + len(name))
                 summary[name + '_paired_bootstrap_95_interval_percent'] = [
@@ -201,7 +206,8 @@ def main():
     parser.add_argument('--workload-cells', nargs='+', required=True,
                         help='one held-out workload or short then long workload cells')
     parser.add_argument('--kvs', nargs=2, default=['fp16', 'int8'], choices=['fp16', 'int8'])
-    parser.add_argument('--windows', nargs=2, type=int, default=[0, 4])
+    parser.add_argument('--windows', nargs=2, type=int, default=[0, 4],
+                        help='MTP-off control and candidate window (2, 3, or 4)')
     parser.add_argument('--blocks', type=int, default=3)
     parser.add_argument('--seed', type=int, default=20261023)
     parser.add_argument('--first-port', type=int, default=19400)
@@ -220,8 +226,10 @@ def main():
         parser.error('--expert-cache-budget must be positive')
     if (args.blocks < 3 and not (args.followup_block and args.blocks == 1)) or (args.followup_block and args.blocks != 1):
         parser.error('use at least three blocks for a screen; --followup-block permits exactly one block')
-    if args.windows != [0, 4] or args.kvs != ['fp16', 'int8']:
-        parser.error('this screen requires MTP windows 0/4 and KV formats fp16/int8')
+    try:
+        validate_factors(args.windows, args.kvs)
+    except ValueError as exc:
+        parser.error(str(exc))
     if len(args.workload_cells) not in (1, 2):
         parser.error('select one held-out workload or a short/long workload pair')
     cfg = json.loads(args.config.read_text())
@@ -368,8 +376,8 @@ def main():
                 raise ValueError(f"requested KV {kv}, engine reported {engine.get('kv')!r}")
             if not isinstance(engine.get('expert_slots'), int) or engine['expert_slots'] <= 0:
                 raise ValueError('actual expert residency is missing')
-            if window == 4 and (not observed.get('drafted') or not observed.get('accepted')):
-                raise ValueError('MTP4 did not draft and accept tokens')
+            if window > 0 and (not observed.get('drafted') or not observed.get('accepted')):
+                raise ValueError(f'MTP{window} did not draft and accept tokens')
             if supervisor['minimum_available_bytes'] < 6 * (1 << 30):
                 raise ValueError('six-GiB physical availability floor failed')
             record.update(status='pass', request_status=request['status'], answer=answer,

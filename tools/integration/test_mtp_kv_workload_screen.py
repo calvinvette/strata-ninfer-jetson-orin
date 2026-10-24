@@ -5,10 +5,22 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT / 'tools'), str(ROOT / 'tools/integration')]
 from mtp_kv_workload_screen import (bootstrap_interval, expected_answer,
-                                    make_design, summarize_factorial)
+                                    make_design, summarize_factorial,
+                                    validate_factors)
 
 
 class MtpKvWorkloadScreenTests(unittest.TestCase):
+    def test_supported_mtp_candidate_windows_include_window_three(self):
+        for window in (2, 3, 4):
+            validate_factors([0, window], ['fp16', 'int8'])
+
+    def test_factor_validation_requires_mtp_off_control_and_supported_kv_pair(self):
+        for windows, kvs in (([2, 3], ['fp16', 'int8']),
+                             ([0, 1], ['fp16', 'int8']),
+                             ([0, 3], ['fp16', 'q4_0'])):
+            with self.assertRaises(ValueError):
+                validate_factors(windows, kvs)
+
     def test_independent_answers_cover_sum_and_marker_only_tasks(self):
         short = {'cell': 'short', 'expected_codes': ['A-1', 'B-2', 'C-3'],
                  'expected_suffix_sum': 6}
@@ -92,6 +104,20 @@ class MtpKvWorkloadScreenTests(unittest.TestCase):
         self.assertEqual(len(result['mtp_by_kv_interactions']), 1)
         self.assertEqual(result['mtp_by_workload_interactions'], [])
         self.assertEqual(result['three_way_interactions'], [])
+
+    def test_factorial_summary_names_selected_mtp_window(self):
+        rows = []
+        for kv in ('fp16', 'int8'):
+            for window, value in ((0, 100.0), (3, 105.0)):
+                rows.append({'block': 0, 'kv': kv, 'workload': 'heldout',
+                             'window': window,
+                             'metrics': {'prompt_tps': value, 'decode_tps': value,
+                                         'client_ttft_s': 1 / value,
+                                         'client_total_s': 1 / value}})
+        result = summarize_factorial(rows, ['heldout'], ['fp16', 'int8'], [0, 3], 13)
+        effect = result['cell_effects'][0]
+        self.assertAlmostEqual(effect['decode_tps_mtp3_effect_percent'], 5.0)
+        self.assertNotIn('decode_tps_mtp4_effect_percent', effect)
 
     def test_bootstrap_interval_is_finite_for_three_paired_blocks(self):
         interval = bootstrap_interval([0.1, 0.2, 0.3], 7)
