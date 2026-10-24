@@ -2859,3 +2859,15 @@ requests. In a future Strata/Splash port, compare the accepted-prefix state,
 KV, token history and published output together; do not infer state safety from
 matching final text. See [prefix parity](../../bench/results/2026-10-23-phase5-coder-mtp3-accepted-prefix-64/README.md)
 and [near-limit rejection/recovery](../../bench/results/2026-10-23-phase5-coder-mtp3-long-rejection-recovery/README.md).
+
+A full Coder MTP3 × KV × prompt-length screen now quantifies the factor that a
+future Strata/Splash study should test first: on the same retrieval task, MTP3
+raised decode throughput by about 8.4% for 512-token prompts but lowered it by
+3.5% (FP16 KV) and 4.7% (INT8 KV) at 7,501 tokens. The workload-length
+interaction intervals excluded zero; the three-way MTP × KV × length interval
+did not. Total long-request time moved less than 0.7% because prefill dominated.
+Retain a blocked, randomized factorial design, verify the answer and actual
+runtime KV/residency for every arm, and separate decode from TTFT/total time.
+Three blocks are screening evidence only; do not promote an MTP window from a
+single workload or combine request timing with unintegrated board rails. See
+the [factorial report](../../bench/results/2026-10-23-phase6-coder-mtp3-kv-length-screen3/README.md).
