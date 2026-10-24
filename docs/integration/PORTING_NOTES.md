@@ -2950,3 +2950,19 @@ bytes on that one activation, while still differing from CUDA's hidden f32
 values. Since that is not CUDA `__expf` and no held-out activation was checked,
 retain the result as an experiment direction only. [Stage-level summary and
 analyzer](../../bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/operator-stage-analysis.json).
+
+A later seven-activation replay found that host `exp2f((-g)*log2(e))` matched
+CUDA's packed hidden Q8_1 bytes and CPU down output on all seven rows; default
+CPU SwiGLU matched on six. The candidate was then tested through a layer-9,
+expert-233-only CPU selector against a same-profile control. The exact route,
+weights and activation were held fixed; the service CPU part equaled the
+selected CPU oracle bit-for-bit, and that oracle equaled CUDA for the row. The
+baseline slot-1 batch output diverged at token 66, while the candidate matched
+all 72 tokens. Position-83 GDN state became exact for slot 1, but the first
+accepted-prefix mismatch only moved from position 84 to 89. A reversed-order
+repeat reproduced the same result on the same prompt pair. For a Strata/Splash
+port, this is a useful pattern for validating a narrow owner-specific arithmetic
+candidate, not a portability recommendation: test multiple independent
+activations, use a paired same-profile service control, join the returned
+service tensor to the independent oracle, and keep checking committed state
+past the local repair. [Paired report and compact analyses](../../bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/README.md).
