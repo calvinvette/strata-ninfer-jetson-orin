@@ -477,8 +477,10 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
                         const size_t at = (size_t) token * FF + (size_t) row;
                         cpu_gate_snapshot[at] = g;
                         cpu_up_snapshot[at] = u;
-                        const float sigmoid = 1.f / (1.f + std::exp(-g));
-                        const float h = (g * sigmoid) * u;
+                        // Mirror native_gu_rows' operation order. Rewriting this as
+                        // g * (1 / (1 + exp(-g))) changes float rounding and makes
+                        // this independent reconstruction report false mismatches.
+                        const float h = (g / (1.f + std::exp(-g))) * u;
                         reconstructed_differences += std::memcmp(&h, &cpu_hidden_snapshot[at], sizeof(float)) != 0;
                     }
                 }
