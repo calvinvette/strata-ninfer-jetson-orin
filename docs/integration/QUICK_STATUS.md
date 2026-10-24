@@ -17,12 +17,14 @@ accepted-state correctness and broader performance interactions. The full
 Orin CUDA regression suite passed 130 tests with two optional IQ-fixture tests
 skipped; Python integration discovery now passes 173/173. The latest focused
 accepted-window, GDN and graph CTest selection passed 5/5. The latest
-seven shared-source files were rebuilt from a fresh isolated snapshot for HIP
-and SYCL on maestro1 with two jobs; both `strata --help` checks returned zero.
-This is x86 compile/link and CLI-startup evidence only, not accelerator runtime
-or Orin performance evidence. Build/source hashes are in the linked backend
-record in [STATUS](STATUS.md). See the [Phase 8 closeout](PHASE8_CLOSEOUT.md)
-for the exact release scope and exclusions.
+HIP/SYCL evidence is the 2026-10-23 full-tree maestro1 build; it is x86
+compile/link and CLI-startup evidence only, not accelerator runtime or Orin
+performance evidence. Shared CPU-expert/parity sources changed after that
+build, so a current-source rebuild is pending. maestro1 currently has only
+1.1 GiB free on its 56-GiB root filesystem, insufficient for the build. Build
+and source hashes are in the linked backend record in [STATUS](STATUS.md). See
+the [Phase 8 closeout](PHASE8_CLOSEOUT.md) for the exact release scope and
+exclusions.
 
 A fresh full-tree rebuild also passed for HIP (345 targets) and SYCL (201)
 from current shared sources on maestro1 with one job. Both `strata --help`
@@ -673,3 +675,23 @@ An opt-in QSA hash trace found slot 0 first differed at position 74 in layers
 across both indexer and KV state. Both 32-token outputs remained exact; slot 1
 GDN state first differed at layer 12 / position 89. This locates additional
 state boundaries but not their cause. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer11-position89/README.md).
+
+### Latest Phase 5 check: same-run owner/state boundary
+
+A same-profile capture found prompt 1's all-layer GDN state exact at positions
+86 and 87, then first changed at layer 12 / position 88. Layer-10 stages were
+exact at 87 and 88. Layer-11 routes, activation and all expert outputs were
+exact at 87; at 88, expert 114 moved GPU→CPU and was the only changed part.
+An independent same-activation oracle matched serial service to GPU and batch
+service to CPU bitwise. Both requests still emitted 32 exact tokens. This
+localizes a sampled source of state movement but does not bound longer state
+drift or quality impact. No exp2f fix was supported for this expert. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md).
+
+### Latest Phase 6 check: worker/transfer Pareto view
+
+The seven-block held-out worker × transfer study now includes a descriptive
+four-cell Pareto table for TTFT, request/decode time and three named energy
+rails. All four settings are nondominated because latency, CPU/CV and GPU/SOC
+rail tradeoffs cross; these rails include background activity and are not
+whole-device energy. Per-cell headroom and physical disk traffic were not
+retained, so this does not select a serving profile. [Table](../../bench/results/2026-10-24-phase6-coder-worker-transfer-confirm7/README.md#workload-specific-pareto-view).
