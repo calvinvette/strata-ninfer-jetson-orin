@@ -24,6 +24,12 @@ or Orin performance evidence. Build/source hashes are in the linked backend
 record in [STATUS](STATUS.md). See the [Phase 8 closeout](PHASE8_CLOSEOUT.md)
 for the exact release scope and exclusions.
 
+A fresh full-tree rebuild also passed for HIP (345 targets) and SYCL (201)
+from current shared sources on maestro1 with one job. Both `strata --help`
+checks passed; a direct SYCL CPU-runtime snapshot test passed 3,901 checks.
+This adds x86 build and CPU-runtime evidence only; accelerator runtime was not
+tested. [Build record](../../bench/results/2026-10-23-phase8-maestro1-current-source-backend-build/README.md).
+
 ## Performance observed
 
 A current-source owner-transition diagnostic at layer 27 / generated position

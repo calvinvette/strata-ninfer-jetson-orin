@@ -4836,6 +4836,16 @@ activity, are not process-attributed, and are not summed or whole-device
 energy; they add one workload-specific observation, not a general Pareto
 frontier. [Analysis](../../bench/results/2026-10-23-phase6-coder-prefill-cache-confirm7/rail-followup/README.md).
 
+The full current shared-source tree also completed fresh one-job Release builds
+on maestro1: HIP compiled 345 targets and SYCL compiled 201, both from the
+isolated `d0baa266` snapshot. The current `src/`, `include/` and `sycl/` trees
+have no differences from that snapshot. `strata --help` passed for both.
+HIP's selected CPU test set had one pass and three ISA/test-guard skips; the
+SYCL build had no CTest registrations, but its direct CPU-side
+`conversation_snapshot_test` passed 3,901 checks on maestro1's Intel OpenCL
+Celeron CPU device. This is x86 compile/CLI/CPU-runtime evidence only; neither
+backend executed on an accelerator. [Build record](../../bench/results/2026-10-23-phase8-maestro1-current-source-backend-build/README.md).
+
 A current-source MTP3 rejection/recovery probe extended the three-request
 same-engine transaction test. MTP3 rejected three drafts in the initial
 request and one in its continuation before recovery; outputs and every shared
