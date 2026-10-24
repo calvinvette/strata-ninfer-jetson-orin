@@ -386,5 +386,63 @@
     "cpu_down_vs_cuda_output_words_different": 0,
     "service_cpu_expert_part_equals_selected_cpu_oracle_bitwise": true,
     "service_and_oracle_part_sha256": "cff8f354e1ab1e584ce7998e39713dbd4f1587abb73e1154f58698596f26061c"
+  },
+  "reversed_order_repeat": {
+    "order": "candidate, then no-selector control",
+    "profile_sha256": "1f03ed71cdac371e07480a3b4473e93be5cdfc9afb910f2fdac8491ac555502e",
+    "position83_owner_codes": {
+      "serial": 0,
+      "batch": -1
+    },
+    "route_and_activation_identical": true,
+    "activation_sha256": "7ce8c948912b5f39471d5809fae4672f168e0cfc1b1e404be211f3ec600d77b3",
+    "outputs_and_state": {
+      "slot-0": {
+        "control_first_changed_layer": 5,
+        "candidate_first_changed_layer": 5,
+        "control_first_prefix_mismatch": {
+          "batch_position": 75,
+          "serial_prefix_position": 73,
+          "first_gdn_allocation_ordinal": 24,
+          "different_gdn_allocations": 12,
+          "total_gdn_allocations": 36
+        },
+        "candidate_first_prefix_mismatch": {
+          "batch_position": 75,
+          "serial_prefix_position": 73,
+          "first_gdn_allocation_ordinal": 24,
+          "different_gdn_allocations": 12,
+          "total_gdn_allocations": 36
+        },
+        "control_slot_tokens_match_serial": true,
+        "candidate_slot_tokens_match_serial": true,
+        "candidate_vs_control_batch_first_token_difference": null
+      },
+      "slot-1": {
+        "control_first_changed_layer": 10,
+        "candidate_first_changed_layer": null,
+        "control_first_prefix_mismatch": {
+          "batch_position": 84,
+          "serial_prefix_position": 82,
+          "first_gdn_allocation_ordinal": 8,
+          "different_gdn_allocations": 28,
+          "total_gdn_allocations": 36
+        },
+        "candidate_first_prefix_mismatch": {
+          "batch_position": 89,
+          "serial_prefix_position": 87,
+          "first_gdn_allocation_ordinal": 9,
+          "different_gdn_allocations": 27,
+          "total_gdn_allocations": 36
+        },
+        "control_slot_tokens_match_serial": false,
+        "candidate_slot_tokens_match_serial": true,
+        "candidate_vs_control_batch_first_token_difference": 66
+      }
+    },
+    "notes": [
+      "The repeat reproduces the first paired run for this same prompt pair; it is repeatability evidence, not an independent held-out prompt.",
+      "Slot 1 control output first differs at token 66; candidate output matches serial for all 72 tokens. State at position 83 changes from first difference layer 10 to exact. First prefix mismatch moves 84 to 89. Slot 0 output remains exact and state first differs at layer 5 / prefix mismatch position 75."
+    ]
   }
 }

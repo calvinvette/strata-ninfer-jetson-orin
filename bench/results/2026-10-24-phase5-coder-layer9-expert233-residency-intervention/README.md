@@ -207,7 +207,11 @@ same-profile control. The large `.stgcmt`,
 `.stgdiag`, `.stmoe`, and `.stmparts` captures remain local and are not Git
 artifacts. `exp2f-service-analysis.json` keeps compact source/profile/binary
 hashes, route evidence, output comparisons, and accepted-prefix mismatch
-locations. The CUDA `native_expert_parity` and `strata` targets rebuilt, and
+locations. A reversed-order repeat (candidate before control) reproduced the
+same exact route and activation, slot-1 token-66 baseline divergence, candidate
+72-token match, position-83 state result, and 84→89 prefix-mismatch shift. This
+is a repeat on the same prompt pair, not independent prompt confirmation. The
+CUDA `native_expert_parity` and `strata` targets rebuilt, and
 `native_expert_parity_q8_1_selector_contract` passed on Orin. HIP `strata` and
 `native_expert_parity` targets built on maestro1; `strata --help` and the
 selector-contract command passed with the ROCm library path. SYCL `strata` and
