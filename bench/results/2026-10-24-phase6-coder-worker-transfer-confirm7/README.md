@@ -29,13 +29,16 @@ medians; successive tokens are not treated as replicates.
 
 One 8-worker/mapped observation had a 22.5-second decode versus 3.5–3.7
 seconds in its other six blocks; its prompt phase was ordinary and the output
-still passed. It remains in the reported data. The paired-median summaries are
-robust to that observation, but its cause was not captured and the result
-should be treated as a bounded workload signal rather than a general profile
-recommendation. No default changed. The result strengthens the four-versus-
-eight-worker signal seen on the screening prompt and finds a small `pread`
-request-time benefit in this held-out task; it does not qualify cold-disk
-behavior, energy or sustained service.
+still passed. During its approximate decode window, supervisor observations
+showed the GPU at 1,300.5 MHz and `GR3D_FREQ` at 99%, with `tj` 54.8–60.3 °C;
+the other six 8-worker/mapped decode windows also showed about 99% GPU use and
+overlapping temperatures. This does not identify the cause or rule out outside
+contention. The cell remains in the reported data. The paired-median summaries
+are robust to that observation, but the result should be treated as a bounded
+workload signal rather than a general profile recommendation. No default
+changed. The result strengthens the four-versus-eight-worker signal seen on
+the screening prompt and finds a small `pread` request-time benefit in this
+held-out task; it does not qualify cold-disk behavior or sustained service.
 
 The 1,742-second supervised run used a 28-GiB cgroup cap and no clock controls.
 Minimum physical and admission availability were 13.99/9.60 GiB; cgroup
