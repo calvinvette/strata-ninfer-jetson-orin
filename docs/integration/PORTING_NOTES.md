@@ -3030,3 +3030,10 @@ The same matched-setting oracle showed the GPU-owned service part matching the
 GPU oracle and independently confirmed a CPU/GPU owner delta. Record selector
 environment with the activation and weight identity before attributing an
 owner transition. [Reproduction and result](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#expert-137-residency-intervention).
+
+For multi-live drift investigations, swap prompts across logical slots while
+preserving each prompt's serial control and model settings. In the expert-137
+rank intervention, the token-66 mismatch followed the prompt through slot
+reversal, while the corrected layer-19 output and committed GDN state through
+p105 remained exact. This distinguishes prompt-specific long-chain behavior
+from a logical-slot-specific symptom; it does not identify the downstream cause.

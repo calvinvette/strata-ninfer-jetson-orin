@@ -414,3 +414,28 @@ already commits it); that harness mistake was corrected, with no kernel change.
 The complete `gdn_parity` executable then reported zero failures. Build used
 `-j1`; the supervisor recorded 26.25 GB minimum physical availability and no
 pressure events. HIP/SYCL builds remain pending maestro1 scratch-space recovery.
+
+#### Expert-137 intervention with reversed logical slots
+
+The 72-token expert-137-rank-0 intervention was repeated with the same two
+prompts swapped between logical slots. This checks whether its output behavior
+was tied to a slot-local effect. The mismatch followed the prompt: original
+prompt 1, now in slot 0, first differed at generated token 66 (serial token
+2100, batch token 5435); original prompt 0, now in slot 1, remained exact for
+all 72 tokens. Thus the mismatch is prompt-dependent in this pair, not tied to
+logical slot 1.
+
+At layer-19 MoE and position 104 for original prompt 1, routes and input were
+exact. Expert 137 remained GPU-owned; expert 146 alone changed owner and its
+part stayed exact. All expert parts and combined MoE output were bit-identical.
+At matched model position 105, the committed token matched (7620) and all 36
+GDN layers were bit-identical (`first_changed_layer: null`). The local state
+repair therefore reproduces under slot reversal, while the later output
+mismatch also reproduces with the prompt. This still does not explain the later
+divergence or establish a serving improvement.
+
+The reversed run took 287.02 seconds and retained 17.62 GiB minimum physical
+availability with no cgroup OOM events. Its capture and position-paired state
+analysis are under `capture-gr-v3-72-e137-first-reversed/`; raw captures remain
+local. The capture harness now accepts `--reverse-prompt-order` for this
+controlled check.

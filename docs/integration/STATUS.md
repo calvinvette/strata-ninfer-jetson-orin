@@ -5248,3 +5248,10 @@ The run retained 19.19 GiB minimum physical/admission availability and no cgroup
 OOM events. The focused verifier convolution test is included and passed. This
 is functional coverage, not a performance result; configure the missing
 default fixture before treating the unmodified CTest suite as clean. [Report](../../bench/results/2026-10-24-orin-cuda-functional-ctest/README.md).
+
+A slot-reversed repeat of the expert-137 residency intervention shows the
+remaining 72-token mismatch follows the prompt: original prompt 1 first differs
+at token 66 after moving to slot 0, while original prompt 0 remains exact in
+slot 1. Layer-19 MoE output at p104 and all 36 committed GDN states at matched
+p105/token 7620 are exact. The local repair is reproducible under slot reversal,
+but the later prompt-specific divergence remains unexplained. [Experiment](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#expert-137-residency-intervention-with-reversed-logical-slots).

@@ -780,3 +780,9 @@ restored exact layer-19 outputs and layer-20 committed state through p105, but
 slot 1 still diverged at token 66; the previous profile matched all 72 tokens.
 The intervention isolates a local contributor without fixing end-to-end
 behavior. [Details](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#expert-137-residency-intervention).
+
+A reversed-slot repeat confirms the expert-137 intervention's local repair is
+slot-independent; the later token-66 mismatch follows original prompt 1, while
+original prompt 0 stays exact. All GDN state remains exact through matched
+position 105 in this 72-token pair. The cause of later prompt-specific drift is
+still open. [Details](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#expert-137-residency-intervention-with-reversed-logical-slots).

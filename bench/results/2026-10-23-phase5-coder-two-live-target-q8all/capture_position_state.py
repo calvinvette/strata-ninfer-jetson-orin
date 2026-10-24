@@ -38,6 +38,8 @@ p.add_argument('--generated-tokens', type=int, default=96,
                help='generated tokens per serial and batch request')
 p.add_argument('--prompt-offset', type=int, default=0,
                help='select two consecutive prepared integration prompts starting at this task index')
+p.add_argument('--reverse-prompt-order', action='store_true',
+               help='assign the same selected prompt pair to the opposite logical slots')
 p.add_argument('--trace-state-hashes', action='store_true',
                help='log accepted-prefix GDN/QSA fingerprints at every committed position')
 p.add_argument('--trace-batch-gdn-hashes', action='store_true',
@@ -73,6 +75,8 @@ if opts.expert_profile is not None:
 replace_arg(args, '--prompt-cache', '6')
 prepared = prepared_prompts(cfg, opts.prompt_offset + 2)
 prompts = {f'slot-{i}': prepared[f'slot-{opts.prompt_offset + i}'] for i in range(2)}
+if opts.reverse_prompt_order:
+    prompts = {'slot-0': prompts['slot-1'], 'slot-1': prompts['slot-0']}
 batch_prompts = prompts if opts.batch_live == 2 else {'slot-1': prompts['slot-1']}
 
 def make_env(name, is_batch=False):
@@ -164,6 +168,7 @@ result = {'capture_positions': [int(x) for x in positions.split(',')],
                       'expert_cache_slots': opts.expert_cache_slots,
                       'generated_tokens': opts.generated_tokens,
                       'prompt_offset': opts.prompt_offset,
+                      'reverse_prompt_order': opts.reverse_prompt_order,
                       'serial_slot_controls': list(serial_slots),
                       'gdn_layer': opts.layer,
                       'stage_layer': opts.stage_layer,
