@@ -773,3 +773,10 @@ outputs remained exact. Layer-20 `x` and `qkv` matched at p105; `h` was the
 first changed stage field. The earlier batch-hash/serial-prefix offset compared
 pre-window batch state with post-commit serial state, so those labels are not
 the same numeric boundary. [Analysis](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#committed-state-alignment-at-positions-103105).
+
+An exact-activation oracle confirmed that expert 137's GPU→CPU owner change
+contributed to the layer-19 output delta at p104. Moving this expert to rank 0
+restored exact layer-19 outputs and layer-20 committed state through p105, but
+slot 1 still diverged at token 66; the previous profile matched all 72 tokens.
+The intervention isolates a local contributor without fixing end-to-end
+behavior. [Details](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#expert-137-residency-intervention).

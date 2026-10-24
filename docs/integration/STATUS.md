@@ -5228,6 +5228,17 @@ operation. The hash trace samples batch state before its window and serial
 state after commit, so its batch-p105 / serial-prefix-103 match is a different
 sampling boundary from these post-commit numeric dumps. [Aligned capture and analyzer](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#committed-state-alignment-at-positions-103105).
 
+A same-activation layer-19 oracle and residency intervention confirms one
+local contributor. At p104, expert 137 was the only changed part after a
+GPU→CPU owner transition (relative L2 `2.1722e-4`); exact-activation service
+outputs matched the GPU/CPU oracles when the oracle used the capture's
+`STRATA_NATIVE_CPU_Q8_1_DOT=all` selector. Moving expert 137 to rank 0 made the
+layer-19 parts/output and layer-20 state exact at p104, and committed GDN state
+exact through p105. The slot-1 output nevertheless diverged at token 66, while
+the original GR-V3 profile matched all 72 tokens. This establishes a local
+owner-specific contribution to the sampled state delta, not a sufficient cause
+or a useful end-to-end profile. Phase 5 remains open. [Intervention and matched-setting oracle](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#expert-137-residency-intervention).
+
 The current Orin candidate CTest suite ran all 135 registered cases serially:
 132 passed, two IQ-fixture tests skipped, and `pool_test` could not open its
 default `pack/full/experts.bin`. The pool test then passed with the existing

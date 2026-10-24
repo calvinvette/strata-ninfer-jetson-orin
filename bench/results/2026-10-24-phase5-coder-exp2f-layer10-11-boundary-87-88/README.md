@@ -340,6 +340,48 @@ expert-profile SHA256 remained `e495a29eb202f0918388e79e33b24691295c3b898ef1118c
 The full dump and compact analyses remain local; the reusable position-aware
 analyzer is `tools/integration/compare_gdn_commit_state.py`.
 
+#### Expert-137 residency intervention
+
+At p104 in the baseline profile, layer-19 routes and input activation were
+exact. Expert 137 (rank 2 among the ten routed experts) and expert 146 changed
+GPU→CPU. Expert 137 was the only changed part: its relative L2 delta was
+`2.1722e-4`; expert 146's part stayed bit-identical. The combined MoE output
+changed by relative L2 `6.8178e-5`. The activation SHA256 was
+`459114f25e2642d1d679e489358e08865614dc51d443bdc3343eca3d7b6489a2`.
+
+The exact-activation native oracle confirmed the owner arithmetic. With
+`STRATA_NATIVE_CPU_Q8_1_DOT=all` matching the capture environment, serial
+expert-137 service output matched the GPU oracle bitwise and batch output
+matched the CPU oracle bitwise; their relative L2 difference was `2.1722e-4`.
+Expert 146's CPU and GPU oracle outputs were bit-identical for this activation,
+matching its unchanged service part. An initial oracle call without the Q8_1
+selector failed these service-to-oracle joins; it was retained as a harness
+configuration mismatch and rerun with the recorded selector.
+
+A one-factor profile moved layer-19 expert 137 from global rank 9,938 to rank 0
+while retaining the prior layer-11 expert-114 rank-0 profile. Its profile
+SHA256 was `0ed56fbe092e01d981f317ea85854b7c1e3bffcbff8a8b485f0d24fa6fe7d86f`.
+At p104, expert 137 stayed GPU-owned in both rows; expert 146 still changed
+owner but all parts and the layer-19 combined output were bit-identical. Layer
+20's stage and committed state were exact. In the same 72-token run, all 36
+committed GDN layers remained exact at matched-token positions 103, 104 and
+105. At p105, three layer-19 owner changes also left all expert parts and the
+combined output exact.
+
+This is a local state-boundary repair, not an end-to-end improvement. Slot 0's
+72-token output remained exact, but slot 1 first differed at output token 66;
+the prior GR-V3 profile with expert 137 at its original rank matched both
+72-token outputs. The candidate's pre-window batch hash trace first differed
+later at batch position 126 / serial accepted-prefix position 124, rather than
+at its earlier baseline hash positions. The hash and committed-state captures
+have different sampling boundaries as documented above. The intervention
+shows that expert-137 owner arithmetic contributed to the sampled p104 MoE and
+layer-20 state delta, but it did not remove later state/output divergence and
+is not a serving recommendation. The run took 309.01 seconds with 17.61 GiB
+minimum physical availability and no cgroup OOM events. Full raw captures and
+oracle dumps remain local under `capture-gr-v3-72-e137-first-103-105/` and
+`oracle-layer19-expert137-q8all/`.
+
 ### GDN layer-20 follow-up and verifier convolution parity
 
 Two additional 128-token `STRATA_GR_V3=1` captures sampled layer-20 and layer-19

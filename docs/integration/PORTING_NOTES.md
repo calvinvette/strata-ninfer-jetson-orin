@@ -3021,3 +3021,12 @@ false numeric comparisons. In the Orin capture, matching post-commit states
 were exact at p103 and first differed at layer 20 by p105, with layer-20 input
 and QKV exact but `h` changed. Carry this distinction into future Splash/NInfer
 state analyzers. [Observed example](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#committed-state-alignment-at-positions-103105).
+
+Owner oracles must inherit the service's CPU arithmetic selectors. For the
+layer-19 IQ2_S/IQ4_NL activation, `native_expert_parity` using its default CPU
+path failed to match the service's CPU-owned part; rerunning with
+`STRATA_NATIVE_CPU_Q8_1_DOT=all`, as in the captured service, matched exactly.
+The same matched-setting oracle showed the GPU-owned service part matching the
+GPU oracle and independently confirmed a CPU/GPU owner delta. Record selector
+environment with the activation and weight identity before attributing an
+owner transition. [Reproduction and result](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#expert-137-residency-intervention).
