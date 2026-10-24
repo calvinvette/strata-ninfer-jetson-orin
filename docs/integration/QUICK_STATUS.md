@@ -15,7 +15,7 @@ its bounded Orin qualification matrix. Phase 8 is complete for one bounded,
 opt-in Q2_0 release profile; Phases 5 and 6 remain open for unresolved
 accepted-state correctness and broader performance interactions. The full
 Orin CUDA regression suite passed 130 tests with two optional IQ-fixture tests
-skipped; Python integration discovery now passes 170/170. The latest focused
+skipped; Python integration discovery now passes 173/173. The latest focused
 accepted-window, GDN and graph CTest selection passed 5/5. The latest
 seven shared-source files were rebuilt from a fresh isolated snapshot for HIP
 and SYCL on maestro1 with two jobs; both `strata --help` checks returned zero.
@@ -549,3 +549,7 @@ A three-block factorial MTP3 × FP16/INT8 KV screen passed all 12 short-task
 cells. MTP3 decode gains were 7.78% and 7.89%; the MTP-by-KV interaction
 interval included zero. The screen covers one held-out 512-token workload only.
 [Report](../../bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/README.md).
+
+The factorial runner was generalized from MTP4-only to windows 2, 3 and 4 with
+a selected-window summary label. Its focused suite passes 12/12; the full
+Python integration suite now passes 173/173.

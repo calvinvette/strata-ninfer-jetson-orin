@@ -4933,3 +4933,8 @@ screen. Minimum physical availability was 17.00 GiB and cgroup memory events
 were zero. Three blocks on one short task are screening evidence only; broader
 Phase 5 state and Phase 6 interaction/energy gates remain open. [Report and raw
 traces](../../bench/results/2026-10-23-phase6-coder-mtp3-kv-short-screen3/README.md).
+
+The MTP × KV factorial runner now accepts MTP-off paired with window 2, 3 or 4
+and names candidate effects by the selected window. Its 12 focused unit tests
+pass, and full Python integration discovery passes 173/173 after this change.
+This enables testing MTP3 × KV without changing default runtime behavior.
