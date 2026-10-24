@@ -26,6 +26,15 @@ default path's token-60 mismatch. Minimum physical availability was 14.0 GiB,
 with no sampled cgroup memory events. The other concurrent prompt had no serial
 control in this capture and is excluded from the parity claim.
 
+A same-profile capture at positions 105 and 138 also matched all 72 target
+tokens. State was exact at position 105, then first changed at position 138,
+layer 2: recurrent state differed in 782,209/786,432 values (relative L2
+`4.5873e-5`) while that layer's convolution state remained exact. Thus the
+opt-in path delays this observed state onset past the default path's p105
+boundary but does not keep persistent state bit-identical through the tested
+output range. At position 138, layer 24 recurrent and convolution state differed
+in 786,431/786,432 and 30,720/30,720 values respectively.
+
 This is a reproducible local correction for one prompt pair and one position
 range. It does not establish long-chain state parity, held-out quality, or a
 performance benefit. Earlier 128-token GR-V3 evidence found accepted-prefix
@@ -41,6 +50,7 @@ local in the following directories and are intentionally not committed:
 - `2026-10-24-phase5-coder-slot1-first-divergence-dec-batch-off/`
 - `2026-10-24-phase5-coder-slot1-first-divergence-gr-v3/`
 - `2026-10-24-phase5-coder-slot1-first-divergence-gr-v3-72/`
+- `2026-10-24-phase5-coder-slot1-grv3-state105-138/`
 
 Common settings were target-only decode, two live rows, context 1,024,
 3,000 expert-cache slots, 64-token prefill chunks, eight pool workers, MTP

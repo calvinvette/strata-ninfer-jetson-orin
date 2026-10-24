@@ -3044,3 +3044,8 @@ mismatch; matching each row to its serial token sequence identified the correct
 prompt. Verify token identity at the captured position before comparing state
 or logits, and record the per-run physical-to-logical mapping. Apply this same
 rule to future Strata/Splash and NInfer integrations.
+
+Also extend persistent-state checks beyond an exact output window. In the
+cache-3k GR-V3 sample, all 72 target tokens matched serial, yet committed GDN
+state first changed at position 138/layer 2. Text parity over a finite prefix
+does not establish exact transaction-state parity or safe continuation.

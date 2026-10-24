@@ -14,9 +14,11 @@ the default path's prompt-1 state first changed at position 105/layer 24 and its
 output first differed at generated token 60. `STRATA_DEC_BATCH=0` retained the
 state difference. The existing opt-in `STRATA_GR_V3=1` path matched committed
 GDN state at position 105 and matched the prompt's serial output for 72 tokens.
-This is a bounded result for one prompt pair, not held-out confirmation or a
-release qualification; Phase 5 remains open for this multi-live scope and Phase
-8 must not claim it as supported. See the [focused report](../../bench/results/2026-10-24-phase5-coder-cache3k-grv3-position105/README.md).
+At position 138, however, GDN state first changed at layer 2 even though all 72
+tokens still matched. This is a bounded result for one prompt pair, not held-out
+confirmation or a release qualification; Phase 5 remains open for this
+multi-live scope and Phase 8 must not claim it as supported. See the
+[focused report](../../bench/results/2026-10-24-phase5-coder-cache3k-grv3-position105/README.md).
 
 The held-out seven-block Coder IQ1_M [worker × transfer confirmation](../../bench/results/2026-10-24-phase6-coder-worker-transfer-confirm7/README.md)
 passed all 28 cells with identical outputs and 3,903 actual expert-cache slots.
