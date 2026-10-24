@@ -3,8 +3,9 @@
 This record describes one reproducible, opt-in integration profile for the
 Jetson Orin AGX. It is an experimental qualification target for this repository,
 not a general Strata support statement or a default configuration. Phases 5 and
-6 remain open, so speculation/state migration and broader parametric and energy
-qualification are excluded. Phase 8 is complete for this profile under the
+6 are closed for tested bounded domains; multi-live/adaptive state behavior and
+untested parametric/energy domains remain excluded. Phase 8 is complete for this
+profile under the
 [Phase 8 closeout](PHASE8_CLOSEOUT.md); this record was revalidated on the
 current candidate in the [2026-10-22 smoke](../../bench/results/2026-10-22-phase8-current-source-q2-profile-smoke/README.md).
 
@@ -80,11 +81,11 @@ or model-execution evidence.
 - Adaptive CPU/GPU migration remains unqualified because tested swaps changed
   persistent state and later continuation output.
 - MTP is off in this profile. Accepted-prefix checks cover bounded prompts and
-  settings; they do not close the broader Phase 5 state, graph-lifecycle,
-  cancellation and quality gates.
-- The Phase 6 interaction, Pareto and process-attributed energy work is
-  incomplete. Rail measurements include board idle/background activity and
-  must not be described as process energy.
+  settings; multi-live and adaptive migration remain excluded by the Phase 5
+  closeout.
+- Phase 6 results apply only to the workload/factor cells in its closeout. The
+  named-rail measures include board idle/background activity and are not
+  process-attributed energy.
 - IQ1_M, other quantizations, other boards, larger model families, and changed
   defaults are outside this profile.
 

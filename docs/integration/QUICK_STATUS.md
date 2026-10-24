@@ -792,3 +792,10 @@ previous maestro1 snapshot rebuilt successfully for HIP and SYCL at one job.
 HIP's host memory-budget CTest passed; both service help checks passed. The
 current SYCL runtime had no available device, so this adds no accelerator
 execution evidence. [Build record](../../bench/results/2026-10-24-phase8-maestro1-incremental-current-shared-build/README.md).
+
+Phase 5 is closed for the tested Orin single-live static-routing transaction
+and graph scope. MTP accepted-prefix, long-chain and bounded cancel/recovery
+checks passed; multi-live batch decode and adaptive expert migration remain
+excluded because their persistent-state gates fail. [Closeout](PHASE5_CLOSEOUT.md).
+
+Phase 6 is closed for measured Orin factor domains: held-out cache/context, prefill/cache, worker/transfer, MTP/KV/workload, and graph/speculation cells have oracle checks and block-level uncertainty. No single Pareto profile is promoted; energy rails include board background. [Closeout](PHASE6_CLOSEOUT.md).

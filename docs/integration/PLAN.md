@@ -193,13 +193,16 @@ exclusions recorded. Phase 3 is closed for the tested Orin Q2_0 scope under
 [its closeout](PHASE3_CLOSEOUT.md); reopen it if allocation lifetimes, transfer
 defaults, graph-disable support or model/backend scope changes. Phase 4 is
 closed for the tested opt-in kernel and CPU candidates under
-[its closeout](PHASE4_CLOSEOUT.md); no performance default was promoted. Phase 7
-is closed for its bounded Orin matrix under [its closeout](PHASE7_CLOSEOUT.md);
-reopen it if the model, profile, feature or hardware scope changes. Phases 5 and
-6 remain open, so Phase 8 must state those exclusions for any release feature
-that depends on them. Phase 8 is complete for the bounded Q2_0 profile under
-[its closeout](PHASE8_CLOSEOUT.md); adaptive migration, MTP, multi-live batch
-decoding, and general Phase 6 profiles remain excluded. Reopen Phase 8 when
-those features are added to a release scope. Do not change kernels,
+[its closeout](PHASE4_CLOSEOUT.md); no performance default was promoted. Phase 5 is closed for the tested Orin single-live transaction and graph scope
+under [its closeout](PHASE5_CLOSEOUT.md); multi-live batch decode and adaptive
+CPU/GPU migration remain excluded. Phase 6 is closed for its measured workload
+and factor domains under [its closeout](PHASE6_CLOSEOUT.md); no global Pareto
+profile or default is promoted. Phase 7 is closed for its bounded Orin matrix
+under [its closeout](PHASE7_CLOSEOUT.md); reopen it if the model, profile,
+feature or hardware scope changes. Phase 8 is complete for the bounded Q2_0
+profile under [its closeout](PHASE8_CLOSEOUT.md). Reopen any phase when its
+model, backend, feature or support scope expands. Do not change kernels,
+quantization, model, toolchain and clocks simultaneously; select each candidate
+from measured bottlenecks and qualify its contract first. Do not change kernels,
 quantization, model, toolchain and clocks simultaneously; select each candidate
 from measured bottlenecks and qualify its contract first.

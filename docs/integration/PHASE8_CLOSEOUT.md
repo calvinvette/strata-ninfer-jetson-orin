@@ -1,15 +1,16 @@
 # Phase 8 closeout — bounded Q2_0 integration profile
 
 Phase 8 is complete for one documented, opt-in Orin AGX integration profile.
-This closes the integration-release gate for that bounded scope; it does not
-close Phases 5 or 6, promote defaults, or qualify features excluded below.
+Phases 5 and 6 are also closed for the tested bounded domains under their
+closeouts. This closes the release gate for the documented Q2_0 profile; it does not
+promote defaults or qualify features excluded below.
 
 | Gate | Evidence and result |
 | --- | --- |
 | Documented profile and identities | [`RELEASE_PROFILE.md`](RELEASE_PROFILE.md) pins the Q2_0 model shards, pack, source, binary, runtime settings, memory floor, reproduction command and rollback path. Models remain under `~/models/`. |
 | Current CUDA/ARM64 functional runtime | The 2026-10-22 current-candidate smoke passed exact 7,498-token ingestion, three-marker retrieval in order, and same-service recovery. It retained 17.84 GiB minimum host and 8.71 GiB admission availability over 317 samples, with zero cgroup memory events. The [smoke record](../../bench/results/2026-10-22-phase8-current-source-q2-profile-smoke/README.md) includes the candidate binary hash and test commands. |
 | Default-path regression | The current candidate passed all 130 runnable CUDA CTests; two optional IQ-fixture tests skipped, and no test failed. Python integration discovery passed 163/163. The CTest run retained at least 21.4 GiB host availability and had zero sampled cgroup memory events. |
-| HIP and SYCL source portability checks | Fresh maestro1 Release builds compiled and linked the shared diagnostic sources with two jobs; both `strata --help` checks returned zero. This is x86_64 build/CLI evidence only, not accelerator execution. See the [backend record](../../bench/results/2026-10-22-phase5-maestro1-q8-selector-backend-build/README.md). |
+| HIP and SYCL source portability checks | Fresh Release builds and a current-source rebuild of five later shared C++ changes completed on maestro1; HIP `strata --help` and `shared_memory_budget_test` passed, as did SYCL `strata --help`. This is x86_64 build/CLI/host-test evidence only, not accelerator execution. See the [current shared-source record](../../bench/results/2026-10-24-phase8-maestro1-incremental-current-shared-build/README.md) and [earlier full build](../../bench/results/2026-10-23-phase8-maestro1-current-source-backend-build/README.md). |
 | Rollback | The pinned-control/current-candidate API comparison passed its seven documented scenarios. Restore the pinned executable together with its compatible invocation and configuration; the pinned binary does not accept every Q2_0 candidate-profile option. |
 | Opt-in changes and attribution | Native-expert arithmetic selectors and the graph-cap override are opt-in; defaults were not changed. NInfer source remains an immutable reference. No upstream pull request was opened, and Strata portability PR #1621 remains separate. |
 
@@ -22,9 +23,10 @@ qualification target for this Orin/model cell, not a general support claim.
 
 - Adaptive CPU/GPU migration remains excluded because long accepted chains
   change persistent state and later output.
-- MTP remains off. The MTP2 cancellation cell passes at five captured prefixes,
-  but broader accepted-state, multi-live batch correctness, and graph/MTP
-  interaction gates remain open.
+- MTP remains off in this profile. Single-live accepted-prefix and bounded
+  cancellation checks passed; multi-live batch correctness remains excluded.
+  Phase 6 graph/MTP evidence is limited to its tested Q2_0 workload; no MTP
+  profile is promoted.
 - Phase 6's measured interactions cover specific workloads and cohorts only.
   Named tegrastats rails include board idle/background energy and are not
   process-attributed; no general Pareto choice or default promotion follows.
