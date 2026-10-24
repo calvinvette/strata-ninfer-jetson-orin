@@ -2832,3 +2832,30 @@ owner transitions in this integration produced measurable output and state
 deltas. Keep exact activation, route, owner and per-expert output together in
 future Strata/Splash traces, then validate committed recurrent state directly.
 See the [position-515 capture](../../bench/results/2026-10-22-phase5-coder-adaptive-all-layer-position-trace/adaptive-layer27-current-source-generated-position515/README.md).
+
+## MTP measurement and state-transaction notes for a future Splash port
+
+Treat speculation window size as a workload factor, not a backend default. On
+Orin with Coder IQ1_M, a three-block short-prompt screen and seven-block
+held-out retrieval confirmation showed MTP3 decode-throughput gains of +5.24%
+and +10.25%, while a distinct 7,501-token prompt screen showed a -6.01%
+decode delta. The long request's total time moved only +0.67% because prefill
+dominated. MTP2 also had a severe single-cell decode outlier in its short
+screen. Keep paired per-block data and report decode, prefill/TTFT, request
+latency and draft acceptance separately; never remove outliers without a
+predeclared reason. These small workload-specific results do not define an
+MTP3 default or a general speedup. See the [short screen](../../bench/results/2026-10-23-phase6-coder-mtp-window-screen3-current/README.md),
+[held-out confirmation](../../bench/results/2026-10-23-phase6-coder-mtp3-heldout-retrieval-confirm7/README.md),
+[near-limit screen](../../bench/results/2026-10-23-phase6-coder-mtp3-window-long-screen3/README.md),
+and [same-prompt replication](../../bench/results/2026-10-23-phase6-coder-mtp3-window-paired7-same-prompt/README.md).
+
+Output equality and MTP acceptance are not enough to qualify state transactions.
+The 64-token MTP3 probe matched token IDs and all nine persistent-state fields
+at 31 shared accepted-prefix boundaries and the final state; the 512-token
+near-limit MTP3 continuation probe separately checked output and state through
+rejections/recovery. Keep these gates distinct from no-trace timing campaigns,
+then repeat over long chains, cancellation boundaries and competing live
+requests. In a future Strata/Splash port, compare the accepted-prefix state,
+KV, token history and published output together; do not infer state safety from
+matching final text. See [prefix parity](../../bench/results/2026-10-23-phase5-coder-mtp3-accepted-prefix-64/README.md)
+and [near-limit rejection/recovery](../../bench/results/2026-10-23-phase5-coder-mtp3-long-rejection-recovery/README.md).
