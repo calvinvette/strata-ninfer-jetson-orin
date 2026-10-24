@@ -253,3 +253,17 @@ the layer-31 inputs already differ, this does not support attributing its part
 or output differences to owner arithmetic. It places the tested drift between
 the layer-30 stage and layer-31 MoE input; the normalization/residual path
 there remains unlocalized.
+
+## `STRATA_NO_MULTI_GR` diagnostic ablation
+
+A single-factor 72-token repeat set `STRATA_NO_MULTI_GR=1` with the same model,
+profile, prompts, controls and position-75 captures. Exact-hash mapping again
+paired the two rows to their serial controls. At the tested prompt, all
+layer-30 fields remained bit-identical; layer-31's MoE input delta and route
+difference were unchanged (relative L2 `5.2730e-4`), as were the combined
+output delta (`0.006014`) and first committed GDN difference at layer 32.
+Output slot 0 remained exact and slot 1 still first differed at token 60.
+Thus this kernel-specialization flag did not repair the sampled boundary. The
+single diagnostic run took 317.67 seconds with 17.66 GiB minimum physical
+availability and no cgroup events. Instrumented run durations are not a
+performance comparison; no default changed.

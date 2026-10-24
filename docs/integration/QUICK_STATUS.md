@@ -743,3 +743,8 @@ layer-31 MoE input and routes differ before expert execution; all expert owners
 are unchanged. The same run first changes GDN at layer 32. The change therefore
 lies in the intervening residual/normalization path or an earlier hidden-state
 source, not the layer-31 owner choice; its exact operation remains unknown.
+
+The `STRATA_NO_MULTI_GR=1` single-factor ablation left the position-75
+layer-31 activation/routes, layer-32 first changed GDN layer, and token-60
+output mismatch unchanged. This kernel-specialization flag does not repair the
+sampled state boundary; no speed inference is made. [Run and paired analysis](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#strata_no_multi_gr-diagnostic-ablation).

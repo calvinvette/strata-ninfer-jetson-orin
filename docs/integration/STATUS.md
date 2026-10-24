@@ -5186,3 +5186,10 @@ GDN state first changed at layer 32. The divergence is between the exact
 layer-30 stage capture and layer-31 MoE input, in the residual/normalization
 boundary or an earlier hidden-state source; no individual operation is yet
 isolated. Phase 5 remains open.
+
+A one-factor `STRATA_NO_MULTI_GR=1` repeat left the mapped position-75
+layer-31 input/route differences, layer-32 first changed GDN state, and
+slot-1 output mismatch at token 60 unchanged. The observed memory minimum was
+17.66 GiB with no cgroup pressure/OOM events. This excludes that diagnostic
+kernel-specialization choice as a repair for this sampled boundary; no
+performance conclusion is drawn. Phase 5 remains open. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#strata_no_multi_gr-diagnostic-ablation).
