@@ -737,3 +737,9 @@ difference at layer 32. Layer-4 expert 218 also changed owner at this position
 but its exact-input output stayed bit-identical. The responsible layer-30/31
 boundary operation remains unknown; a requested layer-3 stage dump was not
 available. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#earlier-prompt-layer-3031-boundary).
+
+The follow-up directly confirms that layer-30 stage fields match, but
+layer-31 MoE input and routes differ before expert execution; all expert owners
+are unchanged. The same run first changes GDN at layer 32. The change therefore
+lies in the intervening residual/normalization path or an earlier hidden-state
+source, not the layer-31 owner choice; its exact operation remains unknown.

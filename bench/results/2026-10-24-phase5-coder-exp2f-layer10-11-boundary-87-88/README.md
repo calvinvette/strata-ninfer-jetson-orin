@@ -242,3 +242,14 @@ file was emitted, so that stage comparison is unsupported. The layer-30/31
 capture passed in 287.03 seconds with 17.73 GiB minimum physical availability
 and zero cgroup pressure/OOM events. This is a diagnostic run, not a performance
 result.
+
+The companion same-position follow-up maps batch row 0 to serial control 0 for
+the earlier prompt. Layer-30 stage fields are exact and all layer-31 owner
+codes match, but layer-31 routes differ and its input activation differs in all
+2,560 values (max absolute `0.0018873`, relative L2 `5.2730e-4`). All ten
+expert parts and the combined layer-31 output differ (combined relative L2
+`0.006014`). The same run's GDN snapshot first differs at model layer 32. Since
+the layer-31 inputs already differ, this does not support attributing its part
+or output differences to owner arithmetic. It places the tested drift between
+the layer-30 stage and layer-31 MoE input; the normalization/residual path
+there remains unlocalized.

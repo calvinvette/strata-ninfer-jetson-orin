@@ -5177,3 +5177,12 @@ layer 4, expert 218 changed GPU→CPU on exact routes/input but its part and MoE
 output remained exact. No layer-3 stage dump was produced, so that requested
 cell is unsupported. The capture retained 17.73 GiB minimum physical
 availability with zero cgroup events. Phase 5 remains open. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-layer10-11-boundary-87-88/README.md#earlier-prompt-layer-3031-boundary).
+
+Direct layer-31 MoE analysis confirms the layer-30 stage fields matched, but
+its MoE input and routes were already different (all 2,560 input values changed;
+relative L2 `5.2730e-4`), with every expert owner unchanged. The layer-31 output
+therefore cannot be used for owner-arithmetic attribution. In the same run,
+GDN state first changed at layer 32. The divergence is between the exact
+layer-30 stage capture and layer-31 MoE input, in the residual/normalization
+boundary or an earlier hidden-state source; no individual operation is yet
+isolated. Phase 5 remains open.
