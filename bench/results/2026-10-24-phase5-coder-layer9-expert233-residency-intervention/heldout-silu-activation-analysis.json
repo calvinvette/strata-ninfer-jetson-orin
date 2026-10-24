@@ -2,8 +2,8 @@
   "scope": "Held-out batch route activation at Coder IQ1_M layer 9, expert 233, position 83; independent CPU/GPU native operator replay. The captured service owner was GPU; this is not evidence of a CPU-owned service row.",
   "activation_sha256": "b426c044fec3546f75fa28c38cfde8253874c234548c5719c5fd42471ffc56cf",
   "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
-  "native_expert_parity_returncode": 1,
-  "native_expert_parity_diagnostic_failure": "independent Q8_1 gate/up reconstruction vs native float hidden differs in 369/1,920 words; packed CPU/GPU hidden Q8_1 and expert outputs nevertheless match bitwise.",
+  "native_expert_parity_returncode": 0,
+  "native_expert_parity_diagnostic_failure": null,
   "cpu_gpu_gate_values_equal": true,
   "cpu_gpu_up_values_equal": true,
   "cpu_gpu_hidden_q8_1_equal": true,
@@ -14,9 +14,9 @@
   "gpu_hidden_q8_1_sha256": "2e4db7d5d2f9818cb3b18c1c381ad145d3f26d2d5feb4c4aec74d16d5ef359ef",
   "gpu_gate_sha256": "3c91efc23342f7796efe2bbb57c875b75a45af0185a4800c5cd2f3e222ae0671",
   "gpu_up_sha256": "75631f1fdbc7236a095f2b92ed79270a6b6903115d08cd3fbc8d71faed60e852",
-  "gate_up_reconstruction_vs_cpu_hidden_float_mismatches": 369,
+  "gate_up_reconstruction_vs_cpu_hidden_float_mismatches": 0,
   "packed_hidden_q8_1_blocks": 60,
-  "interpretation": "Unlike the original position-83 sample, this second activation has exact CPU/GPU gate/up and packed hidden Q8_1 plus exact final expert output. Host libm expf and exp2f candidates also pack all 60 blocks identically to CUDA. This supports activation-dependent numerical behavior, not universal owner parity or an exp2f runtime change.",
+  "interpretation": "With the f32 checker operation order corrected, native_expert_parity passes both the original and held-out exact activations. The original sample retains three hidden scale-block and expert-output differences; the held-out sample has exact packed hidden Q8_1 and final expert output. Host libm expf and exp2f candidates pack all held-out blocks exactly, but the default CPU quotient does as well on that sample. This supports activation-dependent owner arithmetic, not universal CPU/GPU parity or a serving change.",
   "reproduction_command": [
     "/home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/candidate/native_expert_parity",
     "/home/calvin/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
@@ -67,5 +67,19 @@
     "different_values": 234,
     "max_abs": 2.9802322387695312e-08,
     "relative_l2": 4.078145756375954e-08
-  }
+  },
+  "pre_fix_harness_observation": {
+    "returncode": 1,
+    "mismatched_words": 369,
+    "cause": "reconstruction used (g * reciprocal_sigmoid) * up while native_gu_rows uses (g / denominator) * up; correction now mirrors native operation order"
+  },
+  "corrected_harness": {
+    "source": "src/kernels/native_expert_parity.cpp",
+    "source_sha256": "ae2a60ca1df93f3a3798564eb52f582fb7a2d7a0129ed42901e1685a02b87a1e",
+    "local_cuda_build_binary_sha256": "ea1fd3ddcb039132086b5ab9b8564c9cf60f0c8114f7f9b1c0b6cbb4686bfca1",
+    "maestro1_hip_target": "native_expert_parity compiled and linked; strata --help passed with ROCm LD_LIBRARY_PATH; no HIP accelerator runtime",
+    "maestro1_source_sha256": "ae2a60ca1df93f3a3798564eb52f582fb7a2d7a0129ed42901e1685a02b87a1e",
+    "sycl": "not rebuilt: this CUDA/HIP source file differs from the separate sycl/src copy and is not part of the SYCL target"
+  },
+  "source_commit": "cff4a2943d47d50d795a2a1b622ad07d013457cc"
 }

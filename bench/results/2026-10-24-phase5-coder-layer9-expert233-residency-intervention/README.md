@@ -143,13 +143,18 @@ positions (max absolute `2.98e-8`, relative L2 `4.08e-8`). Both host `libm`
 `expf` and `exp2f(-g*log2(e))` candidates also produced the same packed hidden
 Q8_1 bytes as CUDA on this sample; neither candidate is a serving change.
 
-The parity executable returned one diagnostic failure because an independent
-float gate/up reconstruction differed from the native hidden f32 row in
-369/1,920 words. Its relevant CPU/GPU Q8_1 and final-output comparisons still
-passed. This strict float-intermediate mismatch is retained and limits the
-interpretation; it is not counted as a full parity-test pass. The contrasting
-original sample had three hidden scale-block differences and an owner-output
-delta, so these two activations show sample-dependent operator behavior, not
-general CPU/GPU parity. Compact hashes and the command are in
+The first replay exposed a false failure in the parity utility: its independent
+f32 reconstruction used reciprocal multiplication, while `native_gu_rows`
+uses division before multiplying by `up`. The checker now mirrors that
+operation order. The rebuilt CUDA utility passes on the original and held-out
+activations; the corrected held-out reconstruction has zero
+float mismatches. The original activation still shows three hidden scale-block
+differences and an owner-output delta, while the held-out activation is exact
+through packed hidden Q8_1 and final output. This supports sample-dependent
+owner arithmetic, not general CPU/GPU parity. The HIP target compiled and
+linked on maestro1 and its `strata --help` passed with the configured ROCm
+library path; the HIP parity executable was not run because no HIP accelerator
+was available there. The source is not in
+the separate SYCL build. Compact hashes and build identity are in
 `heldout-silu-activation-analysis.json`; raw activation and stage files remain
 in `/tmp`.
