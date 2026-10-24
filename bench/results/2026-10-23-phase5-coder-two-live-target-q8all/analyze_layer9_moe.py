@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pair layer-9 MoE records at position 83 by route token and report parts."""
+"""Pair selected layer-9 MoE records by batch slot and report expert parts."""
 import argparse,json,math,struct
 import hashlib
 from pathlib import Path
@@ -36,8 +36,11 @@ def arm(stem, expected_token=None):
  if expected_token is not None:routes=[r for r in routes if r.get('token_id')==expected_token]
  if stem=='batch' and args.batch_slot>=0:routes=[r for r in routes if r.get('slot')==args.batch_slot]
  parts=read_blob(root/f'{stem}.parts.stmparts',b'STMPART2');outs=read_blob(root/f'{stem}.output.stmoe',b'MOEOUT02')
- parts=[r for r in parts if r['position']==args.position and r['token']==routes[0]['token_id']] if routes else []
- outs=[r for r in outs if r['position']==args.position and r['token']==routes[0]['token_id']] if routes else []
+ batch_row=stem=='batch' and args.batch_slot>=0
+ parts=[r for r in parts if r['position']==args.position and r['token']==routes[0]['token_id']
+        and (not batch_row or r['slot']==args.batch_slot)] if routes else []
+ outs=[r for r in outs if r['position']==args.position and r['token']==routes[0]['token_id']
+       and (not batch_row or r['slot']==args.batch_slot)] if routes else []
  if len(routes)!=1 or len(parts)!=1 or len(outs)!=1:raise ValueError(f'{stem}: route/parts/output counts {len(routes)}/{len(parts)}/{len(outs)}')
  return routes[0],parts[0],outs[0],jsonrows(root/f'{stem}.owners.jsonl')
 serial_stem=f'serial-slot-{args.serial_control}' if (root/f'serial-slot-{args.serial_control}.routes.jsonl').is_file() else 'serial'

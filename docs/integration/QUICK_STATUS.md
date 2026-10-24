@@ -664,4 +664,6 @@ layer 32 / position 75 (relative L2 0.003175); slot 1 was exact at position 75
 and first changed at layer 12 / position 89 (relative L2 `9.16e-5`). Minimum
 physical availability was 17.73 GiB, with zero cgroup pressure/OOM events.
 Output parity therefore still does not establish multi-live state parity; no
-profile is qualified. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-boundary-state-pair/README.md).
+profile is qualified. At slot 1 / position 89, routes, activation, layer-9
+expert parts/MoE output and layer-10 stage fields matched serial even though
+expert 233 moved GPU→CPU; state first differed at layer 12. [Report](../../bench/results/2026-10-24-phase5-coder-exp2f-boundary-state-pair/README.md).

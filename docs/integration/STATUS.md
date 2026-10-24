@@ -5075,6 +5075,13 @@ cgroup pressure/OOM events. This extends the prior hash-only trace but does not
 identify the cause of later drift or qualify the exp2f candidate/profile.
 Phase 5 remains open.
 
+At slot 1 / position 89, a slot-aware MoE comparison found matching layer-9
+routes and input activation. Expert 233 changed GPU→CPU owner, but its exp2f
+service part, all ten expert parts and combined MoE output matched bitwise; all
+captured layer-10 GDN stage fields also matched. The first direct committed
+state change is at layer 12. This excludes differences in the sampled layer-9
+expert output and layer-10 stage, without locating the intervening change.
+
 The MTP4 accepted-prefix comparison was extended to 256 tokens and a 512-token
 allowance on the deterministic Coder prompt. MTP-off and MTP4 matched all token
 IDs, all nine final persistent-state fields and every shared commit boundary:

@@ -18,6 +18,15 @@ exact output on this prompt pair still does not preserve all committed state.
 These snapshots do not localize the upstream arithmetic that causes the
 drift, establish a tolerance, or qualify the candidate/profile.
 
+At the slot-1 / position-89 boundary, the layer-9 routes and input activation
+match its serial control. Expert 233 is GPU-owned in serial and CPU-owned in
+batch, but its exp2f-selected service part matches bit-for-bit; all ten expert
+parts and the combined MoE output are exact. Every captured layer-10 GDN stage
+field is also exact. The first directly captured recurrent-state change is at
+layer 12. This rules out a difference in the sampled layer-9 expert output or
+layer-10 stage as the immediate source, but does not locate what changes in the
+intervening computation.
+
 The run used the same 1,500-slot profile as the previous exp2f control/candidate
 comparison (profile SHA-256 below; expert 233 at residency rank 12,287) and
 enabled the exp2f CPU SwiGLU selector only for layer 9 / expert 233. Both
@@ -36,14 +45,17 @@ No serving default changed.
   MHz; EMC readback was denied. Energy was not analyzed.
 
 `summary.json` retains the paired metrics and identities. `direct-state-analysis.json`
-and `hash-analysis.json` retain compact analyzer outputs. Raw state dumps,
+and `hash-analysis.json` retain compact analyzer outputs; `moe-position89.json`
+and `layer10-position89.json` retain the selected operator/stage checks. Raw state dumps,
 engine logs and telemetry are local-only. The capture emitted roughly 900 MiB
 of diagnostic state/log data; none of those raw captures is included in Git.
 
 Reproduction used the existing `capture_position_state.py` harness with
 `--positions 75,89 --layer all --serial-slot both --generated-tokens 128`, the
 temporary expert profile above, `--exp2f-silu-layer 9 --exp2f-silu-expert
-233`, and accepted-prefix plus batch-GDN hash tracing. Run under
+233`, and accepted-prefix plus batch-GDN hash tracing. The slot-aware MoE
+comparison used the position-89 route/parts capture and paired batch row 1 to
+serial prompt 1. Run under
 `tools/integration/run_control.py` to retain the physical-memory guard.
 
 Phase 5 remains open. This is correctness evidence for one prompt pair, not a
