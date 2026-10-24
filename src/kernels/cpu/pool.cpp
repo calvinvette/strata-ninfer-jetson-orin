@@ -651,6 +651,9 @@ void ExpertPool::drain(int id, ExpertScratch& scratch, uint32_t epoch) {
                     if (fmt.q8_1_reciprocal_silu_expert >= 0 &&
                         fmt.q8_1_reciprocal_silu_expert != mjobs_[e].expert_id)
                         fmt.q8_1_reciprocal_silu = false;
+                    if (fmt.q8_1_exp2f_silu_expert >= 0 &&
+                        fmt.q8_1_exp2f_silu_expert != mjobs_[e].expert_id)
+                        fmt.q8_1_exp2f_silu = false;
                     native_gu_rows(fmt, mjobs_[e].blob, mjobs_[e].nact, mjobs_[e].nt, ff, r0, r1);
                 } else if (q2_native_kernels(nfmt_->d_type)) {
                     // Q2_0 down (most IQ layers): the AVX-512 kernel, ggml-cpu has only a scalar one on x86

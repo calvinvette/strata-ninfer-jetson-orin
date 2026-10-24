@@ -21,6 +21,10 @@ p.add_argument('--expert-cache-slots', '--expert-cache-mib', type=int, default=1
                help='requested Strata expert-cache slot count (legacy MiB alias accepted)')
 p.add_argument('--expert-profile', type=Path,
                help='optional static residency profile used by serial and batch controls')
+p.add_argument('--exp2f-silu-layer', type=int,
+               help='opt in to host exp2f SiLU for CPU Q8_1 experts on this model layer')
+p.add_argument('--exp2f-silu-expert', type=int,
+               help='optional model expert ID filter for --exp2f-silu-layer')
 p.add_argument('--layer', default='all', help='GDN model layer or all')
 p.add_argument('--stage-layer', type=int, help='also capture GDN intermediate fields for this layer')
 p.add_argument('--moe-layer', type=int, help='also capture MoE route/parts/output and owner records for this layer')
@@ -45,6 +49,8 @@ if opts.generated_tokens < 1:
     p.error('--generated-tokens must be positive')
 if opts.prompt_offset < 0:
     p.error('--prompt-offset must be nonnegative')
+if opts.exp2f_silu_expert is not None and opts.exp2f_silu_layer is None:
+    p.error('--exp2f-silu-expert requires --exp2f-silu-layer')
 positions = opts.positions or str(opts.position)
 if opts.boundary_layer is not None and ',' in positions:
     p.error('--boundary-layer currently supports one --position at a time')
@@ -71,6 +77,10 @@ def make_env(name, is_batch=False):
                 'STRATA_PREFILL_CPU_SHARE': '0', 'STRATA_VERIFY_DUMP_GDN_COMMIT_LAYER': str(opts.layer),
                 'STRATA_VERIFY_DUMP_GDN_COMMIT_POSITIONS': positions,
                 'STRATA_VERIFY_DUMP_GDN_COMMIT_PATH': str((out/f'{name}.stgcmt').resolve())})
+    if opts.exp2f_silu_layer is not None:
+        env['STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_LAYER'] = str(opts.exp2f_silu_layer)
+    if opts.exp2f_silu_expert is not None:
+        env['STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_EXPERT'] = str(opts.exp2f_silu_expert)
     if opts.stage_layer is not None:
         env.update({'STRATA_VERIFY_DUMP_GDN_LAYER': str(opts.stage_layer),
                     'STRATA_VERIFY_DUMP_GDN_PATH': str((out/f'{name}.stgdiag').resolve()),
@@ -155,6 +165,9 @@ result = {'capture_positions': [int(x) for x in positions.split(',')],
                       'trace_batch_gdn_hashes': opts.trace_batch_gdn_hashes,
                       'batch_gdn_hash_range': [opts.batch_gdn_hash_from, opts.batch_gdn_hash_to],
                       'STRATA_NATIVE_CPU_Q8_1_DOT': 'all', 'STRATA_IQ_MT_MIN': '1'}}
+result['exp2f_silu'] = ({'layer': opts.exp2f_silu_layer,
+                         'expert': opts.exp2f_silu_expert}
+                        if opts.exp2f_silu_layer is not None else None)
 (out/'result.json').write_text(json.dumps(result, indent=2)+'\n')
 print(json.dumps({'positions': [int(x) for x in positions.split(',')],
                   'serial_tokens': {key: len(value['tokens']) for key, value in serial_out.items()},

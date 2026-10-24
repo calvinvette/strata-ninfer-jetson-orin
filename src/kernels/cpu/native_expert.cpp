@@ -464,6 +464,26 @@ bool native_fmt(int gu_type, int d_type, int64_t n_embd, int64_t n_ff, NativeFmt
         err = "native experts: STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_EXPERT must be a non-negative expert number";
         return false;
     }
+    const char* exp2f_silu_layer = std::getenv("STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_LAYER");
+    const char* exp2f_silu_expert = std::getenv("STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_EXPERT");
+    if (exp2f_silu_layer != nullptr) {
+        int selected_layer = -1;
+        if (!parse_layer_selector(exp2f_silu_layer, selected_layer)) {
+            err = "native experts: STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_LAYER must be a non-negative layer number";
+            return false;
+        }
+        f.q8_1_exp2f_silu = selected_layer == layer && f.gu_act == GGML_TYPE_Q8_1 &&
+                            f.d_act == GGML_TYPE_Q8_1;
+    }
+    if (exp2f_silu_expert != nullptr &&
+        !parse_layer_selector(exp2f_silu_expert, f.q8_1_exp2f_silu_expert)) {
+        err = "native experts: STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_EXPERT must be a non-negative expert number";
+        return false;
+    }
+    if (f.q8_1_exp2f_silu && f.q8_1_reciprocal_silu) {
+        err = "native experts: exp2f and reciprocal SiLU probes cannot both select the same layer";
+        return false;
+    }
     f.n_embd = n_embd;
     f.n_ff = n_ff;
     f.gu_row = ggml_row_size((ggml_type) gu_type, n_embd);
@@ -538,7 +558,11 @@ void native_gu_rows(const NativeFmt& f, const uint8_t* blob, const void* const* 
                                  f.gu_type == GGML_TYPE_IQ3_XXS ? q8_1_iq3_xxs_cuda_dot : q8_1_iq3_s_cuda_dot;
                 const float g = dot(gr, xq, (int) f.n_embd);
                 const float u = dot(ur, xq, (int) f.n_embd);
-                if (f.q8_1_reciprocal_silu) {
+                if (f.q8_1_exp2f_silu) {
+                    constexpr float kLog2E = 1.4426950408889634f;
+                    const float e = std::exp2((-g) * kLog2E);
+                    ff[t][r] = (g / (1.f + e)) * u;
+                } else if (f.q8_1_reciprocal_silu) {
                     const float sigmoid = 1.f / (1.f + std::exp(-g));
                     ff[t][r] = (g * sigmoid) * u;
                 } else {

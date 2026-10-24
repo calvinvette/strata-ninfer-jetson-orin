@@ -1,0 +1,455 @@
+{
+  "schema": 1,
+  "scope": "Distinct exact captured Coder IQ1_M activation rows at layer 9 where expert 233 is routed; replayed through native CPU and CUDA operator oracle.",
+  "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
+  "source_commit": "cb8ed9980c685e4d5077dcdf8707017f22e111ba",
+  "source_sha256": {
+    "include/strata/kernels/cpu/native_expert.hpp": "08096702f380c5f1c7f15c7c87aaf9c87b6b8526568744b9cd9bae543b779ffc",
+    "src/kernels/cpu/native_expert.cpp": "a953a7df61b17612897ad71df6139f8870b180683300e6ee61a5da676fbd7ae0",
+    "src/kernels/cpu/pool.cpp": "41c22c698f6c92449148eb70af3ab438b8354f012ae6aed92db407c6665d7a8a",
+    "src/kernels/native_expert_parity.cpp": "1c40734575398e098aab120d2d156f4d1dc5f62a8b11925aabe7f490a6eb33bd"
+  },
+  "native_expert_parity_binary_sha256": "0c0eb4fd6b5a7f5904a82caf34990009eb373f1e4082d2420a9fd02d1a0b4efe",
+  "activation_count": 7,
+  "notes": [
+    "Rows from separate capture files were deduplicated by exact float32 activation bytes.",
+    "Owner codes in source captures are metadata; the CPU/GPU replay is independent and does not assert the captured service used either route.",
+    "This operator-only diagnostic does not establish end-to-end persistent-state parity or a runtime change."
+  ],
+  "activations": [
+    {
+      "activation_sha256": "0475d4464b64ecea6ac2acc7524ce05e8852333500dbd746ffbadec6f6570181",
+      "references": [
+        {
+          "path": "bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer9-cache3000-position-83/batch.owners.jsonl",
+          "line": 3,
+          "position": 83,
+          "token_id": 11,
+          "owner_code": 0
+        },
+        {
+          "path": "bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer9-cache3000-position-83/serial.owners.jsonl",
+          "line": 2,
+          "position": 83,
+          "token_id": 11,
+          "owner_code": 0
+        },
+        {
+          "path": "bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer9-cache3000-position-83-repeat/batch.owners.jsonl",
+          "line": 3,
+          "position": 83,
+          "token_id": 11,
+          "owner_code": 0
+        },
+        {
+          "path": "bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer9-cache3000-position-83-repeat/serial.owners.jsonl",
+          "line": 2,
+          "position": 83,
+          "token_id": 11,
+          "owner_code": 0
+        }
+      ],
+      "native_expert_parity_returncode": 0,
+      "independent_hidden_f32_reconstruction_mismatches": 0,
+      "hidden_q8_1_blocks_different_cpu_vs_gpu": 0,
+      "host_exp2f_hidden_q8_1_blocks_different_vs_cuda": 0,
+      "host_exp2f_cpu_down_words_different_vs_cuda": 0,
+      "host_exp2f_cpu_down_max_abs_vs_cuda": 0.0,
+      "host_exp2f_cpu_down_relative_l2_vs_cuda": 0.0,
+      "cpu_gpu_gate_bitwise_equal": true,
+      "cpu_gpu_up_bitwise_equal": true,
+      "cpu_gpu_hidden_q8_1_bitwise_equal": true,
+      "cpu_gpu_final_output_bitwise_equal": true,
+      "cpu_gpu_hidden_f32_differing_values": 264,
+      "cpu_gpu_hidden_f32_max_abs": 2.9802322387695312e-08,
+      "host_quantizer_candidates": {
+        "libm_expf": {
+          "different_cuda_hidden_f32_values": 264,
+          "different_q8_1_blocks": 0,
+          "q8_1_field_block_mismatches": {
+            "d_scale_blocks": 0,
+            "sum_blocks": 0,
+            "code_blocks": 0
+          }
+        },
+        "host_exp2f_log2e": {
+          "different_cuda_hidden_f32_values": 282,
+          "different_q8_1_blocks": 0,
+          "q8_1_field_block_mismatches": {
+            "d_scale_blocks": 0,
+            "sum_blocks": 0,
+            "code_blocks": 0
+          }
+        }
+      }
+    },
+    {
+      "activation_sha256": "147149408fd67d35871807df737f29c7f77368aa281ab904062ee86494bdb4c5",
+      "references": [
+        {
+          "path": "bench/results/2026-10-24-phase5-coder-layer39-expert50-residency-intervention/layer9-to10-position84/batch.owners.jsonl",
+          "line": 3,
+          "position": 84,
+          "token_id": 1608,
+          "owner_code": -1
+        },
+        {
+          "path": "bench/results/2026-10-24-phase5-coder-layer39-expert50-residency-intervention/layer9-to10-position84/serial-slot-1.owners.jsonl",
+          "line": 2,
+          "position": 84,
+          "token_id": 1608,
+          "owner_code": 0
+        },
+        {
+          "path": "bench/results/2026-10-24-phase5-coder-layer39-expert50-residency-intervention/state-positions83-84-run2/batch.owners.jsonl",
+          "line": 5,
+          "position": 84,
+          "token_id": 1608,
+          "owner_code": -1
+        },
+        {
+          "path": "bench/results/2026-10-24-phase5-coder-layer39-expert50-residency-intervention/state-positions83-84-run2/serial-slot-1.owners.jsonl",
+          "line": 3,
+          "position": 84,
+          "token_id": 1608,
+          "owner_code": 0
+        }
+      ],
+      "native_expert_parity_returncode": 0,
+      "independent_hidden_f32_reconstruction_mismatches": 0,
+      "hidden_q8_1_blocks_different_cpu_vs_gpu": 0,
+      "host_exp2f_hidden_q8_1_blocks_different_vs_cuda": 0,
+      "host_exp2f_cpu_down_words_different_vs_cuda": 0,
+      "host_exp2f_cpu_down_max_abs_vs_cuda": 0.0,
+      "host_exp2f_cpu_down_relative_l2_vs_cuda": 0.0,
+      "cpu_gpu_gate_bitwise_equal": true,
+      "cpu_gpu_up_bitwise_equal": true,
+      "cpu_gpu_hidden_q8_1_bitwise_equal": true,
+      "cpu_gpu_final_output_bitwise_equal": true,
+      "cpu_gpu_hidden_f32_differing_values": 276,
+      "cpu_gpu_hidden_f32_max_abs": 2.9802322387695312e-08,
+      "host_quantizer_candidates": {
+        "libm_expf": {
+          "different_cuda_hidden_f32_values": 276,
+          "different_q8_1_blocks": 0,
+          "q8_1_field_block_mismatches": {
+            "d_scale_blocks": 0,
+            "sum_blocks": 0,
+            "code_blocks": 0
+          }
+        },
+        "host_exp2f_log2e": {
+          "different_cuda_hidden_f32_values": 285,
+          "different_q8_1_blocks": 0,
+          "q8_1_field_block_mismatches": {
+            "d_scale_blocks": 0,
+            "sum_blocks": 0,
+            "code_blocks": 0
+          }
+        }
+      }
+    },
+    {
+      "activation_sha256": "27d6ff9ff3f4878c83a88abb380eda79061bc2e3080d8b87474a27971514ed63",
+      "references": [
+        {
+          "path": "bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/heldout-pair-2-3/serial-slot-0.owners.jsonl",
+          "line": 2,
+          "position": 83,
+          "token_id": 1149,
+          "owner_code": 0
+        }
+      ],
+      "native_expert_parity_returncode": 0,
+      "independent_hidden_f32_reconstruction_mismatches": 0,
+      "hidden_q8_1_blocks_different_cpu_vs_gpu": 0,
+      "host_exp2f_hidden_q8_1_blocks_different_vs_cuda": 0,
+      "host_exp2f_cpu_down_words_different_vs_cuda": 0,
+      "host_exp2f_cpu_down_max_abs_vs_cuda": 0.0,
+      "host_exp2f_cpu_down_relative_l2_vs_cuda": 0.0,
+      "cpu_gpu_gate_bitwise_equal": true,
+      "cpu_gpu_up_bitwise_equal": true,
+      "cpu_gpu_hidden_q8_1_bitwise_equal": true,
+      "cpu_gpu_final_output_bitwise_equal": true,
+      "cpu_gpu_hidden_f32_differing_values": 246,
+      "cpu_gpu_hidden_f32_max_abs": 1.4901161193847656e-08,
+      "host_quantizer_candidates": {
+        "libm_expf": {
+          "different_cuda_hidden_f32_values": 246,
+          "different_q8_1_blocks": 0,
+          "q8_1_field_block_mismatches": {
+            "d_scale_blocks": 0,
+            "sum_blocks": 0,
+            "code_blocks": 0
+          }
+        },
+        "host_exp2f_log2e": {
+          "different_cuda_hidden_f32_values": 240,
+          "different_q8_1_blocks": 0,
+          "q8_1_field_block_mismatches": {
+            "d_scale_blocks": 0,
+            "sum_blocks": 0,
+            "code_blocks": 0
+          }
+        }
+      }
+    },
+    {
+      "activation_sha256": "40a0c3ba012d0dc45c07fa1bc0d18c2f5355c003be0f621058d5d2433ee08158",
+      "references": [
+        {
+          "path": "bench/results/2026-10-24-phase5-coder-layer39-expert50-residency-intervention/layer9-to10-position84/batch.owners.jsonl",
+          "line": 2,
+          "position": 84,
+          "token_id": 11,
+          "owner_code": -1
+        },
+        {
+          "path": "bench/results/2026-10-24-phase5-coder-layer39-expert50-residency-intervention/state-positions83-84-run2/batch.owners.jsonl",
+          "line": 3,
+          "position": 84,
+          "token_id": 11,
+          "owner_code": -1
+        }
+      ],
+      "native_expert_parity_returncode": 0,
+      "independent_hidden_f32_reconstruction_mismatches": 0,
+      "hidden_q8_1_blocks_different_cpu_vs_gpu": 0,
+      "host_exp2f_hidden_q8_1_blocks_different_vs_cuda": 0,
+      "host_exp2f_cpu_down_words_different_vs_cuda": 0,
+      "host_exp2f_cpu_down_max_abs_vs_cuda": 0.0,
+      "host_exp2f_cpu_down_relative_l2_vs_cuda": 0.0,
+      "cpu_gpu_gate_bitwise_equal": true,
+      "cpu_gpu_up_bitwise_equal": true,
+      "cpu_gpu_hidden_q8_1_bitwise_equal": true,
+      "cpu_gpu_final_output_bitwise_equal": true,
+      "cpu_gpu_hidden_f32_differing_values": 258,
+      "cpu_gpu_hidden_f32_max_abs": 2.9802322387695312e-08,
+      "host_quantizer_candidates": {
+        "libm_expf": {
+          "different_cuda_hidden_f32_values": 258,
+          "different_q8_1_blocks": 0,
+          "q8_1_field_block_mismatches": {
+            "d_scale_blocks": 0,
+            "sum_blocks": 0,
+            "code_blocks": 0
+          }
+        },
+        "host_exp2f_log2e": {
+          "different_cuda_hidden_f32_values": 261,
+          "different_q8_1_blocks": 0,
+          "q8_1_field_block_mismatches": {
+            "d_scale_blocks": 0,
+            "sum_blocks": 0,
+            "code_blocks": 0
+          }
+        }
+      }
+    },
+    {
+      "activation_sha256": "7ce8c948912b5f39471d5809fae4672f168e0cfc1b1e404be211f3ec600d77b3",
+      "references": [
+        {
+          "path": "bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer9-moe-position-83/batch.owners.jsonl",
+          "line": 3,
+          "position": 83,
+          "token_id": 11,
+          "owner_code": -1
+        },
+        {
+          "path": "bench/results/2026-10-23-phase5-coder-two-live-target-q8all/layer9-moe-position-83/serial.owners.jsonl",
+          "line": 2,
+          "position": 83,
+          "token_id": 11,
+          "owner_code": 0
+        },
+        {
+          "path": "bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/exp2f-cpu-owner-two-live/batch.owners.jsonl",
+          "line": 3,
+          "position": 83,
+          "token_id": 11,
+          "owner_code": -1
+        },
+        {
+          "path": "bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/exp2f-cpu-owner-two-live/serial-slot-1.owners.jsonl",
+          "line": 2,
+          "position": 83,
+          "token_id": 11,
+          "owner_code": 0
+        },
+        {
+          "path": "bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/exp2f-optin-two-live/batch.owners.jsonl",
+          "line": 3,
+          "position": 83,
+          "token_id": 11,
+          "owner_code": 0
+        },
+        {
+          "path": "bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/exp2f-optin-two-live/serial-slot-1.owners.jsonl",
+          "line": 2,
+          "position": 83,
+          "token_id": 11,
+          "owner_code": 0
+        },
+        {
+          "path": "bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/run/batch.owners.jsonl",
+          "line": 3,
+          "position": 83,
+          "token_id": 11,
+          "owner_code": 0
+        },
+        {
+          "path": "bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/run/serial-slot-1.owners.jsonl",
+          "line": 2,
+          "position": 83,
+          "token_id": 11,
+          "owner_code": 0
+        },
+        {
+          "path": "bench/results/2026-10-24-phase5-coder-layer39-expert50-residency-intervention/state-positions83-84-run2/batch.owners.jsonl",
+          "line": 4,
+          "position": 83,
+          "token_id": 11,
+          "owner_code": -1
+        },
+        {
+          "path": "bench/results/2026-10-24-phase5-coder-layer39-expert50-residency-intervention/state-positions83-84-run2/serial-slot-1.owners.jsonl",
+          "line": 2,
+          "position": 83,
+          "token_id": 11,
+          "owner_code": 0
+        }
+      ],
+      "native_expert_parity_returncode": 0,
+      "independent_hidden_f32_reconstruction_mismatches": 0,
+      "hidden_q8_1_blocks_different_cpu_vs_gpu": 3,
+      "host_exp2f_hidden_q8_1_blocks_different_vs_cuda": 0,
+      "host_exp2f_cpu_down_words_different_vs_cuda": 0,
+      "host_exp2f_cpu_down_max_abs_vs_cuda": 0.0,
+      "host_exp2f_cpu_down_relative_l2_vs_cuda": 0.0,
+      "cpu_gpu_gate_bitwise_equal": true,
+      "cpu_gpu_up_bitwise_equal": true,
+      "cpu_gpu_hidden_q8_1_bitwise_equal": false,
+      "cpu_gpu_final_output_bitwise_equal": false,
+      "cpu_gpu_hidden_f32_differing_values": 258,
+      "cpu_gpu_hidden_f32_max_abs": 2.9802322387695312e-08,
+      "host_quantizer_candidates": {
+        "libm_expf": {
+          "different_cuda_hidden_f32_values": 258,
+          "different_q8_1_blocks": 3,
+          "q8_1_field_block_mismatches": {
+            "d_scale_blocks": 3,
+            "sum_blocks": 0,
+            "code_blocks": 0
+          }
+        },
+        "host_exp2f_log2e": {
+          "different_cuda_hidden_f32_values": 264,
+          "different_q8_1_blocks": 0,
+          "q8_1_field_block_mismatches": {
+            "d_scale_blocks": 0,
+            "sum_blocks": 0,
+            "code_blocks": 0
+          }
+        }
+      }
+    },
+    {
+      "activation_sha256": "b426c044fec3546f75fa28c38cfde8253874c234548c5719c5fd42471ffc56cf",
+      "references": [
+        {
+          "path": "bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/heldout-pair-2-3/batch.owners.jsonl",
+          "line": 3,
+          "position": 83,
+          "token_id": 1149,
+          "owner_code": 0
+        }
+      ],
+      "native_expert_parity_returncode": 0,
+      "independent_hidden_f32_reconstruction_mismatches": 0,
+      "hidden_q8_1_blocks_different_cpu_vs_gpu": 0,
+      "host_exp2f_hidden_q8_1_blocks_different_vs_cuda": 0,
+      "host_exp2f_cpu_down_words_different_vs_cuda": 0,
+      "host_exp2f_cpu_down_max_abs_vs_cuda": 0.0,
+      "host_exp2f_cpu_down_relative_l2_vs_cuda": 0.0,
+      "cpu_gpu_gate_bitwise_equal": true,
+      "cpu_gpu_up_bitwise_equal": true,
+      "cpu_gpu_hidden_q8_1_bitwise_equal": true,
+      "cpu_gpu_final_output_bitwise_equal": true,
+      "cpu_gpu_hidden_f32_differing_values": 234,
+      "cpu_gpu_hidden_f32_max_abs": 2.9802322387695312e-08,
+      "host_quantizer_candidates": {
+        "libm_expf": {
+          "different_cuda_hidden_f32_values": 234,
+          "different_q8_1_blocks": 0,
+          "q8_1_field_block_mismatches": {
+            "d_scale_blocks": 0,
+            "sum_blocks": 0,
+            "code_blocks": 0
+          }
+        },
+        "host_exp2f_log2e": {
+          "different_cuda_hidden_f32_values": 270,
+          "different_q8_1_blocks": 0,
+          "q8_1_field_block_mismatches": {
+            "d_scale_blocks": 0,
+            "sum_blocks": 0,
+            "code_blocks": 0
+          }
+        }
+      }
+    },
+    {
+      "activation_sha256": "ffc731ca2ea76457c42a30713406aea3127d8d4ff12d52cb7e53bf5dc8c0ae27",
+      "references": [
+        {
+          "path": "bench/results/2026-10-24-phase5-coder-layer39-expert50-residency-intervention/layer9-to10-position84/serial-slot-0.owners.jsonl",
+          "line": 2,
+          "position": 84,
+          "token_id": 11,
+          "owner_code": 0
+        },
+        {
+          "path": "bench/results/2026-10-24-phase5-coder-layer39-expert50-residency-intervention/state-positions83-84-run2/serial-slot-0.owners.jsonl",
+          "line": 3,
+          "position": 84,
+          "token_id": 11,
+          "owner_code": 0
+        }
+      ],
+      "native_expert_parity_returncode": 0,
+      "independent_hidden_f32_reconstruction_mismatches": 0,
+      "hidden_q8_1_blocks_different_cpu_vs_gpu": 0,
+      "host_exp2f_hidden_q8_1_blocks_different_vs_cuda": 0,
+      "host_exp2f_cpu_down_words_different_vs_cuda": 0,
+      "host_exp2f_cpu_down_max_abs_vs_cuda": 0.0,
+      "host_exp2f_cpu_down_relative_l2_vs_cuda": 0.0,
+      "cpu_gpu_gate_bitwise_equal": true,
+      "cpu_gpu_up_bitwise_equal": true,
+      "cpu_gpu_hidden_q8_1_bitwise_equal": true,
+      "cpu_gpu_final_output_bitwise_equal": true,
+      "cpu_gpu_hidden_f32_differing_values": 321,
+      "cpu_gpu_hidden_f32_max_abs": 2.9802322387695312e-08,
+      "host_quantizer_candidates": {
+        "libm_expf": {
+          "different_cuda_hidden_f32_values": 321,
+          "different_q8_1_blocks": 0,
+          "q8_1_field_block_mismatches": {
+            "d_scale_blocks": 0,
+            "sum_blocks": 0,
+            "code_blocks": 0
+          }
+        },
+        "host_exp2f_log2e": {
+          "different_cuda_hidden_f32_values": 294,
+          "different_q8_1_blocks": 0,
+          "q8_1_field_block_mismatches": {
+            "d_scale_blocks": 0,
+            "sum_blocks": 0,
+            "code_blocks": 0
+          }
+        }
+      }
+    }
+  ]
+}

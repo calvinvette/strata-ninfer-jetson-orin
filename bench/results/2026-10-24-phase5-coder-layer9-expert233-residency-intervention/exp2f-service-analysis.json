@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "scope": "Opt-in host exp2f SiLU service-path diagnostic for layer 9 / expert 233; two-live Coder IQ1_M, 72 generated tokens.",
+  "source_commit": "cb8ed9980c685e4d5077dcdf8707017f22e111ba",
+  "source_sha256": {
+    "include/strata/kernels/cpu/native_expert.hpp": "08096702f380c5f1c7f15c7c87aaf9c87b6b8526568744b9cd9bae543b779ffc",
+    "src/kernels/cpu/native_expert.cpp": "a953a7df61b17612897ad71df6139f8870b180683300e6ee61a5da676fbd7ae0",
+    "src/kernels/cpu/pool.cpp": "41c22c698f6c92449148eb70af3ab438b8354f012ae6aed92db407c6665d7a8a",
+    "src/kernels/native_expert_parity.cpp": "1c40734575398e098aab120d2d156f4d1dc5f62a8b11925aabe7f490a6eb33bd"
+  },
+  "strata_binary_sha256": "ad4b2354fe98f0e4128cf9a9ed70488fef362207dd1f7e94555a8ba35d8985df",
+  "profile_sha256": "1f03ed71cdac371e07480a3b4473e93be5cdfc9afb910f2fdac8491ac555502e",
+  "profile_expert_233_rank": 12287,
+  "model_revision": "5348543e0147355ac9cbcb031184a3546350988e",
+  "environment": {
+    "STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_LAYER": "9",
+    "STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_EXPERT": "233",
+    "STRATA_NATIVE_CPU_Q8_1_DOT": "all",
+    "STRATA_IQ_MT_MIN": "1"
+  },
+  "route_evidence": {
+    "layer": 9,
+    "position": 83,
+    "batch_expert_233_owner_code": -1,
+    "serial_expert_233_owner_code": 0,
+    "activation_sha256": "7ce8c948912b5f39471d5809fae4672f168e0cfc1b1e404be211f3ec600d77b3"
+  },
+  "output_and_state_vs_rank0_run": {
+    "slot-0": {
+      "serial_tokens_equal_rank0_run": true,
+      "batch_tokens_equal_rank0_run": true,
+      "position83_state_first_changed_layer": 5
+    },
+    "slot-1": {
+      "serial_tokens_equal_rank0_run": true,
+      "batch_tokens_equal_rank0_run": true,
+      "position83_state_first_changed_layer": null
+    }
+  },
+  "accepted_prefix_hashes": {
+    "0": {
+      "first_mismatch": {
+        "batch_position": 75,
+        "serial_prefix_position": 73,
+        "first_gdn_allocation_ordinal": 24,
+        "different_gdn_allocations": 12,
+        "total_gdn_allocations": 36
+      },
+      "compared_positions": 69
+    },
+    "1": {
+      "first_mismatch": {
+        "batch_position": 89,
+        "serial_prefix_position": 87,
+        "first_gdn_allocation_ordinal": 9,
+        "different_gdn_allocations": 27,
+        "total_gdn_allocations": 36
+      },
+      "compared_positions": 70
+    }
+  },
+  "notes": [
+    "Owner code -1 is CPU and 0 is GPU.",
+    "The layer-9/position-83 row is one of seven exact activation rows in activation-rounding-sweep.json; the exp2f oracle matches CUDA hidden Q8_1 and CPU down output on all seven.",
+    "Rank-0 run is a different residency profile, not a same-profile paired control. Equality is a bounded regression observation.",
+    "Position-83 state matches the rank-0 run per prompt: slot 0 first differs at layer 5; slot 1 is exact. Accepted-prefix mismatch locations are unchanged.",
+    "No default changed. This does not close Phase 5 or establish whole-model CPU/GPU parity. Large tensor captures are local only."
+  ],
+  "build_and_test_evidence": {
+    "cuda_orin": {
+      "targets": [
+        "native_expert_parity",
+        "strata"
+      ],
+      "result": "built",
+      "test": "native_expert_parity_q8_1_selector_contract passed",
+      "runtime": "two-live 72-token service replay on Orin"
+    },
+    "hip_maestro1": {
+      "targets": [
+        "native_expert_parity",
+        "strata"
+      ],
+      "result": "built and linked",
+      "checks": [
+        "strata --help passed",
+        "native_expert_parity --q8_1-selector-contract passed"
+      ],
+      "limitation": "x86 build evidence only; no HIP accelerator execution"
+    },
+    "sycl_maestro1": {
+      "targets": [
+        "native_expert_parity",
+        "strata"
+      ],
+      "result": "compiled and linked with MKLROOT and LIBRARY_PATH set to installed oneAPI MKL 2026.1",
+      "runtime": "strata --help unavailable: no SYCL device on maestro1"
+    }
+  }
+}

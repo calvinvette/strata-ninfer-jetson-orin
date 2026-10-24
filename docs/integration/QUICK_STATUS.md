@@ -599,3 +599,15 @@ FP16 interval crossing zero. On the near-limit task, system-rail energy/token
 rose about 0.5% for both KV formats. These are three-block rail estimates that
 include idle/background load; they are not process-attributed or summed device
 energy. Phase 6 energy/Pareto work remains open. [Report](../../bench/results/2026-10-23-phase6-coder-mtp3-kv-length-screen3/README.md).
+
+### Latest Phase 5 check: layer-9 expert-233 exp2f candidate
+
+Seven captured activations had exact CPU/CUDA gate/up outputs. Default CPU
+SwiGLU matched CUDA's packed hidden Q8_1 and final output on six; an opt-in host
+exp2f candidate matched on all seven. In a two-live 72-token service replay,
+expert 233 was confirmed CPU-owned at layer 9 / position 83. The direct
+committed GDN state reproduced the previous run's prompt-specific results
+(slot 1 exact; slot 0 first differed at layer 5), and both output sequences
+matched the previous rank-0 run. Later accepted-prefix state divergence was
+unchanged (batch positions 75 and 89), so Phase 5 remains open. Details and
+limits are in the [experiment report](../../bench/results/2026-10-24-phase5-coder-layer9-expert233-residency-intervention/README.md).

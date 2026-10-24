@@ -158,3 +158,48 @@ was available there. The source is not in
 the separate SYCL build. Compact hashes and build identity are in
 `heldout-silu-activation-analysis.json`; raw activation and stage files remain
 in `/tmp`.
+
+## Seven-activation exp2f replay and opt-in service check
+
+The follow-up sweep deduplicated seven captured layer-9/expert-233 Coder
+activations and replayed each through the CPU/CUDA oracle. Gate and up values
+matched bitwise for all seven. Default CPU SwiGLU produced the same hidden
+Q8_1 blocks and final down output as CUDA on six of seven. The diagnostic host
+`exp2f((-g)*log2(e))` candidate reproduced CUDA's packed hidden Q8_1 blocks and
+CPU down output on all seven. This is a small captured-activation set, not a
+general numerical guarantee. See `activation-rounding-sweep.json` and
+`sweep_activation_rounding.py`.
+
+An opt-in CPU selector was then added for a selected model layer and optional
+expert ID: `STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_LAYER` and
+`STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_EXPERT`. It only affects the native CPU
+Q8_1 activation path and leaves defaults unchanged. A two-live 72-token
+service replay used a diagnostic profile with expert 233 at rank 12,287
+(profile SHA-256 `1f03ed71cdac371e07480a3b4473e93be5cdfc9afb910f2fdac8491ac555502e`).
+The captured batch row at layer 9 / position 83 routed expert 233 to CPU
+(owner code `-1`); its exact activation is the original seven-row sample
+`7ce8c948…d77b3`. The serial row remained GPU-owned. Both output sequences
+matched the existing rank-0 residency run. The direct committed GDN state at
+position 83 reproduced the same prompt-specific results: slot 1 was bit-
+identical, while slot 0 first differed at layer 5.
+
+The full accepted-prefix trace still first diverged at batch position 75 for
+slot 0 and position 89 for slot 1, exactly as in the rank-0 run. Thus the
+targeted CPU service branch executed and reproduced the sampled output and
+prompt-specific state results, but did not resolve later multi-live state
+drift. No default was
+changed and Phase 5 remains open. To reproduce, rebuild `strata`, use
+`capture_position_state.py --exp2f-silu-layer 9 --exp2f-silu-expert 233`
+with the Coder settings from the run record, and place expert 233 outside the
+initial GPU residency set to exercise the CPU branch. The large `.stgcmt`,
+`.stgdiag`, `.stmoe`, and `.stmparts` captures remain local and are not Git
+artifacts. `exp2f-service-analysis.json` keeps compact source/profile/binary
+hashes, route evidence, output comparisons, and accepted-prefix mismatch
+locations. The CUDA `native_expert_parity` and `strata` targets rebuilt, and
+`native_expert_parity_q8_1_selector_contract` passed on Orin. HIP `strata` and
+`native_expert_parity` targets built on maestro1; `strata --help` and the
+selector-contract command passed with the ROCm library path. SYCL `strata` and
+`native_expert_parity` compiled and linked on maestro1 after setting the
+installed MKL 2026.1 `MKLROOT` and `LIBRARY_PATH`; `strata --help` could not run
+because maestro1 has no SYCL device. No HIP or SYCL accelerator execution is
+claimed.

@@ -858,6 +858,56 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
                                         f.gu_type == GGML_TYPE_IQ2_S ? "IQ2_S" : "IQ3_XXS",
                                         gate_diffs, cpu_gate_gpuq.size(), gate_max, gate_l2,
                                         up_diffs, cpu_up_gpuq.size(), up_max, up_l2);
+
+                            // Offline oracle for the host exp2f SiLU hypothesis.
+                            // It consumes CUDA gate/up rows and never serves requests.
+                            if (std::getenv("STRATA_PARITY_TRY_EXP2F_SILU") != nullptr &&
+                                f.d_type == GGML_TYPE_IQ4_NL) {
+                                constexpr float kLog2E = 1.4426950408889634f;
+                                std::vector<float> candidate_hidden((size_t) N * FF);
+                                std::vector<std::vector<uint8_t>> candidate_hq(
+                                    (size_t) N, std::vector<uint8_t>(f.h_bytes));
+                                const void* candidate_hq_rows[N];
+                                std::vector<float> candidate_down((size_t) N * H);
+                                float* candidate_down_rows[N];
+                                for (int token = 0; token < N; ++token) {
+                                    for (int64_t row = 0; row < FF; ++row) {
+                                        const size_t at = (size_t) token * FF + (size_t) row;
+                                        const float g = gpu_gate[at];
+                                        const float u = gpu_up[at];
+                                        const float e = std::exp2((-g) * kLog2E);
+                                        candidate_hidden[at] = (g / (1.f + e)) * u;
+                                    }
+                                    cpu::native_quant_h(f, candidate_hidden.data() + (size_t) token * FF,
+                                                        candidate_hq[(size_t) token].data());
+                                    candidate_hq_rows[token] = candidate_hq[(size_t) token].data();
+                                    candidate_down_rows[token] = candidate_down.data() + (size_t) token * H;
+                                }
+                                cpu::native_down_rows(f, blob.data(), candidate_hq_rows, N,
+                                                      candidate_down_rows, 0, (int) H);
+                                const size_t blocks_per_token = f.h_bytes / 36;
+                                size_t candidate_q8_blocks_differ = 0, candidate_output_words_differ = 0;
+                                double candidate_sum_sq = 0.0, candidate_ref_sq = 0.0;
+                                float candidate_max_abs = 0.f;
+                                for (int token = 0; token < N; ++token)
+                                    for (size_t b = 0; b < blocks_per_token; ++b)
+                                        candidate_q8_blocks_differ += std::memcmp(
+                                            candidate_hq[(size_t) token].data() + b * 36,
+                                            gpu_hq.data() + (size_t) token * f.h_bytes + b * 36, 36) != 0;
+                                for (size_t i = 0; i < candidate_down.size(); ++i) {
+                                    const float delta = candidate_down[i] - got_g[i];
+                                    candidate_output_words_differ +=
+                                        std::memcmp(&candidate_down[i], &got_g[i], sizeof(float)) != 0;
+                                    candidate_max_abs = std::max(candidate_max_abs, std::fabs(delta));
+                                    candidate_sum_sq += (double) delta * delta;
+                                    candidate_ref_sq += (double) got_g[i] * got_g[i];
+                                }
+                                std::printf("          host exp2f SiLU-Q8_1 candidate: %zu/%zu hidden blocks differ; "
+                                            "CPU down vs CUDA %zu/%zu words differ (max %.3g, relL2 %.3g)\n",
+                                            candidate_q8_blocks_differ, blocks_per_token * (size_t) N,
+                                            candidate_output_words_differ, candidate_down.size(), candidate_max_abs,
+                                            std::sqrt(candidate_sum_sq / (candidate_ref_sq + 1e-300)));
+                            }
                         }
                     }
                     const size_t blocks = nbytes / 36;
@@ -887,6 +937,7 @@ int check_blob(const cpu::NativeFmt& f, const std::vector<uint8_t>& blob, int se
                     std::printf("          CPU IQ4_NL down on CUDA hidden Q8_1 vs grouped CUDA output: "
                                 "%zu/%zu words differ\n", down_words_differ, cpu_down_from_gpu_hq.size());
                     if (down_words_differ != 0) ++failures;
+
                 }
             }
         }
@@ -1201,6 +1252,51 @@ int check_q8_1_selector_contract() {
     }
     set_env("STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_LAYER", nullptr);
     set_env("STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_EXPERT", nullptr);
+    set_env("STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_LAYER", "3");
+    set_env("STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_EXPERT", "233");
+    for (size_t i = 0; i < std::size(pairs); ++i) {
+        cpu::NativeFmt selected, other_layer;
+        std::string selected_err, other_err;
+        if (!cpu::native_fmt(pairs[i].gu, pairs[i].down, H, FF, selected, selected_err, 3) ||
+            !cpu::native_fmt(pairs[i].gu, pairs[i].down, H, FF, other_layer, other_err, 4)) {
+            std::fprintf(stderr, "exp2f-SiLU selector setup failed for %s: %s / %s\n",
+                         pairs[i].selector, selected_err.c_str(), other_err.c_str());
+            ++failures;
+            continue;
+        }
+        if (!selected.q8_1_exp2f_silu || selected.q8_1_exp2f_silu_expert != 233 ||
+            other_layer.q8_1_exp2f_silu || other_layer.q8_1_exp2f_silu_expert != 233) {
+            std::fprintf(stderr, "exp2f-SiLU layer/expert selector mismatch for %s\n", pairs[i].selector);
+            ++failures;
+        }
+    }
+    set_env("STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_LAYER", "x");
+    err.clear();
+    if (cpu::native_fmt(pairs[0].gu, pairs[0].down, H, FF, invalid, err, 3) ||
+        err.find("STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_LAYER") == std::string::npos) {
+        std::fprintf(stderr, "malformed exp2f-SiLU layer was not rejected clearly: %s\n", err.c_str());
+        ++failures;
+    }
+    set_env("STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_LAYER", "3");
+    set_env("STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_EXPERT", "999999999999999999999999999999");
+    err.clear();
+    if (cpu::native_fmt(pairs[0].gu, pairs[0].down, H, FF, invalid, err, 3) ||
+        err.find("STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_EXPERT") == std::string::npos) {
+        std::fprintf(stderr, "out-of-range exp2f-SiLU expert was not rejected clearly: %s\n", err.c_str());
+        ++failures;
+    }
+    set_env("STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_LAYER", "3");
+    set_env("STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_EXPERT", "233");
+    set_env("STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_LAYER", "3");
+    err.clear();
+    if (cpu::native_fmt(pairs[0].gu, pairs[0].down, H, FF, invalid, err, 3) ||
+        err.find("cannot both select") == std::string::npos) {
+        std::fprintf(stderr, "conflicting SiLU probes were not rejected clearly: %s\n", err.c_str());
+        ++failures;
+    }
+    set_env("STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_LAYER", nullptr);
+    set_env("STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_LAYER", nullptr);
+    set_env("STRATA_NATIVE_CPU_Q8_1_EXP2F_SILU_EXPERT", nullptr);
     std::printf("Q8_1 selector contract: %s (%d failures)\n", failures ? "FAIL" : "PASS", failures);
     return failures;
 }
