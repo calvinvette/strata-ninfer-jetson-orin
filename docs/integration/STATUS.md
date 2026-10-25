@@ -26,6 +26,14 @@ E0 remains open because the pinned binary does not expose its resident-ID map
 and the same-source backend-off/on ablation awaits E2's selector. See the
 [E0 runtime audit](../../bench/results/2026-10-25-phase-e0-expert-runtime-audit/README.md).
 
+E1 has started with the actual Coder Q2_0 GGUF inventory. All 48 layers use Q2_0
+for routed gate/up/down tensors at 2560/640 dimensions, with 512 experts and
+top-10 routing. The new [E1 contract](E1_Q2_0_EXPERT_CONTRACT.md) records the
+byte layout, ownership boundaries, NInfer incompatibilities and scalar oracle;
+its synthetic codec/shape checks pass (3/3). Real-payload CUDA parity and an
+independently linked ggml comparison remain open, so this does not close E1 or
+establish runtime integration.
+
 The current Coder two-live investigation refines that exclusion. At cache 3,000,
 the default path's prompt-1 state first changed at position 105/layer 24 and its
 output first differed at generated token 60. `STRATA_DEC_BATCH=0` retained the

@@ -108,7 +108,9 @@ Do not print a generic NInfer-enabled banner when all work fell back.
 
 ## Implementation sequence
 
-All stages below are pending. Each stage produces a small source/evidence change
+All stages remain open. E1 now has an initial Q2_0 codec/geometry contract and
+passing synthetic scalar checks; its real-payload and independent ggml parity
+requirements remain pending. Each stage produces a small source/evidence change
 and a written decision before the next dependent stage begins.
 
 Execution note (2026-10-25): an isolated `feat/ninfer-expert-e0` worktree now
@@ -118,6 +120,12 @@ still uses Strata's existing expert kernels. E0 remains open because the pinned
 binary does not emit its actual resident-ID map, and the same-source
 backend-off/on ablation must be repeated after E2 adds its selector. See the
 [E0 runtime audit](../../bench/results/2026-10-25-phase-e0-expert-runtime-audit/README.md).
+
+Execution note (2026-10-25): E1 inventory confirmed that all routed Q2_0
+gate/up/down tensors in the Coder Q2_0 artifact use 2560/640 geometry across 48
+layers. The first adapter contract and dependency-free synthetic codec/shape
+oracle are in [E1_Q2_0_EXPERT_CONTRACT.md](E1_Q2_0_EXPERT_CONTRACT.md); 3/3
+checks pass. This is not yet a real-payload or CUDA parity result.
 
 ### E0 — Freeze controls and identify where time is spent
 
