@@ -10,7 +10,8 @@ release profile still excludes unresolved multi-live/adaptive paths and does
 not promote a universal parametric profile. This records tested cells, not general product support.
 
 The [NInfer expert execution plan](NINFER_EXPERT_EXECUTION_PLAN.md) is now in
-progress. On 2026-10-25, E0 captured a supervised Coder IQ1_M decode profile
+progress: E0 remains open, E1 is complete, E2 produced a functional but
+performance-rejected Q2_0 prototype, and E3–E7 remain pending. On 2026-10-25, E0 captured a supervised Coder IQ1_M decode profile
 with Strata's existing expert backend. The opt-in decode timer measured 21.73 ms
 per token-window in CPU expert work and 35.07 ms waiting for GPU reach; a
 separate Nsight diagnostic recorded 255.8 ms of resident gate/up and 174.5 ms
@@ -21,10 +22,12 @@ rates (58.9/16.1 tok/s) with identical 512+64 responses; it is a product
 control, not an NInfer effect estimate. The profile indicates that a
 resident-only kernel substitution leaves CPU-served misses and dense Q6_K work
 untouched; bounded GPU staging for misses remains necessary to test the expected
-larger end-to-end gain. No NInfer runtime code has been promoted or exercised.
-E0 remains open because the pinned binary does not expose its resident-ID map
-and the same-source backend-off/on ablation awaits E2's selector. See the
-[E0 runtime audit](../../bench/results/2026-10-25-phase-e0-expert-runtime-audit/README.md).
+larger end-to-end gain. The later E2 Q2_0 selector has now been exercised, with
+three same-source paired service screens and matched resident-map hashes; it
+was slower than the default. E0 remains open because the pinned binary does not
+expose its resident-ID map and request-phase timing has not been decomposed for
+the target Q2_0 workload. See the [E0 runtime audit](../../bench/results/2026-10-25-phase-e0-expert-runtime-audit/README.md)
+and [E2 paired screen](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/paired-screen/README.md).
 
 E1 completed its first codec contract on 2026-10-25 from the actual Coder Q2_0
 GGUF inventory. All 48 layers use Q2_0

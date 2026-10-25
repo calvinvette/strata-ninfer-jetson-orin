@@ -108,17 +108,22 @@ Do not print a generic NInfer-enabled banner when all work fell back.
 
 ## Implementation sequence
 
-E0 remains open; E1 is complete; E2 is in progress; E3–E7 remain pending. Each
-stage produces a small source/evidence change and a written decision before the
-next dependent stage begins.
+E0 remains open; E1 and E2 are complete; E3–E7 remain pending. E2 completed as
+a bounded functional prototype, while its initial Q2_0 schedule was rejected
+for performance. The default remains Strata and the NInfer path remains
+experimental. Each stage produces a small source/evidence change and a written
+decision before the next dependent stage begins.
 
 Execution note (2026-10-25): an isolated `feat/ninfer-expert-e0` worktree now
 contains a supervised Orin baseline profile, an opt-in current-source residency
 map dump, and a three-pair pinned-product-control screen. The current executable
-still uses Strata's existing expert kernels. E0 remains open because the pinned
-binary does not emit its actual resident-ID map, and the same-source
-backend-off/on ablation must be repeated after E2 adds its selector. See the
-[E0 runtime audit](../../bench/results/2026-10-25-phase-e0-expert-runtime-audit/README.md).
+still uses Strata's existing expert kernels for that pinned-product comparison.
+E2 has since added a three-pair same-source backend-off/on screening set with
+matching resident maps; it rejects the initial NInfer Q2_0 schedule for
+performance. E0 remains open because the pinned binary does not expose its
+resident-ID map and no request-phase critical-path decomposition for the
+selected Q2_0 workload has been completed. See the [E0 runtime audit](../../bench/results/2026-10-25-phase-e0-expert-runtime-audit/README.md)
+and [E2 paired screen](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/paired-screen/README.md).
 
 Execution note (2026-10-25): E1 inventory confirmed that all routed Q2_0
 gate/up/down tensors in the Coder Q2_0 artifact use 2560/640 geometry across 48
@@ -180,8 +185,9 @@ pair, source mapping, lifetimes and numerical oracle. Synthetic codec/geometry/
 route-map checks pass 4/4; 32,768 sampled values from eight real tensors match
 pinned ggml bit-for-bit. A full real-weight FP64 oracle case matches the current
 Strata unquantized reference at relative L1 `3.76e-8`. The activation is a
-captured cross-variant Coder IQ1_M vector; Q2_0-model-native activation coverage
-and NInfer adapter parity remain E2 qualification work.
+captured cross-variant Coder IQ1_M vector. The E2 prototype's direct and grouped
+GPU adapter parity is now recorded, but Q2_0-model-native activation coverage
+remains an open release limitation.
 Retain fixtures under `~/models/` when they contain model payloads. A stub or an
 operator that simply forwards all work to Strata is not the E2 deliverable.
 
@@ -209,7 +215,7 @@ the candidate 3.4% slower on prompt latency, 7.3% slower on decode latency and
 negative screening result, not a performance confirmation; revise or reject
 this schedule before considering a larger confirmation campaign.
 
-### E2 — Execute resident experts with NInfer-derived kernels
+### E2 — Execute resident experts with NInfer-derived kernels — complete 2026-10-25
 
 1. Promote the narrow NInfer compute code into active Strata source ownership
    outside `reference/ninfer/`; adapt it for Flash-Next shape, codec and activations.
@@ -225,9 +231,19 @@ this schedule before considering a larger confirmation campaign.
 5. Run full service requests with dispatch counters proving that the new code ran.
    Confirm resident-kernel on/off effects independently of new transfer policies.
 
-**Exit:** working, numerically qualified resident-expert execution in a real Strata
-request, with explicit coverage and matched operator/request measurements. A slow
-candidate is recorded and revised or rejected; its activation alone is not a win.
+**Exit:** satisfied for a bounded Q2_0/Q2_0 functional prototype. The strict
+real-model request exercised the selected CUDA path; scalar and grouped GPU
+outputs passed their independent/current-backend checks; matched one-token
+operator and three-block same-residency service screens were recorded. The
+screening result rejected this schedule: operator median was 3.50x slower, and
+the service median paired changes were +3.4% prompt latency, +7.3% decode
+latency and +4.4% client completion time. This closes the implementation audit
+for the prototype, not the performance goal. Do not promote it as an optimized
+backend or begin E3 by assuming this schedule is suitable. Exact service route
+IDs, broad edge cases, model-native activations, kernel resource breakdown and
+other backends remain open release limitations. Evidence: [E2 implementation
+report](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/README.md)
+and [paired screen](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/paired-screen/README.md).
 
 ### E3 — Feed missing active experts to the GPU backend
 
