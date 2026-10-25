@@ -67,6 +67,20 @@ range checks. This establishes a repeatable oracle fixture for real weights and
 a representative activation; it does not validate a runtime kernel or the
 Q2_0 model's own activation distribution.
 
+The same `(layer 0, expert 32)` case was then run through the current Strata
+`native_expert_parity` CUDA executable using that activation. CUDA weight
+dequantization matched ggml for all 4,915,200 values bit-for-bit, and the harness
+reported no failures. Comparing the scalar oracle output to the harness's
+unquantized float output gave relative L1 `3.76e-8`, max absolute difference
+`4.31e-9`, and RMS difference `6.35e-10`. The current quantized-activation CPU
+and GPU expert outputs were each about 1.2023% relative L1 from that reference;
+the CPU/GPU pair differed by `1.04e-7` relative L1. This qualifies the
+independent reference and the existing Strata Q2_0 route for this one real-weight,
+cross-variant activation case. It does not qualify an NInfer-derived kernel.
+Reproduction uses `native_expert_parity` with `--expert 32`, the activation path
+above, and layer `0`, plus `q2_0_expert_oracle.py --output-f64 <path>`; raw output
+and model-derived tensors remain outside Git.
+
 Expected execution arithmetic: input activations are the represented values
 delivered to the adapter; decoded Q2_0 weights are exact in binary16 scale and
 integer code, but dot-product accumulation order is implementation-defined.

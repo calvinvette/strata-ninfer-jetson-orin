@@ -53,7 +53,7 @@ def read_rows(gguf_path, gguf, name, expert, rows, width):
     return (decode_row(payload[i * row_bytes : (i + 1) * row_bytes], width) for i in range(rows))
 
 
-def run(gguf_path, activation_path, layer, expert):
+def run(gguf_path, activation_path, layer, expert, output_f64=None):
     gguf_path = Path(gguf_path).expanduser()
     activation_path = Path(activation_path).expanduser()
     gguf = GGUFFile(gguf_path)
@@ -74,6 +74,8 @@ def run(gguf_path, activation_path, layer, expert):
     output = [dot(row, hidden_values) for row in read_rows(gguf_path, gguf, prefix + "ffn_down_exps.weight",
                                                            expert, hidden, intermediate)]
     packed_output = struct.pack(f"<{hidden}d", *output)
+    if output_f64 is not None:
+        Path(output_f64).expanduser().write_bytes(packed_output)
     return {
         "schema": "strata-q2-expert-oracle-v1",
         "gguf": str(gguf_path),
@@ -100,8 +102,9 @@ def main():
     parser.add_argument("activation_f32", type=Path)
     parser.add_argument("--layer", type=int, required=True)
     parser.add_argument("--expert", type=int, required=True)
+    parser.add_argument("--output-f64", type=Path, help="optional path for the little-endian FP64 output row")
     args = parser.parse_args()
-    print(json.dumps(run(args.gguf, args.activation_f32, args.layer, args.expert), indent=2))
+    print(json.dumps(run(args.gguf, args.activation_f32, args.layer, args.expert, args.output_f64), indent=2))
 
 
 if __name__ == "__main__":

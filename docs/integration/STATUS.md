@@ -35,8 +35,12 @@ decoded across 32,768 values by the Python oracle and `ggml::dequantize_row_q2_0
 from pinned llama.cpp commit `3cf03257`; every FP32 value matched bit-for-bit.
 The FP64 oracle also ran an actual Q2_0 layer-0/expert-32 weight triplet against
 a captured same-architecture IQ1_M activation; this is cross-variant, not the
-Q2_0 model's own activation distribution. CUDA adapter parity remains open, so
-E1 remains open and runtime integration is not established.
+Q2_0 model's own activation distribution. Its full-precision output matched the
+current Strata parity harness's unquantized reference at relative L1 `3.76e-8`;
+the existing quantized CPU/GPU routes were each about `1.2023%` from that
+reference, and differed from one another by `1.04e-7`. This validates the
+reference and existing route for one case; NInfer-derived adapter parity remains
+open, so E1 remains open and runtime integration is not established.
 
 The current Coder two-live investigation refines that exclusion. At cache 3,000,
 the default path's prompt-1 state first changed at position 105/layer 24 and its

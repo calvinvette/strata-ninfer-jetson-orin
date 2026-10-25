@@ -127,8 +127,9 @@ layers. The first adapter contract and scalar oracle are in
 [E1_Q2_0_EXPERT_CONTRACT.md](E1_Q2_0_EXPERT_CONTRACT.md); synthetic checks pass
 3/3, and 32,768 sampled real-payload decoded values match pinned ggml bit-for-bit.
 The full FP64 projection oracle ran actual Q2_0 expert weights on a captured
-cross-variant Coder IQ1_M activation. The target model's own activation
-distribution and CUDA adapter parity are still untested.
+cross-variant Coder IQ1_M activation and matched the current Strata harness's
+unquantized reference at relative L1 `3.76e-8`. The target model's own activation
+distribution and NInfer-derived CUDA adapter parity are still untested.
 
 ### E0 — Freeze controls and identify where time is spent
 
