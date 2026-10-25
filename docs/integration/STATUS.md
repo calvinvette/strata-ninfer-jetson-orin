@@ -37,13 +37,14 @@ A fresh three-pair 8K service screen showed median NInfer latency changes of
 +0.34% prompt, +1.77% decode, +0.82% client total and +0.36% TTFT; all measured
 outputs and startup residency maps matched. Decode was slower in each pair.
 The useful-effect gate was not met, so seven-pair confirmation is not justified.
-A one-pair-per-capacity screen is underway across 1K–256K to record configured-
-context behavior and failure boundaries; all pairs through 128K have passed so
-far, with the lowest physical/admission availability at 14.76 GiB. The same
-3,000-slot residency-map hash was observed across these pairs. Per-workload TPS
-and TTFT vary and some longer output hashes differ; this one-request matrix has
-no numerical/task-quality oracle and cannot qualify a performance effect.
-256K remains. See the [E5 closeout](NINFER_E5_CLOSEOUT.md)
+A one-pair-per-capacity screen across 1K–256K has completed; every eligible API
+and token-count check passed. Minimum available physical/admission memory was
+11.31 GiB, above the 6 GiB floor, and all eighteen startup maps had the same
+3,000-slot residency hash. Single-request TPS and TTFT vary without a consistent
+backend advantage. Some long-output hashes differ, with no independent quality
+oracle in this screen. These samples cannot qualify a performance effect. The
+same-day 8K screen missed the useful-effect gate, so seven-pair confirmation
+was not run and E6 performance exit criteria remain unmet. See the [E5 closeout](NINFER_E5_CLOSEOUT.md)
 and [E6 report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md).
 The E2 resident and E3 staged-miss schedules both failed
 initial performance screens. On 2026-10-25, E0 captured a supervised Coder IQ1_M decode profile

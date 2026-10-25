@@ -92,10 +92,10 @@ supervised campaign lasted 258.9 seconds and minimum available memory was
 revision still fails the operator and useful-service gates, it does not
 advance to seven-pair confirmation.
 
-## Parametric context-capacity screen (in progress)
+## Parametric context-capacity screen (completed screening)
 
-To complete E6's capacity coverage, a separate one-pair-per-capacity screen is
-running on this candidate despite the failed useful-effect gate. It uses the
+To complete E6's capacity coverage, a separate one-pair-per-capacity screen was
+run on this candidate despite the failed useful-effect gate. It used the
 same Q2_0 profile and changes only `--max-context`; each fresh NInfer/Strata
 service receives a warmup and one measured request for each workload that fits
 the capacity. The requested shapes are `pp512+tg64`, `pp2048+tg128`, and the
@@ -103,12 +103,12 @@ the capacity. The requested shapes are `pp512+tg64`, `pp2048+tg128`, and the
 omitted at 1K; input plus output must fit the configured capacity. This is
 capacity-allocation and short-request screening, not near-limit ingestion.
 
-The 1K, 2K, 4K, 8K, 16K, 32K, 64K and 128K pairs have completed. All sixteen
-service processes passed every eligible warmup and measured API check and
-exact token-count check. All sixteen startup residency maps have the same SHA256
+The 1K, 2K, 4K, 8K, 16K, 32K, 64K, 128K and 256K pairs have completed. All
+eighteen service processes passed every eligible warmup and measured API check
+and exact token-count check. All eighteen startup residency maps have the same SHA256
 `a02fd81e6337273a299b4b834ab1b694c16e5f97512e5dfec9d4fec08cd5ddf7`; each
 reported 3,000 slots / 3,955 MiB. Minimum available physical/admission memory
-was 14.76 GiB, above the 6 GiB floor. The measurements below are one request
+was 11.31 GiB, above the 6 GiB floor. The measurements below are one request
 per arm and workload. PP/TG and TTFT are descriptive samples, not paired
 estimates or confirmation intervals.
 
@@ -131,14 +131,23 @@ estimates or confirmation intervals.
 | 128K | 172+64 | 13.2 / 8.4 | 16.8 / 9.4 | 13.29 / 10.44 |
 | 128K | 557+64 | 34.8 / 9.6 | 36.1 / 9.8 | 16.16 / 15.59 |
 | 128K | 1,069+64 | 40.1 / 9.5 | 42.2 / 9.4 | 26.84 / 25.49 |
+| 256K | 512+64 | 21.4 / 7.5 | 21.3 / 7.4 | 24.30 / 24.44 |
+| 256K | 2,048+128 | 39.2 / 7.2 | 39.4 / 7.7 | 52.75 / 52.54 |
+| 256K | 172+64 | 10.8 / 7.4 | 10.4 / 7.7 | 16.30 / 16.90 |
+| 256K | 557+64 | 22.0 / 7.4 | 21.8 / 5.8 | 25.66 / 25.86 |
+| 256K | 1,069+64 | 31.2 / 8.1 | 30.6 / 7.8 | 34.73 / 35.45 |
 
 These single samples show no consistent backend advantage. At 128K, output
-hashes match between arms for all five workloads. At smaller capacities, hashes
-match for 512+64 and 172+64, but differ for some longer cells; this screen has
-no independent numerical or task-quality oracle, so hash differences remain
-unresolved rather than serving as a quality pass/fail. The one-request design
-cannot establish a context-dependent performance effect. The 256K pair remains.
-The runner is
+hashes match between arms for all five workloads. At 256K, hashes match for
+512+64 and 172+64, and differ for the other three workloads. At lower
+capacities, hashes match for 512+64 and 172+64 but differ for some longer
+cells. This screen has no independent numerical or task-quality oracle, so hash
+differences remain unresolved rather than serving as a quality pass/fail. The
+one-request design cannot establish a context-dependent performance effect or
+support performance charts with uncertainty. Because the same-day three-pair
+8K service screen failed the predeclared useful-effect gate, seven-pair
+confirmation was not run. E6 screening is complete, but its performance exit
+criteria remain unmet. The runner is
 [`run_context_matrix.py`](run_context_matrix.py); its `context-matrix/` data
 contains per-request API checks, engine logs, resident maps and supervisor
 summaries. The full matrix will remain screening evidence; a new implementation
