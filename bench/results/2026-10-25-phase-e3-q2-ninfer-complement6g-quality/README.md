@@ -32,3 +32,20 @@ parity failed, the favorable 6-GiB TTFT screening result does not proceed to
 seven-pair performance confirmation or profile promotion. Raw output is in
 [`evidence/results.json`](evidence/results.json); the supervised invocation
 and resource telemetry are alongside it.
+
+## State-difference follow-up
+
+The final GDN arrays were compared directly at `L=558`: 26,711,062 of
+29,417,472 values differed (90.80%), with global relative L2 0.02396, RMS
+absolute delta 0.00599, and maximum absolute delta 0.6991 at GDN layer 25.
+Layers 0–2 were bit-identical; layer 3 was the first with a nonzero delta
+(relative L2 approximately `1.2e-7`). A targeted verifier capture at generated
+position 557 in model layer 3 found identical inputs, routes/weights, expert
+parts, shared output and combined output between backends. This capture does
+not explain the GDN difference: it sampled one generated position, while the
+state aggregates the full 512-token prompt and continuation. It therefore
+cannot rule out earlier prompt-position differences or attribute the first
+GDN delta to the staged expert kernel. Numeric GDN analysis and compact
+position-557 captures are retained in `gdn-dump/gdn-diff.json` and
+`moe-layer3-pos557/` respectively. The large raw GDN arrays and service logs
+remain local and are not committed.

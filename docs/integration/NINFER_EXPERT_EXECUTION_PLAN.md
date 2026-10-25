@@ -336,10 +336,16 @@ Because the 6-GiB held-out retrieval/arithmetic check returned matching token
 IDs but differing final GDN, tail, pooled, pooled-full and KV fingerprints,
 the quality gate failed. Do not run seven-pair confirmation or promote this
 setting until the state difference is understood and the quality gate passes.
+The final GDN comparison found 90.80% of values different (global relative
+L2 0.02396); layers 0–2 were exact and layer 3 first differed by about
+`1.2e-7`. A one-position layer-3 MoE capture at generated position 557 was
+exact across inputs, routes, expert parts and outputs, so it does not explain
+the aggregate state difference or rule out earlier prompt-position deltas.
 The 6-GiB TTFT screen alone is not a performance qualification: median client
 latency remains below the 5% target, each cell has only three pairs, and
 persistent-state equivalence is unresolved. See the [complement sweep
-report](../../bench/results/2026-10-25-phase-e3-q2-complement-sweep/README.md).
+report](../../bench/results/2026-10-25-phase-e3-q2-complement-sweep/README.md)
+and [quality diagnostic](../../bench/results/2026-10-25-phase-e3-q2-ninfer-complement6g-quality/README.md).
 
 ### E4 — Add prefill, small-token execution and model coverage — complete with partial model support
 

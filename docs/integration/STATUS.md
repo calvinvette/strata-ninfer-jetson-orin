@@ -84,7 +84,12 @@ TTFT improvements were 1.62%/3.80%/6.05%. Only the 6-GiB TTFT result crossed
 returned the exact expected answer with identical token IDs, but persistent
 GDN, tail, pooled, pooled-full and KV fingerprints differed. This fails the
 state-parity quality gate; no confirmation or promotion is justified. Minimum
-available memory remained 11.36 GiB. See the [complement sweep report](../../bench/results/2026-10-25-phase-e3-q2-complement-sweep/README.md).
+available memory remained 11.36 GiB. Direct GDN comparison found 90.80% of
+values different (global relative L2 0.02396), beginning at layer 3 with a
+small `1.2e-7` relative L2 delta. A same-position layer-3 MoE capture was bit
+identical across backends, so the observed capture does not explain the
+aggregate state mismatch. See the [complement sweep report](../../bench/results/2026-10-25-phase-e3-q2-complement-sweep/README.md)
+and [6-GiB quality diagnostic](../../bench/results/2026-10-25-phase-e3-q2-ninfer-complement6g-quality/README.md).
 On 2026-10-25, E0 captured a supervised Coder IQ1_M decode profile
 with Strata's existing expert backend. The opt-in decode timer measured 21.73 ms
 per token-window in CPU expert work and 35.07 ms waiting for GPU reach; a
