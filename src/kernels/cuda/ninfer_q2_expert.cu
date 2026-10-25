@@ -86,31 +86,120 @@ __global__ void ninfer_swiglu_quantize_q8_1_many(const float* gate, const float*
     }
 }
 
-__device__ __forceinline__ float dot_q2_q8_1(const uint8_t* row, const Q8_1Block* xq, int width) {
-    const int lane = threadIdx.x & 31;
-    const int lane_group = lane / 8;
-    const int lane_byte = lane & 7;
-    float acc = 0.0f;
-    for (int block32 = lane_group; block32 < width / 32; block32 += 4) {
-        const uint8_t* block = row + static_cast<size_t>(block32 / 2) * kQ2Bytes;
-        const int qbyte = (block32 & 1) * 8 + lane_byte;
-        const uint8_t packed_q2 = block[2 + qbyte];
-        const int q0 = (packed_q2 >> 0) & 3;
-        const int q1 = (packed_q2 >> 2) & 3;
-        const int q2 = (packed_q2 >> 4) & 3;
-        const int q3 = (packed_q2 >> 6) & 3;
-        const uint32_t packed_weights =
-            (static_cast<uint32_t>(q0 - 1) & 0xffu) |
-            ((static_cast<uint32_t>(q1 - 1) & 0xffu) << 8) |
-            ((static_cast<uint32_t>(q2 - 1) & 0xffu) << 16) |
-            ((static_cast<uint32_t>(q3 - 1) & 0xffu) << 24);
-        const auto* activation_bytes = reinterpret_cast<const int*>(xq[block32].qs);
-        const int dot = STRATA_DP4A(static_cast<int>(packed_weights), activation_bytes[lane_byte], 0);
-        const float dw = __half2float(*reinterpret_cast<const __half*>(block));
-        const float dx = __half2float(xq[block32].d);
-        acc += (dw * dx) * static_cast<float>(dot);
+struct PackedQ2_0 {
+    int qx[4];
+    int qy[4];
+    float d;
+};
+
+__device__ __forceinline__ PackedQ2_0 load_q2_0(const uint8_t* row, int kbx, int iqs) {
+    const auto* block = reinterpret_cast<const uint8_t*>(row) + static_cast<size_t>(kbx) * kQ2Bytes;
+    PackedQ2_0 w;
+    w.d = __half2float(*reinterpret_cast<const __half*>(block));
+    const auto* qs = reinterpret_cast<const int16_t*>(block + 2) + iqs * 4;
+#pragma unroll
+    for (int j = 0; j < 4; ++j) {
+        const int q = qs[j];
+        const int qe = __byte_perm(0x020100ff, 0x020100ff, q >> 0);
+        const int qo = __byte_perm(0x020100ff, 0x020100ff, q >> 2);
+        w.qx[j] = __byte_perm(qe, qo, 0x5140);
+        w.qy[j] = __byte_perm(qe, qo, 0x7362);
     }
-    return warp_sum(acc);
+    return w;
+}
+
+__device__ __forceinline__ float apply_q2_q8_1(const PackedQ2_0& w,
+                                                const Q8_1Block* xq, int iqs) {
+    const auto* chunk = xq + iqs;
+    const auto* q8 = reinterpret_cast<const int*>(chunk->qs);
+    int sum = 0;
+#pragma unroll
+    for (int j = 0; j < 4; ++j) {
+        sum = STRATA_DP4A(q8[j * 2], w.qx[j], sum);
+        sum = STRATA_DP4A(q8[j * 2 + 1], w.qy[j], sum);
+    }
+    return w.d * __half2float(chunk->d) * static_cast<float>(sum);
+}
+
+template<int Blocks32>
+__device__ __forceinline__ float dot_q2_q8_1_sub16_single(const uint8_t* row,
+                                                          const Q8_1Block* xq, int lane) {
+    float acc = 0.0f;
+    float partial = 0.0f;
+    if constexpr (Blocks32 == 80) {
+        for (int k = lane; k < 80; k += 32) {
+            const int kbx = k / 2, iqs = k & 1;
+            acc += apply_q2_q8_1(load_q2_0(row, kbx, iqs), xq + kbx * 2, iqs);
+        }
+        for (int k = lane + 16; k < 64; k += 32) {
+            const int kbx = k / 2, iqs = k & 1;
+            partial += apply_q2_q8_1(load_q2_0(row, kbx, iqs), xq + kbx * 2, iqs);
+        }
+    } else {
+        const int kbx = lane / 2, iqs = lane & 1;
+        acc = apply_q2_q8_1(load_q2_0(row, kbx, iqs), xq + kbx * 2, iqs);
+        if (lane < 4) {
+            const int k = lane + 16;
+            const int kbx2 = k / 2, iqs2 = k & 1;
+            partial = apply_q2_q8_1(load_q2_0(row, kbx2, iqs2), xq + kbx2 * 2, iqs2);
+        }
+    }
+    acc = __fadd_rn(acc, partial);
+    for (int offset = 8; offset > 0; offset >>= 1)
+        acc += __shfl_xor_sync(0xffffffffu, acc, offset);
+    return acc;
+}
+
+// Reuse each decoded Q2 weight chunk across four routed entries and use two
+// 16-lane rows per warp, matching the useful Q2 mapping in Strata's
+// Split<42>/row_dot_multi path while retaining this backend's grouped ABI.
+template<int NC>
+__device__ __forceinline__ void dot_q2_q8_1_sub16(const uint8_t* row,
+                                                   const Q8_1Block* const* xq,
+                                                   int n, int width, int lane,
+                                                   float* output) {
+    float acc[NC] = {};
+    float partial[NC] = {};
+    const int blocks32 = width / 32;
+    if (blocks32 == 80) {
+        for (int k = lane; k < 80; k += 32) {
+            const int kbx = k / 2, iqs = k & 1;
+            const PackedQ2_0 w = load_q2_0(row, kbx, iqs);
+#pragma unroll
+            for (int c = 0; c < NC; ++c)
+                if (c < n) acc[c] += apply_q2_q8_1(w, xq[c] + kbx * 2, iqs);
+        }
+        for (int k = lane + 16; k < 64; k += 32) {
+            const int kbx = k / 2, iqs = k & 1;
+            const PackedQ2_0 w = load_q2_0(row, kbx, iqs);
+#pragma unroll
+            for (int c = 0; c < NC; ++c)
+                if (c < n) partial[c] += apply_q2_q8_1(w, xq[c] + kbx * 2, iqs);
+        }
+    } else {  // Flash-Next Q2_0 down projection: 20 32-value blocks.
+        const int kbx = lane / 2, iqs = lane & 1;
+        const PackedQ2_0 w = load_q2_0(row, kbx, iqs);
+#pragma unroll
+        for (int c = 0; c < NC; ++c)
+            if (c < n) acc[c] += apply_q2_q8_1(w, xq[c] + kbx * 2, iqs);
+        if (lane < 4) {
+            const int k = lane + 16;
+            const int kbx2 = k / 2, iqs2 = k & 1;
+            const PackedQ2_0 w2 = load_q2_0(row, kbx2, iqs2);
+#pragma unroll
+            for (int c = 0; c < NC; ++c)
+                if (c < n) partial[c] += apply_q2_q8_1(w2, xq[c] + kbx2 * 2, iqs2);
+        }
+    }
+#pragma unroll
+    for (int c = 0; c < NC; ++c) {
+        if (c < n) {
+            acc[c] = __fadd_rn(acc[c], partial[c]);
+            for (int offset = 8; offset > 0; offset >>= 1)
+                acc[c] += __shfl_xor_sync(0xffffffffu, acc[c], offset);
+            output[c] = acc[c];
+        }
+    }
 }
 
 __global__ void d3_q2_0(const uint8_t* gate, const uint8_t* up, const float* x, float* hidden) {
@@ -141,9 +230,9 @@ __global__ void d3_q2_0_grouped(const unsigned long long* grp_ptr, const int32_t
                                 const int32_t* n_groups, const int32_t* ent_tok,
                                 const Q8_1Block* xq, NativeExpertLayout L,
                                 float* gate, float* up, int64_t grid_groups) {
-    const int lane = threadIdx.x & 31;
+    const int lane = threadIdx.x & 15;
     const int warp = threadIdx.x >> 5;
-    const int row = static_cast<int>(blockIdx.x) * kRowsPerCta + warp;
+    const int row = static_cast<int>(blockIdx.x) * 8 + warp * 2 + ((threadIdx.x & 31) >> 4);
     if (row >= 2 * L.n_ff) return;
     const bool is_up = row >= L.n_ff;
     const int r = is_up ? row - static_cast<int>(L.n_ff) : row;
@@ -152,10 +241,25 @@ __global__ void d3_q2_0_grouped(const unsigned long long* grp_ptr, const int32_t
     const int group_count = *n_groups;
     for (int g = static_cast<int>(blockIdx.y); g < group_count; g += static_cast<int>(grid_groups)) {
         const auto* weights = reinterpret_cast<const uint8_t*>(grp_ptr[g]) + offset;
-        for (int e = grp_start[g]; e < grp_start[g + 1]; ++e) {
-            const float value = dot_q2_q8_1(weights, xq + static_cast<size_t>(ent_tok[e]) * (L.n_embd / 32),
-                                             static_cast<int>(L.n_embd));
-            if (lane == 0) dst[static_cast<size_t>(e) * L.n_ff + r] = value;
+        const int e1 = grp_start[g + 1];
+        for (int e = grp_start[g]; e < e1; e += 4) {
+            const int n = min(4, e1 - e);
+            const Q8_1Block* activations[4];
+#pragma unroll
+            for (int c = 0; c < 4; ++c) {
+                const int entry = e + min(c, n - 1);
+                activations[c] = xq + static_cast<size_t>(ent_tok[entry]) * (L.n_embd / 32);
+            }
+            float values[4];
+            if (n == 1)
+                values[0] = dot_q2_q8_1_sub16_single<80>(weights, activations[0], lane);
+            else
+                dot_q2_q8_1_sub16<4>(weights, activations, n, static_cast<int>(L.n_embd), lane, values);
+            if (lane == 0) {
+#pragma unroll
+                for (int c = 0; c < 4; ++c)
+                    if (c < n) dst[static_cast<size_t>(e + c) * L.n_ff + r] = values[c];
+            }
         }
     }
 }
@@ -164,18 +268,31 @@ __global__ void d4_q2_0_grouped(const unsigned long long* grp_ptr, const int32_t
                                 const int32_t* n_groups, const int32_t* ent_dst,
                                 const Q8_1Block* hq, NativeExpertLayout L, float* output,
                                 int64_t grid_groups) {
-    const int lane = threadIdx.x & 31;
+    const int lane = threadIdx.x & 15;
     const int warp = threadIdx.x >> 5;
-    const int row = static_cast<int>(blockIdx.x) * kRowsPerCta + warp;
+    const int row = static_cast<int>(blockIdx.x) * 8 + warp * 2 + ((threadIdx.x & 31) >> 4);
     if (row >= L.n_embd) return;
     const size_t offset = L.down_off + static_cast<size_t>(row) * L.d_row;
     const int group_count = *n_groups;
     for (int g = static_cast<int>(blockIdx.y); g < group_count; g += static_cast<int>(grid_groups)) {
         const auto* weights = reinterpret_cast<const uint8_t*>(grp_ptr[g]) + offset;
-        for (int e = grp_start[g]; e < grp_start[g + 1]; ++e) {
-            const float value = dot_q2_q8_1(weights, hq + static_cast<size_t>(e) * (L.n_ff / 32),
-                                             static_cast<int>(L.n_ff));
-            if (lane == 0) output[static_cast<size_t>(ent_dst[e]) * L.n_embd + row] = value;
+        const int e1 = grp_start[g + 1];
+        for (int e = grp_start[g]; e < e1; e += 4) {
+            const int n = min(4, e1 - e);
+            const Q8_1Block* activations[4];
+#pragma unroll
+            for (int c = 0; c < 4; ++c)
+                activations[c] = hq + static_cast<size_t>(e + min(c, n - 1)) * (L.n_ff / 32);
+            float values[4];
+            if (n == 1)
+                values[0] = dot_q2_q8_1_sub16_single<20>(weights, activations[0], lane);
+            else
+                dot_q2_q8_1_sub16<4>(weights, activations, n, static_cast<int>(L.n_ff), lane, values);
+            if (lane == 0) {
+#pragma unroll
+                for (int c = 0; c < 4; ++c)
+                    if (c < n) output[static_cast<size_t>(ent_dst[e + c]) * L.n_embd + row] = values[c];
+            }
         }
     }
 }
@@ -224,13 +341,13 @@ void ninfer_q2_0_expert_grouped(const NativeExpertLayout& L, const unsigned long
     auto* up = reinterpret_cast<float*>(scratch + fa);
     auto* hidden_q8_1 = scratch + 3 * fa;
     const auto s = static_cast<cudaStream_t>(stream);
-    d3_q2_0_grouped<<<dim3((2 * kIntermediate + kRowsPerCta - 1) / kRowsPerCta, static_cast<unsigned>(gy)),
+    d3_q2_0_grouped<<<dim3((2 * kIntermediate + 7) / 8, static_cast<unsigned>(gy)),
                        128, 0, s>>>(grp_ptr, grp_start, n_groups, ent_tok,
                                      static_cast<const Q8_1Block*>(x_q8_1), L, gate, up, gy);
     const int64_t hidden_values = cap_entries * kIntermediate;
     ninfer_swiglu_quantize_q8_1_many<<<static_cast<unsigned>((hidden_values + 255) / 256), 256, 0, s>>>(
         gate, up, reinterpret_cast<Q8_1Block*>(hidden_q8_1), hidden_values);
-    d4_q2_0_grouped<<<dim3((kHidden + kRowsPerCta - 1) / kRowsPerCta, static_cast<unsigned>(gy)),
+    d4_q2_0_grouped<<<dim3((kHidden + 7) / 8, static_cast<unsigned>(gy)),
                        128, 0, s>>>(grp_ptr, grp_start, n_groups, ent_dst,
                                      reinterpret_cast<const Q8_1Block*>(hidden_q8_1), L, output, gy);
     const cudaError_t error = cudaGetLastError();

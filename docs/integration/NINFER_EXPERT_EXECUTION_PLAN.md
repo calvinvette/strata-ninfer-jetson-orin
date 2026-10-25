@@ -489,7 +489,14 @@ three-pair, 8K same-residency service screen found median paired changes of
 +0.34% prompt, +1.77% decode, +0.82% client total and +0.36% TTFT, with decode
 slower in all three pairs. Outputs and resident-map hashes matched. These
 screens do not meet the useful-effect gate, so seven-pair confirmation is not
-justified. The one-pair-per-capacity screening matrix across 1K–256K is
+justified. A follow-up packed four entries per Q2 weight chunk, used two
+16-lane rows per warp and specialized the single-entry decode case. Operator
+parity passed; grouped NInfer/Strata latency fell to 1.107×/1.120× and the
+one-entry ratio to 0.980×. Its new three-pair 8K screen still measured median
++2.74% client total and +2.70% TTFT for NInfer, slower in all pairs with
+matching outputs and residency maps. The 256-thread/16-row variation was slower
+than the retained 128-thread/eight-row schedule. The one-pair-per-capacity
+screening matrix across 1K–256K is
 complete: all eligible checks passed, minimum available physical/admission
 memory was 11.31 GiB, and all eighteen residency maps matched. Single-sample TPS
 and TTFT show no consistent backend advantage; several longer output hashes

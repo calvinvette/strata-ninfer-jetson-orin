@@ -39,6 +39,11 @@ A fresh three-pair 8K service screen showed median NInfer latency changes of
 +0.34% prompt, +1.77% decode, +0.82% client total and +0.36% TTFT; all measured
 outputs and startup residency maps matched. Decode was slower in each pair.
 The useful-effect gate was not met, so seven-pair confirmation is not justified.
+A later four-entry/16-lane Q2 schedule reduced the grouped operator ratio to
+1.107×/1.120× and brought the one-entry ratio to 0.980×, all with passing
+operator parity. Its new three-pair 8K service screen was still slower: median
+client total +2.74% and TTFT +2.70%; all three pairs were slower and output/map
+hashes matched. No performance-qualified profile is available.
 A one-pair-per-capacity screen across 1K–256K has completed; every eligible API
 and token-count check passed. Minimum available physical/admission memory was
 11.31 GiB, above the 6 GiB floor, and all eighteen startup maps had the same

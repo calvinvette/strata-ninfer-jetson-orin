@@ -3064,6 +3064,16 @@ integer-dot operations. Adapting those projections to `dp4a` cut the gap to
 4.36×, but still did not beat Strata; the one-entry case was 1.83× slower.
 Parity at the operator boundary was not evidence of a faster request path.
 
+A follow-up batched four routed entries so each warp reused decoded Q2 weights,
+and used two 16-lane rows per warp. This passed exact grouped-output fixtures
+and brought grouped NInfer/Strata operator latency to 1.107×/1.120×; a
+single-entry specialization measured 0.980×. A 256-thread, sixteen-row block
+was slower than the retained 128-thread, eight-row block. Even with the
+single-entry operator at parity, a fresh three-pair 8K service screen measured
+NInfer +2.74% client total and +2.70% TTFT, slower in every pair. The operator
+path was improved, but request-level overhead and other model work still hid
+the gain. Do not infer a product speedup from parity or a nearly tied kernel.
+
 The same-residency 8K service screen then measured +0.82% client latency and
 +1.77% decode latency for NInfer, with decode slower in all three pairs. A
 one-request context matrix through 256K showed no consistent advantage and

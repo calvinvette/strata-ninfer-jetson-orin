@@ -22,15 +22,20 @@ The separate performance-qualified outcome is **not achieved**.
   Flash-Next 2560/640 geometry. It is guarded by a CUDA build definition. The
   default dispatch remains Strata; strict mode rejects unsupported pairs and
   non-strict NInfer mode falls back.
-- The packed `dp4a` operator passed grouped parity, with relative L1 errors of
-  `1.85e-5` and `1.86e-5` at 64 and 128 tokens. It remains 4.36× slower than
-  Strata on those grouped shapes; a one-entry shape was 1.83× slower. See the
+- The initial packed `dp4a` operator passed grouped parity but remained 4.36×
+  slower than Strata on 64/128-token shapes. A later four-entry, 16-lane Q2
+  schedule passed exact grouped-output fixtures and reduced those ratios to
+  1.107×/1.120×; a specialized one-entry operator measured 0.980×. The
+  operator result is still not an end-to-end win. See the
   [E6 grouped throughput report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md).
-- The same-day three-pair 8K service screen measured median NInfer latency
+- The first same-day three-pair 8K service screen measured median NInfer latency
   changes of +0.34% prompt, +1.77% decode, +0.82% client total and +0.36% TTFT;
   positive values mean slower. Decode was slower in all pairs. The predeclared
   useful-effect gate failed, so seven-pair confirmation and performance charts
-  with uncertainty were not justified.
+  with uncertainty were not justified. A subsequent three-pair screen of the
+  four-entry/single-entry candidate was also slower: median +2.74% client total
+  and +2.70% client TTFT, with NInfer slower in all pairs and outputs/maps
+  matching. It did not meet the useful-effect threshold.
 - The one-pair context screen from 1K through 256K passed all eligible API and
   exact token-count checks. Minimum available physical/admission memory was
   11.31 GiB; the 6 GiB floor held and all eighteen startup residency maps
@@ -56,8 +61,8 @@ Binary SHA256 values:
 
 | Artifact | SHA256 |
 | --- | --- |
-| `strata` | `ef3da9e05acc8cd6ebc24ecf3de09fe293f3f458a93574516f85880f2d0f1316` |
-| `ninfer_q2_expert_parity` | `1a0618419eb05e008dd7c480836694fde3c8d55a6e94170dfe2de2b8cb10dd1c` |
+| `strata` | `daaf67ff7b764f0bd8413bee1d4e027132d4f2f978472795a82404fddeb5d420` |
+| `ninfer_q2_expert_parity` | `6334fb6015e115ea8978f870aa6e25a2cb122761fd098a23a318b3bc1e1fd2bb` |
 
 HIP and SYCL builds remain unverified. Neither compiler was available on the
 Orin or on `maestro1`; the latter had 1.1 GiB free on its root filesystem and
@@ -75,4 +80,6 @@ alone. E7 release qualification remains open until a candidate both passes the
 performance and task-quality gates and receives the required builds and
 sustained-service checks. Any renewed work should first change the operator or
 request critical path, then repeat same-day paired controls before proposing a
-profile.
+profile. The latest one-entry operator matches Strata within this harness, but
+the request-level screen remains slower; no profile is nominated. The 30-minute
+soak requirement remains untriggered.

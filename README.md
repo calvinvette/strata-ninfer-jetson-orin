@@ -37,12 +37,14 @@ The translated READMEs describe the original project and have not been updated f
 `--expert-backend ninfer` selects a CUDA-only Q2_0/Q2_0 resident expert kernel
 for Flash-Next geometry 2560/640. The default remains `strata`; strict mode
 rejects unsupported codec or geometry pairs, while non-strict NInfer mode falls
-back. The packed operator was 4.36× slower than Strata at the measured
-64/128-token grouped shapes. A three-pair 8K service screen also found median
-NInfer client latency 0.82% slower and decode latency 1.77% slower. The context
-capacity matrix is one request per cell and is screening evidence only. No
-performance-qualified profile is available, so this option remains
-experimental. See the [full E7 assessment](docs/integration/NINFER_E7_RELEASE_ASSESSMENT.md).
+back. The initial packed operator was 4.36× slower than Strata at the measured
+64/128-token grouped shapes. A later four-entry, 16-lane Q2 schedule reduced
+the grouped ratio to 1.107×/1.120× and matched the one-entry operator, but a
+new three-pair 8K service screen still found NInfer client total 2.74% slower
+and TTFT 2.70% slower. The context capacity matrix is one request per cell and
+is screening evidence only. No performance-qualified profile is available, so
+this option remains experimental. See the [E6 results](bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md)
+and [full E7 assessment](docs/integration/NINFER_E7_RELEASE_ASSESSMENT.md).
 
 Orin's CPU and GPU share its 32 GB of RAM; there is no separate 32 GB VRAM pool. The runtime leaves six GiB
 of physical RAM headroom by default and an additional three GiB for late workspaces when sizing the automatic

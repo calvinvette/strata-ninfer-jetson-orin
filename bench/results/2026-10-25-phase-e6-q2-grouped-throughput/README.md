@@ -92,6 +92,43 @@ supervised campaign lasted 258.9 seconds and minimum available memory was
 revision still fails the operator and useful-service gates, it does not
 advance to seven-pair confirmation.
 
+### Four-entry Q2 reuse and 16-lane rows
+
+A follow-up candidate reuses each decoded Q2_0 weight chunk across up to four
+routed entries and uses two 16-lane rows per warp. A dedicated one-entry path
+avoids the multi-entry bookkeeping on decode-sized groups. The arithmetic,
+Q8_1 interface and output layout remain unchanged. This follows the target
+model's grouped schedule; it does not import a new NInfer codec.
+
+| Candidate shape | Strata median | NInfer median | NInfer / Strata | Correctness |
+| --- | ---: | ---: | ---: | --- |
+| One resident entry, seven interleaved × 1,000 | 24.754 µs | 24.270 µs | 0.980× | grouped output relative L1 `0`, pass |
+| 64 tokens × top-10 entries, seven paired blocks × 50 | 3,945.485 µs | 4,369.008 µs | 1.107× latency | relative L1 `0`, pass |
+| 128 tokens × top-10 entries, seven paired blocks × 50 | 7,958.770 µs | 8,910.264 µs | 1.120× latency | relative L1 `0`, pass |
+
+The source SHA256 is
+`3891bf2de2d8bae370841df86011787d9e145833f06961b3a00040d377305d3a`; the
+server binary SHA256 is
+`daaf67ff7b764f0bd8413bee1d4e027132d4f2f978472795a82404fddeb5d420`. A first
+four-entry/full-warp trial was 3.797× and 3.858× slower at 64/128 tokens. A
+256-thread, 16-output-rows-per-block trial was also slower (1.137×/1.147×) than
+the retained 128-thread, eight-row schedule. Its diagnostic is retained with
+the candidate evidence. The retained subwarp schedule passes the model-derived
+D3/D4 reference with relative L2 `2.131e-7`; grouped outputs were exact in the
+recorded fixture checks.
+
+A new three-pair, same-day 8K service screen used the same 3,000-entry resident
+map in all six runs and produced the same output SHA256 in every run. Paired
+NInfer client total latency was slower by 2.74%, 4.11% and 1.28%; client TTFT
+was slower by 2.70%, 5.73% and 1.97%. The median changes were +2.74% client
+total and +2.70% TTFT (positive means slower). Minimum available
+physical/admission memory was 17.73 GiB, above the 6 GiB floor. Energy was not
+attributed. The 5% useful-effect threshold was not met, so seven-pair
+confirmation remains unjustified. The faster operator does not translate into
+a request-level win; E6's performance exit remains unmet. Detailed candidate
+and supervisor data are in
+[`sub16-single-entry-specialization`](sub16-single-entry-specialization/README.md).
+
 ## Parametric context-capacity screen (completed screening)
 
 To complete E6's capacity coverage, a separate one-pair-per-capacity screen was

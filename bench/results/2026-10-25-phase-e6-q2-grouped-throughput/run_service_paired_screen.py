@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Small randomized E2 service screen; not a performance confirmation campaign."""
 import hashlib
+import argparse
 import http.client
 import json
 import os
@@ -13,8 +14,8 @@ import sys
 import time
 
 ROOT = Path(__file__).resolve().parents[3]
-OUT = Path(__file__).resolve().parent / "paired-screen"
-OUT.mkdir(exist_ok=True)
+OUT = None
+DEFAULT_OUT = Path(__file__).resolve().parent / "paired-screen"
 ENGINE = ROOT / "build/integration/e0-cuda-build/strata"
 MODEL = Path.home() / "models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf"
 PLE = Path.home() / "models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf"
@@ -98,7 +99,7 @@ def start_one(arm, block, order):
         proc = subprocess.Popen([sys.executable, str(ROOT / "serve/server.py"), "--engine", "strata",
                                  "--config", str(config_path), "--port", str(PORT)],
                                 cwd=ROOT, env=env, stdout=log, stderr=subprocess.STDOUT,
-                                start_new_session=True)
+                                start_new_session=False)
     try:
         deadline = time.monotonic() + 300
         ready = False
@@ -130,6 +131,13 @@ def start_one(arm, block, order):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--out", type=Path, default=DEFAULT_OUT,
+                        help="output directory (default: prior paired-screen directory)")
+    args = parser.parse_args()
+    global OUT
+    OUT = args.out.resolve()
+    OUT.mkdir(parents=True, exist_ok=True)
     rng = random.Random(20261025)
     rows = []
     for block in range(1, 4):
