@@ -5306,3 +5306,29 @@ and 50.08 GB per request; they include unrelated I/O and read-ahead. Clocks ran
 dynamically in MAXN and EMC readback was unavailable. Output text had two hashes
 per workload and no quality oracle was used. This is not a paired Q2_0
 comparison and does not change the Q2_0 release-profile boundary.
+# 2026-10-24: Current candidate performance on Coder IQ1_M
+
+Ran seven independent, supervised current-candidate processes against the
+Coder IQ1_M GGUF pair at Hugging Face revision
+`5348543e0147355ac9cbcb031184a3546350988e`. Both shard checksums match the
+model manifest. Each process performed one warmup per workload and one measured
+request per workload, with workload order randomized. All 14 measured requests
+completed fresh prefill and returned the exact requested token counts.
+
+At 512 prompt + 64 generated tokens, median prompt/decode throughput was
+65.2/16.0 tok/s, client TTFT 7.93 s and full request 11.85 s. At 2,048 + 128,
+the corresponding medians were 68.5/15.9 tok/s, 29.97 s and 37.97 s. The
+95% bootstrap intervals for medians and descriptive maximum request times are
+in the [full report](../../bench/results/2026-10-24-coder-iq1m-current-candidate-performance/README.md).
+The 3,000-slot request realized 3,903 slots. Minimum sampled physical and
+admission availability across the campaign were 14.18 and 9.69 GiB, above the
+6 GiB floor, and cgroup memory events remained zero. MAXN clocks were dynamic;
+EMC readback and energy measurements were unavailable. Output text hashes
+were stable within each workload, but no independent output-quality oracle was
+run.
+
+These results form a Coder IQ1_M cohort and are not paired with the separate
+IQ3_S or Q2_0 measurements; they do not establish a quantization speedup or
+change the bounded Q2_0 release profile. Model files remain in
+`~/models/strata-orin-validation/`. Raw per-process evidence, artifact checksums
+and the summarizer are retained in the report directory.

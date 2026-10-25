@@ -34,6 +34,15 @@ telemetry and raw captures are not committed.
 
 ## Performance observed
 
+A seven-block current-candidate run on the Coder IQ1_M shards measured 65.2
+prompt / 16.0 generated tok/s at 512/64 and 68.5 / 15.9 tok/s at 2,048/128.
+Median client TTFT was 7.93/29.97 s; median full request time was 11.85/37.97
+s. Seven independent process blocks passed exact token-count checks. The
+3,000-slot request realized 3,903 slots; minimum physical/admission availability
+was 14.18/9.69 GiB, with zero cgroup memory events. Energy was not measured.
+This is a separate Coder IQ1_M cohort, not a paired quantization comparison or
+a change to the bounded Q2_0 release profile. [Full report](../../bench/results/2026-10-24-coder-iq1m-current-candidate-performance/README.md).
+
 A seven-block current-candidate run on the original Qwen3.8-Flash-Next IQ3_S
 model measured 13.1 prompt / 5.7 generated tok/s at 512/64 and 22.1 / 6.3
 tok/s at 2,048/128. Median client TTFT was 40.06/93.46 s; median full request
