@@ -129,7 +129,8 @@ int main(int argc, char** argv) {
 
         // Exercise the grouped cache-slot ABI used by the service. The exact
         // expert bytes are packed in NativeExpertLayout order; one device group
-        // and one routed entry keep this a decode-path test, not a benchmark.
+        // and one routed entry keep this focused on the decode path; a
+        // separate event-timed operator screen below is not end-to-end.
         const auto layout = strata::kernels::native_expert_layout(42, 42, kHidden, kIntermediate);
         std::vector<uint8_t> blob(layout.bytes);
         std::memcpy(blob.data(), expert_gate, layout.up_off);
@@ -199,6 +200,58 @@ int main(int argc, char** argv) {
                     route_rel_l1, route_unwritten, static_cast<unsigned long long>(calls),
                     route_rel_l1 <= 2.0e-4 && route_unwritten == 0 && calls == 1 ? "PASS" : "FAIL");
         failed += route_rel_l1 <= 2.0e-4 && route_unwritten == 0 && calls == 1 ? 0 : 1;
+
+        // Diagnostic device-timeline screen: seven interleaved paired blocks,
+        // one resident expert and one token. This excludes model routing,
+        // transfers and request overhead; it is not an end-to-end benchmark.
+        auto run_candidate = [&] {
+            strata::kernels::ninfer_q2_0_expert_grouped(layout, device_ptrs, device_starts, device_group_count,
+                                                         device_dst, device_tok, 1, 1, device_xq,
+                                                         candidate_scratch, device_group_output, stream, 1);
+        };
+        auto run_strata = [&] {
+            strata::kernels::native_expert_grouped(layout, device_ptrs, device_starts, device_group_count,
+                                                    device_dst, device_tok, 1, 1, device_xq, native_scratch,
+                                                    device_native_output, stream, 1);
+        };
+        auto timed = [&](auto&& invoke, int iterations) {
+            for (int i = 0; i < 12; ++i) invoke();
+            cudaEvent_t begin = nullptr, end = nullptr;
+            cuda_check(cudaEventCreate(&begin), "create benchmark start event");
+            cuda_check(cudaEventCreate(&end), "create benchmark end event");
+            cuda_check(cudaEventRecord(begin, stream), "record benchmark start");
+            for (int i = 0; i < iterations; ++i) invoke();
+            cuda_check(cudaEventRecord(end, stream), "record benchmark end");
+            cuda_check(cudaEventSynchronize(end), "synchronize benchmark end");
+            float elapsed_ms = 0.0f;
+            cuda_check(cudaEventElapsedTime(&elapsed_ms, begin, end), "read benchmark events");
+            cudaEventDestroy(end);
+            cudaEventDestroy(begin);
+            return static_cast<double>(elapsed_ms) * 1000.0 / iterations;
+        };
+        constexpr int kBenchIterations = 1000;
+        std::vector<double> candidate_us, strata_us;
+        for (int block = 0; block < 7; ++block) {
+            if ((block & 1) == 0) {
+                candidate_us.push_back(timed(run_candidate, kBenchIterations));
+                strata_us.push_back(timed(run_strata, kBenchIterations));
+            } else {
+                strata_us.push_back(timed(run_strata, kBenchIterations));
+                candidate_us.push_back(timed(run_candidate, kBenchIterations));
+            }
+        }
+        auto median = [](std::vector<double> values) {
+            std::sort(values.begin(), values.end());
+            return values[values.size() / 2];
+        };
+        const auto candidate_range = std::minmax_element(candidate_us.begin(), candidate_us.end());
+        const auto strata_range = std::minmax_element(strata_us.begin(), strata_us.end());
+        std::printf("one-token resident operator device timeline (7 interleaved x %d): "
+                    "Strata median=%.3f us range=[%.3f,%.3f], NInfer median=%.3f us range=[%.3f,%.3f], "
+                    "ratio=%.3f\n",
+                    kBenchIterations, median(strata_us), *strata_range.first, *strata_range.second,
+                    median(candidate_us), *candidate_range.first, *candidate_range.second,
+                    median(candidate_us) / median(strata_us));
         cudaFree(device_tok); cudaFree(device_dst); cudaFree(device_group_count); cudaFree(device_starts);
         cudaFree(device_ptrs); cudaFree(device_native_output); cudaFree(device_group_output);
         cudaFree(native_scratch); cudaFree(candidate_scratch); cudaFree(device_xq); cudaFree(device_blob);

@@ -5456,3 +5456,9 @@ matched-residency on/off campaign has been completed. Device-side per-entry
 coverage, Q2_0-native activation cases, broader graph/edge-case qualification,
 and HIP/SYCL builds remain open. See the [E2 evidence report](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/README.md)
 and [execution plan](NINFER_EXPERT_EXECUTION_PLAN.md).
+
+The same report now includes an initial event-timed one-token operator screen:
+the grouped NInfer route took 85.7 us median versus 24.5 us for Strata (3.50x
+candidate/control). This excludes request and cache work, and its block range
+was wider than the control. Treat it as a regression signal that motivates
+fusion and controlled repeat measurements, not as a service-level comparison.

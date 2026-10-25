@@ -108,9 +108,9 @@ Do not print a generic NInfer-enabled banner when all work fell back.
 
 ## Implementation sequence
 
-E0 remains open; E1 is complete; E2–E7 remain pending. Each stage produces a
-small source/evidence change and a written decision before the next dependent
-stage begins.
+E0 remains open; E1 is complete; E2 is in progress; E3–E7 remain pending. Each
+stage produces a small source/evidence change and a written decision before the
+next dependent stage begins.
 
 Execution note (2026-10-25): an isolated `feat/ninfer-expert-e0` worktree now
 contains a supervised Orin baseline profile, an opt-in current-source residency
@@ -200,6 +200,11 @@ differed; matched on/off kernel timing, resident-ID identity, device-side entry
 coverage, model-native activation cases, and sustained/edge-case qualification
 remain open. CUDA only; HIP/SYCL builds are not yet available. See the [E2
 smoke report](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/README.md).
+An initial same-weight, one-token grouped operator screen measured 85.7 us
+median for the NInfer route versus 24.5 us for Strata across seven interleaved
+blocks of 1,000 calls. This is an operator-level regression signal with a wider
+candidate range, not an end-to-end comparison; fusion and a controlled repeat
+are required before deciding whether this implementation should proceed.
 
 ### E2 — Execute resident experts with NInfer-derived kernels
 

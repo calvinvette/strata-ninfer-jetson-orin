@@ -53,6 +53,21 @@ This counter establishes the host enqueue call in the harness; it is not a
 per-entry device-side counter. The passing output comparison demonstrates that
 the queued kernels completed and wrote the tested row.
 
+An event-timed diagnostic compared the one-token grouped NInfer route with
+`native_expert_grouped` on the same resident weight bytes and prequantized
+activation. Seven interleaved paired blocks each timed 1,000 calls after 12
+warmups. Median device-timeline time was 85.664 microseconds for the NInfer
+route (block range 85.276–145.009 us) and 24.498 us for Strata (24.351–24.537
+us), a candidate/control ratio of 3.50. CUDA events bracketed repeated stream
+invocations; the timing excludes initial activation quantization, model routing,
+cache lookup/fill, host storage, scheduling and service overhead. The candidate
+includes grouped Q2_0 gate/up, Strata's SwiGLU/Q8_1 quantizer and Q2_0 down
+projection. This is a one-token operator regression signal, not an end-to-end
+result. The candidate's wider block range and unavailable GPU clock readback
+are reasons to repeat under controlled clock/power observation. Its extra
+quantization/launch stage is an obvious fusion target; do not promote this
+implementation as a performance win in its current form.
+
 The independent Python codec/oracle unit tests pass 4/4. A previous real-payload
 check sampled 32,768 Q2_0 values across eight tensors against pinned ggml and
 matched bit-for-bit (see E1 contract and closeout).
@@ -71,8 +86,9 @@ counts and logged 6,578/19,200 cache hits (34.3%). Its engine prompt/decode rate
 were 8.2/4.9 tok/s; the NInfer screen reported 19.6/9.1 tok/s. These are single,
 non-randomized screening observations with different cache-hit ratios and prior
 request histories. They are **not a valid paired comparison** and must not be
-used to claim a performance improvement. No kernel-only timing, launch count,
-register/shared-memory report or same-residency on/off ablation was collected.
+used to claim a performance improvement. No Nsight kernel-level breakdown,
+register/shared-memory report or same-residency service on/off ablation was
+collected.
 
 The first strict service request initially failed because Strata's existing
 Q8_1 SwiGLU quantizer accepts at most eight columns per call. The adapter was
@@ -91,9 +107,11 @@ retained as implementation evidence.
 - Re-run strict service checks with Q2_0 model-native captured activations and
   broaden edge cases (empty/partial groups, multiple groups, graph reuse and
   strict rejection of unsupported tensors).
-- Complete same-day randomized paired backend-off/on measurements with matched
-  resident expert IDs and bytes. Measure operator latency and complete requests,
-  then follow the full E6 protocol before making any speed claim.
+- Repeat operator timing under controlled clock/power observation, inspect
+  kernel-level launch/resource costs, and revise or reject the extra quantization
+  stage. Then complete same-day randomized paired backend-off/on service
+  measurements with matched resident expert IDs and bytes before making an
+  end-to-end claim.
 - The first attempt exposed the existing helper's eight-column limit; the fixed
   code now chunks calls, but maximum-capacity scratch and graph-capture behavior
   need dedicated qualification.
