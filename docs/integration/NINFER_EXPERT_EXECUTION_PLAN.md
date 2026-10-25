@@ -476,11 +476,10 @@ parity and reduced the operator gap to 4.36×, but remained slower. A fresh
 three-pair, 8K same-residency service screen found median paired changes of
 +0.34% prompt, +1.77% decode, +0.82% client total and +0.36% TTFT, with decode
 slower in all three pairs. Outputs and resident-map hashes matched. These
-screens do not meet the useful-effect gate, so seven-pair confirmation and the
-seven-pair confirmation are not justified. A one-pair-per-capacity screening
+screens do not meet the useful-effect gate, so seven-pair confirmation is not justified. A one-pair-per-capacity screening
 matrix is being completed to characterize configured-context costs and failure
-boundaries; it cannot qualify a performance effect. Its pairs through 64K have
-passed, while 128K and 256K remain. E6 remains open; see the [E6 report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md).
+boundaries; it cannot qualify a performance effect. Its pairs through 128K have
+passed, while 256K remains. E6 remains open; see the [E6 report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md).
 
 ## Numerical policy
 

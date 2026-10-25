@@ -103,12 +103,12 @@ the capacity. The requested shapes are `pp512+tg64`, `pp2048+tg128`, and the
 omitted at 1K; input plus output must fit the configured capacity. This is
 capacity-allocation and short-request screening, not near-limit ingestion.
 
-The 1K, 2K, 4K, 8K, 16K, 32K and 64K pairs have completed. All fourteen
+The 1K, 2K, 4K, 8K, 16K, 32K, 64K and 128K pairs have completed. All sixteen
 service processes passed every eligible warmup and measured API check and
-exact token-count check. All fourteen startup residency maps have the same SHA256
+exact token-count check. All sixteen startup residency maps have the same SHA256
 `a02fd81e6337273a299b4b834ab1b694c16e5f97512e5dfec9d4fec08cd5ddf7`; each
 reported 3,000 slots / 3,955 MiB. Minimum available physical/admission memory
-was 16.43 GiB, above the 6 GiB floor. The measurements below are one request
+was 14.76 GiB, above the 6 GiB floor. The measurements below are one request
 per arm and workload. PP/TG and TTFT are descriptive samples, not paired
 estimates or confirmation intervals.
 
@@ -126,14 +126,19 @@ estimates or confirmation intervals.
 | 16K | 2,048+128 | 53.1 / 7.8 | 54.7 / 10.5 | 38.75 / 37.58 |
 | 32K | 2,048+128 | 53.9 / 9.3 | 54.0 / 10.2 | 38.12 / 38.12 |
 | 64K | 2,048+128 | 54.2 / 9.1 | 52.4 / 9.7 | 37.91 / 39.25 |
+| 128K | 512+64 | 10.6 / 8.7 | 30.6 / 9.6 | 48.60 / 16.89 |
+| 128K | 2,048+128 | 43.8 / 7.3 | 50.6 / 8.4 | 47.06 / 40.62 |
+| 128K | 172+64 | 13.2 / 8.4 | 16.8 / 9.4 | 13.29 / 10.44 |
+| 128K | 557+64 | 34.8 / 9.6 | 36.1 / 9.8 | 16.16 / 15.59 |
+| 128K | 1,069+64 | 40.1 / 9.5 | 42.2 / 9.4 | 26.84 / 25.49 |
 
-These single samples show no consistent backend advantage. The output hashes
-match between arms for 512+64 and 172+64 at every completed capacity, but differ
-for some longer cells; this screen has no independent numerical or task-quality
-oracle, so hash differences remain unresolved rather than serving as a quality
-pass/fail. The one-request design cannot establish a context-dependent
-performance effect. The remaining capacity measurements are running at 128K
-and 256K. The runner is
+These single samples show no consistent backend advantage. At 128K, output
+hashes match between arms for all five workloads. At smaller capacities, hashes
+match for 512+64 and 172+64, but differ for some longer cells; this screen has
+no independent numerical or task-quality oracle, so hash differences remain
+unresolved rather than serving as a quality pass/fail. The one-request design
+cannot establish a context-dependent performance effect. The 256K pair remains.
+The runner is
 [`run_context_matrix.py`](run_context_matrix.py); its `context-matrix/` data
 contains per-request API checks, engine logs, resident maps and supervisor
 summaries. The full matrix will remain screening evidence; a new implementation
