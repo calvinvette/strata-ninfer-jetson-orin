@@ -30,9 +30,11 @@ E1 has started with the actual Coder Q2_0 GGUF inventory. All 48 layers use Q2_0
 for routed gate/up/down tensors at 2560/640 dimensions, with 512 experts and
 top-10 routing. The new [E1 contract](E1_Q2_0_EXPERT_CONTRACT.md) records the
 byte layout, ownership boundaries, NInfer incompatibilities and scalar oracle;
-its synthetic codec/shape checks pass (3/3). Real-payload CUDA parity and an
-independently linked ggml comparison remain open, so this does not close E1 or
-establish runtime integration.
+its synthetic codec/shape checks pass (3/3). The first 64 real routed down-weight
+blocks also produced matching Python/C++ scalar checksums (0.6449966431 sum;
+33.21868134 absolute sum); this remains a decoder cross-check, not CUDA parity or
+an independently linked ggml comparison. E1 remains open and runtime integration
+is not established.
 
 The current Coder two-live investigation refines that exclusion. At cache 3,000,
 the default path's prompt-1 state first changed at position 105/layer 24 and its

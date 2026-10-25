@@ -42,6 +42,15 @@ mathematical reference, not a claim of parity with ggml or a CUDA kernel. E2 mus
 compare it with a separately linked trusted Q2_0 decoder and define numerical
 bounds before performance screening.
 
+For a real-payload spot check, the first 64 blocks of
+`blk.0.ffn_down_exps.weight` in shard 1 were decoded both by Strata's scalar C++
+utility and by the Python byte-level oracle. The C++ checksum was
+`sum=0.6449966431`, `sumabs=33.21868134`; Python produced the same printed values
+(absolute differences `3.36e-11` and `4.55e-9`). The C++ utility also checked
+eight Q2_0 tensors × their first 64 blocks against the structural code/scale
+invariant with zero violations. This cross-check detects layout/decoder mistakes
+between two implementations but is not an independent ggml comparison.
+
 Expected execution arithmetic: input activations are the represented values
 delivered to the adapter; decoded Q2_0 weights are exact in binary16 scale and
 integer code, but dot-product accumulation order is implementation-defined.
