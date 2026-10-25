@@ -138,6 +138,47 @@ latency) and eight-entry reuse (1.096×/1.117×, with a slower one-entry case),
 retaining the four-entry schedule as the best tested grouped layout. Neither
 alternative met the 5% screen threshold, so no new service confirmation ran.
 
+#### Rejected fused D3 + SwiGLU/Q8_1 candidate
+
+A temporary opt-in CUDA candidate fused Q2_0 grouped gate/up, SwiGLU and Q8_1
+packing to remove the intermediate FP32 arrays and one kernel launch. With the
+same real-weight parity fixture, the independent D3/D4 oracle passed (relative
+L2 `2.131e-7`), and one-entry, 3-token/3-group, 64-token/top-10 and
+128-token/top-10 output checks all passed with relative L1 `0` and no unwritten
+outputs. The candidate nevertheless regressed the grouped operator screen:
+
+| Workload | Strata median in fused run | Fused NInfer median | Fused / Strata |
+| --- | ---: | ---: | ---: |
+| One resident entry | 24.688 µs | 23.461 µs | 0.950× |
+| 64 tokens × top-10 | 3,959.514 µs | 5,069.320 µs | 1.280× |
+| 128 tokens × top-10 | 7,979.607 µs | 10,243.391 µs | 1.283× |
+
+In a separate unprofiled four-entry control harness, NInfer measured 4,356.908
+and 8,910.023 µs against Strata's 3,948.911 and 7,960.986 µs (1.103×/1.120×)
+for 64/128 tokens. These are adjacent screens, not a randomized paired
+comparison between source variants.
+
+The one-entry value was a single timing screen, not a paired confirmation. A
+corrected Nsight Compute capture recorded 168 registers/thread, 25% theoretical
+occupancy and 10.41% achieved occupancy for the captured 20-block launch. The
+profile swept repeated kernel invocations from the whole parity harness and did
+not isolate the 64-token/top-10 launch geometry; its replayed duration and
+occupancy are diagnostic, not the source of the unprofiled timing result. The
+high register count and low achieved occupancy are consistent with the
+shared-array/warp scheduling cost, but do not prove the cause of the grouped
+regression. The first profiling attempt omitted the opt-in environment variable
+and profiled no fused kernels; the corrected run was stopped after its report
+was written, so its supervisor record is incomplete. The candidate was
+discarded and is not part of the default or qualified binary. The four-entry/
+16-lane schedule remains the selected experimental baseline; E6's
+useful-effect and release gates remain unmet. After reverting the candidate,
+the CUDA targets rebuilt and the standard harness passed: D3/D4 oracle relative
+L2 `2.131e-7`, exact grouped parity, and 1.104×/1.119× grouped NInfer/Strata
+ratios. Restored-source hashes were source
+`3891bf2de2d8bae370841df86011787d9e145833f06961b3a00040d377305d3a`, server
+`daaf67ff7b764f0bd8413bee1d4e027132d4f2f978472795a82404fddeb5d420` and parity
+harness `6334fb6015e115ea8978f870aa6e25a2cb122761fd098a23a318b3bc1e1fd2bb`.
+
 ## Parametric context-capacity screen (completed screening)
 
 To complete E6's capacity coverage, a separate one-pair-per-capacity screen was

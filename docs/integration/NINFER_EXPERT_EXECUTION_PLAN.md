@@ -530,6 +530,19 @@ A restored-source seven-block retest passed parity and measured 1.118×/1.119×
 grouped latency at 64/128 tokens, with a 0.980× one-entry ratio. The original
 four-entry server and harness hashes were verified after the rebuild.
 
+Execution note (2026-10-25): a temporary fusion of grouped Q2_0 D3,
+SwiGLU and Q8_1 packing passed the independent numerical oracle and all tested
+single/grouped output boundaries, but regressed grouped latency to 1.280×/1.283×
+Strata at 64/128 tokens (the adjacent four-entry control measured 1.103×/1.120× in that
+screen). A single-entry timing was 0.950× Strata but is one diagnostic sample.
+Nsight Compute found 168 registers/thread and 10.41% achieved occupancy on a
+20-block captured launch; the whole-harness capture did not isolate the
+top-10 grouped launch, so this is hypothesis-generating only. The candidate was
+removed. No performance gate was met; the four-entry schedule remains the best
+tested grouped candidate. The restored CUDA build passed the standard oracle and
+grouped parity checks and reproduced 1.104×/1.119× operator ratios. See the
+[E6 report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md).
+
 ## Numerical policy
 
 - **Codec/layout:** exact independent decode, offset and guard checks. Moving or

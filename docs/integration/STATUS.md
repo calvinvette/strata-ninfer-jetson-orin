@@ -43,7 +43,13 @@ A later four-entry/16-lane Q2 schedule reduced the grouped operator ratio to
 1.107×/1.120× and brought the one-entry ratio to 0.980×, all with passing
 operator parity. Its new three-pair 8K service screen was still slower: median
 client total +2.74% and TTFT +2.70%; all three pairs were slower and output/map
-hashes matched. No performance-qualified profile is available.
+hashes matched. A temporary fused D3+SwiGLU/Q8_1 candidate passed its operator
+parity fixtures but measured 1.280×/1.283× Strata latency for grouped 64/128
+token work. NCU recorded 168 registers/thread and 10.41% achieved occupancy on
+a 20-block launch, but did not isolate the top-10 grouped shape; the candidate
+was discarded. The restored four-entry build passed the parity/operator harness
+again (exact grouped output; 1.104×/1.119× grouped latency). No
+performance-qualified profile is available.
 A one-pair-per-capacity screen across 1K–256K has completed; every eligible API
 and token-count check passed. Minimum available physical/admission memory was
 11.31 GiB, above the 6 GiB floor, and all eighteen startup maps had the same
