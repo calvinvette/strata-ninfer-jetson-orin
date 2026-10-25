@@ -50,8 +50,22 @@ matched bit-for-bit; all eight sum and absolute-sum checksums matched. For
 `blk.0.ffn_down_exps.weight`, the checksums were `sum=0.6449966431` and
 `sumabs=33.21868134`. Strata's C++ utility also checked eight Q2_0 tensors ×
 their first 64 blocks against the structural code/scale invariant with zero
-violations. This qualifies sampled codec decoding only; the full tensor payloads,
-real-activation projections, and CUDA adapter remain untested.
+violations. This qualifies sampled codec decoding only; full tensor payloads and
+CUDA adapter parity remain untested.
+
+The reusable `tools/integration/q2_0_expert_oracle.py` was also run on actual
+layer-0, expert-32 gate/up/down rows from the Q2_0 artifact. Its input was the
+previously captured layer-0 activation for expert 32 from the related Coder IQ1_M
+artifact (`2026-10-15-phase5-activation-error-decomposition`, SHA256
+`607553ddddee20523c8259ba171eedc35fb01239dca19d1124114cf574515391`). This is
+a real activation vector but a cross-variant input, not an activation captured
+from the Q2_0 model. Under exact Q2_0 decoding and FP64 dots/SiLU the unweighted
+output SHA256 is
+`86630939911b8899265cc806fefc448ce462f32958c13a150af84936fc604c9a`, max
+absolute value `0.08953284`, RMS `0.01652383`. The JSON includes gate/up/hidden
+range checks. This establishes a repeatable oracle fixture for real weights and
+a representative activation; it does not validate a runtime kernel or the
+Q2_0 model's own activation distribution.
 
 Expected execution arithmetic: input activations are the represented values
 delivered to the adapter; decoded Q2_0 weights are exact in binary16 scale and

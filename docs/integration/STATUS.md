@@ -33,9 +33,10 @@ byte layout, ownership boundaries, NInfer incompatibilities and scalar oracle;
 its synthetic codec/shape checks pass (3/3). Eight real Q2_0 tensors were also
 decoded across 32,768 values by the Python oracle and `ggml::dequantize_row_q2_0`
 from pinned llama.cpp commit `3cf03257`; every FP32 value matched bit-for-bit.
-This qualifies sampled codec decoding only. Real-activation projections and CUDA
-adapter parity remain open, so E1 remains open and runtime integration is not
-established.
+The FP64 oracle also ran an actual Q2_0 layer-0/expert-32 weight triplet against
+a captured same-architecture IQ1_M activation; this is cross-variant, not the
+Q2_0 model's own activation distribution. CUDA adapter parity remains open, so
+E1 remains open and runtime integration is not established.
 
 The current Coder two-live investigation refines that exclusion. At cache 3,000,
 the default path's prompt-1 state first changed at position 105/layer 24 and its

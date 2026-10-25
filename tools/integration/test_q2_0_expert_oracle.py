@@ -4,19 +4,7 @@
 import math
 import struct
 import unittest
-
-
-def half_to_float(bits):
-    return struct.unpack("<e", struct.pack("<H", bits))[0]
-
-
-def decode_block(block):
-    if len(block) != 18:
-        raise ValueError("Q2_0 block must be 18 bytes")
-    scale = half_to_float(struct.unpack_from("<H", block)[0])
-    codes = block[2:]
-    return [scale * (((codes[j // 4] >> ((j % 4) * 2)) & 3) - 1) for j in range(64)]
-
+from q2_0_expert_oracle import decode_block, decode_row
 
 def encode_block(scale_bits, codes):
     if len(codes) != 64 or any(c < 0 or c > 3 for c in codes):
@@ -26,12 +14,6 @@ def encode_block(scale_bits, codes):
     for j, code in enumerate(codes):
         packed[2 + j // 4] |= code << ((j % 4) * 2)
     return bytes(packed)
-
-
-def decode_row(blob, width):
-    if width % 64 or len(blob) != width // 64 * 18:
-        raise ValueError("row width/blob size violates Q2_0 block geometry")
-    return [value for off in range(0, len(blob), 18) for value in decode_block(blob[off : off + 18])]
 
 
 def project(weights, x):
