@@ -342,6 +342,12 @@ L2 0.02396); layers 0–2 were exact and layer 3 first differed by about
 exact across inputs, routes, expert parts and outputs, so it does not explain
 the aggregate state difference or rule out earlier prompt-position deltas. A
 second capture at the final prompt position, model layer 1, was also exact.
+Multi-position layer-3 captures found one difference among positions 512,
+520, 530, 540 and 557: at 520, expert 94's row differed on identical input,
+route IDs and weights (relative L2 `7.15e-4`); the other sampled rows were
+bit-identical. This is the first sampled mismatch, not necessarily the first
+divergent position; 513–519 remain unexamined. The [quality diagnostic](../../bench/results/2026-10-25-phase-e3-q2-ninfer-complement6g-quality/README.md)
+contains per-expert evidence.
 The 6-GiB TTFT screen alone is not a performance qualification: median client
 latency remains below the 5% target, each cell has only three pairs, and
 persistent-state equivalence is unresolved. See the [complement sweep

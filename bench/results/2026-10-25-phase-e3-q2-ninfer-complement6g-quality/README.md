@@ -54,3 +54,16 @@ A second targeted capture at the last prompt position (511), model layer 1,
 also found identical inputs, routes/weights, expert parts and outputs. These
 two exact sampled boundaries do not account for the accumulated state delta;
 other prompt positions and layers remain unsampled.
+
+A multi-position layer-3 verifier capture sampled generated positions 512,
+520, 530, 540 and 557. The first sampled difference was at position 520:
+input, route IDs and route weights matched, while expert 94 (route rank 5)
+differed in 1,538/2,560 output values (relative L2 `7.15e-4`, max absolute
+delta `4.55e-5`). The combined MoE output differed in 1,538/2,560 values
+(relative L2 `1.37e-4`); shared output remained exact. The other four sampled
+positions were bit-identical. Positions 513–519 were not sampled, so position
+520 is not proven to be the first divergent token. This isolates a same-input,
+same-route expert arithmetic difference in one sampled layer-3 row; it is
+consistent with the final-state difference but does not alone prove its full
+causal path. The multi-position files and per-expert comparison are in
+`moe-layer3-generated/`.

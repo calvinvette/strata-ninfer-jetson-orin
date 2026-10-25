@@ -35,8 +35,16 @@ def main() -> int:
                     help='capture route, input, per-expert parts and output for one verifier layer')
     ap.add_argument('--capture-moe-position', type=int,
                     help='filter the MoE capture to one token position')
+    ap.add_argument('--capture-moe-positions', type=int, nargs='+',
+                    help='filter the MoE capture to several increasing token positions')
     ap.add_argument('--run', action='store_true')
     a = ap.parse_args()
+    if a.capture_moe_position is not None and a.capture_moe_positions is not None:
+        ap.error('use only one of --capture-moe-position and --capture-moe-positions')
+    if a.capture_moe_positions is not None and (
+            not a.capture_moe_positions or any(x < 0 for x in a.capture_moe_positions) or
+            a.capture_moe_positions != sorted(set(a.capture_moe_positions))):
+        ap.error('--capture-moe-positions must be unique, increasing, nonnegative integers')
     cfg = json.loads(a.config.read_text())
     workload = json.loads(a.workload.read_text())['workloads'][0]
     max_new = a.max_new if a.max_new is not None else workload['generate_tokens']
@@ -94,7 +102,9 @@ def main() -> int:
                 arm_env[f'{stem}_PATH'] = str((a.output / f'{name}.layer{a.capture_moe_layer}.{kind.lower()}').resolve())
                 if kind in ('ROUTE', 'PARTS', 'OUTPUT'):
                     arm_env[f'{stem}_BATCH'] = '1'
-                if a.capture_moe_position is not None:
+                if a.capture_moe_positions is not None:
+                    arm_env[f'{stem}_POSITIONS'] = ','.join(map(str, a.capture_moe_positions))
+                elif a.capture_moe_position is not None:
                     arm_env[f'{stem}_POSITION'] = str(a.capture_moe_position)
         engine = StrataEngine(str(a.engine.resolve()), command, cwd=cfg.get('cwd'),
                               log=str(log), env=arm_env)
