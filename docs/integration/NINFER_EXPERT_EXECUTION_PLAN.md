@@ -108,10 +108,9 @@ Do not print a generic NInfer-enabled banner when all work fell back.
 
 ## Implementation sequence
 
-All stages remain open. E1 now has an initial Q2_0 codec/geometry contract and
-passing synthetic scalar checks; its real-payload and independent ggml parity
-requirements remain pending. Each stage produces a small source/evidence change
-and a written decision before the next dependent stage begins.
+E0 remains open; E1 is complete; E2–E7 remain pending. Each stage produces a
+small source/evidence change and a written decision before the next dependent
+stage begins.
 
 Execution note (2026-10-25): an isolated `feat/ninfer-expert-e0` worktree now
 contains a supervised Orin baseline profile, an opt-in current-source residency
@@ -161,7 +160,7 @@ Use the measured exposed time to estimate a speedup ceiling, without treating
 cache hit percentage as a time fraction. This stage ends with implementation
 selection; it does not expand into unrelated concurrency diagnosis.
 
-### E1 — Specify and prove the selected expert contract
+### E1 — Specify and prove the selected expert contract — complete 2026-10-25
 
 1. Map exact NInfer source functions to the proposed Strata adapter, including
    geometry, decoder, activation scaling, SiLU, down projection and output order.
@@ -176,6 +175,13 @@ selection; it does not expand into unrelated concurrency diagnosis.
    edge values, routing permutations and actual Flash-Next dimensions.
 
 **Exit:** a concrete adapter contract and oracle fixtures for the first codec pair.
+The [E1 Q2_0 contract](E1_Q2_0_EXPERT_CONTRACT.md) records the supported tensor
+pair, source mapping, lifetimes and numerical oracle. Synthetic codec/geometry/
+route-map checks pass 4/4; 32,768 sampled values from eight real tensors match
+pinned ggml bit-for-bit. A full real-weight FP64 oracle case matches the current
+Strata unquantized reference at relative L1 `3.76e-8`. The activation is a
+captured cross-variant Coder IQ1_M vector; Q2_0-model-native activation coverage
+and NInfer adapter parity remain E2 qualification work.
 Retain fixtures under `~/models/` when they contain model payloads. A stub or an
 operator that simply forwards all work to Strata is not the E2 deliverable.
 

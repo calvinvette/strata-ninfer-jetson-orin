@@ -1,6 +1,6 @@
 # E1 Q2_0 routed expert contract
 
-Status: contract and codec oracle defined; CUDA adapter not implemented yet.
+Status: **E1 complete (2026-10-25)**. CUDA adapter and runtime integration are E2 work.
 Inventory source: `ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF`, revision
 `5348543e0147355ac9cbcb031184a3546350988e`, local Q2_0 shards under
 `~/models/strata-orin-validation/Q2_0/`. The inventory JSON is generated locally

@@ -26,7 +26,8 @@ E0 remains open because the pinned binary does not expose its resident-ID map
 and the same-source backend-off/on ablation awaits E2's selector. See the
 [E0 runtime audit](../../bench/results/2026-10-25-phase-e0-expert-runtime-audit/README.md).
 
-E1 has started with the actual Coder Q2_0 GGUF inventory. All 48 layers use Q2_0
+E1 completed its first codec contract on 2026-10-25 from the actual Coder Q2_0
+GGUF inventory. All 48 layers use Q2_0
 for routed gate/up/down tensors at 2560/640 dimensions, with 512 experts and
 top-10 routing. The new [E1 contract](E1_Q2_0_EXPERT_CONTRACT.md) records the
 byte layout, ownership boundaries, NInfer incompatibilities and scalar oracle;
