@@ -1,0 +1,50 @@
+{
+  "exe": "/home/calvin/workspace/strata-ninfer-jetson-orin/build/integration/candidate/strata",
+  "args": [
+    "--pack",
+    "/home/calvin/models/strata-orin-validation/q2-ple-pack",
+    "--native",
+    "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+    "--ple-gguf",
+    "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+    "--expert-profile",
+    "/home/calvin/models/strata-orin-validation/q2-expert-profile.bin",
+    "--expert-cache",
+    "3000",
+    "--prefill",
+    "128",
+    "--spec",
+    "2",
+    "--max-context",
+    "131072",
+    "--mmap-experts",
+    "--prompt-cache",
+    "0",
+    "--vram-reserve-mib",
+    "3072",
+    "--pcie-frac",
+    "0.55",
+    "--no-prefill-borrow",
+    "--pool-workers",
+    "8",
+    "--suffix-draft",
+    "0",
+    "--spec-min-p",
+    "0"
+  ],
+  "cwd": "/home/calvin/workspace/strata-ninfer-jetson-orin",
+  "tokenizer": "/home/calvin/models/strata-orin-validation/pack/tokenizer",
+  "model_name": "Flash-Next context sweep coder-q2_0 ctx131072",
+  "log": "/home/calvin/workspace/strata-ninfer-jetson-orin/bench/results/2026-10-25-flashnext-context-capacity-sweep/campaign/coder-q2_0/131072/run/engine.log",
+  "lib_dirs": [
+    "/usr/local/cuda-12/lib64"
+  ],
+  "port": 18887,
+  "host": "127.0.0.1",
+  "cuda": 12,
+  "open_browser": false,
+  "draft_vocab": "cjk",
+  "env": {
+    "STRATA_PREFILL_CPU_SHARE": "0"
+  }
+}

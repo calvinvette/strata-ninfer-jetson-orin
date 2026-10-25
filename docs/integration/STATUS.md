@@ -5369,6 +5369,18 @@ documentation consolidation, not a new run; the campaigns are not same-day
 paired, and the GGUF variants have not been run through NInfer. Treat this as
 Strata-side reference data, not a causal quantization or cross-port comparison.
 
+An expanded [context-capacity sweep](../../bench/results/2026-10-25-flashnext-context-capacity-sweep/README.md)
+then measured the October 8 matched prompt shapes (172/557/1,069 tokens,
+64-token output) at configured capacities 1K through 256K for Coder IQ1_M,
+Coder Q2_0 and original IQ3_S. All 27 cells passed under the six-GiB guard.
+From 8K to 256K, median 557-token prompt throughput fell 49%, 50% and 44%
+respectively; client TTFT rose from 9.4/12.7/36.2 to 18.4/25.4/64.8 seconds.
+These are short prompts at larger reserved capacities, not actual 64K–256K
+prefills. The current candidate kept fixed model profiles and MTP off; the
+October 8 run used MTP spec 4 and automatic expert-cache sizing, so this is not
+a same-profile or causal engine-version comparison. Full per-request medians,
+ranges, memory, profiles and limitations are in the report.
+
 # 2026-10-25: Dense Qwen3.8-27B IQ3_S is unsupported by Strata
 
 Checked the requested `~/models/qwen3.8-27b-iq3s/Qwen3.8-27B-UD-IQ3_S.gguf`

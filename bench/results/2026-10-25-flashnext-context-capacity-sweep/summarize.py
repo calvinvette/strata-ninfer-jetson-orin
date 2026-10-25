@@ -21,19 +21,32 @@ def main():
     args = parser.parse_args()
     matrix = json.loads((args.campaign / "matrix.json").read_text())
     summary = {
-        "source_matrix": str((args.campaign / "matrix.json").resolve()),
+        "source_matrix": "campaign/matrix.json",
         "statistic": "median and min/max across three in-process repetitions; descriptive only",
         "metrics": {},
     }
     errors = []
     for cell in matrix["cells"]:
         model, context = cell["model"], cell["context"]
+        supervisor_dir = args.campaign / model / str(context) / "supervisor"
         row = {
             "status": cell["status"],
             "minimum_available_gib": (cell.get("minimum_available_bytes") or 0) / 2**30,
             "minimum_admission_available_gib": (cell.get("minimum_admission_available_bytes") or 0) / 2**30,
             "prompts": {},
         }
+        sample_path = supervisor_dir / "memory.jsonl"
+        if sample_path.exists():
+            telemetry = [json.loads(line) for line in sample_path.read_text().splitlines() if line]
+            if telemetry:
+                row["maximum_swap_gib"] = max(sample["swap_used_bytes"] for sample in telemetry) / 2**30
+                row["minimum_available_gib"] = min(sample["available_bytes"] for sample in telemetry) / 2**30
+                row["minimum_admission_available_gib"] = min(sample["admission_available_bytes"] for sample in telemetry) / 2**30
+                events = [limit.get("memory_events", {}) for sample in telemetry for limit in sample.get("cgroups", [])]
+                row["maximum_cgroup_memory_events"] = {
+                    key: max((event.get(key, 0) for event in events), default=0)
+                    for key in ("low", "high", "max", "oom", "oom_kill", "oom_group_kill")
+                }
         run_dir = args.campaign / model / str(context) / "run"
         for repeat, prompt_tokens in ((32, 172), (128, 557), (256, 1069)):
             if prompt_tokens + 64 > context:
