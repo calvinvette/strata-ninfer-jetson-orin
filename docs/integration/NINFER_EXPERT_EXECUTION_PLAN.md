@@ -535,12 +535,15 @@ SwiGLU and Q8_1 packing passed the independent numerical oracle and all tested
 single/grouped output boundaries, but regressed grouped latency to 1.280×/1.283×
 Strata at 64/128 tokens (the adjacent four-entry control measured 1.103×/1.120× in that
 screen). A single-entry timing was 0.950× Strata but is one diagnostic sample.
-Nsight Compute found 168 registers/thread and 10.41% achieved occupancy on a
-20-block captured launch; the whole-harness capture did not isolate the
-top-10 grouped launch, so this is hypothesis-generating only. The candidate was
+Nsight Compute found 168 registers/thread and 10.41% achieved occupancy on the
+20-block single-entry launch. A later exact grouped invocation used 200 blocks
+and achieved 23.92% occupancy against its 25% register-limited theoretical
+ceiling, with 40.25% compute and 46.14% memory throughput. Thus severe grouped
+grid underfill is not the cause; register pressure and latency are plausible
+limits but profiling does not establish causality. The candidate was
 removed. No performance gate was met; the four-entry schedule remains the best
 tested grouped candidate. The restored CUDA build passed the standard oracle and
-grouped parity checks and reproduced 1.104×/1.119× operator ratios. See the
+grouped parity checks and reproduced 1.109×/1.119× operator ratios. See the
 [E6 report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md).
 
 ## Numerical policy

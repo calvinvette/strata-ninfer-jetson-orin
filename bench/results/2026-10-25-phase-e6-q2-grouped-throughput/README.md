@@ -161,19 +161,20 @@ comparison between source variants.
 The one-entry value was a single timing screen, not a paired confirmation. A
 corrected Nsight Compute capture recorded 168 registers/thread, 25% theoretical
 occupancy and 10.41% achieved occupancy for the captured 20-block launch. The
-profile swept repeated kernel invocations from the whole parity harness and did
-not isolate the 64-token/top-10 launch geometry; its replayed duration and
-occupancy are diagnostic, not the source of the unprofiled timing result. The
-high register count and low achieved occupancy are consistent with the
-shared-array/warp scheduling cost, but do not prove the cause of the grouped
-regression. The first profiling attempt omitted the opt-in environment variable
-and profiled no fused kernels; the corrected run was stopped after its report
-was written, so its supervisor record is incomplete. The candidate was
-discarded and is not part of the default or qualified binary. The four-entry/
-16-lane schedule remains the selected experimental baseline; E6's
-useful-effect and release gates remain unmet. After reverting the candidate,
+profile did not isolate the 64-token/top-10 launch geometry. A later exact
+kernel-invocation capture did: the grouped shape launched 200 blocks (grid
+20×10), used 168 registers/thread, and achieved 23.92% occupancy against a
+25% theoretical limit. Compute and memory throughput were 40.25% and 46.14%.
+This removes severe grouped-launch underfill as an explanation; register-limited
+occupancy and latency are plausible constraints, but counters do not prove the
+source of the grouped regression. NCU replay durations are diagnostic and are
+not the source of the unprofiled operator medians. The first profiling attempt
+omitted the opt-in environment variable and profiled no fused kernels. The
+candidate was discarded and is not part of the default or qualified binary.
+The four-entry/16-lane schedule remains the selected experimental baseline;
+E6's useful-effect and release gates remain unmet. After reverting the candidate,
 the CUDA targets rebuilt and the standard harness passed: D3/D4 oracle relative
-L2 `2.131e-7`, exact grouped parity, and 1.104×/1.119× grouped NInfer/Strata
+L2 `2.131e-7`, exact grouped parity, and 1.109×/1.119× grouped NInfer/Strata
 ratios. Restored-source hashes were source
 `3891bf2de2d8bae370841df86011787d9e145833f06961b3a00040d377305d3a`, server
 `daaf67ff7b764f0bd8413bee1d4e027132d4f2f978472795a82404fddeb5d420` and parity

@@ -46,10 +46,13 @@ client total +2.74% and TTFT +2.70%; all three pairs were slower and output/map
 hashes matched. A temporary fused D3+SwiGLU/Q8_1 candidate passed its operator
 parity fixtures but measured 1.280×/1.283× Strata latency for grouped 64/128
 token work. NCU recorded 168 registers/thread and 10.41% achieved occupancy on
-a 20-block launch, but did not isolate the top-10 grouped shape; the candidate
-was discarded. The restored four-entry build passed the parity/operator harness
-again (exact grouped output; 1.104×/1.119× grouped latency). No
-performance-qualified profile is available.
+a 20-block single-entry launch. A later exact grouped capture used a 200-block
+grid and achieved 23.92% occupancy against the 25% register-limited ceiling;
+compute/memory throughput were 40.25%/46.14%. This excludes severe grouped-grid
+underfill, though register pressure and latency remain plausible limits. The
+candidate was discarded. The restored four-entry build passed the
+parity/operator harness again (exact grouped output; 1.109×/1.119× grouped
+latency). No performance-qualified profile is available.
 A one-pair-per-capacity screen across 1K–256K has completed; every eligible API
 and token-count check passed. Minimum available physical/admission memory was
 11.31 GiB, above the 6 GiB floor, and all eighteen startup maps had the same
