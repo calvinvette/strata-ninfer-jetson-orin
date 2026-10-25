@@ -5293,3 +5293,16 @@ paired uncertainty and scoped interaction/Pareto results. The short/long MTP
 tradeoff and worker/transfer latency/rail tradeoffs do not yield a general
 winner. Named rails include idle/background activity and are not process energy.
 No default changed. [Phase 6 closeout](PHASE6_CLOSEOUT.md).
+
+A separate seven-block [IQ3_S current-candidate performance run](../../bench/results/2026-10-24-iq3s-current-candidate-performance/README.md)
+used the original, non-Coder Qwen3.8-Flash-Next IQ3_S shards at the matching
+Hugging Face revision. Median rates were 13.1 prompt / 5.7 generated tokens/s
+for 512/64 and 22.1 / 6.3 tokens/s for 2,048/128; median client TTFT was
+40.06/93.46 seconds. All 14 requests passed fresh-prefill and requested token
+count checks. The 3,000-slot cache request realized 3,904 slots (7.44 GiB);
+minimum host/admission availability was 12.77/10.07 GiB with zero cgroup memory
+events, while swap use reached 3.60 GiB. Host-wide NVMe read deltas were 33.81
+and 50.08 GB per request; they include unrelated I/O and read-ahead. Clocks ran
+dynamically in MAXN and EMC readback was unavailable. Output text had two hashes
+per workload and no quality oracle was used. This is not a paired Q2_0
+comparison and does not change the Q2_0 release-profile boundary.

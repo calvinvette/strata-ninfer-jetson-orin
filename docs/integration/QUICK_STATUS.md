@@ -34,6 +34,17 @@ telemetry and raw captures are not committed.
 
 ## Performance observed
 
+A seven-block current-candidate run on the original Qwen3.8-Flash-Next IQ3_S
+model measured 13.1 prompt / 5.7 generated tok/s at 512/64 and 22.1 / 6.3
+tok/s at 2,048/128. Median client TTFT was 40.06/93.46 s; median full request
+time was 50.82/112.93 s. The 3,000-slot cache request realized 3,904 slots
+(7.44 GiB). Minimum host availability was 12.77 GiB and minimum admission
+availability 10.07 GiB; cgroup memory events stayed zero. Host-wide NVMe reads
+were high at 33.81/50.08 GB per request and are not process-attributed. This is
+an exploratory IQ3_S cohort with dynamic MAXN clocks, no paired Q2_0 control, and
+no output-quality oracle; it does not widen the bounded Q2_0 release profile.
+[Full report](../../bench/results/2026-10-24-iq3s-current-candidate-performance/README.md).
+
 A current Phase 5 two-live diagnostic found a local owner-dependent change at
 Coder layer 9 / expert 233. Promoting that expert to GPU residency restored
 exact 72-token output parity on the original prompt pair and one held-out pair,

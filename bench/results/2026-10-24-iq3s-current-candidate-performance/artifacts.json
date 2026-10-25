@@ -1,0 +1,122 @@
+{
+  "schema": 1,
+  "measured_on": "2026-10-24",
+  "board": "NVIDIA Jetson AGX Orin, aarch64",
+  "kernel": "Linux 5.15.148-tegra",
+  "l4t": "R36.4.4",
+  "cuda": "12.6",
+  "driver": "540.4.0",
+  "power_mode": "MAXN, dynamic clocks observed; no clock changes",
+  "source_commit": "348e6261ab3fa5f119ec3050637c01477fddaa78",
+  "candidate_executable_sha256": "ad4b2354fe98f0e4128cf9a9ed70488fef362207dd1f7e94555a8ba35d8985df",
+  "engine_reported_version": "0.1.41",
+  "model": {
+    "repo": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
+    "revision": "ed59f92082b1e93c0e96d60a8b11aab089b52f09",
+    "quantization": "IQ3_S",
+    "shards": {
+      "model_shard_1": {
+        "relative_path": "~/models/strata-orin-validation/ISTA-DASLab-Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S/IQ3_S/Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00001-of-00002.gguf",
+        "size_bytes": 54817524224,
+        "sha256": "4c1eb2ceb4915e1192f4f386021897bde56a97f40a0bb78bb86465e0f7d2aca3"
+      },
+      "model_shard_2": {
+        "relative_path": "~/models/strata-orin-validation/ISTA-DASLab-Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S/IQ3_S/Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00002-of-00002.gguf",
+        "size_bytes": 28800138432,
+        "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+      }
+    }
+  },
+  "pack": {
+    "path": "~/models/strata-orin-validation/iq3-s-pack",
+    "method": "tools/iq_pack.py --base using shared byte-identical Q2_0 base float tensors; IQ3_S native quantized tensors and PLE sourced from the IQ3_S GGUF pair",
+    "index_tensor_count": 1079,
+    "native_served_tensor_count": 302,
+    "extra_tensor_count": 1,
+    "files": {
+      "dense.bin": {
+        "size_bytes": 1485606400,
+        "sha256": "a43d7d0b69525335f4b000d5197a1d3aefcd3c0014fc3e12b3455e0a5d827ba2"
+      },
+      "extra.bin": {
+        "size_bytes": 52428800,
+        "sha256": "f431e2b51311b4bbea97ea0e02b6c35944033490dd5dc76bb5cc5b594f7af7de"
+      },
+      "index.txt": {
+        "size_bytes": 93635,
+        "sha256": "ff753a1f406ee039a0a63bb3877a325321e72ec4ce52a0572e626906c833bd3c"
+      },
+      "native_experts.txt": {
+        "size_bytes": 3304,
+        "sha256": "d9ac2dfa3ee63c55c9c6a6db26f72da0cec0ee41733f007e5cbbbba71617aa5d"
+      }
+    },
+    "tokenizer_sha256_by_file": {
+      "chat_template.jinja": {
+        "size_bytes": 9993,
+        "sha256": "12827f24b742ea4e80cdc12dbcf9622227056b9f797252a3149263d4f9aaadce"
+      },
+      "merges.txt": {
+        "size_bytes": 3353258,
+        "sha256": "4ba698529766c7a2f5052083ea10cdf2485577f5237a332ee291054eb11e3332"
+      },
+      "token_type.json": {
+        "size_bytes": 744960,
+        "sha256": "5088c8c298fc06af8382ddb3b76c888703ac2634e82263b97eedcc2ad202738b"
+      },
+      "tokenizer.json": {
+        "size_bytes": 541,
+        "sha256": "c0bd435efbc6c3b28964b47999afe16c4ad268c7c7c4e8cb3af410796a6f30bf"
+      },
+      "vocab.json": {
+        "size_bytes": 5737005,
+        "sha256": "4ba64f0332abcfb0b600b7df1537d1e836e68009d5fb7cdb77339738dc6365c4"
+      }
+    }
+  },
+  "expert_profile": {
+    "path": "~/models/strata-orin-validation/q2-expert-profile.bin",
+    "sha256": "b3e62120218cd96d175a0547530158869177dd2164b22b40f32bea7d7e85fb8c"
+  },
+  "workload_sha256": "80cea36409c8d71bd2192df12959c55ca6bd270ad3176205304742803f8fe9ca",
+  "server_config_sha256": "095236f19e2f5a125de71b5ada18ac149d93305111e68290fe7d48b8419dd499",
+  "campaign_seed": 2026102401,
+  "campaign_blocks": 7,
+  "profile_flags": [
+    "--expert-cache 3000",
+    "--prefill 128",
+    "--spec 2",
+    "--max-context 8192",
+    "--mmap-experts",
+    "--prompt-cache 0",
+    "--vram-reserve-mib 3072",
+    "--pcie-frac 0.55",
+    "--no-prefill-borrow",
+    "--pool-workers 8",
+    "--suffix-draft 0",
+    "--spec-min-p 0",
+    "STRATA_PREFILL_CPU_SHARE=0"
+  ],
+  "settings_realized": {
+    "expert_cache_slots": 3904,
+    "expert_cache_shared_ram_bytes": 7998535680,
+    "workspace_reserve_mib": 3072,
+    "kv": "FP16",
+    "mtp": "off",
+    "prompt_cache": "off"
+  },
+  "measurement_protocol": {
+    "supervisor": "tools/integration/run_control.py",
+    "cgroup_memory_max": "28G",
+    "minimum_admission_floor_gib": 6,
+    "clock_sampling": "read-only CPU/GPU clocks",
+    "warmup": "one request per workload per independent process; excluded",
+    "repetitions": 7,
+    "energy": "not process-attributed; no energy estimate"
+  },
+  "report_hashes": {
+    "summary.json": "78d1a89830bdd0045018ae60943a1bcdda9bc8124170a08c4e0f54efcbbc2d2b",
+    "workloads.json": "80cea36409c8d71bd2192df12959c55ca6bd270ad3176205304742803f8fe9ca",
+    "server-config.template.json": "095236f19e2f5a125de71b5ada18ac149d93305111e68290fe7d48b8419dd499"
+  }
+}
