@@ -133,6 +133,10 @@ full operator harness and hardware-counter profiles of one-entry and 64-token
 grouped paths. These diagnostics show near-native per-kernel medians in the
 broad trace and near-theoretical occupancy for the grouped D3/D4 launches, but
 do not isolate the source of the remaining operator or service latency gap.
+An entries-per-tile sweep rejected two-entry reuse (1.234×/1.236× grouped
+latency) and eight-entry reuse (1.096×/1.117×, with a slower one-entry case),
+retaining the four-entry schedule as the best tested grouped layout. Neither
+alternative met the 5% screen threshold, so no new service confirmation ran.
 
 ## Parametric context-capacity screen (completed screening)
 

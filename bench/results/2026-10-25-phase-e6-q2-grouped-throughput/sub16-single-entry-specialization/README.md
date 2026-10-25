@@ -94,6 +94,42 @@ are recorded above. Raw [one-entry Nsight Compute](decode-one-entry-basic.ncu-re
 and [64-token Nsight Compute](grouped-64-exact-basic.ncu-rep) reports, plus
 supervisor summaries, are stored beside this report.
 
+## Entries-per-tile sweep
+
+Using the same 16-lane Q2 schedule, I tested tiles of two and eight entries
+around the retained four-entry tile. Each grouped value is the median of seven
+paired blocks with 50 invocations per arm; lower NInfer/Strata is better. All
+cases passed the independent D3/D4 and grouped-output parity checks with no
+unwritten results.
+
+| Entries per tile | One-entry NInfer / Strata | 64-token NInfer / Strata | 128-token NInfer / Strata | Decision |
+| ---: | ---: | ---: | ---: | --- |
+| 2 | 0.984× | 1.234× | 1.236× | Reject: repeated weight loads cost more |
+| 4 | 0.980× | 1.107× | 1.120× | Retain: best grouped result |
+| 8 | 1.043× | 1.096× | 1.117× | Reject: grouped improvement is only about 1% and decode regresses |
+
+The two-entry run used source SHA256
+`8668380b781846376b5501b3ce5bfd76ac1ae8d1b789ca2c6f51c2c11ad5679b`, server
+SHA256 `a0e0edc94e7586a96e548bc8f92917f05299d9d2b6d1c22994137cbcd12b6881`, and
+parity binary SHA256 `5aca9bb41d3bc6285dd0c3821643492ade1b07814b894e6b8e5ba149f5c7b6db`.
+The eight-entry run used source SHA256
+`5bacff8cc4952955b3b75123fc6af938065c4a1e24d220f484d601c7a90e10db`, server
+SHA256 `2fee37e9c6353f33c888f18c0bc73ee7fb4b62500ec32c4888b51f31abd3c80f`, and
+parity binary SHA256 `7ae2880f6bfa1a54f4b25187bb04a38454acebf5e5742578f73486fd5d06bbf8`.
+The retained four-entry build remains
+`daaf67ff7b764f0bd8413bee1d4e027132d4f2f978472795a82404fddeb5d420` for
+`strata` and `6334fb6015e115ea8978f870aa6e25a2cb122761fd098a23a318b3bc1e1fd2bb`
+for the parity harness. Raw supervised runs are in the adjacent `entries2/`
+and `entries8/` directories. Neither alternative crossed the 5% useful-effect
+threshold, so no additional service screen was run.
+
+After restoring the four-entry source, I rebuilt `strata` and the parity
+harness and confirmed their hashes matched the retained artifacts above. A
+fresh seven-block operator run again passed all parity checks and measured
+NInfer/Strata ratios of 1.118× and 1.119× for 64 and 128 tokens (one-entry
+ratio 0.980×). This repeat confirms the four-entry path's grouped result is
+still about 12% slower; it is not a new service confirmation.
+
 ## Reproduction
 
 Build the tested CUDA targets with bounded parallelism:

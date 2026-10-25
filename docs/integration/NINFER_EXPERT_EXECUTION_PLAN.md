@@ -519,6 +519,16 @@ are diagnostic only. The grouped capture does not show a large occupancy
 deficit and does not explain the remaining latency gap; no performance claim
 is justified by profiling alone. See the [candidate
 profiling note](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/sub16-single-entry-specialization/README.md).
+The subsequent two/four/eight-entry reuse sweep retained four entries: the
+two-entry candidate measured 1.234×/1.236× NInfer/Strata latency at 64/128
+tokens, while eight entries measured 1.096×/1.117× and regressed the one-entry
+case. All passed the operator parity fixture; neither alternative met the 5%
+screen threshold, so no service confirmation was run. The four-entry schedule
+remains the best measured grouped version, but its grouped and request-level
+screens still fail the performance exit.
+A restored-source seven-block retest passed parity and measured 1.118×/1.119×
+grouped latency at 64/128 tokens, with a 0.980× one-entry ratio. The original
+four-entry server and harness hashes were verified after the rebuild.
 
 ## Numerical policy
 

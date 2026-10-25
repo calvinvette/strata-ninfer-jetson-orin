@@ -5544,3 +5544,11 @@ measurements. The grouped capture shows no large occupancy deficit and does not
 explain the slower operator and service screens. No profile is proposed; E6
 performance and E7 release gates remain open. See the [profiling
 details](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/sub16-single-entry-specialization/README.md).
+The follow-up two/four/eight-entry tile sweep retained four-entry reuse: two
+entries regressed grouped latency by 23–24%, while eight entries improved it
+by only about 1% and regressed the single-entry result. All operator parity
+checks passed; neither variant met the 5% screen threshold, so service
+confirmation was not run. The 4-entry source and qualified binary hashes were
+restored and rechecked after these experiments. A fresh seven-block retest of
+the restored path passed parity and measured grouped ratios 1.118×/1.119× at
+64/128 tokens, consistent with an approximately 12% operator regression.
