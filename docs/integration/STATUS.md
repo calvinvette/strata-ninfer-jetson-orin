@@ -36,9 +36,11 @@ reduced the 64/128-token operator gap from 12.2× to 4.36×, but remained slower
 A fresh three-pair 8K service screen showed median NInfer latency changes of
 +0.34% prompt, +1.77% decode, +0.82% client total and +0.36% TTFT; all measured
 outputs and startup residency maps matched. Decode was slower in each pair.
-The useful-effect gate was not met, so broad context-size service measurements
-are deferred until another candidate passes screening. See the [E5
-closeout](NINFER_E5_CLOSEOUT.md) and [E6 report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md).
+The useful-effect gate was not met, so seven-pair confirmation is not justified.
+A one-pair-per-capacity screen is underway across 1K–256K to record configured-
+context behavior and failure boundaries; 1K, 2K and 4K have passed so far. This
+matrix cannot qualify a performance effect. See the [E5 closeout](NINFER_E5_CLOSEOUT.md)
+and [E6 report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md).
 The E2 resident and E3 staged-miss schedules both failed
 initial performance screens. On 2026-10-25, E0 captured a supervised Coder IQ1_M decode profile
 with Strata's existing expert backend. The opt-in decode timer measured 21.73 ms

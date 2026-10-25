@@ -89,9 +89,51 @@ The service binary SHA256 was
 `ef3da9e05acc8cd6ebc24ecf3de09fe293f3f458a93574516f85880f2d0f1316`. The
 supervised campaign lasted 258.9 seconds and minimum available memory was
 19,116,306,432 bytes (about 17.8 GiB), above the 6 GiB floor. Because this
-revision still fails the operator and useful-service gates, broader
-context-size service measurements are deferred until a materially faster
-candidate passes a new screen.
+revision still fails the operator and useful-service gates, it does not
+advance to seven-pair confirmation.
+
+## Parametric context-capacity screen (in progress)
+
+To complete E6's capacity coverage, a separate one-pair-per-capacity screen is
+running on this candidate despite the failed useful-effect gate. It uses the
+same Q2_0 profile and changes only `--max-context`; each fresh NInfer/Strata
+service receives a warmup and one measured request for each workload that fits
+the capacity. The requested shapes are `pp512+tg64`, `pp2048+tg128`, and the
+172/557/1,069-token inputs with 64-token output. The 1,069-token input is
+omitted at 1K; input plus output must fit the configured capacity. This is
+capacity-allocation and short-request screening, not near-limit ingestion.
+
+The 1K, 2K, 4K, 8K and 16K pairs have completed. All ten service processes
+passed every eligible warmup and measured API check and exact token-count
+check. All ten startup residency maps have the same SHA256
+`a02fd81e6337273a299b4b834ab1b694c16e5f97512e5dfec9d4fec08cd5ddf7`; each
+reported 3,000 slots / 3,955 MiB. Minimum available physical/admission memory
+was 17.58 GiB, above the 6 GiB floor. The measurements below are one request
+per arm and workload. PP/TG and TTFT are descriptive samples, not paired
+estimates or confirmation intervals.
+
+| Context capacity | Workload | NInfer PP/TG tok/s | Strata PP/TG tok/s | Client TTFT NInfer / Strata (s) |
+| ---: | --- | ---: | ---: | ---: |
+| 1K | 512+64 | 38.2 / 10.9 | 36.8 / 11.4 | 13.57 / 14.06 |
+| 2K | 512+64 | 37.8 / 10.5 | 38.0 / 11.8 | 13.70 / 13.62 |
+| 4K | 512+64 | 38.4 / 10.9 | 39.6 / 11.2 | 13.48 / 13.08 |
+| 8K | 512+64 | 38.1 / 10.8 | 39.1 / 11.2 | 13.59 / 13.24 |
+| 16K | 512+64 | 36.8 / 9.4 | 38.1 / 11.3 | 14.08 / 13.57 |
+| 4K | 2,048+128 | 54.8 / 9.6 | 54.8 / 9.9 | 37.54 / 37.52 |
+| 8K | 2,048+128 | 54.3 / 9.6 | 55.2 / 10.2 | 37.88 / 37.23 |
+| 16K | 2,048+128 | 53.1 / 7.8 | 54.7 / 10.5 | 38.75 / 37.58 |
+
+These single samples show no consistent backend advantage. The output hashes
+match between arms for 512+64 and 172+64 at every completed capacity, but differ
+for some longer cells; this screen has no independent numerical or task-quality
+oracle, so hash differences remain unresolved rather than serving as a quality
+pass/fail. The one-request design cannot establish a context-dependent
+performance effect. The remaining capacity measurements are running from 32K
+through 256K. The runner is
+[`run_context_matrix.py`](run_context_matrix.py); its `context-matrix/` data
+contains per-request API checks, engine logs, resident maps and supervisor
+summaries. The full matrix will remain screening evidence; a new implementation
+must pass a fresh useful-effect screen before confirmation.
 
 ## Reproduction
 
@@ -108,4 +150,6 @@ python3 tools/integration/run_control.py \
 The harness prints parity and the per-shape paired timing screen. The service
 screen can be rerun with
 `python3 bench/results/2026-10-25-phase-e6-q2-grouped-throughput/run_service_paired_screen.py`.
+The parametric capacity screen is run with
+`python3 bench/results/2026-10-25-phase-e6-q2-grouped-throughput/run_context_matrix.py --out <output-dir>`.
 Raw supervisor telemetry and generated outputs remain outside this report.

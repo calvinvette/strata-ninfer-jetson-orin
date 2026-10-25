@@ -477,8 +477,10 @@ three-pair, 8K same-residency service screen found median paired changes of
 +0.34% prompt, +1.77% decode, +0.82% client total and +0.36% TTFT, with decode
 slower in all three pairs. Outputs and resident-map hashes matched. These
 screens do not meet the useful-effect gate, so seven-pair confirmation and the
-broader context matrix are deferred until a materially faster candidate passes
-a new screen. E6 remains open; see the [E6 report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md).
+seven-pair confirmation are not justified. A one-pair-per-capacity screening
+matrix is being completed to characterize configured-context costs and failure
+boundaries; it cannot qualify a performance effect. Its 1K, 2K and 4K cells
+passed so far. E6 remains open; see the [E6 report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md).
 
 ## Numerical policy
 
