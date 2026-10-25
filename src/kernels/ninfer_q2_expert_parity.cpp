@@ -252,9 +252,118 @@ int main(int argc, char** argv) {
                     kBenchIterations, median(strata_us), *strata_range.first, *strata_range.second,
                     median(candidate_us), *candidate_range.first, *candidate_range.second,
                     median(candidate_us) / median(strata_us));
+
+        // Prefill-shaped grouped dispatch: three input tokens, three expert
+        // groups and nine output entries. Nine entries exercise both the
+        // 8-column quantizer limit and the bounded second chunk (8 + 1).
+        constexpr int kMultiTokens = 3, kMultiGroups = 3, kMultiEntries = 9;
+        std::vector<float> multi_x(kMultiTokens * kHidden);
+        std::vector<float> activation(kHidden);
+        std::memcpy(activation.data(), activation_bytes.data(), activation_bytes.size());
+        std::copy(activation.begin(), activation.end(), multi_x.begin());
+        for (int i = 0; i < kHidden; ++i) {
+            multi_x[kHidden + i] = activation[i] * 0.75f;
+            multi_x[2 * kHidden + i] = activation[i] * ((i & 1) ? -0.5f : 0.5f);
+        }
+        std::vector<uint8_t> multi_blob(kMultiGroups * layout.bytes);
+        for (int group = 0; group < kMultiGroups; ++group) {
+            const int id = expert + group;
+            const void* g = gate_data + static_cast<size_t>(id) * one_expert_bytes;
+            const void* u = up_data + static_cast<size_t>(id) * one_expert_bytes;
+            const void* d = down_data + static_cast<size_t>(id) * kHidden * d_row_bytes;
+            uint8_t* blob = multi_blob.data() + static_cast<size_t>(group) * layout.bytes;
+            std::memcpy(blob, g, layout.up_off);
+            std::memcpy(blob + layout.up_off, u, layout.down_off - layout.up_off);
+            std::memcpy(blob + layout.down_off, d, layout.bytes - layout.down_off);
+        }
+        uint8_t *device_multi_blob = nullptr, *device_multi_xq = nullptr;
+        uint8_t *candidate_multi_scratch = nullptr, *native_multi_scratch = nullptr;
+        float *device_multi_output = nullptr, *device_multi_native_output = nullptr;
+        unsigned long long* device_multi_ptrs = nullptr;
+        int32_t *device_multi_starts = nullptr, *device_multi_count = nullptr;
+        int32_t *device_multi_dst = nullptr, *device_multi_tok = nullptr;
+        const size_t multi_x_bytes = multi_x.size() * sizeof(float);
+        const size_t multi_q8_bytes = static_cast<size_t>(kMultiTokens) * kHidden / 32 * 36;
+        const size_t multi_scratch_bytes = strata::kernels::native_expert_scratch_bytes(kMultiEntries, kIntermediate);
+        cuda_check(cudaMalloc(&device_multi_blob, multi_blob.size()), "allocate multi-group blobs");
+        cuda_check(cudaMalloc(&device_multi_xq, multi_q8_bytes), "allocate multi-token Q8_1 input");
+        cuda_check(cudaMalloc(&candidate_multi_scratch, multi_scratch_bytes), "allocate multi-entry NInfer workspace");
+        cuda_check(cudaMalloc(&native_multi_scratch, multi_scratch_bytes), "allocate multi-entry Strata workspace");
+        cuda_check(cudaMalloc(&device_multi_output, kMultiEntries * kHidden * sizeof(float)), "allocate multi-entry NInfer output");
+        cuda_check(cudaMalloc(&device_multi_native_output, kMultiEntries * kHidden * sizeof(float)), "allocate multi-entry Strata output");
+        cuda_check(cudaMalloc(&device_multi_ptrs, kMultiGroups * sizeof(unsigned long long)), "allocate multi-group pointers");
+        cuda_check(cudaMalloc(&device_multi_starts, (kMultiGroups + 1) * sizeof(int32_t)), "allocate multi-group starts");
+        cuda_check(cudaMalloc(&device_multi_count, sizeof(int32_t)), "allocate multi-group count");
+        cuda_check(cudaMalloc(&device_multi_dst, kMultiEntries * sizeof(int32_t)), "allocate multi-entry destinations");
+        cuda_check(cudaMalloc(&device_multi_tok, kMultiEntries * sizeof(int32_t)), "allocate multi-entry token map");
+        std::vector<unsigned long long> multi_ptrs(kMultiGroups);
+        for (int group = 0; group < kMultiGroups; ++group)
+            multi_ptrs[group] = reinterpret_cast<unsigned long long>(device_multi_blob + static_cast<size_t>(group) * layout.bytes);
+        const int32_t multi_starts[kMultiGroups + 1] = {0, 4, 7, 9};
+        const int32_t multi_dst[kMultiEntries] = {5, 0, 8, 1, 7, 2, 6, 3, 4};
+        const int32_t multi_tok[kMultiEntries] = {0, 1, 2, 0, 1, 2, 1, 2, 0};
+        const int32_t multi_group_count = kMultiGroups;
+        cuda_check(cudaMemcpyAsync(device_multi_blob, multi_blob.data(), multi_blob.size(), cudaMemcpyHostToDevice, stream),
+                   "copy multi-group blobs");
+        cuda_check(cudaMemcpyAsync(device_multi_ptrs, multi_ptrs.data(), multi_ptrs.size() * sizeof(multi_ptrs[0]),
+                                   cudaMemcpyHostToDevice, stream), "copy multi-group pointers");
+        cuda_check(cudaMemcpyAsync(device_multi_starts, multi_starts, sizeof(multi_starts), cudaMemcpyHostToDevice, stream),
+                   "copy multi-group starts");
+        cuda_check(cudaMemcpyAsync(device_multi_count, &multi_group_count, sizeof(multi_group_count), cudaMemcpyHostToDevice,
+                                   stream), "copy multi-group count");
+        cuda_check(cudaMemcpyAsync(device_multi_dst, multi_dst, sizeof(multi_dst), cudaMemcpyHostToDevice, stream),
+                   "copy multi-entry destinations");
+        cuda_check(cudaMemcpyAsync(device_multi_tok, multi_tok, sizeof(multi_tok), cudaMemcpyHostToDevice, stream),
+                   "copy multi-entry token map");
+        float* device_multi_x = nullptr;
+        cuda_check(cudaMalloc(&device_multi_x, multi_x_bytes), "allocate multi-token activations");
+        cuda_check(cudaMemcpyAsync(device_multi_x, multi_x.data(), multi_x_bytes, cudaMemcpyHostToDevice, stream),
+                   "copy multi-token activations");
+        strata::kernels::native_quantize_q8_1(device_multi_x, device_multi_xq, kHidden, kMultiTokens, stream);
+        const std::vector<float> multi_sentinel(kMultiEntries * kHidden, -12345.0f);
+        cuda_check(cudaMemcpyAsync(device_multi_output, multi_sentinel.data(), multi_sentinel.size() * sizeof(float),
+                                   cudaMemcpyHostToDevice, stream), "initialize multi-entry NInfer output");
+        cuda_check(cudaMemcpyAsync(device_multi_native_output, multi_sentinel.data(), multi_sentinel.size() * sizeof(float),
+                                   cudaMemcpyHostToDevice, stream), "initialize multi-entry Strata output");
+        const uint64_t multi_calls_before = strata::kernels::ninfer_q2_0_expert_dispatch_count();
+        strata::kernels::ninfer_q2_0_expert_grouped(layout, device_multi_ptrs, device_multi_starts, device_multi_count,
+                                                     device_multi_dst, device_multi_tok, kMultiGroups, kMultiEntries,
+                                                     device_multi_xq, candidate_multi_scratch, device_multi_output,
+                                                     stream, kMultiGroups);
+        strata::kernels::native_expert_grouped(layout, device_multi_ptrs, device_multi_starts, device_multi_count,
+                                               device_multi_dst, device_multi_tok, kMultiGroups, kMultiEntries,
+                                               device_multi_xq, native_multi_scratch, device_multi_native_output,
+                                               stream, kMultiGroups);
+        std::vector<float> multi_output(multi_sentinel.size()), multi_native_output(multi_sentinel.size());
+        cuda_check(cudaMemcpyAsync(multi_output.data(), device_multi_output, multi_output.size() * sizeof(float),
+                                   cudaMemcpyDeviceToHost, stream), "copy multi-entry NInfer output");
+        cuda_check(cudaMemcpyAsync(multi_native_output.data(), device_multi_native_output,
+                                   multi_native_output.size() * sizeof(float), cudaMemcpyDeviceToHost, stream),
+                   "copy multi-entry Strata output");
+        cuda_check(cudaStreamSynchronize(stream), "synchronize multi-entry grouped routes");
+        double multi_err = 0.0, multi_ref = 0.0;
+        size_t multi_unwritten = 0;
+        for (size_t i = 0; i < multi_output.size(); ++i) {
+            const double delta = static_cast<double>(multi_output[i]) - multi_native_output[i];
+            multi_err += std::fabs(delta);
+            multi_ref += std::fabs(multi_native_output[i]);
+            multi_unwritten += !std::isfinite(multi_output[i]) || multi_output[i] == -12345.0f;
+        }
+        const double multi_rel_l1 = multi_err / multi_ref;
+        const uint64_t multi_calls = strata::kernels::ninfer_q2_0_expert_dispatch_count() - multi_calls_before;
+        const bool multi_pass = multi_rel_l1 <= 2.0e-4 && multi_unwritten == 0 && multi_calls == 1;
+        std::printf("multi-token grouped Q2_0/Q8_1 prefill shape (tokens=%d entries=%d groups=%d): "
+                    "rel_l1=%.9g unwritten=%zu NInfer_calls=%llu %s\n",
+                    kMultiTokens, kMultiEntries, kMultiGroups, multi_rel_l1, multi_unwritten,
+                    static_cast<unsigned long long>(multi_calls), multi_pass ? "PASS" : "FAIL");
+        failed += multi_pass ? 0 : 1;
         cudaFree(device_tok); cudaFree(device_dst); cudaFree(device_group_count); cudaFree(device_starts);
         cudaFree(device_ptrs); cudaFree(device_native_output); cudaFree(device_group_output);
         cudaFree(native_scratch); cudaFree(candidate_scratch); cudaFree(device_xq); cudaFree(device_blob);
+        cudaFree(device_multi_x); cudaFree(device_multi_tok); cudaFree(device_multi_dst); cudaFree(device_multi_count);
+        cudaFree(device_multi_starts); cudaFree(device_multi_ptrs); cudaFree(device_multi_native_output);
+        cudaFree(device_multi_output); cudaFree(native_multi_scratch); cudaFree(candidate_multi_scratch);
+        cudaFree(device_multi_xq); cudaFree(device_multi_blob);
         cudaFree(device_output); cudaFree(device_workspace); cudaFree(device_x);
         cudaFree(device_down); cudaFree(device_up); cudaFree(device_gate); cudaStreamDestroy(stream);
         return failed;

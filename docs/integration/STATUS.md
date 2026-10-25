@@ -10,8 +10,9 @@ release profile still excludes unresolved multi-live/adaptive paths and does
 not promote a universal parametric profile. This records tested cells, not general product support.
 
 The [NInfer expert execution plan](NINFER_EXPERT_EXECUTION_PLAN.md) is now in
-progress: E0 remains open, E1–E3 have bounded Q2_0 prototype evidence, and
-E4–E7 remain pending. The E2 resident and E3 staged-miss schedules both failed
+progress: E0 remains open; E1–E4 have bounded Q2_0 prototype evidence, while
+E4 leaves mixed-codec Coder IQ1_M and ISTA-DASLab IQ3_S unsupported; E5–E7 remain
+pending. The E2 resident and E3 staged-miss schedules both failed
 initial performance screens. On 2026-10-25, E0 captured a supervised Coder IQ1_M decode profile
 with Strata's existing expert backend. The opt-in decode timer measured 21.73 ms
 per token-window in CPU expert work and 35.07 ms waiting for GPU reach; a
@@ -44,8 +45,12 @@ Q2_0 model's own activation distribution. Its full-precision output matched the
 current Strata parity harness's unquantized reference at relative L1 `3.76e-8`;
 the existing quantized CPU/GPU routes were each about `1.2023%` from that
 reference, and differed from one another by `1.04e-7`. This validates the
-reference and existing route for one case; NInfer-derived adapter parity remains
-open, so E1 remains open and runtime integration is not established.
+reference and existing route for one case. The NInfer-derived Q2_0 adapter has
+since passed real-weight FP64 parity, grouped decode-route parity and a bounded
+three-token grouped prefill-shaped parity case. Its operator and paired service
+screens were slower than the Strata control. This is bounded Q2_0 functional
+integration evidence, not performance qualification or mixed-codec model
+support. See the [E4 coverage report](../../bench/results/2026-10-25-phase-e4-model-codec-coverage/README.md).
 
 The current Coder two-live investigation refines that exclusion. At cache 3,000,
 the default path's prompt-1 state first changed at position 105/layer 24 and its

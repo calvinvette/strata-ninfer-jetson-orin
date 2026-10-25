@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **in progress; E2 resident Q2_0 implementation and initial qualification started on 2026-10-25**.
+Status: **in progress; E1–E4 have bounded Q2_0 evidence; E4 model coverage is partial as of 2026-10-25**.
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -108,8 +108,9 @@ Do not print a generic NInfer-enabled banner when all work fell back.
 
 ## Implementation sequence
 
-E0 remains open; E1–E3 are complete for a bounded Q2_0 prototype; E4–E7 remain
-pending. E2's resident schedule and E3's staged-miss schedule both failed the
+E0 remains open; E1–E4 have bounded Q2_0 prototype evidence. E4 explicitly
+leaves the mixed-codec Coder IQ1_M and ISTA-DASLab IQ3_S models unsupported by
+the NInfer selector; E5–E7 remain pending. E2's resident schedule and E3's staged-miss schedule both failed the
 initial performance screens. The default remains Strata and the NInfer path
 remains experimental. Each stage produces a small source/evidence change and
 a written decision before the next dependent stage begins.
@@ -289,21 +290,28 @@ goal remains open.
 
 ### E4 — Add prefill, small-token execution and model coverage
 
-1. Adapt small-token and prefill schedules using actual tokens per expert group.
-   Sweep admitted shapes around dispatch boundaries; do not copy NInfer's token
-   thresholds unchanged. Start with existing prefill chunks 64/128.
-2. Reuse selected expert weights across grouped prompt tokens and evaluate fusion
-   against the existing Strata grouped implementation, including gather/merge costs.
-3. Extend codec pairs in order of measured work to Coder IQ1_M, Coder Q2_0 and
-   original ISTA-DASLab IQ3_S. Pin each model separately and exercise every admitted
-   tensor pair, including layers not selected by a particular benchmark prompt.
-4. Publish a capability table for each model/codec, decode/prefill, resident/staged
-   path and CUDA/HIP/SYCL backend. Reject unsupported strict-mode cells explicitly.
+1. The bounded Q2_0 implementation now exercises one-token decode and a
+   three-token, three-group, nine-entry prefill-shaped batch. This confirms the
+   grouped descriptor/token/output mapping and the 8+1 SwiGLU quantizer chunk
+   boundary against Strata's grouped route. It is not a 64/128-token schedule
+   sweep or an end-to-end prefill qualification; these remain open.
+2. Q2_0 expert weights are reused through grouped descriptors for multiple
+   token/expert entries. The initial operator screen was slower than Strata;
+   no fusion or performance claim is made.
+3. Header-only inventories identify exact expert codec pairs in Coder IQ1_M
+   and ISTA-DASLab IQ3_S. Both are mixed-codec; their full-model expert routes
+   are explicitly unsupported by the current Q2_0-only selector. The exact
+   Q2_0 artifact remains the only supported codec pair in this prototype.
+4. Publish the current model/codec, shape, residency and backend capability
+   table. HIP/SYCL runtime cells remain unsupported/unqualified; no shared
+   backend implementation was changed in E4.
 
-**Exit:** the three target models have either complete declared expert coverage
-or an explicit unsupported/partial status with remaining work. Only models with
-complete required coverage may be called integrated. Shared-file changes build
-on CUDA, HIP and SYCL; CUDA runtime qualification is performed on this Orin.
+**Exit:** the bounded Q2_0 shape and codec result and explicit partial status for
+the other target variants are recorded in
+[E4 model and shape coverage](../../bench/results/2026-10-25-phase-e4-model-codec-coverage/README.md).
+Only the Q2_0/Q2_0 artifact is covered, and it is not performance-qualified.
+64/128-token dispatch, mixed-codec support and HIP/SYCL qualification remain
+open; E4's broad model-coverage objective is therefore only partially complete.
 
 ### E5 — Qualify numerical behavior and useful execution policies
 

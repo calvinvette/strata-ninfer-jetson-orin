@@ -1,6 +1,8 @@
 # E1 Q2_0 routed expert contract
 
-Status: **E1 complete (2026-10-25)**. CUDA adapter and runtime integration are E2 work.
+Status: **E1 contract complete (2026-10-25)**. The bounded CUDA prototype and
+service integration are recorded under E2/E3; see the current implementation
+limits and E4 coverage report below.
 Inventory source: `ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF`, revision
 `5348543e0147355ac9cbcb031184a3546350988e`, local Q2_0 shards under
 `~/models/strata-orin-validation/Q2_0/`. The inventory JSON is generated locally
@@ -50,8 +52,8 @@ matched bit-for-bit; all eight sum and absolute-sum checksums matched. For
 `blk.0.ffn_down_exps.weight`, the checksums were `sum=0.6449966431` and
 `sumabs=33.21868134`. Strata's C++ utility also checked eight Q2_0 tensors ×
 their first 64 blocks against the structural code/scale invariant with zero
-violations. This qualifies sampled codec decoding only; full tensor payloads and
-CUDA adapter parity remain untested.
+violations. This qualifies sampled codec decoding only; full tensor payloads
+were not exhaustively decoded in this check.
 
 The reusable `tools/integration/q2_0_expert_oracle.py` was also run on actual
 layer-0, expert-32 gate/up/down rows from the Q2_0 artifact. Its input was the
@@ -76,7 +78,8 @@ unquantized float output gave relative L1 `3.76e-8`, max absolute difference
 and GPU expert outputs were each about 1.2023% relative L1 from that reference;
 the CPU/GPU pair differed by `1.04e-7` relative L1. This qualifies the
 independent reference and the existing Strata Q2_0 route for this one real-weight,
-cross-variant activation case. It does not qualify an NInfer-derived kernel.
+cross-variant activation case. At the E1 checkpoint this did not qualify an
+NInfer-derived kernel; the later E2/E3/E4 evidence is summarized below.
 Reproduction uses `native_expert_parity` with `--expert 32`, the activation path
 above, and layer `0`, plus `q2_0_expert_oracle.py --output-f64 <path>`; raw output
 and model-derived tensors remain outside Git.
@@ -129,10 +132,12 @@ function-level provenance note.
 ## E1 limits and next decision
 
 This document and oracle establish the first codec/geometry contract and a
-real-weight numerical fixture, not Q2_0-model-native activation coverage, slot
-lifetime correctness, or NInfer integration. The pure route-map checks exercise
-permutation, duplicate and empty-job semantics without implying a CUDA dispatch.
-Next: add a small caller-owned CUDA adapter for one-token Q2_0 resident work,
-compare decoded rows and projection outputs against this oracle on exact runtime
-activations, then wire the opt-in selector. Do not start staging absent experts
-until E2 proves the resident path.
+real-weight numerical fixture, not Q2_0-model-native activation coverage. E2/E3
+added and measured an opt-in caller-owned CUDA adapter, strict selector, and
+bounded staged/direct-mapped paths; see the [E2 report](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/README.md)
+and [E3 reports](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/staged-screen/README.md).
+Real-weight FP64 parity and grouped route parity pass for the recorded fixture.
+The adapter remains Q2_0/Q2_0 only, and E4's grouped prefill-shaped check covers
+three tokens, not the 64/128-token service chunks. The Coder IQ1_M and original
+IQ3_S variants have mixed expert codecs and are not covered by this adapter.
+These are implementation and capability boundaries, not performance claims.
