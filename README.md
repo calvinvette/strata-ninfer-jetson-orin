@@ -72,6 +72,16 @@ The current combined candidate was measured on the same Jetson AGX Orin. It supp
 configured context sweep for Coder IQ1_M, Coder Q2_0 and the original ISTA-DASLab IQ3_S. At 8K context with
 a 557-token prompt and 64 generated tokens, the measured medians were:
 
+<p align="center"><img src="bench/results/2026-10-25-flashnext-context-capacity-sweep/charts/combined.svg" width="100%" alt="Prompt processing and token generation throughput versus configured context size for all three model variants"></p>
+
+Individual model charts use the same workload and axis units:
+
+<p align="center">
+<img src="bench/results/2026-10-25-flashnext-context-capacity-sweep/charts/coder-iq1m.svg" width="32%" alt="Coder IQ1_M throughput versus context size">
+<img src="bench/results/2026-10-25-flashnext-context-capacity-sweep/charts/coder-q2_0.svg" width="32%" alt="Coder Q2_0 throughput versus context size">
+<img src="bench/results/2026-10-25-flashnext-context-capacity-sweep/charts/original-iq3-s.svg" width="32%" alt="Original ISTA-DASLab IQ3_S throughput versus context size">
+</p>
+
 | Model | Prompt processing (tok/s) | Generation (tok/s) | Client TTFT (s) | Minimum available RAM (GiB) |
 | --- | ---: | ---: | ---: | ---: |
 | Coder IQ1_M | 60.6 | 16.0 | 9.4 | 14.25 |

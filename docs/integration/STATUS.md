@@ -1,6 +1,6 @@
 # Integration status
 
-Updated: 2026-10-24. Phases 1 through 4 are complete for their documented tested
+Updated: 2026-10-25. Phases 1 through 4 are complete for their documented tested
 Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 is
 complete for its bounded Orin qualification matrix under [its closeout]
 (PHASE7_CLOSEOUT.md), and Phase 8 is complete for the bounded Q2_0 release
@@ -5380,6 +5380,17 @@ prefills. The current candidate kept fixed model profiles and MTP off; the
 October 8 run used MTP spec 4 and automatic expert-cache sizing, so this is not
 a same-profile or causal engine-version comparison. Full per-request medians,
 ranges, memory, profiles and limitations are in the report.
+
+The sweep's 557-token prompt / 64-token output throughput is now plotted against
+configured context size in a [combined chart](../../bench/results/2026-10-25-flashnext-context-capacity-sweep/charts/combined.svg)
+and [individual Coder IQ1_M](../../bench/results/2026-10-25-flashnext-context-capacity-sweep/charts/coder-iq1m.svg),
+[Coder Q2_0](../../bench/results/2026-10-25-flashnext-context-capacity-sweep/charts/coder-q2_0.svg) and
+[ISTA-DASLab IQ3_S](../../bench/results/2026-10-25-flashnext-context-capacity-sweep/charts/original-iq3-s.svg)
+charts. The combined figure separates prompt processing and token generation
+into panels so the three models remain legible on a common linear scale within
+each metric.
+
+![Combined prompt processing and token generation throughput by context capacity](../../bench/results/2026-10-25-flashnext-context-capacity-sweep/charts/combined.svg)
 
 # 2026-10-25: Dense Qwen3.8-27B IQ3_S is unsupported by Strata
 
