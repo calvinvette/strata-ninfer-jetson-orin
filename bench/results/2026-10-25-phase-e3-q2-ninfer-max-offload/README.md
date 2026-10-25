@@ -52,4 +52,6 @@ logs, residency maps, paired JSON and supervisor telemetry are retained beside
 this report. The runner is [`run_max_offload_screen.py`](run_max_offload_screen.py).
 
 This is an Orin-only result. It does not change the backend default or E6's
-unmet performance exit.
+unmet performance exit. The same full-offload experiment at a 1,000-slot GPU
+cache selected 226 entries (1.6%) and improved median client latency by only
+0.72%; see the [1,000-slot screen](../2026-10-25-phase-e3-q2-ninfer-cache1k-max-offload/README.md).

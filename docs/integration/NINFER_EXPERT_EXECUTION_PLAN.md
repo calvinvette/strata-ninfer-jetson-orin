@@ -319,6 +319,11 @@ their CPU-miss controls; no independent quality oracle was run. Minimum
 available physical/admission memory was 16.21 GiB. The limited routed coverage
 and sub-threshold latency effect do not justify confirmation or promotion. See
 the [max-offload screen](../../bench/results/2026-10-25-phase-e3-q2-ninfer-max-offload/README.md).
+A second three-pair full-offload screen reduced GPU residency to 1,000 slots
+with the same 1-GiB complement. It selected 226 entries (1.6%), produced exact
+response-hash matches, and improved median client latency by 0.72% and TTFT by
+0.43%. Staged coverage was lower than with 3,000 slots, and the effect remained
+below threshold. See the [1,000-slot screen](../../bench/results/2026-10-25-phase-e3-q2-ninfer-cache1k-max-offload/README.md).
 
 ### E4 — Add prefill, small-token execution and model coverage — complete with partial model support
 
