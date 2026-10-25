@@ -195,16 +195,19 @@ oracle, and one grouped GPU resident entry passes comparison against the
 existing Strata Q2_0 route. A strict-mode service smoke returned a completion.
 The first service attempt exposed the helper's eight-column limit and the adapter
 now chunks quantization calls accordingly. This is implementation evidence,
-not an acceleration claim: the service screen was unpaired and cache hit ratios
-differed; matched on/off kernel timing, resident-ID identity, device-side entry
-coverage, model-native activation cases, and sustained/edge-case qualification
-remain open. CUDA only; HIP/SYCL builds are not yet available. See the [E2
-smoke report](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/README.md).
+not an acceleration claim. A later three-pair screen matched the resident-map
+hash and output hashes, and found the candidate consistently slower; exact
+route IDs, broad device-side entry coverage, model-native activation cases and
+edge-case qualification remain open. CUDA only; HIP/SYCL builds are not yet
+available. See the [E2 smoke report](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/README.md)
+and [paired service screen](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/paired-screen/README.md).
 An initial same-weight, one-token grouped operator screen measured 85.7 us
 median for the NInfer route versus 24.5 us for Strata across seven interleaved
-blocks of 1,000 calls. This is an operator-level regression signal with a wider
-candidate range, not an end-to-end comparison; fusion and a controlled repeat
-are required before deciding whether this implementation should proceed.
+blocks of 1,000 calls. Three randomized same-residency service pairs also found
+the candidate 3.4% slower on prompt latency, 7.3% slower on decode latency and
+4.4% slower on client completion time by median paired change. This is a
+negative screening result, not a performance confirmation; revise or reject
+this schedule before considering a larger confirmation campaign.
 
 ### E2 — Execute resident experts with NInfer-derived kernels
 

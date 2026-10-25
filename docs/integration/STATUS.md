@@ -5449,16 +5449,18 @@ route weighting, shared experts, residuals and persistent state. Default
 behavior remains Strata. A first smoke attempt found the inherited Q8_1
 SwiGLU quantizer's eight-column call limit; the adapter now chunks its calls.
 
-This is E2 implementation progress, not a performance result. One unpaired
-service screen returned the same short answer as the default backend, but the
-cache hit ratios and request histories differed. No kernel-only timing or
-matched-residency on/off campaign has been completed. Device-side per-entry
-coverage, Q2_0-native activation cases, broader graph/edge-case qualification,
-and HIP/SYCL builds remain open. See the [E2 evidence report](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/README.md)
-and [execution plan](NINFER_EXPERT_EXECUTION_PLAN.md).
+This is E2 implementation progress, not a performance win. The initial
+unpaired service screen was superseded by a three-pair same-residency screen.
+Each pair used the same resident-map hash and produced the same output hash;
+median paired changes were +3.4% prompt latency, +7.3% decode latency and
++4.4% client completion time (slower). Device-side per-entry coverage, exact
+route-ID capture, Q2_0-native activation cases, broader graph/edge-case
+qualification and HIP/SYCL builds remain open. See the [E2 evidence
+report](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/README.md)
+and [paired service screen](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/paired-screen/README.md).
 
-The same report now includes an initial event-timed one-token operator screen:
-the grouped NInfer route took 85.7 us median versus 24.5 us for Strata (3.50x
-candidate/control). This excludes request and cache work, and its block range
-was wider than the control. Treat it as a regression signal that motivates
-fusion and controlled repeat measurements, not as a service-level comparison.
+The report also includes an event-timed one-token operator screen: the grouped
+NInfer route took 85.7 us median versus 24.5 us for Strata (3.50x
+candidate/control). This excludes request and cache work. Together, these
+screens reject the current kernel schedule as a performance candidate; fuse or
+replace its extra projection/quantization cost before any larger confirmation.

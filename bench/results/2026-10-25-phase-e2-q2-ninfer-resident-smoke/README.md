@@ -87,8 +87,10 @@ were 8.2/4.9 tok/s; the NInfer screen reported 19.6/9.1 tok/s. These are single,
 non-randomized screening observations with different cache-hit ratios and prior
 request histories. They are **not a valid paired comparison** and must not be
 used to claim a performance improvement. No Nsight kernel-level breakdown,
-register/shared-memory report or same-residency service on/off ablation was
-collected.
+register/shared-memory report or seven-block confirmation was collected. A
+later three-block same-residency screen is documented in the [paired service
+report](paired-screen/README.md); it also found the current NInfer schedule
+slower.
 
 The first strict service request initially failed because Strata's existing
 Q8_1 SwiGLU quantizer accepts at most eight columns per call. The adapter was
@@ -102,8 +104,9 @@ retained as implementation evidence.
   HIP/SYCL builds and GPU execution were not qualified; maestro1 currently lacks
   the required compilers and has insufficient free disk for a build.
 - The service invocation proves the opt-in strict Q2_0 route can serve a request,
-  but does not yet prove every dispatched expert entry used it. Add device-side
-  route/entry accounting or equivalent trace evidence before closing coverage.
+  but current accounting does not yet expose exact per-layer route IDs and
+  device-side entry counts. Add equivalent trace evidence before closing
+  coverage.
 - Re-run strict service checks with Q2_0 model-native captured activations and
   broaden edge cases (empty/partial groups, multiple groups, graph reuse and
   strict rejection of unsupported tensors).
