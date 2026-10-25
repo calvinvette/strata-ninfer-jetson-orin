@@ -13,8 +13,8 @@ Development is on **`main`**. The [integration guide](docs/integration/README.md
 [multi-phase plan](docs/integration/PLAN.md), [architecture](docs/integration/ARCHITECTURE.md),
 [parametric/multivariate benchmark protocol](docs/integration/BENCHMARKS.md),
 [source import map](docs/integration/IMPORT_MAP.md) and [status](docs/integration/STATUS.md).
-The repository and reference import are complete; runtime integration and its measurements are pending.
-The results below are inherited Strata results, not measurements of a combined engine.
+The combined runtime is implemented and has current Orin performance measurements. Results from the original
+`strata-inference-orin` port are kept separate below; they are not measurements of this combined engine.
 The translated READMEs describe the original project and have not been updated for this integration.
 
 **English** · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Deutsch](README.de.md) · [Français](README.fr.md) · [Español](README.es.md) · [Português](README.pt-BR.md)
@@ -33,7 +33,10 @@ expert cache. Managed memory is supported for sequential ownership, but this Ori
 managed access. The port retains device allocations and mapped control buffers rather than replacing them
 with managed allocations.
 
-## Measured on Jetson AGX Orin 32 GB
+## Original `strata-inference-orin` measurements
+
+These are inherited results from the separate [Strata Orin port](https://github.com/calvinvette/strata-inference-orin),
+not from the Strata + NInfer runtime in this repository.
 
 The tested model is **Qwen3.8-Flash-Next Coder IQ1_M**, with file-backed experts, MTP spec 4 and prefill batch 64.
 These measurements used JetPack 6.2, CUDA 12.6.68, MAXN power mode and unlocked clocks.
@@ -55,13 +58,46 @@ swap was in use. Larger contexts reduce the automatic expert cache and decode th
 The linked report contains the same-day baseline, three matched runs per short prompt and one near-limit
 run per capacity, with raw results and allocation differences.
 
-See the [phased implementation plan](docs/JETSON_ORIN_PLAN.md),
+See the [original port's phased implementation plan](docs/JETSON_ORIN_PLAN.md),
 [portability tests](bench/results/2026-10-07-jetson-orin/README.md) and
 [real-model results, commands and limits](bench/results/2026-10-08-jetson-orin/README.md).
 Other model variants, larger images and controlled thermal tests have not been validated on this host.
 Formatted chat prompts agreed with the CPU reference's top token, but raw-token log probabilities differed;
 universal numerical parity is not established. Desktop setup regressions and x86 CPU cross-builds passed;
 desktop GPU runtime was not tested on the Orin.
+
+## Strata + NInfer combined-port performance
+
+The current combined candidate was measured on the same Jetson AGX Orin. It supports the same 1K–256K
+configured context sweep for Coder IQ1_M, Coder Q2_0 and the original ISTA-DASLab IQ3_S. At 8K context with
+a 557-token prompt and 64 generated tokens, the measured medians were:
+
+| Model | Prompt processing (tok/s) | Generation (tok/s) | Client TTFT (s) | Minimum available RAM (GiB) |
+| --- | ---: | ---: | ---: | ---: |
+| Coder IQ1_M | 60.6 | 16.0 | 9.4 | 14.25 |
+| Coder Q2_0 | 45.0 | 11.4 | 12.7 | 17.99 |
+| Original ISTA-DASLab IQ3_S | 15.8 | 6.7 | 36.2 | 13.30 |
+
+In the same short-prompt workload matrix, the original Strata port's 8K Coder IQ1_M result was 63.4 prompt
+tokens/s and 19.3 generated tokens/s. The combined-port result was 60.6 and 16.0, respectively. This is a
+useful observed reference, not a controlled speed comparison: the original port used MTP spec 4 and automatic
+expert-cache sizing, while the combined candidate used MTP off and a fixed 3,000-slot requested cache; the
+runs were also on different dates. The original report did not measure streaming TTFT.
+
+Increasing configured capacity from 8K to 256K reduced the combined candidate's 557-token prompt processing
+rate from 60.6 to 30.8 tok/s for Coder IQ1_M, 45.0 to 22.5 for Coder Q2_0, and 15.8 to 8.8 for IQ3_S.
+At 256K, minimum available RAM remained 8.11, 11.66 and 7.16 GiB, respectively. These are short prompts at
+large configured capacities, not tests that prefill 256K-token inputs. Across models, absolute rates should
+not be interpreted as quantization effects because the model artifacts differ.
+
+The current IQ1_M candidate also completed seven independently supervised process blocks at 8K context:
+512 prompt + 64 output measured 65.2 prompt tok/s, 16.0 generated tok/s and 7.93 s TTFT; 2,048 + 128
+measured 68.5 prompt tok/s, 15.9 generated tok/s and 29.97 s TTFT. Those workloads are distinct from the
+three-run context sweep above. Full methods, model identities, raw measurements, memory observations and
+limitations are in the [combined-port context sweep](bench/results/2026-10-25-flashnext-context-capacity-sweep/README.md),
+[Coder IQ1_M campaign](bench/results/2026-10-24-coder-iq1m-current-candidate-performance/README.md),
+[Q2_0 campaign](bench/results/2026-10-25-q2-current-candidate-performance/README.md) and
+[IQ3_S campaign](bench/results/2026-10-24-iq3s-current-candidate-performance/README.md).
 
 ## Install this fork on Orin
 
