@@ -94,6 +94,14 @@ useful observed reference, not a controlled speed comparison: the original port 
 expert-cache sizing, while the combined candidate used MTP off and a fixed 3,000-slot requested cache; the
 runs were also on different dates. The original report did not measure streaming TTFT.
 
+The graph compares all nine context capacities for this shared Coder IQ1_M workload. It uses the original
+port's 0.1.41-rebased series and the current combined candidate. The original port's context sweep contains
+no equivalent Q2_0 or ISTA-DASLab IQ3_S matrix, so this cross-port graph is limited to Coder IQ1_M. The two
+campaigns use the same model revision, prompt sizes and output length, but differ in MTP and expert-cache
+settings; the chart shows observed results and does not isolate the effect of the engine port.
+
+<p align="center"><img src="bench/results/2026-10-25-flashnext-context-capacity-sweep/charts/strata-iq1m-comparison.svg" width="100%" alt="Coder IQ1_M prompt processing and generation throughput versus context capacity for the original Strata Orin port and the Strata plus NInfer port"></p>
+
 Increasing configured capacity from 8K to 256K reduced the combined candidate's 557-token prompt processing
 rate from 60.6 to 30.8 tok/s for Coder IQ1_M, 45.0 to 22.5 for Coder Q2_0, and 15.8 to 8.8 for IQ3_S.
 At 256K, minimum available RAM remained 8.11, 11.66 and 7.16 GiB, respectively. These are short prompts at
