@@ -103,12 +103,12 @@ the capacity. The requested shapes are `pp512+tg64`, `pp2048+tg128`, and the
 omitted at 1K; input plus output must fit the configured capacity. This is
 capacity-allocation and short-request screening, not near-limit ingestion.
 
-The 1K, 2K, 4K, 8K and 16K pairs have completed. All ten service processes
-passed every eligible warmup and measured API check and exact token-count
-check. All ten startup residency maps have the same SHA256
+The 1K, 2K, 4K, 8K, 16K and 32K pairs have completed. All twelve service
+processes passed every eligible warmup and measured API check and exact
+token-count check. All twelve startup residency maps have the same SHA256
 `a02fd81e6337273a299b4b834ab1b694c16e5f97512e5dfec9d4fec08cd5ddf7`; each
 reported 3,000 slots / 3,955 MiB. Minimum available physical/admission memory
-was 17.58 GiB, above the 6 GiB floor. The measurements below are one request
+was 17.28 GiB, above the 6 GiB floor. The measurements below are one request
 per arm and workload. PP/TG and TTFT are descriptive samples, not paired
 estimates or confirmation intervals.
 
@@ -119,16 +119,18 @@ estimates or confirmation intervals.
 | 4K | 512+64 | 38.4 / 10.9 | 39.6 / 11.2 | 13.48 / 13.08 |
 | 8K | 512+64 | 38.1 / 10.8 | 39.1 / 11.2 | 13.59 / 13.24 |
 | 16K | 512+64 | 36.8 / 9.4 | 38.1 / 11.3 | 14.08 / 13.57 |
+| 32K | 512+64 | 28.4 / 9.8 | 37.0 / 11.3 | 18.17 / 13.99 |
 | 4K | 2,048+128 | 54.8 / 9.6 | 54.8 / 9.9 | 37.54 / 37.52 |
 | 8K | 2,048+128 | 54.3 / 9.6 | 55.2 / 10.2 | 37.88 / 37.23 |
 | 16K | 2,048+128 | 53.1 / 7.8 | 54.7 / 10.5 | 38.75 / 37.58 |
+| 32K | 2,048+128 | 53.9 / 9.3 | 54.0 / 10.2 | 38.12 / 38.12 |
 
 These single samples show no consistent backend advantage. The output hashes
 match between arms for 512+64 and 172+64 at every completed capacity, but differ
 for some longer cells; this screen has no independent numerical or task-quality
 oracle, so hash differences remain unresolved rather than serving as a quality
 pass/fail. The one-request design cannot establish a context-dependent
-performance effect. The remaining capacity measurements are running from 32K
+performance effect. The remaining capacity measurements are running from 64K
 through 256K. The runner is
 [`run_context_matrix.py`](run_context_matrix.py); its `context-matrix/` data
 contains per-request API checks, engine logs, resident maps and supervisor
