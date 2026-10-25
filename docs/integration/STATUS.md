@@ -77,6 +77,14 @@ screen selected 226 entries (1.6%) and improved median client latency by 0.72%;
 all output hashes matched the CPU control. Reducing the cache therefore did not
 increase staged coverage or meet the performance threshold. See the
 [1,000-slot screen](../../bench/results/2026-10-25-phase-e3-q2-ninfer-cache1k-max-offload/README.md).
+Further 3,000-slot complement screens at 2/4/6 GiB staged 537/922/1,364
+entries (3.9%/6.6%/9.8%). Median client improvements were 1.00%/3.29%/4.09%;
+TTFT improvements were 1.62%/3.80%/6.05%. Only the 6-GiB TTFT result crossed
+5%; its client result did not. A held-out 512-token retrieval check at 6 GiB
+returned the exact expected answer with identical token IDs, but persistent
+GDN, tail, pooled, pooled-full and KV fingerprints differed. This fails the
+state-parity quality gate; no confirmation or promotion is justified. Minimum
+available memory remained 11.36 GiB. See the [complement sweep report](../../bench/results/2026-10-25-phase-e3-q2-complement-sweep/README.md).
 On 2026-10-25, E0 captured a supervised Coder IQ1_M decode profile
 with Strata's existing expert backend. The opt-in decode timer measured 21.73 ms
 per token-window in CPU expert work and 35.07 ms waiting for GPU reach; a

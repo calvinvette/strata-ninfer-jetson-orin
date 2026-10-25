@@ -325,6 +325,22 @@ response-hash matches, and improved median client latency by 0.72% and TTFT by
 0.43%. Staged coverage was lower than with 3,000 slots, and the effect remained
 below threshold. See the [1,000-slot screen](../../bench/results/2026-10-25-phase-e3-q2-ninfer-cache1k-max-offload/README.md).
 
+Execution note (2026-10-25): a pinned complement sweep at 3,000 slots and
+`--pcie-frac 1.0` tested 2, 4 and 6 GiB complements in three randomized pairs
+per cell. Staged entries increased from 537 (3.9%) to 922 (6.6%) to 1,364
+(9.8%) of routed entries. Median client latency improvements were 1.00%,
+3.29% and 4.09%; TTFT improvements were 1.62%, 3.80% and 6.05%. The 2-GiB
+and 6-GiB outputs matched their controls; all 4-GiB outputs differed. Minimum
+available memory at 6 GiB was 11.36 GiB, retaining both required reserves.
+Because the 6-GiB held-out retrieval/arithmetic check returned matching token
+IDs but differing final GDN, tail, pooled, pooled-full and KV fingerprints,
+the quality gate failed. Do not run seven-pair confirmation or promote this
+setting until the state difference is understood and the quality gate passes.
+The 6-GiB TTFT screen alone is not a performance qualification: median client
+latency remains below the 5% target, each cell has only three pairs, and
+persistent-state equivalence is unresolved. See the [complement sweep
+report](../../bench/results/2026-10-25-phase-e3-q2-complement-sweep/README.md).
+
 ### E4 — Add prefill, small-token execution and model coverage — complete with partial model support
 
 1. The bounded Q2_0 implementation now exercises one-token decode and a
