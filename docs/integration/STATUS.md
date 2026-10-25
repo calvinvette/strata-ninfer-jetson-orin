@@ -14,7 +14,8 @@ progress: E0 is complete for bounded controls and Q2_0 timing; E1–E4 have
 bounded Q2_0 prototype evidence, including 3/64/128-token grouped parity
 checks, while
 E4 leaves mixed-codec Coder IQ1_M and ISTA-DASLab IQ3_S unsupported; E5 is in
-progress with passing Q2_0 MTP-2/MTP-4 cancellation-state checks and
+complete for a bounded static Q2_0 profile, with passing MTP-2/MTP-4
+cancellation-state checks and
 MTP-off-versus-MTP-2/MTP-4 accepted-prefix parity runs, plus a three-request
 MTP-4 continuation/recovery state-parity sequence and a 512-token strict-NInfer
 retrieval/arithmetic check and a 4,096-token retrieval/arithmetic check. A
@@ -23,9 +24,13 @@ but showed GDN relative L2 0.0902 at the first committed token and 0.0337 at
 the final boundary; layer captures narrow the first numeric expert difference
 to layer 1 with later activation amplification. A 4K Strata-versus-NInfer task
 also returned matching tokens but different persistent-state fingerprints.
-Cross-backend numerical acceptance remains unresolved, so E5 stays open and
-NInfer remains opt-in.
-E6–E7 remain pending.
+A 512-token natural-generation pair first differed at generated token 9, with
+coherent but nonidentical prose. This does not establish a quality loss, but
+shows exact retrieval output parity does not generalize. Cross-backend numerical
+state equivalence and live state migration are unsupported; broader quality
+coverage remains open. E5 is complete only for the tested single-live static
+Q2_0 profile. E6–E7 remain pending and NInfer remains opt-in. See the [E5
+closeout](NINFER_E5_CLOSEOUT.md).
 The E2 resident and E3 staged-miss schedules both failed
 initial performance screens. On 2026-10-25, E0 captured a supervised Coder IQ1_M decode profile
 with Strata's existing expert backend. The opt-in decode timer measured 21.73 ms

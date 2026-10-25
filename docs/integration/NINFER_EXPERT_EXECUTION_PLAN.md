@@ -113,9 +113,9 @@ have bounded Q2_0 prototype evidence. E5 has MTP-2/MTP-4 cancellation,
 accepted-prefix, continuation/recovery and short retrieval/arithmetic evidence.
 E4 explicitly leaves the mixed-codec
 Coder IQ1_M and ISTA-DASLab IQ3_S models unsupported by
-the NInfer selector; E5 remains in progress for cross-backend numerical
-acceptance and wider quality coverage, with adaptive residency explicitly
-excluded from the static profile; E6–E7 remain pending. E2's resident schedule and
+the NInfer selector; E5 is complete for the bounded single-live static Q2_0
+profile, with cross-backend state migration, adaptive residency and broader
+quality coverage explicitly excluded; E6–E7 remain pending. E2's resident schedule and
 E3's staged-miss schedule both failed the initial performance screens. The
 default remains Strata and the NInfer path remains experimental. Each stage
 produces a small source/evidence change and
@@ -395,8 +395,15 @@ state fingerprints still differed. These are not in-flight backend migration
 tests, but they leave the cross-backend numerical acceptance bound unresolved.
 See the [short state comparison](../../bench/results/2026-10-25-phase-e5-q2-ninfer-backend-regression/README.md)
 and [4K task comparison](../../bench/results/2026-10-25-phase-e5-q2-ninfer-long-backend-regression/README.md).
-Wider task/quality coverage and that numerical bound remain open; keep NInfer
-opt-in and do not treat exact short-task text as sufficient state evidence.
+A separate 512-token natural-generation task produced coherent but different
+text, with the first token mismatch at generated index 8; see the [generation
+check](../../bench/results/2026-10-25-phase-e5-q2-ninfer-generation-regression/README.md).
+This one sample does not establish quality loss, but it confirms exact retrieval
+text parity does not generalize. This completes the bounded E5 exit only for
+single-backend static Q2_0 services. Exact Strata/NInfer state equivalence and
+live migration are unsupported; wider quality coverage remains open. See the
+[E5 closeout](NINFER_E5_CLOSEOUT.md). Keep NInfer opt-in and do not treat exact
+short-task text as sufficient evidence for other tasks.
 
 ### E6 — Demonstrate end-to-end performance and context behavior
 

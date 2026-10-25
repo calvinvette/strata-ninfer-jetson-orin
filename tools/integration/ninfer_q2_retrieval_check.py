@@ -42,10 +42,12 @@ def main() -> int:
     max_new = a.max_new if a.max_new is not None else workload['generate_tokens']
     if max_new < 1:
         ap.error('--max-new must be positive')
-    expected = (f"EARLY={workload['expected_codes'][0]}, "
-                f"MIDDLE={workload['expected_codes'][1]}, "
-                f"LATE={workload['expected_codes'][2]}, "
-                f"SUM={workload['expected_suffix_sum']}")
+    expected = workload.get('expected_text')
+    if expected is None and 'expected_codes' in workload and 'expected_suffix_sum' in workload:
+        expected = (f"EARLY={workload['expected_codes'][0]}, "
+                    f"MIDDLE={workload['expected_codes'][1]}, "
+                    f"LATE={workload['expected_codes'][2]}, "
+                    f"SUM={workload['expected_suffix_sum']}")
     tokenizer_path = Path(cfg['tokenizer'])
     tokenizer = load_tokenizer(tokenizer_path)
     template_path = tokenizer_path / 'chat_template.jinja'
@@ -107,7 +109,7 @@ def main() -> int:
             arm = {'name': name, 'window': window, 'args': command, 'ids': ids,
                    'text': text, 'state': states[0], 'usage': dict(engine.last)}
             result['arms'].append(arm)
-            if max_new == workload['generate_tokens'] and text != expected:
+            if expected is not None and max_new == workload['generate_tokens'] and text != expected:
                 result['failures'].append(f'{name}: exact answer mismatch: {text!r}')
         except Exception as exc:
             result['failures'].append(f'{name}: {type(exc).__name__}: {exc}')
@@ -122,7 +124,7 @@ def main() -> int:
             result['failures'].append(f"{off['name']} and {mtp['name']} token IDs differ")
         if not result['final_state_equal']:
             result['failures'].append(f"{off['name']} and {mtp['name']} final state differ")
-    result['exact_answer_check'] = max_new == workload['generate_tokens']
+    result['exact_answer_check'] = expected is not None and max_new == workload['generate_tokens']
     result['passed'] = not result['failures'] and len(result['arms']) == 2
     (a.output / 'results.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps({k: result.get(k) for k in ('passed', 'failures', 'token_ids_equal',
