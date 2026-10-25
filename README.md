@@ -14,8 +14,11 @@ Development is on **`main`**. The [integration guide](docs/integration/README.md
 [parametric/multivariate benchmark protocol](docs/integration/BENCHMARKS.md),
 [source import map](docs/integration/IMPORT_MAP.md) and [status](docs/integration/STATUS.md).
 This fork has current Orin measurements of its Strata runtime changes and experimental profiles.
-Routed experts still execute through Strata's kernels; the
-[NInfer expert execution plan](docs/integration/NINFER_EXPERT_EXECUTION_PLAN.md) defines the pending compute integration.
+The opt-in NInfer-derived expert path is implemented for one CUDA Q2_0 geometry,
+but did not pass the performance screen and is not a qualified release profile.
+The default still uses Strata's kernels. See the
+[NInfer release assessment](docs/integration/NINFER_E7_RELEASE_ASSESSMENT.md)
+and [execution plan](docs/integration/NINFER_EXPERT_EXECUTION_PLAN.md).
 The original `strata-inference-orin` results and this fork's measurements are identified separately below.
 The translated READMEs describe the original project and have not been updated for this integration.
 
@@ -28,6 +31,18 @@ The translated READMEs describe the original project and have not been updated f
 - ARM synchronization for CUDA mapped host buffers, registration fallback and tested VMM cache resizing.
 - Jetson setup that preserves JetPack's CUDA libraries and avoids x86 binaries and desktop CUDA packages.
 - CPU and CUDA image encoder builds, real API validation and reproducible hardware results.
+
+## Experimental NInfer expert path
+
+`--expert-backend ninfer` selects a CUDA-only Q2_0/Q2_0 resident expert kernel
+for Flash-Next geometry 2560/640. The default remains `strata`; strict mode
+rejects unsupported codec or geometry pairs, while non-strict NInfer mode falls
+back. The packed operator was 4.36× slower than Strata at the measured
+64/128-token grouped shapes. A three-pair 8K service screen also found median
+NInfer client latency 0.82% slower and decode latency 1.77% slower. The context
+capacity matrix is one request per cell and is screening evidence only. No
+performance-qualified profile is available, so this option remains
+experimental. See the [full E7 assessment](docs/integration/NINFER_E7_RELEASE_ASSESSMENT.md).
 
 Orin's CPU and GPU share its 32 GB of RAM; there is no separate 32 GB VRAM pool. The runtime leaves six GiB
 of physical RAM headroom by default and an additional three GiB for late workspaces when sizing the automatic

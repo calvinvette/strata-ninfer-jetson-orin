@@ -4,11 +4,13 @@ This project starts from Strata's validated ARM64 port and applies the architect
 correctness methods and measured SM87 lessons from the NInfer Orin port. The first
 deliverable was an integration plan and an auditable source/evidence import.
 
-The current runtime still executes routed experts through Strata's kernels.
-The [NInfer expert execution plan](NINFER_EXPERT_EXECUTION_PLAN.md) specifies the
-missing implementation: Strata owns residency and state while an adapted
-NInfer backend computes resident and staged experts. Stages E0–E7 are pending;
-this plan has not started a new implementation or measurement campaign.
+The runtime now has an experimental, opt-in CUDA path for resident Q2_0
+Flash-Next experts; Strata continues to own residency, memory, routing and
+state. E0–E5 have bounded implementation and test evidence. E6's context
+screen is complete, but its performance gate failed, and the E7 assessment
+proposes no NInfer release profile. NInfer remains opt-in and the default path
+remains Strata. See the [release assessment](NINFER_E7_RELEASE_ASSESSMENT.md)
+and [current status](STATUS.md) for tested limits and unresolved build checks.
 
 The earlier phases have bounded closeouts for their tested Strata changes,
 correctness gates and profiles. Those closeouts do not establish NInfer expert

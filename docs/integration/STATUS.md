@@ -29,8 +29,10 @@ coherent but nonidentical prose. This does not establish a quality loss, but
 shows exact retrieval output parity does not generalize. Cross-backend numerical
 state equivalence and live state migration are unsupported; broader quality
 coverage remains open. E5 is complete only for the tested single-live static
-Q2_0 profile. E6 performance screening is underway; E7 remains pending and
-NInfer remains opt-in. Nsight Systems identified scalar Q2 projections as the
+Q2_0 profile. E6 screening across 1K–256K is complete, but its performance exit
+criteria remain unmet. E7 assessment proposes no release profile; HIP/SYCL
+build evidence is outstanding, and NInfer remains opt-in. See the [E7
+assessment](NINFER_E7_RELEASE_ASSESSMENT.md). Nsight Systems identified scalar Q2 projections as the
 main grouped-kernel cost. A packed `dp4a` revision passed grouped parity and
 reduced the 64/128-token operator gap from 12.2× to 4.36×, but remained slower.
 A fresh three-pair 8K service screen showed median NInfer latency changes of

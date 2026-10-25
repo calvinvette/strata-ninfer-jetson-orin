@@ -3053,3 +3053,29 @@ operator oracle reproduced both service outputs bitwise and confirmed their
 arithmetic difference. Moving the expert to rank 0 changed the output earlier,
 so static residency is not a safe general fix. Text parity over a finite prefix
 does not establish exact transaction-state parity or safe continuation.
+
+## A fast-path port needs the target format's fast path
+
+The bounded NInfer-derived CUDA expert path first decoded Q2 values in scalar
+loops and was 12.18–12.31× slower than Strata in grouped operator timings.
+Collapsing an 80-call activation/quantization loop changed little. Nsight
+localized the cost to D3/D4 projections, where Strata already used packed
+integer-dot operations. Adapting those projections to `dp4a` cut the gap to
+4.36×, but still did not beat Strata; the one-entry case was 1.83× slower.
+Parity at the operator boundary was not evidence of a faster request path.
+
+The same-residency 8K service screen then measured +0.82% client latency and
++1.77% decode latency for NInfer, with decode slower in all three pairs. A
+one-request context matrix through 256K showed no consistent advantage and
+cannot provide uncertainty estimates. These results suggest that matching
+Strata's resident Q2 schedule is necessary but insufficient: CPU expert work,
+storage, scheduling and synchronization can dominate or hide the GPU change.
+
+For a future Strata + Splash port, first map the model's real codec, geometry
+and route batching to the target's existing optimized kernels. Profile both
+operator and end-to-end paths before adapting a reference schedule; isolate
+launch overhead from arithmetic, and keep residency, cache size and fallback
+policy fixed in paired controls. Require an independent arithmetic/state
+oracle, then apply the predeclared request-level effect threshold before
+running confirmation or proposing a profile. Keep per-kernel parity, GPU
+execution, build success and product-level benefit as separate claims.

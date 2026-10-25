@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **in progress; E1–E4 have bounded Q2_0 evidence; E4 model coverage is partial as of 2026-10-25**.
+Status: **E0–E5 bounded implementation evidence complete; E6 screening complete but performance exit unmet; E7 assessed with no release profile (2026-10-25)**.
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -45,7 +45,7 @@ record that result without claiming acceleration or closing the performance goal
 Sources: [active dispatch](../../src/core/verify.cpp),
 [NInfer sparse-MoE contract](../../reference/ninfer/include/ninfer/ops/sparse_moe.h),
 [original 8K log](../../bench/results/2026-10-08-jetson-orin/rebased-context-sweep/rebased/8192/engine.txt),
-[current 8K log](../../bench/results/2026-10-25-flashnext-context-capacity-sweep/campaign/coder-iq1m/8192/run/engine.log),
+[current 8K server log](../../bench/results/2026-10-25-flashnext-context-capacity-sweep/campaign/coder-iq1m/8192/run/server.txt),
 [Q6_K qualification](PHASE4_CLOSEOUT.md),
 [request profile](../../bench/results/2026-10-10-phase4-candidate-request-profile/README.md),
 [IQ3_S measurements](../../bench/results/2026-10-24-iq3s-current-candidate-performance/README.md).
@@ -115,7 +115,10 @@ E4 explicitly leaves the mixed-codec
 Coder IQ1_M and ISTA-DASLab IQ3_S models unsupported by
 the NInfer selector; E5 is complete for the bounded single-live static Q2_0
 profile, with cross-backend state migration, adaptive residency and broader
-quality coverage explicitly excluded; E6 is underway and E7 remains pending.
+quality coverage explicitly excluded. E6's one-pair 1K–256K context screen is
+complete, but the predeclared useful-effect gate failed and its performance
+exit remains unmet. E7's release assessment proposes no profile; HIP/SYCL
+builds and any future release-candidate soak remain open.
 E2's resident schedule and
 E3's staged-miss schedule both failed the initial performance screens. The
 default remains Strata and the NInfer path remains experimental. Each stage
@@ -447,7 +450,7 @@ per-model and combined charts include matched controls and uncertainty. Keep
 historical unmatched charts labeled as observations. There is no universal
 "best profile" without evidence across the stated workloads and resource limits.
 
-### E7 — Release the demonstrated integration
+### E7 — Assess release of the demonstrated integration
 
 1. Run focused regression and at least 30 minutes of sustained service for each
    proposed release profile. Use at least 30 independent requests for tail-latency
@@ -465,6 +468,15 @@ historical unmatched charts labeled as observations. There is no universal
 start of this document are assessed explicitly. A bounded release names its
 models, hardware, profiles, exclusions and remaining stages; it cannot close
 unimplemented expert paths by narrowing the wording of a phase closeout.
+
+Execution note (2026-10-25): the assessment finds a bounded CUDA Q2_0 resident
+expert path is implemented and exercised, but it is experimental rather than a
+release profile. The operator and three-pair service screens failed the useful-
+effect threshold; the completed 1K–256K single-sample matrix cannot qualify
+performance or quality. No 30-minute NInfer soak was run because no release
+profile is proposed. The local CUDA build completed. HIP/SYCL compilers were
+unavailable on Orin and `maestro1`, which had 1.1 GiB free, so their required
+build evidence is outstanding. See the [E7 assessment](NINFER_E7_RELEASE_ASSESSMENT.md).
 
 Execution note (2026-10-25): E6's first full top-10 grouped Q2_0 timing screen
 passed parity at 64 and 128 tokens but measured 12.18× and 12.31× NInfer/Strata
@@ -484,8 +496,9 @@ and TTFT show no consistent backend advantage; several longer output hashes
 differ without an independent quality oracle. The matrix characterizes
 configured-context costs and boundaries, but cannot qualify performance or
 replace the required matched charts with uncertainty. The E6 performance exit
-criteria remain unmet; E7 release assessment is still pending. See the [E6
-report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md).
+criteria remain unmet. E7 assessment proposes no profile; see the
+[E6 report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md)
+and [E7 assessment](NINFER_E7_RELEASE_ASSESSMENT.md).
 
 ## Numerical policy
 
