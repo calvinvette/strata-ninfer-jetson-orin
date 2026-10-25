@@ -108,11 +108,11 @@ Do not print a generic NInfer-enabled banner when all work fell back.
 
 ## Implementation sequence
 
-E0 remains open; E1 and E2 are complete; E3–E7 remain pending. E2 completed as
-a bounded functional prototype, while its initial Q2_0 schedule was rejected
-for performance. The default remains Strata and the NInfer path remains
-experimental. Each stage produces a small source/evidence change and a written
-decision before the next dependent stage begins.
+E0 remains open; E1–E3 are complete for a bounded Q2_0 prototype; E4–E7 remain
+pending. E2's resident schedule and E3's staged-miss schedule both failed the
+initial performance screens. The default remains Strata and the NInfer path
+remains experimental. Each stage produces a small source/evidence change and
+a written decision before the next dependent stage begins.
 
 Execution note (2026-10-25): an isolated `feat/ninfer-expert-e0` worktree now
 contains a supervised Orin baseline profile, an opt-in current-source residency
@@ -245,7 +245,7 @@ other backends remain open release limitations. Evidence: [E2 implementation
 report](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/README.md)
 and [paired screen](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/paired-screen/README.md).
 
-### E3 — Feed missing active experts to the GPU backend
+### E3 — Feed missing active experts to the GPU backend — complete 2026-10-25
 
 1. Add a bounded staging route under the existing expert source and memory owner.
    Fetch selected nonresident expert weights into admitted host/device buffers,
@@ -265,6 +265,27 @@ and [paired screen](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-s
 the new GPU backend when that mode is requested, using a bounded working set.
 A separately tuned hybrid mode may retain CPU execution. Publish both coverage
 and total route latency so a fast resident-only result cannot hide slow misses.
+
+The existing Strata `GpuPlanSink` already owns bounded staging descriptors,
+copy/direct mapped paths, transfer lifetimes and shared-memory admission. The
+grouped adapter consumes its staged expert pointers through the same
+caller-owned grouped interface; no second cache, allocator or memory ledger was
+introduced. A 1-GiB pinned complement with the six-GiB physical floor plus
+separate three-GiB workspace reserve exercised both copy-kernel and direct
+mapped modes. Each fresh process used the same 3,000-slot resident-map hash.
+
+Three paired CPU-miss versus copy-staged requests reported 106/13,920 (0.8%)
+expert slots offloaded to the GPU under `--pcie-frac 0.55`. The staged NInfer arm
+was 6.47% slower in decode latency and 2.10% slower in client completion by
+median paired change. Three direct-mapped runs completed and handled the same
+106 slots, with no evident advantage over copied staging. These are screening
+results, not a useful profile. Keep CPU miss fallback and default behavior;
+larger complement/staging sweeps remain subject to memory admission and are not
+release-qualified. See the [staged-miss report](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/staged-screen/README.md)
+and [direct-mapped report](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/direct-screen/README.md).
+
+This closes the bounded Q2_0 staging route integration only; E6's performance
+goal remains open.
 
 ### E4 — Add prefill, small-token execution and model coverage
 

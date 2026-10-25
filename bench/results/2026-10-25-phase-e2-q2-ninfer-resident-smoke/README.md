@@ -118,3 +118,8 @@ retained as implementation evidence.
 - The first attempt exposed the existing helper's eight-column limit; the fixed
   code now chunks calls, but maximum-capacity scratch and graph-capture behavior
   need dedicated qualification.
+- The existing bounded staged-miss route was also exercised with a 1-GiB pinned
+  complement. CPU-miss versus NInfer staging and direct-mapped results are
+  documented in the [staged-miss report](staged-screen/README.md) and
+  [direct-mapped report](direct-screen/README.md); neither showed a performance
+  benefit at this memory budget.

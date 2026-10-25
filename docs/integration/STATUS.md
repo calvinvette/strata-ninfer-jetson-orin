@@ -10,8 +10,9 @@ release profile still excludes unresolved multi-live/adaptive paths and does
 not promote a universal parametric profile. This records tested cells, not general product support.
 
 The [NInfer expert execution plan](NINFER_EXPERT_EXECUTION_PLAN.md) is now in
-progress: E0 remains open, E1 is complete, E2 produced a functional but
-performance-rejected Q2_0 prototype, and E3–E7 remain pending. On 2026-10-25, E0 captured a supervised Coder IQ1_M decode profile
+progress: E0 remains open, E1–E3 have bounded Q2_0 prototype evidence, and
+E4–E7 remain pending. The E2 resident and E3 staged-miss schedules both failed
+initial performance screens. On 2026-10-25, E0 captured a supervised Coder IQ1_M decode profile
 with Strata's existing expert backend. The opt-in decode timer measured 21.73 ms
 per token-window in CPU expert work and 35.07 ms waiting for GPU reach; a
 separate Nsight diagnostic recorded 255.8 ms of resident gate/up and 174.5 ms
@@ -5452,7 +5453,7 @@ route weighting, shared experts, residuals and persistent state. Default
 behavior remains Strata. A first smoke attempt found the inherited Q8_1
 SwiGLU quantizer's eight-column call limit; the adapter now chunks its calls.
 
-This is E2 implementation progress, not a performance win. The initial
+The E2 implementation is functional but not a performance win. The initial
 unpaired service screen was superseded by a three-pair same-residency screen.
 Each pair used the same resident-map hash and produced the same output hash;
 median paired changes were +3.4% prompt latency, +7.3% decode latency and
@@ -5467,3 +5468,17 @@ NInfer route took 85.7 us median versus 24.5 us for Strata (3.50x
 candidate/control). This excludes request and cache work. Together, these
 screens reject the current kernel schedule as a performance candidate; fuse or
 replace its extra projection/quantization cost before any larger confirmation.
+
+# 2026-10-25: NInfer Q2_0 staged-miss and direct-map checks
+
+Reused Strata's bounded `GpuPlanSink`, pinned complement and staging/mapped
+pointer ownership for selected nonresident Q2_0 experts. Three CPU-miss versus
+copy-staged pairs used a 1-GiB pinned complement and identical 3,000-slot GPU
+resident maps, retaining the six-GiB physical floor and separate three-GiB
+workspace reserve. The candidate offloaded 106/13,920 (0.8%) routed slots;
+median paired decode/client latency regressed 6.47%/2.10%. Three direct-mapped
+services completed with the same output and offload count, with no evident
+gain over copy staging. These results close E3's bounded route integration,
+not its performance goal; larger host-complement and staging-depth sweeps remain
+open and require renewed memory admission. See the [CPU versus staged report](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/staged-screen/README.md)
+and [direct-mapped screen](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/direct-screen/README.md).
