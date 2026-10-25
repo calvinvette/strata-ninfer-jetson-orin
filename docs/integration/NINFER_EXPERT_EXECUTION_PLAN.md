@@ -365,11 +365,13 @@ deterministic prompts at one cancellation boundary each; long/held-out tasks and
 adaptive residency remain open. See the [MTP-2 report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-mtp2-cancel-state/README.md)
 and [MTP-4 report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-mtp4-cancel-state/README.md).
 
-A separate 512-token-prompt test compared MTP-off and MTP-4 under the same
-strict NInfer backend: 23/33 drafts were accepted, and all 32 output token IDs,
-final state and 12 shared accepted-prefix state fingerprints matched. The
-[prefix-parity report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-mtp4-prefix-parity/README.md)
-records the held-fixed setup and memory telemetry. Long retrieval/scoring
+Separate 512-token-prompt tests compared MTP-off with MTP-2 and MTP-4 under the
+same strict NInfer backend. MTP-2 accepted 15/17 drafts and matched all 32
+output token IDs, final state and 18 shared accepted-prefix states; MTP-4
+accepted 23/33 and matched all 32 IDs, final state and 12 shared prefixes. The
+[MTP-2 parity report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-mtp2-prefix-parity/README.md)
+and [MTP-4 parity report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-mtp4-prefix-parity/README.md)
+record the held-fixed setup and memory telemetry. Long retrieval/scoring
 prompts and repeated continuation remain open.
 
 ### E6 — Demonstrate end-to-end performance and context behavior
