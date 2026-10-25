@@ -109,12 +109,15 @@ Do not print a generic NInfer-enabled banner when all work fell back.
 ## Implementation sequence
 
 E0 is complete for the bounded controls and current Q2_0 timing audit; E1–E4
-have bounded Q2_0 prototype evidence, and E5 has an initial MTP-2 accepted-state
-check. E4 explicitly leaves the mixed-codec
+have bounded Q2_0 prototype evidence. E5 has MTP-2/MTP-4 cancellation,
+accepted-prefix, continuation/recovery and short retrieval/arithmetic evidence.
+E4 explicitly leaves the mixed-codec
 Coder IQ1_M and ISTA-DASLab IQ3_S models unsupported by
-the NInfer selector; E5–E7 remain pending. E2's resident schedule and E3's staged-miss schedule both failed the
-initial performance screens. The default remains Strata and the NInfer path
-remains experimental. Each stage produces a small source/evidence change and
+the NInfer selector; E5 remains in progress for held-out long-task, quality and
+adaptive-residency coverage, with E6–E7 pending. E2's resident schedule and
+E3's staged-miss schedule both failed the initial performance screens. The
+default remains Strata and the NInfer path remains experimental. Each stage
+produces a small source/evidence change and
 a written decision before the next dependent stage begins.
 
 Execution note (2026-10-25): an isolated `feat/ninfer-expert-e0` worktree now
@@ -376,7 +379,11 @@ MTP-off/MTP-4 sequence (initial generation, continuation, then recovery) matched
 all token IDs and the nine captured persistent-state fields at every request
 boundary. MTP-4 accepted five drafts in each request, with rejected suffixes
 before continuation and recovery. See the [repeated continuation report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-mtp4-continuation/README.md).
-Held-out long retrieval/scoring and quality coverage remain open.
+An exact 512-token retrieval-plus-arithmetic task also passed with strict NInfer
+and MTP off/4: both arms returned the exact three codes and suffix sum in 47
+tokens, with identical token IDs and final persistent state. The single-run
+timings are not an effect estimate. See the [retrieval task report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-retrieval-check/README.md).
+Held-out long retrieval/scoring and wider prompt/quality coverage remain open.
 
 ### E6 — Demonstrate end-to-end performance and context behavior
 
