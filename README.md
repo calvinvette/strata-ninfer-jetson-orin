@@ -13,8 +13,10 @@ Development is on **`main`**. The [integration guide](docs/integration/README.md
 [multi-phase plan](docs/integration/PLAN.md), [architecture](docs/integration/ARCHITECTURE.md),
 [parametric/multivariate benchmark protocol](docs/integration/BENCHMARKS.md),
 [source import map](docs/integration/IMPORT_MAP.md) and [status](docs/integration/STATUS.md).
-The combined runtime is implemented and has current Orin performance measurements. Results from the original
-`strata-inference-orin` port are kept separate below; they are not measurements of this combined engine.
+This fork has current Orin measurements of its Strata runtime changes and experimental profiles.
+Routed experts still execute through Strata's kernels; the
+[NInfer expert execution plan](docs/integration/NINFER_EXPERT_EXECUTION_PLAN.md) defines the pending compute integration.
+The original `strata-inference-orin` results and this fork's measurements are identified separately below.
 The translated READMEs describe the original project and have not been updated for this integration.
 
 **English** · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Deutsch](README.de.md) · [Français](README.fr.md) · [Español](README.es.md) · [Português](README.pt-BR.md)

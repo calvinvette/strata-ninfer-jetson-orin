@@ -3,19 +3,18 @@
 This project starts from Strata's validated ARM64 port and applies the architecture,
 correctness methods and measured SM87 lessons from the NInfer Orin port. The first
 deliverable was an integration plan and an auditable source/evidence import.
-This remains an active integration and qualification effort, not a claim of
-combined-runtime speedup. Phases 1 and 2 are complete, and Phase 3 is closed for
-the tested Orin Q2_0 scope. Phase 4 is closed for its tested candidates; Phases
-5 and 6 remain open. Phase 7 is complete for its bounded Orin qualification
-matrix under the [closeout](PHASE7_CLOSEOUT.md); that is not a general product
-support claim. Phase 8
-backend builds, including the latest current-source HIP/SYCL compile and CLI
-checks and the pinned-control Orin rollback smoke, are recorded; supported
-release packaging and broader runtime gates remain open. The [bounded Orin
-integration profile](RELEASE_PROFILE.md) collects the exact current-source
-Q2_0 profile, reproduction command, rollback evidence and exclusions. A latest current-source Q2_0 service run at engine source `b6ea6188` also
-confirms one selected-profile retrieval/recovery cell; see the [bounded release
-profile](RELEASE_PROFILE.md).
+
+The current runtime still executes routed experts through Strata's kernels.
+The [NInfer expert execution plan](NINFER_EXPERT_EXECUTION_PLAN.md) specifies the
+missing implementation: Strata owns residency and state while an adapted
+NInfer backend computes resident and staged experts. Stages E0–E7 are pending;
+this plan has not started a new implementation or measurement campaign.
+
+The earlier phases have bounded closeouts for their tested Strata changes,
+correctness gates and profiles. Those closeouts do not establish NInfer expert
+execution or a combined-runtime speedup. The [bounded Orin profile](RELEASE_PROFILE.md)
+collects the qualified Q2_0 configuration, source/binary identities,
+reproduction command, rollback evidence and exclusions.
 Current admission, transfer, profiling, speculation and service evidence is
 summarized in [status](STATUS.md). See [control reproduction](PHASE1.md) and
 [porting notes for future engines](PORTING_NOTES.md) for reproducible methods

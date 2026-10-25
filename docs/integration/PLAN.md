@@ -1,5 +1,11 @@
 # Multi-phase development plan
 
+The missing NInfer expert execution work is now specified in
+[NINFER_EXPERT_EXECUTION_PLAN.md](NINFER_EXPERT_EXECUTION_PLAN.md), stages E0–E7.
+That follow-on is planning only. The bounded closeouts below cover the tested
+Strata changes and qualification scopes; they do not establish an implemented
+NInfer expert backend or its performance benefit.
+
 Target: apply NInfer's proven design and SM87 lessons to Strata's Flash-Next Orin
 runtime while preserving correctness, shared-RAM limits and service behavior.
 This is a staged research and implementation plan, not a claim of combined speed.

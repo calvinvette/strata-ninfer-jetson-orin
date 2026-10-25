@@ -9,6 +9,15 @@ Phase 6 is complete for the tested factor domains under their closeouts. The
 release profile still excludes unresolved multi-live/adaptive paths and does
 not promote a universal parametric profile. This records tested cells, not general product support.
 
+The [NInfer expert execution plan](NINFER_EXPERT_EXECUTION_PLAN.md), recorded
+2026-10-25, defines pending stages E0–E7 for the actual compute integration.
+Resident GPU experts currently use Strata's existing kernels; the earlier
+bounded phase closeouts do not establish an implemented NInfer expert backend.
+The follow-on covers NInfer-derived resident computation, bounded staging of
+cache misses, model/codec coverage, state and quality gates, and matched
+performance controls. This update is planning only; no new runtime or benchmark
+was executed for it.
+
 The current Coder two-live investigation refines that exclusion. At cache 3,000,
 the default path's prompt-1 state first changed at position 105/layer 24 and its
 output first differed at generated token 60. `STRATA_DEC_BATCH=0` retained the
