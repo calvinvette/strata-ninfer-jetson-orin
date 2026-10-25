@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **in progress; E0 baseline audit started on 2026-10-25**.
+Status: **in progress; E2 resident Q2_0 implementation and initial qualification started on 2026-10-25**.
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -184,6 +184,22 @@ captured cross-variant Coder IQ1_M vector; Q2_0-model-native activation coverage
 and NInfer adapter parity remain E2 qualification work.
 Retain fixtures under `~/models/` when they contain model payloads. A stub or an
 operator that simply forwards all work to Strata is not the E2 deliverable.
+
+Execution note (2026-10-25): the first CUDA Q2_0/Q2_0 resident adapter is now
+implemented behind `--expert-backend ninfer`; default Strata behavior is
+unchanged. It adapts NInfer-derived D3 gate/up + SiLU and D4 down-projection
+stages to the actual 2560/640 Q2_0 layout, uses Strata's Q8_1 activation
+quantizer for grouped cache work, and leaves route weighting/shared/residual
+semantics in Strata. Actual-weight single-expert GPU output passes the FP64
+oracle, and one grouped GPU resident entry passes comparison against the
+existing Strata Q2_0 route. A strict-mode service smoke returned a completion.
+The first service attempt exposed the helper's eight-column limit and the adapter
+now chunks quantization calls accordingly. This is implementation evidence,
+not an acceleration claim: the service screen was unpaired and cache hit ratios
+differed; matched on/off kernel timing, resident-ID identity, device-side entry
+coverage, model-native activation cases, and sustained/edge-case qualification
+remain open. CUDA only; HIP/SYCL builds are not yet available. See the [E2
+smoke report](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/README.md).
 
 ### E2 — Execute resident experts with NInfer-derived kernels
 

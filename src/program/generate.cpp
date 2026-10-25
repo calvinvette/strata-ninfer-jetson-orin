@@ -43,6 +43,9 @@
 #include "strata/kernels/cpu/expert_layout.hpp"
 #include "strata/kernels/ngram.hpp"
 #include "strata/kernels/iq_kernels.hpp"
+#if defined(STRATA_NINFER_Q2_CUDA)
+#include "strata/kernels/ninfer_q2_expert.hpp"
+#endif
 #include "strata/kernels/s2_expert_grouped.hpp"
 #include "strata/kernels/sampler.hpp"
 #include "strata/kernels/verify_kernels.hpp"
@@ -732,6 +735,8 @@ struct Options {
     /// true is that the ADMISSION POLICY gave every slot to the first position, which is why the earlier
     /// measurement found nothing - see `expert_cache_per_layer`.
     int expert_cache = 0;
+    std::string expert_backend = "strata";
+    bool expert_backend_strict = false;
     std::array<int, 3> expert_cache_remote{}; ///< CUDA1..3 slots; CUDA0 keeps dense/state/MTP
     std::array<bool, 3> expert_cache_remote_auto{};
     bool remote_expert_opt = false; ///< optional optimization of the existing remote-expert decode path
@@ -1109,6 +1114,9 @@ void usage() {
                  "                       GPU via `moe_hit_grouped_s2`.  DEFAULT 0.  Measured at 4096 slots\n"
                  "                       with --expert-cache-per-layer: 54.4%% hits, CPU pool drain 19.1 -> 10.3\n"
                  "                       ms/token, -2.7 ms/token end to end.\n"
+                 "  --expert-backend strata|ninfer  select resident expert compute (default strata; NInfer supports\n"
+                 "                       CUDA Q2_0/Q2_0 Flash-Next 2560/640 only; unsupported pairs fall back)\n"
+                 "  --expert-backend-strict  with ninfer, reject unsupported codec/geometry instead of fallback\n"
                  "  --expert-cache-device1 N|auto  fill CUDA1 with N experts or as many as fit\n"
                  "  --expert-cache-device2 N|auto  fill CUDA2 with more experts\n"
                  "  --expert-cache-device3 N|auto  fill CUDA3 with more experts\n"
@@ -2054,7 +2062,9 @@ int main(int argc, char** argv) {
         // The chain continues here in a second statement: one chain of 120+ `else if` passed MSVC's limit of 128
         // nested blocks (C1061).  The order of the tests and what each does are unchanged.
         if (!parsed) {
-        if (a == "--expert-cache") {
+        if (a == "--expert-backend") o.expert_backend = next("--expert-backend");
+        else if (a == "--expert-backend-strict") o.expert_backend_strict = true;
+        else if (a == "--expert-cache") {
             const std::string v = next("--expert-cache");
             o.expert_cache = (v == "auto") ? -1 : std::atoi(v.c_str());
         }
@@ -2641,6 +2651,22 @@ int main(int argc, char** argv) {
         std::fprintf(stderr, "strata generate: --expert-cache-remote-placement must be stripe or layer\n");
         return 2;
     }
+    if (o.expert_backend != "strata" && o.expert_backend != "ninfer") {
+        std::fprintf(stderr, "strata generate: --expert-backend must be strata or ninfer\n");
+        return 2;
+    }
+    if (o.expert_backend_strict && o.expert_backend != "ninfer") {
+        std::fprintf(stderr, "strata generate: --expert-backend-strict requires --expert-backend ninfer\n");
+        return 2;
+    }
+#if !defined(STRATA_NINFER_Q2_CUDA)
+    if (o.expert_backend != "strata") {
+        std::fprintf(stderr, "strata generate: the NInfer Q2_0 backend is not built for this GPU backend\n");
+        return 2;
+    }
+#else
+    strata::kernels::ninfer_q2_0_expert_backend_set(o.expert_backend == "ninfer", o.expert_backend_strict);
+#endif
     if (o.remote_expert_opt && !o.serve) {
         std::fprintf(stderr, "strata generate: --remote-expert-opt requires --serve\n");
         return 2;

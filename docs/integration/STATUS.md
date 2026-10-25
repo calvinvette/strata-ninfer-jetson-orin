@@ -5437,3 +5437,22 @@ run. Available local NInfer Qwen3.8-27B files use NInfer's `.ninfer` artifact
 format and are not interchangeable with this IQ3_S GGUF. Record this as an
 unsupported cell; do not substitute a different engine or artifact in the same
 performance cohort. [Support check](../../bench/results/2026-10-25-dense-iq3s-support-check/README.md).
+
+# 2026-10-25: First NInfer-derived resident Q2_0 execution
+
+Implemented an opt-in CUDA backend for Q2_0/Q2_0 Flash-Next expert tensors at
+2560/640 geometry. The strict route completed a local service smoke, and actual
+Q2_0 weights passed both the independent FP64 single-expert oracle (relative
+L2 `2.13e-7`) and grouped comparison with Strata's existing Q2_0 route
+(relative L1 `9.69e-8`). The adapter keeps Strata routing, resident cache,
+route weighting, shared experts, residuals and persistent state. Default
+behavior remains Strata. A first smoke attempt found the inherited Q8_1
+SwiGLU quantizer's eight-column call limit; the adapter now chunks its calls.
+
+This is E2 implementation progress, not a performance result. One unpaired
+service screen returned the same short answer as the default backend, but the
+cache hit ratios and request histories differed. No kernel-only timing or
+matched-residency on/off campaign has been completed. Device-side per-entry
+coverage, Q2_0-native activation cases, broader graph/edge-case qualification,
+and HIP/SYCL builds remain open. See the [E2 evidence report](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/README.md)
+and [execution plan](NINFER_EXPERT_EXECUTION_PLAN.md).

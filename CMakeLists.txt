@@ -398,7 +398,17 @@ if(STRATA_ENABLE_CUDA OR STRATA_ENABLE_HIP)
                           src/kernels/ngram.cpp
                           src/ngram/ple_reader.cpp
                           src/platform/direct_file.cpp)
+  # E2: CUDA-only resident NInfer-derived Q2_0 expert compute. The existing
+  # Strata kernels remain the default route; HIP/SYCL source sets stay unchanged.
+  if(STRATA_ENABLE_CUDA AND NOT STRATA_HIP_GFX906)
+    target_sources(strata_kernels PRIVATE src/kernels/cuda/ninfer_q2_expert.cu)
+  endif()
   target_link_libraries(strata_kernels PUBLIC strata_core strata_artifact)
+  if(STRATA_ENABLE_CUDA AND NOT STRATA_HIP_GFX906)
+    add_executable(ninfer_q2_expert_parity src/kernels/ninfer_q2_expert_parity.cpp)
+    target_include_directories(ninfer_q2_expert_parity PRIVATE ${_strata_gpu_include_directories})
+    target_link_libraries(ninfer_q2_expert_parity PRIVATE strata_kernels strata_artifact CUDA::cudart)
+  endif()
   # perf-review D-1: the tensor-core prompt attention vs the FP32 kernel and FP64 (GPU, synthetic, no model); with
   # the tests, or alone with -DSTRATA_PARITY_PROMPT_ATTN=ON.  CUDA only: HIP compiles the tensor-core kernel out.
   if((STRATA_BUILD_TESTS OR STRATA_PARITY_PROMPT_ATTN) AND STRATA_ENABLE_CUDA)
@@ -496,6 +506,9 @@ if(STRATA_ENABLE_CUDA OR STRATA_ENABLE_HIP)
     src/core/arch_defaults.cpp src/core/vmm.cpp src/core/conversation_file.cpp)
   target_include_directories(strata_engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
   target_link_libraries(strata_engine PUBLIC strata_core strata_kernels strata_kernels_cpu ${_strata_gpu_runtime_target})
+  if(STRATA_ENABLE_CUDA AND NOT STRATA_HIP_GFX906)
+    target_compile_definitions(strata_engine PRIVATE STRATA_NINFER_Q2_CUDA=1)
+  endif()
   if(STRATA_BUILD_TESTS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/core/exchange_storage_test.cpp")
     add_executable(exchange_storage_test tests/core/exchange_storage_test.cpp)
     target_include_directories(exchange_storage_test PRIVATE include)
@@ -595,6 +608,9 @@ if(STRATA_ENABLE_CUDA OR STRATA_ENABLE_HIP)
   add_executable(strata src/program/generate.cpp)
   target_include_directories(strata PRIVATE ${_strata_gpu_include_directories})
   target_link_libraries(strata PRIVATE strata_engine strata_prefill strata_spec ${_strata_gpu_runtime_target})
+  if(STRATA_ENABLE_CUDA AND NOT STRATA_HIP_GFX906)
+    target_compile_definitions(strata PRIVATE STRATA_NINFER_Q2_CUDA=1)
+  endif()
 
   if(STRATA_ENABLE_HIP)
     enable_testing()

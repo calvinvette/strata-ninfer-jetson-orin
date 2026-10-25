@@ -13,6 +13,9 @@
 #include "strata/core/on_device.hpp"
 #include "strata/core/peer_experts.hpp"
 #include "strata/kernels/iq_kernels.hpp"
+#if defined(STRATA_NINFER_Q2_CUDA)
+#include "strata/kernels/ninfer_q2_expert.hpp"
+#endif
 #include "strata/kernels/cpu/expert_layout.hpp"
 #include "strata/kernels/bf16_gemv.hpp"
 #include "strata/kernels/native_router.hpp"
@@ -2275,21 +2278,55 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
         const auto& lay = strata::kernels::cpu::expert_layout();
         // plan v0.3 P6: the VRAM groups now; the PCIe groups once the copy engine has landed them in staging.
         // `gy`: the native launch's groups side by side (0: cap, one block row per possible group).
-        auto grouped = [&](const unsigned long long* gp, const int32_t* gs, const int32_t* gn, int64_t gy, float* dst_buf) {
+        auto grouped = [&](const unsigned long long* gp, const int32_t* gs, const int32_t* gn, int64_t gy, float* dst_buf) -> bool {
             if (lay.native) {
                 // the layer's GGUF formats (i-quant gate/up, Q2_0 / IQ4_NL down)
                 const auto& f = lay.fmt[(size_t) l];
                 const NativeExpertLayout L = native_expert_layout(f.gu_type, f.d_type, f.n_embd, f.n_ff);
+#if defined(STRATA_NINFER_Q2_CUDA)
+                if (ninfer_q2_0_expert_backend_enabled()) {
+                    if (f.gu_type == 42 && f.d_type == 42 && f.n_embd == 2560 && f.n_ff == 640) {
+                        if (ninfer_q2_0_expert_dispatch_count() == 0) {
+                            std::fprintf(stderr, "strata verify: queued NInfer Q2_0 resident grouped dispatch at layer "
+                                                 "%lld (CUDA Q2_0/Q2_0, 2560/640)\n", (long long) l);
+                        }
+                        ninfer_q2_0_expert_grouped(L, gp, gs, gn, p_dst, p_tok, cap, cap,
+                                                   nat_xq_ + (size_t) tb * (N / 32) * 36,
+                                                   hit_scratch_, dst_buf, cs, gy);
+                        return true;
+                    }
+                    if (ninfer_q2_0_expert_backend_strict()) {
+                        err = "verify: strict NInfer backend does not support layer " + std::to_string(l) +
+                              " codec pair " + std::to_string(f.gu_type) + "/" + std::to_string(f.d_type) +
+                              " at " + std::to_string(f.n_embd) + "/" + std::to_string(f.n_ff);
+                        return false;
+                    }
+                    static bool warned = false;
+                    if (!warned) {
+                        std::fprintf(stderr, "strata verify: NInfer Q2_0 backend fell back to Strata for unsupported "
+                                             "expert codec/geometry (layer %lld)\n", (long long) l);
+                        warned = true;
+                    }
+                }
+#endif
                 native_expert_grouped(L, gp, gs, gn, p_dst, p_tok, cap, cap,
                                       nat_xq_ + (size_t) tb * (N / 32) * 36, hit_scratch_, dst_buf, cs, gy);
             } else {
+#if defined(STRATA_NINFER_Q2_CUDA)
+                if (ninfer_q2_0_expert_backend_enabled() && ninfer_q2_0_expert_backend_strict()) {
+                    err = "verify: strict NInfer backend requires a native Q2_0 expert layout at layer " +
+                          std::to_string(l);
+                    return false;
+                }
+#endif
                 moe_grouped_s2(gp, gs, gn, p_dst, p_tok, cap, cap, hit_xq_ + (size_t) tb * (N / 32) * 34,
                                hit_xs_ + (size_t) tb * (N / 32), hit_scratch_, dst_buf, cs);
             }
+            return true;
         };
         if (ar_on()) {
             stamp(l, 19, grp);
-            grouped(p_ptr, p_start, p_counts, 0, parts_out);
+            if (!grouped(p_ptr, p_start, p_counts, 0, parts_out)) return false;
             stamp(l, 20, grp);
         } else {
             if (device_plan_) {   // E-6: skipped when the device planned this group (all its experts resident)
@@ -2300,7 +2337,7 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                 copy_i32_from_mapped(pl, m_plan_ + (size_t) grp * (size_t) plan_i32_, plan_i32_, cs);
             }
             stamp(l, 19, grp);
-            grouped(p_ptr, p_start, p_counts, 0, hit_out);
+            if (!grouped(p_ptr, p_start, p_counts, 0, hit_out)) return false;
             stamp(l, 20, grp);
             if (device_plan_) wait_flag_ge_or(m_flagB_, ring, skip_ + grp, cs);
             else wait_flag_ge(m_flagB_, ring, cs);                 // the PCIe share is in staging (DMA) or mapped
@@ -2313,7 +2350,7 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
             stamp(l, 21, grp);
             // the PCIe share is pcie_frac of the misses: a few groups when the cache is cold, usually none (always none at
             // pcie_frac 0), so its launch is kPcieGroupRows block rows striding over the groups, not cap of them
-            grouped(p_ptr2, p_start2, p_counts + 2, kPcieGroupRows, hit_out);
+            if (!grouped(p_ptr2, p_start2, p_counts + 2, kPcieGroupRows, hit_out)) return false;
             stamp(l, 22, grp);
             if (device_plan_) {   // no CPU share when the device planned the group: its rows are zeros
                 wait_flag_ge_or(m_flag_, ring, skip_ + grp, cs);
