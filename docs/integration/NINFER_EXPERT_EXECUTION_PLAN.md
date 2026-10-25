@@ -359,6 +359,14 @@ persistent-state equivalence is unresolved. See the [complement sweep
 report](../../bench/results/2026-10-25-phase-e3-q2-complement-sweep/README.md)
 and [quality diagnostic](../../bench/results/2026-10-25-phase-e3-q2-ninfer-complement6g-quality/README.md).
 
+Pre-registration (2026-10-25, before confirmation): for the corrected grouped
+SwiGLU kernel at this staged 6-GiB profile, nominate TTFT as the primary metric
+because this screen targets prompt-to-first-token delay. Require at least 5%
+median paired improvement with the paired 95% interval excluding zero. Treat
+client completion as the secondary metric, with no more than 5% regression.
+Require matching output hashes and the held-out exact-answer/final-state check
+to pass; retain the six-GiB host headroom and three-GiB workspace reserve.
+
 ### E4 — Add prefill, small-token execution and model coverage — complete with partial model support
 
 1. The bounded Q2_0 implementation now exercises one-token decode and a
