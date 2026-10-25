@@ -22,6 +22,17 @@ current candidate in the [2026-10-22 smoke](../../bench/results/2026-10-22-phase
 | Profile | 8K context, FP16 KV, MTP off, 3,000 exact expert slots, prefill chunk 128, eight workers, 3,072 MiB workspace reserve, prompt cache and adaptive swaps off |
 | Memory guard | `MemoryMax=28G`; preserve at least six GiB host availability |
 
+On 2026-10-25, the current Release candidate was clean-rebuilt from the
+runtime source tree at `348e6261ab3fa5f119ec3050637c01477fddaa78` using two
+build jobs. Its SHA256,
+`ad4b2354fe98f0e4128cf9a9ed70488fef362207dd1f7e94555a8ba35d8985df`, matches
+the current-candidate binary used in the Coder IQ1_M campaign. The rebuilt
+binary then completed a seven-block Q2_0 performance campaign with the profile
+above; all requests passed fresh-prefill and exact output-count checks. This
+adds current-source performance evidence without changing the bounded Phase 8
+functional qualification or its exclusions. See the [Q2_0 performance
+report](../../bench/results/2026-10-25-q2-current-candidate-performance/README.md).
+
 The model and pack stay under `~/models/strata-orin-validation/`. The two Q2_0
 GGUF shard SHA256 values are `69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720`
 and `316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113`.

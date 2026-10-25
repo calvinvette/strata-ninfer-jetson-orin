@@ -1,0 +1,130 @@
+{
+  "schema": 1,
+  "measured_on": "2026-10-25",
+  "board": "NVIDIA Jetson AGX Orin, aarch64",
+  "kernel": "Linux 5.15.148-tegra",
+  "l4t": "R36.4.4",
+  "cuda": "12.6",
+  "driver": "540.4.0",
+  "power_mode": "MAXN; dynamic clocks observed; no clock changes",
+  "build": {
+    "checkout_commit": "3774a9de4cee773a5603e3fbcd6a6331314fdf03",
+    "runtime_source_commit": "348e6261ab3fa5f119ec3050637c01477fddaa78",
+    "command": [
+      "cmake --build build/integration/candidate --target clean",
+      "cmake --build build/integration/candidate --target strata --parallel 2"
+    ],
+    "result": "success",
+    "memory_max": "24G",
+    "binary_sha256": "ad4b2354fe98f0e4128cf9a9ed70488fef362207dd1f7e94555a8ba35d8985df",
+    "matches_previously_recorded_candidate_sha256": true
+  },
+  "model": {
+    "repo": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+    "revision": "5348543e0147355ac9cbcb031184a3546350988e",
+    "quantization": "Q2_0",
+    "shards": {
+      "model_shard_1": {
+        "relative_path": "~/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+        "size_bytes": 37623740192,
+        "sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720",
+        "sha256_verified_against": "RELEASE_PROFILE.md and Phase 7 artifact manifest"
+      },
+      "model_shard_2": {
+        "relative_path": "~/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+        "size_bytes": 28800138432,
+        "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113",
+        "sha256_verified_against": "RELEASE_PROFILE.md and Phase 7 artifact manifest"
+      }
+    }
+  },
+  "pack": {
+    "path": "~/models/strata-orin-validation/q2-ple-pack",
+    "method": "Q2_0 deployment PLE pack; expert bytes are mmap-read from the GGUF shards in place; tokenizer from sibling pack/",
+    "files": {
+      "dense.bin": {
+        "size_bytes": 1485606400,
+        "sha256": "a43d7d0b69525335f4b000d5197a1d3aefcd3c0014fc3e12b3455e0a5d827ba2"
+      },
+      "index.txt": {
+        "size_bytes": 93561,
+        "sha256": "c758314d495a1261d06a806b1c415596dfabe62e0cbf44ce592dc84c53229ccd"
+      },
+      "native_experts.txt": {
+        "size_bytes": 3286,
+        "sha256": "015e53d3ae36324f172be4942bcf129539b343e2eb4fcd4f25ca5eff180bfa41"
+      },
+      "conversions.json": {
+        "size_bytes": 304,
+        "sha256": "331e49b5a4172bc093ce0d1f6f9b8e74b324f3a8b3ca711dbee03ef33f736306"
+      }
+    },
+    "tokenizer_sha256_by_file": {
+      "chat_template.jinja": {
+        "size_bytes": 9993,
+        "sha256": "12827f24b742ea4e80cdc12dbcf9622227056b9f797252a3149263d4f9aaadce"
+      },
+      "merges.txt": {
+        "size_bytes": 3353258,
+        "sha256": "4ba698529766c7a2f5052083ea10cdf2485577f5237a332ee291054eb11e3332"
+      },
+      "token_type.json": {
+        "size_bytes": 744960,
+        "sha256": "5088c8c298fc06af8382ddb3b76c888703ac2634e82263b97eedcc2ad202738b"
+      },
+      "tokenizer.json": {
+        "size_bytes": 541,
+        "sha256": "c0bd435efbc6c3b28964b47999afe16c4ad268c7c7c4e8cb3af410796a6f30bf"
+      },
+      "vocab.json": {
+        "size_bytes": 5737005,
+        "sha256": "4ba64f0332abcfb0b600b7df1537d1e836e68009d5fb7cdb77339738dc6365c4"
+      }
+    }
+  },
+  "expert_profile": {
+    "path": "~/models/strata-orin-validation/q2-expert-profile.bin",
+    "size_bytes": 196632,
+    "sha256": "b3e62120218cd96d175a0547530158869177dd2164b22b40f32bea7d7e85fb8c"
+  },
+  "workload_sha256": "80cea36409c8d71bd2192df12959c55ca6bd270ad3176205304742803f8fe9ca",
+  "server_config_sha256": "fb9ef0722d13713bf090134564d124c19e94b84804b3b922e9a69155e5779abc",
+  "campaign_seed": 2026102501,
+  "campaign_blocks": 7,
+  "profile_flags": [
+    "--expert-cache 3000",
+    "--prefill 128",
+    "--spec 2 (verifier window; MTP drafts disabled via --suffix-draft 0)",
+    "--max-context 8192",
+    "--mmap-experts",
+    "--prompt-cache 0",
+    "--vram-reserve-mib 3072",
+    "--pcie-frac 0.55",
+    "--no-prefill-borrow",
+    "--pool-workers 8",
+    "--spec-min-p 0",
+    "STRATA_PREFILL_CPU_SHARE=0"
+  ],
+  "settings_realized": {
+    "expert_cache_slots": 3000,
+    "expert_cache_shared_ram_bytes": 4146051072,
+    "workspace_reserve_mib": 3072,
+    "kv": "FP16",
+    "mtp": "off",
+    "prompt_cache": "off"
+  },
+  "measurement_protocol": {
+    "supervisor": "tools/integration/run_control.py",
+    "cgroup_memory_max": "28G",
+    "minimum_admission_floor_gib": 6,
+    "clock_sampling": "read-only CPU/GPU observations; EMC unavailable",
+    "warmup": "one request per workload per independent process; excluded",
+    "repetitions": 7,
+    "energy": "not measured; raw tegrastats only"
+  },
+  "report_hashes": {
+    "summary.json": "5a25c0de8ee17879c8c5d382556863db7476082761a482a7b80e23b976a4db5a",
+    "workloads.json": "80cea36409c8d71bd2192df12959c55ca6bd270ad3176205304742803f8fe9ca",
+    "server-config.template.json": "fb9ef0722d13713bf090134564d124c19e94b84804b3b922e9a69155e5779abc"
+  }
+}

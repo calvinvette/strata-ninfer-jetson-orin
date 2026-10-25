@@ -5332,3 +5332,29 @@ IQ3_S or Q2_0 measurements; they do not establish a quantization speedup or
 change the bounded Q2_0 release profile. Model files remain in
 `~/models/strata-orin-validation/`. Raw per-process evidence, artifact checksums
 and the summarizer are retained in the report directory.
+# 2026-10-25: Rebuilt current candidate and measured Q2_0
+
+Clean-rebuilt the Release `strata` target from the current checkout with two
+parallel jobs under a 24 GiB build cgroup. The result hash
+`ad4b2354fe98f0e4128cf9a9ed70488fef362207dd1f7e94555a8ba35d8985df` matches
+the current-candidate executable used in the 2026-10-24 Coder IQ1_M campaign.
+The runtime source tree matches commit
+`348e6261ab3fa5f119ec3050637c01477fddaa78`; the checkout also contains later
+documentation and evidence commits.
+
+Ran seven independent supervised blocks against the Q2_0 model shards and PLE
+pack pinned by the Phase 7 artifact manifest. The documented 8K/FP16 KV/MTP-off
+profile realized exactly 3,000 expert slots. Every measured 512/64 and
+2,048/128 request passed fresh-prefill and exact token-count checks. Median
+prompt/decode rates were 32.6/10.2 and 54.2/10.4 tok/s; median client
+TTFT/full-request times were 15.88/22.00 and 37.97/50.10 seconds. The
+campaign-wide minimum host/admission availability was 17.74/7.36 GiB with zero
+cgroup events. Long-workload output text had two hashes across blocks; no
+independent quality oracle or energy measurement was performed. MAXN clocks
+were dynamic and EMC readback unsupported.
+
+This is performance evidence for the bounded Q2_0 profile. It is not paired
+with the Coder IQ1_M or IQ3_S campaigns, and does not justify a cross-quant
+speedup claim. It does not change the Phase 8 feature exclusions. Model files
+remain under `~/models/strata-orin-validation/`; raw observations and artifact
+identity are retained in the [campaign report](../../bench/results/2026-10-25-q2-current-candidate-performance/README.md).

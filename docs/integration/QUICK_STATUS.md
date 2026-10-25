@@ -34,6 +34,15 @@ telemetry and raw captures are not committed.
 
 ## Performance observed
 
+The qualified Q2_0 profile was clean-rebuilt on 2026-10-25 from the current
+runtime source; its executable hash matched the preceding current-candidate
+build. Seven process blocks measured 32.6/10.2 prompt/decode tok/s at 512/64
+and 54.2/10.4 tok/s at 2,048/128. Median client TTFT/request times were
+15.88/22.00 s and 37.97/50.10 s. All requests passed token-count checks;
+minimum physical/admission availability was 17.74/7.36 GiB, with zero cgroup
+memory events. This is performance evidence for the bounded profile, not a
+quality result or a paired quantization comparison. [Full report](../../bench/results/2026-10-25-q2-current-candidate-performance/README.md).
+
 A seven-block current-candidate run on the Coder IQ1_M shards measured 65.2
 prompt / 16.0 generated tok/s at 512/64 and 68.5 / 15.9 tok/s at 2,048/128.
 Median client TTFT was 7.93/29.97 s; median full request time was 11.85/37.97
