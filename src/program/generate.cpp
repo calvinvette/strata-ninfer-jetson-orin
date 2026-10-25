@@ -6039,6 +6039,29 @@ int main(int argc, char** argv) {
                 host_res[(size_t) (l * g.n_expert + e)] = slot;
                 if (slot != strata::core::kNotResident) ++resident;
             }
+        // E0: an opt-in identity artifact for matched expert-backend controls. The
+        // sorted rows bind each resident model expert to its owning cache slot;
+        // normal runs perform no file I/O here. Keep this before adaptation or
+        // graph capture so it records the cache that the request starts with.
+        if (const char* path = std::getenv("STRATA_RESIDENCY_DUMP"); path != nullptr && *path != '\0') {
+            std::ofstream dump(path, std::ios::binary | std::ios::trunc);
+            if (!dump) {
+                std::fprintf(stderr, "strata generate: cannot write residency map '%s'\n", path);
+            } else {
+                dump << "strata-residency-map-v1," << g.n_layers << ',' << g.n_expert << ',' << resident << '\n';
+                for (int64_t l = 0; l < g.n_layers; ++l)
+                    for (int64_t e = 0; e < g.n_expert; ++e) {
+                        const int32_t slot = host_res[(size_t) (l * g.n_expert + e)];
+                        if (slot != strata::core::kNotResident) dump << l << ',' << e << ',' << slot << '\n';
+                    }
+                dump.flush();
+                if (!dump)
+                    std::fprintf(stderr, "strata generate: incomplete residency map '%s'\n", path);
+                else
+                    std::fprintf(stderr, "strata generate: wrote %lld resident expert mappings to '%s'\n",
+                                 (long long) resident, path);
+            }
+        }
         if (cudaMalloc((void**) &d_res, host_res.size() * sizeof(int32_t)) != cudaSuccess ||
             cudaMalloc((void**) &d_hit_count, sizeof(int32_t)) != cudaSuccess ||
             res_put(d_res) != cudaSuccess) {

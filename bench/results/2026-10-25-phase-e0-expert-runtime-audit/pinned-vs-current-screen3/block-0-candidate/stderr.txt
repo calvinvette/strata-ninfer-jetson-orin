@@ -1,0 +1,40 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/calvin/workspace/strata-ninfer-expert-e0/serve/server.py", line 5897, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/calvin/workspace/strata-ninfer-expert-e0/serve/server.py", line 5722, in main
+    engine = StrataEngine(exe, engine_args(cfg) + (effort_end or []), cwd=cfg.get("cwd"), log=cfg.get("log"),
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/calvin/workspace/strata-ninfer-expert-e0/serve/server.py", line 693, in __init__
+    raise RuntimeError(why + (f" (see {log})" if log else "") +
+RuntimeError: the engine exited before it was ready (see /home/calvin/workspace/strata-ninfer-expert-e0/bench/results/2026-10-25-phase-e0-expert-runtime-audit/pinned-vs-current-screen3/block-0-candidate/engine.log)
+the engine log's last lines:
+    --pool-affinity MODE Worker CPU affinity: all (default: one worker per physical core, as
+                         always), auto (hybrid CPUs: P-cores first, then their SMT siblings,
+                         then E-cores) or p-cores (P-cores and their siblings only).
+    --coupled-draft      enable coupled draft sampling for MTP drafter under sampling (STRATA_SPEC_COUPLED)
+    --no-coupled-draft   disable coupled draft sampling (propose argmax drafts)
+    --mmap-experts       R2.1: opt OUT of the resident expert arena, back to MapViewOfFile.
+                         The A/B arm: the mmap's rate depends on the OS page cache holding
+                         34 GB, and measured 71.97 vs 34.78 ms/token cold vs warm.
+    --shared-expert-arena FILE  Linux: back the resident arena with one MAP_SHARED file.
+                         Put this file on /dev/shm, not ordinary SSD storage.
+                         A small header binds an existing backing file to the same pack.
+    --resident-cpu-experts  with mmap and a static profile, keep the experts the GPU cache does not
+                         hold resident in ordinary RAM (and the prompt path's lend region as far as
+                         RAM allows); adaptive swaps exchange them, so none is read from the file again.
+    --resident-experts   the low-RAM PC's resident mode (setup): --mmap-experts --resident-cpu-experts
+                         with the copy page-locked when possible, 4 GiB headroom, plain mmap if it
+                         does not fit.  Same answers as --mmap-experts for the same placement.
+    --adapt-async 1      --serve with the resident RAM mode (opt-in): the adaptive tier's swaps
+                         advance between verify windows instead of a window waiting for a whole
+                         round.  Not bit-exact run to run.  0 (default) = the blocking tier.
+Traceback (most recent call last):
+  File "/home/calvin/workspace/strata-ninfer-expert-e0/tools/integration/api_control_block.py", line 116, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/calvin/workspace/strata-ninfer-expert-e0/tools/integration/api_control_block.py", line 78, in main
+    raise RuntimeError(f'server exited before readiness: {server.returncode}')
+RuntimeError: server exited before readiness: 1

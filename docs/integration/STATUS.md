@@ -9,14 +9,22 @@ Phase 6 is complete for the tested factor domains under their closeouts. The
 release profile still excludes unresolved multi-live/adaptive paths and does
 not promote a universal parametric profile. This records tested cells, not general product support.
 
-The [NInfer expert execution plan](NINFER_EXPERT_EXECUTION_PLAN.md), recorded
-2026-10-25, defines pending stages E0–E7 for the actual compute integration.
-Resident GPU experts currently use Strata's existing kernels; the earlier
-bounded phase closeouts do not establish an implemented NInfer expert backend.
-The follow-on covers NInfer-derived resident computation, bounded staging of
-cache misses, model/codec coverage, state and quality gates, and matched
-performance controls. This update is planning only; no new runtime or benchmark
-was executed for it.
+The [NInfer expert execution plan](NINFER_EXPERT_EXECUTION_PLAN.md) is now in
+progress. On 2026-10-25, E0 captured a supervised Coder IQ1_M decode profile
+with Strata's existing expert backend. The opt-in decode timer measured 21.73 ms
+per token-window in CPU expert work and 35.07 ms waiting for GPU reach; a
+separate Nsight diagnostic recorded 255.8 ms of resident gate/up and 174.5 ms
+of resident down-kernel duration summed across the measured request. These
+overlapping kernel sums are not request critical-path fractions. A three-pair
+same-day current-versus-pinned Strata screen found equal median prompt/decode
+rates (58.9/16.1 tok/s) with identical 512+64 responses; it is a product
+control, not an NInfer effect estimate. The profile indicates that a
+resident-only kernel substitution leaves CPU-served misses and dense Q6_K work
+untouched; bounded GPU staging for misses remains necessary to test the expected
+larger end-to-end gain. No NInfer runtime code has been promoted or exercised.
+E0 remains open because the pinned binary does not expose its resident-ID map
+and the same-source backend-off/on ablation awaits E2's selector. See the
+[E0 runtime audit](../../bench/results/2026-10-25-phase-e0-expert-runtime-audit/README.md).
 
 The current Coder two-live investigation refines that exclusion. At cache 3,000,
 the default path's prompt-1 state first changed at position 105/layer 24 and its

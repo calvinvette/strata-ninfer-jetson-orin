@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "measured_on": "orin1",
+  "date": "2026-10-25",
+  "hardware": {
+    "board": "NVIDIA Jetson AGX Orin",
+    "architecture": "aarch64",
+    "kernel": "Linux 5.15.148-tegra",
+    "host_compiler": "GNU 11.4.0",
+    "cuda": "12.6.68",
+    "driver": "540.4.0",
+    "nsight_systems": "2024.5.4.34",
+    "clocks": "dynamic, read-only observations; no clock changes"
+  },
+  "source": {
+    "isolated_branch": "feat/ninfer-expert-e0",
+    "branch_base": "7178ce405146be85dbea29e10faf999cf1cea36f",
+    "initial_profile_binary_source": "348e6261ab3fa5f119ec3050637c01477fddaa78",
+    "initial_profile_executable_sha256": "ad4b2354fe98f0e4128cf9a9ed70488fef362207dd1f7e94555a8ba35d8985df",
+    "fresh_e0_source": "7178ce405146be85dbea29e10faf999cf1cea36f plus the opt-in STRATA_RESIDENCY_DUMP source change",
+    "fresh_e0_executable": "build/integration/e0-cuda-build/strata",
+    "fresh_e0_executable_sha256": "48995208032baeb92877afa953b74f80d288905a1744f32b8dcbb355da3dbd19",
+    "pinned_control_commit": "0be090c",
+    "pinned_control_executable_sha256": "edbc0a85fc706fd929f9ea5ad1041c3fed25a0cc107356bcc82e59c2431a5249"
+  },
+  "model": {
+    "repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+    "revision": "5348543e0147355ac9cbcb031184a3546350988e",
+    "quantization": "IQ1_M",
+    "model_shards_under_models": true,
+    "shards": [
+      {
+        "path": "~/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "bytes": 29608446496,
+        "sha256": "e11083ba855e7666b48ea3f2db6a9c3a20c18751a012cc24f948de91b7087fad"
+      },
+      {
+        "path": "~/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "bytes": 28800138432,
+        "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+      }
+    ]
+  },
+  "pack": {
+    "path": "~/models/strata-orin-validation/pack",
+    "experts_bin_sha256": "e72025811e52f0a7fa24a5e0ce4b8d5a8ca91865ae4b8389c6292de8338ca983",
+    "dense_bin_sha256": "99853263806e25450074fc9945f1e955b175bea05aa171ceeb6b5837bf6a1d9d",
+    "native_experts_sha256": "9ace1b92e1fe12595de469409e69dd52c8d5418c7981c405d9a51aa9d574dd3b",
+    "tokenizer_file_hashes": "bench/results/2026-10-24-coder-iq1m-current-candidate-performance/artifacts.json"
+  },
+  "configuration": {
+    "max_context": 8192,
+    "expert_cache_requested": 3000,
+    "expert_cache_actual_slots": 3903,
+    "expert_cache_allocated_gib": 7.44,
+    "prefill_chunk": 128,
+    "pool_workers": 8,
+    "kv": "fp16",
+    "expert_io": "mmap",
+    "prompt_cache": 0,
+    "adaptive_swaps": 0,
+    "q6k_warp_dequant": true,
+    "native_verifier_window": 2,
+    "mtp_drafts_off_by_runtime_counters": true,
+    "resident_expert_map_format": "strata-residency-map-v1,48,256,3903 plus sorted layer,expert,slot rows",
+    "resident_expert_map_sha256": "d391d3b8fe1aa0361b6441aecff74279d0946fcb3529099af2eb4d69a4ca2859"
+  },
+  "workloads": {
+    "profile_cells": ["pp512+tg64", "pp2048+tg128"],
+    "workload_manifest_sha256": "80cea36409c8d71bd2192df12959c55ca6bd270ad3176205304742803f8fe9ca",
+    "profile_512_prompt_tokens_sha256": "c463143cd6cc684c29cba41efe832274e4cc040335b2338cce196d67c47d3cbf",
+    "warmup": "one same-cell warmup before one measured request per cell",
+    "one_live_request": true
+  },
+  "diagnostics": {
+    "nsys_report_sha256": "0e23c624db2f1d6d48c7a8411995b68cd5d971becbbb6d23b12a336a11c513fe",
+    "nsys_sqlite_sha256": "58c9365928892ed4af6375e46bfea5d448547c916743fcf396467da458decc36",
+    "nsys_requests_sha256": "793fbcefa9a008d56a1e2acb561ae4455c20f81c19df854de2419d0aceb5dcfb",
+    "decode_timing_requests_sha256": "b17ff5e689b51fcf30be5c4d104f14828968d251d8eb93f5dae2c686e564cca7",
+    "decode_timing_instrumentation": "existing opt-in STRATA_DECODE_TIMING=1",
+    "resident_map_dump": "build/integration/e0-profile/residency-map.csv; off by default; SHA256 in configuration",
+    "nsys_raw_artifacts": "retained outside Git at build/integration/e0-profile/"
+  },
+  "paired_product_control": {
+    "campaign": "bench/results/2026-10-25-phase-e0-expert-runtime-audit/pinned-vs-current-corrected-screen3/",
+    "summary": "summary.json",
+    "summary_script": "../summarize_pinned_screen.py",
+    "blocks": 3,
+    "model_name_and_runtime_labels": "pinned Strata executable vs fresh current-Strata executable; neither has NInfer code",
+    "common_profile": "8K context, IQ1_M, cache 3000 requested / 3903 actual slots, 7.44 GiB, chunk 128, 8 workers, FP16 KV, static residency, drafts 0/0",
+    "q6k_warp_dequant": false,
+    "minimum_available_gib": 14.1463,
+    "minimum_admission_available_gib": 14.1463,
+    "cgroup_memory_events_nonzero": false,
+    "clock_policy": "dynamic; read-only observations; EMC unavailable",
+    "api_text_identical_in_all_pairs": true,
+    "resident_id_hash_available_for_pinned_control": false
+  },
+  "scope_limitations": [
+    "No NInfer expert backend exists in this executable.",
+    "Pinned control reports the same slot count but does not emit an ID-map fingerprint.",
+    "The three-pair product-control screen is screening, not confirmation.",
+    "A same-source backend-off/backend-on pair remains pending until E2 adds the selector.",
+    "Nsight kernel sums overlap and are not request critical-path fractions.",
+    "No energy measurement or exact CPU stack attribution was collected."
+  ]
+}

@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **planned; implementation has not started under this plan**.
+Status: **in progress; E0 baseline audit started on 2026-10-25**.
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -110,6 +110,14 @@ Do not print a generic NInfer-enabled banner when all work fell back.
 
 All stages below are pending. Each stage produces a small source/evidence change
 and a written decision before the next dependent stage begins.
+
+Execution note (2026-10-25): an isolated `feat/ninfer-expert-e0` worktree now
+contains a supervised Orin baseline profile, an opt-in current-source residency
+map dump, and a three-pair pinned-product-control screen. The current executable
+still uses Strata's existing expert kernels. E0 remains open because the pinned
+binary does not emit its actual resident-ID map, and the same-source
+backend-off/on ablation must be repeated after E2 adds its selector. See the
+[E0 runtime audit](../../bench/results/2026-10-25-phase-e0-expert-runtime-audit/README.md).
 
 ### E0 — Freeze controls and identify where time is spent
 
