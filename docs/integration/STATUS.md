@@ -13,8 +13,9 @@ The [NInfer expert execution plan](NINFER_EXPERT_EXECUTION_PLAN.md) is now in
 progress: E0 is complete for bounded controls and Q2_0 timing; E1–E4 have
 bounded Q2_0 prototype evidence, including 3/64/128-token grouped parity
 checks, while
-E4 leaves mixed-codec Coder IQ1_M and ISTA-DASLab IQ3_S unsupported; E5–E7 remain
-pending. The E2 resident and E3 staged-miss schedules both failed
+E4 leaves mixed-codec Coder IQ1_M and ISTA-DASLab IQ3_S unsupported; E5 is in
+progress with one passing Q2_0 MTP-2 accepted-state/cancellation check, and E6–E7
+remain pending. The E2 resident and E3 staged-miss schedules both failed
 initial performance screens. On 2026-10-25, E0 captured a supervised Coder IQ1_M decode profile
 with Strata's existing expert backend. The opt-in decode timer measured 21.73 ms
 per token-window in CPU expert work and 35.07 ms waiting for GPU reach; a

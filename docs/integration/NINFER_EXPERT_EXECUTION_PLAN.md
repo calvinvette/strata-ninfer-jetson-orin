@@ -109,7 +109,8 @@ Do not print a generic NInfer-enabled banner when all work fell back.
 ## Implementation sequence
 
 E0 is complete for the bounded controls and current Q2_0 timing audit; E1–E4
-have bounded Q2_0 prototype evidence. E4 explicitly leaves the mixed-codec
+have bounded Q2_0 prototype evidence, and E5 has an initial MTP-2 accepted-state
+check. E4 explicitly leaves the mixed-codec
 Coder IQ1_M and ISTA-DASLab IQ3_S models unsupported by
 the NInfer selector; E5–E7 remain pending. E2's resident schedule and E3's staged-miss schedule both failed the
 initial performance screens. The default remains Strata and the NInfer path
@@ -351,6 +352,17 @@ the model and service gates and expands beyond the initial static profile.
 graph lifetime and service evidence. Do not make concurrency, universal replay,
 or every historical adaptive-state investigation prerequisites for a correct
 single-request static integration. Any excluded feature remains explicitly open.
+
+Execution note (2026-10-25): a strict Q2_0 NInfer service with static 3,000-slot
+expert ownership and MTP-2 passed cancellation after five visible stream deltas,
+same-process recovery, and two fresh exact-length references. Seven accepted
+tokens matched at four recorded prefix lengths (48, 50, 52, 54), including GDN,
+PLE, KV, MTP and other state fingerprints; three drafts were accepted. Verifier
+and MTP graph-instantiation events were observed. Minimum physical/admission
+availability was 17.04 GiB, above the 6 GiB floor, with zero cgroup memory
+events. This is one cancellation boundary and a short deterministic prompt;
+long/held-out tasks, MTP-4 and adaptive residency remain open. See the
+[E5 state report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-mtp2-cancel-state/README.md).
 
 ### E6 — Demonstrate end-to-end performance and context behavior
 
