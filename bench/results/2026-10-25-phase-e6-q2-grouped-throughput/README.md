@@ -128,6 +128,11 @@ confirmation remains unjustified. The faster operator does not translate into
 a request-level win; E6's performance exit remains unmet. Detailed candidate
 and supervisor data are in
 [`sub16-single-entry-specialization`](sub16-single-entry-specialization/README.md).
+That follow-up includes summarized Nsight Systems statistics for the latest
+full operator harness and hardware-counter profiles of one-entry and 64-token
+grouped paths. These diagnostics show near-native per-kernel medians in the
+broad trace and near-theoretical occupancy for the grouped D3/D4 launches, but
+do not isolate the source of the remaining operator or service latency gap.
 
 ## Parametric context-capacity screen (completed screening)
 

@@ -1,0 +1,13 @@
+==PROF== Connected to process 3979544 (/home/calvin/workspace/strata-ninfer-expert-e0/build/integration/e0-cuda-build/ninfer_q2_expert_parity)
+==PROF== Profiling "d3_q2_0_grouped": 0%....50%....100% - 8 passes
+==PROF== Profiling "d4_q2_0_grouped": 0%....50%....100% - 8 passes
+NInfer-derived Q2_0 D3/D4: layer=0 expert=32 rel_l2=2.13101098e-07 max_abs=1.45426081e-08 unwritten=0 limits=(5e-05,1e-05) PASS
+grouped resident route vs Strata Q2_0/Q8_1: rel_l1=0 unwritten=0 NInfer_calls=1 PASS
+one-token resident operator device timeline (7 interleaved x 1000): Strata median=344.345 us range=[325.072,375.829], NInfer median=962.080 us range=[823.318,1718.184], ratio=2.794
+multi-token grouped Q2_0/Q8_1 prefill shape (tokens=3 entries=9 groups=3): rel_l1=0 unwritten=0 NInfer_calls=1 PASS
+full top-10 grouped Q2_0/Q8_1 prefill boundary (tokens=64 entries=640 groups=10): rel_l1=0 unwritten=0 NInfer_calls=1 PASS
+grouped operator screen (tokens=64 entries=640 blocks=7 iterations/block=50): Strata median=3949.285 us range=[3946.968,4740.385], NInfer median=4364.349 us range=[4362.828,4377.990], NInfer/Strata=1.105x
+full top-10 grouped Q2_0/Q8_1 prefill boundary (tokens=128 entries=1280 groups=10): rel_l1=0 unwritten=0 NInfer_calls=1 PASS
+grouped operator screen (tokens=128 entries=1280 blocks=7 iterations/block=50): Strata median=7959.482 us range=[7956.046,7977.643], NInfer median=8920.991 us range=[8916.718,8926.714], NInfer/Strata=1.121x
+==PROF== Disconnected from process 3979544
+==PROF== Report: /home/calvin/workspace/strata-ninfer-expert-e0/bench/results/2026-10-25-phase-e6-q2-grouped-throughput/sub16-single-entry-specialization/grouped-64-exact-basic.ncu-rep

@@ -507,6 +507,19 @@ criteria remain unmet. E7 assessment proposes no profile; see the
 [E6 report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md)
 and [E7 assessment](NINFER_E7_RELEASE_ASSESSMENT.md).
 
+Execution note (2026-10-25): Nsight Systems was rerun on the four-entry,
+16-lane candidate. Its broad harness trace showed similar median per-launch
+times for NInfer D3/D4 and native Q2 gate/up/down kernels; the trace combined
+several shapes and cannot explain the remaining operator or request-level
+gap. Nsight Compute's one-entry profile recorded 64/55 registers per thread
+and 53.46%/61.91% achieved occupancy for D3/D4. A separate 64-token/top-10
+capture measured achieved occupancy of 65.41%/73.39%, near theoretical
+66.67%/75%, with memory throughput 69.86%/70.96%. Profiler-replayed durations
+are diagnostic only. The grouped capture does not show a large occupancy
+deficit and does not explain the remaining latency gap; no performance claim
+is justified by profiling alone. See the [candidate
+profiling note](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/sub16-single-entry-specialization/README.md).
+
 ## Numerical policy
 
 - **Codec/layout:** exact independent decode, offset and guard checks. Moving or

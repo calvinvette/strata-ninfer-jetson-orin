@@ -5531,3 +5531,16 @@ gain over copy staging. These results close E3's bounded route integration,
 not its performance goal; larger host-complement and staging-depth sweeps remain
 open and require renewed memory admission. See the [CPU versus staged report](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/staged-screen/README.md)
 and [direct-mapped screen](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/direct-screen/README.md).
+
+# 2026-10-25: Q2_0 grouped operator profiling follow-up
+
+An Nsight Systems capture of the latest four-entry/16-lane candidate showed
+similar broad per-launch medians for NInfer D3/D4 and Strata's Q2 gate/up/down
+kernels. Nsight Compute's one-entry capture reported 64/55 registers per
+thread and 53.46%/61.91% achieved occupancy. Its separate 64-token/top-10
+capture measured 65.41%/73.39% occupancy against 66.67%/75% theoretical and
+69.86%/70.96% memory throughput. Replayed kernel durations are not performance
+measurements. The grouped capture shows no large occupancy deficit and does not
+explain the slower operator and service screens. No profile is proposed; E6
+performance and E7 release gates remain open. See the [profiling
+details](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/sub16-single-entry-specialization/README.md).

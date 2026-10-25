@@ -67,6 +67,33 @@ Minimum available physical/admission memory was 17.73 GiB, above the 6 GiB
 floor. GPU frequency was sampled at 306 MHz; EMC readback was denied. Energy
 was not attributed. The operator improvement did not yield an end-to-end win.
 
+## Kernel profiling diagnostic
+
+An Nsight Systems trace of the complete parity/timing harness recorded median
+CUDA kernel times of 9.792 µs for NInfer grouped D3 and 8.992 µs for grouped
+D4. The corresponding native Q2 medians in that same trace were 9.504 µs for
+gate/up and 9.440 µs for down; NInfer's quantizer median was 2.752 µs versus
+3.264 µs for the native SwiGLU quantizer. This trace contains several shapes,
+repeated timing blocks and profiler overhead, so these are broad per-launch
+diagnostics, not a matched single-shape timing comparison. The ordinary paired
+operator and service results above remain the performance evidence.
+
+Nsight Compute collected hardware counters for the one-entry grouped shape
+(one group; D3 grid 160 × 128 and D4 grid 320 × 128). It reported 64 and 55
+registers per thread and achieved occupancy of 53.46% and 61.91% for D3 and D4,
+respectively. A second capture isolated the 64-token/top-10 grouped launches
+(D3 grid 160 × 10 × 128; D4 grid 320 × 10 × 128). Achieved occupancy was
+65.41%/73.39%, close to the respective theoretical 66.67%/75%; memory
+throughput was 69.86%/70.96%, and compute throughput 52.21%/79.06%. The grouped
+capture therefore shows no large occupancy deficit, but it does not explain
+the remaining operator gap. Both reports' replayed kernel durations are
+profiler-only and must not be compared with ordinary timings. The full parity
+harness passed during both captures. The raw Nsight Systems trace is
+intentionally excluded from the repository; its summarized kernel statistics
+are recorded above. Raw [one-entry Nsight Compute](decode-one-entry-basic.ncu-rep)
+and [64-token Nsight Compute](grouped-64-exact-basic.ncu-rep) reports, plus
+supervisor summaries, are stored beside this report.
+
 ## Reproduction
 
 Build the tested CUDA targets with bounded parallelism:
