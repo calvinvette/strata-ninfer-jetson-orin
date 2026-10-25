@@ -5306,6 +5306,7 @@ and 50.08 GB per request; they include unrelated I/O and read-ahead. Clocks ran
 dynamically in MAXN and EMC readback was unavailable. Output text had two hashes
 per workload and no quality oracle was used. This is not a paired Q2_0
 comparison and does not change the Q2_0 release-profile boundary.
+
 # 2026-10-24: Current candidate performance on Coder IQ1_M
 
 Ran seven independent, supervised current-candidate processes against the
@@ -5358,6 +5359,16 @@ with the Coder IQ1_M or IQ3_S campaigns, and does not justify a cross-quant
 speedup claim. It does not change the Phase 8 feature exclusions. Model files
 remain under `~/models/strata-orin-validation/`; raw observations and artifact
 identity are retained in the [campaign report](../../bench/results/2026-10-25-q2-current-candidate-performance/README.md).
+
+The [Flash-Next cross-variant context matrix](../../bench/results/2026-10-25-flashnext-context-matrix/README.md)
+consolidates the existing seven-block Strata campaigns for Coder IQ1_M,
+Coder Q2_0 and original-model IQ3_S at the NInfer-aligned `pp512+tg64` and
+`pp2048+tg128` workload shapes. The rows include engine prompt/decode rates and
+client TTFT, with configured context fixed at 8,192 tokens. This is a
+documentation consolidation, not a new run; the campaigns are not same-day
+paired, and the GGUF variants have not been run through NInfer. Treat this as
+Strata-side reference data, not a causal quantization or cross-port comparison.
+
 # 2026-10-25: Dense Qwen3.8-27B IQ3_S is unsupported by Strata
 
 Checked the requested `~/models/qwen3.8-27b-iq3s/Qwen3.8-27B-UD-IQ3_S.gguf`
