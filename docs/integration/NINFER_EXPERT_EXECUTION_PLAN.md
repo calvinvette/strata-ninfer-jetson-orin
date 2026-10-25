@@ -301,7 +301,7 @@ and [direct-mapped report](../../bench/results/2026-10-25-phase-e2-q2-ninfer-res
 This closes the bounded Q2_0 staging route integration only; E6's performance
 goal remains open.
 
-### E4 — Add prefill, small-token execution and model coverage
+### E4 — Add prefill, small-token execution and model coverage — complete with partial model support
 
 1. The bounded Q2_0 implementation now exercises one-token decode and a
    three-token, three-group, nine-entry prefill-shaped batch. This confirms the
@@ -323,9 +323,10 @@ goal remains open.
 **Exit:** the bounded Q2_0 shape and codec result and explicit partial status for
 the other target variants are recorded in
 [E4 model and shape coverage](../../bench/results/2026-10-25-phase-e4-model-codec-coverage/README.md).
-Only the Q2_0/Q2_0 artifact is covered, and it is not performance-qualified.
+Only the Q2_0/Q2_0 artifact has functional adapter coverage, and it is not
+performance-qualified. The other model variants are explicitly unsupported.
 64/128-token throughput, mixed-codec support and HIP/SYCL qualification remain
-open; E4's broad model-coverage objective is therefore only partially complete.
+open; this stage closes with partial model support as allowed by its exit.
 
 ### E5 — Qualify numerical behavior and useful execution policies
 
