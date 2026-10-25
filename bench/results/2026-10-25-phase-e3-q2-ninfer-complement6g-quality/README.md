@@ -49,3 +49,8 @@ GDN delta to the staged expert kernel. Numeric GDN analysis and compact
 position-557 captures are retained in `gdn-dump/gdn-diff.json` and
 `moe-layer3-pos557/` respectively. The large raw GDN arrays and service logs
 remain local and are not committed.
+
+A second targeted capture at the last prompt position (511), model layer 1,
+also found identical inputs, routes/weights, expert parts and outputs. These
+two exact sampled boundaries do not account for the accumulated state delta;
+other prompt positions and layers remain unsampled.

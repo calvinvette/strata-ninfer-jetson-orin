@@ -340,7 +340,8 @@ The final GDN comparison found 90.80% of values different (global relative
 L2 0.02396); layers 0–2 were exact and layer 3 first differed by about
 `1.2e-7`. A one-position layer-3 MoE capture at generated position 557 was
 exact across inputs, routes, expert parts and outputs, so it does not explain
-the aggregate state difference or rule out earlier prompt-position deltas.
+the aggregate state difference or rule out earlier prompt-position deltas. A
+second capture at the final prompt position, model layer 1, was also exact.
 The 6-GiB TTFT screen alone is not a performance qualification: median client
 latency remains below the 5% target, each cell has only three pairs, and
 persistent-state equivalence is unresolved. See the [complement sweep
