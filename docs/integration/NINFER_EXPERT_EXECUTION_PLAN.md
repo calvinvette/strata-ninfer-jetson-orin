@@ -347,7 +347,12 @@ Multi-position layer-3 captures found one difference among positions 512,
 route IDs and weights (relative L2 `7.15e-4`); the other sampled rows were
 bit-identical. This is the first sampled mismatch, not necessarily the first
 divergent position; 513–519 remain unexamined. The [quality diagnostic](../../bench/results/2026-10-25-phase-e3-q2-ninfer-complement6g-quality/README.md)
-contains per-expert evidence.
+contains per-expert evidence. A standalone replay using this exact activation
+and expert found scalar D3/D4 relative L2 `2.05e-7` against the FP64 oracle,
+but grouped resident-route relative L1 `6.71e-4` against Strata, failing its
+`2.0e-4` limit. Grouped 64/128-token operator timing was 1.108×/1.121× Strata.
+This makes the grouped kernel arithmetic the next implementation target; the
+service result is not explained by cache staging alone.
 The 6-GiB TTFT screen alone is not a performance qualification: median client
 latency remains below the 5% target, each cell has only three pairs, and
 persistent-state equivalence is unresolved. See the [complement sweep

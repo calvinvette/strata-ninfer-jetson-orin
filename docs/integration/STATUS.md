@@ -93,7 +93,12 @@ also exact. A multi-position capture found an exact-input, exact-route expert
 94 output difference at layer 3 / generated position 520 (relative L2
 `7.15e-4`); four other sampled positions matched exactly. This narrows the
 arithmetic difference but does not establish its first occurrence or full
-causal path. See the [complement sweep report](../../bench/results/2026-10-25-phase-e3-q2-complement-sweep/README.md)
+causal path. Standalone replay of the captured activation passed the scalar
+oracle at relative L2 `2.05e-7`, while grouped NInfer-versus-Strata failed its
+relative-L1 `2e-4` limit at `6.71e-4`. Grouped 64/128-token operator latency
+was 1.108×/1.121× Strata. This establishes grouped-kernel parity as a concrete
+next fix area; service staging alone does not account for the observed row
+difference. See the [complement sweep report](../../bench/results/2026-10-25-phase-e3-q2-complement-sweep/README.md)
 and [6-GiB quality diagnostic](../../bench/results/2026-10-25-phase-e3-q2-ninfer-complement6g-quality/README.md).
 On 2026-10-25, E0 captured a supervised Coder IQ1_M decode profile
 with Strata's existing expert backend. The opt-in decode timer measured 21.73 ms

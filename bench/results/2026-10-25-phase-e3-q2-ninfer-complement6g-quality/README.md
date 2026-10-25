@@ -67,3 +67,19 @@ same-route expert arithmetic difference in one sampled layer-3 row; it is
 consistent with the final-state difference but does not alone prove its full
 causal path. The multi-position files and per-expert comparison are in
 `moe-layer3-generated/`.
+
+## Standalone grouped-kernel replay
+
+The captured layer-3 / expert-94 activation was replayed with the existing
+`ninfer_q2_expert_parity` binary and the same model shard. Its scalar
+F32-input Q2_0 D3/D4 implementation matched the independent FP64 reference
+closely (relative L2 `2.05e-7`, maximum absolute error `1.49e-8`). The grouped
+resident route, which quantizes the activation to Q8_1 and compares NInfer
+against Strata, returned relative L1 `6.71e-4`; this fails the harness's
+`2.0e-4` limit. Thus the grouped numerical difference reproduces outside the
+service with the same expert weights and activation; the scalar pass does not
+qualify the grouped service path. The parity command also measured one-entry
+NInfer/Strata at 0.978×, while grouped 64- and 128-token runs were 1.108× and
+1.121×, respectively. These are local operator diagnostics rather than
+end-to-end results. The harness exited nonzero because the grouped parity
+checks failed. Its output and supervisor record are in `expert94-parity/`.
