@@ -546,6 +546,14 @@ tested grouped candidate. The restored CUDA build passed the standard oracle and
 grouped parity checks and reproduced 1.109×/1.119× operator ratios. See the
 [E6 report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md).
 
+Execution note (2026-10-25): a two-entry version of the temporary fused
+kernel also passed all operator parity fixtures, but measured 1.421×/1.418×
+Strata latency for 64/128-token top-10 groups (0.946× for one resident entry).
+No hardware-counter profile was collected for this schedule; additional
+looping and lower weight reuse are candidate explanations, not isolated causes.
+It was discarded, and a rebuilt four-entry CUDA target again passed exact
+grouped parity. This does not change E6's unmet performance exit.
+
 ## Numerical policy
 
 - **Codec/layout:** exact independent decode, offset and guard checks. Moving or

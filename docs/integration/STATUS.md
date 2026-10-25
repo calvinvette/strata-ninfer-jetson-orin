@@ -53,6 +53,9 @@ underfill, though register pressure and latency remain plausible limits. The
 candidate was discarded. The restored four-entry build passed the
 parity/operator harness again (exact grouped output; 1.109×/1.119× grouped
 latency). No performance-qualified profile is available.
+A two-entry variant of the same fused experiment also passed exact parity but
+was slower at grouped sizes (1.421×/1.418× Strata); it was discarded without
+promoting a new schedule.
 A one-pair-per-capacity screen across 1K–256K has completed; every eligible API
 and token-count check passed. Minimum available physical/admission memory was
 11.31 GiB, above the 6 GiB floor, and all eighteen startup maps had the same

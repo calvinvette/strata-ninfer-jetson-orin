@@ -180,6 +180,23 @@ ratios. Restored-source hashes were source
 `daaf67ff7b764f0bd8413bee1d4e027132d4f2f978472795a82404fddeb5d420` and parity
 harness `6334fb6015e115ea8978f870aa6e25a2cb122761fd098a23a318b3bc1e1fd2bb`.
 
+A follow-up temporary fused kernel reduced the accumulation tile from four
+entries to two. The independent oracle and all grouped fixtures again passed
+exactly, but grouped throughput regressed further:
+
+| Workload | Strata median | Two-entry fused NInfer | NInfer / Strata |
+| --- | ---: | ---: | ---: |
+| One resident entry | 24.665 µs | 23.339 µs | 0.946× |
+| 64 tokens × top-10 | 3,955.395 µs | 5,620.928 µs | 1.421× |
+| 128 tokens × top-10 | 7,966.366 µs | 11,304.049 µs | 1.418× |
+
+The smaller tile was intended to lower live accumulators, but no counter
+capture was taken for this variant. It increased loop iterations and reduced
+weight reuse; the observed slowdown rejects this schedule. It was discarded,
+and the restored four-entry build again passed the standard harness with exact
+parity and 1.109×/1.119× grouped latency. No temporary fused code remains in
+the qualified source or binary.
+
 ## Parametric context-capacity screen (completed screening)
 
 To complete E6's capacity coverage, a separate one-pair-per-capacity screen was
