@@ -15,7 +15,8 @@ bounded Q2_0 prototype evidence, including 3/64/128-token grouped parity
 checks, while
 E4 leaves mixed-codec Coder IQ1_M and ISTA-DASLab IQ3_S unsupported; E5 is in
 progress with passing Q2_0 MTP-2/MTP-4 cancellation-state checks and
-MTP-off-versus-MTP-2/MTP-4 accepted-prefix parity runs; E6–E7 remain pending.
+MTP-off-versus-MTP-2/MTP-4 accepted-prefix parity runs, plus a three-request
+MTP-4 continuation/recovery state-parity sequence; E6–E7 remain pending.
 The E2 resident and E3 staged-miss schedules both failed
 initial performance screens. On 2026-10-25, E0 captured a supervised Coder IQ1_M decode profile
 with Strata's existing expert backend. The opt-in decode timer measured 21.73 ms

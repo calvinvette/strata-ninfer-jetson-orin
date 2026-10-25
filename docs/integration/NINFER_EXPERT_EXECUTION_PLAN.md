@@ -371,8 +371,12 @@ output token IDs, final state and 18 shared accepted-prefix states; MTP-4
 accepted 23/33 and matched all 32 IDs, final state and 12 shared prefixes. The
 [MTP-2 parity report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-mtp2-prefix-parity/README.md)
 and [MTP-4 parity report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-mtp4-prefix-parity/README.md)
-record the held-fixed setup and memory telemetry. Long retrieval/scoring
-prompts and repeated continuation remain open.
+record the held-fixed setup and memory telemetry. A subsequent three-request
+MTP-off/MTP-4 sequence (initial generation, continuation, then recovery) matched
+all token IDs and the nine captured persistent-state fields at every request
+boundary. MTP-4 accepted five drafts in each request, with rejected suffixes
+before continuation and recovery. See the [repeated continuation report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-mtp4-continuation/README.md).
+Held-out long retrieval/scoring and quality coverage remain open.
 
 ### E6 — Demonstrate end-to-end performance and context behavior
 
