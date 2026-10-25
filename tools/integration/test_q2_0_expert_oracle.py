@@ -4,7 +4,7 @@
 import math
 import struct
 import unittest
-from q2_0_expert_oracle import decode_block, decode_row
+from q2_0_expert_oracle import decode_block, decode_row, scatter_expert_outputs
 
 def encode_block(scale_bits, codes):
     if len(codes) != 64 or any(c < 0 or c > 3 for c in codes):
@@ -58,6 +58,14 @@ class Q2ExpertOracleTest(unittest.TestCase):
     def test_rejects_wrong_row_geometry(self):
         with self.assertRaises(ValueError):
             decode_row(bytes(18), 32)
+
+    def test_route_permutation_duplicates_and_empty_jobs(self):
+        results = {7: [1.0, 2.0], 2: [-3.0, 4.0]}
+        self.assertEqual(scatter_expert_outputs([7, 2, 7], [1, 0, 2], results),
+                         {0: [-3.0, 4.0], 1: [1.0, 2.0], 2: [1.0, 2.0]})
+        self.assertEqual(scatter_expert_outputs([], [], results), {})
+        with self.assertRaises(ValueError):
+            scatter_expert_outputs([7, 2], [0, 0], results)
 
 
 if __name__ == "__main__":

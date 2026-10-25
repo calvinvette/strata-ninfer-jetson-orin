@@ -113,15 +113,26 @@ The pinned reference is `reference/ninfer/` at planning revision
 router/shared merge/residual epilogue. Do not call that wrapper for this model.
 The decode internals under
 `reference/ninfer/src/ops/sparse_moe/decode/` are candidates for schedule and
-small-token organization only. Their codecs and reduction implementation are
-not the Q2_0 oracle. Any promoted code must carry Apache-2.0 notices and a
+small-token organization only. More specifically, `dot_two_rows` and
+`sparse_moe_d3_path_tiled_kernel` in
+`reference/ninfer/src/ops/sparse_moe/decode/sparse_moe_decode_kernels.cu` are
+gate/up + SiLU candidates; their `Q4Codec`/`W8Codec` decoders and 2048/512
+dimensions must be replaced. `dot_fp32_rows` and
+`sparse_moe_d4_token_kernel` are down-projection candidates; the latter also
+applies route weights, computes the shared path and adds the residual, all of
+which must be removed from the expert-only adapter. The `launch_d3_small_t_codec`
+and `launch_d4_small_t_codec` helpers show small-token row scheduling, not a
+compatible Q2_0 dispatch contract. Their codecs and reduction implementation
+are not the Q2_0 oracle. Any promoted code must carry Apache-2.0 notices and a
 function-level provenance note.
 
 ## E1 limits and next decision
 
-This document and synthetic oracle establish the first codec/geometry contract,
-not real-payload CUDA parity, slot lifetime correctness, or NInfer integration.
+This document and oracle establish the first codec/geometry contract and a
+real-weight numerical fixture, not Q2_0-model-native activation coverage, slot
+lifetime correctness, or NInfer integration. The pure route-map checks exercise
+permutation, duplicate and empty-job semantics without implying a CUDA dispatch.
 Next: add a small caller-owned CUDA adapter for one-token Q2_0 resident work,
-first compare decoded rows and projection outputs against this oracle and an
-independent ggml-linked decoder, then wire the opt-in selector. Do not start
-staging absent experts until E2 proves the resident path.
+compare decoded rows and projection outputs against this oracle on exact runtime
+activations, then wire the opt-in selector. Do not start staging absent experts
+until E2 proves the resident path.

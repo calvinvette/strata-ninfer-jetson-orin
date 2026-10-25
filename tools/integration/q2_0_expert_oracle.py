@@ -38,6 +38,15 @@ def dot(row, vector):
     return sum(float(w) * float(x) for w, x in zip(row, vector))
 
 
+def scatter_expert_outputs(expert_ids, output_rows, per_expert_outputs):
+    """Map completed unweighted outputs into caller rows; repeated expert IDs stay repeated."""
+    if len(expert_ids) != len(output_rows):
+        raise ValueError("expert and output-row counts differ")
+    if len(set(output_rows)) != len(output_rows) or any(row < 0 for row in output_rows):
+        raise ValueError("output rows must be unique nonnegative indices")
+    return {row: per_expert_outputs[expert] for expert, row in zip(expert_ids, output_rows)}
+
+
 def read_rows(gguf_path, gguf, name, expert, rows, width):
     tensor = next(t for t in gguf.tensors if t.name == name)
     if tensor.type_name != "Q2_0" or tensor.shape != [width, rows, 512]:

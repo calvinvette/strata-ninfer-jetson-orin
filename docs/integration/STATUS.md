@@ -30,7 +30,7 @@ E1 has started with the actual Coder Q2_0 GGUF inventory. All 48 layers use Q2_0
 for routed gate/up/down tensors at 2560/640 dimensions, with 512 experts and
 top-10 routing. The new [E1 contract](E1_Q2_0_EXPERT_CONTRACT.md) records the
 byte layout, ownership boundaries, NInfer incompatibilities and scalar oracle;
-its synthetic codec/shape checks pass (3/3). Eight real Q2_0 tensors were also
+its synthetic codec, shape and route-map checks pass (4/4). Eight real Q2_0 tensors were also
 decoded across 32,768 values by the Python oracle and `ggml::dequantize_row_q2_0`
 from pinned llama.cpp commit `3cf03257`; every FP32 value matched bit-for-bit.
 The FP64 oracle also ran an actual Q2_0 layer-0/expert-32 weight triplet against
