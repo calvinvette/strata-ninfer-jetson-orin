@@ -108,8 +108,9 @@ Do not print a generic NInfer-enabled banner when all work fell back.
 
 ## Implementation sequence
 
-E0 remains open; E1–E4 have bounded Q2_0 prototype evidence. E4 explicitly
-leaves the mixed-codec Coder IQ1_M and ISTA-DASLab IQ3_S models unsupported by
+E0 is complete for the bounded controls and current Q2_0 timing audit; E1–E4
+have bounded Q2_0 prototype evidence. E4 explicitly leaves the mixed-codec
+Coder IQ1_M and ISTA-DASLab IQ3_S models unsupported by
 the NInfer selector; E5–E7 remain pending. E2's resident schedule and E3's staged-miss schedule both failed the
 initial performance screens. The default remains Strata and the NInfer path
 remains experimental. Each stage produces a small source/evidence change and
@@ -121,10 +122,13 @@ map dump, and a three-pair pinned-product-control screen. The current executable
 still uses Strata's existing expert kernels for that pinned-product comparison.
 E2 has since added a three-pair same-source backend-off/on screening set with
 matching resident maps; it rejects the initial NInfer Q2_0 schedule for
-performance. E0 remains open because the pinned binary does not expose its
-resident-ID map and no request-phase critical-path decomposition for the
-selected Q2_0 workload has been completed. See the [E0 runtime audit](../../bench/results/2026-10-25-phase-e0-expert-runtime-audit/README.md)
-and [E2 paired screen](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/paired-screen/README.md).
+performance. E0's Q2_0 request-phase gap is now measured using same-source
+Strata and NInfer services with matched residency-map hashes. The pinned binary
+still does not expose its resident-ID map, so its product comparison remains
+matched by model/profile/options/slot count rather than exact IDs. See the
+[E0 runtime audit](../../bench/results/2026-10-25-phase-e0-expert-runtime-audit/README.md),
+[E2 paired screen](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/paired-screen/README.md),
+and [Q2_0 phase timing](../../bench/results/2026-10-25-phase-e0-expert-runtime-audit/q2-decode-breakdown/README.md).
 
 Execution note (2026-10-25): E1 inventory confirmed that all routed Q2_0
 gate/up/down tensors in the Coder Q2_0 artifact use 2560/640 geometry across 48
@@ -134,9 +138,10 @@ layers. The first adapter contract and scalar oracle are in
 The full FP64 projection oracle ran actual Q2_0 expert weights on a captured
 cross-variant Coder IQ1_M activation and matched the current Strata harness's
 unquantized reference at relative L1 `3.76e-8`. The target model's own activation
-distribution and NInfer-derived CUDA adapter parity are still untested.
+distribution remains an open limitation. NInfer-derived adapter parity now
+passes for the captured cross-variant activation; see the E2/E4 reports.
 
-### E0 — Freeze controls and identify where time is spent
+### E0 — Freeze controls and identify where time is spent — complete for the bounded Q2_0 audit
 
 1. Create an isolated integration branch/worktree from the recorded current
    source, preserving existing dirty evidence and both original project checkouts.
@@ -160,11 +165,19 @@ distribution and NInfer-derived CUDA adapter parity are still untested.
    CPU/GPU shared-memory traffic distinct. Sum of overlapping kernel durations
    must not be presented as a fraction of request wall time.
 
-**Exit:** reproducible paired controls, a current workload/codec/route inventory,
+**Exit:** reproducible paired controls, current workload/codec/route inventory
 and a measured explanation of which work can benefit from expert-kernel changes.
-Use the measured exposed time to estimate a speedup ceiling, without treating
-cache hit percentage as a time fraction. This stage ends with implementation
-selection; it does not expand into unrelated concurrency diagnosis.
+The Q2_0 matched-residency three-pair screen and one same-day decode-phase pair
+are recorded in the [E2 paired screen](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/paired-screen/README.md)
+and [Q2_0 phase timing](../../bench/results/2026-10-25-phase-e0-expert-runtime-audit/q2-decode-breakdown/README.md).
+They identify CPU expert work, job/plan setup and GPU-reach wait separately;
+the grouped NInfer operator screen is slower than Strata. Dense and resident
+expert kernel families are not separated in a Q2_0 service Nsight trace yet.
+This is enough to reject the current schedule and select it for optimization,
+not to claim a speedup ceiling or a performance result. The original pinned
+product binary's resident map remains unavailable. That limitation is explicit;
+it does not invalidate the same-source matched-map experiment. E0 does not
+expand into unrelated concurrency diagnosis.
 
 ### E1 — Specify and prove the selected expert contract — complete 2026-10-25
 

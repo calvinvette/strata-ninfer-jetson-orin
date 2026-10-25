@@ -10,7 +10,8 @@ release profile still excludes unresolved multi-live/adaptive paths and does
 not promote a universal parametric profile. This records tested cells, not general product support.
 
 The [NInfer expert execution plan](NINFER_EXPERT_EXECUTION_PLAN.md) is now in
-progress: E0 remains open; E1–E4 have bounded Q2_0 prototype evidence, while
+progress: E0 is complete for bounded controls and Q2_0 timing; E1–E4 have
+bounded Q2_0 prototype evidence, while
 E4 leaves mixed-codec Coder IQ1_M and ISTA-DASLab IQ3_S unsupported; E5–E7 remain
 pending. The E2 resident and E3 staged-miss schedules both failed
 initial performance screens. On 2026-10-25, E0 captured a supervised Coder IQ1_M decode profile
@@ -26,9 +27,12 @@ resident-only kernel substitution leaves CPU-served misses and dense Q6_K work
 untouched; bounded GPU staging for misses remains necessary to test the expected
 larger end-to-end gain. The later E2 Q2_0 selector has now been exercised, with
 three same-source paired service screens and matched resident-map hashes; it
-was slower than the default. E0 remains open because the pinned binary does not
-expose its resident-ID map and request-phase timing has not been decomposed for
-the target Q2_0 workload. See the [E0 runtime audit](../../bench/results/2026-10-25-phase-e0-expert-runtime-audit/README.md)
+was slower than the default. The Q2_0 timing breakdown now separates CPU expert
+work, plan/activation/job setup, verifier GPU-reach wait and client latency for
+one matched-residency pair; it is diagnostic, not a new effect estimate. The
+pinned binary still does not expose a resident-ID map, while the same-source
+backend comparison does. See the [E0 runtime audit](../../bench/results/2026-10-25-phase-e0-expert-runtime-audit/README.md),
+[Q2_0 phase timing](../../bench/results/2026-10-25-phase-e0-expert-runtime-audit/q2-decode-breakdown/README.md)
 and [E2 paired screen](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/paired-screen/README.md).
 
 E1 completed its first codec contract on 2026-10-25 from the actual Coder Q2_0
