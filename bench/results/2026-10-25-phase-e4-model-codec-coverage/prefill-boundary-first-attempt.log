@@ -1,0 +1,3 @@
+Initial 64/128-token harness attempt: failed before running either grouped route because native_quantize_q8_1 was called with token_count=64, above the helper's ncols<=8 contract.
+Correction: quantize input rows in chunks of at most eight using the same native helper; no production kernel behavior or service defaults changed.
+Corrected 64- and 128-token parity cases passed. See prefill-boundary-parity.log.

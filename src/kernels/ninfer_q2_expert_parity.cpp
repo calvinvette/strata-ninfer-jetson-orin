@@ -357,6 +357,121 @@ int main(int argc, char** argv) {
                     kMultiTokens, kMultiEntries, kMultiGroups, multi_rel_l1, multi_unwritten,
                     static_cast<unsigned long long>(multi_calls), multi_pass ? "PASS" : "FAIL");
         failed += multi_pass ? 0 : 1;
+
+        // Exercise the current service prefill chunk boundaries with a full
+        // top-10 route for each token. These synthetic activations preserve
+        // real model weights and exact Strata Q8_1 quantization; this is an
+        // operator functional/shape check, not a prompt-distribution test.
+        auto check_prefill_shape = [&](int token_count) {
+            constexpr int groups = 10;
+            const int entries = token_count * groups;
+            const size_t input_bytes = static_cast<size_t>(token_count) * kHidden * sizeof(float);
+            const size_t input_q8_bytes = static_cast<size_t>(token_count) * (kHidden / 32) * 36;
+            const size_t blob_bytes = static_cast<size_t>(groups) * layout.bytes;
+            const size_t output_bytes = static_cast<size_t>(entries) * kHidden * sizeof(float);
+            const size_t scratch = strata::kernels::native_expert_scratch_bytes(entries, kIntermediate);
+            std::vector<float> inputs(static_cast<size_t>(token_count) * kHidden);
+            for (int t = 0; t < token_count; ++t) {
+                const float scale = (t & 1) ? -0.5f : 0.5f + static_cast<float>(t % 7) * 0.0625f;
+                for (int i = 0; i < kHidden; ++i) inputs[static_cast<size_t>(t) * kHidden + i] = activation[i] * scale;
+            }
+            std::vector<uint8_t> blobs(blob_bytes);
+            std::vector<unsigned long long> pointers(groups);
+            std::vector<int32_t> starts(groups + 1), destinations(entries), tokens(entries);
+            for (int g = 0; g < groups; ++g) {
+                const int id = expert + g;
+                const void* gptr = gate_data + static_cast<size_t>(id) * one_expert_bytes;
+                const void* uptr = up_data + static_cast<size_t>(id) * one_expert_bytes;
+                const void* dptr = down_data + static_cast<size_t>(id) * kHidden * d_row_bytes;
+                uint8_t* blob = blobs.data() + static_cast<size_t>(g) * layout.bytes;
+                std::memcpy(blob, gptr, layout.up_off);
+                std::memcpy(blob + layout.up_off, uptr, layout.down_off - layout.up_off);
+                std::memcpy(blob + layout.down_off, dptr, layout.bytes - layout.down_off);
+                starts[g] = g * token_count;
+                for (int t = 0; t < token_count; ++t) {
+                    const int e = g * token_count + t;
+                    destinations[e] = e;
+                    tokens[e] = t;
+                }
+            }
+            starts[groups] = entries;
+
+            uint8_t *dev_blobs = nullptr, *dev_xq = nullptr, *candidate_ws = nullptr, *strata_ws = nullptr;
+            float *dev_x = nullptr, *candidate_y = nullptr, *strata_y = nullptr;
+            unsigned long long* dev_ptrs = nullptr;
+            int32_t *dev_starts = nullptr, *dev_groups = nullptr, *dev_dst = nullptr, *dev_tok = nullptr;
+            cuda_check(cudaMalloc(&dev_blobs, blob_bytes), "allocate boundary group weights");
+            cuda_check(cudaMalloc(&dev_x, input_bytes), "allocate boundary activations");
+            cuda_check(cudaMalloc(&dev_xq, input_q8_bytes), "allocate boundary Q8_1 activations");
+            cuda_check(cudaMalloc(&candidate_ws, scratch), "allocate boundary NInfer workspace");
+            cuda_check(cudaMalloc(&strata_ws, scratch), "allocate boundary Strata workspace");
+            cuda_check(cudaMalloc(&candidate_y, output_bytes), "allocate boundary NInfer output");
+            cuda_check(cudaMalloc(&strata_y, output_bytes), "allocate boundary Strata output");
+            cuda_check(cudaMalloc(&dev_ptrs, groups * sizeof(unsigned long long)), "allocate boundary weight pointers");
+            cuda_check(cudaMalloc(&dev_starts, (groups + 1) * sizeof(int32_t)), "allocate boundary group starts");
+            cuda_check(cudaMalloc(&dev_groups, sizeof(int32_t)), "allocate boundary group count");
+            cuda_check(cudaMalloc(&dev_dst, entries * sizeof(int32_t)), "allocate boundary output map");
+            cuda_check(cudaMalloc(&dev_tok, entries * sizeof(int32_t)), "allocate boundary token map");
+            for (int g = 0; g < groups; ++g)
+                pointers[g] = reinterpret_cast<unsigned long long>(dev_blobs + static_cast<size_t>(g) * layout.bytes);
+            cuda_check(cudaMemcpyAsync(dev_blobs, blobs.data(), blob_bytes, cudaMemcpyHostToDevice, stream),
+                       "copy boundary group weights");
+            cuda_check(cudaMemcpyAsync(dev_x, inputs.data(), input_bytes, cudaMemcpyHostToDevice, stream),
+                       "copy boundary activations");
+            cuda_check(cudaMemcpyAsync(dev_ptrs, pointers.data(), pointers.size() * sizeof(pointers[0]),
+                                       cudaMemcpyHostToDevice, stream), "copy boundary weight pointers");
+            cuda_check(cudaMemcpyAsync(dev_starts, starts.data(), starts.size() * sizeof(starts[0]),
+                                       cudaMemcpyHostToDevice, stream), "copy boundary group starts");
+            cuda_check(cudaMemcpyAsync(dev_groups, &groups, sizeof(groups), cudaMemcpyHostToDevice, stream),
+                       "copy boundary group count");
+            cuda_check(cudaMemcpyAsync(dev_dst, destinations.data(), destinations.size() * sizeof(destinations[0]),
+                                       cudaMemcpyHostToDevice, stream), "copy boundary output map");
+            cuda_check(cudaMemcpyAsync(dev_tok, tokens.data(), tokens.size() * sizeof(tokens[0]),
+                                       cudaMemcpyHostToDevice, stream), "copy boundary token map");
+            for (int first = 0; first < token_count; first += 8) {
+                const int count = std::min(8, token_count - first);
+                strata::kernels::native_quantize_q8_1(
+                    dev_x + static_cast<size_t>(first) * kHidden,
+                    dev_xq + static_cast<size_t>(first) * (kHidden / 32) * 36,
+                    kHidden, count, stream);
+            }
+            std::vector<float> sentinels(static_cast<size_t>(entries) * kHidden, -12345.0f);
+            cuda_check(cudaMemcpyAsync(candidate_y, sentinels.data(), output_bytes, cudaMemcpyHostToDevice, stream),
+                       "initialize boundary NInfer output");
+            cuda_check(cudaMemcpyAsync(strata_y, sentinels.data(), output_bytes, cudaMemcpyHostToDevice, stream),
+                       "initialize boundary Strata output");
+            const uint64_t calls_before = strata::kernels::ninfer_q2_0_expert_dispatch_count();
+            strata::kernels::ninfer_q2_0_expert_grouped(layout, dev_ptrs, dev_starts, dev_groups, dev_dst, dev_tok,
+                                                         groups, entries, dev_xq, candidate_ws, candidate_y,
+                                                         stream, groups);
+            strata::kernels::native_expert_grouped(layout, dev_ptrs, dev_starts, dev_groups, dev_dst, dev_tok,
+                                                    groups, entries, dev_xq, strata_ws, strata_y, stream, groups);
+            std::vector<float> candidate_out(sentinels.size()), strata_out(sentinels.size());
+            cuda_check(cudaMemcpyAsync(candidate_out.data(), candidate_y, output_bytes, cudaMemcpyDeviceToHost, stream),
+                       "read boundary NInfer output");
+            cuda_check(cudaMemcpyAsync(strata_out.data(), strata_y, output_bytes, cudaMemcpyDeviceToHost, stream),
+                       "read boundary Strata output");
+            cuda_check(cudaStreamSynchronize(stream), "synchronize boundary grouped routes");
+            double error = 0.0, reference_norm = 0.0;
+            size_t unwritten = 0;
+            for (size_t i = 0; i < candidate_out.size(); ++i) {
+                error += std::fabs(static_cast<double>(candidate_out[i]) - strata_out[i]);
+                reference_norm += std::fabs(static_cast<double>(strata_out[i]));
+                unwritten += !std::isfinite(candidate_out[i]) || candidate_out[i] == -12345.0f;
+            }
+            const double rel_l1 = error / reference_norm;
+            const uint64_t calls = strata::kernels::ninfer_q2_0_expert_dispatch_count() - calls_before;
+            const bool pass = rel_l1 <= 2.0e-4 && unwritten == 0 && calls == 1;
+            std::printf("full top-10 grouped Q2_0/Q8_1 prefill boundary (tokens=%d entries=%d groups=%d): "
+                        "rel_l1=%.9g unwritten=%zu NInfer_calls=%llu %s\n",
+                        token_count, entries, groups, rel_l1, unwritten, static_cast<unsigned long long>(calls),
+                        pass ? "PASS" : "FAIL");
+            cudaFree(dev_tok); cudaFree(dev_dst); cudaFree(dev_groups); cudaFree(dev_starts); cudaFree(dev_ptrs);
+            cudaFree(strata_y); cudaFree(candidate_y); cudaFree(strata_ws); cudaFree(candidate_ws);
+            cudaFree(dev_xq); cudaFree(dev_x); cudaFree(dev_blobs);
+            return pass;
+        };
+        for (const int tokens : {64, 128}) failed += check_prefill_shape(tokens) ? 0 : 1;
         cudaFree(device_tok); cudaFree(device_dst); cudaFree(device_group_count); cudaFree(device_starts);
         cudaFree(device_ptrs); cudaFree(device_native_output); cudaFree(device_group_output);
         cudaFree(native_scratch); cudaFree(candidate_scratch); cudaFree(device_xq); cudaFree(device_blob);

@@ -306,8 +306,9 @@ goal remains open.
 1. The bounded Q2_0 implementation now exercises one-token decode and a
    three-token, three-group, nine-entry prefill-shaped batch. This confirms the
    grouped descriptor/token/output mapping and the 8+1 SwiGLU quantizer chunk
-   boundary against Strata's grouped route. It is not a 64/128-token schedule
-   sweep or an end-to-end prefill qualification; these remain open.
+   boundary against Strata's grouped route. Full top-10 grouped shape checks
+   also pass at 64 and 128 input tokens. These are functional operator checks,
+   not latency sweeps or end-to-end prefill qualification.
 2. Q2_0 expert weights are reused through grouped descriptors for multiple
    token/expert entries. The initial operator screen was slower than Strata;
    no fusion or performance claim is made.
@@ -323,7 +324,7 @@ goal remains open.
 the other target variants are recorded in
 [E4 model and shape coverage](../../bench/results/2026-10-25-phase-e4-model-codec-coverage/README.md).
 Only the Q2_0/Q2_0 artifact is covered, and it is not performance-qualified.
-64/128-token dispatch, mixed-codec support and HIP/SYCL qualification remain
+64/128-token throughput, mixed-codec support and HIP/SYCL qualification remain
 open; E4's broad model-coverage objective is therefore only partially complete.
 
 ### E5 — Qualify numerical behavior and useful execution policies

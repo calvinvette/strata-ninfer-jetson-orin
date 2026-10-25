@@ -137,7 +137,8 @@ added and measured an opt-in caller-owned CUDA adapter, strict selector, and
 bounded staged/direct-mapped paths; see the [E2 report](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/README.md)
 and [E3 reports](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/staged-screen/README.md).
 Real-weight FP64 parity and grouped route parity pass for the recorded fixture.
-The adapter remains Q2_0/Q2_0 only, and E4's grouped prefill-shaped check covers
-three tokens, not the 64/128-token service chunks. The Coder IQ1_M and original
-IQ3_S variants have mixed expert codecs and are not covered by this adapter.
+The adapter remains Q2_0/Q2_0 only. E4's grouped operator checks cover 3, 64 and
+128 tokens, but do not qualify end-to-end serving performance at the 64/128
+prefill chunks. The Coder IQ1_M and original IQ3_S variants have mixed expert
+codecs and are not covered by this adapter.
 These are implementation and capability boundaries, not performance claims.

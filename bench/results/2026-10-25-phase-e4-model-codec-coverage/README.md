@@ -2,8 +2,8 @@
 
 Date: 2026-10-25. Source: current `feat/ninfer-expert-e0` worktree on Orin AGX
 (SM87, CUDA 12.6). This is a bounded capability inventory and functional
-operator check. It does not qualify 64/128-token prefill, mixed codecs, other
-backends, or end-to-end performance.
+operator check. It does not qualify 64/128-token service prefill, mixed codecs,
+other backends, or end-to-end performance.
 
 ## Result
 
@@ -39,6 +39,14 @@ pairing:
   chunks. Activations for tokens 1 and 2 are deterministic transformations of
   the captured activation, so this is a shape/functional check, not a held-out
   runtime prompt distribution.
+- Full top-10 grouped cases pass at 64 tokens / 640 entries and 128 tokens /
+  1,280 entries against Strata's grouped Q2_0/Q8_1 implementation. Relative L1
+  was `9.32514352e-8` and `9.32202759e-8`, with zero unwritten outputs and one
+  NInfer dispatch in each case. All 10 experts per token use actual weights
+  from layer 0; activation rows are deterministic transformations of the
+  captured row. Input quantization was chunked at the helper's eight-token
+  limit. These are functional operator boundary checks, not serving latency
+  measurements or a natural prompt activation distribution.
 - One-token operator timeline: Strata median `24.642 us` (range `24.550–24.665`);
   NInfer-derived median `86.090 us` (range `85.329–156.094`), or `3.494x`
   slower. This is a diagnostic GPU operator comparison, not service latency.
@@ -49,8 +57,16 @@ invalid fixture pairing; the test was rerun with the documented layer-0,
 expert-32 activation and passed. The failed invocation did not modify code or
 model artifacts. The corrected parity output is saved in [`parity.log`](parity.log);
 the Python oracle checks passed 4/4 in [`python-tests.log`](python-tests.log).
-The parity executable SHA256 is
-`a83da2593bfe3b3e13d4de6e5fdb9003c58c7eb9acece533f4931edd9278778d`.
+The initial parity executable SHA256 is
+`a83da2593bfe3b3e13d4de6e5fdb9003c58c7eb9acece533f4931edd9278778d`;
+the rebuilt executable with 64/128-token checks has SHA256
+`8302adccc5f0bb2ca63293a6923d416753bd929cfc9da0f2ac65721cb2d1def4`. The
+full passing output is in [`prefill-boundary-parity.log`](prefill-boundary-parity.log).
+The [initial failed harness call](prefill-boundary-first-attempt.log) documents
+the eight-token helper limit and correction. The run
+sampled RAM at 5.6/30.7 GiB peak, GPU utilization at 92–98%, and SoC temperature
+around 49 °C; see [`prefill-boundary-tegrastats.log`](prefill-boundary-tegrastats.log).
+GPU clock-rate readback was unavailable.
 This timing was repeated with `tegrastats` sampled every 100 ms; it returned
 Strata `24.478 us` (24.409–24.506) and NInfer `85.680 us` (85.473–136.539),
 ratio `3.500x`. During the run RAM use was 4.9/30.7 GiB, GPU utilization was
@@ -88,5 +104,5 @@ qualification. Q2_0 route parity reuses the E2 real-weight FP64 fixture and is
 cross-variant activation evidence, not Q2_0-model-native activation evidence.
 The E2/E3 reports hold the service and staged/direct mapping details. This E4
 result closes only the bounded Q2_0 grouped-shape check and explicit partial
-coverage decision; 64/128-token execution, codec expansion, strict rejection
+coverage decision; 64/128-token performance, codec expansion, strict rejection
 against each mixed model, and HIP/SYCL builds remain open.
