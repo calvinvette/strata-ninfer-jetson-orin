@@ -310,6 +310,16 @@ and [direct-mapped report](../../bench/results/2026-10-25-phase-e2-q2-ninfer-res
 This closes the bounded Q2_0 staging route integration only; E6's performance
 goal remains open.
 
+Execution note (2026-10-25): a fresh randomized three-pair screen at
+`--pcie-frac 1.0` selected 265 staged entries (1.9% of 13,920 routed entries)
+per request, versus 106 (0.8%) at 0.55. Median client latency improved 1.32%
+and TTFT 1.19%, both below the 5% useful-effect threshold. The resident maps
+matched in all six services, but all three NInfer text hashes differed from
+their CPU-miss controls; no independent quality oracle was run. Minimum
+available physical/admission memory was 16.21 GiB. The limited routed coverage
+and sub-threshold latency effect do not justify confirmation or promotion. See
+the [max-offload screen](../../bench/results/2026-10-25-phase-e3-q2-ninfer-max-offload/README.md).
+
 ### E4 — Add prefill, small-token execution and model coverage — complete with partial model support
 
 1. The bounded Q2_0 implementation now exercises one-token decode and a

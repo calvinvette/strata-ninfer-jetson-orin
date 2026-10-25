@@ -66,7 +66,13 @@ same-day 8K screen missed the useful-effect gate, so seven-pair confirmation
 was not run and E6 performance exit criteria remain unmet. See the [E5 closeout](NINFER_E5_CLOSEOUT.md)
 and [E6 report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md).
 The E2 resident and E3 staged-miss schedules both failed
-initial performance screens. On 2026-10-25, E0 captured a supervised Coder IQ1_M decode profile
+initial performance screens. A three-pair `--pcie-frac 1.0` follow-up increased
+selected staged work from 106 to 265 entries (0.8% to 1.9% of routed entries)
+and reduced median client latency by 1.32%; each NInfer output hash differed
+from its CPU-miss control, and no quality oracle was run. This remains below the
+5% useful-effect gate and does not qualify the staging policy. See the
+[max-offload screen](../../bench/results/2026-10-25-phase-e3-q2-ninfer-max-offload/README.md).
+On 2026-10-25, E0 captured a supervised Coder IQ1_M decode profile
 with Strata's existing expert backend. The opt-in decode timer measured 21.73 ms
 per token-window in CPU expert work and 35.07 ms waiting for GPU reach; a
 separate Nsight diagnostic recorded 255.8 ms of resident gate/up and 174.5 ms
