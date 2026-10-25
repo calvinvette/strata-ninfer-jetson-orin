@@ -13,6 +13,7 @@
 #include <fstream>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace {
@@ -466,6 +467,61 @@ int main(int argc, char** argv) {
                         "rel_l1=%.9g unwritten=%zu NInfer_calls=%llu %s\n",
                         token_count, entries, groups, rel_l1, unwritten, static_cast<unsigned long long>(calls),
                         pass ? "PASS" : "FAIL");
+            // Operator-only throughput screen: inputs, routes, weights, output
+            // buffers and workspaces are prepared before timing. Each arm sees
+            // the same captured activation family and 10-expert grouped shape.
+            constexpr int warmup_iterations = 5;
+            constexpr int measured_iterations = 50;
+            constexpr int paired_blocks = 7;
+            auto invoke = [&](bool use_ninfer) {
+                if (use_ninfer)
+                    strata::kernels::ninfer_q2_0_expert_grouped(layout, dev_ptrs, dev_starts, dev_groups,
+                        dev_dst, dev_tok, groups, entries, dev_xq, candidate_ws, candidate_y, stream, groups);
+                else
+                    strata::kernels::native_expert_grouped(layout, dev_ptrs, dev_starts, dev_groups,
+                        dev_dst, dev_tok, groups, entries, dev_xq, strata_ws, strata_y, stream, groups);
+            };
+            cudaEvent_t event_start = nullptr, event_stop = nullptr;
+            cuda_check(cudaEventCreate(&event_start), "create grouped timing start event");
+            cuda_check(cudaEventCreate(&event_stop), "create grouped timing stop event");
+            auto measure_us = [&](bool use_ninfer) {
+                for (int i = 0; i < warmup_iterations; ++i) invoke(use_ninfer);
+                cuda_check(cudaStreamSynchronize(stream), "synchronize grouped timing warmup");
+                cuda_check(cudaEventRecord(event_start, stream), "record grouped timing start");
+                for (int i = 0; i < measured_iterations; ++i) invoke(use_ninfer);
+                cuda_check(cudaEventRecord(event_stop, stream), "record grouped timing stop");
+                cuda_check(cudaEventSynchronize(event_stop), "synchronize grouped timing stop");
+                float elapsed_ms = 0.0f;
+                cuda_check(cudaEventElapsedTime(&elapsed_ms, event_start, event_stop), "read grouped timing");
+                return static_cast<double>(elapsed_ms) * 1000.0 / measured_iterations;
+            };
+            std::vector<double> strata_us, ninfer_us, ratios;
+            for (int block = 0; block < paired_blocks; ++block) {
+                double s = 0.0, n = 0.0;
+                if ((block & 1) == 0) { s = measure_us(false); n = measure_us(true); }
+                else { n = measure_us(true); s = measure_us(false); }
+                strata_us.push_back(s); ninfer_us.push_back(n); ratios.push_back(n / s);
+            }
+            auto median = [](std::vector<double> values) {
+                std::sort(values.begin(), values.end());
+                return values[values.size() / 2];
+            };
+            const double strata_median = median(strata_us);
+            const double ninfer_median = median(ninfer_us);
+            const double ratio_median = median(ratios);
+            const auto bounds = [](const std::vector<double>& values) {
+                const auto mm = std::minmax_element(values.begin(), values.end());
+                return std::pair<double, double>{*mm.first, *mm.second};
+            };
+            const auto s_bounds = bounds(strata_us), n_bounds = bounds(ninfer_us);
+            std::printf("grouped operator screen (tokens=%d entries=%d blocks=%d iterations/block=%d): "
+                        "Strata median=%.3f us range=[%.3f,%.3f], NInfer median=%.3f us "
+                        "range=[%.3f,%.3f], NInfer/Strata=%.3fx\n",
+                        token_count, entries, paired_blocks, measured_iterations,
+                        strata_median, s_bounds.first, s_bounds.second,
+                        ninfer_median, n_bounds.first, n_bounds.second, ratio_median);
+            cuda_check(cudaEventDestroy(event_stop), "destroy grouped timing stop event");
+            cuda_check(cudaEventDestroy(event_start), "destroy grouped timing start event");
             cudaFree(dev_tok); cudaFree(dev_dst); cudaFree(dev_groups); cudaFree(dev_starts); cudaFree(dev_ptrs);
             cudaFree(strata_y); cudaFree(candidate_y); cudaFree(strata_ws); cudaFree(candidate_ws);
             cudaFree(dev_xq); cudaFree(dev_x); cudaFree(dev_blobs);

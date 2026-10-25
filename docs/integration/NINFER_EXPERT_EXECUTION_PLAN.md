@@ -115,7 +115,8 @@ E4 explicitly leaves the mixed-codec
 Coder IQ1_M and ISTA-DASLab IQ3_S models unsupported by
 the NInfer selector; E5 is complete for the bounded single-live static Q2_0
 profile, with cross-backend state migration, adaptive residency and broader
-quality coverage explicitly excluded; E6–E7 remain pending. E2's resident schedule and
+quality coverage explicitly excluded; E6 is underway and E7 remains pending.
+E2's resident schedule and
 E3's staged-miss schedule both failed the initial performance screens. The
 default remains Strata and the NInfer path remains experimental. Each stage
 produces a small source/evidence change and
@@ -464,6 +465,18 @@ historical unmatched charts labeled as observations. There is no universal
 start of this document are assessed explicitly. A bounded release names its
 models, hardware, profiles, exclusions and remaining stages; it cannot close
 unimplemented expert paths by narrowing the wording of a phase closeout.
+
+Execution note (2026-10-25): E6's first full top-10 grouped Q2_0 timing screen
+passed parity at 64 and 128 tokens but measured 12.18× and 12.31× NInfer/Strata
+latency. Replacing the 80-call SwiGLU/Q8_1 chunk loop with a single equivalent
+NInfer-side launch changed little. A separate Nsight Systems capture localized
+the device cost to NInfer's grouped D3/D4 scalar Q2 loops; Strata uses packed
+integer-dot Q2 specializations. The paired operator screen and profile details
+are in the [E6 report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md).
+Since E2's natural service screen and E6's operator screen both fail, do not
+spend seven-pair confirmation effort on this revision. The parametric service
+matrix is held until a packed-dot or otherwise materially improved candidate
+passes a new screen; E6 remains open.
 
 ## Numerical policy
 

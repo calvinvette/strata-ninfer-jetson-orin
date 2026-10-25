@@ -29,8 +29,16 @@ coherent but nonidentical prose. This does not establish a quality loss, but
 shows exact retrieval output parity does not generalize. Cross-backend numerical
 state equivalence and live state migration are unsupported; broader quality
 coverage remains open. E5 is complete only for the tested single-live static
-Q2_0 profile. E6–E7 remain pending and NInfer remains opt-in. See the [E5
-closeout](NINFER_E5_CLOSEOUT.md).
+Q2_0 profile. E6 performance screening is underway; E7 remains pending and
+NInfer remains opt-in. A new seven-block operator screen found the current
+grouped Q2_0 path 12.18–12.31× slower than Strata at 64/128 tokens. One launch
+reduced grouped quantization launches but barely changed total time. Nsight
+Systems attributes most device time to the adapted scalar Q2 projections,
+whereas Strata's Q2 specialization uses packed integer-dot operations. The
+current revision therefore fails the operator and end-to-end performance
+screens; broad context-size confirmation is deferred until a revised schedule
+passes a fresh screen. See the [E5 closeout](NINFER_E5_CLOSEOUT.md) and [E6
+operator screen](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md).
 The E2 resident and E3 staged-miss schedules both failed
 initial performance screens. On 2026-10-25, E0 captured a supervised Coder IQ1_M decode profile
 with Strata's existing expert backend. The opt-in decode timer measured 21.73 ms

@@ -9,6 +9,7 @@
 
 #include "strata/kernels/ninfer_q2_expert.hpp"
 #include "strata/kernels/native_mmvq.hpp"
+#include "strata/kernels/q8_1_finite.hpp"
 
 #include <cuda_fp16.h>
 #include <cuda_runtime.h>
@@ -50,6 +51,39 @@ __device__ __forceinline__ float dot_q2_f32(const uint8_t* row, const float* x, 
 
 struct Q8_1Block { __half d; __half s; int8_t qs[32]; };
 static_assert(sizeof(Q8_1Block) == 36, "Q8_1 block size");
+
+__device__ __forceinline__ float warp_sum_xor(float value) {
+    for (int offset = 16; offset > 0; offset >>= 1)
+        value += __shfl_xor_sync(0xffffffffu, value, offset, 32);
+    return value;
+}
+
+__device__ __forceinline__ float warp_max_xor(float value) {
+    for (int offset = 16; offset > 0; offset >>= 1)
+        value = fmaxf(value, __shfl_xor_sync(0xffffffffu, value, offset, 32));
+    return value;
+}
+
+// One warp owns one Q8_1 block, matching native_swiglu_quantize_q8_1's
+// arithmetic while allowing arbitrary entry counts in one launch. The public
+// native helper intentionally caps columns at eight, which otherwise forced
+// one launch per eight routed entries here.
+__global__ void ninfer_swiglu_quantize_q8_1_many(const float* gate, const float* up,
+                                                 Q8_1Block* output, int64_t values) {
+    const int64_t i = static_cast<int64_t>(blockIdx.x) * blockDim.x + threadIdx.x;
+    if (i >= values) return;
+    const float g = gate[i];
+    const float value = __fmul_rn(__fdividef(g, __fadd_rn(1.0f, __expf(-g))), up[i]);
+    const float amax = warp_max_xor(fabsf(value));
+    const float sum = warp_sum_xor(value);
+    const float scale = q8_1_finite(amax / 127.0f);
+    output[i / 32].qs[i % 32] = q8_1_quant(value, scale, amax);
+    if ((i % 32) == 0) {
+        const half2 ds = q8_1_ds(scale, sum);
+        output[i / 32].d = __low2half(ds);
+        output[i / 32].s = __high2half(ds);
+    }
+}
 
 __device__ __forceinline__ float dot_q2_q8_1(const uint8_t* row, const Q8_1Block* xq, int width) {
     const int lane = threadIdx.x & 31;
@@ -181,15 +215,9 @@ void ninfer_q2_0_expert_grouped(const NativeExpertLayout& L, const unsigned long
     d3_q2_0_grouped<<<dim3((2 * kIntermediate + kRowsPerCta - 1) / kRowsPerCta, static_cast<unsigned>(gy)),
                        128, 0, s>>>(grp_ptr, grp_start, n_groups, ent_tok,
                                      static_cast<const Q8_1Block*>(x_q8_1), L, gate, up, gy);
-    // Strata's established helper validates ncols in [1,8]. Preserve its exact
-    // activation quantizer and process verifier entries in bounded chunks.
-    for (int64_t first = 0; first < cap_entries; first += 8) {
-        const int64_t remaining = cap_entries - first;
-        const int columns = static_cast<int>(remaining < 8 ? remaining : 8);
-        native_swiglu_quantize_q8_1(gate + first * kIntermediate, up + first * kIntermediate,
-                                     hidden_q8_1 + first * (kIntermediate / 32) * 36,
-                                     static_cast<int>(kIntermediate), columns, s);
-    }
+    const int64_t hidden_values = cap_entries * kIntermediate;
+    ninfer_swiglu_quantize_q8_1_many<<<static_cast<unsigned>((hidden_values + 255) / 256), 256, 0, s>>>(
+        gate, up, reinterpret_cast<Q8_1Block*>(hidden_q8_1), hidden_values);
     d4_q2_0_grouped<<<dim3((kHidden + kRowsPerCta - 1) / kRowsPerCta, static_cast<unsigned>(gy)),
                        128, 0, s>>>(grp_ptr, grp_start, n_groups, ent_dst,
                                      reinterpret_cast<const Q8_1Block*>(hidden_q8_1), L, output, gy);
