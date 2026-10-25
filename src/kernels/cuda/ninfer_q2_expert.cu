@@ -9,6 +9,7 @@
 
 #include "strata/kernels/ninfer_q2_expert.hpp"
 #include "strata/kernels/native_mmvq.hpp"
+#include "strata/kernels/dp4a.hpp"
 #include "strata/kernels/q8_1_finite.hpp"
 
 #include <cuda_fp16.h>
@@ -87,16 +88,27 @@ __global__ void ninfer_swiglu_quantize_q8_1_many(const float* gate, const float*
 
 __device__ __forceinline__ float dot_q2_q8_1(const uint8_t* row, const Q8_1Block* xq, int width) {
     const int lane = threadIdx.x & 31;
+    const int lane_group = lane / 8;
+    const int lane_byte = lane & 7;
     float acc = 0.0f;
-    for (int k = lane; k < width; k += 32) {
-        const uint8_t* block = row + (k / kQ2Block) * kQ2Bytes;
+    for (int block32 = lane_group; block32 < width / 32; block32 += 4) {
+        const uint8_t* block = row + static_cast<size_t>(block32 / 2) * kQ2Bytes;
+        const int qbyte = (block32 & 1) * 8 + lane_byte;
+        const uint8_t packed_q2 = block[2 + qbyte];
+        const int q0 = (packed_q2 >> 0) & 3;
+        const int q1 = (packed_q2 >> 2) & 3;
+        const int q2 = (packed_q2 >> 4) & 3;
+        const int q3 = (packed_q2 >> 6) & 3;
+        const uint32_t packed_weights =
+            (static_cast<uint32_t>(q0 - 1) & 0xffu) |
+            ((static_cast<uint32_t>(q1 - 1) & 0xffu) << 8) |
+            ((static_cast<uint32_t>(q2 - 1) & 0xffu) << 16) |
+            ((static_cast<uint32_t>(q3 - 1) & 0xffu) << 24);
+        const auto* activation_bytes = reinterpret_cast<const int*>(xq[block32].qs);
+        const int dot = STRATA_DP4A(static_cast<int>(packed_weights), activation_bytes[lane_byte], 0);
         const float dw = __half2float(*reinterpret_cast<const __half*>(block));
-        const int local = k % kQ2Block;
-        const int code = (block[2 + local / 4] >> ((local & 3) * 2)) & 3;
-        const Q8_1Block& xb = xq[k / 32];
-        const float dx = __half2float(xb.d);
-        const float product = static_cast<float>(code - 1) * static_cast<float>(xb.qs[k % 32]);
-        acc = fmaf(dw * dx, product, acc);
+        const float dx = __half2float(xq[block32].d);
+        acc += (dw * dx) * static_cast<float>(dot);
     }
     return warp_sum(acc);
 }

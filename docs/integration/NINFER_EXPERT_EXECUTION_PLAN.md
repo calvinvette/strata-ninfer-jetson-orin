@@ -471,12 +471,14 @@ passed parity at 64 and 128 tokens but measured 12.18× and 12.31× NInfer/Strat
 latency. Replacing the 80-call SwiGLU/Q8_1 chunk loop with a single equivalent
 NInfer-side launch changed little. A separate Nsight Systems capture localized
 the device cost to NInfer's grouped D3/D4 scalar Q2 loops; Strata uses packed
-integer-dot Q2 specializations. The paired operator screen and profile details
-are in the [E6 report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md).
-Since E2's natural service screen and E6's operator screen both fail, do not
-spend seven-pair confirmation effort on this revision. The parametric service
-matrix is held until a packed-dot or otherwise materially improved candidate
-passes a new screen; E6 remains open.
+integer-dot Q2 specializations. A packed `dp4a` adaptation passed grouped
+parity and reduced the operator gap to 4.36×, but remained slower. A fresh
+three-pair, 8K same-residency service screen found median paired changes of
++0.34% prompt, +1.77% decode, +0.82% client total and +0.36% TTFT, with decode
+slower in all three pairs. Outputs and resident-map hashes matched. These
+screens do not meet the useful-effect gate, so seven-pair confirmation and the
+broader context matrix are deferred until a materially faster candidate passes
+a new screen. E6 remains open; see the [E6 report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md).
 
 ## Numerical policy
 

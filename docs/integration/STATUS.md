@@ -13,7 +13,7 @@ The [NInfer expert execution plan](NINFER_EXPERT_EXECUTION_PLAN.md) is now in
 progress: E0 is complete for bounded controls and Q2_0 timing; E1–E4 have
 bounded Q2_0 prototype evidence, including 3/64/128-token grouped parity
 checks, while
-E4 leaves mixed-codec Coder IQ1_M and ISTA-DASLab IQ3_S unsupported; E5 is in
+E4 leaves mixed-codec Coder IQ1_M and ISTA-DASLab IQ3_S unsupported; E5 is
 complete for a bounded static Q2_0 profile, with passing MTP-2/MTP-4
 cancellation-state checks and
 MTP-off-versus-MTP-2/MTP-4 accepted-prefix parity runs, plus a three-request
@@ -30,15 +30,15 @@ shows exact retrieval output parity does not generalize. Cross-backend numerical
 state equivalence and live state migration are unsupported; broader quality
 coverage remains open. E5 is complete only for the tested single-live static
 Q2_0 profile. E6 performance screening is underway; E7 remains pending and
-NInfer remains opt-in. A new seven-block operator screen found the current
-grouped Q2_0 path 12.18–12.31× slower than Strata at 64/128 tokens. One launch
-reduced grouped quantization launches but barely changed total time. Nsight
-Systems attributes most device time to the adapted scalar Q2 projections,
-whereas Strata's Q2 specialization uses packed integer-dot operations. The
-current revision therefore fails the operator and end-to-end performance
-screens; broad context-size confirmation is deferred until a revised schedule
-passes a fresh screen. See the [E5 closeout](NINFER_E5_CLOSEOUT.md) and [E6
-operator screen](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md).
+NInfer remains opt-in. Nsight Systems identified scalar Q2 projections as the
+main grouped-kernel cost. A packed `dp4a` revision passed grouped parity and
+reduced the 64/128-token operator gap from 12.2× to 4.36×, but remained slower.
+A fresh three-pair 8K service screen showed median NInfer latency changes of
++0.34% prompt, +1.77% decode, +0.82% client total and +0.36% TTFT; all measured
+outputs and startup residency maps matched. Decode was slower in each pair.
+The useful-effect gate was not met, so broad context-size service measurements
+are deferred until another candidate passes screening. See the [E5
+closeout](NINFER_E5_CLOSEOUT.md) and [E6 report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md).
 The E2 resident and E3 staged-miss schedules both failed
 initial performance screens. On 2026-10-25, E0 captured a supervised Coder IQ1_M decode profile
 with Strata's existing expert backend. The opt-in decode timer measured 21.73 ms

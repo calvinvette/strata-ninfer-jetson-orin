@@ -110,14 +110,15 @@ retained as implementation evidence.
 - Re-run strict service checks with Q2_0 model-native captured activations and
   broaden edge cases (empty/partial groups, multiple groups, graph reuse and
   strict rejection of unsupported tensors).
-- Repeat operator timing under controlled clock/power observation, inspect
-  kernel-level launch/resource costs, and revise or reject the extra quantization
-  stage. Then complete same-day randomized paired backend-off/on service
-  measurements with matched resident expert IDs and bytes before making an
-  end-to-end claim.
-- The first attempt exposed the existing helper's eight-column limit; the fixed
-  code now chunks calls, but maximum-capacity scratch and graph-capture behavior
-  need dedicated qualification.
+- E6 followed up with grouped operator timings, Nsight Systems inspection, a
+  single-launch SwiGLU/Q8_1 stage, and a packed `dp4a` Q2 schedule. The packed
+  schedule passed parity and narrowed the grouped gap, but remained slower;
+  same-day paired service timings showed no useful gain. Details and current
+  decision are in the [E6 report](../../phase-e6-q2-grouped-throughput/README.md).
+- The initial route used the existing helper in bounded groups because its API
+  accepts at most eight columns. E6 replaced those calls with a single-launch
+  NInfer-side quantizer. Maximum-capacity scratch and graph-capture behavior
+  still need dedicated qualification.
 - The existing bounded staged-miss route was also exercised with a 1-GiB pinned
   complement. CPU-miss versus NInfer staging and direct-mapped results are
   documented in the [staged-miss report](staged-screen/README.md) and
