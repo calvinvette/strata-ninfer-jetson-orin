@@ -5358,3 +5358,14 @@ with the Coder IQ1_M or IQ3_S campaigns, and does not justify a cross-quant
 speedup claim. It does not change the Phase 8 feature exclusions. Model files
 remain under `~/models/strata-orin-validation/`; raw observations and artifact
 identity are retained in the [campaign report](../../bench/results/2026-10-25-q2-current-candidate-performance/README.md).
+# 2026-10-25: Dense Qwen3.8-27B IQ3_S is unsupported by Strata
+
+Checked the requested `~/models/qwen3.8-27b-iq3s/Qwen3.8-27B-UD-IQ3_S.gguf`
+with the header-only Strata model inspector. The 12,040,883,104-byte file has
+SHA256 `d847e2c1e4aa276e4b7b8e9ad7628050e61e165d49ab995407bc36677a6f3864`
+and declares architecture `qwen35`. The current Strata runtime supports only
+Qwen3.8-Flash-Next and rejects this model family. No performance requests were
+run. Available local NInfer Qwen3.8-27B files use NInfer's `.ninfer` artifact
+format and are not interchangeable with this IQ3_S GGUF. Record this as an
+unsupported cell; do not substitute a different engine or artifact in the same
+performance cohort. [Support check](../../bench/results/2026-10-25-dense-iq3s-support-check/README.md).

@@ -34,6 +34,11 @@ telemetry and raw captures are not committed.
 
 ## Performance observed
 
+The requested dense Qwen3.8-27B UD-IQ3_S GGUF is unsupported by the current
+Strata candidate: its header declares `qwen35`, while Strata accepts only
+Flash-Next. No timing requests were run. NInfer's available dense-model `.ninfer`
+artifacts are a different format and cohort. [Support check](../../bench/results/2026-10-25-dense-iq3s-support-check/README.md).
+
 The qualified Q2_0 profile was clean-rebuilt on 2026-10-25 from the current
 runtime source; its executable hash matched the preceding current-candidate
 build. Seven process blocks measured 32.6/10.2 prompt/decode tok/s at 512/64
