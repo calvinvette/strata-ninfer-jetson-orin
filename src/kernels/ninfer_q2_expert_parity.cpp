@@ -186,7 +186,53 @@ int main(int argc, char** argv) {
                                    cudaMemcpyDeviceToHost, stream), "copy grouped NInfer output");
         cuda_check(cudaMemcpyAsync(native_output.data(), device_native_output, kHidden * sizeof(float),
                                    cudaMemcpyDeviceToHost, stream), "copy grouped Strata output");
+        // The service mismatch is an expert-row delta with identical routes
+        // and input. Retain grouped intermediate tensors here to distinguish
+        // gate/up accumulation, SwiGLU Q8_1 quantization, and down projection.
+        const size_t one_entry_fa = (static_cast<size_t>(kIntermediate) * sizeof(float) + 255) & ~size_t(255);
+        std::vector<float> candidate_gate(kIntermediate), candidate_up(kIntermediate);
+        std::vector<float> native_gate(kIntermediate), native_up(kIntermediate);
+        std::vector<uint8_t> candidate_hq(kIntermediate / 32 * 36), native_hq(kIntermediate / 32 * 36);
+        auto* candidate_bytes = static_cast<uint8_t*>(candidate_scratch);
+        auto* native_bytes = static_cast<uint8_t*>(native_scratch);
+        cuda_check(cudaMemcpyAsync(candidate_gate.data(), candidate_bytes, kIntermediate * sizeof(float),
+                                   cudaMemcpyDeviceToHost, stream), "copy NInfer gate intermediate");
+        cuda_check(cudaMemcpyAsync(candidate_up.data(), candidate_bytes + one_entry_fa, kIntermediate * sizeof(float),
+                                   cudaMemcpyDeviceToHost, stream), "copy NInfer up intermediate");
+        cuda_check(cudaMemcpyAsync(native_gate.data(), native_bytes, kIntermediate * sizeof(float),
+                                   cudaMemcpyDeviceToHost, stream), "copy Strata gate intermediate");
+        cuda_check(cudaMemcpyAsync(native_up.data(), native_bytes + one_entry_fa, kIntermediate * sizeof(float),
+                                   cudaMemcpyDeviceToHost, stream), "copy Strata up intermediate");
+        cuda_check(cudaMemcpyAsync(candidate_hq.data(), candidate_bytes + 3 * one_entry_fa,
+                                   candidate_hq.size(), cudaMemcpyDeviceToHost, stream), "copy NInfer SwiGLU Q8_1");
+        cuda_check(cudaMemcpyAsync(native_hq.data(), native_bytes + 3 * one_entry_fa,
+                                   native_hq.size(), cudaMemcpyDeviceToHost, stream), "copy Strata SwiGLU Q8_1");
         cuda_check(cudaStreamSynchronize(stream), "synchronize grouped route");
+        auto float_stage_diff = [](const std::vector<float>& a, const std::vector<float>& b) {
+            size_t different = 0;
+            for (size_t i = 0; i < a.size(); ++i) different += a[i] != b[i];
+            return different;
+        };
+        size_t q8_bytes_different = 0, q8_first_difference = candidate_hq.size();
+        for (size_t i = 0; i < candidate_hq.size(); ++i)
+            if (candidate_hq[i] != native_hq[i]) {
+                if (q8_first_difference == candidate_hq.size()) q8_first_difference = i;
+                ++q8_bytes_different;
+            }
+        if (q8_first_difference < candidate_hq.size()) {
+            std::printf("grouped intermediate differences: gate=%zu/%d up=%zu/%d swiglu_q8_1=%zu/%zu bytes; "
+                        "first byte=%zu (block=%zu byte-in-block=%zu) NInfer=0x%02x Strata=0x%02x\n",
+                    float_stage_diff(candidate_gate, native_gate), kIntermediate,
+                    float_stage_diff(candidate_up, native_up), kIntermediate,
+                    q8_bytes_different, candidate_hq.size(), q8_first_difference,
+                    q8_first_difference / 36, q8_first_difference % 36,
+                    candidate_hq[q8_first_difference], native_hq[q8_first_difference]);
+        } else {
+            std::printf("grouped intermediate differences: gate=%zu/%d up=%zu/%d swiglu_q8_1=%zu/%zu bytes\n",
+                        float_stage_diff(candidate_gate, native_gate), kIntermediate,
+                        float_stage_diff(candidate_up, native_up), kIntermediate,
+                        q8_bytes_different, candidate_hq.size());
+        }
         double route_err = 0.0, route_ref = 0.0;
         size_t route_unwritten = 0;
         for (int i = 0; i < kHidden; ++i) {

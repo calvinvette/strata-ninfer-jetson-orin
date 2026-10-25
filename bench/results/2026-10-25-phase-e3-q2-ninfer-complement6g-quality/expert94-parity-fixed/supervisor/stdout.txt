@@ -1,0 +1,9 @@
+NInfer-derived Q2_0 D3/D4: layer=3 expert=94 rel_l2=2.05327296e-07 max_abs=1.48970614e-08 unwritten=0 limits=(5e-05,1e-05) PASS
+grouped intermediate differences: gate=0/640 up=0/640 swiglu_q8_1=0/720 bytes
+grouped resident route vs Strata Q2_0/Q8_1: rel_l1=0 unwritten=0 NInfer_calls=1 PASS
+one-token resident operator device timeline (7 interleaved x 1000): Strata median=24.677 us range=[24.663,37.551], NInfer median=24.529 us range=[24.522,64.151], ratio=0.994
+multi-token grouped Q2_0/Q8_1 prefill shape (tokens=3 entries=9 groups=3): rel_l1=0 unwritten=0 NInfer_calls=1 PASS
+full top-10 grouped Q2_0/Q8_1 prefill boundary (tokens=64 entries=640 groups=10): rel_l1=0 unwritten=0 NInfer_calls=1 PASS
+grouped operator screen (tokens=64 entries=640 blocks=7 iterations/block=50): Strata median=3946.189 us range=[3941.049,4154.406], NInfer median=4330.929 us range=[4329.120,4350.854], NInfer/Strata=1.098x
+full top-10 grouped Q2_0/Q8_1 prefill boundary (tokens=128 entries=1280 groups=10): rel_l1=0 unwritten=0 NInfer_calls=1 PASS
+grouped operator screen (tokens=128 entries=1280 blocks=7 iterations/block=50): Strata median=7959.990 us range=[7952.056,8009.363], NInfer median=8936.075 us range=[8930.803,8946.217], NInfer/Strata=1.123x

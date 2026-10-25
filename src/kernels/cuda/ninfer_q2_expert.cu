@@ -74,7 +74,10 @@ __global__ void ninfer_swiglu_quantize_q8_1_many(const float* gate, const float*
     const int64_t i = static_cast<int64_t>(blockIdx.x) * blockDim.x + threadIdx.x;
     if (i >= values) return;
     const float g = gate[i];
-    const float value = __fmul_rn(__fdividef(g, __fadd_rn(1.0f, __expf(-g))), up[i]);
+    // Match Strata's fused grouped quantizer expression. __fdividef uses the
+    // approximate reciprocal path and can move a value across a Q8_1 rounding
+    // boundary even when the gate/up projections are bit-identical.
+    const float value = __fmul_rn(g / (1.0f + __expf(-g)), up[i]);
     const float amax = warp_max_xor(fabsf(value));
     const float sum = warp_sum_xor(value);
     const float scale = q8_1_finite(amax / 127.0f);

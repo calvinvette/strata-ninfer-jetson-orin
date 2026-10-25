@@ -7,14 +7,18 @@ Date: 2026-10-25. Branch: `feat/ninfer-expert-e0`.
 **No NInfer release profile is proposed.** Keep `--expert-backend ninfer`
 experimental and opt-in; the default remains Strata. The bounded CUDA Q2_0 path
 is implemented and has run against the Qwen3.8-Flash-Next Q2_0 model on the
-Jetson AGX Orin, but the performance gate failed and model-level quality is not
-qualified across tasks. This is not a performance release.
+Jetson AGX Orin. A corrected 6-GiB staged profile now has a seven-pair TTFT
+effect on one short request and passes one held-out exact-answer/state check.
+That is narrow workload evidence; performance across the declared contexts and
+quality across tasks remain unqualified. This is not a general performance
+release.
 
 The implementation outcome is therefore bounded: the selected resident-expert
 path, fallback behavior, operator arithmetic and several static-service state
 cases have direct evidence. The outcome does not imply support for other
-formats, staged misses, live state migration, or general generation quality.
-The separate performance-qualified outcome is **not achieved**.
+formats, live state migration, or general generation quality. One
+workload-specific TTFT effect is confirmed; a general performance-qualified
+release profile is **not achieved**.
 
 ## Evidence and limits
 
@@ -40,12 +44,28 @@ The separate performance-qualified outcome is **not achieved**.
   exact token-count checks. Minimum available physical/admission memory was
   11.31 GiB; the 6 GiB floor held and all eighteen startup residency maps
   matched. It has no quality oracle and cannot establish a performance effect.
+- The grouped SwiGLU Q8_1 path initially used approximate `__fdividef`, while
+  Strata used precise division. On the captured layer-3 expert-94 row this
+  changed one Q8_1 code byte despite exact gate/up inputs. Matching Strata's
+  expression restored all Q8_1 bytes and grouped expert output in the
+  standalone replay. The corrected 512-token retrieval task then returned
+  matching token IDs and final persistent-state fields.
+- A corrected 6-GiB staged screen measured a median paired TTFT change of
+  −6.29% across three pairs. Seven-pair confirmation measured −5.96% with
+  paired-bootstrap 95% interval −6.23% to −5.80%. Client completion changed
+  −4.17% (interval −4.40% to −4.00%); all measured response and residency-map
+  hashes matched. All seven warmup hashes differed across arms. Minimum
+  available memory was 11.37 GiB. This confirms the registered TTFT effect
+  only for the short measured request; grouped 64/128-token operator timing
+  remains slower at 1.098×/1.123×.
 - E5 includes operator and state checks for the bounded static Q2_0 profile.
   However, a 512-token natural-generation comparison first differed at
   generated token 9, a 4K retrieval comparison had different persistent-state
   fingerprints, and a backend capture found numerical state drift. These
   observations do not prove a quality failure, but they leave task-level
-  equivalence unresolved. See the [E5 closeout](NINFER_E5_CLOSEOUT.md).
+  equivalence unresolved. Those comparisons predate the SwiGLU precision fix;
+  rerun them on the corrected binary before release assessment. See the
+  [E5 closeout](NINFER_E5_CLOSEOUT.md).
 - Coder IQ1_M, ISTA-DASLab IQ3_S, staged expert misses, broad task quality and
   live Strata/NInfer state migration are not supported or qualified by this
   release assessment.
@@ -61,8 +81,8 @@ Binary SHA256 values:
 
 | Artifact | SHA256 |
 | --- | --- |
-| `strata` | `daaf67ff7b764f0bd8413bee1d4e027132d4f2f978472795a82404fddeb5d420` |
-| `ninfer_q2_expert_parity` | `6334fb6015e115ea8978f870aa6e25a2cb122761fd098a23a318b3bc1e1fd2bb` |
+| `strata` | `c7301655b1a8d2569ab8744d92259b6d05b2baccb8bd04ad86da724a42bd4d75` |
+| `ninfer_q2_expert_parity` | `ec1d713c80aaeb266a8b4934d73faef8bac08692349b2d39db7f09c075811602` |
 
 HIP and SYCL builds remain unverified. Neither compiler was available on the
 Orin or on `maestro1`; the latter had 1.1 GiB free on its root filesystem and
@@ -73,13 +93,10 @@ backends.
 
 ## Sustained service and next entry criteria
 
-No 30-minute NInfer soak was started: there is no proposed release profile
-after the failed useful-effect screen, and a soak would not change the release
-decision. Existing Strata services, clocks and system configuration were left
-alone. E7 release qualification remains open until a candidate both passes the
-performance and task-quality gates and receives the required builds and
-sustained-service checks. Any renewed work should first change the operator or
-request critical path, then repeat same-day paired controls before proposing a
-profile. The latest one-entry operator matches Strata within this harness, but
-the request-level screen remains slower; no profile is nominated. The 30-minute
-soak requirement remains untriggered.
+No 30-minute NInfer soak was started because no general release profile is
+proposed. Existing Strata services, clocks and system configuration were left
+alone. E7 remains open for broader task-quality checks on the corrected
+binary, context/model coverage, backend build evidence and a proposed profile
+that passes those gates. The corrected request-level result is faster on the
+measured short request, but the grouped 64/128-token operator is still slower.
+The 30-minute soak requirement remains untriggered.

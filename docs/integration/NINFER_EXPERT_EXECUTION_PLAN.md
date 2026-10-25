@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **E0–E5 bounded implementation evidence complete; E6 screening complete but performance exit unmet; E7 assessed with no release profile (2026-10-25)**.
+Status: **E0–E5 bounded implementation evidence complete; corrected Q2_0 grouped SwiGLU parity restored; one 6-GiB staged TTFT cell passed seven-pair confirmation, while broader E6 exit and E7 release gates remain open (2026-10-25)**.
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -115,12 +115,14 @@ E4 explicitly leaves the mixed-codec
 Coder IQ1_M and ISTA-DASLab IQ3_S models unsupported by
 the NInfer selector; E5 is complete for the bounded single-live static Q2_0
 profile, with cross-backend state migration, adaptive residency and broader
-quality coverage explicitly excluded. E6's one-pair 1K–256K context screen is
-complete, but the predeclared useful-effect gate failed and its performance
-exit remains unmet. E7's release assessment proposes no profile; HIP/SYCL
+quality coverage explicitly excluded. E6's 1K–256K context screen is complete.
+After a grouped SwiGLU precision correction, one short-request 6-GiB staged
+Q2_0 cell passed seven-pair TTFT confirmation, but broader workload/context
+coverage and E6's full performance exit remain open. E7's release assessment
+proposes no general profile; HIP/SYCL
 builds and any future release-candidate soak remain open.
-E2's resident schedule and
-E3's staged-miss schedule both failed the initial performance screens. The
+E2's resident schedule and the earlier E3 staged-miss schedules failed their
+initial performance screens. The
 default remains Strata and the NInfer path remains experimental. Each stage
 produces a small source/evidence change and
 a written decision before the next dependent stage begins.
@@ -366,6 +368,28 @@ median paired improvement with the paired 95% interval excluding zero. Treat
 client completion as the secondary metric, with no more than 5% regression.
 Require matching output hashes and the held-out exact-answer/final-state check
 to pass; retain the six-GiB host headroom and three-GiB workspace reserve.
+
+Execution note (2026-10-25): the grouped SwiGLU kernel used `__fdividef` while
+Strata's corresponding quantizer used precise `/`. With identical gate/up
+intermediates, this changed one Q8_1 code byte at layer 3 / expert 94 / token
+position 520, producing the grouped output and final-state differences above.
+Replacing approximate division with Strata's expression made the full Q8_1
+block and grouped expert output bit-identical in the standalone replay. The
+corrected CUDA service build then passed the same 512-token answer, token-ID
+and final-state comparison. A fresh randomized three-pair screen measured
+median TTFT improvement 6.29% and client completion improvement 4.57%, with
+matching measured outputs and resident maps. The seven-pair confirmation
+reported TTFT −5.96% with a paired bootstrap 95% interval of −6.23% to −5.80%;
+client completion was −4.17% (interval −4.40% to −4.00%). All seven measured
+hashes and maps matched. All seven warmup hashes differed across arms and are
+retained as a caveat. Minimum available memory was 11.37 GiB. Thus this one
+TTFT cell passes its registered effect, quality and memory checks; the single
+short request does not close E6 across context sizes or models. Grouped
+64/128-token operator timing remains slower (1.098×/1.123× Strata). See the
+[corrected parity replay](../../bench/results/2026-10-25-phase-e3-q2-ninfer-complement6g-quality/expert94-parity-fixed/README.md),
+[held-out state check](../../bench/results/2026-10-25-phase-e3-q2-ninfer-complement6g-quality/fixed-kernel/README.md),
+[three-pair screen](../../bench/results/2026-10-25-phase-e3-q2-ninfer-complement6g-fixed-swiglu/README.md)
+and [seven-pair confirmation](../../bench/results/2026-10-25-phase-e3-q2-ninfer-complement6g-fixed-swiglu-confirm7/README.md).
 
 ### E4 — Add prefill, small-token execution and model coverage — complete with partial model support
 
