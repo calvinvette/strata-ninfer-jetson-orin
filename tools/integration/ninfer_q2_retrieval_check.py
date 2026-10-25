@@ -23,10 +23,25 @@ def main() -> int:
     ap.add_argument('--engine', type=Path, required=True)
     ap.add_argument('--workload', type=Path, required=True)
     ap.add_argument('--output', type=Path, required=True)
+    ap.add_argument('--compare-strata-control', action='store_true',
+                    help='compare MTP-off Strata backend against MTP-off strict NInfer')
+    ap.add_argument('--dump-gdn', action='store_true',
+                    help='write final accepted-prefix GDN arrays for numeric comparison')
+    ap.add_argument('--dump-gdn-at', type=int,
+                    help='exact committed length for the one-shot GDN dump (defaults to max generation length)')
+    ap.add_argument('--max-new', type=int,
+                    help='override fixture generation allowance for prefix diagnostics')
+    ap.add_argument('--capture-moe-layer', type=int,
+                    help='capture route, input, per-expert parts and output for one verifier layer')
+    ap.add_argument('--capture-moe-position', type=int,
+                    help='filter the MoE capture to one token position')
     ap.add_argument('--run', action='store_true')
     a = ap.parse_args()
     cfg = json.loads(a.config.read_text())
     workload = json.loads(a.workload.read_text())['workloads'][0]
+    max_new = a.max_new if a.max_new is not None else workload['generate_tokens']
+    if max_new < 1:
+        ap.error('--max-new must be positive')
     expected = (f"EARLY={workload['expected_codes'][0]}, "
                 f"MIDDLE={workload['expected_codes'][1]}, "
                 f"LATE={workload['expected_codes'][2]}, "
@@ -43,7 +58,8 @@ def main() -> int:
         raise ValueError(f'output already exists: {a.output}')
     if not a.run:
         print(json.dumps({'prompt_tokens': len(prompt), 'prompt_sha256': hashlib.sha256(
-            json.dumps(prompt, separators=(',', ':')).encode()).hexdigest(), 'expected': expected}, indent=2))
+            json.dumps(prompt, separators=(',', ':')).encode()).hexdigest(), 'max_new': max_new,
+            'expected': expected}, indent=2))
         return 0
 
     a.output.mkdir(parents=True)
@@ -53,15 +69,35 @@ def main() -> int:
     result = {'workload': workload['cell'], 'prompt_tokens': len(prompt),
               'prompt_content_sha256': hashlib.sha256(prompt_text.encode()).hexdigest(),
               'prompt_ids_sha256': hashlib.sha256(json.dumps(prompt, separators=(',', ':')).encode()).hexdigest(),
-              'expected': expected, 'state_fields': STATE_KEYS, 'arms': [], 'failures': []}
-    for window in (0, 4):
-        name = 'mtp-off' if window == 0 else 'mtp4'
+              'expected': expected, 'max_new': max_new, 'state_fields': STATE_KEYS, 'arms': [], 'failures': []}
+    arms = (('strata-control', 'strata', 0), ('ninfer-control', 'ninfer', 0)) if a.compare_strata_control else (
+        ('mtp-off', 'ninfer', 0), ('mtp4', 'ninfer', 4))
+    for name, backend, window in arms:
         log = a.output / f'{name}.log'
         command = args_for(cfg, window, disable_adaptive_swaps=True)
+        if backend == 'strata':
+            if '--expert-backend' in command:
+                command[command.index('--expert-backend') + 1] = 'strata'
+            if '--expert-backend-strict' in command:
+                command.remove('--expert-backend-strict')
+        arm_env = dict(env)
+        if a.dump_gdn:
+            arm_env['STRATA_STATE_DUMP_GDN'] = str((a.output / f'{name}.gdn.bin').resolve())
+            dump_at = a.dump_gdn_at if a.dump_gdn_at is not None else len(prompt) + max_new - 1
+            arm_env['STRATA_STATE_DUMP_GDN_AT'] = str(dump_at)
+        if a.capture_moe_layer is not None:
+            for kind in ('ROUTE', 'INPUT', 'PARTS', 'OUTPUT'):
+                stem = f'STRATA_VERIFY_DUMP_MOE_{kind}'
+                arm_env[f'{stem}_LAYER'] = str(a.capture_moe_layer)
+                arm_env[f'{stem}_PATH'] = str((a.output / f'{name}.layer{a.capture_moe_layer}.{kind.lower()}').resolve())
+                if kind in ('ROUTE', 'PARTS', 'OUTPUT'):
+                    arm_env[f'{stem}_BATCH'] = '1'
+                if a.capture_moe_position is not None:
+                    arm_env[f'{stem}_POSITION'] = str(a.capture_moe_position)
         engine = StrataEngine(str(a.engine.resolve()), command, cwd=cfg.get('cwd'),
-                              log=str(log), env=env)
+                              log=str(log), env=arm_env)
         try:
-            ids = [token for token in engine.generate(prompt, workload['generate_tokens'],
+            ids = [token for token in engine.generate(prompt, max_new,
                     {'temperature': 0}, threading.Event()) if token is not None]
             # The engine intentionally yields its terminal chat token; compare
             # the user-visible answer after removing that protocol marker.
@@ -71,7 +107,7 @@ def main() -> int:
             arm = {'name': name, 'window': window, 'args': command, 'ids': ids,
                    'text': text, 'state': states[0], 'usage': dict(engine.last)}
             result['arms'].append(arm)
-            if text != expected:
+            if max_new == workload['generate_tokens'] and text != expected:
                 result['failures'].append(f'{name}: exact answer mismatch: {text!r}')
         except Exception as exc:
             result['failures'].append(f'{name}: {type(exc).__name__}: {exc}')
@@ -83,9 +119,10 @@ def main() -> int:
         result['final_state_equal'] = all(off['state'].get(k) == mtp['state'].get(k) for k in STATE_KEYS)
         result['state_differing_fields'] = [k for k in STATE_KEYS if off['state'].get(k) != mtp['state'].get(k)]
         if not result['token_ids_equal']:
-            result['failures'].append('MTP-off and MTP4 token IDs differ')
+            result['failures'].append(f"{off['name']} and {mtp['name']} token IDs differ")
         if not result['final_state_equal']:
-            result['failures'].append('MTP-off and MTP4 final state differ')
+            result['failures'].append(f"{off['name']} and {mtp['name']} final state differ")
+    result['exact_answer_check'] = max_new == workload['generate_tokens']
     result['passed'] = not result['failures'] and len(result['arms']) == 2
     (a.output / 'results.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps({k: result.get(k) for k in ('passed', 'failures', 'token_ids_equal',

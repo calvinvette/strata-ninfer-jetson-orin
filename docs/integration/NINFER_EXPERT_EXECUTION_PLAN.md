@@ -113,8 +113,9 @@ have bounded Q2_0 prototype evidence. E5 has MTP-2/MTP-4 cancellation,
 accepted-prefix, continuation/recovery and short retrieval/arithmetic evidence.
 E4 explicitly leaves the mixed-codec
 Coder IQ1_M and ISTA-DASLab IQ3_S models unsupported by
-the NInfer selector; E5 remains in progress for held-out long-task, quality and
-adaptive-residency coverage, with E6–E7 pending. E2's resident schedule and
+the NInfer selector; E5 remains in progress for cross-backend numerical
+acceptance and wider quality coverage, with adaptive residency explicitly
+excluded from the static profile; E6–E7 remain pending. E2's resident schedule and
 E3's staged-miss schedule both failed the initial performance screens. The
 default remains Strata and the NInfer path remains experimental. Each stage
 produces a small source/evidence change and
@@ -383,7 +384,19 @@ An exact 512-token retrieval-plus-arithmetic task also passed with strict NInfer
 and MTP off/4: both arms returned the exact three codes and suffix sum in 47
 tokens, with identical token IDs and final persistent state. The single-run
 timings are not an effect estimate. See the [retrieval task report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-retrieval-check/README.md).
-Held-out long retrieval/scoring and wider prompt/quality coverage remain open.
+A held-out 4,096-token version also returned the exact answer in both arms, with
+identical tokens and final NInfer state; see the [long retrieval report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-long-retrieval/README.md).
+A separate MTP-off default-Strata/strict-NInfer comparison returned the same
+short-task tokens but showed substantial persistent-state movement. The first
+committed-token GDN relative L2 was 0.0902; layer captures show a small expert
+arithmetic difference at model layer 1 and a larger activation difference by
+layer 2. The same exact-answer and token-ID result held at 4K context, while
+state fingerprints still differed. These are not in-flight backend migration
+tests, but they leave the cross-backend numerical acceptance bound unresolved.
+See the [short state comparison](../../bench/results/2026-10-25-phase-e5-q2-ninfer-backend-regression/README.md)
+and [4K task comparison](../../bench/results/2026-10-25-phase-e5-q2-ninfer-long-backend-regression/README.md).
+Wider task/quality coverage and that numerical bound remain open; keep NInfer
+opt-in and do not treat exact short-task text as sufficient state evidence.
 
 ### E6 — Demonstrate end-to-end performance and context behavior
 
