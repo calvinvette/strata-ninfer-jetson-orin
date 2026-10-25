@@ -42,14 +42,16 @@ mathematical reference, not a claim of parity with ggml or a CUDA kernel. E2 mus
 compare it with a separately linked trusted Q2_0 decoder and define numerical
 bounds before performance screening.
 
-For a real-payload spot check, the first 64 blocks of
-`blk.0.ffn_down_exps.weight` in shard 1 were decoded both by Strata's scalar C++
-utility and by the Python byte-level oracle. The C++ checksum was
-`sum=0.6449966431`, `sumabs=33.21868134`; Python produced the same printed values
-(absolute differences `3.36e-11` and `4.55e-9`). The C++ utility also checked
-eight Q2_0 tensors × their first 64 blocks against the structural code/scale
-invariant with zero violations. This cross-check detects layout/decoder mistakes
-between two implementations but is not an independent ggml comparison.
+For a real-payload spot check, the first 64 blocks of eight Q2_0 tensors in shard
+1 were decoded by the Python byte-level oracle and the linked
+`dequantize_row_q2_0` from llama.cpp/ggml commit
+`3cf03257f219afbe7334045ff7c6a06ac68c627d`. All 32,768 decoded FP32 values
+matched bit-for-bit; all eight sum and absolute-sum checksums matched. For
+`blk.0.ffn_down_exps.weight`, the checksums were `sum=0.6449966431` and
+`sumabs=33.21868134`. Strata's C++ utility also checked eight Q2_0 tensors ×
+their first 64 blocks against the structural code/scale invariant with zero
+violations. This qualifies sampled codec decoding only; the full tensor payloads,
+real-activation projections, and CUDA adapter remain untested.
 
 Expected execution arithmetic: input activations are the represented values
 delivered to the adapter; decoded Q2_0 weights are exact in binary16 scale and
