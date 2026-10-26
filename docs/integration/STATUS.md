@@ -5721,12 +5721,11 @@ drift near first-layer arithmetic/state update but does not identify a specific
 operation. See both [layer-1 and layer-2 oracle results](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/README.md#state-and-route-localization).
 
 The same held-out retrieval/arithmetic task also returned the exact answer and
-matching token IDs on CPU-miss and strict staged routes at 4K and 8K prompts,
-with identical startup residency maps. Final state hashes still differed in
-six fields at 4K and five at 8K. The 8K GDN state had 3.16% global relative L2
-over 29.4M floats; a corrected 4K rerun measured 2.65% over the same number of
-floats. Minimum available memory was 11.28 GiB at 8K. GDN error was not
-monotonic with prompt length. This supports functional behavior for this task
-at three lengths, while staged state parity and broader workload quality remain
-open. The sequential runs are not performance evidence. See the [4K/8K
-follow-up](../../bench/results/2026-10-26-e6-staged-retrieval-context-followup/README.md).
+matching token IDs on CPU-miss and strict staged routes at 4K, 8K and 16K
+prompts, with identical startup residency maps. Final state hashes still
+differed in six fields at all three lengths. GDN global relative L2 was 2.65%
+at 4K, 3.16% at 8K and 2.57% at 16K over 29.4M floats. Minimum available
+memory was 10.85 GiB at 16K. GDN error was not monotonic with prompt length.
+This supports functional behavior for this task at four lengths, while staged
+state parity and broader workload quality remain open. The sequential runs are
+not performance evidence. See the [4K/8K/16K follow-up](../../bench/results/2026-10-26-e6-staged-retrieval-context-followup/README.md).
