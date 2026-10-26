@@ -79,3 +79,14 @@ not CLI startup or runtime qualification. maestro1 provides x86_64 portability
 evidence only; no HIP/SYCL accelerator execution or Orin performance was
 measured. Build output, help output and hashes are in
 [`evidence/current-source-44db5484/`](evidence/current-source-44db5484/).
+
+## 2026-10-26 follow-up on expert-ID-filtered Q8_1 arithmetic
+
+The `strata` and `native_expert_parity` targets rebuilt at exact source commit
+`6b419221a0d712d18685b19df27e059fc455841f` on maestro1 with parallelism 1.
+HIP build/link, `strata --help`, and the Q8_1 selector contract all passed. The
+SYCL targets also built and linked after sourcing the oneMKL environment for
+the final links. maestro1 has no SYCL device, so `strata --help` could not
+start; the separate SYCL parity program does not implement the selector
+contract mode. These are x86_64 compile/link checks only. See the [exact-source
+report and logs](evidence/current-source-6b419221/README.md).

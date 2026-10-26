@@ -5860,3 +5860,11 @@ divergence remained at state ordinal 4 (model layer 5; `5.07e-6` relative L2);
 minimum available memory was 11.65 GiB. This does not identify the state update
 that amplifies the small incoming delta and adds no quality/performance qualification. E6
 remains open. Compact metrics are in the [layer-3 report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#layer-3-filtered-mirror-follow-up).
+
+maestro1 rebuilt HIP and SYCL `strata` plus `native_expert_parity` at source
+commit `6b419221` with one build job. HIP build/link, CLI help and the Q8_1
+selector contract passed. SYCL build/link passed after sourcing oneMKL for the
+final links; its CLI could not start because the host exposes no SYCL device,
+and its separate parity executable lacks the selector-contract mode. This is
+x86 compile/link evidence only, with no accelerator runtime or Orin performance
+claim. [Build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/evidence/current-source-6b419221/README.md).
