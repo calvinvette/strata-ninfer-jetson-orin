@@ -3089,3 +3089,12 @@ policy fixed in paired controls. Require an independent arithmetic/state
 oracle, then apply the predeclared request-level effect threshold before
 running confirmation or proposing a profile. Keep per-kernel parity, GPU
 execution, build success and product-level benefit as separate claims.
+
+The 240,286-token Q2_0 retrieval comparison initially hit Strata's 60-second
+no-progress watchdog after verifier capture. Repeating the same functional
+check with an experiment-only 300-second allowance let both backends finish and
+match the exact answer, generated IDs and final state. For future Splash work,
+separate progress checkpoints by phase and make no-progress limits account for
+the request size and post-verifier work; a timeout alone does not identify a
+deadlock. This retry was one sequential pair and supplies no performance
+estimate. See the [near-cap Q2_0 report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-240k-retrieval/README.md).

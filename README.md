@@ -52,6 +52,12 @@ remains a screening set. Separate functional checks of an actual retrieval
 prompt matched Strata's answer, generated tokens and persistent state through
 128K input tokens; these are single-task correctness results, not performance
 estimates or near-limit 256K qualification. See the [128K retrieval record](bench/results/2026-10-25-phase-e5-q2-ninfer-128k-retrieval/README.md).
+A separate actual 240,286-token retrieval prompt under a 262,144-token cap
+matched the exact answer, token IDs and all nine final state fields across the
+Strata and strict-NInfer arms. Minimum available memory was 11.44 GiB. This is
+one held-out task per backend, not a general quality or performance
+qualification; the successful run used an experiment-only 300-second watchdog
+allowance. See the [near-256K retrieval record](bench/results/2026-10-25-phase-e5-q2-ninfer-240k-retrieval/README.md).
 No general performance-qualified profile is available,
 so this option remains experimental. See the [E6 results](bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md)
 and [full E7 assessment](docs/integration/NINFER_E7_RELEASE_ASSESSMENT.md).

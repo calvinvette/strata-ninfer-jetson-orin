@@ -11,6 +11,10 @@ screen is complete, but its performance gate failed, and the E7 assessment
 proposes no NInfer release profile. NInfer remains opt-in and the default path
 remains Strata. See the [release assessment](NINFER_E7_RELEASE_ASSESSMENT.md)
 and [current status](STATUS.md) for tested limits and unresolved build checks.
+A 240,286-token held-out retrieval under a 262,144-token cap now passes exact
+answer, generated-token and final-state parity for the Q2_0 Strata/NInfer pair;
+this is one functional workload, not general long-context quality or
+performance qualification.
 
 The earlier phases have bounded closeouts for their tested Strata changes,
 correctness gates and profiles. Those closeouts do not establish NInfer expert
