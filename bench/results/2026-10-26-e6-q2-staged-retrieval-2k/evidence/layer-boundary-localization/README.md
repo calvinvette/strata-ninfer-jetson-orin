@@ -177,12 +177,12 @@ state captures remain local.
 The final `gdn_parity` source, including checked CUDA resource cleanup and
 single-field swaps, passed the Orin CUDA build and the 84-case self-test. The
 executable SHA-256 is recorded in `position-sweep-summary.json`. At source
-commit `cc8d1faf`, maestro1 rebuilt and linked the HIP target with two jobs.
+commit `07ed49d7`, maestro1 rebuilt and linked the HIP target with two jobs.
 This is x86 compile/link evidence only; maestro1 has no relevant
 accelerator runtime. The configured SYCL `gdn_parity` target uses the separate,
 unchanged `sycl/src/kernels/gdn_parity.cpp`, so it had no work for this
 CUDA/HIP-only source change. The HIP executable SHA-256 is
-`e49a9d45039909e55413e654c50b23abade22bf61b33f1cebc1e24c905604ff1`.
+`fa0ddc7b8fb1d712567593d0153c9748ea51926c513b83f4f3ba02574b48055e`.
 
 Reproduce on the Orin with the matching captured raw files using:
 
@@ -190,6 +190,11 @@ Reproduce on the Orin with the matching captured raw files using:
 cmake --build build/integration/e0-cuda-build --target gdn_parity --parallel 2
 build/integration/e0-cuda-build/gdn_parity --selftest
 build/integration/e0-cuda-build/gdn_parity --replay-crossover \
+  bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/gdn-state-step-sweep/cpu-miss.gdn-commit \
+  bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/gdn-state-step-sweep/ninfer-staged.gdn-commit \
+  bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer1-position-sweep/cpu-miss.layer1.gdn-diag \
+  bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer1-position-sweep/ninfer-staged.layer1.gdn-diag
+build/integration/e0-cuda-build/gdn_parity --replay-crossover-window 2044 2045 2046 \
   bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/gdn-state-step-sweep/cpu-miss.gdn-commit \
   bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/gdn-state-step-sweep/ninfer-staged.gdn-commit \
   bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer1-position-sweep/cpu-miss.layer1.gdn-diag \
