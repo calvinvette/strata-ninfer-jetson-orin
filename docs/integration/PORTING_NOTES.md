@@ -3210,5 +3210,7 @@ expert outputs; test a shared activation against both kernels, then compare
 each route against an independent oracle. Carry resulting differences through
 selected K/V and committed recurrent state, and keep this diagnostic selector
 off serving defaults until its quality and performance are separately
-qualified. The paired captures and numerical details are in the [E6
+qualified. Use
+[`compare_q8_1_activation_capture.py`](../../tools/integration/compare_q8_1_activation_capture.py)
+to compare F32 inputs, integer codes and FP16 scales independently. The paired captures and numerical details are in the [E6
 report](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#remaining-layer-3-activation-scale-boundary).

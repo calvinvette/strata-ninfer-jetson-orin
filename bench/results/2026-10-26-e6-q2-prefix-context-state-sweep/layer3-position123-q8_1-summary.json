@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "format": "STMO input; Q8_1 via q2_0_expert_oracle.quantize_q8_1",
+  "reference": "bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/128-qsa-stages/run16/cpu-miss.layer3.input",
+  "candidate": "bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/128-qsa-stages/run16/ninfer-staged.layer3.input",
+  "positions": [
+    {
+      "position": 123,
+      "token_id": 198,
+      "f32": {
+        "count": 2560,
+        "different": 2048,
+        "relative_l2": 1.590096646254369e-07,
+        "max_abs": 4.76837158203125e-07
+      },
+      "q8_1": {
+        "block_count": 80,
+        "integer_codes_different": 0,
+        "scales_different": 1,
+        "different_blocks": [
+          {
+            "block": 61,
+            "code_values_different": 0,
+            "reference_scale": 0.0083160400390625,
+            "candidate_scale": 0.00832366943359375,
+            "scale_different": true
+          }
+        ]
+      }
+    }
+  ]
+}

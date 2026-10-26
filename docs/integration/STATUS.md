@@ -5985,3 +5985,6 @@ tiny upstream activation change; it is a local explanation, not whole-model
 state qualification. At layer-3 QSA position 125, selected K/V and attention
 were exact, so that sampled attention operation adds no delta. [Remaining
 state trace](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#remaining-layer-3-activation-scale-boundary).
+The new Q8_1 capture comparator separates integer-code and FP16-scale changes;
+its four tests pass, and the derived position-123 summary is linked from the
+report.

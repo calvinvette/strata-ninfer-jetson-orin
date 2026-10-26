@@ -200,7 +200,22 @@ not the position-125 attention arithmetic. This is not a complete prompt-wide
 trace or a state-quality pass. The full checker still failed final-state
 equality; minimum available/admission memory stayed above 11.26 GiB, and EMC
 and energy were unavailable. Raw run14/run15/run16 captures and the expert-394
-oracle outputs remain local-only.
+oracle outputs remain local-only. The reusable
+[`compare_q8_1_activation_capture.py`](../../../tools/integration/compare_q8_1_activation_capture.py)
+reports F32 deltas separately from Q8_1 code and scale changes. Its four
+synthetic tests passed with
+`python3 tools/integration/test_compare_q8_1_activation_capture.py`. The
+derived position-123 summary is in
+[`layer3-position123-q8_1-summary.json`](layer3-position123-q8_1-summary.json).
+Recreate the representation comparison on the Orin with:
+
+```bash
+python3 tools/integration/compare_q8_1_activation_capture.py \
+  bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/128-qsa-stages/run16/cpu-miss.layer3.input \
+  bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/128-qsa-stages/run16/ninfer-staged.layer3.input \
+  --position 123 \
+  --output bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/layer3-position123-q8_1-summary.json
+```
 
 ## Expert 114 CUDA operator check
 
