@@ -678,6 +678,10 @@ changed seven other CPU-executed rows that had matched under the default owner
 split; selecting it for all Q2_0 layers did not restore state parity. Keep this
 as diagnostic-only; do not promote it or infer a performance benefit. Full
 results are in the [layer-boundary report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md).
+The shared CPU source rebuilt successfully for HIP and SYCL on maestro1 at
+`44db5484`. HIP CLI help passed; SYCL compiled and linked but could not start
+without a device on this host. This is x86_64 portability evidence only. See
+the [backend build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-the-q2_0-cpu-arithmetic-mirror).
 
 ### E7 — Assess release of the demonstrated integration
 

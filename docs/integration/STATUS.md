@@ -5798,3 +5798,10 @@ L2); all six final state fields still differed. Applying the selector to all
 Q2_0 layers also did not restore final-state parity. The CPU mirror is not a
 qualified fix, remains opt-in, and has no performance result. See the [layer
 boundary report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md).
+
+The opt-in Q2_0 CPU arithmetic mirror change at `44db5484` rebuilt
+successfully for HIP and SYCL on maestro1 with two build jobs. HIP `strata
+--help` passed. SYCL compile/link passed, but its help startup aborted because
+maestro1 exposes no SYCL device/platform. This is x86_64 source portability
+evidence only; no accelerator execution or Orin performance was measured. See
+the [current-source backend build report](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-the-q2_0-cpu-arithmetic-mirror).

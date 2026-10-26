@@ -60,3 +60,22 @@ Both binaries remain on maestro1. No accelerator execution or Orin performance
 was measured. The previous-source evidence above remains valid for commit
 `1f9f116b181ef0503f4203f26922b90e213d4615`; it must not be treated as
 help/runtime evidence for this newer source commit.
+
+## 2026-10-26 follow-up on the Q2_0 CPU arithmetic mirror
+
+The HIP and SYCL Release build trees were incrementally rebuilt at exact
+source commit `44db548402b193202703256da81d75720312cc8d`, with parallelism 2.
+Both rebuilt the changed `src/kernels/cpu/native_expert.cpp` and linked their
+configured targets successfully. HIP `strata --help` passed after adding the
+installed ROCm libraries to `LD_LIBRARY_PATH`. Its binary SHA256 is
+`329331de34fc6eba6132996ec5be96aa545a61a28b1c87b602972fbe02f65efa`.
+
+SYCL compiled and linked all six remaining steps after sourcing the installed
+oneAPI compiler and oneMKL environments. The resulting binary SHA256 is
+`a966bc9df42f15b40ea80ff5a25e7262c91a3005fd42899668b91d46f38baa10`.
+`strata --help` aborted with “No device of requested type available,” and
+`sycl-ls` reported no platforms. This is compile/link evidence only for SYCL,
+not CLI startup or runtime qualification. maestro1 provides x86_64 portability
+evidence only; no HIP/SYCL accelerator execution or Orin performance was
+measured. Build output, help output and hashes are in
+[`evidence/current-source-44db5484/`](evidence/current-source-44db5484/).
