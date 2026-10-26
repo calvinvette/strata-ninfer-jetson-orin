@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **E0–E5 bounded implementation evidence complete; corrected Q2_0 grouped SwiGLU parity restored; one 6-GiB staged TTFT cell passed seven-pair confirmation, while broader E6 exit and E7 release gates remain open (2026-10-25)**.
+Status: **E0–E5 bounded implementation evidence complete; corrected Q2_0 grouped SwiGLU parity restored; one 6-GiB staged TTFT cell passed seven-pair confirmation, while broader E6 exit and E7 release gates remain open (updated 2026-10-26)**.
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -501,6 +501,15 @@ tokens under a 256K cap. Minimum available memory was 11.40 GiB, with no cgroup
 memory events. This is one task at 128K; near-limit 256K ingestion and broader
 quality coverage remain open. See the [128K retrieval
 report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-128k-retrieval/README.md).
+A 240,286-token held-out retrieval/arithmetic prompt under a 262,144-token cap
+also completed with both the Strata control and strict NInfer. Both captured
+the 2-token and 1-token verifier windows, returned the exact answer, matched all
+generated token IDs and all nine final state fields, with minimum available
+memory of 11.44 GiB and no cgroup memory events. The earlier 60-second native
+watchdog attempt stopped before completion; the bounded retry used an
+experiment-only 300-second watchdog allowance and passed. Its single
+sequential pair has descriptive timings only, not a performance estimate. See
+the [240K retrieval report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-240k-retrieval/README.md).
 A pre-fix MTP-off default-Strata/strict-NInfer comparison returned the same
 short-task tokens but showed substantial persistent-state movement. The first
 committed-token GDN relative L2 was 0.0902; layer captures show a small expert

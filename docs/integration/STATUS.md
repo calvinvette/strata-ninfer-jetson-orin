@@ -1,6 +1,6 @@
 # Integration status
 
-Updated: 2026-10-25. Phases 1 through 4 are complete for their documented tested
+Updated: 2026-10-26. Phases 1 through 4 are complete for their documented tested
 Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 is
 complete for its bounded Orin qualification matrix under [its closeout]
 (PHASE7_CLOSEOUT.md), and Phase 8 is complete for the bounded Q2_0 release
@@ -72,6 +72,15 @@ An actual 128K prompt also passed exact retrieval, token-ID and all-nine-field
 state comparisons under a 256K cap; minimum available memory was 11.40 GiB
 with zero cgroup events. This does not establish near-limit 256K quality or
 performance. See the [128K retrieval report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-128k-retrieval/README.md).
+A 240,286-token held-out retrieval/arithmetic prompt under a 262,144-token cap
+also completed on both backends: exact answer, generated token IDs and all nine
+final state fields matched. The strict-NInfer resident grouped Q2_0 dispatch
+was observed, minimum available memory was 11.44 GiB and cgroup memory events
+were zero. This single sequential pair is functional evidence; its prompt and
+decode timings are descriptive only. The previous 60-second watchdog failure
+was resolved for this request with an experiment-only 300-second allowance;
+runtime defaults remain unchanged. See the [240K retrieval
+report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-240k-retrieval/README.md).
 E7 assessment proposes no
 general release profile; HIP/SYCL build evidence is outstanding, and NInfer
 remains opt-in. See the [E7
