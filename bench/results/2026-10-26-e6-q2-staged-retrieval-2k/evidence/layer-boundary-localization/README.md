@@ -162,6 +162,8 @@ this second sample. These adjacent windows show that local sensitivity depends
 on the captured state and inputs; they do not support a general ranking of
 input versus state effects. See
 [`gdn-recurrence-crossover-window-2045-2046.json`](gdn-recurrence-crossover-window-2045-2046.json).
+The replay utility now derives the route-match flag from measured state
+differences and exits nonzero if either route fails bitwise reproduction.
 
 This is a local perturbation result, not a numerical oracle for the full model:
 the replay sets gamma to zero because only recurrent state is compared, and it

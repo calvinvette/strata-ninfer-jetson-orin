@@ -278,6 +278,8 @@ int replay_crossover(int64_t start_position, int64_t position_a, int64_t positio
     const auto beta_only = replay_gdn(cpu_start, beta_only_inputs, channels, heads, value_dim, h_k, position_a, position_b);
     const auto m_cpu = state_metrics(cpu_actual, cc.second, recurrent);
     const auto m_staged = state_metrics(staged_actual, ss.second, recurrent);
+    const bool route_matched_bitwise = m_cpu.different == 0 && m_cpu.max_abs == 0.0 &&
+                                       m_staged.different == 0 && m_staged.max_abs == 0.0;
     const auto input_cpu_a = state_metrics(cc.first, cs.first, recurrent);
     const auto input_cpu_b = state_metrics(cc.second, cs.second, recurrent);
     const auto input_staged_a = state_metrics(sc.first, ss.first, recurrent);
@@ -299,7 +301,7 @@ int replay_crossover(int64_t start_position, int64_t position_a, int64_t positio
     std::printf(
                 "  \"geometry\": {\"state_size\": 128, \"key_heads\": 16, \"value_heads\": 48},\n"
                 "  \"scope\": \"CUDA state recurrence only; gamma is zero and normalized output is not evaluated\",\n"
-                "  \"route_matched_replays_bitwise\": true,\n");
+                "  \"route_matched_replays_bitwise\": %s,\n", route_matched_bitwise ? "true" : "false");
     print("replay_vs_captured_cpu", m_cpu, true); print("replay_vs_captured_staged", m_staged, true);
     auto emit_position = [&](const char* label, int64_t pos, const StateMetrics& input_cpu,
                              const StateMetrics& input_staged, const StateMetrics& state_cpu,
@@ -319,7 +321,7 @@ int replay_crossover(int64_t start_position, int64_t position_a, int64_t positio
     emit_position("position", position_b, input_cpu_b, input_staged_b, state_cpu_b,
                   state_staged_b, gate_only_b, beta_only_b, false);
     std::printf("}\n");
-    return 0;
+    return route_matched_bitwise ? 0 : 2;
 }
 
 }  // namespace
