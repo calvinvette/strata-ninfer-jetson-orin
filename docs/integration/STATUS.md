@@ -6044,18 +6044,24 @@ does not locate the upstream source or establish numerical correctness.
 Two repeats with same-pair layer-0 MoE and layer-1 GDN captures reproduced
 identical per-position metrics: exact layer-0 inputs/routes, small expert-row
 and combined-output deltas, then larger layer-1 GDN input deltas. The requested
-residual-boundary capture at layer 0 / position 2043 emitted no record, so the
-residual step is still unmeasured. Both runs failed final-state parity; no
-correctness or performance gate is closed. [Capture repeat summary](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#repeated-layer-0-to-layer-1-capture).
+residual-boundary capture at layer 0 / position 2043 emitted no record in
+these initial runs. Follow-up telemetry located a missing multirow ordinary-
+verifier capture path; the hook was extended to support it and a later pair
+successfully captured the residual boundary. All pairs failed final-state
+parity; no correctness or performance gate is closed. [Capture report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#repeated-layer-0-to-layer-1-capture).
 
-The current-source diagnostic now reports why an opt-in boundary capture did
-not produce a file. In a third paired run, both arms ended with
-`copy_queued=1`, `batch_graph=0`, and `target_seen=0` for layer 0 / position
-2043: a D2H copy was queued, but the requested position reached neither the
-single-token writer nor the batch writer. This rules out a simple file-write
-failure; the capture-path/position mismatch remains unexplained, so the
-residual is still unmeasured and no gate is closed. The pair again failed final
-state parity. See the [telemetry follow-up](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#capture-path-telemetry-follow-up).
+In the third paired run, both arms ended with `copy_queued=1`,
+`multirow_graph=0`, `batch_writer=0`, and `target_seen=0` for layer 0 / position
+2043. A fourth run confirmed the slot-batch writer was not used. The missing
+case was the ordinary verifier's multirow window; adding row-aware graph
+copies and output writing made the boundary capture succeed in a fifth pair.
+The layer-0 input residual and injection were bitwise equal. The MoE output
+delta was `2.90e-8` relative L2, the next layer's residual delta was
+`3.11e-8`, and its read activation delta was `6.19e-8`. This locates the first
+cross-arm difference at the layer-0 combined MoE output and measures its
+propagation into the next layer read. The pair again failed persistent-state
+parity and does not close a correctness or performance gate. [Capture and
+telemetry report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#multirow-ordinary-verifier-boundary-capture).
 
 The diagnostic source commit `db95a63c874fa0a7cfc9cff450696cd3a9083990`
 rebuilt successfully on Orin CUDA and maestro1 HIP. HIP `strata --help` passed;

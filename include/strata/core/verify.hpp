@@ -410,9 +410,10 @@ private:
     size_t boundary_diag_storage_capacity_ = 0; ///< pinned payload storage for all verifier batch rows
     std::string boundary_diag_path_;
     bool boundary_diag_captured_ = false;
-    bool boundary_diag_batch_graph_captured_ = false;
+    bool boundary_diag_multirow_graph_captured_ = false;
     bool boundary_diag_copy_queued_ = false;
     bool boundary_diag_target_seen_ = false;
+    bool boundary_diag_batch_writer_called_ = false;
     int qsa_diag_layer_ = -1;
     int64_t qsa_diag_position_ = -1;
     uint8_t* qsa_diag_h_ = nullptr; ///< opt-in pinned QSA input/selection/attention/output capture

@@ -900,19 +900,22 @@ Execution note (2026-10-26): two same-day repeats captured layer-0 MoE and
 layer-1 GDN stages in the same request pair. Their per-position metrics matched
 exactly: layer-0 routes/input were exact, a few expert rows differed at
 `~1e-8` scale, and combined output deltas were `2.11e-8`–`3.05e-8`; layer-1
-GDN input deltas were `5.48e-8`–`1.25e-7`. A requested layer-0 residual-boundary
-record was not emitted, so the intervening residual remains unmeasured. The
-requests still failed final-state parity. See the [repeat and capture-limit
+GDN input deltas were `5.48e-8`–`1.25e-7`. The first two requested layer-0
+residual-boundary records were not emitted. Follow-up telemetry localized the
+missing ordinary-verifier multirow hook; it was then implemented and captured
+in a fifth pair. The requests still failed final-state parity. See the [repeat and capture-limit
 report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#repeated-layer-0-to-layer-1-capture).
 
-Execution note (2026-10-26): a third paired run used current-source capture
-bookkeeping. Both arms reported `copy_queued=1`, `batch_graph=0`,
-`target_seen=0` for layer 0 / position 2043. A device-to-host copy was queued,
-but the requested position did not reach either output writer; this is not a
-file-write failure. The exact capture-path/position mismatch is still
-unresolved, and the intervening residual remains unmeasured. Both requests
-again failed persistent-state parity. See the [capture-path telemetry
-follow-up](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#capture-path-telemetry-follow-up).
+Execution note (2026-10-26): current-source telemetry found the requested
+position was outside the slot-batch writer path. Extending the ordinary
+verifier boundary capture to multirow windows produced matching-format
+layer-0 / position-2043 records in a fifth pair. The input residual and
+injection matched bitwise; the combined MoE output differed by `2.90e-8`
+relative L2, the next-layer residual by `3.11e-8`, and its read activation by
+`6.19e-8`. This directly measures the first cross-arm difference at the
+layer-0 combined MoE output and its propagation to the next layer. Both arms
+still failed persistent-state parity; E6 correctness and performance gates
+remain open. See the [multirow boundary capture report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#multirow-ordinary-verifier-boundary-capture).
 
 Execution note (2026-10-26): commit `db95a63c874fa0a7cfc9cff450696cd3a9083990`
 rebuilt for Orin CUDA and maestro1 HIP; HIP and SYCL `strata --help` checks

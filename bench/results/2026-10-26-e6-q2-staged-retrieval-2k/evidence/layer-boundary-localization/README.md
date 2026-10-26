@@ -402,25 +402,46 @@ returned the same generated token and residency map but failed final-state
 parity. Minimum available/admission memory was 11.55–11.61 GiB; these are
 localization runs, not performance or quality measurements.
 
-Both runs also requested the layer-0 residual-boundary record at position
-2043. The engine logs reported allocating the capture buffer, but neither arm
-wrote a boundary record. This capture cell is unsupported; the MoE output and
-next-layer GDN input cannot be equated or used to attribute the intervening
-residual delta. Do not infer the missing value. The [paired summary](layer0-to-layer1-current/summary.json)
-records the repeats and the failed capture explicitly. Raw files remain
-local-only.
+Both initial runs also requested the layer-0 residual-boundary record at
+position 2043, but neither arm wrote it. Follow-up telemetry showed that the
+batch writer was not called. The request used the ordinary verifier's
+multirow path, while boundary copying supported only single-row ordinary
+windows and the distinct slot-batch path. That left the residual unmeasured in
+those initial repeats. A multirow ordinary-verifier capture was then added and
+validated in a fourth pair below. The earlier failed attempts remain part of
+the record; raw files remain local-only.
 
 ### Capture-path telemetry follow-up
 
-A third same-day pair was run with teardown telemetry enabled in the current
-source. Both arm logs reported `copy_queued=1`, `batch_graph=0`, and
-`target_seen=0` for the requested layer-0 / position-2043 boundary. The copy
-queue flag proves that the boundary hook queued at least one D2H copy; the
-target flag and batch-graph flag show that it neither passed position 2043 to
-the single-token writer nor recorded the batch boundary hook. No boundary file
-was emitted. This excludes a simple file-open/write failure, but does not yet
-identify why this verifier run's capture path did not expose the requested
-position to the writer. The capture remains unsupported and the residual step
-remains unmeasured. The request again failed final persistent-state parity.
-This telemetry does not change the measured MoE or GDN values and is not a
-performance result. Raw run3 captures and logs remain local-only.
+A third same-day pair added teardown telemetry; both arms reported
+`copy_queued=1`, `multirow_graph=0`, `batch_writer=0`, and `target_seen=0`.
+A fourth pair with the writer-position check moved ahead of its graph check
+also reported `batch_writer=0`. The target therefore was not processed by the
+slot-batch writer, which narrowed the failure to the ordinary verifier path.
+The ordinary path had supported only one-row capture. Both pairs still failed
+final persistent-state parity. Raw run3/run4 captures and logs remain
+local-only.
+
+### Multirow ordinary-verifier boundary capture
+
+The opt-in boundary hook now captures multirow ordinary-verifier windows,
+including row groups split across streams. A fifth paired 2K run emitted
+matching-format records for layer 0 / position 2043 from both arms. The
+independent comparator found the layer-0 input residual (`layer_output_rt`)
+and injection (`layer_output_inj2`) bitwise equal. The MoE output differed in
+729 / 2,560 values, with relative L2 `2.90e-8` and max absolute delta
+`1.49e-8`. The next layer's pre-read residual differed with relative L2
+`3.11e-8`; the post-read residual showed the same cross-arm difference. The
+next-layer read activation differed in 2,495 / 10,240 values,
+with relative L2 `6.19e-8` and max absolute delta `2.86e-6`. This directly
+measures the intervening residual step: the first cross-arm difference is
+already present in the layer-0 combined MoE output and is carried into the
+next layer's read, with a small increase there.
+
+The pair produced the same generated token and residency map but failed final
+persistent-state parity in GDN, PLE, tail, pooled, pooled-full and KV fields.
+Minimum available/admission memory was 11.61 GiB. Prompt times were 58.84 s
+(CPU miss) and 58.75 s (NInfer staged); this diagnostic pair is not a
+performance comparison or quality qualification. The [compact boundary
+comparison](layer0-to-layer1-current/run5/boundary-comparison.json) and raw
+captures remain local pending the normal evidence-retention decision.
