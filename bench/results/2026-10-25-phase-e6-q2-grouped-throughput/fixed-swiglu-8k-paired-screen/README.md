@@ -22,6 +22,14 @@ a performance estimate or confirmation interval.
 | 557 + 64 | +0.21 / −1.63 / +1.99% | +0.21% | −0.09 / −1.58 / +0.94% | −0.09% | −0.25% | +1.72% |
 | 1,069 + 64 | −0.43 / −1.11 / −0.70% | −0.70% | −0.33 / −1.10 / −0.75% | −0.75% | +0.62% | +0.84% |
 
+The [paired-effect chart](q2_0-8k-effects.svg) shows each block, the median and
+the paired-bootstrap 95% interval for TTFT and full client time. The same
+summary is available as [PNG](q2_0-8k-effects.png), [CSV](paired-effects.csv)
+and [JSON](summary.json); regenerate it with [`make_summary.py`](make_summary.py).
+Intervals resample whole paired process blocks (100,000 draws per cell, fixed
+seed). With only three pairs these intervals are screening uncertainty, not
+confirmation intervals.
+
 No workload reached the predeclared 5% useful-effect threshold at the median,
 so no seven-pair confirmation was run. The 172+64 cell's first-pair TTFT gain
 did not reproduce in the other pairs. The 2,048+128 cell had one NInfer decode

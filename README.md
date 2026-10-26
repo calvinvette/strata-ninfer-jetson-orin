@@ -39,11 +39,17 @@ for Flash-Next geometry 2560/640. The default remains `strata`; strict mode
 rejects unsupported codec or geometry pairs, while non-strict NInfer mode falls
 back. The initial packed operator was 4.36× slower than Strata at the measured
 64/128-token grouped shapes. A later four-entry, 16-lane Q2 schedule reduced
-the grouped ratio to 1.107×/1.120× and matched the one-entry operator, but a
-new three-pair 8K service screen still found NInfer client total 2.74% slower
-and TTFT 2.70% slower. The context capacity matrix is one request per cell and
-is screening evidence only. No performance-qualified profile is available, so
-this option remains experimental. See the [E6 results](bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md)
+the grouped ratio to 1.107×/1.120× and matched the one-entry operator. After a
+precision fix restored exact SwiGLU Q8_1 parity, a randomized three-pair 8K
+screen across five natural-generation shapes matched every output and resident
+map, but median TTFT changes ranged from −1.59% to +0.21%; no cell met the 5%
+screen threshold. One short-request 6-GiB staging profile separately passed a
+seven-pair TTFT gate (−5.96%, paired-bootstrap 95% interval −6.23% to −5.80%),
+but that effect is limited to its `1+1` workload and does not establish a
+general profile. The [Q2_0 8K paired-effect chart](bench/results/2026-10-25-phase-e6-q2-grouped-throughput/fixed-swiglu-8k-paired-screen/q2_0-8k-effects.svg)
+includes individual pairs and bootstrap intervals. The context capacity matrix
+remains a screening set. No general performance-qualified profile is available,
+so this option remains experimental. See the [E6 results](bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md)
 and [full E7 assessment](docs/integration/NINFER_E7_RELEASE_ASSESSMENT.md).
 
 Orin's CPU and GPU share its 32 GB of RAM; there is no separate 32 GB VRAM pool. The runtime leaves six GiB
