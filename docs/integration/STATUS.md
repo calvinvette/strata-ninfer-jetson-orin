@@ -6068,3 +6068,10 @@ rebuilt successfully on Orin CUDA and maestro1 HIP. HIP `strata --help` passed;
 the SYCL target was up to date because this change is confined to the CUDA/HIP
 source tree, and its model-free help also passed with oneAPI/oneMKL initialized.
 maestro1 provides x86_64 compile/startup evidence only. [Backend record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-residual-boundary-capture-telemetry).
+
+The multirow capture fix is commit `8ead1358d27b8f8e23c9ac689d62e0d694a373ae`.
+Orin CUDA rebuilt and captured the requested layer-0 boundary in both arms;
+maestro1 HIP rebuilt the modified verifier and passed `strata --help`. SYCL
+target and help also passed with oneAPI/oneMKL initialized; its separate source
+tree was unchanged. No accelerator run is claimed for maestro1. [Build and
+boundary record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-multirow-residual-boundary-capture).

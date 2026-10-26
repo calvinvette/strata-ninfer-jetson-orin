@@ -151,3 +151,25 @@ paired layer-0 / layer-1 localization capture. Its SHA256 was
 That paired diagnostic run failed the persistent-state gate and is not a
 performance result. The capture telemetry interpretation and limits are in
 the [E6 layer-boundary report](../2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#capture-path-telemetry-follow-up).
+
+## 2026-10-26 follow-up on multirow residual-boundary capture
+
+After adding ordinary-verifier multirow boundary capture, maestro1 fetched
+exact source commit `8ead1358d27b8f8e23c9ac689d62e0d694a373ae`. The HIP target
+recompiled `src/core/verify.cpp`, linked `strata_engine`, rebuilt the final
+executable and passed `strata --help` (exit 0) with ROCm libraries configured
+in `LD_LIBRARY_PATH`. The SYCL target completed successfully and was already
+up to date because its separate source tree was not changed; with oneAPI and
+oneMKL initialized, its `strata --help` also exited 0. This is compile and
+model-free startup evidence on x86_64 only; no HIP/SYCL device execution was
+available.
+
+| Backend | Source handling | Build target | `--help` | SHA256 |
+| --- | --- | --- | --- | --- |
+| HIP | Recompiled multirow capture code and relinked executable | Passed, one job | Passed, exit 0 | `bf86fb2863acd779aabcd7fdc075a9047f8707e8e9f09fbfa1ff1513246f650c` |
+| SYCL | Separate SYCL tree unchanged; target up to date | Passed | Passed with oneAPI/oneMKL environment, exit 0 | `aa99a12fc329328e8e1c43bc10b1cb26e6819a5cc0bcd188e5323f4ab90419f0` |
+
+The current Orin CUDA binary from this source had SHA256
+`54b89b408ab41350561fc0f920030187a854e7339bd23f9c02a1ef92cc895fc5` and
+emitted the layer-0 / position-2043 captures in both arms. The comparison is
+documented in the [E6 boundary report](../2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#multirow-ordinary-verifier-boundary-capture).

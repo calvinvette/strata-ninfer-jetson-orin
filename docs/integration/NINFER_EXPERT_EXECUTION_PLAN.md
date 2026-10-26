@@ -924,6 +924,15 @@ source tree unaffected by this CUDA/HIP-only diagnostic change. These checks
 do not close E6 correctness or performance gates. See the [backend build
 record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-residual-boundary-capture-telemetry).
 
+Execution note (2026-10-26): multirow residual-boundary capture commit
+`8ead1358d27b8f8e23c9ac689d62e0d694a373ae` rebuilt on Orin CUDA and maestro1
+HIP. The modified verifier compiled and linked; HIP and SYCL model-free help
+checks passed with their runtime environments. The fifth paired diagnostic
+captured the boundary and localized the first difference to layer-0 combined
+MoE output. E6 state and performance qualification remain open. See the
+[multirow boundary report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#multirow-ordinary-verifier-boundary-capture)
+and [backend build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-multirow-residual-boundary-capture).
+
 Execution note (2026-10-26): the no-trace five-workload staged-miss state
 replay completed one pair. Three of five measured response hashes matched,
 while final persistent-state fingerprints differed on all five paired
