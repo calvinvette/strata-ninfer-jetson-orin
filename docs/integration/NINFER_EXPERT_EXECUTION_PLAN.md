@@ -887,6 +887,15 @@ the prior capture exactly. The request still ended with six differing
 persistent-state hashes, so this validates the diagnostic and not the E6
 correctness or performance gate. See the [repeat capture](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#position-123-qsa-trace).
 
+Execution note (2026-10-26): a same-pair 2K prompt capture repeated layer-1
+GDN amplification at positions 2043 and 2045. QKV, convolution `h`, and `z`
+were exact, while tiny gate/beta deltas preceded `3.42e-5`/`1.31e-5` GDN
+output and `9.29e-4`/`1.85e-3` FFN output differences. Same-pair CUDA
+recurrence crossover reproduced both arms exactly and found input and
+starting-state effects vary by adjacent window. The upstream source of the
+gate/beta deltas remains unknown; full state and quality qualification remain
+open. See the [layer-1 replay report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#2026-10-26-current-source-layer-1-replay).
+
 Execution note (2026-10-26): the no-trace five-workload staged-miss state
 replay completed one pair. Three of five measured response hashes matched,
 while final persistent-state fingerprints differed on all five paired

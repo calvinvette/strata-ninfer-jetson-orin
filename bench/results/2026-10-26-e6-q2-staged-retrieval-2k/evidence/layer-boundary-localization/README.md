@@ -326,3 +326,62 @@ build/integration/e0-cuda-build/gdn_parity --replay-crossover-window 2044 2045 2
   bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer1-position-sweep/cpu-miss.layer1.gdn-diag \
   bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer1-position-sweep/ninfer-staged.layer1.gdn-diag
 ```
+
+## 2026-10-26 current-source layer-1 replay
+
+To verify the early stateful amplification with captures from the same exact
+pair, the corrected Orin binary repeated the 2,048-token CPU-miss versus strict
+NInfer staged request with layer-1 GDN stage records at positions 2043–2047 and
+committed state at positions 2042, 2044, 2046 and 2047. Source commit was
+`03806747172378e9eb5a99a2a2194c655675b236`; the `strata` binary SHA256 was
+`1b02fc2e34bfef1fd27e5e720163e4be746cc0998812eea7389e9ff4eadc6f6f`. Both
+arms emitted token 19910 and the same residency map; final persistent state
+still differed. The supervised request took 163.0 seconds, with 11.31 GiB
+minimum available/admission memory. It is a diagnostic pair, not a timing or
+quality result.
+
+At layer 1, positions 2043 and 2045 had input relative-L2 differences of
+`9.71e-8` and `1.25e-7`; QKV, convolution `h`, and `z` were exact. Gate and
+beta differed at about `6e-8` relative L2. The GDN outputs then differed by
+`3.42e-5` and `1.31e-5`, followed by FFN outputs at `9.29e-4` and `1.85e-3`.
+At neighboring positions 2044, 2046 and 2047, GDN output was exact despite
+similarly small input/gate/beta changes. The first two positions therefore
+show a repeatable but position-dependent amplification through GDN/FFN.
+
+CUDA recurrence crossover from the captured layer-1 start states reproduced
+both arms bitwise at both windows. After positions 2043 and 2044, swapping the
+captured GDN inputs changed recurrent state by `4.18e-8` and `4.35e-8` relative
+L2; swapping only the starting state changed it by `1.38e-8` and `1.14e-8`.
+Over positions 2045–2046, the corresponding input effects were `3.51e-8` and
+`3.65e-8`, while start-state effects were `4.22e-8` and `4.29e-8`. This
+confirms that both current input and accumulated state matter, with their
+relative effects changing by window. It does not identify where the captured
+gate/beta input deltas began, evaluate normalized GDN output, or establish
+which backend is correct. Layer-1 committed state remained close (`9.44e-10`
+global relative L2 across the four captured states), even though downstream
+layers later diverge materially.
+
+The 84-case `gdn_parity --selftest` passed with zero failures. The pair can be
+reproduced on Orin with:
+
+```bash
+python3 tools/integration/run_control.py \
+  --output /tmp/layer1-gdn-current-supervisor --timeout 600 --interval 1 --sample-clocks -- \
+  python3 tools/integration/ninfer_q2_retrieval_check.py \
+    --config bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/config.json \
+    --engine build/integration/e0-cuda-build/strata \
+    --workload bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/input/workload.json \
+    --output /tmp/layer1-gdn-current --compare-cpu-miss-staged --max-new 1 \
+    --capture-gdn-layer 1 --capture-gdn-positions 2043 2044 2045 2046 2047 \
+    --capture-gdn-commit-layer 1 --capture-gdn-commit-positions 2042 2044 2046 2047 --run
+build/integration/e0-cuda-build/gdn_parity --replay-crossover-model-layer 1 2042 2043 2044 \
+  /tmp/layer1-gdn-current/cpu-miss.gdn-commit /tmp/layer1-gdn-current/ninfer-staged.gdn-commit \
+  /tmp/layer1-gdn-current/cpu-miss.layer1.gdn-diag /tmp/layer1-gdn-current/ninfer-staged.layer1.gdn-diag
+build/integration/e0-cuda-build/gdn_parity --replay-crossover-model-layer 1 2044 2045 2046 \
+  /tmp/layer1-gdn-current/cpu-miss.gdn-commit /tmp/layer1-gdn-current/ninfer-staged.gdn-commit \
+  /tmp/layer1-gdn-current/cpu-miss.layer1.gdn-diag /tmp/layer1-gdn-current/ninfer-staged.layer1.gdn-diag
+```
+
+The compact [paired summary](layer1-gdn-recurrence-current/run1/summary.json)
+contains stage, commit-state, and crossover metrics. Raw diagnostic captures,
+logs and supervisor telemetry remain local-only.

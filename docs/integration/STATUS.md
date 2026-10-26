@@ -6032,3 +6032,11 @@ capture. The request again failed the persistent-state gate (six fields differ)
 with 11.29 GiB minimum available/admission RAM. This confirms diagnostic
 repeatability; E6 state, quality, and performance qualification remain open.
 [Repeat capture summary](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#position-123-qsa-trace).
+
+A same-pair 2K replay localized repeatable GDN/FFN amplification at model layer
+1 positions 2043 and 2045: QKV, `h`, and `z` were exact, but small gate/beta
+input differences preceded material output deltas. Replaying captured CUDA
+recurrence at positions 2043–2046 reproduced both arms bitwise; relative
+input-versus-start-state effects changed between the adjacent windows. This
+does not locate the upstream source or establish numerical correctness.
+[Layer-1 crossover report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#2026-10-26-current-source-layer-1-replay).
