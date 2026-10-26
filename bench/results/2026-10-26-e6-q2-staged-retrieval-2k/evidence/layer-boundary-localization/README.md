@@ -514,3 +514,30 @@ was 11.61 GiB. Next, use a final per-layer GDN state dump to identify which
 later model layer first diverges after correcting the sampled layer-0 and
 layer-1 expert rows. The complete final-state and output-quality gates remain
 open.
+
+### Layer-2 extension and first later state divergence
+
+A subsequent CPU-miss/staged pair kept the layer-0 and layer-1 expert mirrors,
+captured layer-2 MoE rows and GDN checkpoints, and dumped the final per-layer
+GDN state. The final GDN dump is bitwise equal for layers 0, 1 and 2. Layer 3
+is the first differing layer: relative L2 `1.31e-9`, maximum absolute delta
+`2.98e-8`. The difference grows over later layers. The layer-2 MoE inputs,
+routes/weights and shared output were exact, but expert rows differed for IDs
+`75, 84, 89, 114, 130` (per-row relative L2 about `8.9e-8`–`1.2e-7`), producing
+combined output deltas about `2.29e-8`–`4.00e-8`. Thus the first sampled
+unmirrored MoE arithmetic delta remains at layer 2 and immediately precedes
+the first nonzero final GDN state at layer 3. This is a local correlation, not
+yet a causal proof for the request-level state mismatch.
+
+The run generated equal token IDs and equal residency maps but failed final
+state parity in GDN, tail, pooled, pooled-full and KV. The harness also marks
+the exact-answer check false because this diagnostic used `--max-new 1`; it is
+not a workload-quality test. Minimum available/admission memory was 11.61 GiB.
+Prompt time was 59.32 s (CPU miss) and 59.03 s (NInfer staged), with one-token
+decode times 219 ms and 210 ms. These are single-pair diagnostic timings, not
+performance evidence. Compact local comparisons are in
+[`run12/moe-comparison.json`](layer2-extension/run12/moe-comparison.json) and
+[`run12/gdn-state-comparison.json`](layer2-extension/run12/gdn-state-comparison.json);
+raw large GDN dumps remain local. The next intervention mirrors only the
+layer-2 IDs above and captures layer 3 to test whether the same local
+arithmetic discrepancy explains the first layer-3 state delta.

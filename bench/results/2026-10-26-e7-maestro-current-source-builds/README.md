@@ -173,3 +173,23 @@ The current Orin CUDA binary from this source had SHA256
 `54b89b408ab41350561fc0f920030187a854e7339bd23f9c02a1ef92cc895fc5` and
 emitted the layer-0 / position-2043 captures in both arms. The comparison is
 documented in the [E6 boundary report](../2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#multirow-ordinary-verifier-boundary-capture).
+
+## 2026-10-26 follow-up on per-layer Q8_1 mirror filters
+
+The HIP and SYCL Release trees were incrementally rebuilt from exact source
+commit `35051742ab28b6be669e6650064936d1dd899bd5`, with one build job. HIP
+rebuilt `src/kernels/cpu/native_expert.cpp` and the `strata` plus
+`native_expert_parity` targets; the selector contract and model-free help both
+passed. SYCL rebuilt the shared changed CPU source and dependent engine and
+`strata` target, then completed a model-free help invocation with the oneAPI
+and oneMKL environment sourced. This is x86_64 compile/link and startup
+evidence only; no accelerator execution or Orin performance was measured.
+
+| Backend | Build | Contract / help | Binary SHA256 |
+| --- | --- | --- | --- |
+| HIP | Passed, one job | Q8_1 selector contract PASS; `strata --help` exit 0 | `d0b562382483a042b1701445cbed39f03e04912391f4e5aabd2ae9df388c8e7b` |
+| SYCL | Passed, one job | `strata --help` exit 0 with oneAPI/oneMKL environment | `badfdbcfb9f924407a304b06c412b9e29f0897732827a5322b6038d92e0dde6a` |
+
+Build root: `/mnt/sda2/tmp/calvin/strata-ninfer-build-e0-03806747/`. Build
+products and toolchains remain on maestro1. Existing DPCT/compiler warnings
+were emitted; neither build reported an error.

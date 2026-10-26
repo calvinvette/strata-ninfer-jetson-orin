@@ -6102,3 +6102,13 @@ state checkpoints exact at positions 2042, 2044, 2046 and 2047. The full
 request still failed in GDN, tail, pooled, pooled-full and KV state. This
 moves the remaining search to later layer transitions; no quality or
 performance qualification is claimed. [Layer-1 intervention report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#layer-1-expert-row-intervention).
+
+The next paired layer extension found the first nonzero element in the final
+per-layer GDN dump at layer 3 after layers 0–2 were bitwise equal. Layer-2
+MoE inputs/routes/shared output were exact, while expert IDs `75, 84, 89, 114,
+130` had small row differences and the combined output differed by roughly
+`2.3e-8`–`4.0e-8`. The paired request still failed state parity; the
+one-token diagnostic is not a quality or performance test. Layer-2-only
+mirroring and layer-3 capture are in progress. The Q8_1 per-layer filter source
+also rebuilt successfully for HIP and SYCL on maestro1; both model-free help
+checks passed. This is x86_64 compile/startup evidence only. [Layer-2 report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#layer-2-extension-and-first-later-state-divergence), [backend build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-per-layer-q8_1-mirror-filters).
