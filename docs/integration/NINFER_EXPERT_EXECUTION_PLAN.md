@@ -776,10 +776,25 @@ cached K/V contents and individual attention arithmetic were not captured, so
 the precise cause is unresolved. Token IDs matched, while persistent state
 still differed. This is localization evidence only, not quality or performance
 qualification. The CUDA build, capture analyzer tests and HIP build passed;
-SYCL's separate verifier implementation was unchanged and its configured target
-was up to date. maestro1 evidence is x86 compile/link only. Minimum available
-memory was 11.47 GiB; EMC was inaccessible and energy was not measured. See the
+SYCL has a separate verifier implementation, while its shared attention header
+was rebuilt in the later engine-target check. maestro1 evidence is x86
+compile/link only. Minimum available memory was 11.47 GiB; EMC was inaccessible
+and energy was not measured. See the
 [QSA stage report](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#qsa-stage-capture-at-model-layer-3).
+
+A separate opt-in capture decoded the 128 selected historical K/V rows that
+attention consumed. Of 65,536 values per side, 301 keys and 341 values differed
+(`3.91e-5` and `4.93e-5` relative L2). An independent host FP64 attention
+replay matched each backend's captured output within `1.97e-7`; the predicted
+cross-backend attention delta matched the captured delta within `1.2e-9`
+relative L2. For this sampled step, the cached K/V input differences explain
+the attention output difference; query, selected IDs and the mathematical
+attention operation agree. The earlier attempt with cache capture always
+enabled hit the 60-second no-progress watchdog and is excluded; the isolated
+opt-in retry completed. This does not locate the earlier source of cached K/V
+drift or resolve final-state mismatch. No quality/performance qualification is
+made. Minimum available memory was 11.33 GiB. See the [QSA stage and replay
+report](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#qsa-stage-capture-at-model-layer-3).
 
 ### E7 — Assess release of the demonstrated integration
 

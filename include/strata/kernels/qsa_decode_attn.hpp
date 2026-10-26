@@ -43,4 +43,9 @@ void qsa_decode_attn_step(const float* q, const QsaAttnPools& pools, const int32
 void qsa_decode_attn_batch(const float* q, const QsaAttnPools& pools, const int32_t* ids, const int32_t* steps,
                            int64_t cap, const QsaShapes& s, float* scratch, float* attn, int64_t n_q, void* stream);
 
+/// Opt-in diagnostic: decode the selected cache rows as the attention kernel sees them.
+/// Output is [K(cap,n_kv,head_dim), V(cap,n_kv,head_dim)]; invalid/unresident cells are zeroed.
+void qsa_capture_selected_kv(const QsaAttnPools& pools, const int32_t* ids, const int32_t* step,
+                             int64_t cap, const QsaShapes& s, float* output, void* stream);
+
 }  // namespace strata::kernels

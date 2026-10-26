@@ -93,10 +93,28 @@ unknown.
 
 Both checker runs intentionally returned failure because final persistent state
 differs (GDN, tail, pooled, pooled-full and KV), despite equal generated token
-IDs. This remains numerical localization only, not a quality or performance
-qualification. Minimum available memory was 11.47 GiB; EMC frequency was
-inaccessible and energy was not measured. The CUDA build and QSA analyzer tests
-passed. The updated verifier compiled and linked for HIP on maestro1; SYCL uses
-its separate `sycl/src/core/verify.cpp` implementation, which was unchanged and
-already up to date. maestro1 is compile evidence only. Raw `.qsa` captures and
-supervisor logs remain local-only.
+IDs. A follow-up opt-in cache capture decoded the 128 selected historical K/V
+rows at this same layer and position. Across 65,536 values per side, 301 K and
+341 V values differed; relative L2 was `3.91e-5` for K and `4.93e-5` for V.
+An independent host FP64 replay of selected-cell attention matched each
+engine's captured attention output within `1.97e-7` relative L2. Its predicted
+cross-engine attention difference (`3.974187e-5`) matched the captured
+difference (`3.974307e-5`) within `1.2e-9` relative L2. For this sample,
+small historical K/V cache differences explain the measured attention delta;
+the query and block selection match, and attention arithmetic is not a
+material additional source at this boundary. This does not establish why the
+historical cache rows first diverged or explain the later persistent-state
+mismatch.
+
+The paired checker still fails its persistent-state gate (GDN, tail, pooled,
+pooled-full and KV) while token IDs and residency maps match. This is numerical
+localization only, not quality or performance qualification. Minimum available
+memory was 11.33 GiB; EMC frequency was inaccessible and energy was not
+measured. The cache-capture run completed in 64.2 seconds. The final Orin CUDA
+build passed; maestro1 HIP `strata` and SYCL `strata_engine` compile/link targets
+also passed after rebuilding the shared QSA header and HIP implementation.
+maestro1 provides x86 compile evidence only. Its SYCL runtime has no device, and
+neither backend was executed there. Its first attempt
+with cache capture always enabled hit the engine's 60-second no-progress
+watchdog and is excluded; the separate opt-in retry completed. Raw `.qsa`,
+`.kv` captures and supervisor logs remain local-only.

@@ -108,6 +108,15 @@ struct QsaDiagHeaderV1 {
     int32_t token, reserved;
 };
 static_assert(sizeof(QsaDiagHeaderV1) == 72, "STQSAD1 header layout changed");
+struct QsaKvDiagHeaderV1 {
+    char magic[8];
+    uint32_t version;
+    int32_t layer;
+    int64_t position;
+    uint64_t n_kv, head_dim, capacity;
+    int32_t token, valid_count;
+};
+static_assert(sizeof(QsaKvDiagHeaderV1) == 56, "STQKVD1 header layout changed");
 struct MoeOutputHeaderV2 {
     char magic[8];
     uint32_t version;
@@ -547,6 +556,13 @@ Verifier::~Verifier() {
     if (qsa_diag_h_ && cudaFreeHost(qsa_diag_h_) == cudaSuccess)
         strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
                                                     qsa_diag_h_, 0, -1);
+    if (qsa_diag_kv_h_ && cudaFreeHost(qsa_diag_kv_h_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
+                                                    qsa_diag_kv_h_, 0, -1);
+    if (qsa_diag_kv_step_h_ && cudaFreeHost(qsa_diag_kv_step_h_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
+                                                    qsa_diag_kv_step_h_, 0, -1);
+    if (qsa_diag_kv_d_) cudaFree(qsa_diag_kv_d_);
     if (moe_route_diag_h_ && cudaFreeHost(moe_route_diag_h_) == cudaSuccess)
         strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
                                                     moe_route_diag_h_, 0, -1);
@@ -828,6 +844,12 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
         const char* layer = std::getenv("STRATA_VERIFY_DUMP_QSA_LAYER");
         const char* path = std::getenv("STRATA_VERIFY_DUMP_QSA_PATH");
         const char* position = std::getenv("STRATA_VERIFY_DUMP_QSA_POSITION");
+        const char* kv_capture = std::getenv("STRATA_VERIFY_DUMP_QSA_KV");
+        qsa_diag_kv_enabled_ = kv_capture != nullptr && kv_capture[0] != '\0' && std::strcmp(kv_capture, "0") != 0;
+        if (qsa_diag_kv_enabled_ && layer == nullptr) {
+            err = "verify: selected QSA KV capture requires the QSA layer, path, and position";
+            return false;
+        }
         if ((layer != nullptr) != (path != nullptr) || (layer != nullptr) != (position != nullptr)) {
             err = "verify: QSA capture layer, path, and position must be set together";
             return false;
@@ -861,6 +883,24 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
             }
             strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "allocate", this,
                                                         qsa_diag_h_, qsa_diag_capacity_, -1);
+            if (qsa_diag_kv_enabled_) {
+                const uint64_t kv_float_count = 2 * cap_ * NKV * HD;
+                if (kv_float_count > SIZE_MAX / sizeof(float)) {
+                    err = "verify: opt-in selected QSA KV capture size overflows";
+                    return false;
+                }
+                qsa_diag_kv_capacity_ = (size_t) kv_float_count * sizeof(float);
+                if (cudaHostAlloc((void**) &qsa_diag_kv_h_, qsa_diag_kv_capacity_, cudaHostAllocPortable) != cudaSuccess ||
+                    cudaHostAlloc((void**) &qsa_diag_kv_step_h_, strata::kernels::kStepCount * sizeof(int32_t), cudaHostAllocPortable) != cudaSuccess ||
+                    cudaMalloc((void**) &qsa_diag_kv_d_, qsa_diag_kv_capacity_) != cudaSuccess) {
+                    err = "verify: could not allocate opt-in selected QSA KV buffers";
+                    return false;
+                }
+                strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "allocate", this,
+                                                            qsa_diag_kv_h_, qsa_diag_kv_capacity_, -1);
+                strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "allocate", this,
+                                                            qsa_diag_kv_step_h_, strata::kernels::kStepCount * sizeof(int32_t), -1);
+            }
             std::fprintf(stderr, "strata verify: opt-in QSA capture at layer %d position %lld -> %s (%zu bytes)\n",
                          qsa_diag_layer_, (long long) qsa_diag_position_, qsa_diag_path_.c_str(), qsa_diag_capacity_);
         }
@@ -2109,6 +2149,21 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                 stamp(l, 12, grp);
                 if (qbr) join(0);   // the query, for attention
                 const QsaAttnPools pools = qsa_attn_pools(st);
+                if (qsa_diag_kv_enabled_ && qsa_diag_h_ != nullptr && l == qsa_diag_layer_ && !qsa_diag_kv_captured_) {
+                    for (int t = tb; t < te && !qsa_diag_kv_captured_; ++t) {
+                        if (h_pos_[(size_t) t * (size_t) NH] != qsa_diag_position_) continue;
+                        qsa_capture_selected_kv(pools, sel_ + (size_t) t * cap_, step_ + t * kStepCount, cap_, s,
+                                                qsa_diag_kv_d_, cs);
+                        if (cudaMemcpyAsync(qsa_diag_kv_h_, qsa_diag_kv_d_, qsa_diag_kv_capacity_,
+                                            cudaMemcpyDeviceToHost, cs) != cudaSuccess ||
+                            cudaMemcpyAsync(qsa_diag_kv_step_h_, step_ + t * kStepCount,
+                                            kStepCount * sizeof(int32_t), cudaMemcpyDeviceToHost, cs) != cudaSuccess) {
+                            err = "verify: could not queue selected QSA KV capture";
+                            return false;
+                        }
+                        qsa_diag_kv_captured_ = true;
+                    }
+                }
                 qsa_decode_attn_batch(qcur_ + tb * NH * HD, pools, sel_ + (size_t) tb * cap_, step_ + tb * kStepCount, cap_,
                                       s, attn_scratch_ + (size_t) tb * attn_scratch_floats_, attn_ + tb * NH * HD, n, cs);
                 }
@@ -3115,6 +3170,8 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
         header.kv_width = (uint64_t) g.n_head_kv * (uint64_t) g.head_dim;
         header.cap = (uint64_t) cap_;
         header.token = qsa_diag_token_;
+        const QsaState& qsa_state = ss.qsa_states[ss.qsa_primary()];
+        header.reserved = (qsa_state.kv_rot ? 1 : 0) | (qsa_state.kv_hybrid ? 2 : 0);
         std::FILE* dump = std::fopen(qsa_diag_path_.c_str(), "ab");
         bool written = dump != nullptr;
         if (written) {
@@ -3126,6 +3183,35 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
         if (!written) {
             err = "verify: could not write opt-in QSA stage capture";
             return false;
+        }
+        if (qsa_diag_kv_enabled_) {
+            if (!qsa_diag_kv_captured_) {
+                err = "verify: opt-in selected QSA KV capture did not reach attention";
+                return false;
+            }
+            QsaKvDiagHeaderV1 kv_header{};
+            std::memcpy(kv_header.magic, "STQKVD1", sizeof(kv_header.magic));
+            kv_header.version = 1;
+            kv_header.layer = qsa_diag_layer_;
+            kv_header.position = qsa_diag_position_;
+            kv_header.n_kv = (uint64_t) g.n_head_kv;
+            kv_header.head_dim = (uint64_t) g.head_dim;
+            kv_header.capacity = (uint64_t) cap_;
+            kv_header.token = qsa_diag_token_;
+            kv_header.valid_count = qsa_diag_kv_step_h_[kStepWidth];
+            const std::string kv_path = qsa_diag_path_ + ".kv";
+            dump = std::fopen(kv_path.c_str(), "wb");
+            written = dump != nullptr;
+            if (written) {
+                written = std::fwrite(&kv_header, sizeof(kv_header), 1, dump) == 1 &&
+                          std::fwrite(qsa_diag_kv_h_, 1, qsa_diag_kv_capacity_, dump) == qsa_diag_kv_capacity_;
+                if (std::fflush(dump) != 0) written = false;
+                if (std::fclose(dump) != 0) written = false;
+            }
+            if (!written) {
+                err = "verify: could not write opt-in selected QSA KV capture";
+                return false;
+            }
         }
         qsa_diag_captured_ = false;
     }

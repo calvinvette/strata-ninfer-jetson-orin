@@ -5913,7 +5913,21 @@ gated output, projection and exact next-MoE input reached `3.97e-5`,
 `5.41e-5`, `8.32e-4` and `5.47e-4`. Historical cached K/V and finer attention
 operations were not captured, so the exact cause remains open. Token IDs
 matched but persistent state differed; this is diagnostic evidence only. CUDA
-and HIP builds passed, Python capture tests passed, and the separate SYCL
-verifier was unchanged (configured target up to date). Minimum available memory
+and HIP builds passed, and Python capture tests passed. Minimum available memory
 was 11.47 GiB; energy was not measured and EMC frequency was inaccessible. See
 the [QSA stage report](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#qsa-stage-capture-at-model-layer-3).
+
+A separate opt-in capture then compared the dequantized historical K/V rows
+actually consumed by that attention step. Of 65,536 values per side, 301 keys
+and 341 values differed (`3.91e-5` and `4.93e-5` relative L2). Independent
+host FP64 attention replay matched each captured engine output within
+`1.97e-7`; its predicted cross-engine attention delta matched the measured
+delta within `1.2e-9` relative L2. At this sampled position, the small cached
+K/V differences explain the attention mismatch, while selection and query
+match. The earlier cache-capture attempt hit the 60-second no-progress
+watchdog and is excluded; the isolated opt-in retry completed. Final
+persistent state still differs, so E6 remains diagnostic and unqualified.
+Minimum available memory was 11.33 GiB. The final Orin CUDA build passed;
+maestro1 HIP `strata` and SYCL `strata_engine` compile/link targets passed
+after rebuilding affected sources. This is x86 compile evidence only for
+maestro1, with no device execution. [Capture and replay report](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#qsa-stage-capture-at-model-layer-3).

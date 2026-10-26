@@ -81,6 +81,32 @@ __device__ __forceinline__ void load8(const QsaAttnPools& p, bool value, long lo
     } else load8_q4(p, value, row, d0, out);
 }
 
+template <int KV_MODE>
+__global__ void capture_selected_kv_kernel(QsaAttnPools p, const int32_t* ids, const int32_t* step,
+                                           int64_t cap, int n_kv_heads, int page_size, float* output) {
+    const int64_t i = (int64_t) blockIdx.x * blockDim.x + threadIdx.x;
+    const int64_t row_width = (int64_t) n_kv_heads * HD;
+    const int64_t total = cap * row_width;
+    if (i >= total) return;
+    const int cell_i = (int) (i / row_width);
+    const int kvh_dim = (int) (i % row_width);
+    const int kvh = kvh_dim / HD, dim = kvh_dim % HD;
+    const int valid = __ldg(step + kStepWidth);
+    float* key = output + i;
+    float* value = output + total + i;
+    if (cell_i >= valid) { *key = 0.0f; *value = 0.0f; return; }
+    const int cell = __ldg(ids + cell_i);
+    const int page = __ldg(p.page_table + cell / page_size);
+    if (page < 0) { *key = 0.0f; *value = 0.0f; return; }
+    const long long pool_row = ((long long) page * n_kv_heads + kvh) * page_size + cell % page_size;
+    const int d0 = dim & ~7;
+    float k8[8], v8[8];
+    load8<KV_MODE>(p, false, pool_row, d0, k8);
+    load8<KV_MODE>(p, true, pool_row, d0, v8);
+    *key = k8[dim - d0];
+    *value = v8[dim - d0];
+}
+
 template <int KV_MODE, bool LANE_CELL = false>
 __global__ void __launch_bounds__(THREADS) attn_chunk_kernel(const float* __restrict__ q, QsaAttnPools p,
                                                              const int32_t* __restrict__ ids,
@@ -524,6 +550,31 @@ bool pre75_attn() {
 #endif
 
 }  // namespace
+
+void qsa_capture_selected_kv(const QsaAttnPools& pools, const int32_t* ids, const int32_t* step,
+                             int64_t cap, const QsaShapes& s, float* output, void* stream) {
+    if (s.head_dim != HD || s.n_head != (int64_t) G * s.n_head_kv || cap <= 0 || !output || !ids || !step ||
+        !pools.page_table) {
+        std::fprintf(stderr, "qsa_capture_selected_kv: unsupported geometry or missing buffers\n");
+        std::exit(1);
+    }
+    const int kv_mode = pools.k_q4 != nullptr ? 2 : (pools.k_q != nullptr && pools.v_q4 != nullptr ? 3
+                        : (pools.k_q != nullptr ? 1 : 0));
+    const int64_t total = cap * s.n_head_kv * HD;
+    const unsigned blocks = (unsigned) ((total + 255) / 256);
+    cudaStream_t st = (cudaStream_t) stream;
+#define STRATA_QSA_CAPTURE(M) capture_selected_kv_kernel<M><<<blocks, 256, 0, st>>>(pools, ids, step, cap, (int) s.n_head_kv, (int) s.page_size, output)
+    if (kv_mode == 3) STRATA_QSA_CAPTURE(3);
+    else if (kv_mode == 2) STRATA_QSA_CAPTURE(2);
+    else if (kv_mode == 1) STRATA_QSA_CAPTURE(1);
+    else STRATA_QSA_CAPTURE(0);
+#undef STRATA_QSA_CAPTURE
+    const cudaError_t e = cudaGetLastError();
+    if (e != cudaSuccess) {
+        std::fprintf(stderr, "qsa_capture_selected_kv: %s\n", cudaGetErrorString(e));
+        std::exit(1);
+    }
+}
 
 void qsa_decode_attn_batch(const float* q, const QsaAttnPools& pools, const int32_t* ids, const int32_t* steps,
                            int64_t cap, const QsaShapes& s, float* scratch, float* attn, int64_t n_q, void* stream) {

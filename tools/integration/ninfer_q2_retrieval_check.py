@@ -59,6 +59,8 @@ def main() -> int:
                     help='capture selected QSA attention stages at one model layer')
     ap.add_argument('--capture-qsa-position', type=int,
                     help='token position for the QSA stage capture')
+    ap.add_argument('--capture-qsa-kv', action='store_true',
+                    help='also capture dequantized selected historical QSA K/V rows (large diagnostic artifact)')
     ap.add_argument('--cpu-q8-1-selector',
                     help='opt in to a CPU Q8_1 dot selector for the CPU-miss arm only')
     ap.add_argument('--cpu-q8-1-experts',
@@ -100,6 +102,8 @@ def main() -> int:
         ap.error('--capture-qsa-layer must be in [0, 47]')
     if a.capture_qsa_position is not None and a.capture_qsa_position < 0:
         ap.error('--capture-qsa-position must be nonnegative')
+    if a.capture_qsa_kv and a.capture_qsa_layer is None:
+        ap.error('--capture-qsa-kv requires --capture-qsa-layer and --capture-qsa-position')
     if a.capture_gdn_position is not None and a.capture_gdn_layer is None:
         ap.error('--capture-gdn-position requires --capture-gdn-layer')
     if a.capture_gdn_layer is not None and not 0 <= a.capture_gdn_layer < 48:
@@ -209,6 +213,8 @@ def main() -> int:
             arm_env['STRATA_VERIFY_DUMP_QSA_POSITION'] = str(a.capture_qsa_position)
             arm_env['STRATA_VERIFY_DUMP_QSA_PATH'] = str(
                 (a.output / f'{name}.qsa').resolve())
+            if a.capture_qsa_kv:
+                arm_env['STRATA_VERIFY_DUMP_QSA_KV'] = '1'
         engine = StrataEngine(str(a.engine.resolve()), command, cwd=cfg.get('cwd'),
                               log=str(log), env=arm_env)
         try:

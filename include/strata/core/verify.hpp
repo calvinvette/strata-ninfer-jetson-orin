@@ -415,8 +415,14 @@ private:
     int64_t qsa_diag_position_ = -1;
     uint8_t* qsa_diag_h_ = nullptr; ///< opt-in pinned QSA input/selection/attention/output capture
     size_t qsa_diag_capacity_ = 0;
+    float* qsa_diag_kv_d_ = nullptr;
+    float* qsa_diag_kv_h_ = nullptr;
+    size_t qsa_diag_kv_capacity_ = 0;
+    int32_t* qsa_diag_kv_step_h_ = nullptr;
+    bool qsa_diag_kv_enabled_ = false;
     std::string qsa_diag_path_;
     bool qsa_diag_captured_ = false;
+    bool qsa_diag_kv_captured_ = false;
     bool qsa_diag_moe_input_captured_ = false;
     int qsa_diag_row_ = -1;
     int32_t qsa_diag_token_ = -1;
