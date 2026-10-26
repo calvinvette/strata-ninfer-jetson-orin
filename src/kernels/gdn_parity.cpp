@@ -235,8 +235,11 @@ std::pair<std::vector<float>, std::vector<float>> replay_gdn(
         check(cudaMemcpy(snapshot.data(), d_state, state.size() * sizeof(float), cudaMemcpyDeviceToHost),
               "read GDN replay token state");
     }
-    cudaFree(d_state); cudaFree(d_h); cudaFree(d_gate); cudaFree(d_beta); cudaFree(d_z); cudaFree(d_gamma);
-    cudaFree(d_y); cudaFree(d_keep); cudaStreamDestroy(stream);
+    check(cudaFree(d_state), "free replay state"); check(cudaFree(d_h), "free replay h");
+    check(cudaFree(d_gate), "free replay gate"); check(cudaFree(d_beta), "free replay beta");
+    check(cudaFree(d_z), "free replay z"); check(cudaFree(d_gamma), "free replay gamma");
+    check(cudaFree(d_y), "free replay y"); check(cudaFree(d_keep), "free replay keep");
+    check(cudaStreamDestroy(stream), "destroy replay stream");
     return {std::move(after_2043), std::move(after_2044)};
 }
 
