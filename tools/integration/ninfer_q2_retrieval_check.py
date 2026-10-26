@@ -27,6 +27,8 @@ def main() -> int:
                     help='compare MTP-off Strata backend against MTP-off strict NInfer')
     ap.add_argument('--compare-cpu-miss-staged', action='store_true',
                     help='compare MTP-off CPU miss fallback against strict NInfer staging')
+    ap.add_argument('--compare-staged-backends', action='store_true',
+                    help='compare Strata and strict NInfer compute with staging enabled in both arms')
     ap.add_argument('--dump-gdn', action='store_true',
                     help='write final accepted-prefix GDN arrays for numeric comparison')
     ap.add_argument('--dump-gdn-at', type=int,
@@ -41,7 +43,8 @@ def main() -> int:
                     help='filter the MoE capture to several increasing token positions')
     ap.add_argument('--run', action='store_true')
     a = ap.parse_args()
-    if a.compare_strata_control and a.compare_cpu_miss_staged:
+    comparison_modes = (a.compare_strata_control, a.compare_cpu_miss_staged, a.compare_staged_backends)
+    if sum(comparison_modes) > 1:
         ap.error('choose only one comparison mode')
     if a.capture_moe_position is not None and a.capture_moe_positions is not None:
         ap.error('use only one of --capture-moe-position and --capture-moe-positions')
@@ -88,6 +91,8 @@ def main() -> int:
         arms = (('strata-control', 'strata', 0), ('ninfer-control', 'ninfer', 0))
     elif a.compare_cpu_miss_staged:
         arms = (('cpu-miss', 'strata', 0), ('ninfer-staged', 'ninfer', 0))
+    elif a.compare_staged_backends:
+        arms = (('strata-staged', 'strata', 0), ('ninfer-staged', 'ninfer', 0))
     else:
         arms = (('mtp-off', 'ninfer', 0), ('mtp4', 'ninfer', 4))
     for name, backend, window in arms:
@@ -98,8 +103,9 @@ def main() -> int:
                 command[command.index('--expert-backend') + 1] = 'strata'
             if '--expert-backend-strict' in command:
                 command.remove('--expert-backend-strict')
-        if a.compare_cpu_miss_staged and '--pcie-frac' in command:
-            command[command.index('--pcie-frac') + 1] = '0.0' if backend == 'strata' else '1.0'
+        if (a.compare_cpu_miss_staged or a.compare_staged_backends) and '--pcie-frac' in command:
+            command[command.index('--pcie-frac') + 1] = (
+                '0.0' if a.compare_cpu_miss_staged and backend == 'strata' else '1.0')
         arm_env = dict(env)
         arm_env['STRATA_RESIDENCY_DUMP'] = str((a.output / f'{name}.residency.csv').resolve())
         if a.dump_gdn:
@@ -150,7 +156,7 @@ def main() -> int:
             result['failures'].append(f"{off['name']} and {mtp['name']} token IDs differ")
         if not result['final_state_equal']:
             result['failures'].append(f"{off['name']} and {mtp['name']} final state differ")
-        if a.compare_cpu_miss_staged and not result['residency_equal']:
+        if (a.compare_cpu_miss_staged or a.compare_staged_backends) and not result['residency_equal']:
             result['failures'].append(f"{off['name']} and {mtp['name']} resident maps differ or were not captured")
     result['exact_answer_check'] = expected is not None and max_new == workload['generate_tokens']
     result['passed'] = not result['failures'] and len(result['arms']) == 2

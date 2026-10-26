@@ -77,6 +77,42 @@ Reproduce the oracle checks with `python3 analyze_layer_oracle.py --layer 1`
 and `python3 analyze_layer_oracle.py --layer 2` on the Orin with the local
 Q2_0 model.
 
+## Staged-backend isolation
+
+The retrieval checker now has `--compare-staged-backends`. Both arms set
+`--pcie-frac 1.0` and use the same resident map, staged weights and workload;
+only the grouped expert backend changes between Strata and strict NInfer. On
+the one-token diagnostic, both routes generated token 19910, staged 97 expert
+reads, and matched residency plus all final state fingerprints. On the full
+held-out task, both returned the exact answer in 47 tokens, staged 4,556 reads,
+and matched every token ID and persistent-state field. Minimum available
+memory was 11.56 GiB and 11.59 GiB. These are functional ablations, not
+performance measurements.
+
+This comparison indicates the CPU-miss versus staged state difference does
+not come from a difference between the Strata and NInfer grouped GPU backends
+for this task. Both staged GPU backends produce identical persistent state,
+while the prior CPU-miss versus NInfer-staged comparison does not. The
+remaining discrepancy is associated with the CPU-miss versus staged execution
+path; the specific arithmetic, activation representation or state operation
+responsible has not been isolated.
+
+An all-layer committed-state capture after processing the prompt's final
+zero-based position (2047) further localizes the first material GDN difference.
+The two arms used the same committed token (271). Model layer 0 state was
+bit-identical; layer 1 relative L2 was `1.076e-9`; model layer 2 was the first
+material change at `9.937e-4`. Across 36 GDN layers and 29,417,472 floats,
+global relative L2 was `0.03865`. The error then grows through later layers.
+This is one accepted-prefix snapshot; it points to a small upstream difference
+being amplified by downstream computation but does not identify the operation
+that creates it. The raw 225 MB capture remains local. Its SHA256 and the
+13 MB pre/post capture hash are recorded in
+[`evidence/state-capture-artifact-hashes.json`](evidence/state-capture-artifact-hashes.json);
+per-layer metrics are in
+[`evidence/state-commit2047/per-layer-comparison.json`](evidence/state-commit2047/per-layer-comparison.json).
+Reproduce the summary with `python3 analyze_gdn_commit_capture.py <capture>
+--output <json>` on the local capture.
+
 ## Reproduction and evidence
 
 The held-out workload was generated with
@@ -92,6 +128,7 @@ state/route diagnostics, not complete-answer tests.
 Focused checks passed:
 
 - `python3 -m py_compile tools/integration/ninfer_q2_retrieval_check.py bench/results/2026-10-26-e6-q2-staged-retrieval-2k/analyze_layer_oracle.py`
+- `python3 -m py_compile bench/results/2026-10-26-e6-q2-staged-retrieval-2k/analyze_gdn_commit_capture.py`
 - `python3 tools/integration/test_analyze_ninfer_backend_capture.py`
 - `python3 tools/integration/test_q2_0_expert_oracle.py` (4 tests)
 - `git diff --check`

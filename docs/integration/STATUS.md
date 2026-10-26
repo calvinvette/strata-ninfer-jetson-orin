@@ -5737,3 +5737,15 @@ hashes differed. GDN relative L2 was 3.61% over 29.4M values, with 8.08 GiB
 minimum available memory. This is functional evidence for the held-out task,
 not state-parity or performance qualification. See the [4K–64K
 follow-up](../../bench/results/2026-10-26-e6-staged-retrieval-context-followup/README.md).
+
+A controlled backend ablation now compares Strata and strict NInfer while both
+use the same staged route. At 2K, both the one-token check and the full
+47-token held-out task matched all token IDs, residency, and persistent state;
+both staged 97 reads in the short cell and 4,556 in the full task. This shows
+that the observed CPU-miss versus staged mismatch is not specific to the
+NInfer grouped GPU backend for this workload. An all-layer state capture at
+the first prompt boundary found GDN layer 0 bit-identical, layer 1 at
+`1.076e-9` relative L2, then layer 2 at `9.937e-4`; global GDN relative L2
+across the 36 layer states was `0.03865`. The CPU-versus-staged arithmetic or
+state transition remains unidentified. E6 quality and performance gates stay
+open. See the [backend isolation and state capture](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/README.md#staged-backend-isolation).

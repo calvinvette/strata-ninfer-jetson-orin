@@ -632,6 +632,19 @@ are recorded in the context report. This extends task-level functional
 evidence only; state parity, broader quality, and staged-miss performance
 remain unqualified. See the [4K–64K
 follow-up](../../bench/results/2026-10-26-e6-staged-retrieval-context-followup/README.md).
+To separate backend arithmetic from the staged route, an opt-in checker mode
+now compares Strata and strict NInfer with `--pcie-frac 1.0` in both arms. The
+2K one-token cell and full 47-token held-out retrieval matched token IDs,
+residency maps and all persistent-state fields; each backend staged the same
+97 and 4,556 reads, respectively. This points away from an NInfer-specific
+GPU-kernel cause for the CPU-miss versus staged mismatch in this workload.
+An accepted-prefix all-layer state capture showed exact GDN state at model
+layer 0, `1.076e-9` relative L2 at layer 1 and `9.937e-4` at layer 2, with
+`0.03865` global relative L2 across 36 GDN layers. The CPU-miss/staged path
+difference and its first triggering operation remain unidentified. These
+functional checks do not close staged state parity, broader quality or
+performance qualification. See the [2K staged-backend isolation
+report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/README.md#staged-backend-isolation).
 
 ### E7 — Assess release of the demonstrated integration
 
