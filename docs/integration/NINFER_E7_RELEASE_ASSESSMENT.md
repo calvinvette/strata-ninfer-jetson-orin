@@ -202,3 +202,28 @@ coverage but does not bound general generation quality or establish an
 approximate-state contract. The five-shape replay still had output-hash
 mismatches, so no staged release profile or performance claim is proposed. See
 the [4K–32K follow-up](../../bench/results/2026-10-26-e6-staged-retrieval-context-followup/README.md).
+
+## Position-123 owner and operator follow-up (2026-10-26)
+
+A repeated 128-token state trace found exact layer-0 MoE input, routes, expert
+rows and output at position 123, then only `3.50e-8` relative L2 at the
+model-layer-1 GDN output. At model layer 2, only expert 114 showed material
+CPU-miss versus staged-row drift (`6.68e-4` relative L2); the combined output
+delta was `3.24e-5`. Both service captures reproduced the same values. The
+independent FP64 Q2_0×Q8_1 oracle quantized both layer-2 activations to identical
+Q8_1 data and matched the staged service row within `5.84e-8`; the CPU-miss row
+differed by `6.68e-4`. This is consistent with owner-specific arithmetic at
+that sampled expert, and is a plausible source of the later QSA cache-cell-123
+delta, but the cache and expert captures came from separate runs. Persistent
+state remains different, so no approximate-state contract has been established.
+
+The dedicated CUDA operator check on the captured activation separated the
+standalone D3/D4 kernel from the grouped service ABI. D3/D4 failed the
+independent oracle (`8.17e-3` relative L2) and is not qualified. The grouped
+route matched Strata's grouped CUDA output exactly for the captured expert and
+3/64/128-token top-10 cases, but its seven-block operator screen was tied at
+one token and 11.0%/12.3% slower at 64/128 tokens. This reinforces the existing
+no-release decision: there is no material resident-expert speedup, staged-miss
+state remains unresolved, and no 30-minute NInfer soak or performance
+confirmation is warranted. See the [position-123 and operator
+report](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md).
