@@ -64,6 +64,10 @@ At 32,768 prompt tokens with a 64K cap, the exact answer, token IDs and all
 nine final state fields also matched; minimum available memory was 16.48 GiB
 with zero cgroup events. This single retrieval task does not qualify 64K
 near-limit ingestion. See the [32K retrieval report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-32k-retrieval/README.md).
+The actual 64K prompt also passed exact retrieval and cross-backend state
+checks under a 128K cap; minimum available memory was 14.70 GiB with zero
+cgroup events. This does not qualify near-limit 128K ingestion. See the [64K
+retrieval report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-64k-retrieval/README.md).
 E7 assessment proposes no
 general release profile; HIP/SYCL build evidence is outstanding, and NInfer
 remains opt-in. See the [E7

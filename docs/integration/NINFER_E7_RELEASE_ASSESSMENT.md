@@ -90,8 +90,11 @@ release profile is **not achieved**.
   check](../../bench/results/2026-10-25-phase-e5-q2-ninfer-16k-retrieval/README.md),
   and the same retrieval also passed at an actual 32,768-token prompt under a
   64K cap, with exact token and final-state parity and 16.48 GiB minimum
-  availability. Near-limit 64K ingestion remains untested. See the [32K
-  check](../../bench/results/2026-10-25-phase-e5-q2-ninfer-32k-retrieval/README.md),
+  availability. The same task passed at an actual 65,536-token prompt under a
+  128K cap, with 14.70 GiB minimum availability; near-limit 128K ingestion
+  remains untested. See the [32K
+  check](../../bench/results/2026-10-25-phase-e5-q2-ninfer-32k-retrieval/README.md)
+  and [64K check](../../bench/results/2026-10-25-phase-e5-q2-ninfer-64k-retrieval/README.md),
   [E5 closeout](NINFER_E5_CLOSEOUT.md) and the
   [corrected generation checks](../../bench/results/2026-10-25-phase-e5-q2-ninfer-generation-regression/fixed-kernel/README.md).
 - Coder IQ1_M, ISTA-DASLab IQ3_S, staged expert misses, broad task quality and
