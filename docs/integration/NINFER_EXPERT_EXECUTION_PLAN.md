@@ -615,6 +615,16 @@ at most `6e-8`, and the combined MoE output differed by `1.53e-7` relative L2.
 The first GDN state mismatch is state layer 1 at `1.61e-5` relative L2. This
 places the earliest observed drift near first-layer aggregation/state update,
 but does not identify the operation responsible.
+An exact-tokenized 512/1,024/1,536-token prefix sweep subsequently confirmed
+CPU-miss/staged final-state divergence at all three lengths. GDN global
+relative L2 was `0.03431`, `0.03098` and `0.04960`; the first GDN ordinal
+above `1e-5` relative L2 was ordinal 3/model layer 4 for the first two prefixes
+and ordinal 5/model layer 6 for the 1,536-token prefix. Ordinal 4/model layer 5
+was near exact at 1,536 tokens. This shows the first visible divergence moves
+with prompt content and is not a monotonic context-length effect. These
+one-token state diagnostics do not provide task-quality or performance
+evidence; minimum available memory was 11.43–11.52 GiB. See the [prefix state
+sweep](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md).
 The same exact-answer held-out retrieval passed token and residency-map checks
 at 4K and 8K prompts on CPU-miss and strict staged routes. Final state hashes
 still differed in six fields at 4K, 16K and 32K and five at 8K; GDN global

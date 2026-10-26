@@ -65,6 +65,15 @@ variation, but its cause and the original multi-workload cross-arm mismatches
 remain unexplained. No quality oracle has passed for these staged-miss cells,
 so performance confirmation and profile promotion remain deferred pending a
 full workload-order replay and held-out quality task.
+An additional 512/1,024/1,536-token prefix state sweep found matching single
+output-token IDs but persistent-state mismatches in every CPU-miss/staged pair.
+GDN global relative L2 was 0.03098–0.04960. The first GDN ordinal above
+`1e-5` relative L2 was ordinal 3/model layer 4 at 512 and 1,024 tokens, but
+ordinal 5/model layer 6 at 1,536 tokens; ordinal 4/model layer 5 was near exact
+in that last sample. This makes the drift prompt-dependent and confirms it is
+not confined to the 2K prefix. These are diagnostics, not quality or timing
+evidence; minimum available memory was 11.43–11.52 GiB. See the [prefix state
+sweep](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md).
 A held-out exact-answer retrieval/arithmetic check at an actual 8,192-token
 prompt then matched the Strata and strict-NInfer token IDs and all nine final
 state fields. Both returned the three codes and suffix sum exactly; minimum
