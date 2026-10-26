@@ -50,6 +50,12 @@ changes were only −1.59% to +0.21%; one pair showed a 32.6% decode-time
 regression on the 2,048+128 workload. No cell met the five-percent screen
 threshold, and E6's broad performance exit remains unmet. See the [three-pair
 screen](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/fixed-swiglu-8k-paired-screen/README.md).
+A held-out exact-answer retrieval/arithmetic check at an actual 8,192-token
+prompt then matched the Strata and strict-NInfer token IDs and all nine final
+state fields. Both returned the three codes and suffix sum exactly; minimum
+available memory was 17.70 GiB with zero cgroup memory events. This is one
+functional 8K retrieval case, not a timing estimate or near-limit 16K test.
+See the [8K retrieval report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-8k-retrieval/README.md).
 E7 assessment proposes no
 general release profile; HIP/SYCL build evidence is outstanding, and NInfer
 remains opt-in. See the [E7

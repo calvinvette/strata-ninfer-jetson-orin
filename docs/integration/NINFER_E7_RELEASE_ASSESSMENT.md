@@ -80,7 +80,11 @@ release profile is **not achieved**.
   after the SwiGLU precision fix: two natural-generation runs and one 4K
   retrieval comparison matched token IDs and all final state fields. This
   resolves those specific cases, but broader task quality and numerical bounds
-  remain open. See the [E5 closeout](NINFER_E5_CLOSEOUT.md) and the
+  remain open. An additional held-out 8,192-token retrieval/arithmetic check
+  returned the exact answer on both Strata and strict NInfer, with all token
+  IDs and nine final state fields matching; minimum available memory was
+  17.70 GiB. This is one task at one prompt length. See the [8K check](../../bench/results/2026-10-25-phase-e5-q2-ninfer-8k-retrieval/README.md),
+  [E5 closeout](NINFER_E5_CLOSEOUT.md) and the
   [corrected generation checks](../../bench/results/2026-10-25-phase-e5-q2-ninfer-generation-regression/fixed-kernel/README.md).
 - Coder IQ1_M, ISTA-DASLab IQ3_S, staged expert misses, broad task quality and
   live Strata/NInfer state migration are not supported or qualified by this

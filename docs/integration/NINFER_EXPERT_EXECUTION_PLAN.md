@@ -471,6 +471,13 @@ tokens, with identical token IDs and final persistent state. The single-run
 timings are not an effect estimate. See the [retrieval task report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-retrieval-check/README.md).
 A held-out 4,096-token version also returned the exact answer in both arms, with
 identical tokens and final NInfer state; see the [long retrieval report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-long-retrieval/README.md).
+An 8,192-token exact-answer retrieval/arithmetic check then compared fresh
+MTP-off Strata and strict-NInfer engines with the corrected binary. Both
+returned all three codes and the exact suffix sum in 47 tokens; token IDs and
+all nine final state fields matched. Minimum available memory was 17.70 GiB
+with no cgroup memory events. This is one functional retrieval case, not a
+timing estimate or near-limit 16K ingestion result. See the [8K retrieval
+report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-8k-retrieval/README.md).
 A pre-fix MTP-off default-Strata/strict-NInfer comparison returned the same
 short-task tokens but showed substantial persistent-state movement. The first
 committed-token GDN relative L2 was 0.0902; layer captures show a small expert
