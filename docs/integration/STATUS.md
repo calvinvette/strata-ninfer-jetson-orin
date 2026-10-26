@@ -5799,6 +5799,18 @@ Q2_0 layers also did not restore final-state parity. The CPU mirror is not a
 qualified fix, remains opt-in, and has no performance result. See the [layer
 boundary report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md).
 
+Adjacent-position captures now localize the first sampled material output
+amplification. At layer 0 positions 2043/2045, only three/four CPU-miss expert
+parts differed (about `1e-7` relative L2), combined MoE output was about
+`2.9e-8`, and captured GDN output was exact. At layer 1, QKV and convolution
+output were exact while small gate/beta/y deltas were followed by GDN output
+changes of `3.42e-5`/`1.31e-5` and FFN output changes of `9.29e-4`/`1.85e-3`.
+At layer 2, GDN output differences reached `4.64e-3`/`4.74e-3`. Same token IDs
+were returned but final state remained different; minimum observed memory was
+11.49 GiB. These are single diagnostic runs, not performance or quality
+evidence, and they do not identify the responsible state operation. See the
+[adjacent-position report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#adjacent-position-state-drift-localization).
+
 The opt-in Q2_0 CPU arithmetic mirror change at `44db5484` rebuilt
 successfully for HIP and SYCL on maestro1 with two build jobs. HIP `strata
 --help` passed. SYCL compile/link passed, but its help startup aborted because

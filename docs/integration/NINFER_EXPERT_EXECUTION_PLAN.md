@@ -678,6 +678,15 @@ changed seven other CPU-executed rows that had matched under the default owner
 split; selecting it for all Q2_0 layers did not restore state parity. Keep this
 as diagnostic-only; do not promote it or infer a performance benefit. Full
 results are in the [layer-boundary report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md).
+Adjacent-position captures find only sparse, approximately `1e-7` CPU-miss
+expert-row deltas at layer 0, followed by the first sampled material output
+amplification in layer 1's GDN/FFN path: GDN output changes by up to
+`3.42e-5` and FFN output by up to `1.85e-3` at the two examined positions.
+Layer 2 GDN output changes reach `4.74e-3`. Routes and the one generated token
+match, but final state does not. This is single-run diagnosis only; the
+arithmetic/state cause, quality bounds and performance effect remain open.
+Details and compact per-position metrics are in the [adjacent-position
+report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#adjacent-position-state-drift-localization).
 The shared CPU source rebuilt successfully for HIP and SYCL on maestro1 at
 `44db5484`. HIP CLI help passed; SYCL compiled and linked but could not start
 without a device on this host. This is x86_64 portability evidence only. See

@@ -45,6 +45,12 @@ def main() -> int:
                     help='capture GDN and feed-forward intermediates for one verifier layer')
     ap.add_argument('--capture-gdn-position', type=int,
                     help='filter the GDN capture to one token position')
+    ap.add_argument('--capture-gdn-positions', type=int, nargs='+',
+                    help='filter the GDN capture to several increasing token positions')
+    ap.add_argument('--capture-gdn-commit-layer', type=int,
+                    help='capture committed GDN state at one GDN layer')
+    ap.add_argument('--capture-gdn-commit-positions', type=int, nargs='+',
+                    help='filter committed GDN state to several increasing token positions')
     ap.add_argument('--cpu-q8-1-selector',
                     help='opt in to a CPU Q8_1 dot selector for the CPU-miss arm only')
     ap.add_argument('--run', action='store_true')
@@ -58,6 +64,20 @@ def main() -> int:
             not a.capture_moe_positions or any(x < 0 for x in a.capture_moe_positions) or
             a.capture_moe_positions != sorted(set(a.capture_moe_positions))):
         ap.error('--capture-moe-positions must be unique, increasing, nonnegative integers')
+    if a.capture_gdn_position is not None and a.capture_gdn_positions is not None:
+        ap.error('use only one of --capture-gdn-position and --capture-gdn-positions')
+    if a.capture_gdn_positions is not None and (
+            not a.capture_gdn_positions or any(x < 0 for x in a.capture_gdn_positions) or
+            a.capture_gdn_positions != sorted(set(a.capture_gdn_positions))):
+        ap.error('--capture-gdn-positions must be unique, increasing, nonnegative integers')
+    if (a.capture_gdn_commit_layer is None) != (a.capture_gdn_commit_positions is None):
+        ap.error('--capture-gdn-commit-layer and --capture-gdn-commit-positions must be used together')
+    if a.capture_gdn_commit_layer is not None and not 0 <= a.capture_gdn_commit_layer < 48:
+        ap.error('--capture-gdn-commit-layer must be in [0, 47]')
+    if a.capture_gdn_commit_positions is not None and (
+            not a.capture_gdn_commit_positions or any(x < 0 for x in a.capture_gdn_commit_positions) or
+            a.capture_gdn_commit_positions != sorted(set(a.capture_gdn_commit_positions))):
+        ap.error('--capture-gdn-commit-positions must be unique, increasing, nonnegative integers')
     if a.capture_gdn_position is not None and a.capture_gdn_layer is None:
         ap.error('--capture-gdn-position requires --capture-gdn-layer')
     if a.capture_gdn_layer is not None and not 0 <= a.capture_gdn_layer < 48:
@@ -143,8 +163,16 @@ def main() -> int:
             arm_env['STRATA_VERIFY_DUMP_GDN_LAYER'] = str(a.capture_gdn_layer)
             arm_env['STRATA_VERIFY_DUMP_GDN_PATH'] = str(
                 (a.output / f'{name}.layer{a.capture_gdn_layer}.gdn-diag').resolve())
-            if a.capture_gdn_position is not None:
+            if a.capture_gdn_positions is not None:
+                arm_env['STRATA_VERIFY_DUMP_GDN_POSITIONS'] = ','.join(map(str, a.capture_gdn_positions))
+            elif a.capture_gdn_position is not None:
                 arm_env['STRATA_VERIFY_DUMP_GDN_POSITION'] = str(a.capture_gdn_position)
+        if a.capture_gdn_commit_layer is not None:
+            arm_env['STRATA_VERIFY_DUMP_GDN_COMMIT_LAYER'] = str(a.capture_gdn_commit_layer)
+            arm_env['STRATA_VERIFY_DUMP_GDN_COMMIT_PATH'] = str(
+                (a.output / f'{name}.gdn-commit').resolve())
+            arm_env['STRATA_VERIFY_DUMP_GDN_COMMIT_POSITIONS'] = ','.join(
+                map(str, a.capture_gdn_commit_positions))
         engine = StrataEngine(str(a.engine.resolve()), command, cwd=cfg.get('cwd'),
                               log=str(log), env=arm_env)
         try:

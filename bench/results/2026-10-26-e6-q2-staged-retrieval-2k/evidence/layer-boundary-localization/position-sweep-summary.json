@@ -1,0 +1,122 @@
+{
+  "schema": 1,
+  "source_commit": "44db548402b193202703256da81d75720312cc8d",
+  "binary_sha256": "fccda8493f9f41e96f0ceabb905f4cb6301b5be00aab9a6e242b3b782a536f5e",
+  "model": "Qwen3.8-Flash-Next GSQ RCO Q2_0; 2048-token held-out retrieval; one generated token",
+  "comparison": "CPU miss fallback versus strict NInfer staged route",
+  "outcome": {
+    "token_ids_equal": true,
+    "generated_ids": {
+      "cpu_miss": [
+        19910
+      ],
+      "ninfer_staged": [
+        19910
+      ]
+    },
+    "final_state_equal": false,
+    "diagnostic_runs_per_arm": 1,
+    "performance_measured": false
+  },
+  "positions": {
+    "layer0_gdn": {
+      "captured": [
+        2043,
+        2044,
+        2045,
+        2046
+      ],
+      "source": "../layer0-jump-capture/gdn-comparison.json"
+    },
+    "layer0_moe": {
+      "captured": [
+        2043,
+        2045
+      ],
+      "source": "../layer0-jump-capture/moe-comparison.json"
+    },
+    "layer1_gdn": {
+      "captured": [
+        2041,
+        2042,
+        2043,
+        2044,
+        2045,
+        2046,
+        2047
+      ],
+      "source": "../layer1-position-sweep/comparison.json"
+    },
+    "layer1_moe": {
+      "captured": [
+        2043,
+        2045
+      ],
+      "source": "../layer1-moe-jump-capture/comparison.json"
+    },
+    "layer2_gdn": {
+      "captured": [
+        2041,
+        2042,
+        2043,
+        2044,
+        2045,
+        2046,
+        2047
+      ],
+      "source": "../layer2-position-sweep/layer2-position-comparison.json"
+    }
+  },
+  "key_observations": [
+    "At layer 0 positions 2043 and 2045, GDN stages through gdn_out were bit-identical. MoE inputs and route IDs matched; only 3/10 and 4/10 expert parts differed, each around 1e-7 relative L2, with combined output about 2.9e-8.",
+    "At layer 1 positions 2043 and 2045, input differences were 9.71e-8 and 1.25e-7 relative L2; QKV and convolution output h were exact. Small gate/beta/y deltas were followed by gdn_out differences of 3.42e-5 and 1.31e-5, then FFN output differences of 9.29e-4 and 1.85e-3.",
+    "Layer 1 MoE route IDs matched at both positions. All ten expert rows differed after the upstream activation changed by 2.29e-5 and 8.63e-6 relative L2; combined MoE output differences were 9.29e-4 and 1.85e-3.",
+    "At layer 2 positions 2043 and 2045, input relative L2 was 5.38e-4 and 7.75e-4, QKV was 1.49e-3 and 1.78e-3, convolution output h was 9.17e-4 and 1.06e-3, and final GDN output was 4.64e-3 and 4.74e-3. Positions 2044, 2046 and 2047 had exact QKV but still showed later recurrent/GDN differences.",
+    "Layer 1 committed state captures were emitted at positions 2042, 2044, 2046 and 2047. Relative L2 ranged from 5.42e-10 to 1.10e-9, with maximum absolute delta at most 2.98e-8. Other requested positions were not emitted by the commit capture path."
+  ],
+  "memory": {
+    "floor_bytes": 6442450944,
+    "minimum_observed_available_bytes": 12337225728,
+    "runs": {
+      "layer0_jump_capture": 12562706432,
+      "layer1_position_sweep": 12558602240,
+      "layer1_moe_jump_capture": 12557094912,
+      "layer2_position_sweep": 12337225728,
+      "gdn_state_step_sweep": 12535992320
+    }
+  },
+  "measurement_limits": [
+    "All cells were single diagnostic runs per arm, not timing comparisons.",
+    "The comparison command returned 1 because final persistent state differed; the engines completed and generated the same one-token output.",
+    "Read-only clock sampling was used; GPU was sampled at 306 MHz in the supervisor records, and EMC rate was unavailable due permission denial. No clock controls were changed.",
+    "Energy was not measured; tegrastats rail output is not an energy result.",
+    "The compact metrics are checked in; raw binary captures and service logs remain local."
+  ],
+  "compact_artifacts": {
+    "layer0-jump-capture/gdn-comparison.json": {
+      "sha256": "ea2b8712a01b1484220921d303e7fb48b796315bc3a14d4bc27a3e0f550f1088",
+      "bytes": 6688
+    },
+    "layer0-jump-capture/moe-comparison.json": {
+      "sha256": "e1279a349503b06c78f710d04ffe4938514921a35ec05df644624d38ca23abd2",
+      "bytes": 7456
+    },
+    "layer1-position-sweep/comparison.json": {
+      "sha256": "d1143027284cbfb69e2984747bc0681d8318c10ecdfb89f2277947e898f06a92",
+      "bytes": 13133
+    },
+    "layer1-moe-jump-capture/comparison.json": {
+      "sha256": "e9b808d0341be6b5fb71c6c342abbe23a9b7488ee4f145eda3260d554d3263d3",
+      "bytes": 8467
+    },
+    "layer2-position-sweep/layer2-position-comparison.json": {
+      "sha256": "a34640fcffef8f8c565b4e8e84a6c1194ad0fdba7b28d6d1a0e873d8fca73436",
+      "bytes": 13583
+    },
+    "gdn-state-step-sweep/comparison.json": {
+      "sha256": "632bea65f6361ca78adf49eba02f1e6785f87ec34f898096f30f4913ec81d1ba",
+      "bytes": 1183
+    }
+  },
+  "compact_artifacts_root": "../"
+}

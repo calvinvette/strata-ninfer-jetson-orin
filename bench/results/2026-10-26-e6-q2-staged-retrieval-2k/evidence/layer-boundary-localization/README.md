@@ -71,3 +71,52 @@ rounding, but the broad format/layer selector affects other CPU-executed rows
 and does not repair whole-request state. It is not a proposed default or a
 qualified fix. No performance measurement was made. Compact values and memory
 records are in `summary.json`; raw captures remain local.
+
+## Adjacent-position state-drift localization
+
+Follow-up captures compared CPU-miss and strict NInfer at adjacent prompt
+positions 2041–2047 using the same 2,048-token retrieval and one-token output.
+The CUDA binary SHA256 was
+`fccda8493f9f41e96f0ceabb905f4cb6301b5be00aab9a6e242b3b782a536f5e` from
+source commit `44db548402b193202703256da81d75720312cc8d`. Every run emitted the
+same token ID (`19910`) and matching token IDs, but final persistent state
+still differed. These are single diagnostic runs, not timings. The
+supervisor's minimum available memory was 11.49 GiB, above the 6 GiB floor.
+
+At layer 0, the GDN stages through `gdn_out` were exact at captured positions
+2043–2046. At positions 2043 and 2045, MoE inputs and route IDs were exact;
+three and four of ten expert rows differed by about `1e-7` relative L2, with
+combined output around `2.9e-8`. This reproduces a small, sparse CPU/GPU expert
+rounding delta before the larger downstream differences.
+
+At layer 1 positions 2043 and 2045, inputs differed by only `9.71e-8` and
+`1.25e-7` relative L2; projected QKV and convolution output `h` were exact.
+Small gate, beta and `y` differences were followed by GDN output differences
+of `3.42e-5` and `1.31e-5`, then FFN output differences of `9.29e-4` and
+`1.85e-3`. Routes still matched, but all ten expert rows differed after the
+MoE input had moved by `2.29e-5` and `8.63e-6` relative L2. At layer 2 the
+corresponding positions had GDN output differences of `4.64e-3` and
+`4.74e-3`; some neighboring positions had exact QKV but still differed in
+later convolution and recurrent outputs.
+
+The selected committed-state capture for layer 1 remained close at the
+positions emitted by the verifier (2042, 2044, 2046 and 2047): relative L2
+ranged from `5.42e-10` to `1.10e-9`, with maximum absolute delta at most
+`2.98e-8`. The capture path did not emit records for every requested position.
+Together, these observations place the early sparse expert rounding delta at
+layer 0 and the first sampled material output amplification in layer 1's
+stateful GDN/FFN path. They do not establish which state update operation
+causes it or whether either route is the intended numerical result. E6 state
+and quality gates remain open.
+
+Compact per-stage metrics, capture positions, binary identity and memory
+records are in [`position-sweep-summary.json`](position-sweep-summary.json).
+The compact [layer-0 GDN](../layer0-jump-capture/gdn-comparison.json) and
+[MoE](../layer0-jump-capture/moe-comparison.json), [layer-1 GDN](../layer1-position-sweep/comparison.json),
+[layer-1 MoE](../layer1-moe-jump-capture/comparison.json), [layer-2 GDN](../layer2-position-sweep/layer2-position-comparison.json),
+and [committed-state](../gdn-state-step-sweep/comparison.json) summaries sit
+beside the local raw captures. Raw arrays and engine logs remain local.
+[`analyze_gdn_layer_capture.py`](../../analyze_gdn_layer_capture.py) regenerates
+the checked-in GDN stage summaries from those raw captures;
+[`analyze_ninfer_backend_capture.py`](../../../../../tools/integration/analyze_ninfer_backend_capture.py)
+regenerates the MoE comparisons.

@@ -3123,3 +3123,22 @@ token IDs before compacting request logs to hashes. For future Splash screens,
 repeat mismatching cells both in isolation and after the full workload sequence,
 then compare accepted-prefix persistent state and a held-out task oracle before
 interpreting the timing effect. See the [staged workload report](../../bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/README.md).
+
+## 2026-10-26 — Track numerical changes across adjacent recurrent positions
+
+An adjacent-position capture in the Q2_0 staged-miss comparison found sparse
+CPU/GPU expert-row differences around `1e-7` at layer 0, followed by a larger
+sampled output change at layer 1's stateful GDN/FFN path. At two positions,
+layer-1 QKV and convolution output were exact, while small gate/beta/y deltas
+preceded GDN output differences up to `3.42e-5` and FFN output differences up
+to `1.85e-3`; layer 2 amplified these further. The one-token output matched,
+but final request state did not. This does not identify a bug or establish
+which route is numerically preferable.
+
+For future Splash ports, retain the same accepted token positions across
+paired owner routes, capture per-layer inputs and post-GDN/FFN outputs across
+several adjacent positions, and compare committed state at every emitted
+prefix. Sparse operator parity at one token is not enough to establish
+multi-position recurrent-state parity. Use an independent recurrence oracle
+before attributing downstream amplification to the expert backend. See the
+[position-sweep report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#adjacent-position-state-drift-localization).
