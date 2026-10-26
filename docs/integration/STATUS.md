@@ -5820,8 +5820,12 @@ initial state changed it by `1.14e-8`–`1.21e-8`. The captured `h` and `z` matc
 gate/beta hold the small input deltas. Swapping only gate changed state by
 `3.98e-8` relative L2 after position 2044, compared with `2.27e-8` for beta;
 both together gave `4.35e-8`. This makes gate the larger isolated local
-contributor for this sample, but does not identify its upstream cause or
-establish full-model correctness. The GDN parity self-test passed 84 cases. See the [CUDA
+contributor for this first window. In a second window, positions 2045–2046,
+the combined input effect was `3.51e-8`, while the initial-state effect was
+`4.22e-8`; gate remained slightly larger than beta in isolation. These samples
+show that local sensitivity depends on the captured state and inputs. They do
+not identify the upstream cause or establish full-model correctness. The GDN
+parity self-test passed 84 cases. See the [CUDA
 crossover report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#cuda-recurrence-crossover-replay).
 
 The CUDA recurrence replay utility at `cc8d1faf` rebuilt and linked for HIP on

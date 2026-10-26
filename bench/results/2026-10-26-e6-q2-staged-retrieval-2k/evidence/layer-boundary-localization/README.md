@@ -151,6 +151,18 @@ changing both gives `4.35e-8`. Gate is the larger isolated contributor in
 this sample, and the two effects are not additive. The outputs and full
 per-position difference counts are in the compact JSON.
 
+A second window uses the captured state after position 2044 and inputs at
+2045–2046. Both route-matched replays again reproduce their captured states
+bit for bit. After position 2046, swapping the full two-position input sequence
+changes state by `3.51e-8` relative L2, while swapping only the initial state
+changes it by `4.22e-8`. Gate alone contributes `2.66e-8` and beta alone
+`2.46e-8` in that window. Thus gate remains the larger isolated field effect,
+but the pre-existing state delta is larger than the combined input effect in
+this second sample. These adjacent windows show that local sensitivity depends
+on the captured state and inputs; they do not support a general ranking of
+input versus state effects. See
+[`gdn-recurrence-crossover-window-2045-2046.json`](gdn-recurrence-crossover-window-2045-2046.json).
+
 This is a local perturbation result, not a numerical oracle for the full model:
 the replay sets gamma to zero because only recurrent state is compared, and it
 does not evaluate normalized GDN output. It does not explain why gate/beta

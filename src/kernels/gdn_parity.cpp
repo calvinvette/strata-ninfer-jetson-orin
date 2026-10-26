@@ -119,7 +119,8 @@ std::vector<char> read_binary(const char* path) {
     return std::vector<char>(std::istreambuf_iterator<char>(f), {});
 }
 
-std::map<int64_t, std::vector<float>> read_commit_capture(const char* path, int layer) {
+std::map<int64_t, std::vector<float>> read_commit_capture(const char* path, int layer,
+                                                         int64_t start_position, int64_t end_position) {
     const auto bytes = read_binary(path);
     std::map<int64_t, std::vector<float>> records;
     size_t offset = 0;
@@ -130,20 +131,21 @@ std::map<int64_t, std::vector<float>> read_commit_capture(const char* path, int 
             throw std::runtime_error("unexpected STGCMT1 record");
         const size_t data = offset + sizeof(h), nbytes = (size_t) h.state_floats * sizeof(float);
         if (data + nbytes > bytes.size()) throw std::runtime_error("truncated STGCMT1 payload");
-        if (h.position == 2042 || h.position == 2044) {
+        if (h.position == start_position || h.position == end_position) {
             std::vector<float> state((size_t) h.state_floats);
             std::memcpy(state.data(), bytes.data() + data, nbytes);
             records.emplace(h.position, std::move(state));
         }
         offset = data + nbytes;
     }
-    if (!records.count(2042) || !records.count(2044))
-        throw std::runtime_error("commit capture needs positions 2042 and 2044");
+    if (!records.count(start_position) || !records.count(end_position))
+        throw std::runtime_error("commit capture is missing the requested start/end positions");
     return records;
 }
 
 std::map<int64_t, ReplayInput> read_gdn_capture(const char* path, int layer,
-                                               uint64_t& channels, uint64_t& heads, uint64_t& value_dim) {
+                                               uint64_t& channels, uint64_t& heads, uint64_t& value_dim,
+                                               int64_t position_a, int64_t position_b) {
     const auto bytes = read_binary(path);
     std::map<int64_t, ReplayInput> records;
     size_t offset = 0;
@@ -169,7 +171,7 @@ std::map<int64_t, ReplayInput> read_gdn_capture(const char* path, int layer,
         }
         for (int row = 0; row < h.rows; ++row) {
             const int64_t pos = h.pos0 + row;
-            if (pos != 2043 && pos != 2044) continue;
+            if (pos != position_a && pos != position_b) continue;
             auto slice = [&](size_t field) {
                 const size_t width = (size_t) dims[field];
                 return std::vector<float>(fields[field].begin() + (size_t) row * width,
@@ -181,8 +183,8 @@ std::map<int64_t, ReplayInput> read_gdn_capture(const char* path, int layer,
         }
         offset = cursor;
     }
-    if (!records.count(2043) || !records.count(2044))
-        throw std::runtime_error("GDN capture needs positions 2043 and 2044");
+    if (!records.count(position_a) || !records.count(position_b))
+        throw std::runtime_error("GDN capture is missing the requested positions");
     return records;
 }
 
@@ -199,7 +201,8 @@ StateMetrics state_metrics(const std::vector<float>& a, const std::vector<float>
 
 std::pair<std::vector<float>, std::vector<float>> replay_gdn(
     const std::vector<float>& initial, const std::map<int64_t, ReplayInput>& inputs,
-    uint64_t channels, uint64_t heads, uint64_t value_dim, int h_k) {
+    uint64_t channels, uint64_t heads, uint64_t value_dim, int h_k,
+    int64_t position_a, int64_t position_b) {
     std::vector<float> state = initial;
     float *d_state = nullptr, *d_h = nullptr, *d_gate = nullptr, *d_beta = nullptr, *d_z = nullptr;
     float *d_gamma = nullptr, *d_y = nullptr;
@@ -221,7 +224,7 @@ std::pair<std::vector<float>, std::vector<float>> replay_gdn(
     check(cudaMemcpy(d_keep, &keep, sizeof(keep), cudaMemcpyHostToDevice), "copy replay keep");
     check(cudaMemcpy(d_gamma, gamma.data(), gamma.size() * sizeof(float), cudaMemcpyHostToDevice), "copy replay gamma");
     check(cudaMemcpy(d_state, state.data(), state.size() * sizeof(float), cudaMemcpyHostToDevice), "copy replay state");
-    for (int64_t position : {2043, 2044}) {
+    for (int64_t position : {position_a, position_b}) {
         const ReplayInput& x = inputs.at(position);
         check(cudaMemcpy(d_h, x.h.data(), x.h.size() * sizeof(float), cudaMemcpyHostToDevice), "copy replay h");
         check(cudaMemcpy(d_gate, x.gate.data(), x.gate.size() * sizeof(float), cudaMemcpyHostToDevice), "copy replay gate");
@@ -230,7 +233,7 @@ std::pair<std::vector<float>, std::vector<float>> replay_gdn(
         strata::kernels::gdn_step_norm_multi(d_state, d_h, (int) channels, d_gate, d_beta, d_z, d_gamma,
                                              1e-6f, d_y, h_k, (int) heads, 1, d_keep, stream, 0, nullptr);
         check(cudaStreamSynchronize(stream), "synchronize GDN replay token");
-        std::vector<float>& snapshot = position == 2043 ? after_2043 : after_2044;
+        std::vector<float>& snapshot = position == position_a ? after_2043 : after_2044;
         snapshot.resize(state.size());
         check(cudaMemcpy(snapshot.data(), d_state, state.size() * sizeof(float), cudaMemcpyDeviceToHost),
               "read GDN replay token state");
@@ -243,68 +246,78 @@ std::pair<std::vector<float>, std::vector<float>> replay_gdn(
     return {std::move(after_2043), std::move(after_2044)};
 }
 
-int replay_crossover(const char* cpu_state_path, const char* staged_state_path,
+int replay_crossover(int64_t start_position, int64_t position_a, int64_t position_b,
+                     const char* cpu_state_path, const char* staged_state_path,
                      const char* cpu_diag_path, const char* staged_diag_path) {
     constexpr int layer = 1, h_k = 16, h_v = 48, S = 128;
     constexpr size_t recurrent = (size_t) S * h_v * S;
-    auto cpu_states = read_commit_capture(cpu_state_path, layer);
-    auto staged_states = read_commit_capture(staged_state_path, layer);
+    if (position_a != start_position + 1 || position_b != position_a + 1)
+        throw std::runtime_error("replay positions must be consecutive after the start state");
+    auto cpu_states = read_commit_capture(cpu_state_path, layer, start_position, position_b);
+    auto staged_states = read_commit_capture(staged_state_path, layer, start_position, position_b);
     uint64_t channels = 0, heads = 0, value_dim = 0;
-    auto cpu_inputs = read_gdn_capture(cpu_diag_path, layer, channels, heads, value_dim);
-    auto staged_inputs = read_gdn_capture(staged_diag_path, layer, channels, heads, value_dim);
+    auto cpu_inputs = read_gdn_capture(cpu_diag_path, layer, channels, heads, value_dim, position_a, position_b);
+    auto staged_inputs = read_gdn_capture(staged_diag_path, layer, channels, heads, value_dim, position_a, position_b);
     if (heads != h_v || channels != 2 * S * h_k + value_dim || value_dim != (uint64_t) S * h_v)
         throw std::runtime_error("unexpected Flash-Next Q2_0 GDN geometry");
-    for (int64_t p : {2043, 2044})
+    for (int64_t p : {position_a, position_b})
         if (cpu_inputs.at(p).token != staged_inputs.at(p).token) throw std::runtime_error("paired token IDs differ");
     auto prefix = [&](const std::vector<float>& full) { return std::vector<float>(full.begin(), full.begin() + recurrent); };
-    const auto cpu_start = prefix(cpu_states.at(2042)), staged_start = prefix(staged_states.at(2042));
-    const auto cpu_actual = prefix(cpu_states.at(2044)), staged_actual = prefix(staged_states.at(2044));
-    const auto cc = replay_gdn(cpu_start, cpu_inputs, channels, heads, value_dim, h_k);
-    const auto cs = replay_gdn(cpu_start, staged_inputs, channels, heads, value_dim, h_k);
-    const auto sc = replay_gdn(staged_start, cpu_inputs, channels, heads, value_dim, h_k);
-    const auto ss = replay_gdn(staged_start, staged_inputs, channels, heads, value_dim, h_k);
+    const auto cpu_start = prefix(cpu_states.at(start_position)), staged_start = prefix(staged_states.at(start_position));
+    const auto cpu_actual = prefix(cpu_states.at(position_b)), staged_actual = prefix(staged_states.at(position_b));
+    const auto cc = replay_gdn(cpu_start, cpu_inputs, channels, heads, value_dim, h_k, position_a, position_b);
+    const auto cs = replay_gdn(cpu_start, staged_inputs, channels, heads, value_dim, h_k, position_a, position_b);
+    const auto sc = replay_gdn(staged_start, cpu_inputs, channels, heads, value_dim, h_k, position_a, position_b);
+    const auto ss = replay_gdn(staged_start, staged_inputs, channels, heads, value_dim, h_k, position_a, position_b);
     auto gate_only_inputs = cpu_inputs, beta_only_inputs = cpu_inputs;
-    for (int64_t p : {2043, 2044}) {
+    for (int64_t p : {position_a, position_b}) {
         gate_only_inputs.at(p).gate = staged_inputs.at(p).gate;
         beta_only_inputs.at(p).beta = staged_inputs.at(p).beta;
     }
-    const auto gate_only = replay_gdn(cpu_start, gate_only_inputs, channels, heads, value_dim, h_k);
-    const auto beta_only = replay_gdn(cpu_start, beta_only_inputs, channels, heads, value_dim, h_k);
+    const auto gate_only = replay_gdn(cpu_start, gate_only_inputs, channels, heads, value_dim, h_k, position_a, position_b);
+    const auto beta_only = replay_gdn(cpu_start, beta_only_inputs, channels, heads, value_dim, h_k, position_a, position_b);
     const auto m_cpu = state_metrics(cpu_actual, cc.second, recurrent);
     const auto m_staged = state_metrics(staged_actual, ss.second, recurrent);
-    const auto input_cpu_2043 = state_metrics(cc.first, cs.first, recurrent);
-    const auto input_cpu_2044 = state_metrics(cc.second, cs.second, recurrent);
-    const auto input_staged_2043 = state_metrics(sc.first, ss.first, recurrent);
-    const auto input_staged_2044 = state_metrics(sc.second, ss.second, recurrent);
-    const auto state_cpu_2043 = state_metrics(cc.first, sc.first, recurrent);
-    const auto state_cpu_2044 = state_metrics(cc.second, sc.second, recurrent);
-    const auto state_staged_2043 = state_metrics(cs.first, ss.first, recurrent);
-    const auto state_staged_2044 = state_metrics(cs.second, ss.second, recurrent);
-    const auto gate_only_2043 = state_metrics(cc.first, gate_only.first, recurrent);
-    const auto gate_only_2044 = state_metrics(cc.second, gate_only.second, recurrent);
-    const auto beta_only_2043 = state_metrics(cc.first, beta_only.first, recurrent);
-    const auto beta_only_2044 = state_metrics(cc.second, beta_only.second, recurrent);
+    const auto input_cpu_a = state_metrics(cc.first, cs.first, recurrent);
+    const auto input_cpu_b = state_metrics(cc.second, cs.second, recurrent);
+    const auto input_staged_a = state_metrics(sc.first, ss.first, recurrent);
+    const auto input_staged_b = state_metrics(sc.second, ss.second, recurrent);
+    const auto state_cpu_a = state_metrics(cc.first, sc.first, recurrent);
+    const auto state_cpu_b = state_metrics(cc.second, sc.second, recurrent);
+    const auto state_staged_a = state_metrics(cs.first, ss.first, recurrent);
+    const auto state_staged_b = state_metrics(cs.second, ss.second, recurrent);
+    const auto gate_only_a = state_metrics(cc.first, gate_only.first, recurrent);
+    const auto gate_only_b = state_metrics(cc.second, gate_only.second, recurrent);
+    const auto beta_only_a = state_metrics(cc.first, beta_only.first, recurrent);
+    const auto beta_only_b = state_metrics(cc.second, beta_only.second, recurrent);
     auto print = [](const char* name, const StateMetrics& m, bool comma) {
         std::printf("    \"%s\": {\"different\": %zu, \"relative_l2\": %.9g, \"max_abs\": %.9g}%s\n",
                     name, m.different, m.rel, m.max_abs, comma ? "," : "");
     };
-    std::printf("{\n  \"layer\": 1, \"positions\": [2043, 2044],\n"
+    std::printf("{\n  \"layer\": 1, \"start_position\": %lld, \"positions\": [%lld, %lld],\n",
+                (long long) start_position, (long long) position_a, (long long) position_b);
+    std::printf(
                 "  \"geometry\": {\"state_size\": 128, \"key_heads\": 16, \"value_heads\": 48},\n"
                 "  \"scope\": \"CUDA state recurrence only; gamma is zero and normalized output is not evaluated\",\n"
                 "  \"route_matched_replays_bitwise\": true,\n");
     print("replay_vs_captured_cpu", m_cpu, true); print("replay_vs_captured_staged", m_staged, true);
-    print("input_effect_from_cpu_state_after_2043", input_cpu_2043, true);
-    print("input_effect_from_cpu_state_after_2044", input_cpu_2044, true);
-    print("input_effect_from_staged_state_after_2043", input_staged_2043, true);
-    print("input_effect_from_staged_state_after_2044", input_staged_2044, true);
-    print("initial_state_effect_with_cpu_input_after_2043", state_cpu_2043, true);
-    print("initial_state_effect_with_cpu_input_after_2044", state_cpu_2044, true);
-    print("initial_state_effect_with_staged_input_after_2043", state_staged_2043, true);
-    print("initial_state_effect_with_staged_input_after_2044", state_staged_2044, true);
-    print("gate_only_effect_from_cpu_state_after_2043", gate_only_2043, true);
-    print("gate_only_effect_from_cpu_state_after_2044", gate_only_2044, true);
-    print("beta_only_effect_from_cpu_state_after_2043", beta_only_2043, true);
-    print("beta_only_effect_from_cpu_state_after_2044", beta_only_2044, false);
+    auto emit_position = [&](const char* label, int64_t pos, const StateMetrics& input_cpu,
+                             const StateMetrics& input_staged, const StateMetrics& state_cpu,
+                             const StateMetrics& state_staged, const StateMetrics& gate,
+                             const StateMetrics& beta, bool comma) {
+        std::printf("  \"after_%s_%lld\": {\n", label, (long long) pos);
+        print("input_effect_from_cpu_state", input_cpu, true);
+        print("input_effect_from_staged_state", input_staged, true);
+        print("initial_state_effect_with_cpu_input", state_cpu, true);
+        print("initial_state_effect_with_staged_input", state_staged, true);
+        print("gate_only_effect_from_cpu_state", gate, true);
+        print("beta_only_effect_from_cpu_state", beta, false);
+        std::printf("  }%s\n", comma ? "," : "");
+    };
+    emit_position("position", position_a, input_cpu_a, input_staged_a, state_cpu_a,
+                  state_staged_a, gate_only_a, beta_only_a, true);
+    emit_position("position", position_b, input_cpu_b, input_staged_b, state_cpu_b,
+                  state_staged_b, gate_only_b, beta_only_b, false);
     std::printf("}\n");
     return 0;
 }
@@ -313,14 +326,21 @@ int replay_crossover(const char* cpu_state_path, const char* staged_state_path,
 
 int main(int argc, char** argv) {
     if (argc == 6 && std::string(argv[1]) == "--replay-crossover") {
-        try { return replay_crossover(argv[2], argv[3], argv[4], argv[5]); }
+        try { return replay_crossover(2042, 2043, 2044, argv[2], argv[3], argv[4], argv[5]); }
         catch (const std::exception& e) { std::fprintf(stderr, "GDN replay: %s\n", e.what()); return 1; }
+    }
+    if (argc == 9 && std::string(argv[1]) == "--replay-crossover-window") {
+        try {
+            const int64_t start = std::stoll(argv[2]), a = std::stoll(argv[3]), b = std::stoll(argv[4]);
+            return replay_crossover(start, a, b, argv[5], argv[6], argv[7], argv[8]);
+        } catch (const std::exception& e) { std::fprintf(stderr, "GDN replay: %s\n", e.what()); return 1; }
     }
     bool selftest = false;
     for (int i = 1; i < argc; ++i) {
         if (std::string(argv[i]) == "--selftest") selftest = true;
         else { std::fprintf(stderr, "usage: gdn_parity [--selftest]\n"
-                                    "       gdn_parity --replay-crossover CPU_STATE STAGED_STATE CPU_DIAG STAGED_DIAG\n"); return 2; }
+                                    "       gdn_parity --replay-crossover CPU_STATE STAGED_STATE CPU_DIAG STAGED_DIAG\n"
+                                    "       gdn_parity --replay-crossover-window START POS1 POS2 CPU_STATE STAGED_STATE CPU_DIAG STAGED_DIAG\n"); return 2; }
     }
 
     const int S = 128, h_k = 16, h_v = 48;      // the artifact's real geometry

@@ -693,9 +693,12 @@ the captured gate/beta input sequence changed state about 2.6–3.8 times as
 much as swapping the starting state for this two-token sample. A one-field
 cross-over found gate alone changed state by `3.98e-8` relative L2 after
 position 2044, versus `2.27e-8` for beta; combined they changed it by
-`4.35e-8`. Captured `h` and `z` were exact; normalized output was not evaluated.
-This points to gate as the larger isolated contributor in this sample, while
-its upstream cause and full-model quality remain unresolved. See the [crossover
+`4.35e-8`. A second adjacent window (2045–2046) again has a larger isolated
+gate effect than beta, but its starting-state effect (`4.22e-8`) exceeds the
+combined two-position input effect (`3.51e-8`). Captured `h` and `z` were exact;
+normalized output was not evaluated. Local sensitivity depends on the sampled
+state/input window, and the source of the upstream deltas and full-model
+quality remain unresolved. See the [crossover
 report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#cuda-recurrence-crossover-replay).
 The CUDA/HIP-compatible parity source rebuilt and linked for HIP on maestro1
 at `cc8d1faf` with two jobs. The configured SYCL parity target uses a separate,

@@ -3157,7 +3157,9 @@ report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-
 
 When diagnosing an upstream recurrent-state delta, cross each changed input
 field independently while holding the initial state and all other fields
-fixed. In the sampled Strata GDN trace, gate alone had a larger local state
-effect than beta, and their combined effect was not additive. This field-level
-split is a useful addition to Splash recurrence parity tests; it remains a
-local attribution, not a general operator or end-to-end correctness bound.
+fixed. In two adjacent Strata GDN windows, gate alone had a slightly larger
+local effect than beta, while the starting-state delta exceeded the combined
+input effect in the second window but not the first. The ranking is therefore
+window-dependent. This field-level split is a useful addition to Splash
+recurrence parity tests; it remains a local attribution, not a general
+operator or end-to-end correctness bound.
