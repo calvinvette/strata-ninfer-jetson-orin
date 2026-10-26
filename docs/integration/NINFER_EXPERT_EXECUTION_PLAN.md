@@ -690,10 +690,12 @@ report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-
 A CUDA `gdn_step_norm_multi` crossover replay then reproduced each route's
 committed layer-1 recurrent state bitwise after positions 2043–2044. Swapping
 the captured gate/beta input sequence changed state about 2.6–3.8 times as
-much as swapping the starting state for this two-token sample. Captured `h`
-and `z` were exact; normalized output was not evaluated. This points to the
-gate/beta input delta as the larger local contributor, while its upstream
-cause and full-model quality remain unresolved. See the [crossover
+much as swapping the starting state for this two-token sample. A one-field
+cross-over found gate alone changed state by `3.98e-8` relative L2 after
+position 2044, versus `2.27e-8` for beta; combined they changed it by
+`4.35e-8`. Captured `h` and `z` were exact; normalized output was not evaluated.
+This points to gate as the larger isolated contributor in this sample, while
+its upstream cause and full-model quality remain unresolved. See the [crossover
 report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#cuda-recurrence-crossover-replay).
 The CUDA/HIP-compatible parity source rebuilt and linked for HIP on maestro1
 at `61e9335f` with two jobs. The configured SYCL parity target uses a separate,

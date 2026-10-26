@@ -5817,9 +5817,11 @@ beta/`z` inputs through `gdn_step_norm_multi` reproduced its committed
 recurrent state bit for bit. At position 2044, swapping the two-token input
 sequence changed state by `4.33e-8`–`4.35e-8` relative L2; swapping only the
 initial state changed it by `1.14e-8`–`1.21e-8`. The captured `h` and `z` match;
-gate/beta hold the small input deltas. This localizes the stronger effect to
-those GDN inputs for this sample, but not their upstream cause or full-model
-correctness. The GDN parity self-test passed 84 cases. See the [CUDA
+gate/beta hold the small input deltas. Swapping only gate changed state by
+`3.98e-8` relative L2 after position 2044, compared with `2.27e-8` for beta;
+both together gave `4.35e-8`. This makes gate the larger isolated local
+contributor for this sample, but does not identify its upstream cause or
+establish full-model correctness. The GDN parity self-test passed 84 cases. See the [CUDA
 crossover report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#cuda-recurrence-crossover-replay).
 
 The CUDA recurrence replay utility at `61e9335f` rebuilt and linked for HIP on

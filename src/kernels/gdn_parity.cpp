@@ -263,6 +263,13 @@ int replay_crossover(const char* cpu_state_path, const char* staged_state_path,
     const auto cs = replay_gdn(cpu_start, staged_inputs, channels, heads, value_dim, h_k);
     const auto sc = replay_gdn(staged_start, cpu_inputs, channels, heads, value_dim, h_k);
     const auto ss = replay_gdn(staged_start, staged_inputs, channels, heads, value_dim, h_k);
+    auto gate_only_inputs = cpu_inputs, beta_only_inputs = cpu_inputs;
+    for (int64_t p : {2043, 2044}) {
+        gate_only_inputs.at(p).gate = staged_inputs.at(p).gate;
+        beta_only_inputs.at(p).beta = staged_inputs.at(p).beta;
+    }
+    const auto gate_only = replay_gdn(cpu_start, gate_only_inputs, channels, heads, value_dim, h_k);
+    const auto beta_only = replay_gdn(cpu_start, beta_only_inputs, channels, heads, value_dim, h_k);
     const auto m_cpu = state_metrics(cpu_actual, cc.second, recurrent);
     const auto m_staged = state_metrics(staged_actual, ss.second, recurrent);
     const auto input_cpu_2043 = state_metrics(cc.first, cs.first, recurrent);
@@ -273,6 +280,10 @@ int replay_crossover(const char* cpu_state_path, const char* staged_state_path,
     const auto state_cpu_2044 = state_metrics(cc.second, sc.second, recurrent);
     const auto state_staged_2043 = state_metrics(cs.first, ss.first, recurrent);
     const auto state_staged_2044 = state_metrics(cs.second, ss.second, recurrent);
+    const auto gate_only_2043 = state_metrics(cc.first, gate_only.first, recurrent);
+    const auto gate_only_2044 = state_metrics(cc.second, gate_only.second, recurrent);
+    const auto beta_only_2043 = state_metrics(cc.first, beta_only.first, recurrent);
+    const auto beta_only_2044 = state_metrics(cc.second, beta_only.second, recurrent);
     auto print = [](const char* name, const StateMetrics& m, bool comma) {
         std::printf("    \"%s\": {\"different\": %zu, \"relative_l2\": %.9g, \"max_abs\": %.9g}%s\n",
                     name, m.different, m.rel, m.max_abs, comma ? "," : "");
@@ -289,7 +300,11 @@ int replay_crossover(const char* cpu_state_path, const char* staged_state_path,
     print("initial_state_effect_with_cpu_input_after_2043", state_cpu_2043, true);
     print("initial_state_effect_with_cpu_input_after_2044", state_cpu_2044, true);
     print("initial_state_effect_with_staged_input_after_2043", state_staged_2043, true);
-    print("initial_state_effect_with_staged_input_after_2044", state_staged_2044, false);
+    print("initial_state_effect_with_staged_input_after_2044", state_staged_2044, true);
+    print("gate_only_effect_from_cpu_state_after_2043", gate_only_2043, true);
+    print("gate_only_effect_from_cpu_state_after_2044", gate_only_2044, true);
+    print("beta_only_effect_from_cpu_state_after_2043", beta_only_2043, true);
+    print("beta_only_effect_from_cpu_state_after_2044", beta_only_2044, false);
     std::printf("}\n");
     return 0;
 }

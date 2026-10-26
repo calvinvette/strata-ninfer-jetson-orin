@@ -144,6 +144,13 @@ state delta. The layer-1 QKV, convolution `h`, and `z` arrays match at these
 positions; gate and beta contain the small observed deltas, so this crossover
 principally attributes the state change to those gate/beta inputs.
 
+The replay was extended to swap one field at a time from the CPU-miss inputs
+while holding the CPU-miss starting state fixed. After position 2044, changing
+gate alone gives `3.98e-8` relative L2; changing beta alone gives `2.27e-8`;
+changing both gives `4.35e-8`. Gate is the larger isolated contributor in
+this sample, and the two effects are not additive. The outputs and full
+per-position difference counts are in the compact JSON.
+
 This is a local perturbation result, not a numerical oracle for the full model:
 the replay sets gamma to zero because only recurrent state is compared, and it
 does not evaluate normalized GDN output. It does not explain why gate/beta
@@ -154,10 +161,10 @@ failures. Compact crossover values are in
 state captures remain local.
 
 The final `gdn_parity` source, including checked CUDA resource cleanup, passed
-the Orin CUDA build and the 84-case self-test. The executable SHA-256 is
-`66549f926490b761b64760e488f5a55c0ac1cbddea48942ada32e76e6c7fcf4e`.
-At source commit `61e9335f`, maestro1 rebuilt and linked the HIP target with
-two jobs. This is x86 compile/link evidence only; maestro1 has no relevant
+the Orin CUDA build and the 84-case self-test. The executable SHA-256 for the
+single-field replay build is recorded in `position-sweep-summary.json`. At
+source commit `61e9335f`, maestro1 rebuilt and linked the HIP target with two
+jobs. This is x86 compile/link evidence only; maestro1 has no relevant
 accelerator runtime. The configured SYCL `gdn_parity` target uses the separate,
 unchanged `sycl/src/kernels/gdn_parity.cpp`, so it had no work for this
 CUDA/HIP-only source change.
