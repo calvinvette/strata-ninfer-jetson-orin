@@ -5773,3 +5773,17 @@ This localizes the first sampled Q8_1 input-code divergence to layer 2, while
 its upstream cause remains unknown. See the [Q8_1 capture check](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/q8_1-capture-check/README.md).
 The staged-backend three-pair performance screen measured median 0.00% decode
 TPS change and failed its preregistered 5% gain gate. E6 remains open.
+
+A supervised layer-boundary follow-up now places the first captured CPU-miss
+versus staged difference at model layer 0. At prompt position 2047, routes and
+inputs were bit-identical; seven of ten expert parts matched exactly, and the
+three missing experts (90, 109, 88) differed by about `1e-7` relative L2. Both
+CPU and GPU outputs matched the independent Q2_0 × Q8_1 runtime-contract
+oracle within `5.4e-8`–`9.1e-8` relative L2. The combined FFN output differed
+by `2.43e-8`; layer-1 QKV and projected GDN output were exact despite tiny
+intermediate deltas. Along with the layer-1/2 Q8_1 comparison, this places the
+first sampled numerical change in CPU-versus-staged expert arithmetic at layer
+0; the broader state impact and quality bounds remain unknown. The three
+capture runs all preserved >11.5 GiB available memory and reproduced the
+known six-field state mismatch with the same one-token output. See the
+[layer-boundary report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md).

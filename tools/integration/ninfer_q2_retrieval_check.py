@@ -41,6 +41,10 @@ def main() -> int:
                     help='filter the MoE capture to one token position')
     ap.add_argument('--capture-moe-positions', type=int, nargs='+',
                     help='filter the MoE capture to several increasing token positions')
+    ap.add_argument('--capture-gdn-layer', type=int,
+                    help='capture GDN and feed-forward intermediates for one verifier layer')
+    ap.add_argument('--capture-gdn-position', type=int,
+                    help='filter the GDN capture to one token position')
     ap.add_argument('--run', action='store_true')
     a = ap.parse_args()
     comparison_modes = (a.compare_strata_control, a.compare_cpu_miss_staged, a.compare_staged_backends)
@@ -52,6 +56,12 @@ def main() -> int:
             not a.capture_moe_positions or any(x < 0 for x in a.capture_moe_positions) or
             a.capture_moe_positions != sorted(set(a.capture_moe_positions))):
         ap.error('--capture-moe-positions must be unique, increasing, nonnegative integers')
+    if a.capture_gdn_position is not None and a.capture_gdn_layer is None:
+        ap.error('--capture-gdn-position requires --capture-gdn-layer')
+    if a.capture_gdn_layer is not None and not 0 <= a.capture_gdn_layer < 48:
+        ap.error('--capture-gdn-layer must be in [0, 47]')
+    if a.capture_gdn_position is not None and a.capture_gdn_position < 0:
+        ap.error('--capture-gdn-position must be nonnegative')
     cfg = json.loads(a.config.read_text())
     workload = json.loads(a.workload.read_text())['workloads'][0]
     max_new = a.max_new if a.max_new is not None else workload['generate_tokens']
@@ -123,6 +133,12 @@ def main() -> int:
                     arm_env[f'{stem}_POSITIONS'] = ','.join(map(str, a.capture_moe_positions))
                 elif a.capture_moe_position is not None:
                     arm_env[f'{stem}_POSITION'] = str(a.capture_moe_position)
+        if a.capture_gdn_layer is not None:
+            arm_env['STRATA_VERIFY_DUMP_GDN_LAYER'] = str(a.capture_gdn_layer)
+            arm_env['STRATA_VERIFY_DUMP_GDN_PATH'] = str(
+                (a.output / f'{name}.layer{a.capture_gdn_layer}.gdn-diag').resolve())
+            if a.capture_gdn_position is not None:
+                arm_env['STRATA_VERIFY_DUMP_GDN_POSITION'] = str(a.capture_gdn_position)
         engine = StrataEngine(str(a.engine.resolve()), command, cwd=cfg.get('cwd'),
                               log=str(log), env=arm_env)
         try:

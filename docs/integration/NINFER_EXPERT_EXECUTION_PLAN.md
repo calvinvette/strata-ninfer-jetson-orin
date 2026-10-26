@@ -661,6 +661,16 @@ differences at layers 3, 11 and 21. This places the first sampled Q8_1 input
 change at layer 2; it does not identify the preceding operation that creates
 the change. The per-layer numeric summary and quantizer parity runs are recorded
 in the [Q8_1 capture check](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/q8_1-capture-check/README.md).
+A supervised stage capture then found the earliest sampled CPU-miss/staged
+output delta in model-layer-0 experts 90, 109 and 88: route IDs and inputs
+matched; seven other expert parts were bit-identical. The three rows differed
+by about `1e-7` relative L2, while both arms matched the independent Q2_0 ×
+Q8_1 operator oracle within `5.4e-8`–`9.1e-8`. The combined FFN result
+differed by `2.43e-8`; layer-1 projected GDN output was bit-identical. This
+points to tiny CPU-versus-GPU arithmetic differences as an early source for
+this case, but does not establish the full state or quality impact. Keep E6
+state and quality gates open. Details and memory telemetry are in the
+[layer-boundary report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md).
 
 ### E7 — Assess release of the demonstrated integration
 
