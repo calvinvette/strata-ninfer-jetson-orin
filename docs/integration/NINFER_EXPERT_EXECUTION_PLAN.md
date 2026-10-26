@@ -912,10 +912,12 @@ verifier boundary capture to multirow windows produced matching-format
 layer-0 / position-2043 records in a fifth pair. The input residual and
 injection matched bitwise; the combined MoE output differed by `2.90e-8`
 relative L2, the next-layer residual by `3.11e-8`, and its read activation by
-`6.19e-8`. This directly measures the first cross-arm difference at the
-layer-0 combined MoE output and its propagation to the next layer. Both arms
-still failed persistent-state parity; E6 correctness and performance gates
-remain open. See the [multirow boundary capture report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#multirow-ordinary-verifier-boundary-capture).
+`6.19e-8`. Inputs, routes and shared output matched exactly; three or four
+routed expert rows per position differed around `1e-7` relative L2. This
+directly measures the first cross-arm difference at the layer-0 combined MoE
+output and its propagation to the next layer. Both arms still failed
+persistent-state parity; E6 correctness and performance gates remain open. See
+the [multirow boundary capture report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#multirow-ordinary-verifier-boundary-capture).
 
 Execution note (2026-10-26): commit `db95a63c874fa0a7cfc9cff450696cd3a9083990`
 rebuilt for Orin CUDA and maestro1 HIP; HIP and SYCL `strata --help` checks
@@ -932,6 +934,18 @@ captured the boundary and localized the first difference to layer-0 combined
 MoE output. E6 state and performance qualification remain open. See the
 [multirow boundary report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#multirow-ordinary-verifier-boundary-capture)
 and [backend build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-multirow-residual-boundary-capture).
+
+Execution note (2026-10-26): mirroring the ten layer-0 Q2_0 experts identified
+across positions 2043–2047 made every sampled expert row, combined output and
+boundary value match the staged arm exactly. PLE state matched, but the GDN,
+tail, pooled, pooled-full and KV fingerprints did not. A repeated capture and
+exact CUDA recurrence replay found layer-1 inputs matched at positions
+2043–2046; only their differing starting states caused the replayed state
+deltas (`1.72e-8`–`1.89e-8` relative L2). The state gap therefore predates the
+sampled positions under this intervention. Next, trace the layer-1 state
+backward over earlier prompt windows and capture corresponding layer-0 rows.
+This is diagnostic evidence only: E6 correctness, quality and performance
+gates remain open. See the [mirror/crossover report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#position-union-cpu-mirror-intervention).
 
 Execution note (2026-10-26): the no-trace five-workload staged-miss state
 replay completed one pair. Three of five measured response hashes matched,

@@ -6059,9 +6059,26 @@ The layer-0 input residual and injection were bitwise equal. The MoE output
 delta was `2.90e-8` relative L2, the next layer's residual delta was
 `3.11e-8`, and its read activation delta was `6.19e-8`. This locates the first
 cross-arm difference at the layer-0 combined MoE output and measures its
-propagation into the next layer read. The pair again failed persistent-state
-parity and does not close a correctness or performance gate. [Capture and
+propagation into the next layer read. MoE captures show exact input, route
+IDs/weights and shared output; three or four routed expert rows per position
+differ slightly (`8.75e-8`–`1.10e-7` relative L2), while other rows are bitwise
+exact. The combined MoE output delta is `2.11e-8`–`3.05e-8`. This implicates
+a subset of expert-row arithmetic across the CPU-miss and staged paths, rather
+than route selection or the shared expert. The pair again failed
+persistent-state parity and does not close a correctness or performance gate. [Capture and
 telemetry report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#multirow-ordinary-verifier-boundary-capture).
+
+An opt-in layer-0 Q2_0 CPU arithmetic mirror restricted to the ten IDs observed
+to differ across positions 2043–2047 made all captured expert rows, combined
+MoE outputs, and the sampled layer-0 boundary bitwise equal to the staged arm.
+PLE state matched, but GDN, tail, pooled, pooled-full and KV state remained
+different. A repeated pair captured layer-1 GDN state; exact recurrence replay
+showed the current GDN inputs had zero effect on the cross-arm difference,
+while swapping only the already-different start state produced relative-L2
+state deltas of `1.72e-8`–`1.89e-8`. The recurrent-state divergence therefore
+predates the sampled positions, even after the selected layer-0 rows are
+mirrored. The request still fails state parity; find the earlier source before
+claiming correctness. [Mirror and crossover report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#position-union-cpu-mirror-intervention).
 
 The diagnostic source commit `db95a63c874fa0a7cfc9cff450696cd3a9083990`
 rebuilt successfully on Orin CUDA and maestro1 HIP. HIP `strata --help` passed;

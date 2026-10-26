@@ -438,6 +438,15 @@ measures the intervening residual step: the first cross-arm difference is
 already present in the layer-0 combined MoE output and is carried into the
 next layer's read, with a small increase there.
 
+The same run's MoE comparison found exact inputs, route IDs/weights, and shared
+output for all five captured positions. Three or four routed expert rows per
+position differed at about `8.75e-8`–`1.10e-7` relative L2; other routed rows
+matched bitwise. The combined MoE output then differed by `2.11e-8`–
+`3.05e-8`. This points to small owner/backend arithmetic differences in a
+subset of expert rows, rather than routing or shared-expert output. The
+compact [per-expert comparison](layer0-to-layer1-current/run5/moe-comparison.json)
+contains each position and row's metrics; raw captures remain local.
+
 The pair produced the same generated token and residency map but failed final
 persistent-state parity in GDN, PLE, tail, pooled, pooled-full and KV fields.
 Minimum available/admission memory was 11.61 GiB. Prompt times were 58.84 s
@@ -445,3 +454,34 @@ Minimum available/admission memory was 11.61 GiB. Prompt times were 58.84 s
 performance comparison or quality qualification. The [compact boundary
 comparison](layer0-to-layer1-current/run5/boundary-comparison.json) and raw
 captures remain local pending the normal evidence-retention decision.
+
+### Position-union CPU mirror intervention
+
+The five-position comparison identifies ten expert IDs with CPU-miss/staged
+row differences across positions 2043–2047: `64, 72, 83, 88, 90, 109, 120,
+123, 136, 144`. A paired run enabled the existing Q2_0/Q2_0 CPU arithmetic
+mirror at layer 0 only for that ID set. All ten expert rows, combined MoE
+outputs and layer-0 boundary fields then matched the staged arm bit for bit at
+all five positions. PLE final state also matched. GDN, tail, pooled,
+pooled-full and KV state still differed, so correcting these sampled rows
+does not repair the full request. See the compact [MoE
+comparison](layer0-to-layer1-current/run6/moe-comparison.json) and [boundary
+comparison](layer0-to-layer1-current/run6/boundary-comparison.json).
+
+A follow-up repeated the same mirror with layer-1 committed-state captures.
+The CUDA recurrence replay reproduced both captured arms bitwise. At positions
+2043–2046, swapping the current captured inputs had zero effect because the
+recurrence inputs matched; swapping only the starting state changed the
+resulting state by relative L2 `1.72e-8`–`1.89e-8`. Thus the layer-1 recurrent
+state was already different before these positions even after the selected
+layer-0 rows were mirrored. The [two replay summaries](layer0-to-layer1-current/run7/crossover-2043-44.json)
+and [positions 2045–2046](layer0-to-layer1-current/run7/crossover-2045-46.json)
+record this local crossover. The run still failed final-state parity in GDN,
+tail, pooled, pooled-full and KV. Minimum available/admission memory was
+11.64 GiB. Prompt times were 58.61 s (CPU mirror) and 59.10 s (NInfer staged);
+one pair with diagnostic copies is not a performance result.
+
+The next correctness experiment should trace the layer-1 starting-state
+difference backward across earlier prompt windows while capturing matching
+layer-0 MoE rows. This is required to find whether earlier expert IDs, another
+layer transition, or both produced the state gap.
