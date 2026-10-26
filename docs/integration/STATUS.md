@@ -5961,3 +5961,14 @@ in the tested path; it is operator-only and does not replace E6's paired
 end-to-end matrix. Run source was `65b80be3`, binary SHA256
 `ec1d713c80aaeb266a8b4934d73faef8bac08692349b2d39db7f09c075811602`, with
 24.13 GiB minimum available memory. [Operator check](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#expert-114-cuda-operator-check).
+
+An opt-in CPU Q8_1 dot intervention limited to layer-2 expert 114 made its
+position-123 CPU-miss and staged output rows bit-identical. In a paired layer-3
+QSA capture, all selected historical K/V values (including logical cell 123),
+query, current K/V, attention, gated output and projection were then exact with
+matching selection IDs. QSA input/index-query drift remained near `1e-7`
+relative L2. This strongly supports the layer-2 CPU Q8_0 versus staged Q8_1
+activation arithmetic as the cause of the sampled cache-cell mismatch. The
+full checker still reports GDN, tail, pooled, pooled-full and KV state
+differences; this one-expert intervention does not qualify whole-model state
+or quality. It was opt-in and changed no defaults. [Q8_1 intervention](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#scoped-q8_1-owner-intervention).

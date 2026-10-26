@@ -227,3 +227,12 @@ no-release decision: there is no material resident-expert speedup, staged-miss
 state remains unresolved, and no 30-minute NInfer soak or performance
 confirmation is warranted. See the [position-123 and operator
 report](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md).
+
+A scoped opt-in CPU Q8_1 dot selector on layer-2 expert 114 made the service
+rows bit-identical at position 123 and restored exact selected layer-3 QSA K/V
+(including logical cache cell 123), attention and projection. This supports
+the owner activation-format arithmetic as the local source of the sampled
+cache mismatch. The one-token checker still reported final persistent-state
+differences, so this
+does not establish a whole-model numerical contract or change the no-release
+decision.

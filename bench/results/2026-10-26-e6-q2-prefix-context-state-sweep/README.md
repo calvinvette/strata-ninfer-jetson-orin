@@ -151,6 +151,27 @@ clock sampling was read-only; EMC was inaccessible and energy was not measured.
 The GDN batch flag was enabled through the run config. Raw layer captures,
 oracle activation files and supervisor output remain local-only.
 
+## Scoped Q8_1 owner intervention
+
+A third paired capture enabled the existing CPU Q8_1 dot selector only for
+Q2_0/Q2_0 model layer 2, expert 114. At position 123, that expert's CPU-miss
+and NInfer-staged output rows became bit-identical. At model layer 3, position
+125, all 65,536 selected historical K values and all 65,536 selected V values
+were bit-identical across the arms; the previously differing logical cache
+cell 123 now matched exactly. QSA query, current K/V, attention, gated output
+and projection were also exact, with identical selection IDs. The QSA input
+and index query retained only tiny differences (`1.12e-7` and `1.06e-7`
+relative L2), while the exact projection and selected cache agree.
+
+This opt-in intervention strongly supports the CPU Q8_0 versus staged Q8_1
+activation arithmetic for layer-2 expert 114 as the source of the sampled
+QSA cache-cell mismatch. It is a one-expert, one-position diagnostic; the full
+checker still found GDN, tail, pooled, pooled-full and KV state differences,
+so it does not establish whole-model state parity or quality. The run completed
+in 62.3 seconds with 11.27 GiB minimum available/admission memory; EMC and
+energy were unavailable. It did not change defaults. Raw captures remain
+local-only.
+
 ## Expert 114 CUDA operator check
 
 The Orin `ninfer_q2_expert_parity` tool was run on model layer 2 / expert 114

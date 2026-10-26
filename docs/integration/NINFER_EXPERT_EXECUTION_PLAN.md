@@ -135,6 +135,18 @@ multi-workload staged-miss mismatches. The next E6 gate is the complete
 workload-order replay and a held-out task-quality check before performance
 confirmation. See the [staged-miss report and
 diagnostic](../../bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/README.md).
+
+Execution note (2026-10-26): a repeated position-123 trace found the only
+material layer-2 expert-row delta in expert 114. An opt-in CPU Q8_1 dot
+selector for that layer/expert made its output exact against staged execution
+and restored exact selected layer-3 QSA K/V, attention and projection at the
+sampled step, including cache cell 123. Whole-request state still differed.
+This supports owner activation-format arithmetic as the local QSA cause but
+does not close the staged state or task-quality gate. The grouped CUDA operator
+check found no useful resident speedup: one-token timings tied, 64/128-token
+groups regressed, and a standalone D3/D4 path failed its oracle. Keep these
+diagnostics separate from performance confirmation. See the [trace and
+operator report](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md).
 E2's resident schedule and the earlier E3 staged-miss schedules failed their
 initial performance screens. The
 default remains Strata and the NInfer path remains experimental. Each stage
