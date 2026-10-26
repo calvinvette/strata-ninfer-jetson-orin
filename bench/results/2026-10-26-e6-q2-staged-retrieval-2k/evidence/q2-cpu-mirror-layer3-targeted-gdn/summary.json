@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-26",
+  "source_commit": "6b419221",
+  "scope": "one-token held-out retrieval diagnostic; layer-0 filtered CPU Q8_1 mirror, layer-3 captures",
+  "model": "Qwen3.8-Flash-Next Q2_0, split GGUF",
+  "workload": "heldout-retrieval-arithmetic-2048",
+  "prompt_tokens": 2048,
+  "captured_position": 2047,
+  "selector": "q2_0/q2_0@layer=0",
+  "selected_experts": [
+    83,
+    88,
+    90,
+    109
+  ],
+  "route_experts_at_layer3": [
+    205,
+    394,
+    182,
+    335,
+    249,
+    293,
+    496,
+    269,
+    408,
+    310
+  ],
+  "route_ids_match": true,
+  "layer3_input_relative_l2": 7.888009115598133e-08,
+  "layer3_expert_parts_relative_l2": 0.0,
+  "layer3_expert_parts_different_floats": 0,
+  "layer3_shared_output_relative_l2": 0.0,
+  "layer3_combined_output_relative_l2": 1.3578697725463096e-07,
+  "token_ids_equal": true,
+  "residency_equal": true,
+  "final_state_equal": false,
+  "final_state_differing_fields": [
+    "gdn",
+    "tail",
+    "pooled",
+    "pooled_full",
+    "kv"
+  ],
+  "gdn_global_relative_l2": 0.03791778560496753,
+  "gdn_layers_0_to_5_relative_l2": [
+    0.0,
+    4.96580586786443e-10,
+    1.140271958744869e-09,
+    1.3487267711058479e-09,
+    5.069869139906953e-06,
+    0.0032935520064842484
+  ],
+  "minimum_available_gib": 11.65,
+  "interpretation": "At layer 3, routed expert parts remain bit-identical; the incoming activation differs slightly and combined layer output differs at 1.36e-7 relative L2. This does not isolate the state update causing the material GDN divergence at layer 4."
+}

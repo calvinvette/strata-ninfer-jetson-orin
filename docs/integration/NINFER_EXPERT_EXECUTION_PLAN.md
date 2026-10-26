@@ -720,6 +720,17 @@ local owner-arithmetic contribution and shifts its downstream onset, but does
 not resolve later state drift. It is not a quality or performance result. See
 the [expert-filter report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#expert-id-filtered-layer-0-mirror).
 
+A further layer-3 capture under the same filter found bit-identical expert
+parts and shared output at layer 3 despite a `7.89e-8` relative-L2 input
+difference; the combined layer output differed by `1.36e-7`. Routes, generated
+token and residency matched, but final state still differed. The GDN dump
+retained its first material difference at layer 4 (`5.07e-6`), with `0.03792`
+global relative L2. Minimum available/admission memory was 11.65 GiB. This
+shows no material difference in the sampled layer-3 expert operator, but the
+state operation that amplifies the incoming delta remains unidentified.
+This one-token diagnostic adds no quality or performance qualification. See the
+[layer-boundary report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#layer-3-filtered-mirror-follow-up).
+
 ### E7 — Assess release of the demonstrated integration
 
 1. Run focused regression and at least 30 minutes of sustained service for each

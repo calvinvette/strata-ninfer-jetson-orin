@@ -5850,3 +5850,12 @@ global relative L2 was `0.03792`. This isolates one layer-0 CPU/GPU owner
 arithmetic contribution without fixing later drift. Minimum available memory
 was 11.66 GiB. No answer-quality or performance claim is made. See the
 [expert-filter report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#expert-id-filtered-layer-0-mirror).
+
+A follow-up captured layer 3 under the same layer-0 mirror filter. All ten
+expert rows and the shared output were exact; input delta was `7.89e-8`
+relative L2 and combined layer output delta was `1.36e-7`. The token and
+residency still matched, but final state did not. First material committed GDN
+divergence remained at layer 4 (`5.07e-6` relative L2); minimum available
+memory was 11.65 GiB. This does not identify the state update that amplifies
+the small incoming delta and adds no quality/performance qualification. E6
+remains open. Compact metrics are in the [layer-3 report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#layer-3-filtered-mirror-follow-up).

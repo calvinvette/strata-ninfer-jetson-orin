@@ -100,6 +100,26 @@ Compact values are in
 with per-layer state metrics and paired expert-row comparisons alongside it.
 The 113 MiB per-arm state dumps and raw captures remain local.
 
+### Layer-3 filtered-mirror follow-up
+
+A second supervised one-token retrieval run kept the Q8_1 mirror filtered to
+layer-0 experts 83, 88, 90 and 109, while capturing routed MoE rows at
+position 2047 in layer 3. Route IDs matched. All ten layer-3 expert output
+rows and the shared output were bit-identical; the layer input differed by
+`7.89e-8` relative L2 and the combined layer output by `1.36e-7`. Token ID and
+residency matched, while final GDN, tail, pooled, pooled-full and KV fingerprints
+still differed. The state dump again first showed a material difference at GDN
+layer 4 (`5.07e-6` relative L2); the global difference was `0.03792`. Minimum
+available/admission memory was `11.65 GiB`. The run exited nonzero because the
+state-parity check failed, not due to a runtime error. This sampled layer-3
+capture does not identify which state operation amplifies the small incoming
+difference. It is neither a quality nor a performance result.
+
+Compact [layer-3 summary](../q2-cpu-mirror-layer3-targeted-gdn/summary.json),
+[MoE comparison](../q2-cpu-mirror-layer3-targeted-gdn/moe-comparison.json) and
+[GDN comparison](../q2-cpu-mirror-layer3-targeted-gdn/gdn-comparison.json) are
+checked in. Raw captures and 113 MiB per-arm GDN dumps remain local.
+
 Reproduce on Orin with:
 
 ```bash
