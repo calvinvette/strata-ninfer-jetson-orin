@@ -1105,7 +1105,8 @@ differed at layer 3 (relative L2 `1.31e-9`). Layer-2 MoE input, routing and
 shared output matched; routed expert rows for IDs `75, 84, 89, 114, 130`
 differed by about `1e-7`, and their combined output differed by about
 `2.3e-8`–`4.0e-8`. A layer-2 mirror plus layer-3 capture is running to test
-this next transition. The final-state and quality gates remain open; the
+this repeating layer-local effect. The layer-3 intervention with layer-4
+capture is running. The final-state and quality gates remain open; the
 single-pair diagnostic timings do not qualify performance. HIP and SYCL
 rebuilds of the selector change plus model-free help checks passed on maestro1
 (x86_64 compile/startup evidence only). See the linked execution notes in

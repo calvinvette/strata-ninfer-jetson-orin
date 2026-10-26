@@ -6103,12 +6103,15 @@ request still failed in GDN, tail, pooled, pooled-full and KV state. This
 moves the remaining search to later layer transitions; no quality or
 performance qualification is claimed. [Layer-1 intervention report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#layer-1-expert-row-intervention).
 
-The next paired layer extension found the first nonzero element in the final
-per-layer GDN dump at layer 3 after layers 0–2 were bitwise equal. Layer-2
-MoE inputs/routes/shared output were exact, while expert IDs `75, 84, 89, 114,
-130` had small row differences and the combined output differed by roughly
-`2.3e-8`–`4.0e-8`. The paired request still failed state parity; the
-one-token diagnostic is not a quality or performance test. Layer-2-only
-mirroring and layer-3 capture are in progress. The Q8_1 per-layer filter source
-also rebuilt successfully for HIP and SYCL on maestro1; both model-free help
-checks passed. This is x86_64 compile/startup evidence only. [Layer-2 report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#layer-2-extension-and-first-later-state-divergence), [backend build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-per-layer-q8_1-mirror-filters).
+The full final GDN dump is bitwise equal through layers 0–2 after mirroring
+sampled layer-0/1 expert rows. Layer 2 still has small differences in expert
+rows `75, 84, 89, 114, 130`; its output differences precede the first nonzero
+GDN state delta at layer 3. Extending the intervention to those layer-2 rows
+moved the small first delta to layer 3 but did not eliminate it: layer-3 rows
+`78, 87, 94, 113, 135` differ while inputs/routes/shared output match, and the
+GDN state delta grows from relative L2 `8.72e-10` at layer 3 to `5.07e-6` at
+layer 4 and `3.22e-3` at layer 5. A mirror through layer 3 with layer-4
+capture is running. The paired request still fails state parity; one-token
+diagnostics are not quality or performance tests. HIP and SYCL rebuilt the
+filter source on maestro1 and both model-free help checks passed; this is
+x86_64 compile/startup evidence only. [Layer-boundary report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#layer-2-extension-and-first-later-state-divergence), [backend build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-per-layer-q8_1-mirror-filters).

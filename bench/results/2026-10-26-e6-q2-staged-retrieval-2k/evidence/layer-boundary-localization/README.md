@@ -541,3 +541,22 @@ performance evidence. Compact local comparisons are in
 raw large GDN dumps remain local. The next intervention mirrors only the
 layer-2 IDs above and captures layer 3 to test whether the same local
 arithmetic discrepancy explains the first layer-3 state delta.
+
+That intervention extended the mirror through layer 2 and captured layer 3.
+The final GDN dump remained bitwise exact through layers 0–2; layer 3 still
+differed by relative L2 `8.72e-10` (maximum absolute delta `2.98e-8`). The
+layer-3 MoE inputs, routes and shared output were exact, while rows for expert
+IDs `78, 87, 94, 113, 135` differed by about `1e-7` relative L2. Combined
+layer-3 MoE output deltas were zero at positions 2043, 2045 and 2047, and
+`2.49e-8`–`6.34e-8` at the other captured positions. The GDN state gap grew at
+layer 4 to relative L2 `5.07e-6` and at layer 5 to `3.22e-3`. This points to a
+repeating small expert-row arithmetic discrepancy at each successive layer;
+the layer-2 intervention alone does not explain or repair request state.
+Compact [layer-3 comparisons](layer3-extension/run13/) and the final state
+summary are retained locally. The diagnostic again produced equal token IDs
+and equal residency maps but failed state and exact-answer checks; the latter
+is expected to fail for a one-token output cap and is not a quality test.
+
+A follow-up now mirrors the identified layer-3 rows and captures layer 4. It
+will check whether layer-3 GDN state becomes exact and whether the first
+remaining delta moves to layer 4.
