@@ -85,6 +85,17 @@ release profile is **not achieved**.
   independent task-quality oracle or causal explanation is available, these
   are exploratory timings and no seven-pair confirmation was run. See the
   [staged workload report](../../bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/README.md).
+- A randomized three-pair service screen compared Strata and strict NInfer
+  while both used the staged route on the 2K retrieval. Median paired decode
+  rate changed 0.00%; NInfer won one of three pairs, so the preregistered 5%
+  primary gate failed and no confirmation was run. A layer-1 captured-activation
+  check found no CPU/CUDA Q8_1 scale or code mismatch for either route
+  independently. The route activation vectors differed slightly (relative L2
+  `1.027e-7`), so cross-route code-byte identity remains unverified and the
+  state divergence is unexplained. Together with CPU-miss/staged state
+  differences observed through 64K, staged expert misses remain outside a
+  proposed release profile. See the [staged-backend performance screen](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/performance-staged-backend-screen/README.md)
+  and [captured Q8_1 diagnostic](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/q8_1-capture-check/README.md).
 - E5 includes operator and state checks for the bounded static Q2_0 profile.
   Pre-fix natural-generation and 4K retrieval state differences were rerun
   after the SwiGLU precision fix: two natural-generation runs and one 4K

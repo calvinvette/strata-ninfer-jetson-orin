@@ -5760,3 +5760,13 @@ Per-process residency maps were not emitted, so this remains a negative screen
 with a documented evidence gap, not performance qualification. No confirmation
 was run. See the [paired staged-backend
 screen](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/performance-staged-backend-screen/README.md).
+
+The captured layer-1 activation was checked with the independent Q8_1
+quantizer parity mode. CPU and CUDA scales and code bytes matched for each
+route’s 2,560-value input; both inputs had the same small route-to-route
+difference previously measured (relative L2 `1.027e-7`). This rules out a
+CPU-versus-CUDA code mismatch on either captured vector, but does not show
+whether the two input vectors quantize to identical code bytes or explain the
+state drift. See the [Q8_1 capture check](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/q8_1-capture-check/README.md).
+The staged-backend three-pair performance screen measured median 0.00% decode
+TPS change and failed its preregistered 5% gain gate. E6 remains open.
