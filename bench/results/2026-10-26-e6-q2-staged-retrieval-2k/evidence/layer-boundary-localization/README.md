@@ -49,3 +49,25 @@ the matching `supervisor-layer-stage-*` and `supervisor-layer0-moe-capture`
 `result.json` files. The same-activation operator checks used the captured
 layer-0 activation, experts 90, 109 and 88, and the local qualified CUDA
 binary. Python syntax/help checks and all three operator checks passed.
+
+## Opt-in Q2_0 CPU arithmetic mirror trial
+
+The CPU expert path already contains a CUDA-order Q2_0 × Q8_1 dot helper but
+did not expose it for Q2_0 gate/up and Q2_0 down as a selector. An opt-in
+`q2_0/q2_0` pair was added to `STRATA_NATIVE_CPU_Q8_1_DOT`; the default remains
+GGML CPU arithmetic. Its selector-contract check passes. The standalone
+`native_expert_parity` check on the exact layer-0 activation made experts 90,
+109 and 88 bit-identical between CPU and GPU (0/7,680 output values differed
+for each).
+
+A CPU-only service trial restricted to model layer 0 returned the same one
+output token as staged execution, but all six final state fields still
+mismatched. It made the three targeted expert rows exact, while seven other
+active rows that were bit-identical under the default owner split now differed
+by about `9.6e-8`–`1.05e-7` relative L2. A second CPU-only trial selected the
+mirror for all Q2_0/Q2_0 layers; it also retained all six state mismatches.
+These results show the arithmetic helper is useful for isolating owner
+rounding, but the broad format/layer selector affects other CPU-executed rows
+and does not repair whole-request state. It is not a proposed default or a
+qualified fix. No performance measurement was made. Compact values and memory
+records are in `summary.json`; raw captures remain local.

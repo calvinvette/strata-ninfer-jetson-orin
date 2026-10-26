@@ -1103,6 +1103,7 @@ int type_of(std::string name) {
 int check_q8_1_selector_contract() {
     struct Pair { int gu; int down; const char* selector; };
     const Pair pairs[] = {
+        {GGML_TYPE_Q2_0, GGML_TYPE_Q2_0, "q2_0/q2_0"},
         {GGML_TYPE_IQ2_S, GGML_TYPE_Q2_0, "iq2_s/q2_0"},
         {GGML_TYPE_IQ2_S, GGML_TYPE_IQ4_NL, "iq2_s/iq4_nl"},
         {GGML_TYPE_IQ3_XXS, GGML_TYPE_Q2_0, "iq3_xxs/q2_0"},
@@ -1135,7 +1136,7 @@ int check_q8_1_selector_contract() {
             ++failures;
         }
     }
-    const char* selectors[] = {"1", "all", "iq2_s/q2_0", "iq2_s/iq4_nl", "iq3_xxs/q2_0",
+    const char* selectors[] = {"1", "all", "q2_0/q2_0", "iq2_s/q2_0", "iq2_s/iq4_nl", "iq3_xxs/q2_0",
                                "iq3_xxs/iq4_nl", "iq3_s/q2_0", "iq3_s/iq4_nl"};
     for (const char* selector : selectors) {
         set_selector(selector);
@@ -1170,7 +1171,8 @@ int check_q8_1_selector_contract() {
                 ++failures;
                 continue;
             }
-            const bool selected = (i == 0 && layer == 1) || (i == 1 && layer == 3);
+            const bool selected = (std::strcmp(pairs[i].selector, "iq2_s/q2_0") == 0 && layer == 1) ||
+                                  (std::strcmp(pairs[i].selector, "iq2_s/iq4_nl") == 0 && layer == 3);
             const int expected_gu = selected ? GGML_TYPE_Q8_1 : baseline[i].gu_act;
             const int expected_down = selected ? GGML_TYPE_Q8_1 : baseline[i].d_act;
             if (got.gu_act != expected_gu || got.d_act != expected_down) {
@@ -1191,7 +1193,7 @@ int check_q8_1_selector_contract() {
                 ++failures;
                 continue;
             }
-            const bool selected = i == 3 && layer == 7;
+            const bool selected = std::strcmp(pairs[i].selector, "iq3_xxs/iq4_nl") == 0 && layer == 7;
             const int expected_gu = selected ? GGML_TYPE_Q8_1 : baseline[i].gu_act;
             const int expected_down = selected ? GGML_TYPE_Q8_1 : baseline[i].d_act;
             if (got.gu_act != expected_gu || got.d_act != expected_down) {

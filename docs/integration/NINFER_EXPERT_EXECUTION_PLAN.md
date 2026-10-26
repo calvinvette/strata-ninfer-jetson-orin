@@ -671,6 +671,13 @@ points to tiny CPU-versus-GPU arithmetic differences as an early source for
 this case, but does not establish the full state or quality impact. Keep E6
 state and quality gates open. Details and memory telemetry are in the
 [layer-boundary report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md).
+An opt-in Q2_0/Q2_0 CPU Q8_1 mirror made three sampled miss-expert rows
+bit-identical in an isolated parity check, but a whole CPU-miss request still
+differed in six final state fields. Applying the mirror at layer 0 also
+changed seven other CPU-executed rows that had matched under the default owner
+split; selecting it for all Q2_0 layers did not restore state parity. Keep this
+as diagnostic-only; do not promote it or infer a performance benefit. Full
+results are in the [layer-boundary report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md).
 
 ### E7 — Assess release of the demonstrated integration
 

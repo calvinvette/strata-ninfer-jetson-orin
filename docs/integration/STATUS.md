@@ -5787,3 +5787,14 @@ first sampled numerical change in CPU-versus-staged expert arithmetic at layer
 capture runs all preserved >11.5 GiB available memory and reproduced the
 known six-field state mismatch with the same one-token output. See the
 [layer-boundary report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md).
+
+
+An opt-in `q2_0/q2_0` CPU Q8_1 arithmetic mirror was added for diagnostics; the
+selector contract passed, and same-input standalone checks made layer-0
+experts 90, 109 and 88 bit-identical to GPU outputs. Applying it only to the
+CPU-miss service arm at layer 0 made those three rows exact, but changed seven
+other rows that matched under the default owner split (about `1e-7` relative
+L2); all six final state fields still differed. Applying the selector to all
+Q2_0 layers also did not restore final-state parity. The CPU mirror is not a
+qualified fix, remains opt-in, and has no performance result. See the [layer
+boundary report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md).

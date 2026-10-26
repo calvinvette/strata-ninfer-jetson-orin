@@ -45,6 +45,8 @@ def main() -> int:
                     help='capture GDN and feed-forward intermediates for one verifier layer')
     ap.add_argument('--capture-gdn-position', type=int,
                     help='filter the GDN capture to one token position')
+    ap.add_argument('--cpu-q8-1-selector',
+                    help='opt in to a CPU Q8_1 dot selector for the CPU-miss arm only')
     ap.add_argument('--run', action='store_true')
     a = ap.parse_args()
     comparison_modes = (a.compare_strata_control, a.compare_cpu_miss_staged, a.compare_staged_backends)
@@ -62,6 +64,8 @@ def main() -> int:
         ap.error('--capture-gdn-layer must be in [0, 47]')
     if a.capture_gdn_position is not None and a.capture_gdn_position < 0:
         ap.error('--capture-gdn-position must be nonnegative')
+    if a.cpu_q8_1_selector is not None and not a.compare_cpu_miss_staged:
+        ap.error('--cpu-q8-1-selector requires --compare-cpu-miss-staged')
     cfg = json.loads(a.config.read_text())
     workload = json.loads(a.workload.read_text())['workloads'][0]
     max_new = a.max_new if a.max_new is not None else workload['generate_tokens']
@@ -117,6 +121,8 @@ def main() -> int:
             command[command.index('--pcie-frac') + 1] = (
                 '0.0' if a.compare_cpu_miss_staged and backend == 'strata' else '1.0')
         arm_env = dict(env)
+        if a.cpu_q8_1_selector is not None and name == 'cpu-miss':
+            arm_env['STRATA_NATIVE_CPU_Q8_1_DOT'] = a.cpu_q8_1_selector
         arm_env['STRATA_RESIDENCY_DUMP'] = str((a.output / f'{name}.residency.csv').resolve())
         if a.dump_gdn:
             arm_env['STRATA_STATE_DUMP_GDN'] = str((a.output / f'{name}.gdn.bin').resolve())

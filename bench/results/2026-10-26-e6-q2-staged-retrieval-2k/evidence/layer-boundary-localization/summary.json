@@ -334,5 +334,137 @@
       "88": 9.13e-08
     },
     "logs_local": "../layer0-native-parity/*.log"
+  },
+  "q2_0_cpu_q8_1_mirror_experiment": {
+    "selector_contract": "PASS",
+    "same_activation_native_expert_parity": {
+      "experts": [
+        90,
+        109,
+        88
+      ],
+      "bitwise_equal": true,
+      "failures": 0
+    },
+    "cpu_only_layer0_selector": {
+      "selector_run": "q2-cpu-mirror-layer0",
+      "token_ids_equal": true,
+      "completion_ids": [
+        [
+          19910
+        ],
+        [
+          19910
+        ]
+      ],
+      "final_state_equal": false,
+      "state_differing_fields": [
+        "gdn",
+        "ple",
+        "tail",
+        "pooled",
+        "pooled_full",
+        "kv"
+      ],
+      "minimum_available_memory_gib": 11.681
+    },
+    "layer0_expert_parts": {
+      "route_ids_equal": true,
+      "rows": [
+        {
+          "expert": 333,
+          "exact": false,
+          "different_values": 1847,
+          "relative_l2": 1.002513784454759e-07,
+          "max_abs": 1.4901161193847656e-08
+        },
+        {
+          "expert": 351,
+          "exact": false,
+          "different_values": 1840,
+          "relative_l2": 1.0333012955651284e-07,
+          "max_abs": 1.4901161193847656e-08
+        },
+        {
+          "expert": 214,
+          "exact": false,
+          "different_values": 1774,
+          "relative_l2": 9.812506180557227e-08,
+          "max_abs": 2.2351741790771484e-08
+        },
+        {
+          "expert": 249,
+          "exact": false,
+          "different_values": 1782,
+          "relative_l2": 9.57765900826131e-08,
+          "max_abs": 1.4901161193847656e-08
+        },
+        {
+          "expert": 90,
+          "exact": true,
+          "different_values": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        {
+          "expert": 109,
+          "exact": true,
+          "different_values": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        {
+          "expert": 315,
+          "exact": false,
+          "different_values": 1783,
+          "relative_l2": 1.0415135559459052e-07,
+          "max_abs": 5.960464477539063e-08
+        },
+        {
+          "expert": 88,
+          "exact": true,
+          "different_values": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        {
+          "expert": 261,
+          "exact": false,
+          "different_values": 1829,
+          "relative_l2": 1.0024947126836422e-07,
+          "max_abs": 7.450580596923828e-09
+        },
+        {
+          "expert": 262,
+          "exact": false,
+          "different_values": 1875,
+          "relative_l2": 1.0534792734666634e-07,
+          "max_abs": 1.4901161193847656e-08
+        }
+      ]
+    },
+    "cpu_only_all_layers_selector": {
+      "selector_run": "q2-cpu-mirror-all",
+      "token_ids_equal": true,
+      "completion_ids": [
+        [
+          19910
+        ],
+        [
+          19910
+        ]
+      ],
+      "final_state_equal": false,
+      "state_differing_fields": [
+        "gdn",
+        "ple",
+        "tail",
+        "pooled",
+        "pooled_full",
+        "kv"
+      ],
+      "minimum_available_memory_gib": 11.717
+    },
+    "interpretation": "The Q2_0/Q2_0 selector makes the three sampled CPU-owned miss rows match the GPU result in a standalone same-activation test. In the service, applying it to CPU work at layer 0 changes seven other rows that had matched under the default owner split; final state still differs. Applying it to all layers does not restore state parity. This is diagnostic only; performance was not measured."
   }
 }
