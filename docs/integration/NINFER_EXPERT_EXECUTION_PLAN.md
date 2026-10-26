@@ -736,7 +736,10 @@ This one-token diagnostic adds no quality or performance qualification. See the
 
 A layer-5 GDN state-history capture and CUDA recurrence crossover then found
 model-layer-5 committed state already differing at position 2044 (`8.15e-4`
-relative L2). The position-2044 start state, replayed over positions 2045–2046,
+whole-state relative L2), split between recurrent (`3.86e-4`) and convolution
+(`8.15e-4`) state. Convolution state was exact at positions 2046 and 2047,
+while recurrent state remained different (`2.53e-4` and `2.25e-4`). The
+position-2044 start state, replayed over positions 2045–2046,
 reproduced both captured backend states bitwise. Swapping GDN inputs changed
 the recurrent state by `1.61e-4`/`9.99e-5`, while swapping only the recurrent
 start state changed it by `2.71e-4`/`2.30e-4`; isolated gate/beta effects were
@@ -744,7 +747,8 @@ around `2e-8`–`3e-8`. At position 2047, GDN `y` and `gdn_out` differences were
 `1.69e-4` and `1.95e-3`, followed by a `7.89e-3` layer output difference.
 This supports pre-existing recurrent state as the larger local influence in
 that selected window, but does not locate the earlier prompt operation that
-created it. The recurrence replay does not evaluate normalized output. The
+created it. The replay covers recurrence only, not convolution-state updates,
+and does not evaluate normalized output. The
 one-token run is not quality/performance qualification; E6 remains open. See
 the [layer-5 state-history report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#gdn-state-history-crossover-at-model-layer-5).
 

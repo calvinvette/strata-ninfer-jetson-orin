@@ -141,17 +141,23 @@ expert-row changes are downstream of changed inputs and are not evidence of
 different CPU/GPU arithmetic on matching inputs.
 
 Committed state at model layer 5 was already different at captured position
-2044 (`8.15e-4` relative L2); it measured `6.29e-6` at 2046 and `5.07e-6` at
-2047. A CUDA recurrence crossover replay started from the captured position
+2044 (`8.15e-4` whole-state relative L2), split between recurrent state
+(`3.86e-4`) and convolution state (`8.15e-4`). At positions 2046 and 2047 the
+convolution state was exact while recurrent state remained different
+(`2.53e-4` and `2.25e-4` relative L2); whole-state differences were `6.29e-6`
+and `5.07e-6`. The captured `h` differed at position 2045 (`1.98e-4`) and was
+exact at 2046, consistent with the convolution buffer realigning after an
+exact QKV update. A CUDA recurrence crossover replay started from the captured position
 2044 state and replayed positions 2045–2046. Both route-matched replays
 reproduced each captured committed recurrent state bitwise. Swapping the paired
 GDN inputs changed recurrent state by `1.61e-4` and `9.99e-5`; swapping only
 the initial recurrent state changed it by `2.71e-4` and `2.30e-4`. Gate-only
 and beta-only effects were smaller (`1.85e-8`/`3.01e-8` at 2045 and
 `1.90e-8`/`3.35e-8` at 2046). In this sampled window, the pre-existing
-recurrent-state difference has the larger local effect. The replay does not
-identify the earlier prompt operation that created that state difference, and
-does not evaluate normalized output. Minimum available/admission memory was
+recurrent-state difference has the larger local effect. The replay covers the
+recurrent component, not convolution-state updates. The earlier prompt
+operation that created either state difference remains unidentified, and the
+replay does not evaluate normalized output. Minimum available/admission memory was
 `11.71 GiB`. The run is diagnostic only, with no quality or performance claim.
 
 The replay helper now accepts a model-layer argument while preserving the

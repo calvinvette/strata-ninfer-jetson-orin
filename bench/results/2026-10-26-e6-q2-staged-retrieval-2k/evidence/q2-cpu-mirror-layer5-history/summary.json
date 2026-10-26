@@ -18,32 +18,68 @@
     {
       "position": 2044,
       "model_layer": 5,
+      "token_equal": true,
       "cpu_token": 248068,
       "staged_token": 248068,
-      "token_equal": true,
-      "state_relative_l2": 0.000815211149678452,
-      "different_floats": 796630,
-      "max_abs_delta": 0.008529901504516602
+      "whole_state": {
+        "relative_l2": 0.000815211149678452,
+        "different_floats": 796630,
+        "max_abs_delta": 0.008529901504516602
+      },
+      "recurrent_state": {
+        "relative_l2": 0.0003856618834878637,
+        "different_floats": 786391,
+        "max_abs_delta": 0.00015103816986083984
+      },
+      "convolution_state": {
+        "relative_l2": 0.0008154140105379265,
+        "different_floats": 10239,
+        "max_abs_delta": 0.008529901504516602
+      }
     },
     {
       "position": 2046,
       "model_layer": 5,
+      "token_equal": true,
       "cpu_token": 248069,
       "staged_token": 248069,
-      "token_equal": true,
-      "state_relative_l2": 6.285520556044977e-06,
-      "different_floats": 760667,
-      "max_abs_delta": 0.0001271367073059082
+      "whole_state": {
+        "relative_l2": 6.285520556044977e-06,
+        "different_floats": 760667,
+        "max_abs_delta": 0.0001271367073059082
+      },
+      "recurrent_state": {
+        "relative_l2": 0.0002530931547123107,
+        "different_floats": 760667,
+        "max_abs_delta": 0.0001271367073059082
+      },
+      "convolution_state": {
+        "relative_l2": 0.0,
+        "different_floats": 0,
+        "max_abs_delta": 0.0
+      }
     },
     {
       "position": 2047,
       "model_layer": 5,
+      "token_equal": true,
       "cpu_token": 271,
       "staged_token": 271,
-      "token_equal": true,
-      "state_relative_l2": 5.069869139906953e-06,
-      "different_floats": 745788,
-      "max_abs_delta": 0.00011768937110900879
+      "whole_state": {
+        "relative_l2": 5.069869139906953e-06,
+        "different_floats": 745788,
+        "max_abs_delta": 0.00011768937110900879
+      },
+      "recurrent_state": {
+        "relative_l2": 0.00022490044552790015,
+        "different_floats": 745788,
+        "max_abs_delta": 0.00011768937110900879
+      },
+      "convolution_state": {
+        "relative_l2": 0.0,
+        "different_floats": 0,
+        "max_abs_delta": 0.0
+      }
     }
   ],
   "replay": {
@@ -129,6 +165,6 @@
     }
   },
   "minimum_available_gib": 11.72,
-  "interpretation": "At this sampled window, the existing recurrent start-state difference has a larger effect on replayed state than swapping the paired GDN inputs; gate-only and beta-only effects are much smaller. The recurrent state was already different at the captured start position 2044. This does not identify the earlier prompt operation that created that state delta.",
+  "interpretation": "At model layer 5, the captured state at position 2044 already differs in both recurrent and convolution components. Convolution state is exact by positions 2046 and 2047, while recurrent state remains different. At the sampled 2045\u20132046 window, changing the recurrent start state has a larger effect on replayed recurrent state than swapping paired GDN inputs; gate-only and beta-only effects are much smaller. The recurrence replay excludes convolution-state updates and does not identify the earlier prompt operation that created either state delta.",
   "replay_tool_sha256": "68242c05dc2567753177c7400a8fdfbc3361dc49c1af0a9ff820b5de9f613a8c"
 }
