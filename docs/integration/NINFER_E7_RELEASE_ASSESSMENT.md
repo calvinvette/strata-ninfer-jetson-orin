@@ -237,6 +237,13 @@ differences, so this
 does not establish a whole-model numerical contract or change the no-release
 decision.
 
+The all-expert Q8_1 CPU mirror still left `4.686e-2` global GDN relative L2.
+At layer-3 position 123, a `1.59e-7` input delta changed one FP16 activation
+scale although all Q8_1 integer codes matched; ten routed expert rows then
+produced a `1.156e-3` combined-output delta. This shows that activation-format
+matching alone is not a state-parity contract when upstream activations sit
+near a block-scale rounding boundary. [Cross-owner scale trace](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#remaining-layer-3-activation-scale-boundary).
+
 Extending the Q8_1 CPU mirror to every Q2_0 expert retained substantial final
 GDN drift (`4.686e-2` global relative L2). The first material state change was
 GDN ordinal 3/model layer 4. At layer 3 / position 123, the service inputs

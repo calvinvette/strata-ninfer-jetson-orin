@@ -3184,3 +3184,31 @@ window where input changes were larger. For Splash, qualify state history as
 well as current-token arithmetic, label GDN allocation ordinals separately
 from model-layer indices, and avoid generalizing a sensitivity ranking from a
 single position pair.
+
+## Q8_1 owner-format sensitivity from the NInfer integration
+
+In the Q2_0 staged-miss trace, CPU default activation arithmetic differed from
+the staged row for layer-2 expert 114. Opting that expert into CPU Q8_1 made its
+sampled output exact and restored exact selected layer-3 QSA cache K/V,
+attention and projection, including historical cache cell 123. This isolated
+one owner-format contribution, but it did not make final recurrent state
+equal.
+
+Extending the CPU Q8_1 mirror to every Q2_0 expert still left GDN drift. At
+model layer 3, position 123, the input vectors differed by only `1.59e-7`
+relative L2. Their 80 Q8_1 blocks had identical integer codes, but one block's
+FP16 scale rounded differently (`0.00831604` vs `0.00832367`). All ten expert
+rows then differed and the combined MoE output was `1.156e-3` apart; each
+sampled expert-394 output matched its independent FP64 oracle for its own
+activation. This is a concrete example where matching the activation format
+does not guarantee matching the quantized activation when upstream floats
+differ near a scale boundary.
+
+For a future Splash port, capture each owner's exact F32 input plus the packed
+activation bytes and scales. Compare both representations before comparing
+expert outputs; test a shared activation against both kernels, then compare
+each route against an independent oracle. Carry resulting differences through
+selected K/V and committed recurrent state, and keep this diagnostic selector
+off serving defaults until its quality and performance are separately
+qualified. The paired captures and numerical details are in the [E6
+report](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#remaining-layer-3-activation-scale-boundary).
