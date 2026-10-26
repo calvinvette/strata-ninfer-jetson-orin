@@ -6108,10 +6108,12 @@ sampled layer-0/1 expert rows. Layer 2 still has small differences in expert
 rows `75, 84, 89, 114, 130`; its output differences precede the first nonzero
 GDN state delta at layer 3. Extending the intervention to those layer-2 rows
 moved the small first delta to layer 3 but did not eliminate it: layer-3 rows
-`78, 87, 94, 113, 135` differ while inputs/routes/shared output match, and the
-GDN state delta grows from relative L2 `8.72e-10` at layer 3 to `5.07e-6` at
-layer 4 and `3.22e-3` at layer 5. A mirror through layer 3 with layer-4
-capture is running. The paired request still fails state parity; one-token
+`78, 87, 94, 113, 135` differ while inputs/routes/shared output match.
+Mirroring those rows makes GDN state exact through layer 3; layer 4 becomes
+the first differing state. Most layer-4 rows differ by about `1e-7`, but
+expert 106 at position 2042 has a `9.02e-5` maximum absolute error and drives
+a `9.79e-5` combined-output relative-L2 delta. A mirror through layer 4 with
+layer-5 capture is running. The paired request still fails state parity; one-token
 diagnostics are not quality or performance tests. HIP and SYCL rebuilt the
 filter source on maestro1 and both model-free help checks passed; this is
-x86_64 compile/startup evidence only. [Layer-boundary report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#layer-2-extension-and-first-later-state-divergence), [backend build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-per-layer-q8_1-mirror-filters).
+x86_64 compile/startup evidence only. [Layer-boundary report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#layer-3-mirror-and-layer-4-arithmetic-outlier), [backend build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-per-layer-q8_1-mirror-filters).

@@ -560,3 +560,24 @@ is expected to fail for a one-token output cap and is not a quality test.
 A follow-up now mirrors the identified layer-3 rows and captures layer 4. It
 will check whether layer-3 GDN state becomes exact and whether the first
 remaining delta moves to layer 4.
+
+### Layer-3 mirror and layer-4 arithmetic outlier
+
+The layer-3 mirror made the final GDN dump bitwise equal through layers 0–3;
+layer 4 became the first differing state (relative L2 `1.78e-6`, maximum
+absolute delta `6.16e-5`). Captured layer-4 inputs, routes and shared output
+were exact. Most differing expert rows were again near `1e-7` relative L2,
+but expert 106 at position 2042 differed by relative L2 `9.60e-4`, maximum
+absolute `9.02e-5`; the combined MoE output at that position differed by
+relative L2 `9.79e-5`. The per-position layer-4 row IDs also include 82, 91,
+131, 153 and 156. Layer 4 therefore contains a localized larger arithmetic
+outlier that merits separate investigation from the small rounding-sized
+differences. With no layer-4 mirror, later GDN gaps grew to relative L2
+`2.99e-3` at layer 5 and `5.41e-3` at layer 6.
+
+The paired run again emitted the same token IDs and residency map but failed
+request state parity; it used `--max-new 1`, so its answer check is not a
+quality evaluation. A follow-up mirrors layer-4 IDs and captures layer 5.
+Compact raw-derived results are in [`run14/moe-comparison.json`](layer4-extension/run14/moe-comparison.json)
+and [`run14/gdn-state-comparison.json`](layer4-extension/run14/gdn-state-comparison.json);
+large dumps remain local.
