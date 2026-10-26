@@ -5828,7 +5828,7 @@ not identify the upstream cause or establish full-model correctness. The GDN
 parity self-test passed 84 cases. See the [CUDA
 crossover report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#cuda-recurrence-crossover-replay).
 
-The CUDA recurrence replay utility at `cc8d1faf` rebuilt and linked for HIP on
+The CUDA recurrence replay utility at `9004cd82` rebuilt and linked for HIP on
 maestro1 with two build jobs. The configured SYCL parity target compiles the
 separate unchanged `sycl/src/kernels/gdn_parity.cpp`; there was no SYCL source
 change in this diagnostic. maestro1 supplies x86 compile/link evidence only.

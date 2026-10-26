@@ -179,7 +179,8 @@ commit `cc8d1faf`, maestro1 rebuilt and linked the HIP target with two jobs.
 This is x86 compile/link evidence only; maestro1 has no relevant
 accelerator runtime. The configured SYCL `gdn_parity` target uses the separate,
 unchanged `sycl/src/kernels/gdn_parity.cpp`, so it had no work for this
-CUDA/HIP-only source change.
+CUDA/HIP-only source change. The HIP executable SHA-256 is
+`e49a9d45039909e55413e654c50b23abade22bf61b33f1cebc1e24c905604ff1`.
 
 Reproduce on the Orin with the matching captured raw files using:
 
