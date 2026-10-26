@@ -147,6 +147,16 @@ check found no useful resident speedup: one-token timings tied, 64/128-token
 groups regressed, and a standalone D3/D4 path failed its oracle. Keep these
 diagnostics separate from performance confirmation. See the [trace and
 operator report](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md).
+
+Execution note (2026-10-26): applying the CPU Q8_1 mirror across all Q2_0
+experts left global GDN relative L2 `4.686e-2`, with the first material state
+delta at GDN ordinal 3/model layer 4. At model layer 3, position 123, tiny
+input drift (`1.59e-7`) changed one Q8_1 block's FP16 scale despite identical
+integer codes; all ten expert rows then differed and the combined output was
+`1.156e-3` apart. An independent oracle matched the captured expert-394 rows
+for their respective inputs. This identifies a local quantization-scale
+boundary, but not a whole-model tolerance. The 5-position/per-layer trace is
+recorded in the [E6 diagnostic report](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#remaining-layer-3-activation-scale-boundary).
 E2's resident schedule and the earlier E3 staged-miss schedules failed their
 initial performance screens. The
 default remains Strata and the NInfer path remains experimental. Each stage

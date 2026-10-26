@@ -5972,3 +5972,16 @@ activation arithmetic as the cause of the sampled cache-cell mismatch. The
 full checker still reports GDN, tail, pooled, pooled-full and KV state
 differences; this one-expert intervention does not qualify whole-model state
 or quality. It was opt-in and changed no defaults. [Q8_1 intervention](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#scoped-q8_1-owner-intervention).
+
+Extending that mirror to all Q2_0 experts still left `4.686e-2` global GDN
+relative L2; ordinal 3/model layer 4 was the first material state difference
+(`3.16e-3`). A batch-aware layer-3 MoE capture at position 123 found matching
+routes, `1.59e-7` input relative L2 and a `1.156e-3` combined-output delta. All
+ten expert rows differed. Their 80-block Q8_1 activations had identical integer
+codes but one different FP16 scale (block 61: `0.00831604` vs `0.00832367`).
+An independent Q2_0 oracle matched each captured expert-394 row against its
+own activation within `8.4e-8`. This points to a scale-rounding boundary from a
+tiny upstream activation change; it is a local explanation, not whole-model
+state qualification. At layer-3 QSA position 125, selected K/V and attention
+were exact, so that sampled attention operation adds no delta. [Remaining
+state trace](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#remaining-layer-3-activation-scale-boundary).

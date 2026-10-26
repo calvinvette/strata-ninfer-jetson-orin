@@ -236,3 +236,14 @@ cache mismatch. The one-token checker still reported final persistent-state
 differences, so this
 does not establish a whole-model numerical contract or change the no-release
 decision.
+
+Extending the Q8_1 CPU mirror to every Q2_0 expert retained substantial final
+GDN drift (`4.686e-2` global relative L2). The first material state change was
+GDN ordinal 3/model layer 4. At layer 3 / position 123, the service inputs
+differed by `1.59e-7`; their Q8_1 integer codes matched, but one FP16 scale
+block differed. The resulting ten routed expert rows produced a `1.156e-3`
+combined-output delta, while each sampled expert-394 service result matched its
+own independent oracle. This shows why a per-expert format mirror does not
+guarantee state parity when upstream activations differ near a quantization
+scale boundary. The finding does not create a supported approximate-state
+contract; E7 remains a no-release assessment.

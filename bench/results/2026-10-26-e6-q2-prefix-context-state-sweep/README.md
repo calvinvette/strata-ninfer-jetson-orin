@@ -172,6 +172,36 @@ in 62.3 seconds with 11.27 GiB minimum available/admission memory; EMC and
 energy were unavailable. It did not change defaults. Raw captures remain
 local-only.
 
+## Remaining layer-3 activation-scale boundary
+
+The Q8_1 mirror was extended to every Q2_0 expert for a diagnostic pair.
+Final GDN state still differed globally by `4.686e-2`. GDN ordinals 0–2 were
+at `0`, `8.85e-10` and `1.25e-9` relative L2; ordinal 3 (model layer 4) was
+the first above `1e-5`, at `3.16e-3`. Thus matching the layer-2 expert-114
+format removes the earlier local cache mismatch, but a tiny discrepancy still
+reaches the next recurrent block and grows.
+
+A batch-aware model-layer-3 MoE capture at position 123 showed matching routes
+and token IDs, route-weight delta at most `3.8e-8`, and input relative L2
+`1.59e-7`. All ten expert rows differed by about `9.0e-5` to `2.04e-3`; the
+combined MoE output differed by `1.156e-3`. The 80-block CPU Q8_1 and staged
+Q8_1 activations had identical integer codes, but one block (61) had different
+FP16 scales: `0.00831604` versus `0.00832367`. An independent FP64 oracle for
+rank-0 expert 394 matched each service row against its own activation within
+`5.8e-8` and `8.4e-8` relative L2. The evidence points to a one-block scale
+rounding boundary, caused by the tiny upstream activation difference, as the
+immediate source of the all-expert row delta at this sampled position.
+
+At position 123, model-layer-4 GDN input was `6.50e-4` relative L2 apart. In
+the same all-expert Q8_1 diagnostic, layer-3 QSA at position 125 still had
+identical selected cache K/V, query, attention and projection. These sampled
+steps localize the recurrence drift to earlier layer-3 activation/MoE rows,
+not the position-125 attention arithmetic. This is not a complete prompt-wide
+trace or a state-quality pass. The full checker still failed final-state
+equality; minimum available/admission memory stayed above 11.26 GiB, and EMC
+and energy were unavailable. Raw run14/run15/run16 captures and the expert-394
+oracle outputs remain local-only.
+
 ## Expert 114 CUDA operator check
 
 The Orin `ninfer_q2_expert_parity` tool was run on model layer 2 / expert 114
