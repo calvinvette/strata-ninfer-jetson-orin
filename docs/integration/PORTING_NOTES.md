@@ -3163,3 +3163,13 @@ input effect in the second window but not the first. The ranking is therefore
 window-dependent. This field-level split is a useful addition to Splash
 recurrence parity tests; it remains a local attribution, not a general
 operator or end-to-end correctness bound.
+
+For CPU/GPU expert parity, a pair-and-layer arithmetic selector may still
+change unrelated experts that share that weight format. Add an optional
+expert-ID filter and prepare both baseline and mirror activation
+representations so unselected experts retain their original bytes. In this
+Q2_0 sample, mirroring only the routed mismatching layer-0 rows made all ten
+expert outputs equal the GPU result and delayed the first material GDN state
+delta from layer 2 to layer 4. It did not remove later state drift. This is a
+useful diagnostic pattern for a future Splash port, not a serving policy or a
+general correctness proof.

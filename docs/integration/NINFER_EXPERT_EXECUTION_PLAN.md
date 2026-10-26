@@ -706,6 +706,20 @@ unchanged `sycl/src/kernels/gdn_parity.cpp`, so this source change did not
 require a SYCL rebuild. These are x86_64 compile/link boundaries only. See
 the [backend build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-the-q2_0-cpu-arithmetic-mirror).
 
+Execution note (2026-10-26): an expert-ID filter restricted the diagnostic
+Q2_0/Q2_0 Q8_1 mirror to layer-0 experts 83, 88, 90 and 109. At the captured
+position, three were routed (88, 90, 109); those were the only CPU expert rows
+changed from the default arm, and all ten rows plus the combined layer-0 output
+then matched staged GPU output bit for bit. The one-token run retained matching
+residency and token ID; PLE state now matched, while GDN, tail, pooled,
+pooled-full and KV state still differed. Numeric GDN state was exact at layer 0,
+about `1e-9` relative L2 through layers 1–3, and first materially differed at
+layer 4 (`5.07e-6`), compared with the default run's layer-2 onset (`9.94e-4`).
+Layer 5 reached `0.00329` and global relative L2 was `0.03792`. This confirms a
+local owner-arithmetic contribution and shifts its downstream onset, but does
+not resolve later state drift. It is not a quality or performance result. See
+the [expert-filter report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#expert-id-filtered-layer-0-mirror).
+
 ### E7 — Assess release of the demonstrated integration
 
 1. Run focused regression and at least 30 minutes of sustained service for each

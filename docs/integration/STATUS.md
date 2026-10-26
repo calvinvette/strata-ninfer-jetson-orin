@@ -5838,3 +5838,15 @@ successfully for HIP and SYCL on maestro1 with two build jobs. HIP `strata
 maestro1 exposes no SYCL device/platform. This is x86_64 source portability
 evidence only; no accelerator execution or Orin performance was measured. See
 the [current-source backend build report](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-the-q2_0-cpu-arithmetic-mirror).
+
+An opt-in CPU mirror filter now selects expert IDs in addition to pair and
+layer. In a one-token held-out retrieval diagnostic, it changed only the three
+routed target rows (experts 88, 90 and 109); all other seven active layer-0
+rows stayed at default CPU arithmetic. All ten rows and the combined output
+then matched staged GPU exactly. PLE state matched, but GDN, tail, pooled,
+pooled-full and KV state still differed. The first material GDN delta moved
+from layer 2 (`9.94e-4`) to layer 4 (`5.07e-6`); layer 5 reached `0.00329` and
+global relative L2 was `0.03792`. This isolates one layer-0 CPU/GPU owner
+arithmetic contribution without fixing later drift. Minimum available memory
+was 11.66 GiB. No answer-quality or performance claim is made. See the
+[expert-filter report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#expert-id-filtered-layer-0-mirror).

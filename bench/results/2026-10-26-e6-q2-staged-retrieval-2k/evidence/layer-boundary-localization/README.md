@@ -72,6 +72,51 @@ and does not repair whole-request state. It is not a proposed default or a
 qualified fix. No performance measurement was made. Compact values and memory
 records are in `summary.json`; raw captures remain local.
 
+## Expert-ID-filtered layer-0 mirror
+
+The earlier layer-wide selector changed unrelated CPU rows. An opt-in
+`STRATA_NATIVE_CPU_Q8_1_DOT_EXPERTS` filter now limits the mirror to listed
+expert IDs within the selected pair/layer, and the retrieval checker exposes
+this as `--cpu-q8-1-experts`. For the held-out 2,048-token prompt, the CPU arm
+selected Q2_0/Q2_0 at layer 0 for IDs 83, 88, 90 and 109. At captured position
+2047, IDs 90, 109 and 88 were routed; those three were the only rows changed
+from the default CPU arm. The other seven routed expert rows were unchanged.
+All ten targeted CPU rows and the combined layer-0 output matched the staged
+GPU arm bit for bit.
+
+The one-token service run kept matching residency maps and emitted the same
+token ID. PLE state now matches; GDN, tail, pooled, pooled-full and KV state
+still differ. The final GDN dump is exact at layer 0, differs only at roughly
+`1e-9` relative L2 through layers 1–3, then first has a material difference
+at layer 4 (`5.07e-6`); layer 5 reaches `0.00329`. Global relative L2 is
+`0.03792`. The default CPU-miss/staged trace first had a material difference
+at layer 2 (`9.94e-4`). This intervention therefore removes the sampled
+layer-0 expert delta and delays material GDN divergence, but later state drift
+remains. Minimum available/admission memory was 11.66 GiB, above the 6 GiB
+floor. The one-token run does not assess answer quality or performance.
+
+Compact values are in
+[`q2-cpu-mirror-layer0-targeted-gdn/summary.json`](../q2-cpu-mirror-layer0-targeted-gdn/summary.json),
+with per-layer state metrics and paired expert-row comparisons alongside it.
+The 113 MiB per-arm state dumps and raw captures remain local.
+
+Reproduce on Orin with:
+
+```bash
+python3 tools/integration/run_control.py \
+  --output bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/supervisor-q2-cpu-mirror-layer0-targeted-gdn \
+  --timeout 600 --interval 1 --sample-clocks -- \
+  python3 tools/integration/ninfer_q2_retrieval_check.py \
+    --config bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/config.json \
+    --engine build/integration/e0-cuda-build/strata \
+    --workload bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/input/workload.json \
+    --output bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/q2-cpu-mirror-layer0-targeted-gdn \
+    --compare-cpu-miss-staged --max-new 1 --capture-moe-layer 0 \
+    --capture-moe-position 2047 --dump-gdn \
+    --cpu-q8-1-selector 'q2_0/q2_0@layer=0' \
+    --cpu-q8-1-experts '83,88,90,109' --run
+```
+
 ## Adjacent-position state-drift localization
 
 Follow-up captures compared CPU-miss and strict NInfer at adjacent prompt

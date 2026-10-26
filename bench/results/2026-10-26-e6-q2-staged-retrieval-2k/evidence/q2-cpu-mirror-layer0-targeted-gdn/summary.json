@@ -1,0 +1,159 @@
+{
+  "date": "2026-10-26",
+  "source_commit": "6b419221",
+  "scope": "one-token functional diagnostic; no performance measurement",
+  "model": "Qwen3.8-Flash-Next GSQ RCO Q2_0",
+  "workload": "heldout-retrieval-arithmetic-2048",
+  "prompt_tokens": 2048,
+  "generated_token_ids_equal": true,
+  "max_new": 1,
+  "answer_quality_checked": false,
+  "selector": {
+    "STRATA_NATIVE_CPU_Q8_1_DOT": "q2_0/q2_0@layer=0",
+    "STRATA_NATIVE_CPU_Q8_1_DOT_EXPERTS": "83,88,90,109"
+  },
+  "captured_position": 2047,
+  "token_id": 271,
+  "route_ids": [
+    333,
+    351,
+    214,
+    249,
+    90,
+    109,
+    315,
+    88,
+    261,
+    262
+  ],
+  "route_ids_equal": true,
+  "route_weights_max_abs_delta": 0.0,
+  "expert_rows": {
+    "333": {
+      "default_cpu_vs_target_cpu_different": 0,
+      "target_cpu_vs_staged_different": 0
+    },
+    "351": {
+      "default_cpu_vs_target_cpu_different": 0,
+      "target_cpu_vs_staged_different": 0
+    },
+    "214": {
+      "default_cpu_vs_target_cpu_different": 0,
+      "target_cpu_vs_staged_different": 0
+    },
+    "249": {
+      "default_cpu_vs_target_cpu_different": 0,
+      "target_cpu_vs_staged_different": 0
+    },
+    "90": {
+      "default_cpu_vs_target_cpu_different": 1861,
+      "target_cpu_vs_staged_different": 0
+    },
+    "109": {
+      "default_cpu_vs_target_cpu_different": 1769,
+      "target_cpu_vs_staged_different": 0
+    },
+    "315": {
+      "default_cpu_vs_target_cpu_different": 0,
+      "target_cpu_vs_staged_different": 0
+    },
+    "88": {
+      "default_cpu_vs_target_cpu_different": 1804,
+      "target_cpu_vs_staged_different": 0
+    },
+    "261": {
+      "default_cpu_vs_target_cpu_different": 0,
+      "target_cpu_vs_staged_different": 0
+    },
+    "262": {
+      "default_cpu_vs_target_cpu_different": 0,
+      "target_cpu_vs_staged_different": 0
+    }
+  },
+  "all_layer0_expert_rows_target_cpu_vs_staged_bitwise": true,
+  "layer0_combined_output_target_cpu_vs_staged_different": 0,
+  "target_cpu_vs_default_cpu_changed_experts": [
+    90,
+    109,
+    88
+  ],
+  "target_cpu_vs_default_cpu_unchanged_expert_count": 7,
+  "final_state_equal": false,
+  "state_differing_fields": [
+    "gdn",
+    "tail",
+    "pooled",
+    "pooled_full",
+    "kv"
+  ],
+  "resident_map_equal": true,
+  "gdn": {
+    "layers": 36,
+    "global_relative_l2": 0.03791778560496753,
+    "different_floats": 27067264,
+    "total_floats": 29417472,
+    "per_layer_first_6": [
+      {
+        "exact_fraction": 1.0,
+        "layer": 0,
+        "max_abs_delta": 0.0,
+        "max_abs_index": 0,
+        "mean_abs_delta": 0.0,
+        "relative_l2": 0.0,
+        "rms_abs_delta": 0.0
+      },
+      {
+        "exact_fraction": 0.8163193628602757,
+        "layer": 1,
+        "max_abs_delta": 1.4901161193847656e-08,
+        "max_abs_index": 191021,
+        "mean_abs_delta": 9.892428693065561e-12,
+        "relative_l2": 4.96580586786443e-10,
+        "rms_abs_delta": 8.198181940237942e-11
+      },
+      {
+        "exact_fraction": 0.5197050242794486,
+        "layer": 2,
+        "max_abs_delta": 4.470348358154297e-08,
+        "max_abs_index": 578714,
+        "mean_abs_delta": 5.304013180914113e-11,
+        "relative_l2": 1.140271958744869e-09,
+        "rms_abs_delta": 2.1524551397190702e-10
+      },
+      {
+        "exact_fraction": 0.4526452850877193,
+        "layer": 3,
+        "max_abs_delta": 2.9802322387695312e-08,
+        "max_abs_index": 413126,
+        "mean_abs_delta": 7.22708519727804e-11,
+        "relative_l2": 1.3487267711058479e-09,
+        "rms_abs_delta": 2.72859992159489e-10
+      },
+      {
+        "exact_fraction": 0.08733258928571429,
+        "layer": 4,
+        "max_abs_delta": 0.00011768937110900879,
+        "max_abs_index": 378360,
+        "mean_abs_delta": 3.9963686593624437e-07,
+        "relative_l2": 5.069869139906953e-06,
+        "rms_abs_delta": 1.1836808177575272e-06
+      },
+      {
+        "exact_fraction": 1.4685150375939849e-05,
+        "layer": 5,
+        "max_abs_delta": 0.01916670799255371,
+        "max_abs_index": 789384,
+        "mean_abs_delta": 9.201512674388883e-05,
+        "relative_l2": 0.0032935520064842484,
+        "rms_abs_delta": 0.0005873344162464168
+      }
+    ]
+  },
+  "memory": {
+    "minimum_available_bytes": 12519874560,
+    "minimum_admission_available_bytes": 12519874560,
+    "floor_bytes": 6442450944
+  },
+  "inference_binary_sha256": "5d11d4417c5254ef45075d8756bcc78c2712b7b66da8f6cdc677c7ad664d30b1",
+  "replay_binary_sha256": "c000a8feaa4f333c1da398db9aec7fb45f21af6f78e424138bc2947b328b34a9"
+}
