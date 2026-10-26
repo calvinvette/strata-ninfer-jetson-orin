@@ -5931,3 +5931,18 @@ Minimum available memory was 11.33 GiB. The final Orin CUDA build passed;
 maestro1 HIP `strata` and SYCL `strata_engine` compile/link targets passed
 after rebuilding affected sources. This is x86 compile evidence only for
 maestro1, with no device execution. [Capture and replay report](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#qsa-stage-capture-at-model-layer-3).
+
+A follow-up trace at position 123 (token 198) found exact layer-0 MoE inputs,
+routes, expert rows and output, then only `3.50e-8` relative L2 drift in the
+model-layer-1 GDN output. At model layer 2, routes still matched and input
+relative L2 was `5.28e-8`; only expert 114's row showed material drift
+(`6.68e-4` relative L2), yielding `3.24e-5` at the combined layer-2 output.
+An independent FP64 Q2_0×Q8_1 oracle produced identical results from both
+captured inputs because they quantized to the same activation. The staged
+service row matched the oracle within `5.84e-8`; the CPU-miss row differed by
+`6.68e-4`. This localizes a substantial sampled CPU/staged owner-arithmetic
+delta upstream of the layer-3 QSA cache-cell-123 mismatch. The observations
+come from separate paired runs, and final persistent state still differs, so
+this is diagnostic evidence rather than a completed state or quality gate.
+The run returned the expected checker failure in 63.1 seconds with at least
+11.27 GiB available; EMC and energy were unavailable. [Position-123 trace](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#upstream-trace-at-position-123).

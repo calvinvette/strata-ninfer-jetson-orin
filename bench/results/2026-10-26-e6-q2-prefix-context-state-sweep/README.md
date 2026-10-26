@@ -118,3 +118,33 @@ neither backend was executed there. Its first attempt
 with cache capture always enabled hit the engine's 60-second no-progress
 watchdog and is excluded; the separate opt-in retry completed. Raw `.qsa`,
 `.kv` captures and supervisor logs remain local-only.
+
+## Upstream trace at position 123
+
+A follow-up captured model-layer-0 MoE rows at positions 122–125. At position
+123 (token 198), both arms had bit-identical layer-0 input, routes, all ten
+expert rows and combined output. The layer-1 GDN batch capture then showed only
+floating-point-scale drift at its output (`3.50e-8` relative L2 for `y` and
+`2.84e-8` for the feed-forward output). At model layer 2, position 123, the
+MoE input differed by `5.28e-8` relative L2 and route IDs were identical; the
+largest route-weight change was about `1.5e-8`.
+
+Only rank 4, expert 114, had a material layer-2 expert-row difference: 2,268
+of 2,560 values, relative L2 `6.68e-4` (unweighted row). The combined layer-2
+MoE output differed by `3.24e-5` relative L2. An independent FP64 Q2_0×Q8_1
+expert oracle quantized both captured layer-2 inputs to the same Q8_1
+activation and produced identical output hashes. The NInfer-staged service row
+matched that oracle to `5.84e-8` relative L2; the CPU-miss service row differed
+by `6.68e-4`. This localizes the large position-123 perturbation to the
+CPU-versus-staged expert arithmetic for expert 114, rather than its tiny input
+or route-weight differences. It provides a plausible upstream source for the
+later layer-3 QSA cache-cell-123 mismatch, though the cache-cell capture and
+layer-2 oracle came from separate paired runs; the full persistent-state
+failure is still not resolved or qualified.
+
+The run used the same 128-token Q2_0 retrieval prefix and one generated token.
+It returned exit code 1 on the expected persistent-state gate, completed in
+63.1 seconds, and retained 11.27 GiB minimum available/admission memory. CUDA
+clock sampling was read-only; EMC was inaccessible and energy was not measured.
+The GDN batch flag was enabled through the run config. Raw layer captures,
+oracle activation files and supervisor output remain local-only.
