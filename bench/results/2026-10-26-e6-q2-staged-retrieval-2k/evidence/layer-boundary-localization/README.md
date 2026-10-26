@@ -153,6 +153,15 @@ failures. Compact crossover values are in
 [`gdn-recurrence-crossover.json`](gdn-recurrence-crossover.json); raw inputs and
 state captures remain local.
 
+The final `gdn_parity` source, including checked CUDA resource cleanup, passed
+the Orin CUDA build and the 84-case self-test. The executable SHA-256 is
+`66549f926490b761b64760e488f5a55c0ac1cbddea48942ada32e76e6c7fcf4e`.
+At source commit `61e9335f`, maestro1 rebuilt and linked the HIP target with
+two jobs. This is x86 compile/link evidence only; maestro1 has no relevant
+accelerator runtime. The configured SYCL `gdn_parity` target uses the separate,
+unchanged `sycl/src/kernels/gdn_parity.cpp`, so it had no work for this
+CUDA/HIP-only source change.
+
 Reproduce on the Orin with the matching captured raw files using:
 
 ```bash

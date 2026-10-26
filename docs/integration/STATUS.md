@@ -5822,7 +5822,11 @@ those GDN inputs for this sample, but not their upstream cause or full-model
 correctness. The GDN parity self-test passed 84 cases. See the [CUDA
 crossover report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#cuda-recurrence-crossover-replay).
 
-The opt-in Q2_0 CPU arithmetic mirror change at `44db5484` rebuilt
+The CUDA recurrence replay utility at `61e9335f` rebuilt and linked for HIP on
+maestro1 with two build jobs. The configured SYCL parity target compiles the
+separate unchanged `sycl/src/kernels/gdn_parity.cpp`; there was no SYCL source
+change in this diagnostic. maestro1 supplies x86 compile/link evidence only.
+The earlier opt-in Q2_0 CPU arithmetic mirror change at `44db5484` rebuilt
 successfully for HIP and SYCL on maestro1 with two build jobs. HIP `strata
 --help` passed. SYCL compile/link passed, but its help startup aborted because
 maestro1 exposes no SYCL device/platform. This is x86_64 source portability

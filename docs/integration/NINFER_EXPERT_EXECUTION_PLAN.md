@@ -695,9 +695,10 @@ and `z` were exact; normalized output was not evaluated. This points to the
 gate/beta input delta as the larger local contributor, while its upstream
 cause and full-model quality remain unresolved. See the [crossover
 report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#cuda-recurrence-crossover-replay).
-The shared CPU source rebuilt successfully for HIP and SYCL on maestro1 at
-`44db5484`. HIP CLI help passed; SYCL compiled and linked but could not start
-without a device on this host. This is x86_64 portability evidence only. See
+The CUDA/HIP-compatible parity source rebuilt and linked for HIP on maestro1
+at `61e9335f` with two jobs. The configured SYCL parity target uses a separate,
+unchanged `sycl/src/kernels/gdn_parity.cpp`, so this source change did not
+require a SYCL rebuild. These are x86_64 compile/link boundaries only. See
 the [backend build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-the-q2_0-cpu-arithmetic-mirror).
 
 ### E7 — Assess release of the demonstrated integration
