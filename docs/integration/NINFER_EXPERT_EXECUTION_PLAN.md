@@ -872,6 +872,14 @@ maestro1 has no visible SYCL platform, so the current binary's help startup
 aborted. This is not device/runtime qualification. See the [current-source
 build addendum](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-state-diagnostic-source).
 
+Execution note (2026-10-26): after fixing position-filtered QSA graph recapture,
+the complete HIP and SYCL `strata` targets rebuilt from exact source commit
+`03806747172378e9eb5a99a2a2194c655675b236` on maestro1 with one build job.
+HIP `strata --help` passed. SYCL compile/link passed; `--help` aborted because
+maestro1 has no SYCL device. This provides x86_64 compile/link evidence only,
+not accelerator runtime or Orin performance qualification. See the [current
+source build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-position-filtered-qsa-capture).
+
 Execution note (2026-10-26): the no-trace five-workload staged-miss state
 replay completed one pair. Three of five measured response hashes matched,
 while final persistent-state fingerprints differed on all five paired

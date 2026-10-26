@@ -99,3 +99,29 @@ with parallelism 1. The HIP runtime self-test stopped before kernel cases
 because the host reported no ROCm-capable device. This is compile/link
 evidence only; the new replay was exercised on Orin CUDA. See the [build
 record](evidence/current-source-32f04b56-gdn-parity/README.md).
+
+## 2026-10-26 follow-up on position-filtered QSA capture
+
+The complete `strata` target was rebuilt from exact source commit
+`03806747172378e9eb5a99a2a2194c655675b236` in an isolated checkout on
+maestro1. HIP used ROCm HIP 7.2.53210 / AMD Clang 22.0.0, Release, gfx1100,
+and one build job. SYCL used Intel oneAPI DPC++ 2026.1.1 with oneMKL 2026.1,
+Release, and one build job. Both used the pinned ggml source
+`llama.cpp-3cf03257f219afbe7334045ff7c6a06ac68c627d`. The HIP build and
+model-free `strata --help` passed. The SYCL build and link passed; its
+`strata --help` invocation aborted with exit 134 because maestro1 exposes no
+SYCL device (`No device of requested type available`). This is x86_64
+compile/link evidence only. No HIP or SYCL accelerator execution and no Orin
+performance measurement was made.
+
+| Backend | Build | CLI help | Binary SHA256 |
+| --- | --- | --- | --- |
+| HIP | Passed, one job | Passed | `09b274818ce99f098cd9af18fe2873cd94f0a82189c45155cd6dca6fe432c289` |
+| SYCL | Passed, one job | Unsupported here: no SYCL device (exit 134) | `aa99a12fc329328e8e1c43bc10b1cb26e6819a5cc0bcd188e5323f4ab90419f0` |
+
+Build root on maestro1: `/mnt/sda2/tmp/calvin/strata-ninfer-build-e0-03806747/`.
+The exact configure, build, help and hash logs remain there under `logs/`;
+the compiler executable was `build-sycl/sycl/strata` (CMake places it in the
+backend subdirectory). The checkout, toolchains, and binaries were not copied
+into this repository. maestro1 provides no Orin performance or AMD/SYCL
+runtime qualification.

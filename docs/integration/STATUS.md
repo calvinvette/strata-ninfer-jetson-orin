@@ -6014,3 +6014,14 @@ error, but both began “A computer” instead of the rubric's required
 rates (8.2 vs 9.8 tokens/s) are not a performance comparison. Minimum available
 RAM was 11.10/11.34 GiB, above the six-GiB floor. This does not resolve the
 quality or state gates; E6 remains open. See the [task-quality diagnostic](../../bench/results/2026-10-26-e6-q2-quality-1069-512/README.md).
+
+The opt-in prompt-prefill capture now records the sampled QSA operation at
+model layer 3 / token 123. The corrected paired trace matched the routed
+expert IDs, selected historical K/V bytes, current K/V, attention, gated
+attention and projection exactly; small input/query differences remain, and
+the full persistent-state hashes still differ. This localizes the sampled
+attention/cache lookup but does not close E6's state or quality gates. Current
+source commit `03806747172378e9eb5a99a2a2194c655675b236` built as a complete
+HIP target on maestro1, and `strata --help` passed. The complete SYCL target
+also compiled and linked; help startup is unsupported there because maestro1
+has no SYCL device. These are x86_64 build checks only. [QSA evidence](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#qsa-stage-capture-at-model-layer-3), [backend build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-position-filtered-qsa-capture).
