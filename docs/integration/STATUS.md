@@ -5708,3 +5708,8 @@ MoE routes matched at layers 1, 2, 3, 11 and 21, while activation/output deltas
 grew with depth. This is a state-parity blocker, not a performance result; the
 task-level answer alone does not qualify the staged route. Minimum available
 memory was 11.45 GiB. See the [held-out result and state diagnosis](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/README.md).
+
+The layer-2 Q8_1-contract oracle now matches both sampled expert outputs on
+both routes to about `9e-8` relative L2. This validates those operator rows
+under the captured, route-specific activations; the inputs themselves already
+differ at layer 2, so the upstream source of state drift remains unresolved.

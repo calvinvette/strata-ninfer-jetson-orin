@@ -33,7 +33,7 @@ def error_metrics(reference: tuple[float, ...], actual: tuple[float, ...]) -> di
 
 
 def main() -> None:
-    OUT.mkdir(parents=True, exist_ok=False)
+    OUT.mkdir(parents=True, exist_ok=True)
     result = {"schema": 1, "layer": 2, "position": 2047, "experts": []}
     route = json.loads((CAPTURE / "cpu-miss.layer2.route").read_text().splitlines()[1])
     route_ids = route["ids"]
@@ -64,11 +64,18 @@ def main() -> None:
                                     output_f64=oracle_path)
             reference = struct.unpack("<2560d", oracle_path.read_bytes())
             metric = error_metrics(reference, actual)
+            q8_path = OUT / f"{arm}.expert{expert}.q8_1-oracle.f64"
+            q8_info = q2_oracle(GGUF, activation_path, layer=2, expert=expert,
+                                output_f64=q8_path, q8_1=True)
+            q8_reference = struct.unpack("<2560d", q8_path.read_bytes())
             expert_results.append({
                 "rank": rank, "expert": expert, "oracle": oracle_info,
                 "part_vs_f64_oracle": metric,
+                "q8_1_runtime_contract_oracle": q8_info,
+                "part_vs_q8_1_runtime_contract_oracle": error_metrics(q8_reference, actual),
                 "part_sha256": hashlib.sha256(part_path.read_bytes()).hexdigest(),
                 "oracle_f64_sha256": hashlib.sha256(oracle_path.read_bytes()).hexdigest(),
+                "q8_1_oracle_f64_sha256": hashlib.sha256(q8_path.read_bytes()).hexdigest(),
             })
         result["experts"].append({
             "arm": arm,

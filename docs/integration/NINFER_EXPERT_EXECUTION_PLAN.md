@@ -604,6 +604,11 @@ output differences grew with depth. This fails the staged state-parity gate;
 the task answer does not qualify performance or release. Minimum available
 memory was 11.45 GiB. See the [held-out retrieval/state
 report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/README.md).
+An independent layer-2 oracle that applies the runtime's Q8_1 input and
+SwiGLU-intermediate boundaries matched the captured rows for experts 372 and
+357 on both routes to about `9e-8` relative L2. This validates those sampled
+expert computations for their respective inputs; it does not account for the
+activation drift already present at layer 2 or locate the earlier state change.
 
 ### E7 — Assess release of the demonstrated integration
 

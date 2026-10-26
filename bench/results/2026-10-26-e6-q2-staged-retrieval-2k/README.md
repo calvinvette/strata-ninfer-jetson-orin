@@ -55,11 +55,17 @@ The four 117-MB raw arrays remain local to the Orin worktree rather than Git;
 their byte counts and SHA256 values are recorded in
 [`gdn-dump-artifact-hashes.json`](evidence/gdn-dump-artifact-hashes.json).
 
-The raw-F32 FP64 expert-oracle experiment in `analyze_layer2_oracle.py` is
-retained as exploratory only. The service projects with Q8_1-quantized
-activations, including a Q8_1 SwiGLU intermediate; that experiment's reference
-uses unquantized F32 activations and therefore does not match the runtime
-arithmetic contract. Its residuals are not used as a pass/fail result.
+The first raw-F32 FP64 oracle comparison bypassed the runtime's Q8_1 activation
+boundaries, so its residuals are exploratory and are not a pass/fail result.
+The oracle now also emulates the service's Q8_1 input quantization, Q2_0 × Q8_1
+block dot products, and Q8_1 SwiGLU intermediate before the down projection.
+For both sampled layer-2 experts (372 and 357) on both routes, its output
+matched the captured expert row to about `9e-8` relative L2 (maximum absolute
+error below `1.3e-8`). This strongly validates these sampled expert rows and
+the local NInfer operator against an independent codec/arithmetic oracle. The
+captured CPU-miss and staged activations already differ at layer 2, however, so
+this does not explain the upstream source of accumulated state drift. See
+[`oracle-layer2/analysis.json`](evidence/oracle-layer2/analysis.json).
 
 ## Reproduction and evidence
 
