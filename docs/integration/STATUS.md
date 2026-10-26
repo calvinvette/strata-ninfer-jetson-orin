@@ -5695,3 +5695,16 @@ oracle and is not performance evidence. The output/state differences keep
 staged-miss performance qualification open. See the [replay
 report](../../bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/README.md#full-order-no-trace-state-replay)
 and [per-arm results](../../bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/full-workload-order-state-replay-no-trace/).
+
+# 2026-10-26: Staged-miss retrieval answer passes; persistent state fails
+
+A 2,048-token held-out retrieval/arithmetic task returned the exact expected
+answer and identical token IDs on CPU-miss and strict staged routes. Residency
+maps matched; staging offloaded 4,556 expert reads. Six final state fields
+differed, including GDN, PLE, tail, pooled and KV. The resident-only control
+passed exact token and all-state parity, with bit-identical 36-layer GDN dumps.
+The staged GDN dump had 3.41% global relative L2 over 29.4M floats. Sampled
+MoE routes matched at layers 1, 2, 3, 11 and 21, while activation/output deltas
+grew with depth. This is a state-parity blocker, not a performance result; the
+task-level answer alone does not qualify the staged route. Minimum available
+memory was 11.45 GiB. See the [held-out result and state diagnosis](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/README.md).

@@ -594,6 +594,17 @@ least 11.42 GiB physical/admission memory. The output divergence has no task
 quality oracle yet, so no seven-pair confirmation or profile promotion is
 justified. See the [staged workload report](../../bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/README.md).
 
+Execution note (2026-10-26): a 2,048-token held-out retrieval task returned the
+exact expected answer and matching token IDs under CPU miss and strict NInfer
+staging, with identical residency maps and 4,556 staged reads. The final state
+still differed in six fields; a resident-only Strata/NInfer control passed
+exact token and all-state parity. The staged GDN state had 3.41% global
+relative L2 over 29.4M floats. Sampled MoE routes matched while activation and
+output differences grew with depth. This fails the staged state-parity gate;
+the task answer does not qualify performance or release. Minimum available
+memory was 11.45 GiB. See the [held-out retrieval/state
+report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/README.md).
+
 ### E7 — Assess release of the demonstrated integration
 
 1. Run focused regression and at least 30 minutes of sustained service for each

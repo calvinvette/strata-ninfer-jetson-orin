@@ -166,3 +166,14 @@ the host exposes no SYCL platform, so CLI startup aborted with “No device of
 requested type available.” This is build evidence only for the new SYCL binary.
 The earlier commit's SYCL help result does not establish startup on this newer
 binary. Full hashes and setup notes are in the [maestro1 build report](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-state-diagnostic-source).
+
+## Staged-miss state-parity follow-up (2026-10-26)
+
+A held-out 2,048-token retrieval task passed its exact answer and token-ID
+checks on CPU-miss and strict NInfer staged routes, with matching startup
+residency maps. The final accepted-prefix state still differed in six fields,
+and the GDN arrays differed by 3.41% global relative L2. A resident-only
+Strata/NInfer control matched all final state fields and the full GDN arrays.
+This isolates the unresolved result to the staged-miss configuration for this
+task; it does not establish a general cause or release profile. E7 remains
+open. See the [held-out retrieval/state report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/README.md).

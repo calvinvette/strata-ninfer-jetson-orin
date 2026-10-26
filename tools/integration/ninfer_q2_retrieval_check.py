@@ -25,6 +25,8 @@ def main() -> int:
     ap.add_argument('--output', type=Path, required=True)
     ap.add_argument('--compare-strata-control', action='store_true',
                     help='compare MTP-off Strata backend against MTP-off strict NInfer')
+    ap.add_argument('--compare-cpu-miss-staged', action='store_true',
+                    help='compare MTP-off CPU miss fallback against strict NInfer staging')
     ap.add_argument('--dump-gdn', action='store_true',
                     help='write final accepted-prefix GDN arrays for numeric comparison')
     ap.add_argument('--dump-gdn-at', type=int,
@@ -39,6 +41,8 @@ def main() -> int:
                     help='filter the MoE capture to several increasing token positions')
     ap.add_argument('--run', action='store_true')
     a = ap.parse_args()
+    if a.compare_strata_control and a.compare_cpu_miss_staged:
+        ap.error('choose only one comparison mode')
     if a.capture_moe_position is not None and a.capture_moe_positions is not None:
         ap.error('use only one of --capture-moe-position and --capture-moe-positions')
     if a.capture_moe_positions is not None and (
@@ -80,8 +84,12 @@ def main() -> int:
               'prompt_content_sha256': hashlib.sha256(prompt_text.encode()).hexdigest(),
               'prompt_ids_sha256': hashlib.sha256(json.dumps(prompt, separators=(',', ':')).encode()).hexdigest(),
               'expected': expected, 'max_new': max_new, 'state_fields': STATE_KEYS, 'arms': [], 'failures': []}
-    arms = (('strata-control', 'strata', 0), ('ninfer-control', 'ninfer', 0)) if a.compare_strata_control else (
-        ('mtp-off', 'ninfer', 0), ('mtp4', 'ninfer', 4))
+    if a.compare_strata_control:
+        arms = (('strata-control', 'strata', 0), ('ninfer-control', 'ninfer', 0))
+    elif a.compare_cpu_miss_staged:
+        arms = (('cpu-miss', 'strata', 0), ('ninfer-staged', 'ninfer', 0))
+    else:
+        arms = (('mtp-off', 'ninfer', 0), ('mtp4', 'ninfer', 4))
     for name, backend, window in arms:
         log = a.output / f'{name}.log'
         command = args_for(cfg, window, disable_adaptive_swaps=True)
@@ -90,7 +98,10 @@ def main() -> int:
                 command[command.index('--expert-backend') + 1] = 'strata'
             if '--expert-backend-strict' in command:
                 command.remove('--expert-backend-strict')
+        if a.compare_cpu_miss_staged and '--pcie-frac' in command:
+            command[command.index('--pcie-frac') + 1] = '0.0' if backend == 'strata' else '1.0'
         arm_env = dict(env)
+        arm_env['STRATA_RESIDENCY_DUMP'] = str((a.output / f'{name}.residency.csv').resolve())
         if a.dump_gdn:
             arm_env['STRATA_STATE_DUMP_GDN'] = str((a.output / f'{name}.gdn.bin').resolve())
             dump_at = a.dump_gdn_at if a.dump_gdn_at is not None else len(prompt) + max_new - 1
@@ -117,7 +128,10 @@ def main() -> int:
             states = parse_hashes(log)
             require(len(states) == 1, f'{name}: expected one final state fingerprint')
             arm = {'name': name, 'window': window, 'args': command, 'ids': ids,
-                   'text': text, 'state': states[0], 'usage': dict(engine.last)}
+                   'text': text, 'state': states[0], 'usage': dict(engine.last),
+                   'residency_sha256': hashlib.sha256(
+                       (a.output / f'{name}.residency.csv').read_bytes()).hexdigest()
+                       if (a.output / f'{name}.residency.csv').exists() else None}
             result['arms'].append(arm)
             if expected is not None and max_new == workload['generate_tokens'] and text != expected:
                 result['failures'].append(f'{name}: exact answer mismatch: {text!r}')
@@ -129,11 +143,15 @@ def main() -> int:
         off, mtp = result['arms']
         result['token_ids_equal'] = off['ids'] == mtp['ids']
         result['final_state_equal'] = all(off['state'].get(k) == mtp['state'].get(k) for k in STATE_KEYS)
+        result['residency_equal'] = (off.get('residency_sha256') is not None and
+                                     off.get('residency_sha256') == mtp.get('residency_sha256'))
         result['state_differing_fields'] = [k for k in STATE_KEYS if off['state'].get(k) != mtp['state'].get(k)]
         if not result['token_ids_equal']:
             result['failures'].append(f"{off['name']} and {mtp['name']} token IDs differ")
         if not result['final_state_equal']:
             result['failures'].append(f"{off['name']} and {mtp['name']} final state differ")
+        if a.compare_cpu_miss_staged and not result['residency_equal']:
+            result['failures'].append(f"{off['name']} and {mtp['name']} resident maps differ or were not captured")
     result['exact_answer_check'] = expected is not None and max_new == workload['generate_tokens']
     result['passed'] = not result['failures'] and len(result['arms']) == 2
     (a.output / 'results.json').write_text(json.dumps(result, indent=2) + '\n')
