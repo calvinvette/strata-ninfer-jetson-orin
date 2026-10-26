@@ -119,6 +119,35 @@ five-workload order under both miss routes with warmup and final-state capture.
 The original 1,069-token screen remains unqualified and requires a held-out task
 oracle before confirmation.
 
+## Full-order no-trace state replay
+
+The complete five-shape sequence was replayed once per arm with one warmup and
+one measured call per shape, temperature zero, prompt cache disabled, tracing
+disabled, and the opt-in final-state hash enabled. All 20 calls passed API and
+exact token-count checks. The 3,000-slot startup residency maps matched across
+the two arms. Measured response hashes matched for 512, 2,048 and 172 prompt
+tokens, and differed for 557 and 1,069. Warmup hashes matched for 512, 172 and
+1,069, and differed for 2,048 and 557. Thus, three of five measured outputs
+match in this single replay, while the original balanced screen's divergent
+557/1,069 cells remain reproducible concerns.
+
+The final persistent-state fingerprints were not identical across arms for any
+of the ten corresponding requests. Some component hashes (including PLE,
+`ple_prev`, MTP, stale and dead-expert state) matched on subsets of requests;
+GDN, tail, pooled/KV state prevented full equality. The capture identifies
+where state differs but has no independent oracle to determine whether that
+difference is valid. This remains a correctness/quality blocker for qualifying
+the staged-miss performance cells. The replay is diagnostic only and is not a
+performance estimate. Raw response records and state hashes are in
+[`full-workload-order-state-replay-no-trace/`](full-workload-order-state-replay-no-trace/).
+Recreate it with:
+
+```bash
+python3 bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/run_staged_workload_screen.py \
+  --pairs 1 --capture-text --capture-state \
+  --out bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/full-workload-order-state-replay-no-trace
+```
+
 Recreate this diagnostic with the same binary and model files using:
 
 ```bash

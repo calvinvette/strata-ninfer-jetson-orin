@@ -58,6 +58,8 @@ def main():
     parser.add_argument('--require-kv-streaming', action='store_true')
     parser.add_argument('--no-trace', action='store_true',
                         help='do not force STRATA_TRACE for timing-only API cells')
+    parser.add_argument('--state-hash', action='store_true',
+                        help='enable final persistent-state fingerprints without enabling STRATA_TRACE')
     args = parser.parse_args()
     cfg = json.loads(args.config.read_text())
     base = 'http://127.0.0.1:' + str(cfg['port'])
@@ -66,6 +68,9 @@ def main():
     cfg['log'] = str((args.output.parent / 'engine.log').resolve())
     cfg['env'], server_env = configure_trace_environment(cfg.get('env', {}), os.environ,
                                                         args.no_trace)
+    if args.state_hash:
+        cfg['env']['STRATA_STATE_HASH'] = '1'
+        server_env['STRATA_STATE_HASH'] = '1'
     owned_config = args.output.parent / 'server-config.json'
     owned_config.write_text(json.dumps(cfg, indent=2) + '\n')
     server = subprocess.Popen([sys.executable, '-m', 'serve.server', '--engine', 'strata',

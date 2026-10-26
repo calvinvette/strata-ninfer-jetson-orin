@@ -5682,3 +5682,16 @@ confirmation was not run. The 4-entry source and qualified binary hashes were
 restored and rechecked after these experiments. A fresh seven-block retest of
 the restored path passed parity and measured grouped ratios 1.118×/1.119× at
 64/128 tokens, consistent with an approximately 12% operator regression.
+
+# 2026-10-26: No-trace staged-miss state replay
+
+The full five-workload sequence was replayed once per route with tracing off
+and final-state hashing on. All 20 warmup/measured calls passed API and exact
+token-count checks, and startup residency maps matched. Three of five measured
+output hashes matched; the 557- and 1,069-token outputs differed. Final
+persistent-state fingerprints differed across routes for all ten paired calls,
+although some components matched. This replay has no independent quality
+oracle and is not performance evidence. The output/state differences keep
+staged-miss performance qualification open. See the [replay
+report](../../bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/README.md#full-order-no-trace-state-replay)
+and [per-arm results](../../bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/full-workload-order-state-replay-no-trace/).

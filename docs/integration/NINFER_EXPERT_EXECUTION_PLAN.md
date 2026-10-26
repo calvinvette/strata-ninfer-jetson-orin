@@ -628,6 +628,21 @@ profile is proposed. The local CUDA build completed. At the time, HIP/SYCL
 build evidence was outstanding; it was later completed on maestro1 as recorded
 above. See the [E7 assessment](NINFER_E7_RELEASE_ASSESSMENT.md).
 
+Execution note (2026-10-26): after the state-fingerprint diagnostic source
+change, HIP and SYCL were rebuilt from commit
+`68de59ab2c6736ca328c83afabe2138123cd7051`. HIP build and CLI help passed.
+SYCL compile/link passed after setting `MKLROOT` from the oneMKL environment;
+maestro1 has no visible SYCL platform, so the current binary's help startup
+aborted. This is not device/runtime qualification. See the [current-source
+build addendum](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-state-diagnostic-source).
+
+Execution note (2026-10-26): the no-trace five-workload staged-miss state
+replay completed one pair. Three of five measured response hashes matched,
+while final persistent-state fingerprints differed on all five paired
+workloads. This is diagnostic evidence without a quality oracle; the staged
+miss performance qualification remains open. See the [replay
+report](../../bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/README.md#full-order-no-trace-state-replay).
+
 Execution note (2026-10-25): E6's first full top-10 grouped Q2_0 timing screen
 passed parity at 64 and 128 tokens but measured 12.18× and 12.31× NInfer/Strata
 latency. Replacing the 80-call SwiGLU/Q8_1 chunk loop with a single equivalent

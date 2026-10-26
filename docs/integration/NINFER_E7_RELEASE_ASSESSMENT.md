@@ -156,3 +156,13 @@ binary, context/model coverage, backend build evidence and a proposed profile
 that passes those gates. The corrected request-level result is faster on the
 measured short request, but the grouped 64/128-token operator is still slower.
 The 30-minute soak requirement remains untriggered.
+
+## Current state-hash source backend build follow-up
+
+The backend builds were repeated at exact commit
+`68de59ab2c6736ca328c83afabe2138123cd7051`. HIP build and `strata --help`
+passed. SYCL compile/link passed after sourcing oneMKL so `MKLROOT` was set;
+the host exposes no SYCL platform, so CLI startup aborted with “No device of
+requested type available.” This is build evidence only for the new SYCL binary.
+The earlier commit's SYCL help result does not establish startup on this newer
+binary. Full hashes and setup notes are in the [maestro1 build report](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-state-diagnostic-source).

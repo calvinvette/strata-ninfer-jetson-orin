@@ -80,8 +80,9 @@ def run_arm(base, workload_path, block, arm, position):
         "--output", str(request_path),
         "--variant", "candidate" if arm == "ninfer-staged" else "baseline",
     ]
-    if not CAPTURE_STATE:
-        command.append("--no-trace")
+    command.append("--no-trace")
+    if CAPTURE_STATE:
+        command.append("--state-hash")
     launcher = cell / "launcher.txt"
     started = time.time()
     with launcher.open("w") as log:
