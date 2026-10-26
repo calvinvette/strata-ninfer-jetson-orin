@@ -97,8 +97,13 @@ release profile is **not achieved**.
   and [64K check](../../bench/results/2026-10-25-phase-e5-q2-ninfer-64k-retrieval/README.md),
   and the same actual retrieval at 131,072 tokens under a 256K cap, with exact
   answer/token/state parity and 11.40 GiB minimum available memory. This is
-  still one task; near-limit 256K ingestion remains untested. See the [128K
-  check](../../bench/results/2026-10-25-phase-e5-q2-ninfer-128k-retrieval/README.md),
+  still one task. A 240,286-token retrieval under a 262,144-token cap also
+  returned the exact answer with matching token IDs and all nine final state
+  fields; minimum available memory was 11.44 GiB. Its successful retry used an
+  experiment-only 300-second watchdog allowance after a previous 60-second
+  timeout. This single functional case does not establish broader near-limit
+  quality or performance. See the [128K check](../../bench/results/2026-10-25-phase-e5-q2-ninfer-128k-retrieval/README.md)
+  and [240K check](../../bench/results/2026-10-25-phase-e5-q2-ninfer-240k-retrieval/README.md),
   [E5 closeout](NINFER_E5_CLOSEOUT.md) and the
   [corrected generation checks](../../bench/results/2026-10-25-phase-e5-q2-ninfer-generation-regression/fixed-kernel/README.md).
 - Coder IQ1_M, ISTA-DASLab IQ3_S, staged expert misses, broad task quality and
