@@ -712,10 +712,12 @@ position, three were routed (88, 90, 109); those were the only CPU expert rows
 changed from the default arm, and all ten rows plus the combined layer-0 output
 then matched staged GPU output bit for bit. The one-token run retained matching
 residency and token ID; PLE state now matched, while GDN, tail, pooled,
-pooled-full and KV state still differed. Numeric GDN state was exact at layer 0,
-about `1e-9` relative L2 through layers 1–3, and first materially differed at
-layer 4 (`5.07e-6`), compared with the default run's layer-2 onset (`9.94e-4`).
-Layer 5 reached `0.00329` and global relative L2 was `0.03792`. This confirms a
+pooled-full and KV state still differed. Numeric GDN state was exact at state
+ordinal 0, about `1e-9` relative L2 through ordinals 1–3, and first materially
+differed at ordinal 4 (`5.07e-6`), compared with the default run's ordinal-2
+onset (`9.94e-4`). For this model, every fourth model layer is QSA, so ordinal
+4 maps to model layer 5. GDN ordinal 5 reached `0.00329` and global relative
+L2 was `0.03792`. This confirms a
 local owner-arithmetic contribution and shifts its downstream onset, but does
 not resolve later state drift. It is not a quality or performance result. See
 the [expert-filter report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#expert-id-filtered-layer-0-mirror).
@@ -724,8 +726,9 @@ A further layer-3 capture under the same filter found bit-identical expert
 parts and shared output at layer 3 despite a `7.89e-8` relative-L2 input
 difference; the combined layer output differed by `1.36e-7`. Routes, generated
 token and residency matched, but final state still differed. The GDN dump
-retained its first material difference at layer 4 (`5.07e-6`), with `0.03792`
-global relative L2. Minimum available/admission memory was 11.65 GiB. This
+retained its first material difference at state ordinal 4 (model layer 5;
+`5.07e-6`), with `0.03792` global relative L2. Minimum available/admission
+memory was 11.65 GiB. This
 shows no material difference in the sampled layer-3 expert operator, but the
 state operation that amplifies the incoming delta remains unidentified.
 This one-token diagnostic adds no quality or performance qualification. See the

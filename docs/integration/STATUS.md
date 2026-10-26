@@ -5845,8 +5845,9 @@ routed target rows (experts 88, 90 and 109); all other seven active layer-0
 rows stayed at default CPU arithmetic. All ten rows and the combined output
 then matched staged GPU exactly. PLE state matched, but GDN, tail, pooled,
 pooled-full and KV state still differed. The first material GDN delta moved
-from layer 2 (`9.94e-4`) to layer 4 (`5.07e-6`); layer 5 reached `0.00329` and
-global relative L2 was `0.03792`. This isolates one layer-0 CPU/GPU owner
+from state ordinal 2 (`9.94e-4`) to ordinal 4 (`5.07e-6`); ordinal 5 reached
+`0.00329` and global relative L2 was `0.03792`. Every fourth model layer is
+QSA, so ordinal 4 maps to model layer 5. This isolates one layer-0 CPU/GPU owner
 arithmetic contribution without fixing later drift. Minimum available memory
 was 11.66 GiB. No answer-quality or performance claim is made. See the
 [expert-filter report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#expert-id-filtered-layer-0-mirror).
@@ -5855,7 +5856,7 @@ A follow-up captured layer 3 under the same layer-0 mirror filter. All ten
 expert rows and the shared output were exact; input delta was `7.89e-8`
 relative L2 and combined layer output delta was `1.36e-7`. The token and
 residency still matched, but final state did not. First material committed GDN
-divergence remained at layer 4 (`5.07e-6` relative L2); minimum available
-memory was 11.65 GiB. This does not identify the state update that amplifies
-the small incoming delta and adds no quality/performance qualification. E6
+divergence remained at state ordinal 4 (model layer 5; `5.07e-6` relative L2);
+minimum available memory was 11.65 GiB. This does not identify the state update
+that amplifies the small incoming delta and adds no quality/performance qualification. E6
 remains open. Compact metrics are in the [layer-3 report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#layer-3-filtered-mirror-follow-up).

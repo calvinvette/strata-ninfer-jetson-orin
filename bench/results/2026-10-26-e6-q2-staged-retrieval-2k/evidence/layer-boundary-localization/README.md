@@ -86,11 +86,13 @@ GPU arm bit for bit.
 
 The one-token service run kept matching residency maps and emitted the same
 token ID. PLE state now matches; GDN, tail, pooled, pooled-full and KV state
-still differ. The final GDN dump is exact at layer 0, differs only at roughly
-`1e-9` relative L2 through layers 1–3, then first has a material difference
-at layer 4 (`5.07e-6`); layer 5 reaches `0.00329`. Global relative L2 is
+still differ. The final GDN dump is exact at GDN state ordinal 0, differs only
+at roughly `1e-9` relative L2 through ordinals 1–3, then first has a material
+difference at ordinal 4 (`5.07e-6`); ordinal 5 reaches `0.00329`. For this
+model, every fourth model layer is QSA, so GDN ordinal 4 maps to model layer 5.
+Global relative L2 is
 `0.03792`. The default CPU-miss/staged trace first had a material difference
-at layer 2 (`9.94e-4`). This intervention therefore removes the sampled
+at GDN state ordinal 2 (`9.94e-4`). This intervention therefore removes the sampled
 layer-0 expert delta and delays material GDN divergence, but later state drift
 remains. Minimum available/admission memory was 11.66 GiB, above the 6 GiB
 floor. The one-token run does not assess answer quality or performance.
@@ -109,7 +111,8 @@ rows and the shared output were bit-identical; the layer input differed by
 `7.89e-8` relative L2 and the combined layer output by `1.36e-7`. Token ID and
 residency matched, while final GDN, tail, pooled, pooled-full and KV fingerprints
 still differed. The state dump again first showed a material difference at GDN
-layer 4 (`5.07e-6` relative L2); the global difference was `0.03792`. Minimum
+state ordinal 4 (model layer 5; `5.07e-6` relative L2); the global difference
+was `0.03792`. Minimum
 available/admission memory was `11.65 GiB`. The run exited nonzero because the
 state-parity check failed, not due to a runtime error. This sampled layer-3
 capture does not identify which state operation amplifies the small incoming
