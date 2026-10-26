@@ -56,13 +56,15 @@ performance signal, but its output hashes differed in all three pairs; the
 557-token cell also differed in all three. Temperature-zero direct repetitions
 found exact CPU/NInfer token and persistent-state parity at each paired
 ordinal. Two fresh-engine repeats were stable, while same-service repeats
-changed output with cache reuse and with prompt caching disabled (the current
-runtime suppresses state hashing when caching is disabled). This is shared
-request/process-history variation, but its cause and the original
-multi-workload cross-arm mismatches remain unexplained. No quality oracle has
-passed for these staged-miss cells, so performance confirmation and profile
-promotion remain deferred pending cache-off state capture, full workload-order
-replay and a held-out quality task.
+changed output with cache reuse and with prompt caching disabled. The latter
+also changed seven of nine final-state fingerprints on both routes; CPU-miss
+and NInfer still matched exactly at each request ordinal. An opt-in
+`STRATA_STATE_HASH=1` hook now enables this observation with cache disabled, and
+the Orin CUDA rebuild passed its direct check. This is shared same-process
+variation, but its cause and the original multi-workload cross-arm mismatches
+remain unexplained. No quality oracle has passed for these staged-miss cells,
+so performance confirmation and profile promotion remain deferred pending a
+full workload-order replay and held-out quality task.
 A held-out exact-answer retrieval/arithmetic check at an actual 8,192-token
 prompt then matched the Strata and strict-NInfer token IDs and all nine final
 state fields. Both returned the three codes and suffix sum exactly; minimum

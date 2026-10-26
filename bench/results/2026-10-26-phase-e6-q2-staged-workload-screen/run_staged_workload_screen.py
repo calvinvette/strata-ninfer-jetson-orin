@@ -17,6 +17,7 @@ ARMS = ("cpu-miss", "ninfer-staged")
 CONTEXT = 8192
 SEED = 20261029
 CAPTURE_TEXT = False
+CAPTURE_STATE = False
 
 
 def write_json(path, value):
@@ -59,6 +60,8 @@ def config_for(base, arm, cell):
         "STRATA_RESIDENT_HEADROOM_GIB": "9",
         "STRATA_RESIDENCY_DUMP": str((cell / "residency.csv").resolve()),
     }
+    if CAPTURE_STATE:
+        cfg["env"]["STRATA_STATE_HASH"] = "1"
     return cfg
 
 
@@ -76,8 +79,9 @@ def run_arm(base, workload_path, block, arm, position):
         "--config", str(cfg_path), "--workloads", str(workload_path),
         "--output", str(request_path),
         "--variant", "candidate" if arm == "ninfer-staged" else "baseline",
-        "--no-trace",
     ]
+    if not CAPTURE_STATE:
+        command.append("--no-trace")
     launcher = cell / "launcher.txt"
     started = time.time()
     with launcher.open("w") as log:
@@ -124,15 +128,18 @@ def run_arm(base, workload_path, block, arm, position):
 def main():
     global OUT
     global CAPTURE_TEXT
+    global CAPTURE_STATE
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, default=OUT, help="campaign output directory")
     parser.add_argument("--only-workload", help="run one named workload cell")
     parser.add_argument("--pairs", type=int, default=3)
     parser.add_argument("--capture-text", action="store_true", help="save generated output text for mismatch diagnosis")
+    parser.add_argument("--capture-state", action="store_true", help="enable final persistent-state fingerprints; diagnostic timing only")
     args = parser.parse_args()
     OUT = args.out.resolve()
     CAPTURE_TEXT = args.capture_text
+    CAPTURE_STATE = args.capture_state
     OUT.mkdir(parents=True, exist_ok=True)
     workload_set = workloads()
     if args.only_workload:
@@ -148,6 +155,7 @@ def main():
         "model": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0; 3,000 expert slots; 6-GiB resident budget; 3-GiB workspace reserve; 8K capacity; MTP-2; prefill 128; 8 workers",
         "comparison": "CPU miss fallback (pcie-frac 0) versus strict NInfer staged misses (pcie-frac 1); same five natural-generation workloads and resident-map hash required",
         "screen": f"{args.pairs} randomized process pair(s); workload-level output hashes and API token counts checked; supervisor retains physical/admission memory and clock telemetry",
+        "state_capture": "final persistent-state hashes enabled; timing is diagnostic only" if CAPTURE_STATE else None,
         "seed": SEED, "contexts": [CONTEXT], "pairs": [],
     }
     write_json(OUT / "matrix.json", matrix)

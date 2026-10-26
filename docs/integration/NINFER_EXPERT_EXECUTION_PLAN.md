@@ -127,11 +127,13 @@ no general profile.
 The 1,069-token follow-up found exact CPU/NInfer token parity at each paired
 request ordinal and exact final-state parity wherever capture was available.
 Fresh-engine repeats were stable, while same-service repeats changed output
-with cache reuse and with prompt caching disabled; the runtime suppresses state
-hashing in cache-off mode. This shared process/request-history signal does not
-explain the original multi-workload staged-miss mismatches. The next E6 gate is
-cache-off state capture, full workload-order replay and a held-out task-quality
-check before performance confirmation. See the [staged-miss report and
+with cache reuse and with prompt caching disabled. A small opt-in final-state
+hash hook now supports the cache-off diagnostic; the Orin CUDA build and direct
+check passed, with HIP/SYCL rebuilds still required because the source is shared.
+This shared process/request-history signal does not explain the original
+multi-workload staged-miss mismatches. The next E6 gate is the complete
+workload-order replay and a held-out task-quality check before performance
+confirmation. See the [staged-miss report and
 diagnostic](../../bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/README.md).
 E2's resident schedule and the earlier E3 staged-miss schedules failed their
 initial performance screens. The

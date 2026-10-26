@@ -11745,7 +11745,10 @@ int main(int argc, char** argv) {
                 live_imgs = imgs_below(req_imgs, (int64_t) live.size());
                 live_ok = o.prompt_cache > 0 && req_ckpt;   // ckpt=0: nothing to continue or park (#830)
             }
-            if ((state_hash || accepted_prefix_trace) && !cancelled && o.prompt_cache > 0) {
+            // Final-state hashing is also useful when prompt-cache is disabled:
+            // that is the serving control for request-history diagnostics, and
+            // the live state remains available until this request returns.
+            if ((state_hash || (accepted_prefix_trace && o.prompt_cache > 0)) && !cancelled) {
                 std::string fingerprint;
                 if (!hash_session_state((int64_t) live.size(), fingerprint)) return 1;
                 std::fprintf(stderr, "strata serve: %s\n", fingerprint.c_str());

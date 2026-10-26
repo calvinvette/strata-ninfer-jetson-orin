@@ -96,30 +96,28 @@ until this difference is explained or bounded.
 
 ## Request-history and state fingerprint follow-up
 
-A direct temperature-zero engine diagnostic repeated the exact 1,069-token
-prompt twice per backend with prompt caching enabled and MTP draft counters at
-zero. On both CPU-miss and strict-NInfer staged routes, the second request
-reused 1,062 prompt tokens and read seven. Its 64 generated token IDs differed
-from the first request, and the final GDN, PLE, tail, pooled, pooled-full, KV
-and PLE-previous fingerprints changed. Two fresh-engine repeats per backend
-produced identical tokens and state. A same-service cache-off repeat also
-changed token IDs between requests, identically on both backends; state hashing
-is suppressed by the current runtime when prompt caching is zero. Across every
-diagnostic condition, CPU-miss and NInfer produced identical tokens at matching
-request ordinals, and all nine final-state fields matched where available.
-This demonstrates shared process/request-history variation but does not
-identify its cause. It does not explain why the original multi-workload screen
+Temperature-zero direct repetitions found exact CPU/NInfer token parity at
+each paired request ordinal. With prompt caching enabled, the second
+same-service request reused 1,062 prompt tokens and read seven; both routes
+changed output and seven final-state fields. Two fresh-engine repeats per
+backend were stable in tokens and all nine state fields. With prompt caching
+disabled, a same-service repeat also changed output and seven final-state
+fields on both routes. This demonstrates shared same-process variation, but
+does not identify its cause or explain why the original multi-workload screen
 had cross-arm mismatches.
 
 Raw IDs, decoded text, per-request engine metrics and state fingerprints are in
 [`state-fingerprint-diagnostic/results.json`](state-fingerprint-diagnostic/results.json);
 engine logs are retained alongside it. The [fresh-engine repetitions](state-fresh-engine-diagnostic/)
 and [same-service cache-off repetitions](state-cache-off-diagnostic-rerun/)
-retain their raw token IDs and logs. Next, add an opt-in final-state fingerprint
-for cache-off requests, then replay the complete five-workload order under both
-miss routes with warmup and prompt-end/final-state capture. Preserve exact
-tokens and direct persistent-state evidence. The original 1,069-token screen
-remains unqualified and requires a held-out task oracle before confirmation.
+retain their raw token IDs and logs. An opt-in `STRATA_STATE_HASH=1` hook now
+emits final-state fingerprints with `--prompt-cache 0`; ordinary service
+behavior is unchanged when the variable is unset. The rebuilt Orin CUDA binary
+passed a direct cache-off check on CPU-miss and NInfer routes. Hashing adds
+synchronization, so these runs are diagnostic only. Next replay the complete
+five-workload order under both miss routes with warmup and final-state capture.
+The original 1,069-token screen remains unqualified and requires a held-out task
+oracle before confirmation.
 
 Recreate this diagnostic with the same binary and model files using:
 
@@ -132,4 +130,7 @@ python3 bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/state-finger
 
 python3 bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/state-fingerprint-diagnostic/run_state_fingerprint_diagnostic.py \
   --prompt-cache 0 --out bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/state-cache-off-rerun
+
+python3 bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/state-fingerprint-diagnostic/run_state_fingerprint_diagnostic.py \
+  --prompt-cache 0 --out bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/state-cache-off-fingerprinted
 ```
