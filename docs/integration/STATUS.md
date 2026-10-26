@@ -5713,3 +5713,9 @@ The layer-2 Q8_1-contract oracle now matches both sampled expert outputs on
 both routes to about `9e-8` relative L2. This validates those operator rows
 under the captured, route-specific activations; the inputs themselves already
 differ at layer 2, so the upstream source of state drift remains unresolved.
+At the earliest sampled MoE layer, three expert rows also match the oracle to
+`5.9e-8`–`1.03e-7` relative L2. Route IDs match there, with at most `6e-8`
+route-weight delta and `1.53e-7` combined MoE-output delta. The first GDN state
+mismatch is layer 1 at `1.61e-5` relative L2. This localizes the first observed
+drift near first-layer arithmetic/state update but does not identify a specific
+operation. See both [layer-1 and layer-2 oracle results](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/README.md#state-and-route-localization).

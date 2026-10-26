@@ -609,6 +609,12 @@ SwiGLU-intermediate boundaries matched the captured rows for experts 372 and
 357 on both routes to about `9e-8` relative L2. This validates those sampled
 expert computations for their respective inputs; it does not account for the
 activation drift already present at layer 2 or locate the earlier state change.
+An oracle check of sampled model-layer-1 experts 97, 74 and 70 also matched at
+`5.9e-8`–`1.03e-7` relative L2. Route IDs matched, route weights differed by
+at most `6e-8`, and the combined MoE output differed by `1.53e-7` relative L2.
+The first GDN state mismatch is state layer 1 at `1.61e-5` relative L2. This
+places the earliest observed drift near first-layer aggregation/state update,
+but does not identify the operation responsible.
 
 ### E7 — Assess release of the demonstrated integration
 

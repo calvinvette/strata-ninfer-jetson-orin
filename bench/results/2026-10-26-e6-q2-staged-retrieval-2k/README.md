@@ -61,11 +61,21 @@ The oracle now also emulates the service's Q8_1 input quantization, Q2_0 × Q8_1
 block dot products, and Q8_1 SwiGLU intermediate before the down projection.
 For both sampled layer-2 experts (372 and 357) on both routes, its output
 matched the captured expert row to about `9e-8` relative L2 (maximum absolute
-error below `1.3e-8`). This strongly validates these sampled expert rows and
-the local NInfer operator against an independent codec/arithmetic oracle. The
-captured CPU-miss and staged activations already differ at layer 2, however, so
-this does not explain the upstream source of accumulated state drift. See
-[`oracle-layer2/analysis.json`](evidence/oracle-layer2/analysis.json).
+error below `1.3e-8`). We extended the check to the earliest sampled MoE layer:
+experts 97, 74 and 70 at model layer 1 match at `5.9e-8`–`1.03e-7` relative
+L2. There, route IDs match, the route-weight delta is at most `6e-8`, the input
+delta is `1.03e-7`, and the combined MoE output delta is `1.53e-7`. The first
+nonzero GDN state difference is at state layer 1 (`1.61e-5` relative L2).
+Together these results locate the earliest observed divergence near first-layer
+computation/aggregation and state update, with small numerical differences;
+they do not establish which operation causes it. The larger layer-2 activation
+delta is downstream growth, not evidence of a layer-2 expert-kernel fault. See
+the [layer-1 oracle results](evidence/oracle-layer1/analysis.json) and
+[layer-2 oracle results](evidence/oracle-layer2/analysis.json).
+
+Reproduce the oracle checks with `python3 analyze_layer_oracle.py --layer 1`
+and `python3 analyze_layer_oracle.py --layer 2` on the Orin with the local
+Q2_0 model.
 
 ## Reproduction and evidence
 
@@ -81,7 +91,7 @@ state/route diagnostics, not complete-answer tests.
 
 Focused checks passed:
 
-- `python3 -m py_compile tools/integration/ninfer_q2_retrieval_check.py bench/results/2026-10-26-e6-q2-staged-retrieval-2k/analyze_layer2_oracle.py`
+- `python3 -m py_compile tools/integration/ninfer_q2_retrieval_check.py bench/results/2026-10-26-e6-q2-staged-retrieval-2k/analyze_layer_oracle.py`
 - `python3 tools/integration/test_analyze_ninfer_backend_capture.py`
 - `python3 tools/integration/test_q2_0_expert_oracle.py` (4 tests)
 - `git diff --check`
