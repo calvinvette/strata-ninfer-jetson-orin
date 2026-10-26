@@ -617,14 +617,14 @@ places the earliest observed drift near first-layer aggregation/state update,
 but does not identify the operation responsible.
 The same exact-answer held-out retrieval passed token and residency-map checks
 at 4K and 8K prompts on CPU-miss and strict staged routes. Final state hashes
-still differed in six fields at 4K and 16K and five at 8K; GDN global relative
-L2 was `0.02645`, `0.03159` and `0.02572`, respectively, over 29.4M floats.
-Minimum available memory was 10.85 GiB at 16K. A corrected 4K rerun captured
-numeric state after the initial dump target was one token too high. GDN error
-did not increase monotonically with context length. These cases broaden
-exact-answer evidence for this task but do not close state parity or broader
-workload quality. The sequential timings are not performance evidence. See the
-[4K/8K/16K follow-up](../../bench/results/2026-10-26-e6-staged-retrieval-context-followup/README.md).
+still differed in six fields at 4K, 16K and 32K and five at 8K; GDN global
+relative L2 was `0.02645`, `0.03159`, `0.02572` and `0.02685`, respectively,
+over 29.4M floats. Minimum available memory was 9.93 GiB at 32K. A corrected
+4K rerun captured numeric state after the initial dump target was one token
+too high. GDN error did not increase monotonically with context length. These
+cases broaden exact-answer evidence for this task but do not close state parity
+or broader workload quality. The sequential timings are not performance
+evidence. See the [4K–32K follow-up](../../bench/results/2026-10-26-e6-staged-retrieval-context-followup/README.md).
 
 ### E7 — Assess release of the demonstrated integration
 

@@ -179,12 +179,12 @@ task; it does not establish a general cause or release profile. E7 remains
 open. See the [held-out retrieval/state report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/README.md).
 
 The same held-out exact-answer retrieval/arithmetic task also passed answer and
-token-ID checks at 4K, 8K and 16K prompts with identical startup residency
-maps. Final state hashes still differed at all lengths. Numeric GDN comparisons
-measured 2.645%, 3.159% and 2.572% global relative L2 at 4K, 8K and 16K over
-29.4M floats; these values are not monotonic with prompt length. Minimum
-available memory was 10.85 GiB at 16K. This broadens one task's length coverage
-but does not bound general generation quality or establish an approximate-state
-contract. The five-shape replay still had output-hash mismatches, so no staged
-release profile or performance claim is proposed. See the [4K/8K/16K
-follow-up](../../bench/results/2026-10-26-e6-staged-retrieval-context-followup/README.md).
+token-ID checks at 4K, 8K, 16K and 32K prompts with identical startup residency
+maps. Final state hashes differed at all lengths. Numeric GDN comparisons
+measured 2.645%, 3.159%, 2.572% and 2.685% global relative L2 at 4K, 8K, 16K
+and 32K over 29.4M floats; these values are not monotonic with prompt length.
+Minimum available memory was 9.93 GiB at 32K. This broadens one task's length
+coverage but does not bound general generation quality or establish an
+approximate-state contract. The five-shape replay still had output-hash
+mismatches, so no staged release profile or performance claim is proposed. See
+the [4K–32K follow-up](../../bench/results/2026-10-26-e6-staged-retrieval-context-followup/README.md).
