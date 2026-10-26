@@ -615,6 +615,15 @@ at most `6e-8`, and the combined MoE output differed by `1.53e-7` relative L2.
 The first GDN state mismatch is state layer 1 at `1.61e-5` relative L2. This
 places the earliest observed drift near first-layer aggregation/state update,
 but does not identify the operation responsible.
+The same exact-answer held-out retrieval passed token and residency-map checks
+at 4K and 8K prompts on CPU-miss and strict staged routes. Final state hashes
+still differed in six fields at 4K and five at 8K; 8K GDN global relative L2
+was `0.03159` over 29.4M floats, with 11.28 GiB minimum available memory.
+At 4K the hash comparison is valid, but the GDN dump requested `L=4143` while
+the actual accepted length was `L=4142`, so no numeric array comparison exists.
+These cases broaden exact-answer evidence for this task but do not close state
+parity or broader workload quality. The sequential timings are not performance
+evidence. See the [4K/8K follow-up](../../bench/results/2026-10-26-e6-staged-retrieval-context-followup/README.md).
 
 ### E7 — Assess release of the demonstrated integration
 

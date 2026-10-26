@@ -5719,3 +5719,13 @@ route-weight delta and `1.53e-7` combined MoE-output delta. The first GDN state
 mismatch is layer 1 at `1.61e-5` relative L2. This localizes the first observed
 drift near first-layer arithmetic/state update but does not identify a specific
 operation. See both [layer-1 and layer-2 oracle results](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/README.md#state-and-route-localization).
+
+The same held-out retrieval/arithmetic task also returned the exact answer and
+matching token IDs on CPU-miss and strict staged routes at 4K and 8K prompts,
+with identical startup residency maps. Final state hashes still differed in
+six fields at 4K and five at 8K. The 8K GDN state had 3.16% global relative L2
+over 29.4M floats; minimum available memory was 11.28 GiB. At 4K the state
+fingerprints were captured but the numeric GDN dump missed the accepted-length
+gate by one token. This supports functional behavior for this task at three
+lengths, while staged state parity and broader workload quality remain open.
+The sequential runs are not performance evidence. See the [4K/8K follow-up](../../bench/results/2026-10-26-e6-staged-retrieval-context-followup/README.md).
