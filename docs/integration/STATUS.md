@@ -6103,17 +6103,18 @@ request still failed in GDN, tail, pooled, pooled-full and KV state. This
 moves the remaining search to later layer transitions; no quality or
 performance qualification is claimed. [Layer-1 intervention report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#layer-1-expert-row-intervention).
 
-The full final GDN dump is bitwise equal through layers 0–2 after mirroring
-sampled layer-0/1 expert rows. Layer 2 still has small differences in expert
-rows `75, 84, 89, 114, 130`; its output differences precede the first nonzero
-GDN state delta at layer 3. Extending the intervention to those layer-2 rows
-moved the small first delta to layer 3 but did not eliminate it: layer-3 rows
-`78, 87, 94, 113, 135` differ while inputs/routes/shared output match.
-Mirroring those rows makes GDN state exact through layer 3; layer 4 becomes
-the first differing state. Most layer-4 rows differ by about `1e-7`, but
-expert 106 at position 2042 has a `9.02e-5` maximum absolute error and drives
-a `9.79e-5` combined-output relative-L2 delta. A mirror through layer 4 with
-layer-5 capture is running. The paired request still fails state parity; one-token
-diagnostics are not quality or performance tests. HIP and SYCL rebuilt the
-filter source on maestro1 and both model-free help checks passed; this is
-x86_64 compile/startup evidence only. [Layer-boundary report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#layer-3-mirror-and-layer-4-arithmetic-outlier), [backend build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-per-layer-q8_1-mirror-filters).
+Per-layer interventions localized recurring small row differences to CPU
+fallback versus CUDA expert arithmetic. Mirroring the selected layer-4 rows
+made GDN state exact through layer 4; layer 5 then differed by relative L2
+`1.08e-9`, with amplification at layers 6–7. For captured layer-4 expert 106,
+an independent Q2_0×Q8_1 FP64 oracle put CUDA at `6.05e-8` relative L2 and CPU
+at `9.61e-4`; a second expert (131) put both paths near `1e-7`. This explains
+the local outlier without showing a bad staged weight or task-quality failure.
+Active grouped NInfer dispatch exactly matched Strata's grouped operator but
+was 1.111× and 1.122× slower at 64/128-token top-10 screens. The separate
+NInfer-derived D3/D4 candidate failed its expert oracle and is not used by
+service dispatch. No operator or end-to-end performance gate is closed; move
+from per-layer mirroring to held-out task-quality and paired request
+measurements. HIP and SYCL builds of the selector change and help checks
+passed on maestro1, which is x86_64 compile/startup evidence only.
+[Oracle and operator report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#oracle-check-cpu-fallback-versus-cuda-expert-arithmetic), [backend build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-per-layer-q8_1-mirror-filters).

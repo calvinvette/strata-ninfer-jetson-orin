@@ -1097,19 +1097,18 @@ conversion, performance campaign or upstream merge.
 
 ## Execution update (2026-10-26)
 
-Phase E6 remains open. After per-layer expert-ID mirror filters landed, the
-layer-0 and layer-1 sampled arithmetic paths could be made bitwise equal, but
-request-level persistent state still differed. A full final GDN state dump in
-the next paired diagnostic was exact through model layers 0–2 and first
-differed at layer 3 (relative L2 `1.31e-9`). Layer-2 MoE input, routing and
-shared output matched; routed expert rows for IDs `75, 84, 89, 114, 130`
-differed by about `1e-7`, and their combined output differed by about
-`2.3e-8`–`4.0e-8`. A layer-2 mirror plus layer-3 capture is running to test
-this repeating layer-local effect. Mirroring layer 3 made state exact through
-that layer; layer 4 then showed a larger expert-106 row delta at position
-2042 (`9.02e-5` maximum absolute) among the smaller arithmetic differences.
-A layer-4 mirror with layer-5 capture is running. The final-state and quality gates remain open; the
-single-pair diagnostic timings do not qualify performance. HIP and SYCL
-rebuilds of the selector change plus model-free help checks passed on maestro1
-(x86_64 compile/startup evidence only). See the linked execution notes in
-[STATUS](STATUS.md).
+Phase E6 remains open. Per-layer expert mirrors exposed a CPU-fallback versus
+CUDA arithmetic difference. On a captured layer-4 expert-106 activation, the
+CUDA result matched an independent FP64 Q2_0×Q8_1 runtime-contract oracle to
+`6.05e-8` relative L2; CPU was `9.61e-4` away. A second expert put both paths
+near `1e-7`, so the larger gap is activation/expert dependent. The active
+grouped NInfer route matched Strata's grouped Q2_0/Q8_1 operator exactly but
+measured 1.111× and 1.122× Strata latency for 64/128-token top-10 groups. The
+separate NInfer-derived D3/D4 candidate failed its oracle and is not called by
+the service. Do not continue serial per-layer mirroring as a release gate;
+next prioritize held-out task-quality bounds and randomized paired request
+measurements for the active path. Exact persistent-state parity remains a
+diagnostic result, not a task-quality substitute when CPU and CUDA arithmetic
+differ. No performance or quality gate is closed. HIP and SYCL builds and
+model-free help checks passed on maestro1 (x86_64 evidence only). Details are
+linked in [STATUS](STATUS.md).

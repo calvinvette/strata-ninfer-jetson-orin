@@ -581,3 +581,55 @@ quality evaluation. A follow-up mirrors layer-4 IDs and captures layer 5.
 Compact raw-derived results are in [`run14/moe-comparison.json`](layer4-extension/run14/moe-comparison.json)
 and [`run14/gdn-state-comparison.json`](layer4-extension/run14/gdn-state-comparison.json);
 large dumps remain local.
+
+The layer-4 mirror follow-up made the final GDN dump bitwise equal through
+layer 4. Layer 5 was first to differ (relative L2 `1.08e-9`), followed by
+`5.78e-6` at layer 6 and `3.51e-3` at layer 7. Layer-5 expert rows for IDs
+`71, 98, 130, 142` differed by roughly `3.0e-8`–`6.2e-8` relative L2, with
+combined output deltas `2.6e-8`–`6.0e-8`. This continued per-layer movement
+confirmed that serially mirroring each next row set was not an efficient
+release gate; the direct independent oracle check below was prioritized.
+
+### Oracle check: CPU fallback versus CUDA expert arithmetic
+
+The repeated per-layer mirror chase was paused after an independent operator
+check isolated the difference. Using the captured layer-4 input at position
+2042 and the actual Q2_0 weights for layer 4 / expert 106, the CUDA output was
+within relative L2 `6.05e-8` of the independent FP64 Q2_0×Q8_1 runtime-contract
+oracle. The CPU expert output was `9.61e-4` away from that oracle, with maximum
+absolute error `9.02e-5`; CPU-vs-CUDA relative L2 was `8.99e-4` and 6,822 of
+7,680 output floats differed bitwise. Both remained within the legacy parity
+harness's broad 3% end-to-end operator tolerance, so its exit status was 0.
+For a second routed row (layer 4 / expert 131, position 2043), CPU and CUDA
+both matched the independent oracle closely (`9.13e-8` and `6.08e-8` relative
+L2), and their mutual difference was `9.68e-8`. This indicates a sparse,
+activation-dependent CPU/GPU arithmetic discrepancy rather than evidence of
+bad staged weights. It explains the expert-106 service-row outlier; the CPU
+fallback is the less oracle-accurate arm for that activation. It does not yet
+establish a task-quality failure.
+
+The separate active grouped NInfer dispatch passed direct comparison to
+Strata's grouped Q2_0/Q8_1 operator exactly for the captured one-entry route,
+3-token/9-entry case, and 64-token/640-entry and 128-token/1,280-entry top-10
+cases. Its one-token resident timing was 24.427 µs versus Strata 24.580 µs
+(ratio 0.994); the grouped timings were 4,385.8 vs 3,947.6 µs at 64 tokens
+(1.111×) and 8,929.5 vs 7,954.8 µs at 128 tokens (1.122×). These are local
+operator screens without paired physical-memory/clock sampling and are not
+performance qualification. In contrast, the standalone NInfer-derived D3/D4
+candidate failed its independent expert-106 oracle (`9.42e-3` relative L2,
+`7.61e-4` max absolute against limits `5e-5` and `1e-5`). Source search shows
+that direct candidate is called only by its parity harness, not by the active
+service dispatch; do not promote it. The active grouped route's exact parity
+and slower grouped timings reinforce that NInfer has not yet shown an
+operator-level throughput gain here.
+
+Tests used source commit `35051742ab28b6be669e6650064936d1dd899bd5`, the
+Q2_0 model at `/home/calvin/models/strata-orin-validation/Q2_0/` (expert shard
+1; 37,623,740,192 bytes), and Orin CUDA 12.6. Binary hashes: `strata`
+`44c358706192a57ced038cff0478cec05ae3c7476258c7a90e5b1f1ef9a4374e`,
+`native_expert_parity`
+`f163c6074f9e0ad5910270de8b4df9aba11156342523a7604f945e83f7a74dd1`, and
+`ninfer_q2_expert_parity`
+`ec1d713c80aaeb266a8b4934d73faef8bac08692349b2d39db7f09c075811602`.
+Captured activations, oracle arrays and float dumps remain under `/tmp` or in
+the untracked local run directories; they are not committed.
