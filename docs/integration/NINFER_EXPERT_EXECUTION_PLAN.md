@@ -654,6 +654,13 @@ Per-process resident-map files were not captured in this campaign, so it cannot
 qualify performance even apart from the failed decode gate. Seven-pair
 confirmation is not justified. See the [staged-backend performance
 screen](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/performance-staged-backend-screen/README.md).
+A follow-up independent Q8_1 comparison of saved MoE inputs at prompt position
+2047 found no activation scale/code difference at sampled layer 1 (all 80
+blocks matched). At layer 2, 34 scales and 103 codes differed, with more code
+differences at layers 3, 11 and 21. This places the first sampled Q8_1 input
+change at layer 2; it does not identify the preceding operation that creates
+the change. The per-layer numeric summary and quantizer parity runs are recorded
+in the [Q8_1 capture check](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/q8_1-capture-check/README.md).
 
 ### E7 — Assess release of the demonstrated integration
 

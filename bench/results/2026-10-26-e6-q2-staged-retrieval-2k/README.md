@@ -77,6 +77,15 @@ Reproduce the oracle checks with `python3 analyze_layer_oracle.py --layer 1`
 and `python3 analyze_layer_oracle.py --layer 2` on the Orin with the local
 Q2_0 model.
 
+The captured layer-1 MoE input vectors differ slightly in FP32, but an independent
+Q8_1 comparison found identical scales and all 2,560 activation codes across 80
+blocks. At sampled layer 2, 34 scales and 103 activation codes differ; the code
+delta grows at layers 3, 11 and 21. The first sampled activation representation
+difference is therefore at layer 2, downstream of the near-matching layer-1
+MoE calculation. This narrows the search but does not identify which computation
+between the layer-1 boundary and layer-2 input creates the change. See the
+[Q8_1 capture comparison](evidence/q8_1-capture-check/README.md).
+
 ## Staged-backend isolation
 
 The retrieval checker now has `--compare-staged-backends`. Both arms set
