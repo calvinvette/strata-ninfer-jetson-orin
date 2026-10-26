@@ -8,9 +8,11 @@ The runtime now has an experimental, opt-in CUDA path for resident Q2_0
 Flash-Next experts; Strata continues to own residency, memory, routing and
 state. E0–E5 have bounded implementation and test evidence. E6's context
 screen is complete, but its performance gate failed, and the E7 assessment
-proposes no NInfer release profile. NInfer remains opt-in and the default path
-remains Strata. See the [release assessment](NINFER_E7_RELEASE_ASSESSMENT.md)
-and [current status](STATUS.md) for tested limits and unresolved build checks.
+proposes no NInfer release profile. Current-source HIP and SYCL builds and help
+checks passed on x86_64 maestro1; accelerator execution remains untested. NInfer
+remains opt-in and the default path remains Strata. See the [release
+assessment](NINFER_E7_RELEASE_ASSESSMENT.md) and [current
+status](STATUS.md) for tested limits and open qualification gates.
 A 240,286-token held-out retrieval under a 262,144-token cap now passes exact
 answer, generated-token and final-state parity for the Q2_0 Strata/NInfer pair;
 this is one functional workload, not general long-context quality or

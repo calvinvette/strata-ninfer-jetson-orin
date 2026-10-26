@@ -19,6 +19,9 @@ but did not pass the performance screen and is not a qualified release profile.
 The default still uses Strata's kernels. See the
 [NInfer release assessment](docs/integration/NINFER_E7_RELEASE_ASSESSMENT.md)
 and [execution plan](docs/integration/NINFER_EXPERT_EXECUTION_PLAN.md).
+Current-source HIP and SYCL Release builds also pass on x86_64 maestro1; this
+does not qualify either accelerator backend at runtime. See the [build
+record](bench/results/2026-10-26-e7-maestro-current-source-builds/README.md).
 The original `strata-inference-orin` results and this fork's measurements are identified separately below.
 The translated READMEs describe the original project and have not been updated for this integration.
 

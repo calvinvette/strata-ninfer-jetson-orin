@@ -124,17 +124,18 @@ Binary SHA256 values:
 | `strata` | `c7301655b1a8d2569ab8744d92259b6d05b2baccb8bd04ad86da724a42bd4d75` |
 | `ninfer_q2_expert_parity` | `ec1d713c80aaeb266a8b4934d73faef8bac08692349b2d39db7f09c075811602` |
 
-HIP and SYCL builds remain unverified. Neither compiler was available on the
-Orin or on `maestro1`; the latter had 1.1 GiB free on its root filesystem and
-no HIP/SYCL compiler in its login PATH, home directory, or standard `/usr/local`
-and `/opt` locations. `maestro1` is x86_64; it has no `/scratch` mount and
-`/dev/shm` had 1.4 GiB available. No storage was removed to make space. A
-separate historical successful HIP/SYCL build record exists on the original
-Orin port branch at commit `0be090c8`, but it predates this integration's shared
-source changes and is not current-source build evidence. The NInfer kernel
-itself is CUDA-only and HIP/SYCL source sets remain unchanged, but generic
-shared files changed in this integration, so their current-source build gate
-remains open.
+Current-source HIP and SYCL builds have now passed on `maestro1`, using its
+mounted `/mnt/sda2` scratch volume and toolchains outside the login PATH. The
+build source was exact commit `1f9f116b181ef0503f4203f26922b90e213d4615`.
+HIP used ROCm HIP 7.2.53210 / AMD Clang 22.0.0 with `gfx1100`; SYCL used Intel
+oneAPI DPC++/C++ 2026.1.1. Both Release builds used bounded parallelism 2,
+linked the `strata` target, and passed a model-free `strata --help` invocation.
+The SYCL build completed all 201 steps. Binary hashes, configure metadata and
+full logs are in the [maestro1 current-source build report](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md).
+These are x86_64 build and CLI-startup results only. maestro1 has an Intel HD
+Graphics 500, so this is not HIP/SYCL device execution, backend correctness,
+or Orin performance evidence. The NInfer expert kernels remain CUDA-only and
+no general NInfer release profile is proposed.
 
 ## Sustained service and next entry criteria
 

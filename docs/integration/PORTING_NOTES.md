@@ -338,6 +338,17 @@ runtime evidence. The report retains toolchain identities, source checksums,
 binary hashes and build logs for future Strata/Splash parity work. See the
 [Phase 8 backend report](../../bench/results/2026-10-14-phase8-maestro1-4b72a72/README.md).
 
+For the NInfer expert execution branch, a fresh depth-1 source snapshot at
+`1f9f116b181ef0503f4203f26922b90e213d4615` was also built on maestro1 after
+locating its compilers under a mounted data volume rather than PATH. ROCm HIP
+7.2.53210 and Intel oneAPI DPC++ 2026.1.1 both compiled and linked the current
+source with parallelism limited to two jobs; both `strata --help` checks passed.
+The SYCL binary requires its oneAPI runtime environment, including MKL. This is
+x86 build/CLI evidence only, not backend GPU execution. Preserve compiler
+environment setup, scratch location and the distinction between build success
+and device qualification when repeating the method for Splash. See the
+[NInfer current-source build report](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md).
+
 
 ## Expanded owners and reproducibility diagnostics
 

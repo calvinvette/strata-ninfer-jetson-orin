@@ -587,14 +587,20 @@ start of this document are assessed explicitly. A bounded release names its
 models, hardware, profiles, exclusions and remaining stages; it cannot close
 unimplemented expert paths by narrowing the wording of a phase closeout.
 
+Execution note (2026-10-26): current-source HIP and SYCL Release builds passed
+on maestro1 at commit `1f9f116b181ef0503f4203f26922b90e213d4615`, and both
+binaries passed a model-free `strata --help` check. maestro1 supplies x86_64
+build evidence only; it has an Intel HD Graphics 500 and no HIP/SYCL GPU
+execution was tested. See the [build report](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md).
+
 Execution note (2026-10-25): the assessment finds a bounded CUDA Q2_0 resident
 expert path is implemented and exercised, but it is experimental rather than a
 release profile. The operator and three-pair service screens failed the useful-
 effect threshold; the completed 1K–256K single-sample matrix cannot qualify
 performance or quality. No 30-minute NInfer soak was run because no release
-profile is proposed. The local CUDA build completed. HIP/SYCL compilers were
-unavailable on Orin and `maestro1`, which had 1.1 GiB free, so their required
-build evidence is outstanding. See the [E7 assessment](NINFER_E7_RELEASE_ASSESSMENT.md).
+profile is proposed. The local CUDA build completed. At the time, HIP/SYCL
+build evidence was outstanding; it was later completed on maestro1 as recorded
+above. See the [E7 assessment](NINFER_E7_RELEASE_ASSESSMENT.md).
 
 Execution note (2026-10-25): E6's first full top-10 grouped Q2_0 timing screen
 passed parity at 64 and 128 tokens but measured 12.18× and 12.31× NInfer/Strata

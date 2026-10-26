@@ -82,9 +82,10 @@ was resolved for this request with an experiment-only 300-second allowance;
 runtime defaults remain unchanged. See the [240K retrieval
 report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-240k-retrieval/README.md).
 E7 assessment proposes no
-general release profile; HIP/SYCL build evidence is outstanding, and NInfer
-remains opt-in. See the [E7
-assessment](NINFER_E7_RELEASE_ASSESSMENT.md). Nsight Systems identified scalar Q2 projections as the
+general release profile; current-source HIP and SYCL builds and model-free
+help checks have now passed on maestro1, but this is x86 build evidence only,
+not device/runtime qualification. NInfer remains opt-in. See the [E7
+assessment](NINFER_E7_RELEASE_ASSESSMENT.md) and [maestro1 build report](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md). Nsight Systems identified scalar Q2 projections as the
 main grouped-kernel cost. A packed `dp4a` revision passed grouped parity and
 reduced the 64/128-token operator gap from 12.2× to 4.36×, but remained slower.
 A fresh three-pair 8K service screen showed median NInfer latency changes of
