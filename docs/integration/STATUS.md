@@ -5730,3 +5730,10 @@ error was not monotonic with prompt length. This supports functional behavior
 for this task at five lengths, while staged state parity and broader workload
 quality remain open. The sequential runs are not performance evidence. See the
 [4K–32K follow-up](../../bench/results/2026-10-26-e6-staged-retrieval-context-followup/README.md).
+
+At 64K, the task again returned the exact answer and matching token IDs with
+the same startup map; 4,610 expert reads were staged. Five persistent-state
+hashes differed. GDN relative L2 was 3.61% over 29.4M values, with 8.08 GiB
+minimum available memory. This is functional evidence for the held-out task,
+not state-parity or performance qualification. See the [4K–64K
+follow-up](../../bench/results/2026-10-26-e6-staged-retrieval-context-followup/README.md).

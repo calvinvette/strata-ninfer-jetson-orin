@@ -624,7 +624,14 @@ over 29.4M floats. Minimum available memory was 9.93 GiB at 32K. A corrected
 too high. GDN error did not increase monotonically with context length. These
 cases broaden exact-answer evidence for this task but do not close state parity
 or broader workload quality. The sequential timings are not performance
-evidence. See the [4K–32K follow-up](../../bench/results/2026-10-26-e6-staged-retrieval-context-followup/README.md).
+evidence. The same task at 64K also returned exact answer and token parity,
+with matching residency but five differing state fingerprints; GDN relative
+L2 was `0.03609` over 29.4M floats and minimum available memory was 8.08 GiB.
+The raw 118 MB GDN dumps remain local; checked-in hashes and comparison metrics
+are recorded in the context report. This extends task-level functional
+evidence only; state parity, broader quality, and staged-miss performance
+remain unqualified. See the [4K–64K
+follow-up](../../bench/results/2026-10-26-e6-staged-retrieval-context-followup/README.md).
 
 ### E7 — Assess release of the demonstrated integration
 

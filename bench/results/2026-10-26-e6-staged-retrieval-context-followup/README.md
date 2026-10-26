@@ -17,6 +17,7 @@ paired performance measurements.
 | 8,192 | Exact answer on both | Match | Match | GDN, tail, pooled, pooled-full, KV | 3.159% over 29.4M floats | 11.28 GiB |
 | 16,384 | Exact answer on both | Match | Match | GDN, PLE, tail, pooled, pooled-full, KV | 2.572% over 29.4M floats | 10.85 GiB |
 | 32,768 | Exact answer on both | Match | Match | GDN, PLE, tail, pooled, pooled-full, KV | 2.685% over 29.4M floats | 9.93 GiB |
+| 65,536 | Exact answer on both | Match | Match | GDN, tail, pooled, pooled-full, KV | 3.609% over 29.4M floats | 8.08 GiB |
 
 Both runs generated 47 tokens, returned all three retrieval codes and the exact
 suffix sum, and matched the same startup residency map hash as the 2K
@@ -60,6 +61,19 @@ error was `0.04959` at state layer 25. The raw arrays remain local; sizes and
 hashes are in
 [`32768/evidence/gdn-dump-artifact-hashes.json`](32768/evidence/gdn-dump-artifact-hashes.json).
 
+At 64K, both arms generated the exact answer with matching token IDs and the
+same startup residency map (`a02fd81e...ddf7`). The strict staged arm offloaded
+4,610 expert reads. Five final state fingerprints differed: GDN, tail, pooled,
+pooled-full and KV. Of 29,417,472 GDN values, 28,405,416 differed (96.56%);
+global relative L2 was `0.03609` and RMS absolute delta was `0.009005`. State
+layer 1 differed by `8.22e-8` relative L2, layer 2 by `0.001313`, and the
+largest layer-relative error was `0.06498` at state layer 27. The raw 118 MB
+arrays remain local; hashes are in
+[`65536/evidence/gdn-dump-artifact-hashes.json`](65536/evidence/gdn-dump-artifact-hashes.json).
+Minimum available memory was 8.08 GiB. Prompt times were about 642.6 s and
+641.2 s in these sequential diagnostic runs; this is not a performance
+comparison. The state mismatch leaves staged-route correctness open.
+
 ## Reproduction and evidence
 
 Each context directory contains the exact workload, config, result JSON,
@@ -69,7 +83,8 @@ and `tools/integration/ninfer_q2_retrieval_check.py --compare-cpu-miss-staged
 --dump-gdn --run`, wrapped in `tools/integration/run_control.py`. Set
 `--dump-gdn-at 4142` for 4K, `--dump-gdn-at 8238` with `--max-context 16384`
 for 8K, `--dump-gdn-at 16430` with `--max-context 32768` for 16K, and
-`--dump-gdn-at 32814` with `--max-context 65536` for 32K.
+`--dump-gdn-at 32814` with `--max-context 65536` for 32K, and
+`--dump-gdn-at 65582` with `--max-context 131072` for 64K.
 
 Minimum available physical/admission memory stayed above the six-GiB floor in
 all runs. No clocks or services were changed. Sequential prompt/decode times
