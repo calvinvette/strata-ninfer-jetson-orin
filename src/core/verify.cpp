@@ -99,6 +99,15 @@ struct BoundaryDiagHeaderV2 {
     int32_t slot;
 };
 static_assert(sizeof(BoundaryDiagHeaderV2) == 48, "STBNDY2 header layout changed");
+struct QsaDiagHeaderV1 {
+    char magic[8];
+    uint32_t version;
+    int32_t layer;
+    int64_t position;
+    uint64_t n_embd, q_width, idx_width, kv_width, cap;
+    int32_t token, reserved;
+};
+static_assert(sizeof(QsaDiagHeaderV1) == 72, "STQSAD1 header layout changed");
 struct MoeOutputHeaderV2 {
     char magic[8];
     uint32_t version;
@@ -535,6 +544,9 @@ Verifier::~Verifier() {
     if (boundary_diag_h_ && cudaFreeHost(boundary_diag_h_) == cudaSuccess)
         strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
                                                     boundary_diag_h_, 0, -1);
+    if (qsa_diag_h_ && cudaFreeHost(qsa_diag_h_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
+                                                    qsa_diag_h_, 0, -1);
     if (moe_route_diag_h_ && cudaFreeHost(moe_route_diag_h_) == cudaSuccess)
         strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
                                                     moe_route_diag_h_, 0, -1);
@@ -810,6 +822,47 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
             std::fprintf(stderr, "strata verify: opt-in residual/hyperconnection boundary capture at %d/%d position %lld -> %s (%zu bytes)\n",
                          boundary_diag_layer_, boundary_diag_layer_ + 1,
                          (long long) boundary_diag_position_, boundary_diag_path_.c_str(), boundary_diag_capacity_);
+        }
+    }
+    {
+        const char* layer = std::getenv("STRATA_VERIFY_DUMP_QSA_LAYER");
+        const char* path = std::getenv("STRATA_VERIFY_DUMP_QSA_PATH");
+        const char* position = std::getenv("STRATA_VERIFY_DUMP_QSA_POSITION");
+        if ((layer != nullptr) != (path != nullptr) || (layer != nullptr) != (position != nullptr)) {
+            err = "verify: QSA capture layer, path, and position must be set together";
+            return false;
+        }
+        if (layer != nullptr) {
+            char* layer_end = nullptr;
+            char* position_end = nullptr;
+            errno = 0;
+            const long parsed_layer = std::strtol(layer, &layer_end, 10);
+            const long long parsed_position = std::strtoll(position, &position_end, 10);
+            if (errno != 0 || layer_end == layer || *layer_end != '\0' || parsed_layer < 0 ||
+                parsed_layer >= g.n_layers || !is_qsa_layer(g, parsed_layer) || position_end == position ||
+                *position_end != '\0' || parsed_position < 0 || !*path) {
+                err = "verify: invalid opt-in QSA capture layer, position, or path";
+                return false;
+            }
+            const uint64_t q_width = NH * HD, idx_width = IQ * ID, kv_width = NKV * HD;
+            const uint64_t float_count = 3 * N + 3 * q_width + idx_width + 2 * kv_width;
+            if (float_count > (SIZE_MAX - cap_ * sizeof(int32_t)) / sizeof(float)) {
+                err = "verify: opt-in QSA capture size overflows";
+                return false;
+            }
+            qsa_diag_layer_ = (int) parsed_layer;
+            qsa_diag_position_ = (int64_t) parsed_position;
+            qsa_diag_path_ = path;
+            qsa_diag_capacity_ = (size_t) float_count * sizeof(float) + (size_t) cap_ * sizeof(int32_t);
+            if (cudaHostAlloc((void**) &qsa_diag_h_, qsa_diag_capacity_, cudaHostAllocPortable) != cudaSuccess) {
+                qsa_diag_h_ = nullptr;
+                err = "verify: could not allocate the opt-in QSA capture buffer";
+                return false;
+            }
+            strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "allocate", this,
+                                                        qsa_diag_h_, qsa_diag_capacity_, -1);
+            std::fprintf(stderr, "strata verify: opt-in QSA capture at layer %d position %lld -> %s (%zu bytes)\n",
+                         qsa_diag_layer_, (long long) qsa_diag_position_, qsa_diag_path_.c_str(), qsa_diag_capacity_);
         }
     }
     {
@@ -2075,6 +2128,37 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                 native_quantize_q8_1(attn32_ + tb * NH * HD, xq_, (int) (NH * HD), n, cs);
                 il_ready = false;
                 mm(wo, bo_ + tb * N, (int) (NH * HD), (int) N);
+                if (qsa_diag_h_ != nullptr && l == qsa_diag_layer_ && !batch_rec_ && !qsa_diag_captured_) {
+                  for (int t = tb; t < te && !qsa_diag_captured_; ++t) {
+                    if (h_pos_[(size_t) t * (size_t) NH] != qsa_diag_position_) continue;
+                    const size_t q_width = (size_t) NH * (size_t) HD;
+                    const size_t idx_width = (size_t) IQ * (size_t) ID;
+                    const size_t kv_width = (size_t) NKV * (size_t) HD;
+                    size_t offset = 0;
+                    auto capture = [&](const void* source, size_t bytes) {
+                        const cudaError_t ce = cudaMemcpyAsync(qsa_diag_h_ + offset, source, bytes,
+                                                               cudaMemcpyDeviceToHost, cs);
+                        if (ce != cudaSuccess) return false;
+                        offset += bytes;
+                        return true;
+                    };
+                    if (!capture(mixed_ + (size_t) t * (size_t) N, (size_t) N * sizeof(float)) ||
+                        !capture(qcur_ + (size_t) t * q_width, q_width * sizeof(float)) ||
+                        !capture(qidx_ + (size_t) t * idx_width, idx_width * sizeof(float)) ||
+                        !capture(kcur_ + (size_t) t * kv_width, kv_width * sizeof(float)) ||
+                        !capture(vcur_ + (size_t) t * kv_width, kv_width * sizeof(float)) ||
+                        !capture(sel_ + (size_t) t * (size_t) cap_, (size_t) cap_ * sizeof(int32_t)) ||
+                        !capture(attn_ + (size_t) t * q_width, q_width * sizeof(float)) ||
+                        !capture(attn32_ + (size_t) t * q_width, q_width * sizeof(float)) ||
+                        !capture(bo_ + (size_t) t * (size_t) N, (size_t) N * sizeof(float))) {
+                        err = "verify: could not queue opt-in QSA stage capture";
+                        return false;
+                    }
+                    qsa_diag_token_ = h_tok_[t];
+                    qsa_diag_row_ = t;
+                    qsa_diag_captured_ = true;
+                  }
+                }
             }
         } catch (const std::exception& e) {
             err = "verify layer " + std::to_string(l) + ": " + e.what();
@@ -2082,6 +2166,18 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
         }
         stamp(l, 16, grp);
         const bool q8_ffn = gr_read_group(1, true, inj_, inj2_);   // true: nat_xq_ holds the MoE input's q8_1 (STRATA_QFUSE)
+        if (qsa_diag_h_ != nullptr && qsa_diag_captured_ && !qsa_diag_moe_input_captured_ &&
+            l == qsa_diag_layer_ && qsa_diag_row_ >= tb && qsa_diag_row_ < te) {
+            const size_t offset = qsa_diag_capacity_ - (size_t) N * sizeof(float);
+            const cudaError_t ce = cudaMemcpyAsync(qsa_diag_h_ + offset,
+                                                    mixed_ + (size_t) qsa_diag_row_ * (size_t) N,
+                                                    (size_t) N * sizeof(float), cudaMemcpyDeviceToHost, cs);
+            if (ce != cudaSuccess) {
+                err = "verify: could not queue opt-in QSA MoE-input capture";
+                return false;
+            }
+            qsa_diag_moe_input_captured_ = true;
+        }
         if (gdn_diag_h_ != nullptr && l == gdn_diag_layer_ &&
             (!batch_rec_ || gdn_diag_include_batch_) && !is_qsa_layer(g, l) &&
             cudaMemcpyAsync((uint8_t*) gdn_diag_h_ +
@@ -3003,6 +3099,36 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
     const cudaError_t se = cudaStreamSynchronize(cs_);
     trace_ev("SYNCED", -1, -1, (int64_t) se);
     if (se != cudaSuccess) { err = std::string("verify: ") + cudaGetErrorString(se); return false; }
+    if (qsa_diag_captured_ && !qsa_diag_moe_input_captured_) {
+        err = "verify: opt-in QSA capture did not reach the MoE input boundary";
+        return false;
+    }
+    if (qsa_diag_captured_) {
+        QsaDiagHeaderV1 header{};
+        std::memcpy(header.magic, "STQSAD1", sizeof(header.magic));
+        header.version = 1;
+        header.layer = qsa_diag_layer_;
+        header.position = qsa_diag_position_;
+        header.n_embd = (uint64_t) g.n_embd;
+        header.q_width = (uint64_t) g.n_head * (uint64_t) g.head_dim;
+        header.idx_width = (uint64_t) g.idx_q_heads * (uint64_t) g.idx_key_dim;
+        header.kv_width = (uint64_t) g.n_head_kv * (uint64_t) g.head_dim;
+        header.cap = (uint64_t) cap_;
+        header.token = qsa_diag_token_;
+        std::FILE* dump = std::fopen(qsa_diag_path_.c_str(), "ab");
+        bool written = dump != nullptr;
+        if (written) {
+            written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
+                      std::fwrite(qsa_diag_h_, 1, qsa_diag_capacity_, dump) == qsa_diag_capacity_;
+            if (std::fflush(dump) != 0) written = false;
+            if (std::fclose(dump) != 0) written = false;
+        }
+        if (!written) {
+            err = "verify: could not write opt-in QSA stage capture";
+            return false;
+        }
+        qsa_diag_captured_ = false;
+    }
     if (gr_read_diag_captured_ && T == 1 && pos0 == gr_read_diag_position_) {
         struct GrReadHeader {
             char magic[8];

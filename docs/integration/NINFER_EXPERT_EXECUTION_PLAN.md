@@ -766,6 +766,21 @@ and does not evaluate normalized output. The
 one-token run is not quality/performance qualification; E6 remains open. See
 the [layer-5 state-history report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#gdn-state-history-crossover-at-model-layer-5).
 
+An opt-in QSA stage capture at model layer 3, position 125 (token 271) found
+the QSA input at `8.16e-8` relative L2, with exact query/current key/current
+value and identical 2,051 selected block IDs. Index-query relative L2 was
+`9.24e-8`; attention, gated attention, projection and exact next-MoE input
+divergence grew to `3.97e-5`, `5.41e-5`, `8.32e-4` and `5.47e-4`. Thus the
+measured amplification lies within the QSA attention path, but historical
+cached K/V contents and individual attention arithmetic were not captured, so
+the precise cause is unresolved. Token IDs matched, while persistent state
+still differed. This is localization evidence only, not quality or performance
+qualification. The CUDA build, capture analyzer tests and HIP build passed;
+SYCL's separate verifier implementation was unchanged and its configured target
+was up to date. maestro1 evidence is x86 compile/link only. Minimum available
+memory was 11.47 GiB; EMC was inaccessible and energy was not measured. See the
+[QSA stage report](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#qsa-stage-capture-at-model-layer-3).
+
 ### E7 — Assess release of the demonstrated integration
 
 1. Run focused regression and at least 30 minutes of sustained service for each

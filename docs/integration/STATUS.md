@@ -5905,3 +5905,15 @@ before kernel cases because the host reported no ROCm-capable device. Treat
 this as compile/link portability evidence; Orin CUDA built and exercised the
 replay. The SYCL parity implementation is separate and unchanged. [HIP build
 record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/evidence/current-source-32f04b56-gdn-parity/README.md).
+
+An opt-in model-layer-3 QSA capture at position 125 (token 271) localizes
+additional amplification in QSA attention: input rel L2 was `8.16e-8`, query
+and current K/V were exact, and all 2,051 selected block IDs matched. Attention,
+gated output, projection and exact next-MoE input reached `3.97e-5`,
+`5.41e-5`, `8.32e-4` and `5.47e-4`. Historical cached K/V and finer attention
+operations were not captured, so the exact cause remains open. Token IDs
+matched but persistent state differed; this is diagnostic evidence only. CUDA
+and HIP builds passed, Python capture tests passed, and the separate SYCL
+verifier was unchanged (configured target up to date). Minimum available memory
+was 11.47 GiB; energy was not measured and EMC frequency was inaccessible. See
+the [QSA stage report](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#qsa-stage-capture-at-model-layer-3).

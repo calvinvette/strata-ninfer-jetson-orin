@@ -76,3 +76,27 @@ The 128-token layer-2→3 boundary capture uses the same command with
 `--capture-boundary-layer 2 --capture-boundary-position 127`; compare the two
 `cpu-miss.boundary` and `ninfer-staged.boundary` files using
 `tools/integration/compare_boundary_capture.py`.
+
+## QSA stage capture at model layer 3
+
+An opt-in stage capture was added to inspect the QSA block on the 128-token
+prefix at model layer 3, position 125 (token ID 271). The captured QSA input
+relative L2 was `8.16e-8`; the query, current key and current value were exact.
+Index-query relative L2 was `9.24e-8`. The selected block IDs were identical
+(2,051 entries). At the attention output, relative L2 was `3.97e-5`, rising to
+`5.41e-5` after gating and `8.32e-4` after projection. The exact post-read
+input to the next MoE was `5.47e-4` apart, matching the independently captured
+layer-3 MoE input result. This pins the amplification after QSA input and
+through the attention path. Historical cached K/V contents and individual
+attention arithmetic stages were not captured, so its precise source remains
+unknown.
+
+Both checker runs intentionally returned failure because final persistent state
+differs (GDN, tail, pooled, pooled-full and KV), despite equal generated token
+IDs. This remains numerical localization only, not a quality or performance
+qualification. Minimum available memory was 11.47 GiB; EMC frequency was
+inaccessible and energy was not measured. The CUDA build and QSA analyzer tests
+passed. The updated verifier compiled and linked for HIP on maestro1; SYCL uses
+its separate `sycl/src/core/verify.cpp` implementation, which was unchanged and
+already up to date. maestro1 is compile evidence only. Raw `.qsa` captures and
+supervisor logs remain local-only.

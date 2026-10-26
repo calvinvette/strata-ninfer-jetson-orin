@@ -411,6 +411,15 @@ private:
     std::string boundary_diag_path_;
     bool boundary_diag_captured_ = false;
     bool boundary_diag_batch_graph_captured_ = false;
+    int qsa_diag_layer_ = -1;
+    int64_t qsa_diag_position_ = -1;
+    uint8_t* qsa_diag_h_ = nullptr; ///< opt-in pinned QSA input/selection/attention/output capture
+    size_t qsa_diag_capacity_ = 0;
+    std::string qsa_diag_path_;
+    bool qsa_diag_captured_ = false;
+    bool qsa_diag_moe_input_captured_ = false;
+    int qsa_diag_row_ = -1;
+    int32_t qsa_diag_token_ = -1;
     int gdn_commit_diag_layer_ = -1;
     std::vector<int64_t> gdn_commit_diag_positions_;
     std::vector<float> gdn_commit_diag_host_;

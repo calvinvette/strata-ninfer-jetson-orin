@@ -55,6 +55,10 @@ def main() -> int:
                     help='capture residual/hyperconnection boundaries after one model layer')
     ap.add_argument('--capture-boundary-position', type=int,
                     help='token position for the residual-boundary capture')
+    ap.add_argument('--capture-qsa-layer', type=int,
+                    help='capture selected QSA attention stages at one model layer')
+    ap.add_argument('--capture-qsa-position', type=int,
+                    help='token position for the QSA stage capture')
     ap.add_argument('--cpu-q8-1-selector',
                     help='opt in to a CPU Q8_1 dot selector for the CPU-miss arm only')
     ap.add_argument('--cpu-q8-1-experts',
@@ -90,6 +94,12 @@ def main() -> int:
         ap.error('--capture-boundary-layer must be in [0, 46]')
     if a.capture_boundary_position is not None and a.capture_boundary_position < 0:
         ap.error('--capture-boundary-position must be nonnegative')
+    if (a.capture_qsa_layer is None) != (a.capture_qsa_position is None):
+        ap.error('--capture-qsa-layer and --capture-qsa-position must be used together')
+    if a.capture_qsa_layer is not None and not 0 <= a.capture_qsa_layer < 48:
+        ap.error('--capture-qsa-layer must be in [0, 47]')
+    if a.capture_qsa_position is not None and a.capture_qsa_position < 0:
+        ap.error('--capture-qsa-position must be nonnegative')
     if a.capture_gdn_position is not None and a.capture_gdn_layer is None:
         ap.error('--capture-gdn-position requires --capture-gdn-layer')
     if a.capture_gdn_layer is not None and not 0 <= a.capture_gdn_layer < 48:
@@ -194,6 +204,11 @@ def main() -> int:
             arm_env['STRATA_VERIFY_DUMP_BOUNDARY_POSITION'] = str(a.capture_boundary_position)
             arm_env['STRATA_VERIFY_DUMP_BOUNDARY_PATH'] = str(
                 (a.output / f'{name}.boundary').resolve())
+        if a.capture_qsa_layer is not None:
+            arm_env['STRATA_VERIFY_DUMP_QSA_LAYER'] = str(a.capture_qsa_layer)
+            arm_env['STRATA_VERIFY_DUMP_QSA_POSITION'] = str(a.capture_qsa_position)
+            arm_env['STRATA_VERIFY_DUMP_QSA_PATH'] = str(
+                (a.output / f'{name}.qsa').resolve())
         engine = StrataEngine(str(a.engine.resolve()), command, cwd=cfg.get('cwd'),
                               log=str(log), env=arm_env)
         try:
