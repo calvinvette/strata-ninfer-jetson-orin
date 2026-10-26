@@ -84,6 +84,10 @@ release profile is **not achieved**.
   returned the exact answer on both Strata and strict NInfer, with all token
   IDs and nine final state fields matching; minimum available memory was
   17.70 GiB. This is one task at one prompt length. See the [8K check](../../bench/results/2026-10-25-phase-e5-q2-ninfer-8k-retrieval/README.md),
+  and the same task at 16K also matched answer, token IDs and all nine state
+  fields, with 17.09 GiB minimum available memory. Both runs are single-task
+  functional checks, not long-context performance estimates. See the [16K
+  check](../../bench/results/2026-10-25-phase-e5-q2-ninfer-16k-retrieval/README.md),
   [E5 closeout](NINFER_E5_CLOSEOUT.md) and the
   [corrected generation checks](../../bench/results/2026-10-25-phase-e5-q2-ninfer-generation-regression/fixed-kernel/README.md).
 - Coder IQ1_M, ISTA-DASLab IQ3_S, staged expert misses, broad task quality and

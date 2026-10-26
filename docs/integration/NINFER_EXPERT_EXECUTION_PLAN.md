@@ -478,6 +478,12 @@ all nine final state fields matched. Minimum available memory was 17.70 GiB
 with no cgroup memory events. This is one functional retrieval case, not a
 timing estimate or near-limit 16K ingestion result. See the [8K retrieval
 report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-8k-retrieval/README.md).
+The same check at 16,384 prompt tokens with a 32K cap also passed exact answer,
+token-ID and all-nine-field final-state comparisons; minimum available memory
+was 17.09 GiB, with no cgroup memory events. Each backend was run once, so
+timings remain functional diagnostics only. Near-limit 32K ingestion and wider
+task coverage remain open. See the [16K retrieval
+report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-16k-retrieval/README.md).
 A pre-fix MTP-off default-Strata/strict-NInfer comparison returned the same
 short-task tokens but showed substantial persistent-state movement. The first
 committed-token GDN relative L2 was 0.0902; layer captures show a small expert

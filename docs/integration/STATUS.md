@@ -56,6 +56,10 @@ state fields. Both returned the three codes and suffix sum exactly; minimum
 available memory was 17.70 GiB with zero cgroup memory events. This is one
 functional 8K retrieval case, not a timing estimate or near-limit 16K test.
 See the [8K retrieval report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-8k-retrieval/README.md).
+The same task at 16,384 prompt tokens and 32K context cap also matched exactly
+across backends; minimum available memory was 17.09 GiB with zero cgroup memory
+events. These are two functional retrieval points, not long-context performance
+or general task-quality estimates. See the [16K retrieval report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-16k-retrieval/README.md).
 E7 assessment proposes no
 general release profile; HIP/SYCL build evidence is outstanding, and NInfer
 remains opt-in. See the [E7
