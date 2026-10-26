@@ -1126,6 +1126,7 @@ int check_q8_1_selector_contract() {
         else setenv(name, value, 1);
 #endif
     };
+    set_env("STRATA_NATIVE_CPU_Q8_1_DOT_EXPERTS", nullptr);
     cpu::NativeFmt baseline[std::size(pairs)];
     int failures = 0;
     set_selector("0");
@@ -1225,6 +1226,36 @@ int check_q8_1_selector_contract() {
         std::fprintf(stderr, "malformed layer selector was accepted\n");
         ++failures;
     }
+    set_selector("q2_0/q2_0@layer=0");
+    set_env("STRATA_NATIVE_CPU_Q8_1_DOT_EXPERTS", "88,83,90,109");
+    cpu::NativeFmt filtered, filtered_other_layer, selected_expert, unselected_expert;
+    err.clear();
+    if (!cpu::native_fmt(GGML_TYPE_Q2_0, GGML_TYPE_Q2_0, H, FF, filtered, err, 0) ||
+        !cpu::native_fmt(GGML_TYPE_Q2_0, GGML_TYPE_Q2_0, H, FF, filtered_other_layer, err, 1)) {
+        std::fprintf(stderr, "expert-filter selector setup failed: %s\n", err.c_str());
+        ++failures;
+    } else {
+        cpu::native_fmt_for_expert(filtered, 88, selected_expert);
+        cpu::native_fmt_for_expert(filtered, 77, unselected_expert);
+        if (filtered.q8_1_dot_expert_ids.size() != 4 || filtered.gu_act != GGML_TYPE_Q8_1 ||
+            filtered_other_layer.gu_act == GGML_TYPE_Q8_1 ||
+            selected_expert.gu_act != GGML_TYPE_Q8_1 || selected_expert.d_act != GGML_TYPE_Q8_1 ||
+            unselected_expert.gu_act != filtered.gu_act_default ||
+            unselected_expert.d_act != filtered.d_act_default ||
+            !cpu::native_q8_1_dot_expert_selected(filtered, 109) ||
+            cpu::native_q8_1_dot_expert_selected(filtered, 77)) {
+            std::fprintf(stderr, "expert-filter selector did not isolate its layer and IDs\n");
+            ++failures;
+        }
+    }
+    set_env("STRATA_NATIVE_CPU_Q8_1_DOT_EXPERTS", "88,,109");
+    err.clear();
+    if (cpu::native_fmt(GGML_TYPE_Q2_0, GGML_TYPE_Q2_0, H, FF, invalid, err, 0) ||
+        err.find("STRATA_NATIVE_CPU_Q8_1_DOT_EXPERTS") == std::string::npos) {
+        std::fprintf(stderr, "malformed expert filter was not rejected clearly: %s\n", err.c_str());
+        ++failures;
+    }
+    set_env("STRATA_NATIVE_CPU_Q8_1_DOT_EXPERTS", nullptr);
     set_selector("all");
     set_env("STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_LAYER", "3");
     set_env("STRATA_NATIVE_CPU_Q8_1_RECIPROCAL_SILU_EXPERT", "201");

@@ -407,6 +407,8 @@ struct ExpertDispatch {
     std::vector<strata::kernels::cpu::ActQ> act_multi;
     /// Plan v0.3 P6: a native pack's per-token activations (MAXT x kNativeActBytes).
     std::vector<uint8_t> nact_multi;
+    /// Optional second representation for expert-filtered Q8_1 arithmetic diagnostics.
+    std::vector<uint8_t> nact_q8_1_multi;
     std::vector<strata::kernels::cpu::ExpertJobMulti> jobs_multi;
     std::vector<int16_t> job_of;
     /// Plan v0.3 P6: the verify window's GPU plan (VRAM hits + the PCIe share of the misses); `pcie_num`/256 of

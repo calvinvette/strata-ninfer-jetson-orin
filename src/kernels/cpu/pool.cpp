@@ -648,6 +648,9 @@ void ExpertPool::drain(int id, ExpertScratch& scratch, uint32_t epoch) {
                     float* ff[MAXT];
                     for (int t = 0; t < mjobs_[e].nt; ++t) ff[t] = sb.ff[t];
                     NativeFmt fmt = *nfmt_;
+                    if (!nfmt_->q8_1_dot_expert_ids.empty()) {
+                        native_fmt_for_expert(*nfmt_, mjobs_[e].expert_id, fmt);
+                    }
                     if (fmt.q8_1_reciprocal_silu_expert >= 0 &&
                         fmt.q8_1_reciprocal_silu_expert != mjobs_[e].expert_id)
                         fmt.q8_1_reciprocal_silu = false;
@@ -664,7 +667,13 @@ void ExpertPool::drain(int id, ExpertScratch& scratch, uint32_t epoch) {
                 } else {
                     const void* hq[MAXT];
                     for (int t = 0; t < mjobs_[e].nt; ++t) hq[t] = sb.hq[t];
-                    native_down_rows(*nfmt_, mjobs_[e].blob, hq, mjobs_[e].nt, mjobs_[e].out, r0, r1);
+                    NativeFmt filtered_fmt;
+                    const NativeFmt* fmt = nfmt_;
+                    if (!nfmt_->q8_1_dot_expert_ids.empty()) {
+                        native_fmt_for_expert(*nfmt_, mjobs_[e].expert_id, filtered_fmt);
+                        fmt = &filtered_fmt;
+                    }
+                    native_down_rows(*fmt, mjobs_[e].blob, hq, mjobs_[e].nt, mjobs_[e].out, r0, r1);
                 }
                 r += r1 - r0;
             }
@@ -776,10 +785,17 @@ void ExpertPool::run_split_multi_native(const NativeFmt& f, ExpertJobMulti* jobs
         const auto a = std::chrono::steady_clock::now();
         run_phase(5, mtasks_);
         const auto b = std::chrono::steady_clock::now();
-        for (int e = 0; e < nb; ++e)
+        for (int e = 0; e < nb; ++e) {
+            NativeFmt filtered_fmt;
+            const NativeFmt* fmt = &f;
+            if (!f.q8_1_dot_expert_ids.empty()) {
+                native_fmt_for_expert(f, mjobs_[e].expert_id, filtered_fmt);
+                fmt = &filtered_fmt;
+            }
             for (int t = 0; t < mjobs_[e].nt; ++t)
                 if (q2_native_kernels(f.d_type)) act_quant_any(split_multi_[(size_t) e].ff[t], FF, split_multi_[(size_t) e].a2[t]);
-                else native_quant_h(f, split_multi_[(size_t) e].ff[t], split_multi_[(size_t) e].hq[t]);
+                else native_quant_h(*fmt, split_multi_[(size_t) e].ff[t], split_multi_[(size_t) e].hq[t]);
+        }
         const auto c = std::chrono::steady_clock::now();
         mrows_ = (int64_t) nb * H;
         mtasks_ = phase_tasks(mrows_);

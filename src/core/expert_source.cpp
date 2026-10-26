@@ -3292,6 +3292,9 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
     const ExpertLayout& lay = expert_layout();
     const bool native = lay.native;
     if (native && d.nact_multi.size() < (size_t) MAXT * kNativeActBytes) d.nact_multi.resize((size_t) MAXT * kNativeActBytes);
+    if (native && !lay.fmt[(size_t) d.layers].q8_1_dot_expert_ids.empty() &&
+        d.nact_q8_1_multi.size() < (size_t) MAXT * kNativeActBytes)
+        d.nact_q8_1_multi.resize((size_t) MAXT * kNativeActBytes);
     if (d.job_of.size() != (size_t) d.n_expert) d.job_of.assign((size_t) d.n_expert, (int16_t) -1);
     if (d.jobs_multi.size() < (size_t) (n_tok * k)) d.jobs_multi.resize((size_t) (MAXT * k));
     static const bool ptrace = std::getenv("STRATA_POOL_TRACE") != nullptr;
@@ -3471,8 +3474,20 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
             if (ep && std::all_of(kind + t * k, kind + (t + 1) * k, [](int32_t v) { return v >= 0; })) continue;
             if (native && strata::kernels::cpu::q2_native_kernels(lay.fmt[(size_t) d.layers].gu_type))   // a native Q2_0 pack: the Q2_0 kernels' activations
                 act_quant_any(x_f + (size_t) t * H, H, d.act_multi[(size_t) t]);
-            else if (native)
-                native_quant_act(lay.fmt[(size_t) d.layers], x_f + (size_t) t * H, d.nact_multi.data() + (size_t) t * kNativeActBytes);
+            else if (native) {
+                const NativeFmt& fmt = lay.fmt[(size_t) d.layers];
+                if (fmt.q8_1_dot_expert_ids.empty()) {
+                    native_quant_act(fmt, x_f + (size_t) t * H,
+                                     d.nact_multi.data() + (size_t) t * kNativeActBytes);
+                } else {
+                    NativeFmt default_fmt;
+                    native_fmt_for_expert(fmt, -1, default_fmt);
+                    native_quant_act(default_fmt, x_f + (size_t) t * H,
+                                     d.nact_multi.data() + (size_t) t * kNativeActBytes);
+                    native_quant_act(fmt, x_f + (size_t) t * H,
+                                     d.nact_q8_1_multi.data() + (size_t) t * kNativeActBytes);
+                }
+            }
             else
                 act_quant_q8_1(x_f + (size_t) t * H, H, d.act_multi[(size_t) t]);
         }
@@ -3531,7 +3546,13 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
             }
             ExpertJobMulti& jb = d.jobs_multi[(size_t) jo];
             jb.act[jb.nt] = &d.act_multi[(size_t) t];
-            jb.nact[jb.nt] = native ? d.nact_multi.data() + (size_t) t * kNativeActBytes : nullptr;
+            if (native) {
+                const NativeFmt& fmt = lay.fmt[(size_t) d.layers];
+                const bool filtered = !fmt.q8_1_dot_expert_ids.empty();
+                const bool mirror = filtered && native_q8_1_dot_expert_selected(fmt, (int) e);
+                const std::vector<uint8_t>& nact = mirror ? d.nact_q8_1_multi : d.nact_multi;
+                jb.nact[jb.nt] = nact.data() + (size_t) t * kNativeActBytes;
+            } else jb.nact[jb.nt] = nullptr;
             jb.out[jb.nt] = row;
             ++jb.nt;
             ++d.multi_entries;

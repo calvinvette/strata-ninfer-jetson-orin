@@ -53,6 +53,8 @@ def main() -> int:
                     help='filter committed GDN state to several increasing token positions')
     ap.add_argument('--cpu-q8-1-selector',
                     help='opt in to a CPU Q8_1 dot selector for the CPU-miss arm only')
+    ap.add_argument('--cpu-q8-1-experts',
+                    help='limit the CPU Q8_1 dot selector to comma-separated expert IDs')
     ap.add_argument('--run', action='store_true')
     a = ap.parse_args()
     comparison_modes = (a.compare_strata_control, a.compare_cpu_miss_staged, a.compare_staged_backends)
@@ -86,6 +88,8 @@ def main() -> int:
         ap.error('--capture-gdn-position must be nonnegative')
     if a.cpu_q8_1_selector is not None and not a.compare_cpu_miss_staged:
         ap.error('--cpu-q8-1-selector requires --compare-cpu-miss-staged')
+    if a.cpu_q8_1_experts is not None and a.cpu_q8_1_selector is None:
+        ap.error('--cpu-q8-1-experts requires --cpu-q8-1-selector')
     cfg = json.loads(a.config.read_text())
     workload = json.loads(a.workload.read_text())['workloads'][0]
     max_new = a.max_new if a.max_new is not None else workload['generate_tokens']
@@ -143,6 +147,8 @@ def main() -> int:
         arm_env = dict(env)
         if a.cpu_q8_1_selector is not None and name == 'cpu-miss':
             arm_env['STRATA_NATIVE_CPU_Q8_1_DOT'] = a.cpu_q8_1_selector
+            if a.cpu_q8_1_experts is not None:
+                arm_env['STRATA_NATIVE_CPU_Q8_1_DOT_EXPERTS'] = a.cpu_q8_1_experts
         arm_env['STRATA_RESIDENCY_DUMP'] = str((a.output / f'{name}.residency.csv').resolve())
         if a.dump_gdn:
             arm_env['STRATA_STATE_DUMP_GDN'] = str((a.output / f'{name}.gdn.bin').resolve())

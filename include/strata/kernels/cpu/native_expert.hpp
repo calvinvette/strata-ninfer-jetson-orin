@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <vector>
 
 namespace strata::kernels::cpu {
 
@@ -22,6 +23,8 @@ inline constexpr size_t kNativeHBytes = 1024;
 struct NativeFmt {
     int gu_type = -1, d_type = -1;      ///< ggml types of gate/up and of down
     int gu_act = -1, d_act = -1;        ///< their vec_dot_type (the activation formats)
+    int gu_act_default = -1, d_act_default = -1; ///< original vec_dot formats before diagnostic overrides
+    std::vector<int> q8_1_dot_expert_ids; ///< optional expert filter for the Q8_1 arithmetic mirror
     bool q8_1_reciprocal_silu = false;  ///< opt-in CUDA-order SiLU expression for selected Q8_1 routes
     int q8_1_reciprocal_silu_expert = -1; ///< optional model expert ID filter
     bool q8_1_exp2f_silu = false; ///< opt-in host-exp2f SiLU candidate for selected Q8_1 routes
@@ -38,9 +41,13 @@ bool native_experts_available() noexcept;
 /// Fills `f` for a layer; false (with a reason) when ggml-cpu has no dot product for a type. The opt-in
 /// STRATA_NATIVE_CPU_Q8_1_DOT diagnostic selects CUDA-matching Q8_1 routes for IQ2_S/Q2_0,
 /// IQ2_S/IQ4_NL, IQ3_XXS/Q2_0, IQ3_XXS/IQ4_NL, IQ3_S/Q2_0 and IQ3_S/IQ4_NL expert pairs (`1` enables all supported pairs; a
-/// pair name selects one). A pair may be suffixed with `@layer=N` to scope it to one zero-based model layer. It is not
-/// a default dispatch policy.
+/// pair name selects one). A pair may be suffixed with `@layer=N` to scope it to one zero-based model layer. The
+/// optional `STRATA_NATIVE_CPU_Q8_1_DOT_EXPERTS` comma-separated ID list further limits that selected layer/pair;
+/// unlisted experts keep their original activation formats. It is not a default dispatch policy.
 bool native_fmt(int gu_type, int d_type, int64_t n_embd, int64_t n_ff, NativeFmt& f, std::string& err, int layer = -1);
+/// Resolve a layer format for one expert when the opt-in Q8_1 mirror has an expert filter.
+void native_fmt_for_expert(const NativeFmt& f, int expert_id, NativeFmt& out);
+bool native_q8_1_dot_expert_selected(const NativeFmt& f, int expert_id) noexcept;
 
 /// x (n_embd floats) -> the gate/up activation (act_bytes).
 void native_quant_act(const NativeFmt& f, const float* x, void* dst);
