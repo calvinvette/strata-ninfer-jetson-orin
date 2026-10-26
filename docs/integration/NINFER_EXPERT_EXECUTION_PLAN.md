@@ -586,6 +586,17 @@ criteria remain unmet. E7 assessment proposes no profile; see the
 [E6 report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md)
 and [E7 assessment](NINFER_E7_RELEASE_ASSESSMENT.md).
 
+Corrected-kernel follow-up (2026-10-25): the same five workload shapes were
+rerun at 4K and 8K with the precise SwiGLU expression. All 20 measured response
+hashes matched their paired controls, and all four residency maps matched. No
+consistent backend advantage appeared in the one-pair samples. One 4K/557-token
+NInfer measurement had an unexplained 44.35-second client TTFT versus 14.07
+seconds for Strata, while its warmup and output hash matched. A randomized
+three-pair repeat did not reproduce the spike: median TTFT improved 1.08% and
+client completion 0.67%, below the 5% screen threshold. See the [outlier repeat](../../bench/results/2026-10-25-phase-e6-q2-557-repeat3/README.md).
+This is not a performance qualification.
+See the [corrected context report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/fixed-swiglu-context-check/README.md).
+
 Execution note (2026-10-25): Nsight Systems was rerun on the four-entry,
 16-lane candidate. Its broad harness trace showed similar median per-launch
 times for NInfer D3/D4 and native Q2 gate/up/down kernels; the trace combined

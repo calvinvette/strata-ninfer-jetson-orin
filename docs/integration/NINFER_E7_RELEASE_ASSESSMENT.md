@@ -44,6 +44,12 @@ release profile is **not achieved**.
   exact token-count checks. Minimum available physical/admission memory was
   11.31 GiB; the 6 GiB floor held and all eighteen startup residency maps
   matched. It has no quality oracle and cannot establish a performance effect.
+  A corrected-binary 4K/8K rerun also passed all eligible checks, with all
+  measured response hashes and residency maps matching. It showed no consistent
+  backend advantage. A three-pair repeat of the lone 4K/557-token timing
+  outlier did not reproduce it; median TTFT/client changes were −1.08%/−0.67%,
+  below the 5% screen threshold. See the [corrected capacity screen](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/fixed-swiglu-context-check/README.md)
+  and [outlier repeat](../../bench/results/2026-10-25-phase-e6-q2-557-repeat3/README.md).
 - The grouped SwiGLU Q8_1 path initially used approximate `__fdividef`, while
   Strata used precise division. On the captured layer-3 expert-94 row this
   changed one Q8_1 code byte despite exact gate/up inputs. Matching Strata's

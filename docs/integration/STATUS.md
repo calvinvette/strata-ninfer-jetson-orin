@@ -36,8 +36,15 @@ staging confirmation passed its pre-registered TTFT gate: median −5.96%,
 paired bootstrap 95% interval −6.23% to −5.80%. Client completion improved
 4.17% (interval −4.40% to −4.00%); all measured output and resident-map hashes
 matched, while all warmup hashes differed between arms. This qualifies one
-workload-specific TTFT effect. E6 screening across 1K–256K is complete, but its
-broader performance exit criteria remain unmet. E7 assessment proposes no
+workload-specific TTFT effect. A corrected-binary 4K/8K context-capacity rerun
+then passed all 20 eligible API/token-count checks with matching measured
+output hashes and resident maps. The one-pair-per-capacity timing screen showed
+no consistent backend advantage and one unexplained 4K/557-token NInfer TTFT
+outlier; a randomized three-pair repeat did not reproduce it, with median TTFT
+and client changes of −1.08% and −0.67%. E6 screening across
+1K–256K is complete, but its broader performance exit criteria remain unmet.
+See the [corrected capacity screen](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/fixed-swiglu-context-check/README.md).
+E7 assessment proposes no
 general release profile; HIP/SYCL build evidence is outstanding, and NInfer
 remains opt-in. See the [E7
 assessment](NINFER_E7_RELEASE_ASSESSMENT.md). Nsight Systems identified scalar Q2 projections as the
