@@ -1,4 +1,4 @@
-# Q2_0 near-256K retrieval parity — in progress
+# Q2_0 near-256K retrieval parity — watchdog failure
 
 Date started: 2026-10-25 23:11:24 EDT. Host: Jetson AGX Orin, CUDA 12.6,
 SM87. This is a functional state/parity check, not a performance estimate.
@@ -25,11 +25,33 @@ state fingerprint. The native 60-second watchdog stopped the engine at stage
 `decode -1` after no progress. The captured control log is preserved in
 `evidence/strata-control.log`.
 
-The strict-NInfer arm is still running. Current supervisor telemetry through
-2026-10-26 00:10 EDT shows a minimum of 11.29 GiB available physical memory,
-above the preserved 6 GiB floor, and zero cgroup OOM events. No paired parity
-conclusion is available until the strict-NInfer arm completes and, if needed,
-the control arm is retried with the native watchdog setting understood.
+The strict-NInfer arm reached the same point and failed the same way. Both
+services exited with signal 6 after the watchdog reported stage `decode -1`,
+no progress for 60 seconds, and verifier position 240,331. Each arm captured
+the 2-token and 1-token verifier graphs. The NInfer log confirms that the
+resident grouped Q2_0 dispatch was selected. Neither arm returned a completed
+response or final state fingerprint; token and state parity are therefore
+unavailable. This is a shared near-cap request failure, not a parity pass or a
+measured backend regression.
+
+The run lasted 5,252.6 seconds (87.5 minutes), from 2026-10-25 23:11:24 to
+2026-10-26 00:38:57 EDT. Minimum available physical/admission memory was
+12,124,082,176 bytes (11.29 GiB), above the preserved 6 GiB floor, with zero
+cgroup low/high/max/OOM/OOM-kill events. Clock sampling was read-only; EMC
+readback was unavailable. Energy was not attributed; raw tegrastats rails are
+retained. The control and NInfer arms crossed midnight, so this is not a
+same-day paired performance measurement.
+
+The stop report showed all 27 expert-pool jobs complete, all eight workers
+parked, and the verifier GPU flags served. That narrows the stall to work after
+the verifier window, but does not identify whether final state hashing,
+commit completion, or another post-window step is responsible. The native
+watchdog defaults to 60 seconds and accepts `STRATA_WATCHDOG_S`; a follow-up
+uses a bounded 300-second allowance to distinguish a slow finalization from a
+deadlock. No runtime default is changed by that experiment.
+
+The qualified server binary SHA256 was
+`c7301655b1a8d2569ab8744d92259b6d05b2baccb8bd04ad86da724a42bd4d75`.
 
 ## Evidence files
 
@@ -37,4 +59,10 @@ the control arm is retried with the native watchdog setting understood.
 - `evidence/workload.json`: prompt fixture and expected answer.
 - `evidence/strata-control.log`: control engine output, including watchdog
   stall report.
+- `evidence/ninfer-control.log`: strict-NInfer output and matching stall report.
+- `evidence/results.json`: arm failures and missing parity fields.
+- `evidence/supervisor-result.json`, `supervisor-stdout.txt`, and
+  `supervisor-stderr.txt`: run status and wrapper output.
+- `evidence/memory.jsonl.gz` and `evidence/tegrastats.txt`: losslessly
+  compressed physical-memory samples and raw platform telemetry.
 
