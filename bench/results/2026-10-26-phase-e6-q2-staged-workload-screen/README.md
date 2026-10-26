@@ -98,28 +98,38 @@ until this difference is explained or bounded.
 
 A direct temperature-zero engine diagnostic repeated the exact 1,069-token
 prompt twice per backend with prompt caching enabled and MTP draft counters at
-zero. On both the CPU-miss and strict-NInfer staged routes, the second request
+zero. On both CPU-miss and strict-NInfer staged routes, the second request
 reused 1,062 prompt tokens and read seven. Its 64 generated token IDs differed
 from the first request, and the final GDN, PLE, tail, pooled, pooled-full, KV
-and PLE-previous fingerprints changed. The CPU-miss and NInfer arms produced
-identical token IDs and all nine recorded final-state fields at each matching
-request ordinal. This reproduces a request-history-associated variation in
-both routes; it does not implicate NInfer or establish that prompt-cache reuse
-caused it. Since the main performance screen used `--prompt-cache 0`, this is a
-diagnostic lead rather than an explanation of its cross-arm output mismatches.
+and PLE-previous fingerprints changed. Two fresh-engine repeats per backend
+produced identical tokens and state. A same-service cache-off repeat also
+changed token IDs between requests, identically on both backends; state hashing
+is suppressed by the current runtime when prompt caching is zero. Across every
+diagnostic condition, CPU-miss and NInfer produced identical tokens at matching
+request ordinals, and all nine final-state fields matched where available.
+This demonstrates shared process/request-history variation but does not
+identify its cause. It does not explain why the original multi-workload screen
+had cross-arm mismatches.
 
 Raw IDs, decoded text, per-request engine metrics and state fingerprints are in
 [`state-fingerprint-diagnostic/results.json`](state-fingerprint-diagnostic/results.json);
-engine logs are retained alongside it. The next experiment should compare a
-fresh-engine repeat, same-service prompt-cache-off repeat and cache-on repeat,
-with a distinct-length warmup and prompt-end/final-state capture. Preserve the
-exact token sequence and direct persistent-state evidence. The original 1,069-
-token screen remains unqualified and requires an independent held-out task
-oracle before performance confirmation.
+engine logs are retained alongside it. The [fresh-engine repetitions](state-fresh-engine-diagnostic/)
+and [same-service cache-off repetitions](state-cache-off-diagnostic-rerun/)
+retain their raw token IDs and logs. Next, add an opt-in final-state fingerprint
+for cache-off requests, then replay the complete five-workload order under both
+miss routes with warmup and prompt-end/final-state capture. Preserve exact
+tokens and direct persistent-state evidence. The original 1,069-token screen
+remains unqualified and requires a held-out task oracle before confirmation.
 
 Recreate this diagnostic with the same binary and model files using:
 
 ```bash
 python3 bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/state-fingerprint-diagnostic/run_state_fingerprint_diagnostic.py \
   --out bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/state-fingerprint-diagnostic-rerun
+
+python3 bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/state-fingerprint-diagnostic/run_state_fingerprint_diagnostic.py \
+  --fresh-each --out bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/state-fresh-engine-rerun
+
+python3 bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/state-fingerprint-diagnostic/run_state_fingerprint_diagnostic.py \
+  --prompt-cache 0 --out bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/state-cache-off-rerun
 ```

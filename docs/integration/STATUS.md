@@ -53,15 +53,16 @@ screen](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/fixed-swig
 The following [CPU-miss versus strict-NInfer staged screen](../../bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/README.md)
 used balanced three-pair ordering and found a workload-specific 1,069-token
 performance signal, but its output hashes differed in all three pairs; the
-557-token cell also differed in all three. A direct temperature-zero follow-up
-with prompt caching enabled found exact CPU/NInfer token and persistent-state
-parity at each paired ordinal, but both routes changed output and state between
-fresh prefill and a repeated request that reused 1,062 tokens. This signals
-shared request-history variation; it does not explain the original test, which
-had prompt caching disabled. No quality oracle has passed for the mismatched
-staged cells, so no seven-pair performance confirmation or profile promotion
-is justified yet. The next diagnostic is a fresh-engine/cache-off/cache-on
-comparison with state capture and a held-out quality task.
+557-token cell also differed in all three. Temperature-zero direct repetitions
+found exact CPU/NInfer token and persistent-state parity at each paired
+ordinal. Two fresh-engine repeats were stable, while same-service repeats
+changed output with cache reuse and with prompt caching disabled (the current
+runtime suppresses state hashing when caching is disabled). This is shared
+request/process-history variation, but its cause and the original
+multi-workload cross-arm mismatches remain unexplained. No quality oracle has
+passed for these staged-miss cells, so performance confirmation and profile
+promotion remain deferred pending cache-off state capture, full workload-order
+replay and a held-out quality task.
 A held-out exact-answer retrieval/arithmetic check at an actual 8,192-token
 prompt then matched the Strata and strict-NInfer token IDs and all nine final
 state fields. Both returned the three codes and suffix sum exactly; minimum

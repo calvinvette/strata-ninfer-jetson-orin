@@ -124,13 +124,15 @@ mismatches, so their performance effects are not quality-qualified. Current-
 source HIP/SYCL builds and help checks passed on maestro1, but accelerator
 execution and any release-candidate soak remain open. E7's assessment proposes
 no general profile.
-The 1,069-token follow-up with prompt caching enabled found exact CPU/NInfer
-token and final-state parity at each request ordinal, but each backend changed
-between fresh prefill and a repeated request that reused 1,062 prompt tokens.
-This is a shared request-history signal, not an explanation of the original
-cache-off staged-miss screen. The next E6 gate is fresh-engine/cache-off/cache-on
-state comparison and a held-out task-quality check before any performance
-confirmation. See the [staged-miss report and diagnostic](../../bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/README.md).
+The 1,069-token follow-up found exact CPU/NInfer token parity at each paired
+request ordinal and exact final-state parity wherever capture was available.
+Fresh-engine repeats were stable, while same-service repeats changed output
+with cache reuse and with prompt caching disabled; the runtime suppresses state
+hashing in cache-off mode. This shared process/request-history signal does not
+explain the original multi-workload staged-miss mismatches. The next E6 gate is
+cache-off state capture, full workload-order replay and a held-out task-quality
+check before performance confirmation. See the [staged-miss report and
+diagnostic](../../bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/README.md).
 E2's resident schedule and the earlier E3 staged-miss schedules failed their
 initial performance screens. The
 default remains Strata and the NInfer path remains experimental. Each stage

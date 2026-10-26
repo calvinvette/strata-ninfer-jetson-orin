@@ -25,6 +25,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--out', type=Path, required=True, help='new output directory')
     parser.add_argument('--repeats', type=int, default=2)
+    parser.add_argument('--fresh-each', action='store_true',
+                        help='start a fresh engine for each repeat instead of reusing one process')
+    parser.add_argument('--prompt-cache', type=int, choices=(0, 6), default=6)
     args = parser.parse_args()
     if args.repeats < 2:
         parser.error('--repeats must be at least 2')
@@ -41,7 +44,7 @@ def main():
         raise ValueError(f'expected 1,069 formatted prompt tokens, got {len(prompt)}')
 
     base_args = list(cfg['args'])
-    overrides = {'--max-context': '8192', '--prompt-cache': '6', '--pcie-frac': '0.0'}
+    overrides = {'--max-context': '8192', '--prompt-cache': str(args.prompt_cache), '--pcie-frac': '0.0'}
     for flag, value in overrides.items():
         if flag in base_args:
             base_args[base_args.index(flag) + 1] = value
@@ -56,28 +59,34 @@ def main():
         env = child_env(cfg)
         env.update({'STRATA_STATE_HASH': '1', 'STRATA_INTEGRATION_TRACE': '1',
                     'STRATA_MTP_BATCH': '1', 'STRATA_PREFILL_CPU_SHARE': '0'})
-        log_path = out / f'{arm}.log'
-        engine = StrataEngine(str(ENGINE), engine_args, cwd=cfg.get('cwd'),
-                              log=str(log_path), env=env)
-        try:
-            for repeat in range(args.repeats):
-                token_ids = [token for token in engine.generate(
-                    prompt, 64, {'temperature': 0}, threading.Event()) if token is not None]
-                last = dict(engine.last)
-                if len(token_ids) != 64:
-                    raise RuntimeError(f'{arm} repeat {repeat}: generated {len(token_ids)} tokens')
-                if last.get('drafts_offered') != 0 or last.get('drafts_accepted') != 0:
-                    raise RuntimeError(f'{arm} repeat {repeat}: unexpected MTP draft counts {last}')
-                records.append({'arm': arm, 'repeat': repeat, 'token_ids': token_ids,
-                                'text': tokenizer.decode(token_ids), 'last': last})
-        finally:
-            engine.close()
-        state_rows = parse_hashes(log_path)
-        arm_rows = [row for row in records if row['arm'] == arm]
-        if len(state_rows) != args.repeats:
-            raise RuntimeError(f'{arm}: expected {args.repeats} state fingerprints, got {len(state_rows)}')
-        for row, state in zip(arm_rows, state_rows):
-            row['state'] = state
+        arm_rows = []
+        repeats_per_engine = 1 if args.fresh_each else args.repeats
+        for engine_group in range(args.repeats // repeats_per_engine):
+            log_path = out / (f'{arm}-repeat-{engine_group}.log' if args.fresh_each else f'{arm}.log')
+            engine = StrataEngine(str(ENGINE), engine_args, cwd=cfg.get('cwd'),
+                                  log=str(log_path), env=env)
+            try:
+                for _ in range(repeats_per_engine):
+                    repeat = len(arm_rows)
+                    token_ids = [token for token in engine.generate(
+                        prompt, 64, {'temperature': 0}, threading.Event()) if token is not None]
+                    last = dict(engine.last)
+                    if len(token_ids) != 64:
+                        raise RuntimeError(f'{arm} repeat {repeat}: generated {len(token_ids)} tokens')
+                    if last.get('drafts_offered') != 0 or last.get('drafts_accepted') != 0:
+                        raise RuntimeError(f'{arm} repeat {repeat}: unexpected MTP draft counts {last}')
+                    row = {'arm': arm, 'repeat': repeat, 'token_ids': token_ids,
+                           'text': tokenizer.decode(token_ids), 'last': last}
+                    arm_rows.append(row)
+                    records.append(row)
+            finally:
+                engine.close()
+            state_rows = parse_hashes(log_path)
+            if args.prompt_cache > 0 and len(state_rows) != repeats_per_engine:
+                raise RuntimeError(f'{arm}: expected {repeats_per_engine} state fingerprints in {log_path}, got {len(state_rows)}')
+            first = len(arm_rows) - repeats_per_engine
+            for idx, row in enumerate(arm_rows[first:]):
+                row['state'] = state_rows[idx] if idx < len(state_rows) else None
 
     for row in records:
         row['output_sha256'] = hashlib.sha256(
@@ -94,20 +103,24 @@ def main():
     for arm, rows in (('cpu-miss', cpu), ('ninfer-staged', staged)):
         summary['within_arm'][arm] = {
             'token_ids_equal': all(row['token_ids'] == rows[0]['token_ids'] for row in rows[1:]),
-            'state_equal': all(all(row['state'].get(k) == rows[0]['state'].get(k)
-                                   for k in STATE_KEYS) for row in rows[1:]),
+            'state_equal': (None if any(row['state'] is None for row in rows) else
+                            all(all(row['state'].get(k) == rows[0]['state'].get(k)
+                                    for k in STATE_KEYS) for row in rows[1:])),
             'output_sha256': [row['output_sha256'] for row in rows],
-            'differing_state_fields_from_first': [k for k in STATE_KEYS
-                if any(row['state'].get(k) != rows[0]['state'].get(k) for row in rows[1:])],
+            'differing_state_fields_from_first': (None if any(row['state'] is None for row in rows) else
+                [k for k in STATE_KEYS
+                 if any(row['state'].get(k) != rows[0]['state'].get(k) for row in rows[1:])]),
         }
     for left, right in zip(cpu, staged):
         summary['cross_arm']['token_ids_equal_per_repeat'].append(left['token_ids'] == right['token_ids'])
         summary['cross_arm']['state_equal_per_repeat'].append(
+            None if left['state'] is None or right['state'] is None else
             all(left['state'].get(k) == right['state'].get(k) for k in STATE_KEYS))
     result = {'source_commit': __import__('subprocess').check_output(
                 ['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
               'binary_sha256': hashlib.sha256(ENGINE.read_bytes()).hexdigest(),
-              'cache_policy': 'prompt-cache 6; repeated same prompt in one engine process',
+              'cache_policy': (f'prompt-cache {args.prompt_cache}; fresh engine per request' if args.fresh_each else
+                               f'prompt-cache {args.prompt_cache}; repeated same prompt in one engine process'),
               'temperature': 0, 'mtp_drafts_required': 0,
               'diagnostic': summary, 'runs': records}
     (out / 'results.json').write_text(json.dumps(result, indent=2) + '\n')
