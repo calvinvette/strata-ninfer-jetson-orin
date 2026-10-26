@@ -5868,3 +5868,17 @@ final links; its CLI could not start because the host exposes no SYCL device,
 and its separate parity executable lacks the selector-contract mode. This is
 x86 compile/link evidence only, with no accelerator runtime or Orin performance
 claim. [Build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/evidence/current-source-6b419221/README.md).
+
+At model layer 5 (GDN state ordinal 4), selected committed state was already
+different by position 2044 (`8.15e-4` relative L2). A CUDA recurrence replay
+from that start state reproduced both captured backend states bitwise over
+positions 2045–2046. In this window, swapping the input sequence changed the
+recurrent state by `1.61e-4`/`9.99e-5`; swapping only the recurrent start state
+changed it by `2.71e-4`/`2.30e-4`. Gate-only and beta-only effects were around
+`2e-8`–`3e-8`. At position 2047, the GDN normalized output differed by
+`1.69e-4` and projected output by `1.95e-3`, followed by a `7.89e-3` layer
+output difference. This shows a larger local influence from the pre-existing
+recurrent state for the selected window, without identifying the earlier
+prompt operation that created it. The recurrence replay does not evaluate
+normalized output. No answer-quality or performance claim is made; E6 remains
+open. [State-history and replay report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#gdn-state-history-crossover-at-model-layer-5).

@@ -3173,3 +3173,12 @@ expert outputs equal the GPU result and delayed the first material GDN state
 delta from layer 2 to layer 4. It did not remove later state drift. This is a
 useful diagnostic pattern for a future Splash port, not a serving policy or a
 general correctness proof.
+
+The follow-up model-layer-5 replay found the selected recurrent state already
+differed before positions 2045–2046; swapping that start state changed the
+replayed result more than swapping the paired inputs, and both replay routes
+matched captured state bit for bit. This complements the earlier layer-1
+window where input changes were larger. For Splash, qualify state history as
+well as current-token arithmetic, label GDN allocation ordinals separately
+from model-layer indices, and avoid generalizing a sensitivity ranking from a
+single position pair.

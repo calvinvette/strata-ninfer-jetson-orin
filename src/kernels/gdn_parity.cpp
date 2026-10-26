@@ -219,7 +219,7 @@ std::pair<std::vector<float>, std::vector<float>> replay_gdn(
     allocate((void**) &d_y, value_dim * sizeof(float), "allocate replay y");
     allocate((void**) &d_keep, sizeof(int32_t), "allocate replay keep");
     const int32_t keep = 1;
-    std::vector<float> after_2043, after_2044;
+    std::vector<float> after_a, after_b;
     std::vector<float> gamma((size_t) (value_dim / heads), 0.0f);
     check(cudaMemcpy(d_keep, &keep, sizeof(keep), cudaMemcpyHostToDevice), "copy replay keep");
     check(cudaMemcpy(d_gamma, gamma.data(), gamma.size() * sizeof(float), cudaMemcpyHostToDevice), "copy replay gamma");
@@ -233,7 +233,7 @@ std::pair<std::vector<float>, std::vector<float>> replay_gdn(
         strata::kernels::gdn_step_norm_multi(d_state, d_h, (int) channels, d_gate, d_beta, d_z, d_gamma,
                                              1e-6f, d_y, h_k, (int) heads, 1, d_keep, stream, 0, nullptr);
         check(cudaStreamSynchronize(stream), "synchronize GDN replay token");
-        std::vector<float>& snapshot = position == position_a ? after_2043 : after_2044;
+        std::vector<float>& snapshot = position == position_a ? after_a : after_b;
         snapshot.resize(state.size());
         check(cudaMemcpy(snapshot.data(), d_state, state.size() * sizeof(float), cudaMemcpyDeviceToHost),
               "read GDN replay token state");
@@ -243,13 +243,13 @@ std::pair<std::vector<float>, std::vector<float>> replay_gdn(
     check(cudaFree(d_z), "free replay z"); check(cudaFree(d_gamma), "free replay gamma");
     check(cudaFree(d_y), "free replay y"); check(cudaFree(d_keep), "free replay keep");
     check(cudaStreamDestroy(stream), "destroy replay stream");
-    return {std::move(after_2043), std::move(after_2044)};
+    return {std::move(after_a), std::move(after_b)};
 }
 
-int replay_crossover(int64_t start_position, int64_t position_a, int64_t position_b,
+int replay_crossover(int layer, int64_t start_position, int64_t position_a, int64_t position_b,
                      const char* cpu_state_path, const char* staged_state_path,
                      const char* cpu_diag_path, const char* staged_diag_path) {
-    constexpr int layer = 1, h_k = 16, h_v = 48, S = 128;
+    constexpr int h_k = 16, h_v = 48, S = 128;
     constexpr size_t recurrent = (size_t) S * h_v * S;
     if (position_a != start_position + 1 || position_b != position_a + 1)
         throw std::runtime_error("replay positions must be consecutive after the start state");
@@ -296,7 +296,8 @@ int replay_crossover(int64_t start_position, int64_t position_a, int64_t positio
         std::printf("    \"%s\": {\"different\": %zu, \"relative_l2\": %.9g, \"max_abs\": %.9g}%s\n",
                     name, m.different, m.rel, m.max_abs, comma ? "," : "");
     };
-    std::printf("{\n  \"layer\": 1, \"start_position\": %lld, \"positions\": [%lld, %lld],\n",
+    std::printf("{\n  \"layer\": %d, \"model_layer\": %d, \"start_position\": %lld, \"positions\": [%lld, %lld],\n",
+                layer, layer,
                 (long long) start_position, (long long) position_a, (long long) position_b);
     std::printf(
                 "  \"geometry\": {\"state_size\": 128, \"key_heads\": 16, \"value_heads\": 48},\n"
@@ -328,13 +329,21 @@ int replay_crossover(int64_t start_position, int64_t position_a, int64_t positio
 
 int main(int argc, char** argv) {
     if (argc == 6 && std::string(argv[1]) == "--replay-crossover") {
-        try { return replay_crossover(2042, 2043, 2044, argv[2], argv[3], argv[4], argv[5]); }
+        try { return replay_crossover(1, 2042, 2043, 2044, argv[2], argv[3], argv[4], argv[5]); }
         catch (const std::exception& e) { std::fprintf(stderr, "GDN replay: %s\n", e.what()); return 1; }
     }
     if (argc == 9 && std::string(argv[1]) == "--replay-crossover-window") {
         try {
             const int64_t start = std::stoll(argv[2]), a = std::stoll(argv[3]), b = std::stoll(argv[4]);
-            return replay_crossover(start, a, b, argv[5], argv[6], argv[7], argv[8]);
+            return replay_crossover(1, start, a, b, argv[5], argv[6], argv[7], argv[8]);
+        } catch (const std::exception& e) { std::fprintf(stderr, "GDN replay: %s\n", e.what()); return 1; }
+    }
+    if (argc == 10 && std::string(argv[1]) == "--replay-crossover-model-layer") {
+        try {
+            const int layer = std::stoi(argv[2]);
+            const int64_t start = std::stoll(argv[3]), a = std::stoll(argv[4]), b = std::stoll(argv[5]);
+            if (layer < 0) throw std::runtime_error("model layer must be nonnegative");
+            return replay_crossover(layer, start, a, b, argv[6], argv[7], argv[8], argv[9]);
         } catch (const std::exception& e) { std::fprintf(stderr, "GDN replay: %s\n", e.what()); return 1; }
     }
     bool selftest = false;
@@ -342,7 +351,8 @@ int main(int argc, char** argv) {
         if (std::string(argv[i]) == "--selftest") selftest = true;
         else { std::fprintf(stderr, "usage: gdn_parity [--selftest]\n"
                                     "       gdn_parity --replay-crossover CPU_STATE STAGED_STATE CPU_DIAG STAGED_DIAG\n"
-                                    "       gdn_parity --replay-crossover-window START POS1 POS2 CPU_STATE STAGED_STATE CPU_DIAG STAGED_DIAG\n"); return 2; }
+                                    "       gdn_parity --replay-crossover-window START POS1 POS2 CPU_STATE STAGED_STATE CPU_DIAG STAGED_DIAG\n"
+                                    "       gdn_parity --replay-crossover-model-layer LAYER START POS1 POS2 CPU_STATE STAGED_STATE CPU_DIAG STAGED_DIAG\n"); return 2; }
     }
 
     const int S = 128, h_k = 16, h_v = 48;      // the artifact's real geometry

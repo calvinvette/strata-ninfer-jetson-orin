@@ -734,6 +734,20 @@ state operation that amplifies the incoming delta remains unidentified.
 This one-token diagnostic adds no quality or performance qualification. See the
 [layer-boundary report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#layer-3-filtered-mirror-follow-up).
 
+A layer-5 GDN state-history capture and CUDA recurrence crossover then found
+model-layer-5 committed state already differing at position 2044 (`8.15e-4`
+relative L2). The position-2044 start state, replayed over positions 2045–2046,
+reproduced both captured backend states bitwise. Swapping GDN inputs changed
+the recurrent state by `1.61e-4`/`9.99e-5`, while swapping only the recurrent
+start state changed it by `2.71e-4`/`2.30e-4`; isolated gate/beta effects were
+around `2e-8`–`3e-8`. At position 2047, GDN `y` and `gdn_out` differences were
+`1.69e-4` and `1.95e-3`, followed by a `7.89e-3` layer output difference.
+This supports pre-existing recurrent state as the larger local influence in
+that selected window, but does not locate the earlier prompt operation that
+created it. The recurrence replay does not evaluate normalized output. The
+one-token run is not quality/performance qualification; E6 remains open. See
+the [layer-5 state-history report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#gdn-state-history-crossover-at-model-layer-5).
+
 ### E7 — Assess release of the demonstrated integration
 
 1. Run focused regression and at least 30 minutes of sustained service for each

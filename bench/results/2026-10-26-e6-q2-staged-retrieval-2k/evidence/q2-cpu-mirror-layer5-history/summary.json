@@ -1,0 +1,134 @@
+{
+  "date": "2026-10-26",
+  "inference_source_commit": "6b419221",
+  "model": "Qwen3.8-Flash-Next Q2_0, split GGUF",
+  "workload": "heldout-retrieval-arithmetic-2048",
+  "prompt_tokens": 2048,
+  "cpu_q8_1_selector": "q2_0/q2_0@layer=0",
+  "cpu_q8_1_experts": [
+    83,
+    88,
+    90,
+    109
+  ],
+  "model_layer": 5,
+  "gdn_state_ordinal": 4,
+  "model_layer_to_gdn_ordinal": "model layer - floor(model layer / 4); QSA blocks occur every fourth model layer",
+  "committed_state_comparison": [
+    {
+      "position": 2044,
+      "model_layer": 5,
+      "cpu_token": 248068,
+      "staged_token": 248068,
+      "token_equal": true,
+      "state_relative_l2": 0.000815211149678452,
+      "different_floats": 796630,
+      "max_abs_delta": 0.008529901504516602
+    },
+    {
+      "position": 2046,
+      "model_layer": 5,
+      "cpu_token": 248069,
+      "staged_token": 248069,
+      "token_equal": true,
+      "state_relative_l2": 6.285520556044977e-06,
+      "different_floats": 760667,
+      "max_abs_delta": 0.0001271367073059082
+    },
+    {
+      "position": 2047,
+      "model_layer": 5,
+      "cpu_token": 271,
+      "staged_token": 271,
+      "token_equal": true,
+      "state_relative_l2": 5.069869139906953e-06,
+      "different_floats": 745788,
+      "max_abs_delta": 0.00011768937110900879
+    }
+  ],
+  "replay": {
+    "start_position": 2044,
+    "positions": [
+      2045,
+      2046
+    ],
+    "route_matched_replays_bitwise": true,
+    "replay_vs_captured_cpu": {
+      "different": 0,
+      "relative_l2": 0,
+      "max_abs": 0
+    },
+    "replay_vs_captured_staged": {
+      "different": 0,
+      "relative_l2": 0,
+      "max_abs": 0
+    },
+    "after_position_2045": {
+      "input_effect_from_cpu_state": {
+        "different": 785875,
+        "relative_l2": 0.000161062362,
+        "max_abs": 0.000180003699
+      },
+      "input_effect_from_staged_state": {
+        "different": 785884,
+        "relative_l2": 0.000161072896,
+        "max_abs": 0.000180003699
+      },
+      "initial_state_effect_with_cpu_input": {
+        "different": 769567,
+        "relative_l2": 0.000270883893,
+        "max_abs": 0.000112995505
+      },
+      "initial_state_effect_with_staged_input": {
+        "different": 769694,
+        "relative_l2": 0.00027088452,
+        "max_abs": 0.000112980604
+      },
+      "gate_only_effect_from_cpu_state": {
+        "different": 117144,
+        "relative_l2": 1.84941018e-08,
+        "max_abs": 2.98023224e-08
+      },
+      "beta_only_effect_from_cpu_state": {
+        "different": 151064,
+        "relative_l2": 3.00845487e-08,
+        "max_abs": 4.47034836e-08
+      }
+    },
+    "after_position_2046": {
+      "input_effect_from_cpu_state": {
+        "different": 760007,
+        "relative_l2": 9.98722446e-05,
+        "max_abs": 7.5426884e-05
+      },
+      "input_effect_from_staged_state": {
+        "different": 760057,
+        "relative_l2": 9.98798579e-05,
+        "max_abs": 7.54264183e-05
+      },
+      "initial_state_effect_with_cpu_input": {
+        "different": 744982,
+        "relative_l2": 0.000230300117,
+        "max_abs": 0.000112459064
+      },
+      "initial_state_effect_with_staged_input": {
+        "different": 744973,
+        "relative_l2": 0.000230301332,
+        "max_abs": 0.000112444162
+      },
+      "gate_only_effect_from_cpu_state": {
+        "different": 164896,
+        "relative_l2": 1.89809862e-08,
+        "max_abs": 2.98023224e-08
+      },
+      "beta_only_effect_from_cpu_state": {
+        "different": 194943,
+        "relative_l2": 3.35253898e-08,
+        "max_abs": 5.96046448e-08
+      }
+    }
+  },
+  "minimum_available_gib": 11.72,
+  "interpretation": "At this sampled window, the existing recurrent start-state difference has a larger effect on replayed state than swapping the paired GDN inputs; gate-only and beta-only effects are much smaller. The recurrent state was already different at the captured start position 2044. This does not identify the earlier prompt operation that created that state delta.",
+  "replay_tool_sha256": "68242c05dc2567753177c7400a8fdfbc3361dc49c1af0a9ff820b5de9f613a8c"
+}

@@ -123,6 +123,58 @@ Compact [layer-3 summary](../q2-cpu-mirror-layer3-targeted-gdn/summary.json),
 [GDN comparison](../q2-cpu-mirror-layer3-targeted-gdn/gdn-comparison.json) are
 checked in. Raw captures and 113 MiB per-arm GDN dumps remain local.
 
+### GDN state-history crossover at model layer 5
+
+The next paired capture targeted model layers 4 and 5, then captured selected
+accepted GDN states and intermediates at model layer 5. Model layer 4 is a GDN
+block followed by an MoE. Its GDN `qkv`, convolution output `h`, `z`, and
+projected `gdn_out` matched exactly at position 2047. Its two changed expert
+rows (131 and 156) each differed by about `1.1e-7` relative L2; combined output
+differed by `1.82e-7`.
+
+At model layer 5 (GDN state ordinal 4), position 2047's input `x` differed by
+`1.29e-7`; `qkv`, `h`, and `z` were exact, while gate/beta differed by
+`1.53e-7`/`4.38e-8`. The normalized GDN output `y` differed by `1.69e-4`,
+`gdn_out` by `1.95e-3`, and the layer's `ffn_y` by `7.89e-3`. The following
+MoE saw a `6.70e-4` input difference and all ten expert rows changed. Those
+expert-row changes are downstream of changed inputs and are not evidence of
+different CPU/GPU arithmetic on matching inputs.
+
+Committed state at model layer 5 was already different at captured position
+2044 (`8.15e-4` relative L2); it measured `6.29e-6` at 2046 and `5.07e-6` at
+2047. A CUDA recurrence crossover replay started from the captured position
+2044 state and replayed positions 2045–2046. Both route-matched replays
+reproduced each captured committed recurrent state bitwise. Swapping the paired
+GDN inputs changed recurrent state by `1.61e-4` and `9.99e-5`; swapping only
+the initial recurrent state changed it by `2.71e-4` and `2.30e-4`. Gate-only
+and beta-only effects were smaller (`1.85e-8`/`3.01e-8` at 2045 and
+`1.90e-8`/`3.35e-8` at 2046). In this sampled window, the pre-existing
+recurrent-state difference has the larger local effect. The replay does not
+identify the earlier prompt operation that created that state difference, and
+does not evaluate normalized output. Minimum available/admission memory was
+`11.71 GiB`. The run is diagnostic only, with no quality or performance claim.
+
+The replay helper now accepts a model-layer argument while preserving the
+existing layer-1 invocation. The checked-in crossover can be reproduced with:
+
+```bash
+build/integration/e0-cuda-build/gdn_parity \
+  --replay-crossover-model-layer 5 2044 2045 2046 \
+  bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/q2-cpu-mirror-layer5-history/cpu-miss.gdn-commit \
+  bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/q2-cpu-mirror-layer5-history/ninfer-staged.gdn-commit \
+  bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/q2-cpu-mirror-layer5-history/cpu-miss.layer5.gdn-diag \
+  bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/q2-cpu-mirror-layer5-history/ninfer-staged.layer5.gdn-diag
+```
+The tested Orin `gdn_parity` binary SHA256 was
+`68242c05dc2567753177c7400a8fdfbc3361dc49c1af0a9ff820b5de9f613a8c`.
+
+Compact [model-layer-4](../q2-cpu-mirror-layer4-targeted-gdn/summary.json),
+[model-layer-5](../q2-cpu-mirror-layer5-targeted-gdn/summary.json) and
+[state-history/replay](../q2-cpu-mirror-layer5-history/summary.json) summaries,
+per-stage and expert-row metrics, committed-state comparisons and the crossover
+JSON are checked in. Raw committed states, GDN intermediate captures and logs
+remain local.
+
 Reproduce on Orin with:
 
 ```bash
