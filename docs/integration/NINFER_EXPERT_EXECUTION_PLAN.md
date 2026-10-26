@@ -645,6 +645,15 @@ difference and its first triggering operation remain unidentified. These
 functional checks do not close staged state parity, broader quality or
 performance qualification. See the [2K staged-backend isolation
 report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/README.md#staged-backend-isolation).
+The three-pair same-day performance screen on this 2K task measured median
+decode-rate change `0.00%` for NInfer versus Strata, with only one of three
+pairs favoring NInfer; this fails the registered 5%/consistency gate. Median
+client latency improved `3.84%`, but it was secondary. Outputs and final state
+hashes matched across backends, and both per-request staged-read rows matched.
+Per-process resident-map files were not captured in this campaign, so it cannot
+qualify performance even apart from the failed decode gate. Seven-pair
+confirmation is not justified. See the [staged-backend performance
+screen](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/performance-staged-backend-screen/README.md).
 
 ### E7 — Assess release of the demonstrated integration
 

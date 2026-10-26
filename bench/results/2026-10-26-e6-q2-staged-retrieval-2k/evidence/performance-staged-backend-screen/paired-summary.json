@@ -1,0 +1,271 @@
+{
+  "schema": 1,
+  "metric_convention": "positive throughput delta is faster; negative latency delta is faster",
+  "candidate": "ninfer-staged",
+  "baseline": "strata-staged",
+  "resident_map_capture": "not emitted by this API control harness; the preceding full staged backend ablation with identical routes recorded the same map hash for both backends",
+  "pairs": [
+    {
+      "block": 0,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "candidate": {
+        "status": "pass",
+        "completion_tokens": 47,
+        "text_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+        "client_total_s": 56.88266888214275,
+        "client_ttft_s": 51.16838831920177,
+        "prompt_tokens_per_s": 40.2,
+        "decode_tokens_per_s": 9.2,
+        "warmup_status": "pass",
+        "warmup_text_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+        "state_hashes": [
+          "L=2094 gdn=13aee8372c84c6b9 ple=bbeb45fd95ebfca9 tail=819edfa58367acd2 pooled=c2e54e43f8467683 kv=adf8eb42ae696d84 mtp=14650fb0739d0383 stale=b1c3695b6c660383 dead=dcaae02b3e09f282 pooled_full=b14c896e864f5c0a ple_prev=21,23",
+          "L=2094 gdn=6a3fc88fe3fee43c ple=bbeb45fd95ebfca9 tail=0602f7e76aa0607e pooled=203bbd9bfac90b99 kv=a216f9d19e830c7f mtp=14650fb0739d0383 stale=b1c3695b6c660383 dead=dcaae02b3e09f282 pooled_full=8eb1522b6ef7d150 ple_prev=21,23"
+        ],
+        "route_rows": [
+          {
+            "hits": 8231,
+            "lookups": 19292,
+            "staged_reads": 3268,
+            "routed": 22560
+          },
+          {
+            "hits": 15407,
+            "lookups": 20939,
+            "staged_reads": 1621,
+            "routed": 22560
+          }
+        ],
+        "minimum_available_gib": 11.513355255126953,
+        "backend_args": [
+          "--expert-backend",
+          "ninfer",
+          "--expert-backend-strict"
+        ]
+      },
+      "baseline": {
+        "status": "pass",
+        "completion_tokens": 47,
+        "text_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+        "client_total_s": 59.15583446295932,
+        "client_ttft_s": 53.244308449327946,
+        "prompt_tokens_per_s": 38.7,
+        "decode_tokens_per_s": 8.8,
+        "warmup_status": "pass",
+        "warmup_text_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+        "state_hashes": [
+          "L=2094 gdn=13aee8372c84c6b9 ple=bbeb45fd95ebfca9 tail=819edfa58367acd2 pooled=c2e54e43f8467683 kv=adf8eb42ae696d84 mtp=14650fb0739d0383 stale=b1c3695b6c660383 dead=dcaae02b3e09f282 pooled_full=b14c896e864f5c0a ple_prev=21,23",
+          "L=2094 gdn=6a3fc88fe3fee43c ple=bbeb45fd95ebfca9 tail=0602f7e76aa0607e pooled=203bbd9bfac90b99 kv=a216f9d19e830c7f mtp=14650fb0739d0383 stale=b1c3695b6c660383 dead=dcaae02b3e09f282 pooled_full=8eb1522b6ef7d150 ple_prev=21,23"
+        ],
+        "route_rows": [
+          {
+            "hits": 8231,
+            "lookups": 19292,
+            "staged_reads": 3268,
+            "routed": 22560
+          },
+          {
+            "hits": 15407,
+            "lookups": 20939,
+            "staged_reads": 1621,
+            "routed": 22560
+          }
+        ],
+        "minimum_available_gib": 11.434822082519531,
+        "backend_args": [
+          "6",
+          "--expert-backend",
+          "strata"
+        ]
+      },
+      "decode_tps_change_pct": 4.545454545454519,
+      "prompt_tps_change_pct": 3.875968992248069,
+      "client_total_latency_change_pct": -3.8426735104885035,
+      "client_ttft_latency_change_pct": -3.898858282856299,
+      "measured_text_equal": true,
+      "measured_state_equal": true,
+      "route_counts_equal": true
+    },
+    {
+      "block": 1,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "candidate": {
+        "status": "pass",
+        "completion_tokens": 47,
+        "text_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+        "client_total_s": 56.86825418006629,
+        "client_ttft_s": 50.97341376775876,
+        "prompt_tokens_per_s": 40.4,
+        "decode_tokens_per_s": 8.8,
+        "warmup_status": "pass",
+        "warmup_text_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+        "state_hashes": [
+          "L=2094 gdn=13aee8372c84c6b9 ple=bbeb45fd95ebfca9 tail=819edfa58367acd2 pooled=c2e54e43f8467683 kv=adf8eb42ae696d84 mtp=14650fb0739d0383 stale=b1c3695b6c660383 dead=dcaae02b3e09f282 pooled_full=b14c896e864f5c0a ple_prev=21,23",
+          "L=2094 gdn=6a3fc88fe3fee43c ple=bbeb45fd95ebfca9 tail=0602f7e76aa0607e pooled=203bbd9bfac90b99 kv=a216f9d19e830c7f mtp=14650fb0739d0383 stale=b1c3695b6c660383 dead=dcaae02b3e09f282 pooled_full=8eb1522b6ef7d150 ple_prev=21,23"
+        ],
+        "route_rows": [
+          {
+            "hits": 8231,
+            "lookups": 19292,
+            "staged_reads": 3268,
+            "routed": 22560
+          },
+          {
+            "hits": 15407,
+            "lookups": 20939,
+            "staged_reads": 1621,
+            "routed": 22560
+          }
+        ],
+        "minimum_available_gib": 11.48495101928711,
+        "backend_args": [
+          "--expert-backend",
+          "ninfer",
+          "--expert-backend-strict"
+        ]
+      },
+      "baseline": {
+        "status": "pass",
+        "completion_tokens": 47,
+        "text_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+        "client_total_s": 55.41617641597986,
+        "client_ttft_s": 49.722703581210226,
+        "prompt_tokens_per_s": 41.6,
+        "decode_tokens_per_s": 8.9,
+        "warmup_status": "pass",
+        "warmup_text_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+        "state_hashes": [
+          "L=2094 gdn=13aee8372c84c6b9 ple=bbeb45fd95ebfca9 tail=819edfa58367acd2 pooled=c2e54e43f8467683 kv=adf8eb42ae696d84 mtp=14650fb0739d0383 stale=b1c3695b6c660383 dead=dcaae02b3e09f282 pooled_full=b14c896e864f5c0a ple_prev=21,23",
+          "L=2094 gdn=6a3fc88fe3fee43c ple=bbeb45fd95ebfca9 tail=0602f7e76aa0607e pooled=203bbd9bfac90b99 kv=a216f9d19e830c7f mtp=14650fb0739d0383 stale=b1c3695b6c660383 dead=dcaae02b3e09f282 pooled_full=8eb1522b6ef7d150 ple_prev=21,23"
+        ],
+        "route_rows": [
+          {
+            "hits": 8231,
+            "lookups": 19292,
+            "staged_reads": 3268,
+            "routed": 22560
+          },
+          {
+            "hits": 15407,
+            "lookups": 20939,
+            "staged_reads": 1621,
+            "routed": 22560
+          }
+        ],
+        "minimum_available_gib": 11.54354476928711,
+        "backend_args": [
+          "6",
+          "--expert-backend",
+          "strata"
+        ]
+      },
+      "decode_tps_change_pct": -1.1235955056179692,
+      "prompt_tps_change_pct": -2.8846153846153966,
+      "client_total_latency_change_pct": 2.6203138830554584,
+      "client_ttft_latency_change_pct": 2.51537043738137,
+      "measured_text_equal": true,
+      "measured_state_equal": true,
+      "route_counts_equal": true
+    },
+    {
+      "block": 2,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "candidate": {
+        "status": "pass",
+        "completion_tokens": 47,
+        "text_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+        "client_total_s": 54.75659395894036,
+        "client_ttft_s": 49.141917284112424,
+        "prompt_tokens_per_s": 42.0,
+        "decode_tokens_per_s": 9.0,
+        "warmup_status": "pass",
+        "warmup_text_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+        "state_hashes": [
+          "L=2094 gdn=13aee8372c84c6b9 ple=bbeb45fd95ebfca9 tail=819edfa58367acd2 pooled=c2e54e43f8467683 kv=adf8eb42ae696d84 mtp=14650fb0739d0383 stale=b1c3695b6c660383 dead=dcaae02b3e09f282 pooled_full=b14c896e864f5c0a ple_prev=21,23",
+          "L=2094 gdn=6a3fc88fe3fee43c ple=bbeb45fd95ebfca9 tail=0602f7e76aa0607e pooled=203bbd9bfac90b99 kv=a216f9d19e830c7f mtp=14650fb0739d0383 stale=b1c3695b6c660383 dead=dcaae02b3e09f282 pooled_full=8eb1522b6ef7d150 ple_prev=21,23"
+        ],
+        "route_rows": [
+          {
+            "hits": 8231,
+            "lookups": 19292,
+            "staged_reads": 3268,
+            "routed": 22560
+          },
+          {
+            "hits": 15407,
+            "lookups": 20939,
+            "staged_reads": 1621,
+            "routed": 22560
+          }
+        ],
+        "minimum_available_gib": 11.514446258544922,
+        "backend_args": [
+          "--expert-backend",
+          "ninfer",
+          "--expert-backend-strict"
+        ]
+      },
+      "baseline": {
+        "status": "pass",
+        "completion_tokens": 47,
+        "text_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+        "client_total_s": 59.664390586316586,
+        "client_ttft_s": 53.864939101971686,
+        "prompt_tokens_per_s": 38.2,
+        "decode_tokens_per_s": 9.0,
+        "warmup_status": "pass",
+        "warmup_text_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+        "state_hashes": [
+          "L=2094 gdn=13aee8372c84c6b9 ple=bbeb45fd95ebfca9 tail=819edfa58367acd2 pooled=c2e54e43f8467683 kv=adf8eb42ae696d84 mtp=14650fb0739d0383 stale=b1c3695b6c660383 dead=dcaae02b3e09f282 pooled_full=b14c896e864f5c0a ple_prev=21,23",
+          "L=2094 gdn=6a3fc88fe3fee43c ple=bbeb45fd95ebfca9 tail=0602f7e76aa0607e pooled=203bbd9bfac90b99 kv=a216f9d19e830c7f mtp=14650fb0739d0383 stale=b1c3695b6c660383 dead=dcaae02b3e09f282 pooled_full=8eb1522b6ef7d150 ple_prev=21,23"
+        ],
+        "route_rows": [
+          {
+            "hits": 8231,
+            "lookups": 19292,
+            "staged_reads": 3268,
+            "routed": 22560
+          },
+          {
+            "hits": 15407,
+            "lookups": 20939,
+            "staged_reads": 1621,
+            "routed": 22560
+          }
+        ],
+        "minimum_available_gib": 11.479198455810547,
+        "backend_args": [
+          "6",
+          "--expert-backend",
+          "strata"
+        ]
+      },
+      "decode_tps_change_pct": 0.0,
+      "prompt_tps_change_pct": 9.947643979057585,
+      "client_total_latency_change_pct": -8.225671257424661,
+      "client_ttft_latency_change_pct": -8.768267256216722,
+      "measured_text_equal": true,
+      "measured_state_equal": true,
+      "route_counts_equal": true
+    }
+  ],
+  "median_decode_tps_change_pct": 0.0,
+  "median_prompt_tps_change_pct": 3.875968992248069,
+  "median_client_total_latency_change_pct": -3.8426735104885035,
+  "median_client_ttft_latency_change_pct": -3.898858282856299,
+  "screen_gate": {
+    "median_decode_tps_change_pct": 0.0,
+    "all_pairs_decode_favor_candidate": false,
+    "required_median_gain_pct": 5,
+    "status": "fail"
+  }
+}

@@ -5749,3 +5749,14 @@ the first prompt boundary found GDN layer 0 bit-identical, layer 1 at
 across the 36 layer states was `0.03865`. The CPU-versus-staged arithmetic or
 state transition remains unidentified. E6 quality and performance gates stay
 open. See the [backend isolation and state capture](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/README.md#staged-backend-isolation).
+
+A randomized three-pair service screen then compared the two staged GPU
+backends on that same 2K retrieval. Every measured response and final state
+matched; the two observed expert-cache rows matched exactly across all runs.
+Median paired decode-rate change was 0.00%, failing the registered 5% gain
+gate, and NInfer did not win all three pairs. Median client latency improved
+3.84%, but that secondary result does not pass the nominated decode gate.
+Per-process residency maps were not emitted, so this remains a negative screen
+with a documented evidence gap, not performance qualification. No confirmation
+was run. See the [paired staged-backend
+screen](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/performance-staged-backend-screen/README.md).
