@@ -6025,3 +6025,10 @@ source commit `03806747172378e9eb5a99a2a2194c655675b236` built as a complete
 HIP target on maestro1, and `strata --help` passed. The complete SYCL target
 also compiled and linked; help startup is unsupported there because maestro1
 has no SYCL device. These are x86_64 build checks only. [QSA evidence](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#qsa-stage-capture-at-model-layer-3), [backend build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-position-filtered-qsa-capture).
+
+A fresh supervised Orin run on that source rebuilt the position-123 QSA trace;
+its QSA stage and selected K/V summaries exactly matched the prior corrected
+capture. The request again failed the persistent-state gate (six fields differ)
+with 11.29 GiB minimum available/admission RAM. This confirms diagnostic
+repeatability; E6 state, quality, and performance qualification remain open.
+[Repeat capture summary](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#position-123-qsa-trace).

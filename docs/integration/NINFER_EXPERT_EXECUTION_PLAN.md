@@ -880,6 +880,13 @@ maestro1 has no SYCL device. This provides x86_64 compile/link evidence only,
 not accelerator runtime or Orin performance qualification. See the [current
 source build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-position-filtered-qsa-capture).
 
+Execution note (2026-10-26): the corrected Orin CUDA binary repeated the
+supervised 128-token QSA capture at model layer 3 / position 123. Token,
+residency, all compact QSA-stage metrics and selected historical K/V matched
+the prior capture exactly. The request still ended with six differing
+persistent-state hashes, so this validates the diagnostic and not the E6
+correctness or performance gate. See the [repeat capture](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#position-123-qsa-trace).
+
 Execution note (2026-10-26): the no-trace five-workload staged-miss state
 replay completed one pair. Three of five measured response hashes matched,
 while final persistent-state fingerprints differed on all five paired

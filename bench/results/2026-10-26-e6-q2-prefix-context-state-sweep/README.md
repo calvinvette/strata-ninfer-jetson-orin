@@ -251,6 +251,18 @@ EMC was inaccessible and energy was not measured. This is localization evidence,
 not a quality or performance result. The derived field metrics are in
 [`128-qsa-stages/run25/qsa-summary.json`](128-qsa-stages/run25/qsa-summary.json); raw captures and supervisor output remain local-only.
 
+A fresh supervised reproduction on the corrected current-source Orin binary
+(source commit `03806747172378e9eb5a99a2a2194c655675b236`, binary SHA256
+`1b02fc2e34bfef1fd27e5e720163e4be746cc0998812eea7389e9ff4eadc6f6f`)
+matched the run25 token, residency map, QSA fields and selected K/V exactly.
+The QSA summary metrics are unchanged, and the six persistent-state hashes
+still differ. The request completed in 63.3 seconds with 11.29 GiB minimum
+available/admission RAM. EMC access was denied and energy was not measured.
+This confirms that the position-filtered capture works on the corrected
+source; it does not resolve state parity or qualify quality/performance. The
+compact [run26 summary](128-qsa-stages/run26/qsa-summary.json) is checked in;
+comparator JSON, raw arrays and supervisor telemetry remain local-only.
+
 ## Expert 114 CUDA operator check
 
 The Orin `ninfer_q2_expert_parity` tool was run on model layer 2 / expert 114
