@@ -5724,8 +5724,9 @@ The same held-out retrieval/arithmetic task also returned the exact answer and
 matching token IDs on CPU-miss and strict staged routes at 4K and 8K prompts,
 with identical startup residency maps. Final state hashes still differed in
 six fields at 4K and five at 8K. The 8K GDN state had 3.16% global relative L2
-over 29.4M floats; minimum available memory was 11.28 GiB. At 4K the state
-fingerprints were captured but the numeric GDN dump missed the accepted-length
-gate by one token. This supports functional behavior for this task at three
-lengths, while staged state parity and broader workload quality remain open.
-The sequential runs are not performance evidence. See the [4K/8K follow-up](../../bench/results/2026-10-26-e6-staged-retrieval-context-followup/README.md).
+over 29.4M floats; a corrected 4K rerun measured 2.65% over the same number of
+floats. Minimum available memory was 11.28 GiB at 8K. GDN error was not
+monotonic with prompt length. This supports functional behavior for this task
+at three lengths, while staged state parity and broader workload quality remain
+open. The sequential runs are not performance evidence. See the [4K/8K
+follow-up](../../bench/results/2026-10-26-e6-staged-retrieval-context-followup/README.md).

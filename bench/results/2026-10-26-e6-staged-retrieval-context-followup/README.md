@@ -13,7 +13,7 @@ paired performance measurements.
 
 | Prompt | Expected answer | Token IDs | Residency map | Final state fields that differ | GDN relative L2 | Minimum available RAM |
 | ---: | --- | --- | --- | --- | ---: | ---: |
-| 4,096 | Exact answer on both | Match | Match | GDN, PLE, tail, pooled, pooled-full, KV | Not dumped; requested length was one token past actual accepted length | 11.45 GiB |
+| 4,096 | Exact answer on both | Match | Match | GDN, PLE, tail, pooled, pooled-full, KV | 2.645% over 29.4M floats | 11.45 GiB |
 | 8,192 | Exact answer on both | Match | Match | GDN, tail, pooled, pooled-full, KV | 3.159% over 29.4M floats | 11.28 GiB |
 
 Both runs generated 47 tokens, returned all three retrieval codes and the exact
@@ -25,19 +25,24 @@ did not match, and the earlier five-shape workload replay had token-output
 mismatches. The held-out task therefore does not close staged-miss correctness
 or release qualification.
 
-The 8K GDN comparison covers 36 layers and 29,417,472 floats. It found
-28,487,309 differing values (96.84%), global relative L2 `0.03159`, and global
-RMS absolute delta `0.007895`. State layer 1 differed by `7.44e-7` relative L2;
-state layer 2 by `0.002410`; the largest layer-relative error was `0.05793` at
-state layer 26. Compared with the 2K diagnostic, the final global GDN error is
-similar in scale, but the first-layer error is smaller. It is not monotonic
-with prompt length and does not by itself identify a cause. The 118 MB raw GDN
-arrays remain local; sizes and SHA256 values are in
-[`8192/evidence/gdn-dump-artifact-hashes.json`](8192/evidence/gdn-dump-artifact-hashes.json).
+Both GDN comparisons cover 36 layers and 29,417,472 floats. At 4K, 28,565,809
+values differed (97.11%), global relative L2 was `0.02645`, and global RMS
+absolute delta was `0.006622`. State layer 1 differed by `3.32e-6` relative
+L2, state layer 2 by `0.003146`, and the largest layer-relative error was
+`0.06126` at state layer 27. The first 4K run did not produce dumps because it
+requested `L=4143` rather than actual accepted length `L=4142`; a corrected
+supervised rerun captured arrays. The raw 118 MB arrays remain local; sizes
+and hashes are in
+[`4096/evidence/gdn-dump-artifact-hashes.json`](4096/evidence/gdn-dump-artifact-hashes.json).
 
-The 4K harness asked for a GDN dump at `L=4143`, while both engine logs report
-actual accepted length `L=4142`; no arrays were produced. The state hashes,
-answer, tokens, route counts and memory telemetry remain valid for that run.
+At 8K, 28,487,309 values differed (96.84%), global relative L2 was `0.03159`,
+and global RMS absolute delta was `0.007895`. State layer 1 differed by
+`7.44e-7` relative L2; state layer 2 by `0.002410`; the largest layer-relative
+error was `0.05793` at state layer 26. Global GDN error is similar in scale to
+the 2K diagnostic, but the first-layer error is smaller. Error is not
+monotonic with prompt length and does not identify a cause. The raw 118 MB
+arrays remain local; sizes and hashes are in
+[`8192/evidence/gdn-dump-artifact-hashes.json`](8192/evidence/gdn-dump-artifact-hashes.json).
 
 ## Reproduction and evidence
 
@@ -45,8 +50,9 @@ Each context directory contains the exact workload, config, result JSON,
 engine logs, residency maps and `run_control.py` memory/clock/tegrastats
 records. Reproduce with `tools/integration/prepare_ninfer_long_retrieval.py`
 and `tools/integration/ninfer_q2_retrieval_check.py --compare-cpu-miss-staged
---dump-gdn --run`, wrapped in `tools/integration/run_control.py`. For the 8K
-case set `--max-context 16384` and `--dump-gdn-at 8238`.
+--dump-gdn --run`, wrapped in `tools/integration/run_control.py`. Set
+`--dump-gdn-at 4142` for 4K and `--dump-gdn-at 8238` with `--max-context 16384`
+for 8K.
 
 Minimum available physical/admission memory stayed above the six-GiB floor in
 both runs. No clocks or services were changed. Sequential prompt/decode times
