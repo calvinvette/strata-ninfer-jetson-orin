@@ -6047,3 +6047,12 @@ and combined-output deltas, then larger layer-1 GDN input deltas. The requested
 residual-boundary capture at layer 0 / position 2043 emitted no record, so the
 residual step is still unmeasured. Both runs failed final-state parity; no
 correctness or performance gate is closed. [Capture repeat summary](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#repeated-layer-0-to-layer-1-capture).
+
+The current-source diagnostic now reports why an opt-in boundary capture did
+not produce a file. In a third paired run, both arms ended with
+`copy_queued=1`, `batch_graph=0`, and `target_seen=0` for layer 0 / position
+2043: a D2H copy was queued, but the requested position reached neither the
+single-token writer nor the batch writer. This rules out a simple file-write
+failure; the capture-path/position mismatch remains unexplained, so the
+residual is still unmeasured and no gate is closed. The pair again failed final
+state parity. See the [telemetry follow-up](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#capture-path-telemetry-follow-up).

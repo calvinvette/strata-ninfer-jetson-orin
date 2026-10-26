@@ -409,3 +409,18 @@ next-layer GDN input cannot be equated or used to attribute the intervening
 residual delta. Do not infer the missing value. The [paired summary](layer0-to-layer1-current/summary.json)
 records the repeats and the failed capture explicitly. Raw files remain
 local-only.
+
+### Capture-path telemetry follow-up
+
+A third same-day pair was run with teardown telemetry enabled in the current
+source. Both arm logs reported `copy_queued=1`, `batch_graph=0`, and
+`target_seen=0` for the requested layer-0 / position-2043 boundary. The copy
+queue flag proves that the boundary hook queued at least one D2H copy; the
+target flag and batch-graph flag show that it neither passed position 2043 to
+the single-token writer nor recorded the batch boundary hook. No boundary file
+was emitted. This excludes a simple file-open/write failure, but does not yet
+identify why this verifier run's capture path did not expose the requested
+position to the writer. The capture remains unsupported and the residual step
+remains unmeasured. The request again failed final persistent-state parity.
+This telemetry does not change the measured MoE or GDN values and is not a
+performance result. Raw run3 captures and logs remain local-only.

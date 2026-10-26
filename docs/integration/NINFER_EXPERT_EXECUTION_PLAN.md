@@ -905,6 +905,15 @@ record was not emitted, so the intervening residual remains unmeasured. The
 requests still failed final-state parity. See the [repeat and capture-limit
 report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#repeated-layer-0-to-layer-1-capture).
 
+Execution note (2026-10-26): a third paired run used current-source capture
+bookkeeping. Both arms reported `copy_queued=1`, `batch_graph=0`,
+`target_seen=0` for layer 0 / position 2043. A device-to-host copy was queued,
+but the requested position did not reach either output writer; this is not a
+file-write failure. The exact capture-path/position mismatch is still
+unresolved, and the intervening residual remains unmeasured. Both requests
+again failed persistent-state parity. See the [capture-path telemetry
+follow-up](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#capture-path-telemetry-follow-up).
+
 Execution note (2026-10-26): the no-trace five-workload staged-miss state
 replay completed one pair. Three of five measured response hashes matched,
 while final persistent-state fingerprints differed on all five paired

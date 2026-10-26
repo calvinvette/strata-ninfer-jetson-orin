@@ -513,6 +513,15 @@ Verifier::~Verifier() {
     }
     if (cs_) cudaStreamSynchronize(cs_);
     if (sh_cs_) cudaStreamSynchronize(sh_cs_);
+    if (boundary_diag_h_ != nullptr && !boundary_diag_captured_) {
+        std::fprintf(stderr,
+                     "strata verify: residual-boundary capture missing at %d/%d position %lld "
+                     "(copy_queued=%d batch_graph=%d target_seen=%d) -> %s\n",
+                     boundary_diag_layer_, boundary_diag_layer_ + 1,
+                     (long long) boundary_diag_position_, boundary_diag_copy_queued_ ? 1 : 0,
+                     boundary_diag_batch_graph_captured_ ? 1 : 0,
+                     boundary_diag_target_seen_ ? 1 : 0, boundary_diag_path_.c_str());
+    }
     for (auto& e : exec_)
         if (e) cudaGraphExecDestroy(e);
     for (auto& e : exec_nr_)
@@ -1506,13 +1515,17 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                     err = std::string("verify: could not queue opt-in boundary batch capture: ") + cudaGetErrorString(ce);
                     return false;
                 }
+                boundary_diag_copy_queued_ = true;
             }
             boundary_diag_batch_graph_captured_ = true;
             return true;
         }
         const cudaError_t ce = cudaMemcpyAsync(boundary_diag_h_ + offset_floats, src,
                                                 floats * sizeof(float), cudaMemcpyDeviceToHost, cs);
-        if (ce == cudaSuccess) return true;
+        if (ce == cudaSuccess) {
+            boundary_diag_copy_queued_ = true;
+            return true;
+        }
         err = std::string("verify: could not queue opt-in boundary capture: ") + cudaGetErrorString(ce);
         return false;
     };
@@ -3376,6 +3389,7 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
         }
     }
     if (boundary_diag_h_ != nullptr && T == 1 && !batch_rec_ && pos0 == boundary_diag_position_) {
+        boundary_diag_target_seen_ = true;
         BoundaryDiagHeaderV2 header{};
         std::memcpy(header.magic, "STBNDY2", sizeof(header.magic));
         header.version = 2;
@@ -4322,6 +4336,7 @@ bool Verifier::write_boundary_diag_batch(int T, const int* slots, const int32_t*
     for (int row = 0; row < T; ++row)
         selected = selected || positions[row] == boundary_diag_position_;
     if (!selected) return true;
+    boundary_diag_target_seen_ = true;
     static std::mutex boundary_batch_dump_mutex;
     std::lock_guard<std::mutex> lock(boundary_batch_dump_mutex);
     std::FILE* dump = std::fopen(boundary_diag_path_.c_str(), "ab");
@@ -4350,6 +4365,7 @@ bool Verifier::write_boundary_diag_batch(int T, const int* slots, const int32_t*
         err = "verify: could not write opt-in batch residual-boundary diagnostic";
         return false;
     }
+    boundary_diag_captured_ = true;
     return true;
 }
 
