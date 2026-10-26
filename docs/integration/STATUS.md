@@ -5990,3 +5990,13 @@ its four tests pass, and the derived position-123 summary is linked from the
 report. A counterfactual expert-394 oracle replay forcing either shared block-
 61 scale produced identical outputs across the two captured inputs, confirming
 that scale difference accounts for that row's output delta.
+
+A held-out Q2_0 task diagnostic repeated the 1,069-token prompt with a 512-token
+allowance so its 200-word instruction was feasible. One measured request per
+arm completed at 285 words for CPU-miss and 268 for strict NInfer staged. Both
+explained fetch/decode/execute, memory and I/O without an apparent material
+error, but both began “A computer” instead of the rubric's required
+“Processor”; both therefore fail this task-level rubric. Single-sample decode
+rates (8.2 vs 9.8 tokens/s) are not a performance comparison. Minimum available
+RAM was 11.10/11.34 GiB, above the six-GiB floor. This does not resolve the
+quality or state gates; E6 remains open. See the [task-quality diagnostic](../../bench/results/2026-10-26-e6-q2-quality-1069-512/README.md).
