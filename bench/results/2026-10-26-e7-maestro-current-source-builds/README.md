@@ -90,3 +90,12 @@ the final links. maestro1 has no SYCL device, so `strata --help` could not
 start; the separate SYCL parity program does not implement the selector
 contract mode. These are x86_64 compile/link checks only. See the [exact-source
 report and logs](evidence/current-source-6b419221/README.md).
+
+## 2026-10-26 follow-up on model-layer GDN replay
+
+After generalizing `gdn_parity` to replay a selected model layer, maestro1
+rebuilt and linked the HIP target at `32f04b5695fe9aa6afa540f1b84114a3d17a11fa`
+with parallelism 1. The HIP runtime self-test stopped before kernel cases
+because the host reported no ROCm-capable device. This is compile/link
+evidence only; the new replay was exercised on Orin CUDA. See the [build
+record](evidence/current-source-32f04b56-gdn-parity/README.md).

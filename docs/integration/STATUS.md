@@ -5882,3 +5882,10 @@ recurrent state for the selected window, without identifying the earlier
 prompt operation that created it. The recurrence replay does not evaluate
 normalized output. No answer-quality or performance claim is made; E6 remains
 open. [State-history and replay report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#gdn-state-history-crossover-at-model-layer-5).
+
+The generalized `gdn_parity` model-layer replay rebuilt and linked for HIP on
+maestro1 at commit `32f04b56` with one build job. Its runtime self-test stopped
+before kernel cases because the host reported no ROCm-capable device. Treat
+this as compile/link portability evidence; Orin CUDA built and exercised the
+replay. The SYCL parity implementation is separate and unchanged. [HIP build
+record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/evidence/current-source-32f04b56-gdn-parity/README.md).
