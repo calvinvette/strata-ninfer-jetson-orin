@@ -90,9 +90,12 @@ release profile is **not achieved**.
   rate changed 0.00%; NInfer won one of three pairs, so the preregistered 5%
   primary gate failed and no confirmation was run. A layer-1 captured-activation
   check found no CPU/CUDA Q8_1 scale or code mismatch for either route
-  independently. The route activation vectors differed slightly (relative L2
-  `1.027e-7`), so cross-route code-byte identity remains unverified and the
-  state divergence is unexplained. Together with CPU-miss/staged state
+  independently. An independent direct comparison also found identical Q8_1
+  scales and codes for all 80 blocks across the slightly different layer-1
+  vectors (relative L2 `1.027e-7`). At sampled layer 2, 34 of 80 activation
+  scales and 103 Q8_1 code values differed; later sampled layers showed more
+  differences. This places the first sampled activation-code divergence at
+  layer 2, but its upstream cause remains unknown. Together with CPU-miss/staged state
   differences observed through 64K, staged expert misses remain outside a
   proposed release profile. See the [staged-backend performance screen](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/performance-staged-backend-screen/README.md)
   and [captured Q8_1 diagnostic](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/q8_1-capture-check/README.md).

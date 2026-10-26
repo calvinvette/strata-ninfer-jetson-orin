@@ -23,8 +23,16 @@ difference: GGML stores `d * sum(q)`, while this CUDA path stores `sum(input)`.
 The two captured input vectors are not bit-identical (1,747 of 2,560 values
 differ; relative L2 `1.027e-7`, max absolute difference `3.576e-7`). Therefore
 this check shows that each backend’s quantizer agrees on its own captured
-vector, but does not establish whether cross-route quantized code bytes match.
-It does not identify the operation that first changes persistent state.
+vector. A direct cross-route comparison using the independent Python Q8_1
+oracle compared all captured MoE input vectors at prompt position 2047. Layer
+1 had identical FP16 scales and all 2,560 code values across its 80 blocks,
+despite the small float difference. Layer 2 was the first sampled layer with
+changed Q8_1 input representation: 34 of 80 scales and 103 code values
+differed. Differences grew at sampled layers 3, 11 and 21. The numeric summary
+is in [`cross-route-quantized-comparison.json`](cross-route-quantized-comparison.json).
+This places the first sampled activation-code divergence at layer 2, but does
+not identify which upstream operation causes the difference before that
+boundary.
 
 The two 10-KiB activation payloads and raw checker logs are local diagnostic
 artifacts and are not tracked. Their source-capture SHA256 values are

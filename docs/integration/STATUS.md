@@ -5765,8 +5765,11 @@ The captured layer-1 activation was checked with the independent Q8_1
 quantizer parity mode. CPU and CUDA scales and code bytes matched for each
 route’s 2,560-value input; both inputs had the same small route-to-route
 difference previously measured (relative L2 `1.027e-7`). This rules out a
-CPU-versus-CUDA code mismatch on either captured vector, but does not show
-whether the two input vectors quantize to identical code bytes or explain the
-state drift. See the [Q8_1 capture check](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/q8_1-capture-check/README.md).
+CPU-versus-CUDA code mismatch on either captured vector. An independent direct
+comparison also found identical Q8_1 scales and code bytes across all 80
+blocks for layer 1, despite the small float delta. At sampled layer 2, 34 of
+80 scales and 103 code values differed; more differed at layers 3, 11, and 21.
+This localizes the first sampled Q8_1 input-code divergence to layer 2, while
+its upstream cause remains unknown. See the [Q8_1 capture check](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/q8_1-capture-check/README.md).
 The staged-backend three-pair performance screen measured median 0.00% decode
 TPS change and failed its preregistered 5% gain gate. E6 remains open.
