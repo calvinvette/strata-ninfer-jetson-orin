@@ -5942,7 +5942,9 @@ captured inputs because they quantized to the same activation. The staged
 service row matched the oracle within `5.84e-8`; the CPU-miss row differed by
 `6.68e-4`. This localizes a substantial sampled CPU/staged owner-arithmetic
 delta upstream of the layer-3 QSA cache-cell-123 mismatch. The observations
-come from separate paired runs, and final persistent state still differs, so
-this is diagnostic evidence rather than a completed state or quality gate.
-The run returned the expected checker failure in 63.1 seconds with at least
-11.27 GiB available; EMC and energy were unavailable. [Position-123 trace](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#upstream-trace-at-position-123).
+were reproduced in a second service capture at the reported precision; the
+independent oracle was not rerun. The QSA cache-cell capture and layer-2 trace
+remain separate paired runs, and final persistent state still differs, so this
+is diagnostic evidence rather than a completed state or quality gate. Both
+runs returned the expected checker failure in about 63 seconds and retained at
+least 11.27 GiB available; EMC and energy were unavailable. [Position-123 trace](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#upstream-trace-at-position-123).

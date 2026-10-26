@@ -140,7 +140,9 @@ CPU-versus-staged expert arithmetic for expert 114, rather than its tiny input
 or route-weight differences. It provides a plausible upstream source for the
 later layer-3 QSA cache-cell-123 mismatch, though the cache-cell capture and
 layer-2 oracle came from separate paired runs; the full persistent-state
-failure is still not resolved or qualified.
+failure is still not resolved or qualified. A second service capture reproduced
+the layer-2 input delta, the expert-114 row delta and the combined-output delta
+at the reported precision. The oracle was not rerun for this repeat.
 
 The run used the same 128-token Q2_0 retrieval prefix and one generated token.
 It returned exit code 1 on the expected persistent-state gate, completed in
