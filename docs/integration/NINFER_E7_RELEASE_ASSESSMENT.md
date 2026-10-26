@@ -50,6 +50,10 @@ release profile is **not achieved**.
   outlier did not reproduce it; median TTFT/client changes were −1.08%/−0.67%,
   below the 5% screen threshold. See the [corrected capacity screen](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/fixed-swiglu-context-check/README.md)
   and [outlier repeat](../../bench/results/2026-10-25-phase-e6-q2-557-repeat3/README.md).
+  A randomized three-pair 8K screen across all five workload shapes also failed
+  to reach the 5% median TTFT threshold. All measured outputs and resident maps
+  matched, but one 2,048+128 pair had a 32.6% decode-time regression. No
+  seven-pair confirmation was warranted. See the [8K paired screen](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/fixed-swiglu-8k-paired-screen/README.md).
 - The grouped SwiGLU Q8_1 path initially used approximate `__fdividef`, while
   Strata used precise division. On the captured layer-3 expert-94 row this
   changed one Q8_1 code byte despite exact gate/up inputs. Matching Strata's

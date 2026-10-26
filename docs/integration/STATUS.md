@@ -44,6 +44,12 @@ outlier; a randomized three-pair repeat did not reproduce it, with median TTFT
 and client changes of −1.08% and −0.67%. E6 screening across
 1K–256K is complete, but its broader performance exit criteria remain unmet.
 See the [corrected capacity screen](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/fixed-swiglu-context-check/README.md).
+The subsequent randomized three-pair 8K screen of five natural-generation
+shapes also had matching output and resident-map hashes, but median TTFT
+changes were only −1.59% to +0.21%; one pair showed a 32.6% decode-time
+regression on the 2,048+128 workload. No cell met the five-percent screen
+threshold, and E6's broad performance exit remains unmet. See the [three-pair
+screen](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/fixed-swiglu-8k-paired-screen/README.md).
 E7 assessment proposes no
 general release profile; HIP/SYCL build evidence is outstanding, and NInfer
 remains opt-in. See the [E7

@@ -597,6 +597,14 @@ client completion 0.67%, below the 5% screen threshold. See the [outlier repeat]
 This is not a performance qualification.
 See the [corrected context report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/fixed-swiglu-context-check/README.md).
 
+An 8K randomized three-pair screen then repeated all five natural-generation
+shapes. All measured outputs and maps matched. Median TTFT changes ranged from
+−1.59% to +0.21%; no workload met the 5% threshold, so no seven-pair
+confirmation was triggered. One 2,048+128 pair had a 32.6% NInfer decode-time
+regression, although its TTFT improved 1.84% and output hash matched; median
+client change was +0.05%. E6 therefore remains without a repeatable useful
+effect for the resident profile. See the [three-pair 8K report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/fixed-swiglu-8k-paired-screen/README.md).
+
 Execution note (2026-10-25): Nsight Systems was rerun on the four-entry,
 16-lane candidate. Its broad harness trace showed similar median per-launch
 times for NInfer D3/D4 and native Q2 gate/up/down kernels; the trace combined
