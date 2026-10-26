@@ -5948,3 +5948,16 @@ remain separate paired runs, and final persistent state still differs, so this
 is diagnostic evidence rather than a completed state or quality gate. Both
 runs returned the expected checker failure in about 63 seconds and retained at
 least 11.27 GiB available; EMC and energy were unavailable. [Position-123 trace](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#upstream-trace-at-position-123).
+
+The actual Orin `ninfer_q2_expert_parity` check on layer-2 expert 114
+separated two CUDA paths. The standalone NInfer D3/D4 kernel failed the
+independent Q2_0×Q8_1 oracle on the captured activation (`8.17e-3` relative L2)
+and remains unqualified. The grouped cache-slot route used by the service
+matched Strata's grouped CUDA route exactly across the captured expert and
+3/64/128-token top-10 shapes. Its seven-block operator timing was effectively
+tied for one token (24.502 vs 24.714 us), then 11.0% and 12.3% slower for 64
+and 128 tokens. This explains the lack of a material resident-kernel speedup
+in the tested path; it is operator-only and does not replace E6's paired
+end-to-end matrix. Run source was `65b80be3`, binary SHA256
+`ec1d713c80aaeb266a8b4934d73faef8bac08692349b2d39db7f09c075811602`, with
+24.13 GiB minimum available memory. [Operator check](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#expert-114-cuda-operator-check).

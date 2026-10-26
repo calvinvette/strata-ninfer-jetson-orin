@@ -150,3 +150,33 @@ It returned exit code 1 on the expected persistent-state gate, completed in
 clock sampling was read-only; EMC was inaccessible and energy was not measured.
 The GDN batch flag was enabled through the run config. Raw layer captures,
 oracle activation files and supervisor output remain local-only.
+
+## Expert 114 CUDA operator check
+
+The Orin `ninfer_q2_expert_parity` tool was run on model layer 2 / expert 114
+using the captured CPU-miss activation (SHA256
+`8c51b622ec40d3d14bedc3d55847215046c99f4be8e51d545d1b7fa9a8b8d5f8`) and its
+independent FP64 Q2_0×Q8_1 reference. The standalone NInfer D3/D4 path failed
+this activation: relative L2 `8.17e-3`, maximum absolute error `4.12e-4`.
+This path is not qualified for dispatch. In the same tool, the grouped cache-slot
+route used by the service matched Strata's grouped Q2_0/Q8_1 CUDA path exactly
+for this expert activation and for the 3-, 64- and 128-token top-10 cases; all
+coverage checks passed.
+
+The grouped-path event-timed operator screen had seven interleaved blocks. For
+one token, Strata median was `24.714 us` and NInfer `24.502 us` (ratio 0.991,
+NInfer/Strata). For the ten-expert shapes, NInfer was slower: `1.110x` at 64
+tokens (`4,379.156` vs `3,946.750 us`) and `1.123x` at 128 tokens
+(`8,938.061` vs `7,958.131 us`). These are kernel-only operator measurements;
+they omit request, cache and transfer costs and do not establish an end-to-end
+gain. They show why the qualified grouped integration has not produced a
+significant active-expert speedup: the one-token result is effectively tied,
+larger grouped work regresses, and the standalone D3/D4 candidate fails the
+numerical gate on this real activation.
+
+The measured binary SHA256 was
+`ec1d713c80aaeb266a8b4934d73faef8bac08692349b2d39db7f09c075811602` at source
+commit `65b80be3`; the Q2_0 shard was the same local model used above. The
+supervised run took 11.4 seconds and had 24.13 GiB minimum available/admission
+memory. EMC was inaccessible and energy was not measured. This is a targeted
+operator diagnostic, not the randomized E6 performance confirmation.
