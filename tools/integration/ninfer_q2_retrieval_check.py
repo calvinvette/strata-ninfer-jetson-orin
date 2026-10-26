@@ -64,7 +64,7 @@ def main() -> int:
     ap.add_argument('--cpu-q8-1-selector',
                     help='opt in to a CPU Q8_1 dot selector for the CPU-miss arm only')
     ap.add_argument('--cpu-q8-1-experts',
-                    help='limit the CPU Q8_1 dot selector to comma-separated expert IDs')
+                    help='limit the CPU Q8_1 dot selector to comma-separated expert IDs, or per-layer layer=IDs clauses separated by semicolons')
     ap.add_argument('--run', action='store_true')
     a = ap.parse_args()
     comparison_modes = (a.compare_strata_control, a.compare_cpu_miss_staged, a.compare_staged_backends)

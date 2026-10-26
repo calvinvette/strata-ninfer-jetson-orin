@@ -935,6 +935,16 @@ MoE output. E6 state and performance qualification remain open. See the
 [multirow boundary report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#multirow-ordinary-verifier-boundary-capture)
 and [backend build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-multirow-residual-boundary-capture).
 
+Execution note (2026-10-26): layer-1 captures with the layer-0 mirror showed
+exact inputs/routes/shared output but small row deltas in two or three active
+experts (`~1e-7`). A per-layer ID-map extension to the opt-in CPU mirror passed
+its Orin selector-contract check. Applying position-derived ID lists at both
+layers made sampled layer-1 rows/output and GDN state checkpoints bitwise
+equal, but final GDN, tail, pooled, pooled-full and KV state still differed.
+Next, locate the first later layer that diverges with a final per-layer GDN
+state dump. This diagnostic work closes no E6 release gate. See the
+[layer-1 intervention report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#layer-1-expert-row-intervention).
+
 Execution note (2026-10-26): mirroring the ten layer-0 Q2_0 experts identified
 across positions 2043–2047 made every sampled expert row, combined output and
 boundary value match the staged arm exactly. PLE state matched, but the GDN,

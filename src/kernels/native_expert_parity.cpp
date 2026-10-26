@@ -1248,6 +1248,41 @@ int check_q8_1_selector_contract() {
             ++failures;
         }
     }
+    set_selector("q2_0/q2_0@layer=0,q2_0/q2_0@layer=1");
+    set_env("STRATA_NATIVE_CPU_Q8_1_DOT_EXPERTS", "0=83,88;1=70,74");
+    cpu::NativeFmt layer0_filter, layer1_filter, layer0_other;
+    err.clear();
+    if (!cpu::native_fmt(GGML_TYPE_Q2_0, GGML_TYPE_Q2_0, H, FF, layer0_filter, err, 0) ||
+        !cpu::native_fmt(GGML_TYPE_Q2_0, GGML_TYPE_Q2_0, H, FF, layer1_filter, err, 1) ||
+        !cpu::native_fmt(GGML_TYPE_Q2_0, GGML_TYPE_Q2_0, H, FF, layer0_other, err, 2)) {
+        std::fprintf(stderr, "per-layer expert-filter selector setup failed: %s\n", err.c_str());
+        ++failures;
+    } else {
+        cpu::NativeFmt layer0_selected, layer0_unselected, layer1_selected, layer1_unselected;
+        cpu::native_fmt_for_expert(layer0_filter, 83, layer0_selected);
+        cpu::native_fmt_for_expert(layer0_filter, 70, layer0_unselected);
+        cpu::native_fmt_for_expert(layer1_filter, 70, layer1_selected);
+        cpu::native_fmt_for_expert(layer1_filter, 83, layer1_unselected);
+        if (layer0_filter.q8_1_dot_expert_ids != std::vector<int>{83, 88} ||
+            layer1_filter.q8_1_dot_expert_ids != std::vector<int>{70, 74} ||
+            layer0_other.gu_act == GGML_TYPE_Q8_1 ||
+            layer0_selected.gu_act != GGML_TYPE_Q8_1 ||
+            layer0_unselected.gu_act != layer0_filter.gu_act_default ||
+            layer1_selected.gu_act != GGML_TYPE_Q8_1 ||
+            layer1_unselected.gu_act != layer1_filter.gu_act_default ||
+            cpu::native_q8_1_dot_expert_selected(layer1_filter, 83) ||
+            !cpu::native_q8_1_dot_expert_selected(layer1_filter, 74)) {
+            std::fprintf(stderr, "per-layer expert-ID lists leaked across layer or expert boundaries\n");
+            ++failures;
+        }
+    }
+    set_env("STRATA_NATIVE_CPU_Q8_1_DOT_EXPERTS", "0=83,88;0=70,74");
+    err.clear();
+    if (cpu::native_fmt(GGML_TYPE_Q2_0, GGML_TYPE_Q2_0, H, FF, invalid, err, 0) ||
+        err.find("STRATA_NATIVE_CPU_Q8_1_DOT_EXPERTS") == std::string::npos) {
+        std::fprintf(stderr, "duplicate per-layer expert filter was not rejected clearly: %s\n", err.c_str());
+        ++failures;
+    }
     set_env("STRATA_NATIVE_CPU_Q8_1_DOT_EXPERTS", "88,,109");
     err.clear();
     if (cpu::native_fmt(GGML_TYPE_Q2_0, GGML_TYPE_Q2_0, H, FF, invalid, err, 0) ||

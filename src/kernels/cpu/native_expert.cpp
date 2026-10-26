@@ -26,6 +26,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <mutex>
+#include <utility>
 #include <vector>
 
 namespace strata::kernels::cpu {
@@ -81,9 +82,7 @@ bool parse_layer_selector(const char* value, int& layer) {
     return true;
 }
 
-bool parse_expert_filter(const char* value, std::vector<int>& ids) {
-    if (value == nullptr) return true;
-    const std::string list(value);
+bool parse_expert_id_list(const std::string& list, std::vector<int>& ids) {
     if (list.empty()) return false;
     size_t begin = 0;
     while (begin <= list.size()) {
@@ -102,6 +101,39 @@ bool parse_expert_filter(const char* value, std::vector<int>& ids) {
         begin = end + 1;
     }
     return !ids.empty();
+}
+
+bool parse_expert_filter(const char* value, int layer, std::vector<int>& ids) {
+    if (value == nullptr) return true;
+    const std::string list(value);
+    if (list.empty()) return false;
+    if (list.find('=') != std::string::npos || list.find(';') != std::string::npos) {
+        bool selected_layer_found = false;
+        std::vector<int> seen_layers;
+        size_t begin = 0;
+        while (begin <= list.size()) {
+            const size_t end = list.find(';', begin);
+            const std::string clause = list.substr(begin, end == std::string::npos ? end : end - begin);
+            const size_t equals = clause.find('=');
+            if (clause.empty() || equals == std::string::npos || equals == 0 || equals + 1 == clause.size() ||
+                clause.find('=', equals + 1) != std::string::npos) return false;
+            int selected_layer = -1;
+            const std::string layer_text = clause.substr(0, equals);
+            if (!parse_layer_selector(layer_text.c_str(), selected_layer) ||
+                std::find(seen_layers.begin(), seen_layers.end(), selected_layer) != seen_layers.end()) return false;
+            seen_layers.push_back(selected_layer);
+            std::vector<int> clause_ids;
+            if (!parse_expert_id_list(clause.substr(equals + 1), clause_ids)) return false;
+            if (selected_layer == layer) {
+                ids = std::move(clause_ids);
+                selected_layer_found = true;
+            }
+            if (end == std::string::npos) break;
+            begin = end + 1;
+        }
+        return selected_layer_found;
+    }
+    return parse_expert_id_list(list, ids);
 }
 
 bool q8_1_selector_matches_one(const char* selector, int gu_type, int d_type, int layer) {
@@ -479,8 +511,8 @@ bool native_fmt(int gu_type, int d_type, int64_t n_embd, int64_t n_ff, NativeFmt
         f.gu_act = GGML_TYPE_Q8_1;
         f.d_act = GGML_TYPE_Q8_1;
         const char* expert_filter = std::getenv("STRATA_NATIVE_CPU_Q8_1_DOT_EXPERTS");
-        if (!parse_expert_filter(expert_filter, f.q8_1_dot_expert_ids)) {
-            err = "native experts: STRATA_NATIVE_CPU_Q8_1_DOT_EXPERTS must be a comma-separated list of unique non-negative expert IDs";
+        if (!parse_expert_filter(expert_filter, layer, f.q8_1_dot_expert_ids)) {
+            err = "native experts: STRATA_NATIVE_CPU_Q8_1_DOT_EXPERTS must be a comma-separated ID list or layer=IDs clauses separated by semicolons; include a unique ID list for every selected layer";
             return false;
         }
     }

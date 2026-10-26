@@ -485,3 +485,32 @@ The next correctness experiment should trace the layer-1 starting-state
 difference backward across earlier prompt windows while capturing matching
 layer-0 MoE rows. This is required to find whether earlier expert IDs, another
 layer transition, or both produced the state gap.
+
+### Layer-1 expert-row intervention
+
+With the 15-ID layer-0 mirror active, a paired capture at model layer 1 found
+exact MoE input, route IDs/weights and shared output, but two or three routed
+expert rows differed per position (IDs `70, 74, 97, 130, 146, 149, 152`;
+about `9.7e-8`–`1.19e-7` relative L2). The combined MoE output differed by
+`2.24e-8`–`6.75e-8`, matching the layer-1 `ffn_y` delta. See the [layer-1 MoE
+comparison](layer0-to-layer1-current/run10/moe-comparison.json).
+
+The Q8_1 diagnostic filter now supports scoped lists such as
+`0=64,68;1=70,74` when paired with selectors scoped to layers 0 and 1. Its
+functional selector-contract check passed on Orin. A follow-up pair used the
+position-derived ID lists for each layer. Layer-1 expert rows, combined MoE
+output and committed GDN state at positions 2042, 2044, 2046 and 2047 then
+matched bitwise across arms. Token IDs still matched, while final GDN, tail,
+pooled, pooled-full and KV state did not. The local layer-0 and layer-1
+arithmetic differences are therefore removed at these sampled positions, but
+another transition still causes request-level state divergence. See the
+[layer-1 MoE comparison](layer0-to-layer1-current/run11/moe-comparison.json)
+and [GDN checkpoint comparison](layer0-to-layer1-current/run11/gdn-state-comparison.json).
+
+The pair took 59.24 s prompt time on CPU-miss and 58.68 s with NInfer staging,
+with one-token decode times of 223 ms and 204 ms. Diagnostic copies and one
+pair make these non-qualification timings. Minimum available/admission memory
+was 11.61 GiB. Next, use a final per-layer GDN state dump to identify which
+later model layer first diverges after correcting the sampled layer-0 and
+layer-1 expert rows. The complete final-state and output-quality gates remain
+open.

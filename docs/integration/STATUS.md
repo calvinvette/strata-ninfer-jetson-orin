@@ -6092,3 +6092,13 @@ maestro1 HIP rebuilt the modified verifier and passed `strata --help`. SYCL
 target and help also passed with oneAPI/oneMKL initialized; its separate source
 tree was unchanged. No accelerator run is claimed for maestro1. [Build and
 boundary record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-multirow-residual-boundary-capture).
+
+Layer-1 captures with the layer-0 mirror show exact MoE inputs/routes/shared
+output, but two or three layer-1 expert rows differ by about `1e-7`; their
+combined output delta is `2.24e-8`–`6.75e-8`. The opt-in CPU mirror filter now
+accepts separate layer-scoped expert-ID lists, and its selector-contract check
+passed on Orin. A two-layer mirror made sampled layer-1 rows/output and GDN
+state checkpoints exact at positions 2042, 2044, 2046 and 2047. The full
+request still failed in GDN, tail, pooled, pooled-full and KV state. This
+moves the remaining search to later layer transitions; no quality or
+performance qualification is claimed. [Layer-1 intervention report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#layer-1-expert-row-intervention).

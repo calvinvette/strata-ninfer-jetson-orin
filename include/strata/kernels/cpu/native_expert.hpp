@@ -42,8 +42,9 @@ bool native_experts_available() noexcept;
 /// STRATA_NATIVE_CPU_Q8_1_DOT diagnostic selects CUDA-matching Q8_1 routes for IQ2_S/Q2_0,
 /// IQ2_S/IQ4_NL, IQ3_XXS/Q2_0, IQ3_XXS/IQ4_NL, IQ3_S/Q2_0 and IQ3_S/IQ4_NL expert pairs (`1` enables all supported pairs; a
 /// pair name selects one). A pair may be suffixed with `@layer=N` to scope it to one zero-based model layer. The
-/// optional `STRATA_NATIVE_CPU_Q8_1_DOT_EXPERTS` comma-separated ID list further limits that selected layer/pair;
-/// unlisted experts keep their original activation formats. It is not a default dispatch policy.
+/// optional `STRATA_NATIVE_CPU_Q8_1_DOT_EXPERTS` ID filter further limits selected rows. A comma-separated list is
+/// global to all selected layers; `layer=ID,ID;layer=ID,ID` clauses scope distinct lists per selected layer.
+/// Unlisted experts keep their original activation formats. It is not a default dispatch policy.
 bool native_fmt(int gu_type, int d_type, int64_t n_embd, int64_t n_ff, NativeFmt& f, std::string& err, int layer = -1);
 /// Resolve a layer format for one expert when the opt-in Q8_1 mirror has an expert filter.
 void native_fmt_for_expert(const NativeFmt& f, int expert_id, NativeFmt& out);
