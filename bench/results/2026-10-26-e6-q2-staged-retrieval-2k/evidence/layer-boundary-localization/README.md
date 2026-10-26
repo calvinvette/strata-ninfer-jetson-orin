@@ -385,3 +385,27 @@ build/integration/e0-cuda-build/gdn_parity --replay-crossover-model-layer 1 2044
 The compact [paired summary](layer1-gdn-recurrence-current/run1/summary.json)
 contains stage, commit-state, and crossover metrics. Raw diagnostic captures,
 logs and supervisor telemetry remain local-only.
+
+## Repeated layer-0 to layer-1 capture
+
+Two further supervised pairs captured layer-0 MoE inputs, routes, expert rows
+and combined output together with layer-1 GDN stages at positions 2043–2047.
+The per-position comparisons were identical across both runs. Layer-0 inputs
+and route IDs matched exactly; three or four of the ten expert rows differed
+slightly, leaving combined-output relative-L2 deltas from `2.11e-8` to
+`3.05e-8`. The next layer's GDN input differed by `5.48e-8` to `1.25e-7`.
+QKV, convolution `h`, and `z` remained exact; gate/beta deltas were about
+`3.3e-8` to `8.1e-8`. At positions 2043 and 2045, GDN output differences
+grew to `3.42e-5` and `1.31e-5`, and FFN differences to `9.29e-4` and
+`1.85e-3`. The neighboring positions had exact GDN outputs. Both pairs
+returned the same generated token and residency map but failed final-state
+parity. Minimum available/admission memory was 11.55–11.61 GiB; these are
+localization runs, not performance or quality measurements.
+
+Both runs also requested the layer-0 residual-boundary record at position
+2043. The engine logs reported allocating the capture buffer, but neither arm
+wrote a boundary record. This capture cell is unsupported; the MoE output and
+next-layer GDN input cannot be equated or used to attribute the intervening
+residual delta. Do not infer the missing value. The [paired summary](layer0-to-layer1-current/summary.json)
+records the repeats and the failed capture explicitly. Raw files remain
+local-only.

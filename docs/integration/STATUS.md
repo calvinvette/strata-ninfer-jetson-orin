@@ -6040,3 +6040,10 @@ recurrence at positions 2043–2046 reproduced both arms bitwise; relative
 input-versus-start-state effects changed between the adjacent windows. This
 does not locate the upstream source or establish numerical correctness.
 [Layer-1 crossover report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#2026-10-26-current-source-layer-1-replay).
+
+Two repeats with same-pair layer-0 MoE and layer-1 GDN captures reproduced
+identical per-position metrics: exact layer-0 inputs/routes, small expert-row
+and combined-output deltas, then larger layer-1 GDN input deltas. The requested
+residual-boundary capture at layer 0 / position 2043 emitted no record, so the
+residual step is still unmeasured. Both runs failed final-state parity; no
+correctness or performance gate is closed. [Capture repeat summary](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#repeated-layer-0-to-layer-1-capture).

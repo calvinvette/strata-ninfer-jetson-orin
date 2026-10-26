@@ -896,6 +896,15 @@ starting-state effects vary by adjacent window. The upstream source of the
 gate/beta deltas remains unknown; full state and quality qualification remain
 open. See the [layer-1 replay report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#2026-10-26-current-source-layer-1-replay).
 
+Execution note (2026-10-26): two same-day repeats captured layer-0 MoE and
+layer-1 GDN stages in the same request pair. Their per-position metrics matched
+exactly: layer-0 routes/input were exact, a few expert rows differed at
+`~1e-8` scale, and combined output deltas were `2.11e-8`–`3.05e-8`; layer-1
+GDN input deltas were `5.48e-8`–`1.25e-7`. A requested layer-0 residual-boundary
+record was not emitted, so the intervening residual remains unmeasured. The
+requests still failed final-state parity. See the [repeat and capture-limit
+report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#repeated-layer-0-to-layer-1-capture).
+
 Execution note (2026-10-26): the no-trace five-workload staged-miss state
 replay completed one pair. Three of five measured response hashes matched,
 while final persistent-state fingerprints differed on all five paired
