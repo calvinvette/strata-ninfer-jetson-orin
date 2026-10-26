@@ -93,3 +93,33 @@ The next gate is a held-out task-quality/state check for staged misses,
 including request-history controls and persistent-state comparison. Do not run
 performance confirmation or describe the 1,069-token cell as a qualified gain
 until this difference is explained or bounded.
+
+## Request-history and state fingerprint follow-up
+
+A direct temperature-zero engine diagnostic repeated the exact 1,069-token
+prompt twice per backend with prompt caching enabled and MTP draft counters at
+zero. On both the CPU-miss and strict-NInfer staged routes, the second request
+reused 1,062 prompt tokens and read seven. Its 64 generated token IDs differed
+from the first request, and the final GDN, PLE, tail, pooled, pooled-full, KV
+and PLE-previous fingerprints changed. The CPU-miss and NInfer arms produced
+identical token IDs and all nine recorded final-state fields at each matching
+request ordinal. This reproduces a request-history-associated variation in
+both routes; it does not implicate NInfer or establish that prompt-cache reuse
+caused it. Since the main performance screen used `--prompt-cache 0`, this is a
+diagnostic lead rather than an explanation of its cross-arm output mismatches.
+
+Raw IDs, decoded text, per-request engine metrics and state fingerprints are in
+[`state-fingerprint-diagnostic/results.json`](state-fingerprint-diagnostic/results.json);
+engine logs are retained alongside it. The next experiment should compare a
+fresh-engine repeat, same-service prompt-cache-off repeat and cache-on repeat,
+with a distinct-length warmup and prompt-end/final-state capture. Preserve the
+exact token sequence and direct persistent-state evidence. The original 1,069-
+token screen remains unqualified and requires an independent held-out task
+oracle before performance confirmation.
+
+Recreate this diagnostic with the same binary and model files using:
+
+```bash
+python3 bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/state-fingerprint-diagnostic/run_state_fingerprint_diagnostic.py \
+  --out bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/state-fingerprint-diagnostic-rerun
+```
