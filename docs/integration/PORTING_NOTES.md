@@ -3109,3 +3109,17 @@ separate progress checkpoints by phase and make no-progress limits account for
 the request size and post-verifier work; a timeout alone does not identify a
 deadlock. This retry was one sequential pair and supplies no performance
 estimate. See the [near-cap Q2_0 report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-240k-retrieval/README.md).
+
+## 2026-10-26 — Hold request history and outputs in multi-shape screens
+
+A balanced CPU-miss versus strict-NInfer staging screen found repeated output
+hash mismatches on the 557- and 1,069-token shapes. The isolated 1,069-token
+reproduction had identical warmup outputs, then different CPU-miss and NInfer
+measured outputs; the CPU-miss measured text also changed when the same cell
+followed a five-workload sequence. This does not identify a cause, but it shows
+that output parity must be recorded by workload and request position, not
+inferred from one warmup or one API token count. Preserve generated text or
+token IDs before compacting request logs to hashes. For future Splash screens,
+repeat mismatching cells both in isolation and after the full workload sequence,
+then compare accepted-prefix persistent state and a held-out task oracle before
+interpreting the timing effect. See the [staged workload report](../../bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/README.md).

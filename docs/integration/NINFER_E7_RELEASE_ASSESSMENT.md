@@ -75,6 +75,16 @@ release profile is **not achieved**.
   available memory was 11.37 GiB. This confirms the registered TTFT effect
   only for the short measured request; grouped 64/128-token operator timing
   remains slower at 1.098×/1.123×.
+- A subsequent balanced three-pair comparison of CPU miss fallback and strict
+  NInfer staging at 8K found a 1,069-token cell with median +7.04% prompt TPS,
+  +8.54% decode TPS, −6.56% TTFT and −7.60% client time. Its measured output
+  hash differed in all three pairs. The 557-token cell also differed in every
+  pair, despite a +7.99% median decode-TPS change; TTFT changed only +0.21% and
+  client time −2.54%. A separate capture reproduced the 1,069-token divergence
+  and found a warmup/measured-output difference in the CPU-miss arm. Since no
+  independent task-quality oracle or causal explanation is available, these
+  are exploratory timings and no seven-pair confirmation was run. See the
+  [staged workload report](../../bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/README.md).
 - E5 includes operator and state checks for the bounded static Q2_0 profile.
   Pre-fix natural-generation and 4K retrieval state differences were rerun
   after the SwiGLU precision fix: two natural-generation runs and one 4K

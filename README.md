@@ -49,7 +49,13 @@ map, but median TTFT changes ranged from −1.59% to +0.21%; no cell met the 5%
 screen threshold. One short-request 6-GiB staging profile separately passed a
 seven-pair TTFT gate (−5.96%, paired-bootstrap 95% interval −6.23% to −5.80%),
 but that effect is limited to its `1+1` workload and does not establish a
-general profile. The [Q2_0 8K paired-effect chart](bench/results/2026-10-25-phase-e6-q2-grouped-throughput/fixed-swiglu-8k-paired-screen/q2_0-8k-effects.svg)
+general profile. A separate randomized three-pair comparison of CPU miss
+fallback with 6-GiB NInfer staging found a 1,069-token prompt cell with median
++7.0% prompt TPS, +8.5% decode TPS, −6.6% TTFT and −7.6% client time, but the
+generated output hashes differed in all three pairs. A 557-token cell also had
+output mismatches. These are exploratory timings without a quality oracle, so
+they do not qualify staged execution. See the [staged workload screen](bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/README.md).
+The [Q2_0 8K paired-effect chart](bench/results/2026-10-25-phase-e6-q2-grouped-throughput/fixed-swiglu-8k-paired-screen/q2_0-8k-effects.svg)
 includes individual pairs and bootstrap intervals. The context capacity matrix
 remains a screening set. Separate functional checks of an actual retrieval
 prompt matched Strata's answer, generated tokens and persistent state through

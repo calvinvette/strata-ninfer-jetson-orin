@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **E0–E5 bounded implementation evidence complete; corrected Q2_0 grouped SwiGLU parity restored; one 6-GiB staged TTFT cell passed seven-pair confirmation, while broader E6 exit and E7 release gates remain open (updated 2026-10-26)**.
+Status: **E0–E5 bounded implementation evidence complete; current-source HIP/SYCL builds pass on maestro1; a 6-GiB staged TTFT cell passed seven-pair confirmation, but a new multi-shape screen found unresolved output divergence, so E6 and E7 release gates remain open (updated 2026-10-26)**.
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -118,9 +118,12 @@ profile, with cross-backend state migration, adaptive residency and broader
 quality coverage explicitly excluded. E6's 1K–256K context screen is complete.
 After a grouped SwiGLU precision correction, one short-request 6-GiB staged
 Q2_0 cell passed seven-pair TTFT confirmation, but broader workload/context
-coverage and E6's full performance exit remain open. E7's release assessment
-proposes no general profile; HIP/SYCL
-builds and any future release-candidate soak remain open.
+coverage and E6's full performance exit remain open. A follow-up 8K
+CPU-miss-versus-staged screen found 1,069- and 557-token output hash
+mismatches, so their performance effects are not quality-qualified. Current-
+source HIP/SYCL builds and help checks passed on maestro1, but accelerator
+execution and any release-candidate soak remain open. E7's assessment proposes
+no general profile.
 E2's resident schedule and the earlier E3 staged-miss schedules failed their
 initial performance screens. The
 default remains Strata and the NInfer path remains experimental. Each stage
@@ -567,6 +570,18 @@ to amortize transformation or packing.
 per-model and combined charts include matched controls and uncertainty. Keep
 historical unmatched charts labeled as observations. There is no universal
 "best profile" without evidence across the stated workloads and resource limits.
+
+Execution note (2026-10-26): a balanced three-pair, five-shape comparison of
+CPU miss fallback and strict NInfer staging at 8K found median +7.04% prompt
+TPS, +8.54% decode TPS, −6.56% client TTFT and −7.60% client time for the
+1,069-token cell. The measured output hash differed in all three pairs. The
+557-token cell also had three output mismatches; its median decode TPS rose
+7.99%, but TTFT was effectively unchanged (+0.21%) and client time improved
+2.54%. Shorter shapes showed no useful end-to-end effect. All six arms passed
+API/token-count checks, had identical startup residency maps and retained at
+least 11.42 GiB physical/admission memory. The output divergence has no task
+quality oracle yet, so no seven-pair confirmation or profile promotion is
+justified. See the [staged workload report](../../bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/README.md).
 
 ### E7 — Assess release of the demonstrated integration
 

@@ -85,7 +85,17 @@ E7 assessment proposes no
 general release profile; current-source HIP and SYCL builds and model-free
 help checks have now passed on maestro1, but this is x86 build evidence only,
 not device/runtime qualification. NInfer remains opt-in. See the [E7
-assessment](NINFER_E7_RELEASE_ASSESSMENT.md) and [maestro1 build report](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md). Nsight Systems identified scalar Q2 projections as the
+assessment](NINFER_E7_RELEASE_ASSESSMENT.md) and [maestro1 build report](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md).
+A new balanced three-pair CPU-miss versus strict
+NInfer-staged screen across five 8K workload shapes found a 1,069-token cell
+with median +7.04% prompt TPS, +8.54% decode TPS, −6.56% TTFT and −7.60% client
+time. Its measured output hashes differed in all three pairs; a 557-token cell
+also differed in all three. These are not quality-qualified effects and did
+not advance to seven-pair confirmation. All six processes passed token-count
+checks, matched the same startup residency map, and retained at least 11.42
+GiB physical/admission memory with zero cgroup pressure events. See the [staged
+workload report](../../bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/README.md).
+Nsight Systems identified scalar Q2 projections as the
 main grouped-kernel cost. A packed `dp4a` revision passed grouped parity and
 reduced the 64/128-token operator gap from 12.2× to 4.36×, but remained slower.
 A fresh three-pair 8K service screen showed median NInfer latency changes of
