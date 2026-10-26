@@ -32,11 +32,13 @@ release profile is **not achieved**.
   1.107×/1.120×; a specialized one-entry operator measured 0.980×. The
   operator result is still not an end-to-end win. See the
   [E6 grouped throughput report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md).
-- The first same-day three-pair 8K service screen measured median NInfer latency
-  changes of +0.34% prompt, +1.77% decode, +0.82% client total and +0.36% TTFT;
+- The initial packed-dot and four-entry/single-entry 8K service screens were
+  collected before the grouped SwiGLU precision fix. The packed-dot screen's
+  median NInfer latency changes were +0.34% prompt, +1.77% decode, +0.82%
+  client total and +0.36% TTFT;
   positive values mean slower. Decode was slower in all pairs. The predeclared
-  useful-effect gate failed, so seven-pair confirmation and performance charts
-  with uncertainty were not justified. A subsequent three-pair screen of the
+  useful-effect gate failed, so seven-pair confirmation was not justified for
+  those builds. A subsequent three-pair screen of the
   four-entry/single-entry candidate was also slower: median +2.74% client total
   and +2.70% client TTFT, with NInfer slower in all pairs and outputs/maps
   matching. It did not meet the useful-effect threshold.
@@ -50,10 +52,15 @@ release profile is **not achieved**.
   outlier did not reproduce it; median TTFT/client changes were −1.08%/−0.67%,
   below the 5% screen threshold. See the [corrected capacity screen](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/fixed-swiglu-context-check/README.md)
   and [outlier repeat](../../bench/results/2026-10-25-phase-e6-q2-557-repeat3/README.md).
-  A randomized three-pair 8K screen across all five workload shapes also failed
-  to reach the 5% median TTFT threshold. All measured outputs and resident maps
-  matched, but one 2,048+128 pair had a 32.6% decode-time regression. No
-  seven-pair confirmation was warranted. See the [8K paired screen](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/fixed-swiglu-8k-paired-screen/README.md).
+  The corrected-binary randomized three-pair 8K screen covered
+  five natural-generation shapes and three randomized pairs. All measured
+  outputs and resident maps matched; median TTFT changes ranged from −1.59% to
+  +0.21%, and no cell met the threshold. One 2,048+128 pair had a 32.6%
+  decode-time regression. No seven-pair confirmation was warranted. Its
+  [paired-effect chart](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/fixed-swiglu-8k-paired-screen/q2_0-8k-effects.svg)
+  includes block values and paired-bootstrap intervals; with three blocks,
+  these intervals describe screening uncertainty only. The full [8K report](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/fixed-swiglu-8k-paired-screen/README.md)
+  has CSV/JSON data and reproduction details.
 - The grouped SwiGLU Q8_1 path initially used approximate `__fdividef`, while
   Strata used precise division. On the captured layer-3 expert-94 row this
   changed one Q8_1 code byte despite exact gate/up inputs. Matching Strata's
