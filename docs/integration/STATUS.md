@@ -60,6 +60,10 @@ The same task at 16,384 prompt tokens and 32K context cap also matched exactly
 across backends; minimum available memory was 17.09 GiB with zero cgroup memory
 events. These are two functional retrieval points, not long-context performance
 or general task-quality estimates. See the [16K retrieval report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-16k-retrieval/README.md).
+At 32,768 prompt tokens with a 64K cap, the exact answer, token IDs and all
+nine final state fields also matched; minimum available memory was 16.48 GiB
+with zero cgroup events. This single retrieval task does not qualify 64K
+near-limit ingestion. See the [32K retrieval report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-32k-retrieval/README.md).
 E7 assessment proposes no
 general release profile; HIP/SYCL build evidence is outstanding, and NInfer
 remains opt-in. See the [E7

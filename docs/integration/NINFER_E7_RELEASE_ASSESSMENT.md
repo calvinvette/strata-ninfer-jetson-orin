@@ -88,6 +88,10 @@ release profile is **not achieved**.
   fields, with 17.09 GiB minimum available memory. Both runs are single-task
   functional checks, not long-context performance estimates. See the [16K
   check](../../bench/results/2026-10-25-phase-e5-q2-ninfer-16k-retrieval/README.md),
+  and the same retrieval also passed at an actual 32,768-token prompt under a
+  64K cap, with exact token and final-state parity and 16.48 GiB minimum
+  availability. Near-limit 64K ingestion remains untested. See the [32K
+  check](../../bench/results/2026-10-25-phase-e5-q2-ninfer-32k-retrieval/README.md),
   [E5 closeout](NINFER_E5_CLOSEOUT.md) and the
   [corrected generation checks](../../bench/results/2026-10-25-phase-e5-q2-ninfer-generation-regression/fixed-kernel/README.md).
 - Coder IQ1_M, ISTA-DASLab IQ3_S, staged expert misses, broad task quality and

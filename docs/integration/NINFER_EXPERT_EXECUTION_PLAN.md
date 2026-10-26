@@ -484,6 +484,12 @@ was 17.09 GiB, with no cgroup memory events. Each backend was run once, so
 timings remain functional diagnostics only. Near-limit 32K ingestion and wider
 task coverage remain open. See the [16K retrieval
 report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-16k-retrieval/README.md).
+The actual-prompt check also passed at 32,768 tokens under a 64K cap: both
+backends returned the exact answer and matched token IDs and all nine final
+state fields. Minimum available memory was 16.48 GiB with no cgroup memory
+events. This remains a single retrieval task and not a performance estimate;
+64K near-limit ingestion and broader tasks remain untested. See the [32K
+retrieval report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-32k-retrieval/README.md).
 A pre-fix MTP-off default-Strata/strict-NInfer comparison returned the same
 short-task tokens but showed substantial persistent-state movement. The first
 committed-token GDN relative L2 was 0.0902; layer captures show a small expert
