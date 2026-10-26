@@ -59,13 +59,12 @@ release profile is **not achieved**.
   only for the short measured request; grouped 64/128-token operator timing
   remains slower at 1.098×/1.123×.
 - E5 includes operator and state checks for the bounded static Q2_0 profile.
-  However, a 512-token natural-generation comparison first differed at
-  generated token 9, a 4K retrieval comparison had different persistent-state
-  fingerprints, and a backend capture found numerical state drift. These
-  observations do not prove a quality failure, but they leave task-level
-  equivalence unresolved. Those comparisons predate the SwiGLU precision fix;
-  rerun them on the corrected binary before release assessment. See the
-  [E5 closeout](NINFER_E5_CLOSEOUT.md).
+  Pre-fix natural-generation and 4K retrieval state differences were rerun
+  after the SwiGLU precision fix: two natural-generation runs and one 4K
+  retrieval comparison matched token IDs and all final state fields. This
+  resolves those specific cases, but broader task quality and numerical bounds
+  remain open. See the [E5 closeout](NINFER_E5_CLOSEOUT.md) and the
+  [corrected generation checks](../../bench/results/2026-10-25-phase-e5-q2-ninfer-generation-regression/fixed-kernel/README.md).
 - Coder IQ1_M, ISTA-DASLab IQ3_S, staged expert misses, broad task quality and
   live Strata/NInfer state migration are not supported or qualified by this
   release assessment.

@@ -471,24 +471,22 @@ tokens, with identical token IDs and final persistent state. The single-run
 timings are not an effect estimate. See the [retrieval task report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-retrieval-check/README.md).
 A held-out 4,096-token version also returned the exact answer in both arms, with
 identical tokens and final NInfer state; see the [long retrieval report](../../bench/results/2026-10-25-phase-e5-q2-ninfer-long-retrieval/README.md).
-A separate MTP-off default-Strata/strict-NInfer comparison returned the same
+A pre-fix MTP-off default-Strata/strict-NInfer comparison returned the same
 short-task tokens but showed substantial persistent-state movement. The first
 committed-token GDN relative L2 was 0.0902; layer captures show a small expert
 arithmetic difference at model layer 1 and a larger activation difference by
-layer 2. The same exact-answer and token-ID result held at 4K context, while
-state fingerprints still differed. These are not in-flight backend migration
-tests, but they leave the cross-backend numerical acceptance bound unresolved.
-See the [short state comparison](../../bench/results/2026-10-25-phase-e5-q2-ninfer-backend-regression/README.md)
-and [4K task comparison](../../bench/results/2026-10-25-phase-e5-q2-ninfer-long-backend-regression/README.md).
-A separate 512-token natural-generation task produced coherent but different
-text, with the first token mismatch at generated index 8; see the [generation
-check](../../bench/results/2026-10-25-phase-e5-q2-ninfer-generation-regression/README.md).
-This one sample does not establish quality loss, but it confirms exact retrieval
-text parity does not generalize. This completes the bounded E5 exit only for
-single-backend static Q2_0 services. Exact Strata/NInfer state equivalence and
-live migration are unsupported; wider quality coverage remains open. See the
-[E5 closeout](NINFER_E5_CLOSEOUT.md). Keep NInfer opt-in and do not treat exact
-short-task text as sufficient evidence for other tasks.
+layer 2. The pre-fix 4K task also had different final state, and a pre-fix
+512-token natural-generation task differed at generated token 9. After the
+SwiGLU precision fix, the 512-token retrieval, two repeats of the same natural
+generation task, and the 4K retrieval all matched token IDs and all nine final
+state fields across backends. These reruns resolve those specific discrepancies
+for the corrected binary; broader quality and numerical bounds remain open.
+See the [corrected generation reruns](../../bench/results/2026-10-25-phase-e5-q2-ninfer-generation-regression/fixed-kernel/README.md)
+and [corrected 4K retrieval](../../bench/results/2026-10-25-phase-e5-q2-ninfer-long-backend-regression/fixed-kernel/README.md).
+This completes the bounded E5 exit only for single-backend static Q2_0
+services. Live migration is unsupported; wider quality coverage remains open.
+See the [E5 closeout](NINFER_E5_CLOSEOUT.md). Keep NInfer opt-in and do not
+treat exact short-task text as sufficient evidence for other tasks.
 
 ### E6 — Demonstrate end-to-end performance and context behavior
 

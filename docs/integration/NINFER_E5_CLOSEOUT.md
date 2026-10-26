@@ -43,14 +43,25 @@ for its session; there is no Strata-to-NInfer live-state migration contract.
 
 Fresh Strata-default and strict-NInfer services produced the same exact
 retrieval answers at 512 and 4K, but their persistent-state fingerprints
-differed. Direct GDN comparison at 512 measured relative L2 `0.0902` after the
+initially differed on the pre-fix binary. Direct GDN comparison at 512 measured relative L2 `0.0902` after the
 first committed token and `0.0337` after the full answer. Captures found
 bit-exact layer 0; at layer 1, expert-part relative L2 was `2.94e-8`; at layer
 2, input relative L2 was `7.25e-4` and combined MoE output relative L2 was
 `5.78e-3`. A separate natural-generation sample first differed at token 9 and
-returned coherent, nonidentical prose. These cross-backend deltas are recorded,
-not treated as state parity or a quality failure by themselves. Their quality
-effect outside the tested tasks is unknown.
+returned coherent, nonidentical prose. Those observations were reproduced
+before the grouped SwiGLU precision correction and are retained as historical
+pre-fix evidence.
+
+After the correction, the same 512-token retrieval task passed exact answer,
+token-ID and final-state comparison under the 6-GiB staged profile. Additional
+corrected-binary checks compared Strata and strict NInfer on the former natural-
+generation prompt twice and on the 4K retrieval prompt once. All three
+comparisons matched every generated token ID and all nine final state fields;
+retrieval answers were exact. See the [corrected natural-generation reruns](../../bench/results/2026-10-25-phase-e5-q2-ninfer-generation-regression/fixed-kernel/README.md)
+and [corrected 4K retrieval rerun](../../bench/results/2026-10-25-phase-e5-q2-ninfer-long-backend-regression/fixed-kernel/README.md).
+This narrows the old divergence to the pre-fix build and these tested prompts;
+it does not establish broad task quality or a general cross-backend numerical
+bound. Their quality effect outside the tested tasks remains unknown.
 
 The numerical contract is therefore scoped: accepted-prefix parity is required
 and passed within one static NInfer service across MTP policies; exact state

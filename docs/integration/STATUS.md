@@ -19,17 +19,17 @@ cancellation-state checks and
 MTP-off-versus-MTP-2/MTP-4 accepted-prefix parity runs, plus a three-request
 MTP-4 continuation/recovery state-parity sequence and a 512-token strict-NInfer
 retrieval/arithmetic check and a 4,096-token retrieval/arithmetic check. A
-default-Strata-versus-strict-NInfer pair returned matching short-task tokens
-but showed GDN relative L2 0.0902 at the first committed token and 0.0337 at
-the final boundary; layer captures narrow the first numeric expert difference
-to layer 1 with later activation amplification. A 4K Strata-versus-NInfer task
-also returned matching tokens but different persistent-state fingerprints.
-A 512-token natural-generation pair first differed at generated token 9, with
-coherent but nonidentical prose. This does not establish a quality loss, but
-shows exact retrieval output parity does not generalize. Cross-backend numerical
-state equivalence and live state migration are unsupported; broader quality
-coverage remains open. E5 is complete only for the tested single-live static
-Q2_0 profile. A grouped SwiGLU precision fix restored exact standalone expert
+A pre-fix Strata-versus-strict-NInfer comparison returned matching short-task
+tokens but showed GDN relative L2 0.0902 at the first committed token and 0.0337
+at the final boundary; a pre-fix 4K comparison had different final-state
+fingerprints, and a natural-generation sample first differed at token 9. After
+the grouped SwiGLU precision correction, the short retrieval, two repetitions
+of the same natural-generation prompt, and the 4K retrieval matched all token
+IDs and all nine final state fields across Strata and strict NInfer. These
+reruns supersede those specific pre-fix discrepancies; broader prompt quality
+and a general cross-backend numerical bound remain open. Live state migration
+is unsupported. E5 is complete only for the tested single-live static Q2_0
+profile. A grouped SwiGLU precision fix restored exact standalone expert
 parity and made the 512-token staged Strata/NInfer retrieval check match all
 generated tokens and final-state fields. A seven-pair short-request 6-GiB
 staging confirmation passed its pre-registered TTFT gate: median −5.96%,
