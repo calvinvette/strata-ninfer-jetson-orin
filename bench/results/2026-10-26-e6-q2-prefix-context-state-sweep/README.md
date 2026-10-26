@@ -190,7 +190,12 @@ FP16 scales: `0.00831604` versus `0.00832367`. An independent FP64 oracle for
 rank-0 expert 394 matched each service row against its own activation within
 `5.8e-8` and `8.4e-8` relative L2. The evidence points to a one-block scale
 rounding boundary, caused by the tiny upstream activation difference, as the
-immediate source of the all-expert row delta at this sampled position.
+immediate source of the all-expert row delta at this sampled position. In a
+counterfactual oracle replay, forcing block 61 to the CPU scale for both inputs
+produced identical expert-394 outputs; forcing the staged scale also produced
+identical outputs. Each shared-scale result matched the corresponding original
+oracle output hash, showing that this one scale accounts for the expert-394
+output delta on the captured inputs.
 
 At position 123, model-layer-4 GDN input was `6.50e-4` relative L2 apart. In
 the same all-expert Q8_1 diagnostic, layer-3 QSA at position 125 still had

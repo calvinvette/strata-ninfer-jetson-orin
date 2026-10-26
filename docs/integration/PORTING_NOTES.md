@@ -3202,7 +3202,9 @@ rows then differed and the combined MoE output was `1.156e-3` apart; each
 sampled expert-394 output matched its independent FP64 oracle for its own
 activation. This is a concrete example where matching the activation format
 does not guarantee matching the quantized activation when upstream floats
-differ near a scale boundary.
+differ near a scale boundary. A counterfactual oracle replay using either one
+shared block-61 scale made the two expert-394 outputs identical, isolating the
+scale as the source of that sampled output delta.
 
 For a future Splash port, capture each owner's exact F32 input plus the packed
 activation bytes and scales. Compare both representations before comparing

@@ -5987,4 +5987,6 @@ were exact, so that sampled attention operation adds no delta. [Remaining
 state trace](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#remaining-layer-3-activation-scale-boundary).
 The new Q8_1 capture comparator separates integer-code and FP16-scale changes;
 its four tests pass, and the derived position-123 summary is linked from the
-report.
+report. A counterfactual expert-394 oracle replay forcing either shared block-
+61 scale produced identical outputs across the two captured inputs, confirming
+that scale difference accounts for that row's output delta.

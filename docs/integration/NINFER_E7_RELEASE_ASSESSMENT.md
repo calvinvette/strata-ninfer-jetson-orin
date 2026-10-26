@@ -237,20 +237,15 @@ differences, so this
 does not establish a whole-model numerical contract or change the no-release
 decision.
 
-The all-expert Q8_1 CPU mirror still left `4.686e-2` global GDN relative L2.
-At layer-3 position 123, a `1.59e-7` input delta changed one FP16 activation
-scale although all Q8_1 integer codes matched; ten routed expert rows then
-produced a `1.156e-3` combined-output delta. This shows that activation-format
-matching alone is not a state-parity contract when upstream activations sit
-near a block-scale rounding boundary. [Cross-owner scale trace](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#remaining-layer-3-activation-scale-boundary).
-
-Extending the Q8_1 CPU mirror to every Q2_0 expert retained substantial final
-GDN drift (`4.686e-2` global relative L2). The first material state change was
-GDN ordinal 3/model layer 4. At layer 3 / position 123, the service inputs
-differed by `1.59e-7`; their Q8_1 integer codes matched, but one FP16 scale
-block differed. The resulting ten routed expert rows produced a `1.156e-3`
-combined-output delta, while each sampled expert-394 service result matched its
-own independent oracle. This shows why a per-expert format mirror does not
-guarantee state parity when upstream activations differ near a quantization
-scale boundary. The finding does not create a supported approximate-state
-contract; E7 remains a no-release assessment.
+Extending the Q8_1 CPU mirror to every Q2_0 expert still left `4.686e-2`
+global GDN relative L2; GDN ordinal 3/model layer 4 was the first material
+state difference (`3.16e-3`). At layer 3 / position 123, the service inputs
+differed by `1.59e-7`; their Q8_1 integer codes matched but one FP16 scale
+block differed. All ten routed expert rows then differed and the combined
+output delta was `1.156e-3`. The sampled expert-394 service results matched
+their independent oracles. Forcing either one shared scale in a counterfactual
+expert-394 oracle made both input cases produce identical output. Activation-
+format matching alone therefore does not guarantee state parity when upstream
+activations sit near a scale boundary. This does not create a supported
+approximate-state contract; E7 remains a no-release assessment. [Cross-owner
+scale trace](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#remaining-layer-3-activation-scale-boundary).
