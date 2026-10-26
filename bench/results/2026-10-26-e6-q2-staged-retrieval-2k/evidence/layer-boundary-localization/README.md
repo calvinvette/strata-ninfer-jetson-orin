@@ -42,8 +42,10 @@ the same workload, so these results point to CPU-miss versus GPU execution as
 the relevant boundary for this case. The failed three-pair staged-backend
 performance screen remains unchanged: median decode-rate gain was 0.00%.
 
-The checker now accepts `--capture-gdn-layer L --capture-gdn-position P` to
-capture the existing verifier's GDN and feed-forward intermediate record for
-one layer/position. Reproduce the captures with the commands recorded in the
-matching `supervisor-layer-stage-*` and `supervisor-layer0-moe-capture`
-`result.json` files. The checker's Python syntax check passed before the runs.
+The retrieval checker now accepts `--capture-gdn-layer L --capture-gdn-position P`
+to capture the existing verifier's GDN and feed-forward intermediate record
+for one layer/position. Reproduce the captures with the commands recorded in
+the matching `supervisor-layer-stage-*` and `supervisor-layer0-moe-capture`
+`result.json` files. The same-activation operator checks used the captured
+layer-0 activation, experts 90, 109 and 88, and the local qualified CUDA
+binary. Python syntax/help checks and all three operator checks passed.
