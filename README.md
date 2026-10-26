@@ -48,7 +48,11 @@ seven-pair TTFT gate (−5.96%, paired-bootstrap 95% interval −6.23% to −5.8
 but that effect is limited to its `1+1` workload and does not establish a
 general profile. The [Q2_0 8K paired-effect chart](bench/results/2026-10-25-phase-e6-q2-grouped-throughput/fixed-swiglu-8k-paired-screen/q2_0-8k-effects.svg)
 includes individual pairs and bootstrap intervals. The context capacity matrix
-remains a screening set. No general performance-qualified profile is available,
+remains a screening set. Separate functional checks of an actual retrieval
+prompt matched Strata's answer, generated tokens and persistent state through
+128K input tokens; these are single-task correctness results, not performance
+estimates or near-limit 256K qualification. See the [128K retrieval record](bench/results/2026-10-25-phase-e5-q2-ninfer-128k-retrieval/README.md).
+No general performance-qualified profile is available,
 so this option remains experimental. See the [E6 results](bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md)
 and [full E7 assessment](docs/integration/NINFER_E7_RELEASE_ASSESSMENT.md).
 
