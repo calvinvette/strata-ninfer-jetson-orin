@@ -6056,3 +6056,9 @@ single-token writer nor the batch writer. This rules out a simple file-write
 failure; the capture-path/position mismatch remains unexplained, so the
 residual is still unmeasured and no gate is closed. The pair again failed final
 state parity. See the [telemetry follow-up](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#capture-path-telemetry-follow-up).
+
+The diagnostic source commit `db95a63c874fa0a7cfc9cff450696cd3a9083990`
+rebuilt successfully on Orin CUDA and maestro1 HIP. HIP `strata --help` passed;
+the SYCL target was up to date because this change is confined to the CUDA/HIP
+source tree, and its model-free help also passed with oneAPI/oneMKL initialized.
+maestro1 provides x86_64 compile/startup evidence only. [Backend record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-residual-boundary-capture-telemetry).

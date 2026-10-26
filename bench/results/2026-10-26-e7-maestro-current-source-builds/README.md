@@ -125,3 +125,29 @@ the compiler executable was `build-sycl/sycl/strata` (CMake places it in the
 backend subdirectory). The checkout, toolchains, and binaries were not copied
 into this repository. maestro1 provides no Orin performance or AMD/SYCL
 runtime qualification.
+
+## 2026-10-26 follow-up on residual-boundary capture telemetry
+
+After adding opt-in missing-capture telemetry, the current checkout was
+rebuilt on maestro1 at exact source commit
+`db95a63c874fa0a7cfc9cff450696cd3a9083990`, using one build job. The HIP
+target rebuilt the modified verifier, linked `strata_engine`, compiled the
+final executable, and linked successfully. HIP `strata --help` exited 0 with
+the installed ROCm libraries on `LD_LIBRARY_PATH`. The SYCL build target
+completed successfully; its source tree is separate (`src/sycl` and
+`sycl/include`) and contains no corresponding change from this commit, so the
+target was already up to date. With the installed oneAPI compiler and oneMKL
+environment sourced, SYCL `strata --help` also exited 0. maestro1 is x86_64
+build evidence only; no accelerator was exercised.
+
+| Backend | Source handling | Build target | `--help` | SHA256 |
+| --- | --- | --- | --- | --- |
+| HIP | Recompiled modified `src/core/verify.cpp`, linked engine and executable | Passed, one job | Passed, exit 0 | `c8cf5e49bc69970bb259767cc1650556c442506278d34cd11ee2ee24e46dac43` |
+| SYCL | Separate SYCL source tree unchanged; target up to date | Passed | Passed with oneAPI/oneMKL environment, exit 0 | `aa99a12fc329328e8e1c43bc10b1cb26e6819a5cc0bcd188e5323f4ab90419f0` |
+
+The same commit's CUDA binary was rebuilt on Orin and used for the third
+paired layer-0 / layer-1 localization capture. Its SHA256 was
+`41def6adbd54d4f1dd8e20e4f50ff685ea0248cd3ddb24e36ad0fe1128443051`.
+That paired diagnostic run failed the persistent-state gate and is not a
+performance result. The capture telemetry interpretation and limits are in
+the [E6 layer-boundary report](../2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#capture-path-telemetry-follow-up).

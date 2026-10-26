@@ -914,6 +914,13 @@ unresolved, and the intervening residual remains unmeasured. Both requests
 again failed persistent-state parity. See the [capture-path telemetry
 follow-up](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#capture-path-telemetry-follow-up).
 
+Execution note (2026-10-26): commit `db95a63c874fa0a7cfc9cff450696cd3a9083990`
+rebuilt for Orin CUDA and maestro1 HIP; HIP and SYCL `strata --help` checks
+passed with their runtime environments initialized. SYCL uses a separate
+source tree unaffected by this CUDA/HIP-only diagnostic change. These checks
+do not close E6 correctness or performance gates. See the [backend build
+record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-residual-boundary-capture-telemetry).
+
 Execution note (2026-10-26): the no-trace five-workload staged-miss state
 replay completed one pair. Three of five measured response hashes matched,
 while final persistent-state fingerprints differed on all five paired
