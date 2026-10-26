@@ -117,10 +117,15 @@ Binary SHA256 values:
 
 HIP and SYCL builds remain unverified. Neither compiler was available on the
 Orin or on `maestro1`; the latter had 1.1 GiB free on its root filesystem and
-no HIP/SYCL compiler in PATH or under `/opt`. No storage was removed to make
-space. The NInfer kernel itself is CUDA-only and the HIP/SYCL source sets remain
-unchanged, but the shared-file build requirement has not been met for those
-backends.
+no HIP/SYCL compiler in its login PATH, home directory, or standard `/usr/local`
+and `/opt` locations. `maestro1` is x86_64; it has no `/scratch` mount and
+`/dev/shm` had 1.4 GiB available. No storage was removed to make space. A
+separate historical successful HIP/SYCL build record exists on the original
+Orin port branch at commit `0be090c8`, but it predates this integration's shared
+source changes and is not current-source build evidence. The NInfer kernel
+itself is CUDA-only and HIP/SYCL source sets remain unchanged, but generic
+shared files changed in this integration, so their current-source build gate
+remains open.
 
 ## Sustained service and next entry criteria
 
