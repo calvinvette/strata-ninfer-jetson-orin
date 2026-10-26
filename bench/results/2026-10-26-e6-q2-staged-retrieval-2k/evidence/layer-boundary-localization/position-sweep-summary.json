@@ -116,7 +116,31 @@
     "gdn-state-step-sweep/comparison.json": {
       "sha256": "632bea65f6361ca78adf49eba02f1e6785f87ec34f898096f30f4913ec81d1ba",
       "bytes": 1183
+    },
+    "gdn-recurrence-crossover.json": {
+      "sha256": "897ed83acb8467b2742ae134dbbd6056efc6d20b5e492fec0090ada2a8dad3af",
+      "bytes": 1468
     }
   },
-  "compact_artifacts_root": "../"
+  "compact_artifacts_root": "../",
+  "gdn_recurrence_crossover": {
+    "source": "gdn-recurrence-crossover.json",
+    "route_matched_replays_bitwise": true,
+    "scope": "actual CUDA gdn_step_norm_multi; recurrent state only; gamma zero; normalized output not evaluated",
+    "positions": [
+      2043,
+      2044
+    ],
+    "input_effect_relative_l2_after_2044": {
+      "cpu_start_state": 4.3494758e-08,
+      "staged_start_state": 4.32771906e-08
+    },
+    "initial_state_effect_relative_l2_after_2044": {
+      "cpu_inputs": 1.13673593e-08,
+      "staged_inputs": 1.2114923e-08
+    },
+    "input_fields_that_differ_for_this_replay": "gate and beta; captured h and z are exact at positions 2043 and 2044",
+    "interpretation": "for this two-token sample, swapping captured gate/beta inputs changes recurrent state about 2.6 to 3.8 times as much as swapping the already-different start state; upstream cause and full-model correctness remain open",
+    "gdn_parity_binary_sha256": "587486ac335af0b667ac4d3061287b3671b58854fef4fe5b9f4a6d83e572d6ea"
+  }
 }

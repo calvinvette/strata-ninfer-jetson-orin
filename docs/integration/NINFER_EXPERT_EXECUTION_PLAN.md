@@ -687,6 +687,14 @@ match, but final state does not. This is single-run diagnosis only; the
 arithmetic/state cause, quality bounds and performance effect remain open.
 Details and compact per-position metrics are in the [adjacent-position
 report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#adjacent-position-state-drift-localization).
+A CUDA `gdn_step_norm_multi` crossover replay then reproduced each route's
+committed layer-1 recurrent state bitwise after positions 2043–2044. Swapping
+the captured gate/beta input sequence changed state about 2.6–3.8 times as
+much as swapping the starting state for this two-token sample. Captured `h`
+and `z` were exact; normalized output was not evaluated. This points to the
+gate/beta input delta as the larger local contributor, while its upstream
+cause and full-model quality remain unresolved. See the [crossover
+report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#cuda-recurrence-crossover-replay).
 The shared CPU source rebuilt successfully for HIP and SYCL on maestro1 at
 `44db5484`. HIP CLI help passed; SYCL compiled and linked but could not start
 without a device on this host. This is x86_64 portability evidence only. See

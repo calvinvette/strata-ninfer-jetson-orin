@@ -3142,3 +3142,15 @@ prefix. Sparse operator parity at one token is not enough to establish
 multi-position recurrent-state parity. Use an independent recurrence oracle
 before attributing downstream amplification to the expert backend. See the
 [position-sweep report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#adjacent-position-state-drift-localization).
+
+A CUDA crossover replay of the layer-1 recurrence reproduced each captured
+route's committed state bit for bit. For positions 2043–2044, swapping the
+captured GDN input sequence changed recurrent state about 2.6–3.8 times as much
+as swapping the already-different starting state; the differing inputs here
+were gate/beta, while `h` and `z` matched. The replay set gamma to zero and did
+not evaluate normalized output, so it is a state-only attribution check. For a
+future Splash implementation, add the same crossed-state/crossed-input test
+around the target's recurrent update, validate each route-matched replay
+against committed state, and retain an independent mathematical oracle for
+the full operator. See the [CUDA crossover
+report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#cuda-recurrence-crossover-replay).

@@ -5811,6 +5811,17 @@ were returned but final state remained different; minimum observed memory was
 evidence, and they do not identify the responsible state operation. See the
 [adjacent-position report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#adjacent-position-state-drift-localization).
 
+A CUDA crossover replay now separates layer-1 input and starting-state effects
+for positions 2043–2044. Replaying each route's captured state and `h`/gate/
+beta/`z` inputs through `gdn_step_norm_multi` reproduced its committed
+recurrent state bit for bit. At position 2044, swapping the two-token input
+sequence changed state by `4.33e-8`–`4.35e-8` relative L2; swapping only the
+initial state changed it by `1.14e-8`–`1.21e-8`. The captured `h` and `z` match;
+gate/beta hold the small input deltas. This localizes the stronger effect to
+those GDN inputs for this sample, but not their upstream cause or full-model
+correctness. The GDN parity self-test passed 84 cases. See the [CUDA
+crossover report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#cuda-recurrence-crossover-replay).
+
 The opt-in Q2_0 CPU arithmetic mirror change at `44db5484` rebuilt
 successfully for HIP and SYCL on maestro1 with two build jobs. HIP `strata
 --help` passed. SYCL compile/link passed, but its help startup aborted because

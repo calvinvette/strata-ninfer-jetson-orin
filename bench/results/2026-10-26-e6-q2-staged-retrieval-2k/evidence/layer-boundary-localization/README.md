@@ -120,3 +120,47 @@ beside the local raw captures. Raw arrays and engine logs remain local.
 the checked-in GDN stage summaries from those raw captures;
 [`analyze_ninfer_backend_capture.py`](../../../../../tools/integration/analyze_ninfer_backend_capture.py)
 regenerates the MoE comparisons.
+
+## CUDA recurrence crossover replay
+
+To separate the starting-state difference from the layer-1 input difference,
+`gdn_parity --replay-crossover` replays the actual CUDA
+`gdn_step_norm_multi` kernel for positions 2043 and 2044. Each replay starts
+from the captured committed state after position 2042 and uses the captured
+`h`, gate, beta and `z` values. Swapping the start state and input sequence
+creates four combinations. The two route-matched replays each reproduce their
+captured committed recurrent state after position 2044 bit for bit. This
+validates the capture pairing and the state recurrence replay for this sample.
+
+With the CPU-miss start state held fixed, swapping to the staged inputs changes
+the recurrent state by `4.35e-8` relative L2 after position 2044. With staged
+inputs held fixed, swapping only the captured start state changes it by
+`1.14e-8`. From the staged start state, the corresponding effects are
+`4.33e-8` for input and `1.21e-8` for the start state. After position 2043,
+the input effects are `4.13e-8`–`4.18e-8`, compared with `1.38e-8`–`1.58e-8`
+for the start-state effects. In this two-token sample, the captured GDN inputs
+therefore have roughly 2.6–3.8 times the local effect of the already-existing
+state delta. The layer-1 QKV, convolution `h`, and `z` arrays match at these
+positions; gate and beta contain the small observed deltas, so this crossover
+principally attributes the state change to those gate/beta inputs.
+
+This is a local perturbation result, not a numerical oracle for the full model:
+the replay sets gamma to zero because only recurrent state is compared, and it
+does not evaluate normalized GDN output. It does not explain why gate/beta
+inputs differ upstream or establish either route as the correct result. The
+existing `gdn_parity --selftest` also passed all 84 recurrence cases with zero
+failures. Compact crossover values are in
+[`gdn-recurrence-crossover.json`](gdn-recurrence-crossover.json); raw inputs and
+state captures remain local.
+
+Reproduce on the Orin with the matching captured raw files using:
+
+```bash
+cmake --build build/integration/e0-cuda-build --target gdn_parity --parallel 2
+build/integration/e0-cuda-build/gdn_parity --selftest
+build/integration/e0-cuda-build/gdn_parity --replay-crossover \
+  bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/gdn-state-step-sweep/cpu-miss.gdn-commit \
+  bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/gdn-state-step-sweep/ninfer-staged.gdn-commit \
+  bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer1-position-sweep/cpu-miss.layer1.gdn-diag \
+  bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer1-position-sweep/ninfer-staged.layer1.gdn-diag
+```
