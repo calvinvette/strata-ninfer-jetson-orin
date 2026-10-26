@@ -99,6 +99,25 @@ using Clock = std::chrono::steady_clock;
 constexpr float EPS = 1e-6f;
 constexpr int64_t N = 2560, HC = 4, D = N * HC, LR = 320, K = 10, NE = 512;
 constexpr int64_t C = 10240, ZV = 6144, HV = 48;
+
+struct PrefillQsaCaptureHeaderV1 {
+    char magic[8];
+    uint32_t version;
+    int32_t layer;
+    int64_t position;
+    uint64_t n_embd, q_width, idx_width, kv_width, cap;
+    int32_t token, reserved;
+};
+static_assert(sizeof(PrefillQsaCaptureHeaderV1) == 72, "STQPF1 header layout changed");
+struct PrefillQsaKvCaptureHeaderV1 {
+    char magic[8];
+    uint32_t version;
+    int32_t layer;
+    int64_t position;
+    uint64_t n_kv, head_dim, capacity;
+    int32_t token, valid_count;
+};
+static_assert(sizeof(PrefillQsaKvCaptureHeaderV1) == 56, "STQKVD1 header layout changed");
 // plan v0.3 P6: staging holds the largest blob of the pack (a native pack's blobs differ per layer)
 inline int64_t MAXBLOB() { return (int64_t) strata::kernels::cpu::expert_layout().max_blob; }
 constexpr int STAGE = 8;           // host->device expert staging ring (chunks below stream_all_min())
@@ -1998,6 +2017,39 @@ bool Prefill::run_impl(const int64_t* tokens, int64_t n, int64_t pos0, std::stri
     strata::kernels::QsaShapes s = strata::kernels::qsa_real_shapes();
     s.n_head = g.n_head; s.n_head_kv = g.n_head_kv; s.head_dim = g.head_dim; s.idx_n_head = g.idx_q_heads;
     s.idx_dim = g.idx_key_dim;
+    const char* qsa_capture_layer_text = std::getenv("STRATA_PREFILL_QSA_LAYER");
+    const char* qsa_capture_position_text = std::getenv("STRATA_PREFILL_QSA_POSITION");
+    const char* qsa_capture_path = std::getenv("STRATA_PREFILL_QSA_PATH");
+    const char* qsa_capture_kv_text = std::getenv("STRATA_PREFILL_QSA_KV");
+    const bool qsa_capture_kv = qsa_capture_kv_text != nullptr && qsa_capture_kv_text[0] != '\0' &&
+                               std::strcmp(qsa_capture_kv_text, "0") != 0;
+    const bool qsa_capture_requested = qsa_capture_layer_text != nullptr ||
+                                      qsa_capture_position_text != nullptr || qsa_capture_path != nullptr;
+    int64_t qsa_capture_layer = -1, qsa_capture_position = -1;
+    if (qsa_capture_requested) {
+        if (qsa_capture_layer_text == nullptr || qsa_capture_position_text == nullptr ||
+            qsa_capture_path == nullptr || *qsa_capture_path == '\0') {
+            err = "prefill: QSA capture requires layer, position and a nonempty path";
+            return false;
+        }
+        char* layer_end = nullptr;
+        char* position_end = nullptr;
+        errno = 0;
+        const long parsed_layer = std::strtol(qsa_capture_layer_text, &layer_end, 10);
+        const long long parsed_position = std::strtoll(qsa_capture_position_text, &position_end, 10);
+        if (errno != 0 || layer_end == qsa_capture_layer_text || *layer_end != '\0' ||
+            position_end == qsa_capture_position_text || *position_end != '\0' || parsed_position < 0 ||
+            parsed_layer < LB || parsed_layer >= LE ||
+            !core::is_qsa_layer(g, parsed_layer)) {
+            err = "prefill: QSA capture layer or position is invalid for this prompt stage";
+            return false;
+        }
+        qsa_capture_layer = parsed_layer;
+        qsa_capture_position = parsed_position;
+        std::fprintf(stderr, "strata prefill: QSA capture armed for layer %lld position %lld (request positions %lld..%lld)\n",
+                     (long long) qsa_capture_layer, (long long) qsa_capture_position,
+                     (long long) pos0, (long long) (pos0 + n - 1));
+    }
     // read once (STRATA_KV_PREFETCH=1/0: the next streamed layer's KV prefix is staged on its own stream)
     static const bool kv_prefetch_on = [] {
         const char* e = std::getenv("STRATA_KV_PREFETCH");
@@ -2605,6 +2657,10 @@ bool Prefill::run_impl(const int64_t* tokens, int64_t n, int64_t pos0, std::stri
                     ++gdn_index;
                 } else if (half == 0) {
                     // ======================= QSA =======================
+                    if (qsa_capture_requested && l == qsa_capture_layer)
+                        std::fprintf(stderr, "strata prefill: QSA layer %lld chunk positions %lld..%lld (target %lld)\n",
+                                     (long long) l, (long long) p0, (long long) (p0 + T - 1),
+                                     (long long) qsa_capture_position);
                     const core::QsaState& st = ss.qsa_states[qsa_index];
                     const core::WeightRef *wq = need(v, "attn_q.weight", err), *wk = need(v, "attn_k.weight", err),
                                           *wv = need(v, "attn_v.weight", err), *wo = need(v, "attn_output.weight", err),
@@ -2832,6 +2888,112 @@ bool Prefill::run_impl(const int64_t* tokens, int64_t n, int64_t pos0, std::stri
                     const int64_t ld_a = pf_pad() && T >= std::max<int64_t>(pf_switch_min_t(), 64) ? ZV + ZV_PAD : 0;
                     gate_attn(m.attn, m.Qf, m.attn_h, T, m.cs, ld_a);
                     if (!native_proj(m.gemm, wo, m.attn_h, m.bo, T, v.name("attn_output.weight"), err, 0, ld_a)) return false;
+                    if (qsa_capture_requested && l == qsa_capture_layer && qsa_capture_position >= p0 &&
+                        qsa_capture_position < p0 + T) {
+                        const int64_t t = qsa_capture_position - p0;
+                        const size_t q_width = (size_t) g.n_head * (size_t) g.head_dim;
+                        const size_t idx_width = (size_t) g.idx_q_heads * (size_t) g.idx_key_dim;
+                        const size_t kv_width = (size_t) g.n_head_kv * (size_t) g.head_dim;
+                        const size_t kv_count = (size_t) m.cap * kv_width;
+                        if (tokens[t] < INT32_MIN || tokens[t] > INT32_MAX ||
+                            kv_count > SIZE_MAX / (2 * sizeof(float))) {
+                            err = "prefill: selected QSA capture dimensions or token ID are invalid";
+                            return false;
+                        }
+                        std::vector<float> input((size_t) N), query(q_width), index_query(idx_width),
+                            key(kv_width), value(kv_width), attention(q_width), projected((size_t) N),
+                                           selected_kv(qsa_capture_kv ? 2 * kv_count : 0);
+                        std::vector<int32_t> selection((size_t) m.cap);
+                        std::vector<uint16_t> gated(q_width);
+                        const int64_t gate_stride = ld_a > 0 ? ld_a : ZV;
+                        for (size_t i = 0; i < q_width; ++i)
+                            gated[i] = m.attn_h[(size_t) t * (size_t) gate_stride + i];
+                        float* selected_kv_device = nullptr;
+                        const size_t selected_kv_bytes = selected_kv.size() * sizeof(float);
+                        if (qsa_capture_kv && cudaMalloc((void**) &selected_kv_device, selected_kv_bytes) != cudaSuccess) {
+                            err = "prefill: could not allocate selected QSA KV capture buffer";
+                            return false;
+                        }
+                        if (qsa_capture_kv)
+                            strata::kernels::qsa_capture_selected_kv(pools, m.sel_ids + (size_t) t * (size_t) m.cap,
+                                m.steps_dev + t * strata::kernels::kStepCount, m.cap, s, selected_kv_device, m.cs);
+                        const int32_t* selected_steps = m.steps_dev + t * strata::kernels::kStepCount;
+                        const bool copied = cudaStreamSynchronize(m.cs) == cudaSuccess &&
+                            cudaMemcpy(input.data(), m.mixed + (size_t) t * (size_t) N, (size_t) N * sizeof(float), cudaMemcpyDeviceToHost) == cudaSuccess &&
+                            cudaMemcpy(query.data(), m.q + (size_t) t * q_width, q_width * sizeof(float), cudaMemcpyDeviceToHost) == cudaSuccess &&
+                            cudaMemcpy(index_query.data(), m.q_idx + (size_t) t * idx_width, idx_width * sizeof(float), cudaMemcpyDeviceToHost) == cudaSuccess &&
+                            cudaMemcpy(key.data(), m.Kc + (size_t) t * kv_width, kv_width * sizeof(float), cudaMemcpyDeviceToHost) == cudaSuccess &&
+                            cudaMemcpy(value.data(), m.Vc + (size_t) t * kv_width, kv_width * sizeof(float), cudaMemcpyDeviceToHost) == cudaSuccess &&
+                            cudaMemcpy(selection.data(), m.sel_ids + (size_t) t * (size_t) m.cap, (size_t) m.cap * sizeof(int32_t), cudaMemcpyDeviceToHost) == cudaSuccess &&
+                            cudaMemcpy(attention.data(), m.attn + (size_t) t * q_width, q_width * sizeof(float), cudaMemcpyDeviceToHost) == cudaSuccess &&
+                            cudaMemcpy(projected.data(), m.bo + (size_t) t * (size_t) N, (size_t) N * sizeof(float), cudaMemcpyDeviceToHost) == cudaSuccess &&
+                            (!qsa_capture_kv || cudaMemcpy(selected_kv.data(), selected_kv_device, selected_kv_bytes,
+                                                            cudaMemcpyDeviceToHost) == cudaSuccess);
+                        cudaFree(selected_kv_device);
+                        if (!copied) {
+                            err = "prefill: could not copy selected QSA prompt capture";
+                            return false;
+                        }
+                        PrefillQsaCaptureHeaderV1 header{};
+                        std::memcpy(header.magic, "STQPFD1", sizeof(header.magic));
+                        header.version = 1;
+                        header.layer = (int32_t) l;
+                        header.position = qsa_capture_position;
+                        header.n_embd = N;
+                        header.q_width = q_width;
+                        header.idx_width = idx_width;
+                        header.kv_width = kv_width;
+                        header.cap = (uint64_t) m.cap;
+                        header.token = (int32_t) tokens[t];
+                        header.reserved = (st.kv_rot ? 1 : 0) | (st.kv_hybrid ? 2 : 0);
+                        std::FILE* dump = std::fopen(qsa_capture_path, "wb");
+                        bool written = dump != nullptr;
+                        if (written) {
+                            written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
+                                std::fwrite(input.data(), sizeof(float), input.size(), dump) == input.size() &&
+                                std::fwrite(query.data(), sizeof(float), query.size(), dump) == query.size() &&
+                                std::fwrite(index_query.data(), sizeof(float), index_query.size(), dump) == index_query.size() &&
+                                std::fwrite(key.data(), sizeof(float), key.size(), dump) == key.size() &&
+                                std::fwrite(value.data(), sizeof(float), value.size(), dump) == value.size() &&
+                                std::fwrite(selection.data(), sizeof(int32_t), selection.size(), dump) == selection.size() &&
+                                std::fwrite(attention.data(), sizeof(float), attention.size(), dump) == attention.size() &&
+                                std::fwrite(gated.data(), sizeof(uint16_t), gated.size(), dump) == gated.size() &&
+                                std::fwrite(projected.data(), sizeof(float), projected.size(), dump) == projected.size();
+                            if (std::fflush(dump) != 0) written = false;
+                            if (std::fclose(dump) != 0) written = false;
+                        }
+                        if (!written) {
+                            err = "prefill: could not write QSA prompt-stage capture";
+                            return false;
+                        }
+                        if (qsa_capture_kv) {
+                            PrefillQsaKvCaptureHeaderV1 kv_header{};
+                            std::memcpy(kv_header.magic, "STQKVD1", sizeof(kv_header.magic));
+                            kv_header.version = 1;
+                            kv_header.layer = (int32_t) l;
+                            kv_header.position = qsa_capture_position;
+                            kv_header.n_kv = (uint64_t) g.n_head_kv;
+                            kv_header.head_dim = (uint64_t) g.head_dim;
+                            kv_header.capacity = (uint64_t) m.cap;
+                            kv_header.token = (int32_t) tokens[t];
+                            kv_header.valid_count = selected_steps[strata::kernels::kStepWidth];
+                            const std::string kv_path = std::string(qsa_capture_path) + ".kv";
+                            dump = std::fopen(kv_path.c_str(), "wb");
+                            written = dump != nullptr;
+                            if (written) {
+                                written = std::fwrite(&kv_header, sizeof(kv_header), 1, dump) == 1 &&
+                                    std::fwrite(selected_kv.data(), sizeof(float), selected_kv.size(), dump) == selected_kv.size();
+                                if (std::fflush(dump) != 0) written = false;
+                                if (std::fclose(dump) != 0) written = false;
+                            }
+                            if (!written) {
+                                err = "prefill: could not write selected QSA prompt K/V capture";
+                                return false;
+                            }
+                        }
+                        std::fprintf(stderr, "strata prefill: captured QSA prompt layer %lld position %lld -> %s\n",
+                                     (long long) l, (long long) qsa_capture_position, qsa_capture_path);
+                    }
                     ++qsa_index;
                     if (!kv_prefetch_after(l + 1, qsa_index)) return false;
                 } else {

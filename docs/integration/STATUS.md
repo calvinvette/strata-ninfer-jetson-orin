@@ -75,10 +75,12 @@ ordinal 5/model layer 6 as the prompt changed. At 128 tokens, sampled model
 layer-2 MoE output differed by `1.00e-7` relative L2, while the subsequent
 model-layer-3 MoE input differed by `5.47e-4`; model layer 3 is a QSA block.
 The opt-in residual-boundary capture measured only `5.50e-8` at the post-read
-QSA input, bracketing the amplification inside the QSA attention/residual path
-before its MoE; internal QSA stages remain uncaptured. These are diagnostics, not quality or timing
-evidence; minimum available memory was 11.43–11.52 GiB. See the [prefix state
-sweep](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md).
+QSA input. A later paired capture at model layer 3 / position 123 found exact
+selected K/V, attention, gate and projection outputs; the QSA input and index
+query differed by `1.84e-7` and `1.18e-7` relative L2. This sampled QSA step did
+not explain the persistent-state mismatch. These are diagnostics, not quality
+or timing evidence; minimum available memory was 11.36 GiB. See the [prefix
+state sweep](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md).
 A held-out exact-answer retrieval/arithmetic check at an actual 8,192-token
 prompt then matched the Strata and strict-NInfer token IDs and all nine final
 state fields. Both returned the three codes and suffix sum exactly; minimum

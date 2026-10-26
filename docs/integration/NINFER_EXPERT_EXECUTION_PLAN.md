@@ -137,13 +137,16 @@ requests. A preregistered 1,069-token task-quality diagnostic also completed;
 both backends met its content/length criteria but both missed the required
 opening word. The task therefore does not qualify either arm or resolve the
 output mismatches. Performance confirmation and profile promotion remain
-deferred. The latest position-123 QSA trace attempt could not observe that
-prompt position because the verifier capture covers only its final windows;
-QSA instrumentation in the prompt-prefill path is the next useful correctness
-diagnostic. See the [staged-miss report and
+deferred. The position-123 QSA trace initially missed its target because its
+row filter was recorded into a reusable CUDA graph before current positions
+were staged. The opt-in trace now stages positions before graph recording and
+rebuilds the window graph; a paired capture at model layer 3 / position 123
+found exact selected K/V and attention outputs, with only F32-scale upstream
+input deltas. Final persistent state still differs, so the correctness gate
+remains open. See the [staged-miss report and
 diagnostic](../../bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/README.md),
 [task-quality check](../../bench/results/2026-10-26-e6-q2-quality-1069-512/README.md),
-and [position-123 trace report](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#position-123-qsa-prompt-capture-attempt).
+and [position-123 trace report](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#position-123-qsa-trace).
 
 Execution note (2026-10-26): a repeated position-123 trace found the only
 material layer-2 expert-row delta in expert 114. An opt-in CPU Q8_1 dot

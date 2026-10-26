@@ -209,11 +209,16 @@ def main() -> int:
             arm_env['STRATA_VERIFY_DUMP_BOUNDARY_PATH'] = str(
                 (a.output / f'{name}.boundary').resolve())
         if a.capture_qsa_layer is not None:
+            arm_env['STRATA_PREFILL_QSA_LAYER'] = str(a.capture_qsa_layer)
+            arm_env['STRATA_PREFILL_QSA_POSITION'] = str(a.capture_qsa_position)
+            arm_env['STRATA_PREFILL_QSA_PATH'] = str(
+                (a.output / f'{name}.prefill.qsa').resolve())
             arm_env['STRATA_VERIFY_DUMP_QSA_LAYER'] = str(a.capture_qsa_layer)
             arm_env['STRATA_VERIFY_DUMP_QSA_POSITION'] = str(a.capture_qsa_position)
             arm_env['STRATA_VERIFY_DUMP_QSA_PATH'] = str(
                 (a.output / f'{name}.qsa').resolve())
             if a.capture_qsa_kv:
+                arm_env['STRATA_PREFILL_QSA_KV'] = '1'
                 arm_env['STRATA_VERIFY_DUMP_QSA_KV'] = '1'
         engine = StrataEngine(str(a.engine.resolve()), command, cwd=cfg.get('cwd'),
                               log=str(log), env=arm_env)

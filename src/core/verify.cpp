@@ -3015,6 +3015,27 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
     SessionState& ss = *ss_;
     if (pos0 + T > ss.qsa_states[ss.qsa_primary()].max_cells) { err = "verify: the window runs past the context"; return false; }
     refresh_ar();
+    if (qsa_diag_h_ != nullptr) {
+        // The diagnostic copy rows are selected while the CUDA graph is recorded. Refresh inputs first,
+        // then rebuild this opt-in graph so the position filter sees the current window's positions.
+        if (!staged_) stage_inputs(T, tokens, pos0);
+        if (exec_[T] != nullptr) {
+            const cudaError_t de = cudaGraphExecDestroy(exec_[T]);
+            if (de != cudaSuccess) {
+                err = std::string("verify: could not refresh opt-in QSA graph: ") + cudaGetErrorString(de);
+                return false;
+            }
+            exec_[T] = nullptr;
+        }
+        if (exec_nr_[T] != nullptr) {
+            const cudaError_t de = cudaGraphExecDestroy(exec_nr_[T]);
+            if (de != cudaSuccess) {
+                err = std::string("verify: could not refresh no-replay QSA graph: ") + cudaGetErrorString(de);
+                return false;
+            }
+            exec_nr_[T] = nullptr;
+        }
+    }
     if (!capture(T, err) || !capture_commit(err)) return false;
     VDBG("captured; staging\n");
     const Clock::time_point t0 = Clock::now();

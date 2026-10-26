@@ -222,23 +222,34 @@ python3 tools/integration/compare_q8_1_activation_capture.py \
   --output bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/layer3-position123-q8_1-summary.json
 ```
 
-### Position-123 QSA prompt-capture attempt
+### Position-123 QSA trace
 
-Two supervised retries targeted the QSA stages at model layer 3 / prompt
-position 123, with selected historical K/V enabled and the all-Q2_0 CPU Q8_1
-mirror on the CPU-miss arm. Both runs kept token IDs equal but retained the
-expected final-state mismatch; minimum available/admission memory was 11.39
-GiB. The capture initialized, but neither run wrote QSA-stage or selected-K/V
-records for position 123, so no QSA comparison can be reported. Engine logs
-show the verifier processed only the final two-token and one-token windows;
-position 123 of the 128-token prompt was already consumed by prompt prefill.
-The QSA capture hook is in verifier code and does not observe that earlier
-prefill pass. A temporary verifier-only capture experiment did not change this
-limitation and was discarded; the source tree was restored and the current
-CUDA binary rebuilt from it. The next useful trace must instrument the QSA
-stages in `src/prefill/prefill.cpp` (or otherwise capture them during prompt
-prefill). These attempts are localization-tool diagnostics only, not quality
-or performance evidence. Raw files and supervisor logs remain local-only.
+The first two supervised retries requested model-layer-3 position 123 but did
+not write QSA records. The position was in a verifier window, not the logged
+prompt-prefill chunk: prefill covered positions 0–120 and verifier windows
+started at 121. The missed record came from CUDA graph reuse. The diagnostic
+selected rows while recording a graph, before the window positions were staged;
+that graph was then reused for later windows. For the opt-in QSA trace only,
+the verifier now stages positions before graph recording and rebuilds the
+window graph so its row filter reflects each window. This capture mode covers
+the standard verifier path; batch-row QSA records remain outside its tested
+scope. A separate opt-in prefill hook remains available for positions that are
+actually processed by prefill.
+
+The corrected paired trace captured model layer 3 / position 123 (token 198)
+with the all-Q2_0 CPU Q8_1 selector enabled on the CPU-miss arm. Selection IDs
+matched. All 63,488 selected historical K values and all 63,488 selected V
+values were bit-identical. QSA query, current K/V, attention, gated attention
+and projection were also bit-identical. QSA input differed by relative L2
+`1.84e-7`, the index query by `1.18e-7`, and the MoE input by `1.59e-7`.
+This says the sampled QSA attention/cache operation is not amplifying the small
+upstream delta at this position. It does not establish whole-prompt parity:
+the run still returned equal token IDs but different GDN, PLE, tail, pooled,
+pooled-full and KV final-state fingerprints. The run completed in 63.2 seconds
+with 11.36 GiB minimum available/admission memory; clocks were observed only,
+EMC was inaccessible and energy was not measured. This is localization evidence,
+not a quality or performance result. The derived field metrics are in
+[`128-qsa-stages/run25/qsa-summary.json`](128-qsa-stages/run25/qsa-summary.json); raw captures and supervisor output remain local-only.
 
 ## Expert 114 CUDA operator check
 
