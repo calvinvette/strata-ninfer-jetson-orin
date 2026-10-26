@@ -3154,3 +3154,10 @@ around the target's recurrent update, validate each route-matched replay
 against committed state, and retain an independent mathematical oracle for
 the full operator. See the [CUDA crossover
 report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#cuda-recurrence-crossover-replay).
+
+When diagnosing an upstream recurrent-state delta, cross each changed input
+field independently while holding the initial state and all other fields
+fixed. In the sampled Strata GDN trace, gate alone had a larger local state
+effect than beta, and their combined effect was not additive. This field-level
+split is a useful addition to Splash recurrence parity tests; it remains a
+local attribution, not a general operator or end-to-end correctness bound.

@@ -698,7 +698,7 @@ This points to gate as the larger isolated contributor in this sample, while
 its upstream cause and full-model quality remain unresolved. See the [crossover
 report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#cuda-recurrence-crossover-replay).
 The CUDA/HIP-compatible parity source rebuilt and linked for HIP on maestro1
-at `61e9335f` with two jobs. The configured SYCL parity target uses a separate,
+at `cc8d1faf` with two jobs. The configured SYCL parity target uses a separate,
 unchanged `sycl/src/kernels/gdn_parity.cpp`, so this source change did not
 require a SYCL rebuild. These are x86_64 compile/link boundaries only. See
 the [backend build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-the-q2_0-cpu-arithmetic-mirror).
