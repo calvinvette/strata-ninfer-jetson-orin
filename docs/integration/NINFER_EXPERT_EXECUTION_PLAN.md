@@ -615,15 +615,19 @@ at most `6e-8`, and the combined MoE output differed by `1.53e-7` relative L2.
 The first GDN state mismatch is state layer 1 at `1.61e-5` relative L2. This
 places the earliest observed drift near first-layer aggregation/state update,
 but does not identify the operation responsible.
-An exact-tokenized 512/1,024/1,536-token prefix sweep subsequently confirmed
-CPU-miss/staged final-state divergence at all three lengths. GDN global
-relative L2 was `0.03431`, `0.03098` and `0.04960`; the first GDN ordinal
-above `1e-5` relative L2 was ordinal 3/model layer 4 for the first two prefixes
-and ordinal 5/model layer 6 for the 1,536-token prefix. Ordinal 4/model layer 5
-was near exact at 1,536 tokens. This shows the first visible divergence moves
-with prompt content and is not a monotonic context-length effect. These
-one-token state diagnostics do not provide task-quality or performance
-evidence; minimum available memory was 11.43–11.52 GiB. See the [prefix state
+An exact-tokenized 128/256/512/1,024/1,536-token prefix sweep subsequently
+confirmed CPU-miss/staged final-state divergence at every length; at 256 tokens
+the single generated token differed as well. GDN global relative L2 ranged
+from `0.03098` to `0.06257`; the first GDN ordinal above `1e-5` relative L2
+moved between ordinal 3/model layer 4 and ordinal 5/model layer 6 with prompt
+content. At 128 tokens, model-layer-2 MoE input/output deltas were only
+`6.87e-8`/`1.00e-7` relative L2, while the captured model-layer-3 MoE input
+was `5.47e-4` apart. A new opt-in residual-boundary capture found only
+`5.50e-8` relative L2 at the post-read input to model layer 3, so amplification
+occurs within the subsequent QSA attention/residual path before its MoE.
+Internal QSA stages remain uncaptured, so the responsible operation is unknown.
+These one-token state diagnostics do not provide task-quality or performance evidence; minimum
+available memory was 11.43–11.52 GiB. See the [prefix state
 sweep](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md).
 The same exact-answer held-out retrieval passed token and residency-map checks
 at 4K and 8K prompts on CPU-miss and strict staged routes. Final state hashes

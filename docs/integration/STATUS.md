@@ -65,13 +65,16 @@ variation, but its cause and the original multi-workload cross-arm mismatches
 remain unexplained. No quality oracle has passed for these staged-miss cells,
 so performance confirmation and profile promotion remain deferred pending a
 full workload-order replay and held-out quality task.
-An additional 512/1,024/1,536-token prefix state sweep found matching single
-output-token IDs but persistent-state mismatches in every CPU-miss/staged pair.
-GDN global relative L2 was 0.03098–0.04960. The first GDN ordinal above
-`1e-5` relative L2 was ordinal 3/model layer 4 at 512 and 1,024 tokens, but
-ordinal 5/model layer 6 at 1,536 tokens; ordinal 4/model layer 5 was near exact
-in that last sample. This makes the drift prompt-dependent and confirms it is
-not confined to the 2K prefix. These are diagnostics, not quality or timing
+An additional exact-prefix state sweep at 128, 256, 512, 1,024 and 1,536
+tokens found persistent-state mismatch at every length; the one generated token
+also differed at 256 tokens. GDN global relative L2 was 0.03098–0.06257. The
+first GDN ordinal above `1e-5` moved between ordinal 3/model layer 4 and
+ordinal 5/model layer 6 as the prompt changed. At 128 tokens, sampled model
+layer-2 MoE output differed by `1.00e-7` relative L2, while the subsequent
+model-layer-3 MoE input differed by `5.47e-4`; model layer 3 is a QSA block.
+The opt-in residual-boundary capture measured only `5.50e-8` at the post-read
+QSA input, bracketing the amplification inside the QSA attention/residual path
+before its MoE; internal QSA stages remain uncaptured. These are diagnostics, not quality or timing
 evidence; minimum available memory was 11.43–11.52 GiB. See the [prefix state
 sweep](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md).
 A held-out exact-answer retrieval/arithmetic check at an actual 8,192-token

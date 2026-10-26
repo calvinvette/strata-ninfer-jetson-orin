@@ -1,0 +1,138 @@
+{
+  "schema": 1,
+  "classification": "state-drift localization; not quality or performance evidence",
+  "prompt_tokens": 128,
+  "position": 127,
+  "token_id": 271,
+  "model_layer2_moe": {
+    "routes_equal": true,
+    "input_relative_l2": 6.866836141947888e-08,
+    "expert_parts_relative_l2": 6.530593765723389e-08,
+    "differing_expert_rows": 4,
+    "combined_output_relative_l2": 1.0002293325784771e-07,
+    "max_route_weight_abs_delta": 2.9799999995416826e-08
+  },
+  "model_layer3_moe": {
+    "routes_equal": true,
+    "input_relative_l2": 0.0005470073899396537,
+    "expert_parts_relative_l2": 0.007830016525312606,
+    "combined_output_relative_l2": 0.00650906011858167,
+    "max_route_weight_abs_delta": 2.800680000000777e-05
+  },
+  "model_layer4_gdn": {
+    "x": {
+      "exact": false,
+      "relative_l2": 0.004368696395730707,
+      "max_abs": 0.010219931602478027
+    },
+    "qkv": {
+      "exact": false,
+      "relative_l2": 0.004826611472594875,
+      "max_abs": 0.02181267738342285
+    },
+    "h": {
+      "exact": false,
+      "relative_l2": 0.0035925788813232612,
+      "max_abs": 0.0024407394230365753
+    },
+    "gate": {
+      "exact": false,
+      "relative_l2": 0.0013029632278905852,
+      "max_abs": 0.006356239318847656
+    },
+    "beta": {
+      "exact": false,
+      "relative_l2": 0.000846500226728993,
+      "max_abs": 0.0014388561248779297
+    },
+    "y": {
+      "exact": false,
+      "relative_l2": 0.004756548359596306,
+      "max_abs": 0.0035534948110580444
+    },
+    "gdn_out": {
+      "exact": false,
+      "relative_l2": 0.009131155112679803,
+      "max_abs": 0.002417653799057007
+    },
+    "ffn_y": {
+      "exact": false,
+      "relative_l2": 0.011792437494241163,
+      "max_abs": 0.000486547127366066
+    }
+  },
+  "limits": "model-layer-3 QSA internals, residual boundary and direct preceding-to-following activation link not captured; attribution remains bounded to the interval",
+  "capture_sha256": {
+    "cpu-miss.layer3.input": "245d6b57f3658f2191ce3fd7b9eaad649c3a8a2bbdf4c55e22906241001558c2",
+    "ninfer-staged.layer3.input": "d69a8b87d2b1e72d931e74da2d35ef50a0ebf5d6b71c01f4a29c7a0e363dec97",
+    "cpu-miss.layer3.parts": "5966c3f1778dba7272ae4fb19c8fb618dbe94e0487b1efb76466cd8743200ca7",
+    "ninfer-staged.layer3.parts": "4e827475b86ca03aa6b8152c7e3dfa3072654d903e8aa9bdd60a1c14053c1af6",
+    "cpu-miss.layer4.gdn-diag": "14289eac91de037e9194be62be8c300c26b8db3eae2a557f8c77f4abd85f29a5",
+    "ninfer-staged.layer4.gdn-diag": "b4e2f2710c0a3c206501271dfee28b5259948ce7de78a57f7c6b577f00403917",
+    "cpu-miss.layer2.input": "2d2fd2d8ad3541cef55e68cd0f097b262776dc219dc4c9bdea7dd07e532f673c",
+    "ninfer-staged.layer2.input": "c7165d714e1c925a4dccb1c9b63fdb9eb204a91512017f8a48aaa818b73955eb",
+    "cpu-miss.layer2.parts": "741559a08927151f48c4a349e9e155a07e047308cbdd27222af70647311f0a1f",
+    "ninfer-staged.layer2.parts": "e7cd07f1b5d3c3e4e129eb6844f7c4e55810890df22f70b07b5669deed48d0cd"
+  },
+  "residual_boundary_capture": {
+    "header": {
+      "layer": 2,
+      "position": 127,
+      "n_embd": 2560,
+      "hc": 4,
+      "token": 271,
+      "slot": -1
+    },
+    "fields": {
+      "layer_output_rt": {
+        "count": 10240,
+        "different": 3396,
+        "relative_l2": 1.3607200283827228e-08,
+        "max_abs": 3.725290298461914e-09
+      },
+      "layer_output_moe": {
+        "count": 2560,
+        "different": 1805,
+        "relative_l2": 1.0002293325784772e-07,
+        "max_abs": 7.450580596923828e-09
+      },
+      "layer_output_inj2": {
+        "count": 4,
+        "different": 0,
+        "relative_l2": 0.0,
+        "max_abs": 0.0
+      },
+      "next_layer_rt": {
+        "count": 10240,
+        "different": 3396,
+        "relative_l2": 1.3607200283827228e-08,
+        "max_abs": 3.725290298461914e-09
+      },
+      "next_layer_moe": {
+        "count": 2560,
+        "different": 1805,
+        "relative_l2": 1.0002293325784772e-07,
+        "max_abs": 7.450580596923828e-09
+      },
+      "next_layer_inj2": {
+        "count": 4,
+        "different": 0,
+        "relative_l2": 0.0,
+        "max_abs": 0.0
+      },
+      "next_layer_postread_rt": {
+        "count": 10240,
+        "different": 5119,
+        "relative_l2": 3.72350248034684e-08,
+        "max_abs": 7.450580596923828e-09
+      },
+      "next_layer_xn": {
+        "count": 10240,
+        "different": 4668,
+        "relative_l2": 5.5013849017716555e-08,
+        "max_abs": 7.152557373046875e-07
+      }
+    },
+    "interpretation": "Matched values at the layer-2 output and layer-3 pre-read input remain close. The post-read layer-3 input is also close. The captured layer-3 MoE input differs much more, placing amplification after the captured QSA input and before the layer-3 MoE; QSA internals and intervening residual operations are not captured."
+  }
+}

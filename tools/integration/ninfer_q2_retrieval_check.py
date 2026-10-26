@@ -51,6 +51,10 @@ def main() -> int:
                     help='capture committed GDN state at one GDN layer')
     ap.add_argument('--capture-gdn-commit-positions', type=int, nargs='+',
                     help='filter committed GDN state to several increasing token positions')
+    ap.add_argument('--capture-boundary-layer', type=int,
+                    help='capture residual/hyperconnection boundaries after one model layer')
+    ap.add_argument('--capture-boundary-position', type=int,
+                    help='token position for the residual-boundary capture')
     ap.add_argument('--cpu-q8-1-selector',
                     help='opt in to a CPU Q8_1 dot selector for the CPU-miss arm only')
     ap.add_argument('--cpu-q8-1-experts',
@@ -80,6 +84,12 @@ def main() -> int:
             not a.capture_gdn_commit_positions or any(x < 0 for x in a.capture_gdn_commit_positions) or
             a.capture_gdn_commit_positions != sorted(set(a.capture_gdn_commit_positions))):
         ap.error('--capture-gdn-commit-positions must be unique, increasing, nonnegative integers')
+    if (a.capture_boundary_layer is None) != (a.capture_boundary_position is None):
+        ap.error('--capture-boundary-layer and --capture-boundary-position must be used together')
+    if a.capture_boundary_layer is not None and not 0 <= a.capture_boundary_layer < 47:
+        ap.error('--capture-boundary-layer must be in [0, 46]')
+    if a.capture_boundary_position is not None and a.capture_boundary_position < 0:
+        ap.error('--capture-boundary-position must be nonnegative')
     if a.capture_gdn_position is not None and a.capture_gdn_layer is None:
         ap.error('--capture-gdn-position requires --capture-gdn-layer')
     if a.capture_gdn_layer is not None and not 0 <= a.capture_gdn_layer < 48:
@@ -179,6 +189,11 @@ def main() -> int:
                 (a.output / f'{name}.gdn-commit').resolve())
             arm_env['STRATA_VERIFY_DUMP_GDN_COMMIT_POSITIONS'] = ','.join(
                 map(str, a.capture_gdn_commit_positions))
+        if a.capture_boundary_layer is not None:
+            arm_env['STRATA_VERIFY_DUMP_BOUNDARY_LAYER'] = str(a.capture_boundary_layer)
+            arm_env['STRATA_VERIFY_DUMP_BOUNDARY_POSITION'] = str(a.capture_boundary_position)
+            arm_env['STRATA_VERIFY_DUMP_BOUNDARY_PATH'] = str(
+                (a.output / f'{name}.boundary').resolve())
         engine = StrataEngine(str(a.engine.resolve()), command, cwd=cfg.get('cwd'),
                               log=str(log), env=arm_env)
         try:
