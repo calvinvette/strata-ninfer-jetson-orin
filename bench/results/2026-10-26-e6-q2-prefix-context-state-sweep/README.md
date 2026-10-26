@@ -222,6 +222,24 @@ python3 tools/integration/compare_q8_1_activation_capture.py \
   --output bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/layer3-position123-q8_1-summary.json
 ```
 
+### Position-123 QSA prompt-capture attempt
+
+Two supervised retries targeted the QSA stages at model layer 3 / prompt
+position 123, with selected historical K/V enabled and the all-Q2_0 CPU Q8_1
+mirror on the CPU-miss arm. Both runs kept token IDs equal but retained the
+expected final-state mismatch; minimum available/admission memory was 11.39
+GiB. The capture initialized, but neither run wrote QSA-stage or selected-K/V
+records for position 123, so no QSA comparison can be reported. Engine logs
+show the verifier processed only the final two-token and one-token windows;
+position 123 of the 128-token prompt was already consumed by prompt prefill.
+The QSA capture hook is in verifier code and does not observe that earlier
+prefill pass. A temporary verifier-only capture experiment did not change this
+limitation and was discarded; the source tree was restored and the current
+CUDA binary rebuilt from it. The next useful trace must instrument the QSA
+stages in `src/prefill/prefill.cpp` (or otherwise capture them during prompt
+prefill). These attempts are localization-tool diagnostics only, not quality
+or performance evidence. Raw files and supervisor logs remain local-only.
+
 ## Expert 114 CUDA operator check
 
 The Orin `ninfer_q2_expert_parity` tool was run on model layer 2 / expert 114

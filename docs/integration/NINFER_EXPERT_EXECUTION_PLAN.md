@@ -131,10 +131,19 @@ with cache reuse and with prompt caching disabled. A small opt-in final-state
 hash hook now supports the cache-off diagnostic; the Orin CUDA build and direct
 check passed, with HIP/SYCL rebuilds still required because the source is shared.
 This shared process/request-history signal does not explain the original
-multi-workload staged-miss mismatches. The next E6 gate is the complete
-workload-order replay and a held-out task-quality check before performance
-confirmation. See the [staged-miss report and
-diagnostic](../../bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/README.md).
+multi-workload staged-miss mismatches. The full workload-order replay is
+complete and still finds cross-backend final-state differences on all five
+requests. A preregistered 1,069-token task-quality diagnostic also completed;
+both backends met its content/length criteria but both missed the required
+opening word. The task therefore does not qualify either arm or resolve the
+output mismatches. Performance confirmation and profile promotion remain
+deferred. The latest position-123 QSA trace attempt could not observe that
+prompt position because the verifier capture covers only its final windows;
+QSA instrumentation in the prompt-prefill path is the next useful correctness
+diagnostic. See the [staged-miss report and
+diagnostic](../../bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/README.md),
+[task-quality check](../../bench/results/2026-10-26-e6-q2-quality-1069-512/README.md),
+and [position-123 trace report](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#position-123-qsa-prompt-capture-attempt).
 
 Execution note (2026-10-26): a repeated position-123 trace found the only
 material layer-2 expert-row delta in expert 114. An opt-in CPU Q8_1 dot

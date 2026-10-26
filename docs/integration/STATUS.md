@@ -62,9 +62,11 @@ and NInfer still matched exactly at each request ordinal. An opt-in
 `STRATA_STATE_HASH=1` hook now enables this observation with cache disabled, and
 the Orin CUDA rebuild passed its direct check. This is shared same-process
 variation, but its cause and the original multi-workload cross-arm mismatches
-remain unexplained. No quality oracle has passed for these staged-miss cells,
-so performance confirmation and profile promotion remain deferred pending a
-full workload-order replay and held-out quality task.
+remain unexplained. The full workload-order replay is complete and retains
+cross-backend final-state differences on all five requests. A held-out
+1,069-token quality diagnostic completed, but both backends missed the same
+required opening word; it does not qualify either arm or resolve the differing
+outputs. Performance confirmation and profile promotion remain deferred.
 An additional exact-prefix state sweep at 128, 256, 512, 1,024 and 1,536
 tokens found persistent-state mismatch at every length; the one generated token
 also differed at 256 tokens. GDN global relative L2 was 0.03098–0.06257. The
@@ -5990,6 +5992,16 @@ its four tests pass, and the derived position-123 summary is linked from the
 report. A counterfactual expert-394 oracle replay forcing either shared block-
 61 scale produced identical outputs across the two captured inputs, confirming
 that scale difference accounts for that row's output delta.
+
+The follow-up attempted to capture QSA at model layer 3 / prompt position 123,
+but the verifier-only capture observed only the final two-token and one-token
+windows and emitted no QSA/KV record for the earlier prompt position. Both
+arms retained token parity and the known persistent-state mismatch, with 11.39
+GiB minimum available/admission RAM. An experimental verifier-side batch
+capture extension did not reach the target position and was discarded; the
+current Orin CUDA binary was rebuilt from the restored source. The next useful
+trace must capture QSA within the prompt-prefill path. See the [capture
+attempt](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#position-123-qsa-prompt-capture-attempt).
 
 A held-out Q2_0 task diagnostic repeated the 1,069-token prompt with a 512-token
 allowance so its 200-word instruction was feasible. One measured request per
