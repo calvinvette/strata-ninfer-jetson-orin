@@ -19,3 +19,10 @@ The exact text and token IDs do not qualify the request because five persistent-
 Reproduce by generating the fixture with `python3 tools/integration/prepare_ninfer_long_retrieval.py --tokens 163840 --output <new-output-dir>`, then running `tools/integration/ninfer_q2_retrieval_check.py` under `tools/integration/run_control.py` with `--compare-staged-backends --run`, Q2_0 config at `--max-context 262144`. The 2K report contains the complete invocation.
 
 Raw fixture, config, traces, residency maps and supervisor samples remain local in this directory; model files and build products remain outside Git.
+
+
+A corrected accepted-prefix GDN-array diagnostic found exact equality at GDN
+layer 0, a tiny first difference at layer 1 (relative L2 `6.87e-10`), then
+amplification at layer 2 (`3.41e-6`) and layer 3 (`4.41e-3`). The all-layer
+relative L2 was `3.60%`; the originating operation remains unknown. See the
+[GDN localization note](GDN_STATE_LOCALIZATION.md).

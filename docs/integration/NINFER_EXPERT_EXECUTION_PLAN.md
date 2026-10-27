@@ -1306,3 +1306,12 @@ Minimum available RAM was 6.79 GiB, peak swap 1.71 GiB; the supervisor ended on
 the checker failure, not the memory guard. This is a correctness failure, not
 a memory-unsupported result. Diagnose the source before accepting larger-context
 qualification; text equality alone is insufficient. See the [160K report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/README.md).
+
+
+A corrected accepted-prefix GDN dump for the 160K mismatch found layer 0 exact,
+a tiny layer-1 difference (relative L2 `6.87e-10`), then growth at layer 2
+(`3.41e-6`) and layer 3 (`4.41e-3`), with global relative L2 `3.60%`. This
+shows numerical amplification in recurrent state but does not identify the
+first differing operation or the correct backend. The next planned diagnostic
+is sparse committed-state capture along the prompt. See the [GDN localization
+note](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/GDN_STATE_LOCALIZATION.md).

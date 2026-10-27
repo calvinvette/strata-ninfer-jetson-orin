@@ -6273,3 +6273,12 @@ RAM was 6.79 GiB, peak swap 1.71 GiB and OOM counters were zero. This is a
 correctness failure, not an unsupported memory cell. Do not treat matching text
 as qualification; diagnose the divergence before claiming parity at this
 length. See the [160K report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/README.md).
+
+
+A corrected accepted-prefix GDN capture for the 160K failed cell shows exact
+layer-0 state, a first tiny difference at layer 1 (relative L2 `6.87e-10`),
+and growing state deltas at layers 2 (`3.41e-6`) and 3 (`4.41e-3`); global
+relative L2 is `3.60%`. This localizes numerical growth in recurrent state but
+does not identify the originating operation or say which path is correct.
+Sparse committed-state checkpoints across the prompt are the next step. See
+the [localization note](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/GDN_STATE_LOCALIZATION.md).
