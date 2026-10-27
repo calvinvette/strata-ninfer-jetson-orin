@@ -43,6 +43,11 @@ At 32K, the same 512+64 cell matched outputs and residency in all pairs.
 Median changes were −1.28% prompt TPS, −3.41% decode TPS, +1.36% first-visible
 TTFT and +1.52% client time; minimum available memory was 10.92 GiB. This
 remains below the gain threshold. See the [32K report](../../bench/results/2026-10-26-e6-q2-staged-compute-32k-pp512-screen/README.md).
+At 64K, output and residency hashes matched across three pairs and minimum
+available memory was 10.09 GiB. Median changes were −0.37% prompt TPS, +1.15%
+decode TPS, +0.45% first-visible TTFT and +0.06% client time, but pair spreads
+were wide (−9.47% to +9.92% prompt TPS). This is inconclusive and not a gain;
+no confirmation was triggered. See the [64K report](../../bench/results/2026-10-26-e6-q2-staged-compute-64k-pp512-screen/README.md).
 
 The [NInfer expert execution plan](NINFER_EXPERT_EXECUTION_PLAN.md) is now in
 progress: E0 is complete for bounded controls and Q2_0 timing; E1–E4 have

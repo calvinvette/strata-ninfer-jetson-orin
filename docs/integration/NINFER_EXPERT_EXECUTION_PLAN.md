@@ -1175,3 +1175,9 @@ The 32K-capacity 512+64 cell matched outputs and residency in all three pairs.
 Median paired changes were −1.28% prompt TPS, −3.41% decode TPS, +1.36%
 first-visible TTFT and +1.52% client time. Minimum available memory was
 10.92 GiB. This does not reach the 5% screen threshold. See the [32K report](../../bench/results/2026-10-26-e6-q2-staged-compute-32k-pp512-screen/README.md).
+
+At 64K capacity, three 512+64 pairs matched outputs and resident maps, with
+10.09 GiB minimum available memory. Median changes were −0.37% prompt TPS,
++1.15% decode TPS, +0.45% first-visible TTFT and +0.06% client time. Pair
+spreads were wide (prompt TPS −9.47% to +9.92%), making this inconclusive; it
+does not qualify a gain. See the [64K report](../../bench/results/2026-10-26-e6-q2-staged-compute-64k-pp512-screen/README.md).
