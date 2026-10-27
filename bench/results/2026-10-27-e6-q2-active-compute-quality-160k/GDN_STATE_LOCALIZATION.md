@@ -127,3 +127,39 @@ tested lengths 1–4099. These synthetic checks validate bounded operator
 contracts. The focused trace replay adds captured-input numerical evidence,
 with the separate-state limitation above; it still does not identify the
 earlier model-layer operation.
+
+## Correction: fused residual-read capture is not valid yet
+
+The fused-read equality claims recorded above are withdrawn. The earlier 2K
+and 160K capture files contained only zero-filled pinned buffers because the
+instrumentation marked them captured during allocation, before any D2H copies
+were queued. They do not establish equality for `xn`, `lo`, `rs`, `inj_out` or
+`mixed`. A later 2K trace selected the requested position-2048 row while
+recording a one-token graph, but the request still failed the capture guard
+and produced no qualified capture. The graph replay/flag lifecycle remains
+unresolved; require a nonzero payload plus independent comparison before
+using fused-read evidence.
+
+
+## Qualified 2K fused-read capture (2026-10-27)
+
+The earlier correction above remains applicable to the old zero-filled files.
+The later selected-position failure was caused by two distinct control-flow
+details: the fused-read helper's `false` return requests a separate Q8_1
+quantization fallback, and the target one-token graph must be refreshed after
+the current window inputs are staged. The diagnostic copies are now queued
+before that fallback return, and only the selected target window rebuilds its
+graph. A missing layer capture is reported as an error.
+
+At layer 2 / position 2048, a paired Strata/NInfer trace produced 52,568-byte
+files with valid `STGRRD1` headers and 13,128 nonzero floats per backend. All
+five fields (`xn`, `lo`, `rs`, `inj_out`, `mixed`) matched bitwise. The
+same-run layer-2 GDN `x` vector matched each backend's captured `mixed` vector
+bitwise, and the two GDN `x` vectors matched each other. The full 48-token
+retrieval check passed exact answer, token IDs and all persistent-state fields.
+The compact comparison is
+[`gr-read-gdn-debug-two-token-fixed/comparison.json`](generated-gdn-trace/gr-read-gdn-debug-two-token-fixed/comparison.json);
+the full-answer run is in the adjacent
+`gr-read-gdn-debug-full-answer/` folder. Comparator unit tests passed (3).
+This qualifies the diagnostic at 2K only. A simultaneous 160K capture is still
+needed to investigate the long-context state divergence described above.

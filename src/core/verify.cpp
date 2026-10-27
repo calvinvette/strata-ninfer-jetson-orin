@@ -1050,7 +1050,6 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
             }
             strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "allocate", this,
                                                         gr_read_diag_host_, gr_read_diag_capacity_, -1);
-            gr_read_diag_captured_ = true;
             std::fprintf(stderr, "strata verify: opt-in fused GR-read capture at layer %d position %lld -> %s (%zu bytes)\n",
                          gr_read_diag_layer_, (long long) gr_read_diag_position_, gr_read_diag_path_.c_str(),
                          gr_read_diag_capacity_);
@@ -1796,7 +1795,6 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
             const bool read_ok = fused_gr_read_multi(fa, n, xn_ + (size_t) tb * HC * N, cs,
                                                      (prof_on_ && grp == 0) ? prof_ : nullptr,
                                                      (int) (l * kProfPer + (half == 0 ? 27 : 30)));
-            if (!read_ok) return false;
             if (gr_read_diag_host_ != nullptr && half == 0 && l == gr_read_diag_layer_ && T == 1 && !batch_rec_) {
                 const size_t xn_bytes = (size_t) HC * (size_t) N * sizeof(float);
                 const size_t n_bytes = (size_t) N * sizeof(float);
@@ -1818,7 +1816,9 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                     err = "verify: could not queue opt-in fused GR-read capture";
                     return false;
                 }
+                gr_read_diag_captured_ = true;
             }
+            if (!read_ok) return false;
             return true;
         };
         if (boundary_diag_layer_ >= 0 && l == boundary_diag_layer_ + 1 &&
@@ -3084,9 +3084,10 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
     SessionState& ss = *ss_;
     if (pos0 + T > ss.qsa_states[ss.qsa_primary()].max_cells) { err = "verify: the window runs past the context"; return false; }
     refresh_ar();
-    if (qsa_diag_h_ != nullptr) {
-        // The diagnostic copy rows are selected while the CUDA graph is recorded. Refresh inputs first,
-        // then rebuild this opt-in graph so the position filter sees the current window's positions.
+    const bool gr_read_target_in_window = gr_read_diag_position_ >= pos0 && gr_read_diag_position_ < pos0 + T;
+    if (qsa_diag_h_ != nullptr || (gr_read_diag_host_ != nullptr && gr_read_target_in_window)) {
+        // The diagnostic copy rows are selected while the CUDA graph is recorded. Refresh the selected
+        // window's inputs first, then rebuild this opt-in graph so the position filter sees them.
         if (!staged_) stage_inputs(T, tokens, pos0);
         if (exec_[T] != nullptr) {
             const cudaError_t de = cudaGraphExecDestroy(exec_[T]);
@@ -3305,6 +3306,10 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
         }
         qsa_diag_captured_ = false;
     }
+    if (gr_read_diag_host_ != nullptr && gr_read_target_in_window && !gr_read_diag_captured_) {
+        err = "verify: configured fused GR-read capture did not reach its selected layer";
+        return false;
+    }
     if (gr_read_diag_captured_ && T == 1 && pos0 == gr_read_diag_position_) {
         struct GrReadHeader {
             char magic[8];
@@ -3340,6 +3345,7 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
             err = "verify: could not write opt-in fused GR-read capture";
             return false;
         }
+        gr_read_diag_captured_ = false;
     }
     bool gdn_diag_position_selected = gdn_diag_position_ < 0 && !gdn_diag_multi_position_filter_;
     if (gdn_diag_multi_position_filter_) {

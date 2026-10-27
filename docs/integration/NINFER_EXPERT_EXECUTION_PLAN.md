@@ -1339,3 +1339,24 @@ with both captures enabled in one pair to resolve the between-run discrepancy.
 See the
 [GDN localization
 note](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/GDN_STATE_LOCALIZATION.md).
+
+**Correction (2026-10-27):** the fused grouped-residual read equality described
+above is withdrawn. The 2K and 160K files held zero-filled pinned buffers; the
+capture flag was set during allocation before graph copies were queued. Later
+2K instrumentation selected the requested row during graph recording but
+still failed the runtime capture guard. No fused-read numerical result is
+qualified until the graph replay/flag lifecycle is repaired and a nonzero
+payload is independently checked. Keep E6 open.
+
+
+**E6 instrumentation update (2026-10-27):** repaired the fused GR-read capture
+path. Its Q8_1 availability boolean had been treated as an early diagnostic
+exit, and target graph refresh needed to occur only after staging inputs for
+the selected window. A paired 2K check now records nonzero captures and proves
+bitwise equality across `xn`, `lo`, `rs`, `inj_out` and `mixed`; same-run GDN
+`x` equals captured `mixed` on both backends. Full 48-token retrieval and final
+state parity also pass. This supersedes the prior note that the 2K capture
+guard remained unresolved, while preserving the retraction of the old
+zero-filled 2K/160K data. Next, capture GR-read and GDN inputs simultaneously
+at the 160K divergence position; keep Phase E6 open until its long-context
+state discrepancy is explained.

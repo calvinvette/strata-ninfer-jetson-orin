@@ -75,3 +75,32 @@ match the GDN `x` delta at the same position in a separate paired trace. Since
 the GDN capture copies the fused read's `mixed` input as `x`, capture both in
 the same run next to resolve the between-run discrepancy. Raw read captures
 remain local; the compact comparison is in the localization note.
+
+**Correction (2026-10-27):** the fused-read claims above are withdrawn. The
+captured buffers in both the earlier 2K and 160K runs were zero-filled pinned
+allocations: the instrumentation marked them captured at allocation time even
+though the graph never queued the copies. Those runs provide no numerical
+evidence about `xn`, `lo`, `rs`, `inj_out` or `mixed`. After fixing that flag,
+the 2K reruns initially failed to select a row. A later trace selected position
+2048 during graph recording, but the request still failed the capture guard
+before producing a qualified file. The target-row and batch graph plumbing
+remains under repair; do not rely on any GR-read equality claim until a nonzero
+payload is parsed and independently compared.
+
+**Follow-up (2026-10-27):** the capture lifecycle issue is now fixed. The
+fused-read callback's `false` result means the optional Q8_1 image is
+unavailable and separate quantization is needed; it does not mean the fused
+read failed. Moving that fallback return after diagnostic D2H scheduling lets
+the opt-in capture run on that path. The selected one-token graph is refreshed
+only when its target position is in the current window, and a missing selected
+layer capture now returns an explicit error. A paired 2K/position-2048 run
+produced nonzero captures (13,128/13,128 values in each payload), matching
+bitwise in all five fields. The captured `mixed` vector also matched each
+same-run layer-2 GDN `x` vector bitwise. The 48-token held-out retrieval task
+passed with identical exact answer, token IDs, residency and all final state
+fields. Focused comparator tests passed (3 tests). See the
+[qualified compact comparison](generated-gdn-trace/gr-read-gdn-debug-two-token-fixed/comparison.json)
+and full-answer paired results in the adjacent `gr-read-gdn-debug-full-answer`
+run folder. The earlier zero-filled captures remain invalid; this new 2K
+evidence supersedes the claim that the capture lifecycle is still unresolved.
+The 160K paired simultaneous capture is still outstanding, so E6 remains open.

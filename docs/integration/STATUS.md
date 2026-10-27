@@ -6310,3 +6310,25 @@ simultaneous capture is needed to explain the between-run discrepancy. The
 53.97-minute diagnostic kept minimum available RAM at 7.09 GiB, with 6.36 GiB
 peak swap and zero OOM events. See the
 [localization note](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/GDN_STATE_LOCALIZATION.md).
+
+**Correction (2026-10-27):** the fused grouped-residual read captures cited in
+the preceding E6 update were false positives. They contain zero-filled pinned
+buffers; the diagnostic flag was initialized as captured before graph copies
+were queued. Retract the reported 2K/160K equality for `xn`, `lo`, `rs`,
+`inj_out` and `mixed`. A repaired 2K trace selects position 2048 during graph
+recording but still trips the runtime capture guard. Fused-read evidence is
+unqualified until the capture lifecycle is fixed and a nonzero payload passes
+independent parsing and comparison.
+
+
+**E6 update (2026-10-27):** the opt-in fused GR-read capture lifecycle now
+passes a qualified 2K run. At layer 2 / position 2048, Strata and NInfer each
+produced a 52,568-byte capture with 13,128 nonzero values; all five fields
+matched bitwise, and each captured `mixed` vector matched same-run GDN `x`. A
+48-token paired held-out check passed exact answer, token IDs and all final
+state fields. The comparison is
+[here](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gr-read-gdn-debug-two-token-fixed/comparison.json).
+The full-answer paired results are under the adjacent
+`gr-read-gdn-debug-full-answer/` folder. The earlier reported 2K/160K captures
+remain invalid zero-filled evidence. E6 remains open pending the corresponding
+simultaneous capture at the 160K divergence position.
