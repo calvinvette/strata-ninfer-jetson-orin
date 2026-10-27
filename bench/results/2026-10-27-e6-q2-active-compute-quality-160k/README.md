@@ -20,6 +20,20 @@ Reproduce by generating the fixture with `python3 tools/integration/prepare_ninf
 
 Raw fixture, config, traces, residency maps and supervisor samples remain local in this directory; model files and build products remain outside Git.
 
+The follow-up raw-`o` capture confirms that the first generated-token
+discrepancy exists before GDN output normalization: at position 163840, raw
+`o` differs by relative L2 `3.13e-8` (max absolute `1.49e-8`), with normalized
+`y` at `3.31e-8`. Both remain below `9e-8` through position 163876, then jump
+at 163877 (`o`: `5.11e-4`; `y`: `1.41e-3`), matching the first large split in
+other captured GDN intermediates. The paired run took 53.96 minutes, minimum
+available memory was 7.20 GiB and peak swap was 5.98 GiB. Exact answer, token
+IDs and residency still matched while the same five persistent-state fields
+did not. A no-capture 2K control passed all output and state checks (182.2
+seconds, minimum available memory 11.55 GiB). These measurements localize the
+divergence but do not identify its arithmetic cause or which backend is
+correct. See the [expanded localization note](GDN_STATE_LOCALIZATION.md) and
+[compact raw-output summary](generated-gdn-trace-summary.json).
+
 
 A corrected accepted-prefix GDN-array diagnostic found exact equality at GDN
 layer 0, a tiny first difference at layer 1 (relative L2 `6.87e-10`), then

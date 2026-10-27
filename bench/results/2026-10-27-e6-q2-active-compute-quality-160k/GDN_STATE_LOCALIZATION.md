@@ -2,6 +2,16 @@
 
 Date: 2026-10-27 (Orin AGX). Source: `0295db1e` (source unchanged); binary SHA-256: `44c358706192a57ced038cff0478cec05ae3c7476258c7a90e5b1f1ef9a4374e`. This diagnostic repeats the 163,840-token Q2_0 held-out task at accepted prefix length 163,886, with final GDN arrays captured from both staged grouped-compute backends.
 
+Follow-up raw-output trace used source commit `edb4d9fc` and binary SHA-256
+`f40e30a1a20d3d27e72b81fd9394295d47bee0b5824b767d433dc493e7b8615e`. It
+captures the pre-normalization GDN `o` vector alongside normalized `y` for
+layer 2 at generated positions 163840–163885. The same held-out task returned
+the exact answer and matching token IDs and residency, but again failed final
+state parity in `gdn`, `tail`, `pooled`, `pooled_full` and `kv`. This sequential
+run took 53.96 minutes; minimum sampled available memory was 7.20 GiB against
+the 6-GiB floor and peak swap was 5.98 GiB. It is diagnostic evidence, not a
+performance result.
+
 | GDN state layer | Relative L2 (Strata vs NInfer) | Reading |
 |---:|---:|---|
 | 0 | 0 | Bitwise equal |
@@ -36,15 +46,36 @@ The full compact per-position metrics are in
 [`generated-token-trace-summary.json`](generated-gdn-trace/generated-token-trace-summary.json);
 raw diagnostic arrays remain local.
 
-This narrows the first observed divergence to the layer-2 `y` output during
-generation, following bitwise-equal layer-2 state at the prompt boundary
-(position 163839). It does not establish that `y` is the underlying cause,
-because the tiny discrepancy may be a downstream symptom of arithmetic earlier
-in the operation, nor does it establish which backend is correct. In
-particular, this trace did not capture the pre-normalization `o` vector, so it
-cannot distinguish a recurrence-output difference from a difference in
-`gdn_out_norm`. The long-prompt checkpoint sweep is no longer the immediate next
-step. Next capture `o` alongside `y` and inspect the layer-2 GDN output and
-normalization paths, using a focused operator oracle before another expensive
-long-context run. Keep the memory guard in place and do not infer equivalence
-from final text.
+The raw `o` trace shows a first difference at position 163840: 1,486/6,144
+values differ, max absolute delta `1.49e-8`, relative L2 `3.13e-8`; `y` at the
+same position differs in 1,283 values, max absolute delta `5.96e-8`, relative
+L2 `3.31e-8`. Both relative L2 values remain below `9e-8` through position
+163876. At position 163877, both jump together: `o` relative L2 `5.11e-4` and
+`y` relative L2 `1.41e-3`, with 6,141/6,144 values differing in each. The
+maximum in this captured window occurs at 163877; both differences shrink at
+later positions. This shows normalization is not the first observed source:
+the recurrence output already has a tiny arithmetic discrepancy at the first
+generated token, followed by a much larger event at the same position as the
+previously observed `qkv`, `h`, `z` and `gdn_out` differences. It does not
+identify the originating operation or establish which backend is correct.
+
+The diagnostic's default-path control, with raw capture disabled, passed the
+same 2,048-token held-out task: exact answer, token IDs, residency and all nine
+final state fields matched. Minimum available memory was 11.55 GiB; sequential
+elapsed time was 182.2 seconds. This validates the ordinary no-capture path at
+this short context only. The opt-in trace and short control metrics are
+summarized in
+[`gdn-o-trace-summary.json`](generated-gdn-trace/gdn-o-trace-summary.json);
+raw arrays remain local. Next use an independent focused GDN arithmetic oracle
+and compare the active CUDA backend's recurrence/reduction order against the
+reference contract before another expensive long-context run. Keep the memory
+guard in place and do not infer equivalence from final text.
+
+The existing Orin operator checks also passed during this follow-up. The
+independent `gdn_parity --selftest` measured recurrence-output relative L2
+`2.032e-7` and state relative L2 `3.978e-8` against its FP64 reference; its
+convolution, normalization, layout and fused multi-token cases passed. The
+separate `gdn_rec_parity` reported bitwise-equal recurrence variants for the
+tested lengths 1–4099. These synthetic checks validate bounded operator
+contracts, but they do not replay the captured 160K state/input pair or explain
+the cross-backend mismatch.

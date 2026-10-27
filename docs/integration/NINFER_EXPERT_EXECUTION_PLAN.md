@@ -1313,10 +1313,14 @@ a tiny layer-1 difference (relative L2 `6.87e-10`), then growth at layer 2
 (`3.41e-6`) and layer 3 (`4.41e-3`), with global relative L2 `3.60%`. A
 follow-up capture found bitwise-equal layer-2 state at the prompt boundary,
 then a first observed `y` difference on the first generated token (relative L2
-`2.50e-8`, max absolute delta `5.96e-8`). Differences spread to other
-intermediates by generated positions 163849 and 163877. This narrows the
-observed divergence to generation-side recurrent computation but does not
-identify the underlying operation or which backend is correct. Next inspect
-the `y` computation and backend-specific reduction/rounding paths with a focused
-oracle before another long-context run. See the [GDN localization
+`2.50e-8`, max absolute delta `5.96e-8`). A raw pre-normalization `o` capture
+now shows that the difference is already present before normalization at
+position 163840 (relative L2 `3.13e-8`); both `o` and `y` jump at position
+163877 (`5.11e-4` and `1.41e-3`) where other GDN intermediates first split
+substantially. This narrows the observation to the recurrence/output path but
+does not identify the arithmetic cause or which backend is correct. An opt-in
+instrumentation control with capture disabled passed the 2K task with full
+state parity. Next build an independent focused GDN arithmetic oracle and
+inspect recurrence/reduction order before another long-context run. See the
+[GDN localization
 note](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/GDN_STATE_LOCALIZATION.md).

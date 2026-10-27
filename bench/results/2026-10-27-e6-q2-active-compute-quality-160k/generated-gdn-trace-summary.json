@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "date": "2026-10-27",
+  "hardware": "Jetson AGX Orin",
+  "source_commit": "edb4d9fc",
+  "binary_sha256": "f40e30a1a20d3d27e72b81fd9394295d47bee0b5824b767d433dc493e7b8615e",
+  "long_capture": {
+    "model": "Qwen3.8-Flash-Next GSQ-RCO Q2_0",
+    "prompt_tokens": 163840,
+    "captured_layer": 2,
+    "captured_positions": [163840, 163885],
+    "positions_compared": 46,
+    "exact_answer": true,
+    "token_ids_equal": true,
+    "residency_equal": true,
+    "final_state_equal": false,
+    "state_differing_fields": ["gdn", "tail", "pooled", "pooled_full", "kv"],
+    "first_generated_position": {
+      "position": 163840,
+      "o": {"different_values": 1486, "values": 6144, "max_abs": 1.4901161193847656e-08, "relative_l2": 3.1298308580700416e-08},
+      "y": {"different_values": 1283, "values": 6144, "max_abs": 5.960464477539063e-08, "relative_l2": 3.310645773681516e-08}
+    },
+    "last_sub_9e_8_position": 163876,
+    "largest_divergence_position": {
+      "position": 163877,
+      "o": {"different_values": 6141, "values": 6144, "max_abs": 0.00013597309589385986, "relative_l2": 0.0005113209402228587},
+      "y": {"different_values": 6141, "values": 6144, "max_abs": 0.0008363313972949982, "relative_l2": 0.0014070662005703127}
+    },
+    "elapsed_seconds": 3237.6,
+    "minimum_available_gib": 7.20,
+    "peak_swap_gib": 5.98,
+    "interpretation": "Raw recurrence output differs before normalization at the first generated token; both o and y diverge sharply at position 163877. Cause and backend correctness remain unresolved. Diagnostic only; not performance evidence."
+  },
+  "default_path_control": {
+    "prompt_tokens": 2048,
+    "exact_answer": true,
+    "token_ids_equal": true,
+    "residency_equal": true,
+    "all_nine_final_state_fields_equal": true,
+    "elapsed_seconds": 182.2,
+    "minimum_available_gib": 11.55,
+    "gdn_capture_enabled": false
+  },
+  "existing_operator_oracles": {
+    "gdn_parity_selftest": {
+      "result": "pass",
+      "reference_o_relative_l2": 2.032e-7,
+      "reference_state_relative_l2": 3.978e-8,
+      "conv_output_relative_l2": 2.666e-8,
+      "conv_state_bitwise": true,
+      "cases": "reference math, head mapping, recurrence ordering, convolution layout/slide, normalization, fused multi-token parity"
+    },
+    "gdn_rec_parity": {
+      "result": "pass",
+      "tested_token_lengths": [1, 2, 3, 4, 5, 7, 8, 9, 15, 16, 17, 31, 33, 257, 1000, 4099],
+      "recurrence_variants_bitwise_equal": true,
+      "chunked_variant": "not exercised on Orin by this executable"
+    },
+    "scope": "These existing synthetic operator checks pass, but do not replay the captured long-context state/input pair or establish cross-backend correctness for the 160K cell."
+  },
+  "raw_arrays_and_supervisor_logs_committed": false
+}

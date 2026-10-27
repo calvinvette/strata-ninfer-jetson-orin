@@ -1,6 +1,6 @@
 # Integration status
 
-Updated: 2026-10-26. Phases 1 through 4 are complete for their documented tested
+Updated: 2026-10-27. Phases 1 through 4 are complete for their documented tested
 Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 is
 complete for its bounded Orin qualification matrix under [its closeout]
 (PHASE7_CLOSEOUT.md), and Phase 8 is complete for the bounded Q2_0 release
@@ -6281,10 +6281,15 @@ and growing state deltas at layers 2 (`3.41e-6`) and 3 (`4.41e-3`); global
 relative L2 is `3.60%`. A separate layer-2 generated-token trace found the
 prompt-boundary state exact; the first differing captured segment was `y` at
 generated position 163840 (relative L2 `2.50e-8`, max absolute delta
-`5.96e-8`). Differences spread to other intermediates at positions 163849 and
-163877. The final answer and token IDs still match, but five state fields do
-not. This narrows the observed divergence to generation-side recurrent
-computation without identifying the underlying operation or correct backend.
-Minimum available RAM was 6.70 GiB with peak swap 4.72 GiB. Next inspect the
-`y` computation and backend-specific reduction/rounding paths using a focused
-oracle before another long run. See the [localization note](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/GDN_STATE_LOCALIZATION.md).
+`5.96e-8`). A follow-up raw pre-normalization `o` trace shows that the delta
+already exists before normalization (`3.13e-8` relative L2 at 163840); both
+`o` and `y` jump at position 163877 (`5.11e-4` and `1.41e-3`), alongside
+other recurrent intermediates. The final answer and token IDs still match,
+but five state fields do not. This narrows the observed divergence to the
+generation-side recurrence/output path without identifying its arithmetic
+cause or correct backend. The 53.96-minute capture run kept minimum available
+RAM at 7.20 GiB above the floor, with peak swap 5.98 GiB. A separate no-capture
+2K control passed exact answer, token, residency and all-state checks with
+11.55 GiB minimum available RAM. Next compare recurrence/reduction order to an
+independent focused GDN arithmetic oracle before another long run. See the
+[localization note](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/GDN_STATE_LOCALIZATION.md).
