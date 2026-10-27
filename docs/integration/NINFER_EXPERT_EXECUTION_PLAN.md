@@ -1158,3 +1158,9 @@ with matching output and resident-map hashes. Median paired changes were
 −1.97% prompt TPS, +2.27% decode TPS, +2.18% first-visible TTFT and +0.95%
 client time. Minimum available memory was 11.60 GiB. None met the 5% threshold;
 E6 remains open. See the [4K report](../../bench/results/2026-10-26-e6-q2-staged-compute-4k-pp512-screen/README.md).
+
+At the same 4K capacity, the 2,048+128 request completed three randomized
+pairs with matching output and residency hashes. Median paired changes were
+−1.44% prompt TPS, +2.30% decode TPS, +1.43% first-visible TTFT and +0.50%
+client time; minimum available memory was 11.63 GiB. No performance gate was
+reached. See the [4K 2K-prompt report](../../bench/results/2026-10-26-e6-q2-staged-compute-4k-pp2048-screen/README.md).

@@ -30,6 +30,11 @@ The 4K 512+64 cell also passed all three output/residency checks. Median
 changes were −1.97% prompt TPS, +2.27% decode TPS, +2.18% first-visible TTFT
 and +0.95% client time; minimum available memory was 11.60 GiB. No metric
 reached the registered threshold. See the [4K report](../../bench/results/2026-10-26-e6-q2-staged-compute-4k-pp512-screen/README.md).
+At 4K capacity, the 2,048+128 cell also matched outputs and resident maps in
+all pairs. Median changes were −1.44% prompt TPS, +2.30% decode TPS, +1.43%
+first-visible TTFT and +0.50% client time; minimum available memory was
+11.63 GiB. No metric reached the 5% screen threshold. See the [4K 2K-prompt
+report](../../bench/results/2026-10-26-e6-q2-staged-compute-4k-pp2048-screen/README.md).
 
 The [NInfer expert execution plan](NINFER_EXPERT_EXECUTION_PLAN.md) is now in
 progress: E0 is complete for bounded controls and Q2_0 timing; E1–E4 have
