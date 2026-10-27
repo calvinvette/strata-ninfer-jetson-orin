@@ -1823,7 +1823,11 @@ void gdn_ab_multi(const float* x, const uint16_t* w_alpha, const uint16_t* w_bet
 
 void gdn_step_norm_multi(float* state, const float* h, int conv_channels, const float* gate, const float* beta,
                          const float* z, const float* gamma, float eps, float* y, int h_k, int h_v, int n_tok,
-                         const int32_t* n_keep, void* stream, int t_out_begin, void* xq_out) {
+                         const int32_t* n_keep, void* stream, int t_out_begin, void* xq_out, float* o_capture) {
+    if (o_capture != nullptr) {
+        std::fprintf(stderr, "gdn_step_norm_multi: raw-o capture is not supported by the SYCL verifier\n");
+        std::exit(1);
+    }
     GdnQ81* const xq = static_cast<GdnQ81*>(xq_out);   // S26: non-null = also the outputs' q8_1 (STRATA_QFUSE)
     if (!state || !h || !gate || !beta || !z || !gamma || !y || h_k <= 0 || h_v % h_k || n_tok < 1 ||
         n_tok > kVerifyMaxT) {
