@@ -6253,3 +6253,13 @@ zero OOM events were recorded and the six-GiB guard remained satisfied. Swap
 growth signals material memory pressure. This is bounded functional evidence,
 not near-limit 128K ingestion, broad quality or performance qualification. See
 the [64K active-compute report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-64k/README.md).
+
+
+At a 131,072-token prompt under a 256K cap, the exact-answer held-out task
+passed for both staged grouped-compute backends. The answer, all 47 token IDs,
+resident map and nine final state fields matched. Minimum available RAM was
+6.80 GiB, only 0.80 GiB above the six-GiB supervisor floor; peak swap was
+1.96 GiB and OOM counters were zero. The sequential traced pair took 43.7
+minutes. This is bounded correctness evidence under recorded host conditions,
+not performance evidence or near-limit 256K ingestion; the narrow memory margin
+should constrain follow-up. See the [128K report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-128k/README.md).

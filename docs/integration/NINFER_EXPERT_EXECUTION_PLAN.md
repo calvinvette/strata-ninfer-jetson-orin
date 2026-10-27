@@ -1288,3 +1288,12 @@ available memory was 8.53 GiB; peak swap use was 6.95 GiB, with zero OOM events
 and the six-GiB guard maintained. This is correctness evidence with observed
 memory pressure, not a 128K near-limit or performance result. See the [64K
 report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-64k/README.md).
+
+
+The 131,072-token held-out task also passes under a 256K cap for both active
+staged grouped-compute backends: exact answer, 47 output token IDs, residency
+and all nine final state fields match. Minimum available memory was 6.80 GiB
+(0.80 GiB over the enforced floor), peak swap 1.96 GiB and OOM counters zero.
+The 43.7-minute sequential diagnostic is not performance evidence. This
+correctness cell has a narrow memory margin and does not establish near-limit
+256K ingestion. See the [128K report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-128k/README.md).
