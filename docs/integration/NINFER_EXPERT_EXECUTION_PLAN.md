@@ -1217,3 +1217,9 @@ pairs. Median changes were −2.58% prompt TPS, 0% decode TPS, +2.56% first-visi
 TTFT and +1.83% client time; minimum available memory was 11.29 GiB. Pair
 direction varied and no median reached threshold. See the [16K 2K-prompt
 report](../../bench/results/2026-10-26-e6-q2-staged-compute-16k-pp2048-screen/README.md).
+
+At 32K capacity, the same 2,048+128 shape matched output and residency hashes
+in all pairs. Median changes were −0.44% prompt TPS, −2.30% decode TPS, +0.59%
+first-visible TTFT and +0.56% client time; minimum available memory was
+10.88 GiB. No performance screen threshold was met. See the [32K 2K-prompt
+report](../../bench/results/2026-10-26-e6-q2-staged-compute-32k-pp2048-screen/README.md).
