@@ -524,9 +524,9 @@ Verifier::~Verifier() {
     if (sh_cs_) cudaStreamSynchronize(sh_cs_);
     if (boundary_diag_h_ != nullptr && !boundary_diag_captured_) {
         std::fprintf(stderr,
-                     "strata verify: residual-boundary capture missing at %d/%d position %lld "
+                     "strata verify: residual-boundary capture missing for %zu layer(s), first %d/%d position %lld "
                      "(copy_queued=%d multirow_graph=%d batch_writer=%d target_seen=%d) -> %s\n",
-                     boundary_diag_layer_, boundary_diag_layer_ + 1,
+                     boundary_diag_layers_.size(), boundary_diag_layer_, boundary_diag_layer_ + 1,
                      (long long) boundary_diag_position_, boundary_diag_copy_queued_ ? 1 : 0,
                      boundary_diag_multirow_graph_captured_ ? 1 : 0,
                      boundary_diag_batch_writer_called_ ? 1 : 0,
@@ -849,22 +849,48 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
     }
     {
         const char* layer = std::getenv("STRATA_VERIFY_DUMP_BOUNDARY_LAYER");
+        const char* layers = std::getenv("STRATA_VERIFY_DUMP_BOUNDARY_LAYERS");
         const char* path = std::getenv("STRATA_VERIFY_DUMP_BOUNDARY_PATH");
         const char* position = std::getenv("STRATA_VERIFY_DUMP_BOUNDARY_POSITION");
-        if ((layer != nullptr) != (path != nullptr) || (layer != nullptr) != (position != nullptr)) {
-            err = "verify: boundary capture layer, path, and position must be set together";
+        if (layer != nullptr && layers != nullptr) {
+            err = "verify: set only one of boundary layer and boundary layers";
             return false;
         }
-        if (layer != nullptr) {
-            char* layer_end = nullptr;
+        const char* selected = layers != nullptr ? layers : layer;
+        if ((selected != nullptr) != (path != nullptr) || (selected != nullptr) != (position != nullptr)) {
+            err = "verify: boundary capture layer(s), path, and position must be set together";
+            return false;
+        }
+        if (selected != nullptr) {
             char* position_end = nullptr;
             errno = 0;
-            const long parsed_layer = std::strtol(layer, &layer_end, 10);
             const long long parsed_position = std::strtoll(position, &position_end, 10);
-            if (errno != 0 || layer_end == layer || *layer_end != '\0' || parsed_layer < 0 ||
-                parsed_layer + 1 >= g.n_layers || position_end == position || *position_end != '\0' ||
+            if (errno != 0 || position_end == position || *position_end != '\0' ||
                 parsed_position < 0 || !*path) {
                 err = "verify: invalid opt-in residual-boundary layer, position, or path";
+                return false;
+            }
+            const char* cursor = selected;
+            while (*cursor) {
+                char* end = nullptr;
+                errno = 0;
+                const long parsed_layer = std::strtol(cursor, &end, 10);
+                if (errno != 0 || end == cursor || parsed_layer < 0 || parsed_layer + 1 >= g.n_layers ||
+                    (*end != '\0' && *end != ',') ||
+                    (!boundary_diag_layers_.empty() && parsed_layer <= boundary_diag_layers_.back())) {
+                    err = "verify: boundary layers must be unique, increasing model-layer indices";
+                    return false;
+                }
+                boundary_diag_layers_.push_back((int) parsed_layer);
+                if (*end == '\0') break;
+                cursor = end + 1;
+                if (*cursor == '\0') {
+                    err = "verify: invalid empty boundary layer";
+                    return false;
+                }
+            }
+            if (boundary_diag_layers_.empty()) {
+                err = "verify: empty opt-in residual-boundary layer list";
                 return false;
             }
             const uint64_t row_floats = HC * N + N + HC;
@@ -873,11 +899,17 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
                 err = "verify: opt-in residual-boundary diagnostic size overflows";
                 return false;
             }
-            boundary_diag_layer_ = (int) parsed_layer;
+            boundary_diag_layer_ = boundary_diag_layers_.front();
             boundary_diag_position_ = (int64_t) parsed_position;
             boundary_diag_path_ = path;
             boundary_diag_capacity_ = (size_t) total_floats * sizeof(float);
-            boundary_diag_storage_capacity_ = boundary_diag_capacity_ * strata::kernels::kVerifyMaxT;
+            boundary_diag_layer_stride_ = boundary_diag_capacity_ * strata::kernels::kVerifyMaxT;
+            if (boundary_diag_layer_stride_ > SIZE_MAX / boundary_diag_layers_.size()) {
+                err = "verify: opt-in residual-boundary diagnostic size overflows";
+                return false;
+            }
+            boundary_diag_storage_capacity_ = boundary_diag_layer_stride_ * boundary_diag_layers_.size();
+            boundary_diag_layers_captured_.assign(boundary_diag_layers_.size(), 0);
             if (cudaHostAlloc((void**) &boundary_diag_h_, boundary_diag_storage_capacity_, cudaHostAllocPortable) != cudaSuccess) {
                 boundary_diag_h_ = nullptr;
                 err = "verify: could not allocate the opt-in residual-boundary diagnostic buffer";
@@ -885,9 +917,9 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
             }
             strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "allocate", this,
                                                         boundary_diag_h_, boundary_diag_storage_capacity_, -1);
-            std::fprintf(stderr, "strata verify: opt-in residual/hyperconnection boundary capture at %d/%d position %lld -> %s (%zu bytes)\n",
-                         boundary_diag_layer_, boundary_diag_layer_ + 1,
-                         (long long) boundary_diag_position_, boundary_diag_path_.c_str(), boundary_diag_capacity_);
+            std::fprintf(stderr, "strata verify: opt-in residual/hyperconnection boundary capture at %zu layers, position %lld -> %s (%zu bytes/layer)\n",
+                         boundary_diag_layers_.size(), (long long) boundary_diag_position_,
+                         boundary_diag_path_.c_str(), boundary_diag_capacity_);
         }
     }
     {
@@ -1551,9 +1583,12 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
         if (trace_m_ != nullptr) gpu_stamp(trace_m_, (int) ((l * kProfPer + i) * 2 + grp), cs);   // #649
     };
     const int tb_[2] = {0, (T + 1) / 2}, te_[2] = {G == 2 ? (T + 1) / 2 : T, T};
-    auto boundary_copy = [&](size_t offset_floats, const float* src, size_t floats,
+    auto boundary_copy = [&](int layer_index, size_t offset_floats, const float* src, size_t floats,
                              int row_base, int row_count) -> bool {
         if (boundary_diag_h_ == nullptr) return true;
+        if (layer_index < 0 || (size_t) layer_index >= boundary_diag_layers_.size()) return true;
+        float* const layer_host = boundary_diag_h_ + (size_t) layer_index *
+                                  (boundary_diag_layer_stride_ / sizeof(float));
         if (batch_rec_ || T > 1) {
             if (row_base < 0 || row_count < 1 || row_base + row_count > T || T > strata::kernels::kVerifyMaxT) {
                 err = "verify: opt-in residual-boundary multirow count exceeds its capture buffer";
@@ -1561,7 +1596,7 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
             }
             const size_t row_stride = boundary_diag_capacity_ / sizeof(float);
             for (int row = 0; row < row_count; ++row) {
-                const cudaError_t ce = cudaMemcpyAsync(boundary_diag_h_ + (size_t) (row_base + row) * row_stride + offset_floats,
+                const cudaError_t ce = cudaMemcpyAsync(layer_host + (size_t) (row_base + row) * row_stride + offset_floats,
                                                         src + (size_t) row * floats, floats * sizeof(float),
                                                         cudaMemcpyDeviceToHost, cs);
                 if (ce != cudaSuccess) {
@@ -1573,7 +1608,7 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
             boundary_diag_multirow_graph_captured_ = true;
             return true;
         }
-        const cudaError_t ce = cudaMemcpyAsync(boundary_diag_h_ + offset_floats, src,
+        const cudaError_t ce = cudaMemcpyAsync(layer_host + offset_floats, src,
                                                 floats * sizeof(float), cudaMemcpyDeviceToHost, cs);
         if (ce == cudaSuccess) {
             boundary_diag_copy_queued_ = true;
@@ -1581,6 +1616,10 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
         }
         err = std::string("verify: could not queue opt-in boundary capture: ") + cudaGetErrorString(ce);
         return false;
+    };
+    auto boundary_index = [&](int layer) {
+        const auto it = std::lower_bound(boundary_diag_layers_.begin(), boundary_diag_layers_.end(), layer);
+        return it != boundary_diag_layers_.end() && *it == layer ? (int) (it - boundary_diag_layers_.begin()) : -1;
     };
     const size_t boundary_row_floats = (size_t) HC * (size_t) N + (size_t) N + (size_t) HC;
     const size_t boundary_hc_floats = (size_t) HC * (size_t) N;
@@ -1834,16 +1873,17 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
             if (!read_ok) return false;
             return true;
         };
-        if (boundary_diag_layer_ >= 0 && l == boundary_diag_layer_ + 1 &&
-            !boundary_copy(boundary_row_floats, Rt(tb), boundary_hc_floats, tb, n)) return false;
-        if (boundary_diag_layer_ >= 0 && l == boundary_diag_layer_ + 1 &&
-            (!boundary_copy(boundary_row_floats + boundary_hc_floats, bo_ + tb * N, (size_t) N, tb, n) ||
-             !boundary_copy(boundary_row_floats + boundary_hc_floats + (size_t) N,
+        const int boundary_prev_index = boundary_index((int) l - 1);
+        if (boundary_prev_index >= 0 &&
+            !boundary_copy(boundary_prev_index, boundary_row_floats, Rt(tb), boundary_hc_floats, tb, n)) return false;
+        if (boundary_prev_index >= 0 &&
+            (!boundary_copy(boundary_prev_index, boundary_row_floats + boundary_hc_floats, bo_ + tb * N, (size_t) N, tb, n) ||
+             !boundary_copy(boundary_prev_index, boundary_row_floats + boundary_hc_floats + (size_t) N,
                             inj2_ + tb * HC, (size_t) HC, tb, n))) return false;
         const bool q8_attn = gr_read_group(0, pending, inj2_, inj_);   // true: xq_ holds mixed's q8_1 (STRATA_QFUSE)
-        if (boundary_diag_layer_ >= 0 && l == boundary_diag_layer_ + 1 &&
-            (!boundary_copy(2 * boundary_row_floats, Rt(tb), boundary_hc_floats, tb, n) ||
-             !boundary_copy(2 * boundary_row_floats + boundary_hc_floats,
+        if (boundary_prev_index >= 0 &&
+            (!boundary_copy(boundary_prev_index, 2 * boundary_row_floats, Rt(tb), boundary_hc_floats, tb, n) ||
+             !boundary_copy(boundary_prev_index, 2 * boundary_row_floats + boundary_hc_floats,
                             xn_ + (size_t) tb * boundary_hc_floats, boundary_hc_floats, tb, n))) return false;
         if (inputs_pending) {   // the window's steps and positions, before the first mixer reads them
             join(1);
@@ -2685,10 +2725,11 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
         } else if (cvec().covers(l)) {
             cvec_apply(Rt(tb), l, n, HC * N, bo_ + tb * N, N, inj2_ + tb * HC, HC, true, cs);
         }
-        if (boundary_diag_layer_ >= 0 && l == boundary_diag_layer_ &&
-            (!boundary_copy(0, Rt(tb), boundary_hc_floats, tb, n) ||
-             !boundary_copy(boundary_hc_floats, bo_ + tb * N, (size_t) N, tb, n) ||
-             !boundary_copy(boundary_hc_floats + (size_t) N, inj2_ + tb * HC, (size_t) HC, tb, n))) return false;
+        const int boundary_layer_index = boundary_index((int) l);
+        if (boundary_layer_index >= 0 &&
+            (!boundary_copy(boundary_layer_index, 0, Rt(tb), boundary_hc_floats, tb, n) ||
+             !boundary_copy(boundary_layer_index, boundary_hc_floats, bo_ + tb * N, (size_t) N, tb, n) ||
+             !boundary_copy(boundary_layer_index, boundary_hc_floats + (size_t) N, inj2_ + tb * HC, (size_t) HC, tb, n))) return false;
         return true;
     };
 
@@ -3499,24 +3540,28 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
         }
         if (target_row >= 0) boundary_diag_target_seen_ = true;
         if (target_row >= 0 && (T == 1 || boundary_diag_multirow_graph_captured_)) {
-            BoundaryDiagHeaderV2 header{};
-            std::memcpy(header.magic, "STBNDY2", sizeof(header.magic));
-            header.version = 2;
-            header.layer = boundary_diag_layer_;
-            header.position = pos0 + target_row;
-            header.n_embd = (uint64_t) g.n_embd;
-            header.hc = (uint64_t) g.hc;
-            header.token = tokens[target_row];
-            header.slot = -1;
             static std::mutex boundary_dump_mutex;
             std::lock_guard<std::mutex> lock(boundary_dump_mutex);
             std::FILE* dump = std::fopen(boundary_diag_path_.c_str(), "ab");
             bool written = dump != nullptr;
-            if (written) {
+            const size_t row_stride = boundary_diag_capacity_ / sizeof(float);
+            for (size_t i = 0; i < boundary_diag_layers_.size() && written; ++i) {
+                BoundaryDiagHeaderV2 header{};
+                std::memcpy(header.magic, "STBNDY2", sizeof(header.magic));
+                header.version = 2;
+                header.layer = boundary_diag_layers_[i];
+                header.position = pos0 + target_row;
+                header.n_embd = (uint64_t) g.n_embd;
+                header.hc = (uint64_t) g.hc;
+                header.token = tokens[target_row];
+                header.slot = -1;
+                const float* layer_host = boundary_diag_h_ + i * (boundary_diag_layer_stride_ / sizeof(float));
                 written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
-                          std::fwrite(boundary_diag_h_ + (size_t) target_row *
-                                          (boundary_diag_capacity_ / sizeof(float)),
+                          std::fwrite(layer_host + (size_t) target_row * row_stride,
                                       1, boundary_diag_capacity_, dump) == boundary_diag_capacity_;
+                if (written) boundary_diag_layers_captured_[i] = 1;
+            }
+            if (dump != nullptr) {
                 if (std::fflush(dump) != 0) written = false;
                 if (std::fclose(dump) != 0) written = false;
             }
@@ -3524,7 +3569,8 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
                 err = "verify: could not write opt-in residual-boundary diagnostic";
                 return false;
             }
-            boundary_diag_captured_ = true;
+            boundary_diag_captured_ = std::all_of(boundary_diag_layers_captured_.begin(), boundary_diag_layers_captured_.end(),
+                                                   [](uint8_t value) { return value != 0; });
         }
     }
     if (moe_route_diag_captured_ && diag_position_matches(moe_route_diag_position_,
@@ -4458,18 +4504,22 @@ bool Verifier::write_boundary_diag_batch(int T, const int* slots, const int32_t*
         const size_t row_stride = boundary_diag_capacity_ / sizeof(float);
         for (int row = 0; row < T && written; ++row) {
             if (positions[row] != boundary_diag_position_) continue;
-            BoundaryDiagHeaderV2 header{};
-            std::memcpy(header.magic, "STBNDY2", sizeof(header.magic));
-            header.version = 2;
-            header.layer = boundary_diag_layer_;
-            header.position = positions[row];
-            header.n_embd = (uint64_t) g_->n_embd;
-            header.hc = (uint64_t) g_->hc;
-            header.token = tokens[row];
-            header.slot = slots[row];
-            written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
-                      std::fwrite(boundary_diag_h_ + (size_t) row * row_stride,
-                                  1, boundary_diag_capacity_, dump) == boundary_diag_capacity_;
+            for (size_t i = 0; i < boundary_diag_layers_.size() && written; ++i) {
+                BoundaryDiagHeaderV2 header{};
+                std::memcpy(header.magic, "STBNDY2", sizeof(header.magic));
+                header.version = 2;
+                header.layer = boundary_diag_layers_[i];
+                header.position = positions[row];
+                header.n_embd = (uint64_t) g_->n_embd;
+                header.hc = (uint64_t) g_->hc;
+                header.token = tokens[row];
+                header.slot = slots[row];
+                const float* layer_host = boundary_diag_h_ + i * (boundary_diag_layer_stride_ / sizeof(float));
+                written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
+                          std::fwrite(layer_host + (size_t) row * row_stride,
+                                      1, boundary_diag_capacity_, dump) == boundary_diag_capacity_;
+                if (written) boundary_diag_layers_captured_[i] = 1;
+            }
         }
         if (std::fflush(dump) != 0) written = false;
         if (std::fclose(dump) != 0) written = false;
@@ -4478,7 +4528,8 @@ bool Verifier::write_boundary_diag_batch(int T, const int* slots, const int32_t*
         err = "verify: could not write opt-in batch residual-boundary diagnostic";
         return false;
     }
-    boundary_diag_captured_ = true;
+    boundary_diag_captured_ = std::all_of(boundary_diag_layers_captured_.begin(), boundary_diag_layers_captured_.end(),
+                                           [](uint8_t value) { return value != 0; });
     return true;
 }
 

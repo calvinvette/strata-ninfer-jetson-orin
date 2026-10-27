@@ -13,17 +13,37 @@ HEADER = struct.Struct('<8sIiqQQii')
 
 
 def read_capture(path: Path) -> tuple[dict, dict[str, tuple[float, ...]]]:
+    records = read_capture_records(path)
+    if len(records) != 1:
+        raise ValueError(f'{path}: expected one boundary record, found {len(records)}')
+    return records[0]
+
+
+def read_capture_records(path: Path) -> list[tuple[dict, dict[str, tuple[float, ...]]]]:
     raw = path.read_bytes()
-    if len(raw) < HEADER.size:
-        raise ValueError(f'{path}: truncated boundary header')
-    magic, version, layer, position, n_embd, hc, token, slot = HEADER.unpack_from(raw)
-    if magic != b'STBNDY2\0' or version != 2 or layer < 0 or n_embd == 0 or hc == 0:
-        raise ValueError(f'{path}: invalid STBNDY2 header')
+    records = []
+    offset = 0
+    while offset < len(raw):
+        if len(raw) - offset < HEADER.size:
+            raise ValueError(f'{path}: truncated boundary header')
+        magic, version, layer, position, n_embd, hc, token, slot = HEADER.unpack_from(raw, offset)
+        if magic != b'STBNDY2\0' or version != 2 or layer < 0 or n_embd == 0 or hc == 0:
+            raise ValueError(f'{path}: invalid STBNDY2 header at byte {offset}')
+        row = hc * n_embd + n_embd + hc
+        total_floats = 2 * row + 2 * hc * n_embd
+        record_size = HEADER.size + total_floats * 4
+        if len(raw) - offset < record_size:
+            raise ValueError(f'{path}: truncated boundary payload at byte {offset}')
+        values = struct.unpack_from(f'<{total_floats}f', raw, offset + HEADER.size)
+        records.append(_decode_record(layer, position, n_embd, hc, token, slot, values))
+        offset += record_size
+    if not records:
+        raise ValueError(f'{path}: empty boundary capture')
+    return records
+
+
+def _decode_record(layer, position, n_embd, hc, token, slot, values):
     row = hc * n_embd + n_embd + hc
-    total_floats = 2 * row + 2 * hc * n_embd
-    if len(raw) != HEADER.size + total_floats * 4:
-        raise ValueError(f'{path}: payload has {len(raw) - HEADER.size} bytes; expected {total_floats * 4}')
-    values = struct.unpack_from(f'<{total_floats}f', raw, HEADER.size)
     width = hc * n_embd
     fields = {
         'layer_output_rt': values[:width],
@@ -55,16 +75,28 @@ def main() -> int:
     parser.add_argument('candidate', type=Path)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
-    ah, a = read_capture(args.reference)
-    bh, b = read_capture(args.candidate)
-    if ah != bh:
-        raise ValueError(f'capture headers differ: {ah} vs {bh}')
-    result = {'schema': 1, 'header': ah,
-              'fields': {name: metrics(a[name], b[name]) for name in a}}
+    ar = read_capture_records(args.reference)
+    br = read_capture_records(args.candidate)
+    amap = {h['layer']: (h, f) for h, f in ar}
+    bmap = {h['layer']: (h, f) for h, f in br}
+    if len(amap) != len(ar) or len(bmap) != len(br) or amap.keys() != bmap.keys():
+        raise ValueError('capture layer sets differ or contain duplicates')
+    compared = []
+    for layer in sorted(amap):
+        ah, a = amap[layer]
+        bh, b = bmap[layer]
+        if ah != bh:
+            raise ValueError(f'capture headers differ at layer {layer}: {ah} vs {bh}')
+        compared.append({'header': ah, 'fields': {name: metrics(a[name], b[name]) for name in a}})
+    result = {'schema': 2 if len(compared) > 1 else 1,
+              'header': compared[0]['header'], 'fields': compared[0]['fields']}
+    if len(compared) > 1:
+        result['records'] = compared
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + '\n')
-    print(json.dumps({'layer': ah['layer'], 'position': ah['position'],
-                      'different_fields': [k for k, v in result['fields'].items() if v['different']]}, indent=2))
+    print(json.dumps({'layers': [{'layer': r['header']['layer'],
+                                  'different_fields': [k for k, v in r['fields'].items() if v['different']]}
+                                 for r in compared]}, indent=2))
     return 0
 
 

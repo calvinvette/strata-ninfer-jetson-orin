@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from compare_boundary_capture import HEADER, metrics, read_capture
+from compare_boundary_capture import HEADER, metrics, read_capture, read_capture_records
 
 
 class BoundaryCaptureTests(unittest.TestCase):
@@ -37,6 +37,16 @@ class BoundaryCaptureTests(unittest.TestCase):
             path.write_bytes(HEADER.pack(b'STBNDY2\0', 2, 2, 7, 2, 1, 42, -1) + b'\0')
             with self.assertRaisesRegex(ValueError, 'payload'):
                 read_capture(path)
+
+    def test_reads_concatenated_layer_records(self):
+        payload = struct.pack('<14f', *range(14))
+        records = [HEADER.pack(b'STBNDY2\0', 2, layer, 7, 2, 1, 42, -1) + payload
+                   for layer in (1, 3)]
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / 'capture.bin'
+            path.write_bytes(b''.join(records))
+            decoded = read_capture_records(path)
+        self.assertEqual([header['layer'] for header, _ in decoded], [1, 3])
 
 
 if __name__ == '__main__':

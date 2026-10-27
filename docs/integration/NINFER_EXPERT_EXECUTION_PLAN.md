@@ -1409,3 +1409,13 @@ and [selected-boundary repeat](../../bench/results/2026-10-27-e6-q2-active-compu
 Next add bounded multi-layer boundary capture at a fixed accepted position,
 repeat with identical capture settings, and locate the first reproducible
 boundary difference before applying an independent oracle. E6 remains open.
+
+**Diagnostic tooling follow-up (2026-10-27):** implemented opt-in capture of
+multiple residual boundaries at one fixed token position. Each layer is emitted
+as an existing `STBNDY2` record, and the comparator aligns concatenated records
+by layer; the legacy singular capture remains available. Orin CUDA build and
+204 integration Python tests pass. HIP/SYCL builds are pending because
+maestro1 has 1.1 GiB free. No multi-layer model run or new quality/performance
+qualification has been completed. Next, qualify the shared verifier change on
+HIP/SYCL, then run the paired long-context capture and continue the independent
+oracle investigation. E6 remains open.

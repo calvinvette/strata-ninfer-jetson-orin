@@ -409,12 +409,15 @@ private:
     std::string gdn_state_diag_path_;
     bool gdn_state_diag_captured_ = false;
     int boundary_diag_layer_ = -1;
+    std::vector<int> boundary_diag_layers_;
     int64_t boundary_diag_position_ = -1;
     float* boundary_diag_h_ = nullptr; ///< opt-in residual/hyperconnection boundary snapshots
     size_t boundary_diag_capacity_ = 0; ///< bytes in one row's STBNDY2 payload
-    size_t boundary_diag_storage_capacity_ = 0; ///< pinned payload storage for all verifier batch rows
+    size_t boundary_diag_layer_stride_ = 0; ///< pinned payload storage for one layer across verifier batch rows
+    size_t boundary_diag_storage_capacity_ = 0; ///< pinned payload storage for all selected layers and rows
     std::string boundary_diag_path_;
     bool boundary_diag_captured_ = false;
+    std::vector<uint8_t> boundary_diag_layers_captured_;
     bool boundary_diag_multirow_graph_captured_ = false;
     bool boundary_diag_copy_queued_ = false;
     bool boundary_diag_target_seen_ = false;

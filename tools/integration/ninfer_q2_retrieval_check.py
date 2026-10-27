@@ -55,6 +55,8 @@ def main() -> int:
                     help='filter committed GDN state to several increasing token positions')
     ap.add_argument('--capture-boundary-layer', type=int,
                     help='capture residual/hyperconnection boundaries after one model layer')
+    ap.add_argument('--capture-boundary-layers', type=int, nargs='+',
+                    help='capture boundaries after several increasing model layers')
     ap.add_argument('--capture-boundary-position', type=int,
                     help='token position for the residual-boundary capture')
     ap.add_argument('--capture-gr-read-layer', type=int,
@@ -98,10 +100,19 @@ def main() -> int:
             not a.capture_gdn_commit_positions or any(x < 0 for x in a.capture_gdn_commit_positions) or
             a.capture_gdn_commit_positions != sorted(set(a.capture_gdn_commit_positions))):
         ap.error('--capture-gdn-commit-positions must be unique, increasing, nonnegative integers')
-    if (a.capture_boundary_layer is None) != (a.capture_boundary_position is None):
-        ap.error('--capture-boundary-layer and --capture-boundary-position must be used together')
+    if a.capture_boundary_layer is not None and a.capture_boundary_layers is not None:
+        ap.error('use only one of --capture-boundary-layer and --capture-boundary-layers')
+    boundary_layers = a.capture_boundary_layers
+    if a.capture_boundary_layer is not None:
+        boundary_layers = [a.capture_boundary_layer]
+    if (boundary_layers is None) != (a.capture_boundary_position is None):
+        ap.error('a boundary layer option and --capture-boundary-position must be used together')
     if a.capture_boundary_layer is not None and not 0 <= a.capture_boundary_layer < 47:
         ap.error('--capture-boundary-layer must be in [0, 46]')
+    if boundary_layers is not None and (
+            not boundary_layers or any(not 0 <= x < 47 for x in boundary_layers) or
+            boundary_layers != sorted(set(boundary_layers))):
+        ap.error('--capture-boundary-layers must be unique, increasing model layers in [0, 46]')
     if a.capture_boundary_position is not None and a.capture_boundary_position < 0:
         ap.error('--capture-boundary-position must be nonnegative')
     if a.capture_gr_read_position is not None and a.capture_gr_read_positions is not None:
@@ -227,8 +238,8 @@ def main() -> int:
                 (a.output / f'{name}.gdn-commit').resolve())
             arm_env['STRATA_VERIFY_DUMP_GDN_COMMIT_POSITIONS'] = ','.join(
                 map(str, a.capture_gdn_commit_positions))
-        if a.capture_boundary_layer is not None:
-            arm_env['STRATA_VERIFY_DUMP_BOUNDARY_LAYER'] = str(a.capture_boundary_layer)
+        if boundary_layers is not None:
+            arm_env['STRATA_VERIFY_DUMP_BOUNDARY_LAYERS'] = ','.join(map(str, boundary_layers))
             arm_env['STRATA_VERIFY_DUMP_BOUNDARY_POSITION'] = str(a.capture_boundary_position)
             arm_env['STRATA_VERIFY_DUMP_BOUNDARY_PATH'] = str(
                 (a.output / f'{name}.boundary').resolve())

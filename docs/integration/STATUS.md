@@ -6402,3 +6402,20 @@ and [GR/GDN comparison](../../bench/results/2026-10-27-e6-q2-active-compute-qual
 Next add a bounded multi-layer boundary capture at a fixed accepted position
 and repeat with identical capture settings to find the first reproducible
 boundary difference. E6 remains open.
+
+**E6 multi-layer capture tooling (2026-10-27):** the opt-in residual-boundary
+capture now accepts a sorted list of model layers at one token position, stores
+each layer's existing `STBNDY2` record in a concatenated stream, and compares
+records by layer. The single-layer environment option and single-record
+comparator interface remain supported. Orin CUDA configuration and a full
+`strata` build passed against pinned ggml `3cf03257f219afbe7334045ff7c6a06ac68c627d`
+with two build jobs; the final binary SHA256 was
+`68ec69f5d12ead24a5a7d72c53c3a08cc66d6d6a02f4c4d9fcc2a6650901e46a`. The
+integration Python suite passed (204 tests), Python syntax checks and `strata
+--help` passed. No model workload has used this new multi-layer capture yet.
+HIP/SYCL qualification remains pending: maestro1 currently has only 1.1 GiB
+free on its root filesystem, insufficient for the project builds. This tooling
+change does not resolve the nondeterministic 160K final-state mismatch and
+adds no performance evidence. Next, build the affected backends when scratch
+space is available, then repeat the fixed-position 160K capture across the
+model layers with identical settings. E6 remains open.
