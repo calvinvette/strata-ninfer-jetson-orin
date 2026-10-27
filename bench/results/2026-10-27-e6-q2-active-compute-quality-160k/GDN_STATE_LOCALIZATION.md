@@ -161,5 +161,21 @@ The compact comparison is
 [`gr-read-gdn-debug-two-token-fixed/comparison.json`](generated-gdn-trace/gr-read-gdn-debug-two-token-fixed/comparison.json);
 the full-answer run is in the adjacent
 `gr-read-gdn-debug-full-answer/` folder. Comparator unit tests passed (3).
-This qualifies the diagnostic at 2K only. A simultaneous 160K capture is still
-needed to investigate the long-context state divergence described above.
+This qualifies the diagnostic at both 2K and the selected 160K position. The 160K task still ends with the previously observed five-field state divergence, so later generated positions need same-run localization.
+
+
+## Same-run 160K capture (2026-10-27)
+
+The repaired paired trace captured layer-2 fused-read state and GDN `x` at
+position 163844, token 9269. Both backend GR-read payloads were fully nonzero
+(13,128 floats) and bitwise equal across all five fields. On each backend,
+`mixed` matched the same-run GDN `x` vector bitwise; the two GDN `x` vectors
+also matched. Thus the earlier report of an `x` delta at 163844 came from a
+separate run and is not reproduced by simultaneous capture. The held-out task
+returned exact matching text and token IDs but still differed in final GDN,
+tail, pooled, pooled-full and KV state. The supervised run took 3,238 seconds,
+with 6.72 GiB minimum available memory, 6.05 GiB peak swap and no OOM events.
+See [`comparison.json`](generated-gdn-trace/gr-read-gdn-fixed-same-run/comparison.json).
+Capture the known later split positions 163849 and 163877 together in the next
+paired trace to establish whether the divergence begins there in this same
+trajectory.

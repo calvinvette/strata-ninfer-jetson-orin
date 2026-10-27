@@ -103,4 +103,24 @@ fields. Focused comparator tests passed (3 tests). See the
 and full-answer paired results in the adjacent `gr-read-gdn-debug-full-answer`
 run folder. The earlier zero-filled captures remain invalid; this new 2K
 evidence supersedes the claim that the capture lifecycle is still unresolved.
-The 160K paired simultaneous capture is still outstanding, so E6 remains open.
+The simultaneous 160K capture is now complete; it confirms equality at position 163844 but does not explain the later persistent-state divergence, so E6 remains open.
+
+
+**Same-run 160K follow-up (2026-10-27):** the repaired diagnostic captured
+layer-2 fused read and GDN input at position 163844 for both staged backends.
+Each GR-read file is 52,568 bytes with 13,128/13,128 nonzero floats. All five
+fields match bitwise across Strata and NInfer, and each backend's `mixed`
+vector equals its own same-run GDN `x` vector bitwise. Both runs used token ID
+9269 at the selected position. The full held-out task returned the exact answer
+and identical token IDs (47 generated), but final state still differs in GDN,
+tail, pooled, pooled-full and KV. The supervised pair took 3,238 seconds;
+minimum available RAM was 6.72 GiB, peak swap 6.05 GiB, and observed OOM
+counters were zero. The checker exit was the expected final-state mismatch,
+not a memory stop. See
+[`gr-read-gdn-fixed-same-run/comparison.json`](generated-gdn-trace/gr-read-gdn-fixed-same-run/comparison.json)
+and the paired [results](generated-gdn-trace/gr-read-gdn-fixed-same-run/run/results.json).
+This resolves the between-run contradiction at position 163844: the fused read
+and same-run GDN input are equal there, despite the separate trace that had
+reported a GDN-input delta. It does not locate the later divergence. Next
+capture matching recurrent positions 163849 and 163877 in one paired run; E6
+remains open.

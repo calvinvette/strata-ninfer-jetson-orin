@@ -6329,6 +6329,21 @@ matched bitwise, and each captured `mixed` vector matched same-run GDN `x`. A
 state fields. The comparison is
 [here](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gr-read-gdn-debug-two-token-fixed/comparison.json).
 The full-answer paired results are under the adjacent
-`gr-read-gdn-debug-full-answer/` folder. The earlier reported 2K/160K captures
-remain invalid zero-filled evidence. E6 remains open pending the corresponding
-simultaneous capture at the 160K divergence position.
+`gr-read-gdn-debug-full-answer/` folder. A new simultaneous capture at 160K
+position 163844 also produced fully nonzero, bitwise-equal GR-read payloads;
+its `mixed` vector matched same-run GDN `x` for each backend. The task text and
+tokens matched, but the same five final-state fields still differed. Minimum
+available memory was 6.72 GiB and peak swap 6.05 GiB with no OOM events. The
+old captures remain invalid zero-filled evidence. Next capture positions
+163849 and 163877 together to locate the later divergence. E6 remains open.
+
+
+**E6 same-run long-context update (2026-10-27):** the selected 160K capture at
+layer 2 / position 163844 is now validated: Strata and NInfer GR-read values
+are nonzero and bitwise equal, and each capture's `mixed` vector equals its
+same-run GDN `x`. Despite identical answer and generated token IDs, final GDN,
+tail, pooled, pooled-full and KV state still differ. The run stayed above the
+6 GiB physical-memory floor (6.72 GiB minimum) with zero observed OOM events.
+This rules out the fused read at 163844 as the source in this paired trajectory
+but does not explain a later recurrence/state split. Next measure same-run
+positions 163849 and 163877.

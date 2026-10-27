@@ -1357,6 +1357,18 @@ bitwise equality across `xn`, `lo`, `rs`, `inj_out` and `mixed`; same-run GDN
 `x` equals captured `mixed` on both backends. Full 48-token retrieval and final
 state parity also pass. This supersedes the prior note that the 2K capture
 guard remained unresolved, while preserving the retraction of the old
-zero-filled 2K/160K data. Next, capture GR-read and GDN inputs simultaneously
-at the 160K divergence position; keep Phase E6 open until its long-context
-state discrepancy is explained.
+zero-filled 2K/160K data. The simultaneous 160K capture at position 163844 is complete. Both backends
+match bitwise for the fused read and same-run GDN `x`, but final recurrent and
+KV state still differs by the end of the task. Capture same-run positions
+163849 and 163877 next to locate the later divergence; keep E6 open.
+
+
+**E6 long-context diagnostic update (2026-10-27):** repaired fused GR-read and
+GDN captures now validate at 2K and at 160K position 163844. At 160K, all five
+read fields match bitwise across backends, and `mixed` is equal to each
+backend's same-run GDN `x`. Exact answer and token IDs still accompany a final
+state mismatch in GDN, tail, pooled, pooled-full and KV. Supervised memory
+minimum was 6.72 GiB with no OOMs. The prior separate-run GDN `x` difference
+at 163844 is not reproduced. The next diagnostic is a paired capture of later
+generated positions 163849 and 163877, where earlier traces first observed
+large recurrence deltas. Phase E6 is not complete.
