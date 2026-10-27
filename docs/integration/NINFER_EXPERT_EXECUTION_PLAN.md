@@ -1186,3 +1186,10 @@ At 128K capacity, the 512+64 cell matched all measured output and residency
 hashes. Median paired changes were +0.45% prompt TPS, 0% decode TPS, −0.59%
 first-visible TTFT and −0.08% client time; minimum available memory was
 8.47 GiB. No median reached the screen threshold. See the [128K report](../../bench/results/2026-10-26-e6-q2-staged-compute-128k-pp512-screen/README.md).
+
+At configured 256K capacity, a separate 512+64 staged-compute screen matched
+outputs and resident maps in all pairs. Minimum available memory was 7.10 GiB.
+Median changes were −2.89% prompt TPS, 0% decode TPS, +3.17% first-visible
+TTFT and +2.51% client time, but paired spreads were wide and no median passed
+the threshold. This does not erase the one output mismatch in the separate
+2,048+128 256K screen. See the [512-token 256K report](../../bench/results/2026-10-26-e6-q2-staged-compute-256k-pp512-screen/README.md).

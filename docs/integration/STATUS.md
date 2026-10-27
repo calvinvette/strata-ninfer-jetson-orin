@@ -52,6 +52,11 @@ At 128K, all outputs and resident maps matched; minimum available memory was
 8.47 GiB. Median changes were +0.45% prompt TPS, 0% decode TPS, −0.59%
 first-visible TTFT and −0.08% client time, below the threshold. See the [128K
 report](../../bench/results/2026-10-26-e6-q2-staged-compute-128k-pp512-screen/README.md).
+At 256K, the 512+64 cell matched outputs and resident maps in all pairs, with
+7.10 GiB minimum available memory. Medians were −2.89% prompt TPS, 0% decode
+TPS, +3.17% first-visible TTFT and +2.51% client time, but pair spreads were
+wide; this is inconclusive. It is distinct from the 2,048+128 256K cell above,
+which had one output mismatch. See the [256K 512-token report](../../bench/results/2026-10-26-e6-q2-staged-compute-256k-pp512-screen/README.md).
 
 The [NInfer expert execution plan](NINFER_EXPERT_EXECUTION_PLAN.md) is now in
 progress: E0 is complete for bounded controls and Q2_0 timing; E1–E4 have
