@@ -61,6 +61,10 @@ At 64K, the same 2,048+128 shape matched outputs and residency. Median changes
 were +0.89% prompt TPS, −1.20% decode TPS, −1.01% first-visible TTFT and
 −0.48% client time; minimum available memory was 10.05 GiB. No metric passed
 the threshold. See the [64K 2K-prompt report](../../bench/results/2026-10-26-e6-q2-staged-compute-64k-pp2048-screen/README.md).
+At 128K, the same 2,048+128 shape matched outputs and resident maps across all
+pairs; minimum available memory was 8.36 GiB. Median changes were −0.46%
+prompt TPS, 0% decode TPS, +0.31% first-visible TTFT and −1.16% client time.
+No median passed threshold. See the [128K 2K-prompt report](../../bench/results/2026-10-26-e6-q2-staged-compute-128k-pp2048-screen/README.md).
 The 16K 512+64 cell matched outputs and resident maps across all pairs. Median
 changes were −2.92% prompt TPS, 0% decode TPS, +1.83% first-visible TTFT and
 +1.09% client time; minimum available memory was 11.32 GiB. No median reached
