@@ -1140,4 +1140,9 @@ measured output differed in pair 3; a text-capture rerun did not reproduce the
 mismatch but did not explain it. Therefore this screen is unqualified for task
 quality or performance, and does not establish long-prompt behavior. Minimum
 available memory was 7.14 GiB. The low-capacity 1K staged-compute cell is now
-running; E6 remains open. See the [256K report](../../bench/results/2026-10-26-e6-q2-staged-compute-256k-screen/README.md).
+complete. Its 512+64 request produced matching outputs and residency maps in
+all three pairs; median paired changes were −1.64% prompt TPS, −1.10% decode
+TPS, +1.24% first-visible TTFT and +1.08% client time. No 1K median reached
+the 5% screen threshold; minimum available memory was 11.67 GiB. These are
+capacity-boundary screens only and do not close task-quality or performance
+gates. E6 remains open. See the [256K report](../../bench/results/2026-10-26-e6-q2-staged-compute-256k-screen/README.md) and [1K report](../../bench/results/2026-10-26-e6-q2-staged-compute-1k-screen/README.md).
