@@ -6117,4 +6117,4 @@ service dispatch. No operator or end-to-end performance gate is closed; move
 from per-layer mirroring to held-out task-quality and paired request
 measurements. HIP and SYCL builds of the selector change and help checks
 passed on maestro1, which is x86_64 compile/startup evidence only.
-[Oracle and operator report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#oracle-check-cpu-fallback-versus-cuda-expert-arithmetic), [backend build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-per-layer-q8_1-mirror-filters).
+[Oracle and operator report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#oracle-check-cpu-fallback-versus-cuda-expert-arithmetic), [staged-compute request screen](../../bench/results/2026-10-26-e6-q2-staged-compute-screen/README.md), [backend build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-per-layer-q8_1-mirror-filters).

@@ -1112,3 +1112,13 @@ diagnostic result, not a task-quality substitute when CPU and CUDA arithmetic
 differ. No performance or quality gate is closed. HIP and SYCL builds and
 model-free help checks passed on maestro1 (x86_64 evidence only). Details are
 linked in [STATUS](STATUS.md).
+
+A three-pair randomized request screen then compared Strata and NInfer compute
+with staging enabled in both arms for the held-out 2K+128 shape. All outputs
+and resident maps matched. Paired median changes were +1.91% prompt TPS,
++2.27% decode TPS, −1.81% first-visible TTFT and −1.12% client time; no metric
+reached the 5% threshold, so no confirmation campaign was triggered. Minimum
+available memory was 11.43 GiB. This narrows the product result: the active
+NInfer grouped path has no demonstrated request-level gain on this shape.
+Continue to other planned shapes and the task-quality gate before E6 closeout.
+See the [staged-compute screen](../../bench/results/2026-10-26-e6-q2-staged-compute-screen/README.md).
