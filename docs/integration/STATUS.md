@@ -34,6 +34,11 @@ staged-compute backends again returned the exact answer in 47 tokens and
 matched token IDs, residency and all nine final state fields. Minimum
 available memory was 11.62 GiB. This adds a second bounded quality/state point
 but no performance evidence. See the [4K quality check](../../bench/results/2026-10-27-e6-q2-active-compute-quality-4k/README.md).
+The held-out task also passed with an 8,192-token prompt under a 16K context
+cap. The active staged backends returned the exact answer in 47 tokens and
+matched token IDs, residency and all nine final state fields. Minimum
+available memory was 11.40 GiB. The 2K/4K/8K progression is bounded correctness
+evidence only, not long-context performance. See the [8K quality check](../../bench/results/2026-10-27-e6-q2-active-compute-quality-8k/README.md).
 The matching 1K staged-compute cell (512+64) completed all three pairs with
 matching output and resident-map hashes. Median changes were −1.64% prompt TPS,
 −1.10% decode TPS, +1.24% first-visible TTFT and +1.08% client time, again

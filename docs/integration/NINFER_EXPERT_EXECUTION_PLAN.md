@@ -1260,3 +1260,9 @@ with identical token IDs, residency and all nine final state fields. Minimum
 available memory was 11.62 GiB. This strengthens correctness coverage through
 4K prompt length but is not a timing estimate or near-limit context test. See
 the [4K active-compute quality report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-4k/README.md).
+
+An 8,192-token version under a 16K capacity also passed the exact-answer,
+token-ID, resident-map and all-nine-field final-state comparisons between the
+active staged compute backends. Minimum available memory was 11.40 GiB. This
+extends bounded correctness coverage through an 8K prompt; it is neither
+near-limit 16K ingestion nor performance evidence. See the [8K report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-8k/README.md).
