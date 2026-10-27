@@ -34,6 +34,18 @@ divergence but do not identify its arithmetic cause or which backend is
 correct. See the [expanded localization note](GDN_STATE_LOCALIZATION.md) and
 [compact raw-output summary](generated-gdn-trace-summary.json).
 
+An independent FP64 recurrence replay over the captured `h`, gate and beta
+inputs matched raw `o` at all 46 generated positions. Worst relative L2 was
+`3.52e-7` for Strata and `3.58e-7` for NInfer, below the registered `1e-5`
+operator bound. At position 163877, the recurrence inputs already differed
+substantially (`h`: 10,233/10,240 values; gate and beta: 48/48 each), which
+explains why their raw outputs separate there. The first differences in this
+trace's layer-2 `x`, gate and beta inputs appeared at position 163844. The
+replay starts from a separate same-task prompt-boundary capture, so it does not
+establish a same-run trajectory. Next capture that boundary state and the
+residual entering model layer 2 in the same paired run to localize the earlier
+activation split.
+
 
 A corrected accepted-prefix GDN-array diagnostic found exact equality at GDN
 layer 0, a tiny first difference at layer 1 (relative L2 `6.87e-10`), then

@@ -1317,10 +1317,16 @@ then a first observed `y` difference on the first generated token (relative L2
 now shows that the difference is already present before normalization at
 position 163840 (relative L2 `3.13e-8`); both `o` and `y` jump at position
 163877 (`5.11e-4` and `1.41e-3`) where other GDN intermediates first split
-substantially. This narrows the observation to the recurrence/output path but
-does not identify the arithmetic cause or which backend is correct. An opt-in
-instrumentation control with capture disabled passed the 2K task with full
-state parity. Next build an independent focused GDN arithmetic oracle and
-inspect recurrence/reduction order before another long-context run. See the
+substantially. An independent FP64 recurrence replay over all 46 captured
+positions matches each raw `o` trace to worst relative L2 `3.52e-7` (Strata)
+and `3.58e-7` (NInfer), below the registered `1e-5` operator bound. At
+position 163877, the captured `h`, gate and beta inputs already differ
+substantially; the first layer-2 input differences in this trace occur at
+163844. The replay starts from a separate same-task boundary-state capture, so
+it does not establish same-run trajectory parity or locate the upstream layer
+operation. An opt-in instrumentation control with capture disabled passed the
+2K task with full state parity. Next capture the recurrent boundary state and
+the residual entering model layer 2 around positions 163843–163844 in the same
+paired run. See the
 [GDN localization
 note](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/GDN_STATE_LOCALIZATION.md).

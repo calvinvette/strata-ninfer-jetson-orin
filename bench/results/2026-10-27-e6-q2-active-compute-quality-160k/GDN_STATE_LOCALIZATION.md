@@ -59,6 +59,20 @@ generated token, followed by a much larger event at the same position as the
 previously observed `qkv`, `h`, `z` and `gdn_out` differences. It does not
 identify the originating operation or establish which backend is correct.
 
+An independent FP64 replay of the captured recurrence inputs, initialized from
+the separately captured bitwise-equal layer-2 prompt-boundary state, matches
+captured raw `o` across all 46 generated positions with worst relative L2
+`3.52e-7` for Strata and `3.58e-7` for NInfer. At position 163877, where raw
+`o` differs by `5.11e-4` between backends, the captured recurrence inputs have
+already split substantially: 10,233/10,240 `h` values differ, and all 48 gate
+and beta values differ. The first input differences in this trace appear at
+position 163844 (`x`: 2,047/6,144 values, gate: 10/48, beta: 15/48). This
+places the large raw-output split downstream of a changed layer-2 input, not in
+the recurrence equation itself. The FP64 replay uses a separately captured
+prompt-boundary state rather than a state snapshot from the exact raw-`o` run,
+so it does not prove same-run trajectory equivalence or locate which earlier
+model-layer operation first changed the activation.
+
 The diagnostic's default-path control, with raw capture disabled, passed the
 same 2,048-token held-out task: exact answer, token IDs, residency and all nine
 final state fields matched. Minimum available memory was 11.55 GiB; sequential
@@ -77,5 +91,8 @@ independent `gdn_parity --selftest` measured recurrence-output relative L2
 convolution, normalization, layout and fused multi-token cases passed. The
 separate `gdn_rec_parity` reported bitwise-equal recurrence variants for the
 tested lengths 1–4099. These synthetic checks validate bounded operator
-contracts, but they do not replay the captured 160K state/input pair or explain
-the cross-backend mismatch.
+contracts. The focused trace replay adds captured-input numerical evidence,
+with the separate-state limitation above; it still does not identify the
+earlier model-layer operation. Next capture same-run recurrent state at the
+prompt boundary and the residual boundary entering model layer 2 around
+positions 163843–163844 to locate the earliest upstream activation split.

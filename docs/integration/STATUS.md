@@ -6287,9 +6287,15 @@ already exists before normalization (`3.13e-8` relative L2 at 163840); both
 other recurrent intermediates. The final answer and token IDs still match,
 but five state fields do not. This narrows the observed divergence to the
 generation-side recurrence/output path without identifying its arithmetic
-cause or correct backend. The 53.96-minute capture run kept minimum available
-RAM at 7.20 GiB above the floor, with peak swap 5.98 GiB. A separate no-capture
-2K control passed exact answer, token, residency and all-state checks with
-11.55 GiB minimum available RAM. Next compare recurrence/reduction order to an
-independent focused GDN arithmetic oracle before another long run. See the
+cause or correct backend. An independent FP64 recurrence replay over the 46
+captured positions matched raw `o` to worst relative L2 `3.52e-7` for Strata
+and `3.58e-7` for NInfer. By position 163877, the GDN `h`, gate and beta inputs
+already differed substantially; the first layer-2 `x`, gate and beta input
+deltas in this raw-output trace appear at position 163844. The replay starts
+from a separate prompt-boundary state capture, so it is not same-run trajectory
+proof. The 53.96-minute capture run kept minimum available RAM at 7.20 GiB
+above the floor, with peak swap 5.98 GiB. A separate no-capture 2K control
+passed exact answer, token, residency and all-state checks with 11.55 GiB
+minimum available RAM. Next capture same-run boundary state and the residual
+entering model layer 2 around positions 163843–163844. See the
 [localization note](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/GDN_STATE_LOCALIZATION.md).

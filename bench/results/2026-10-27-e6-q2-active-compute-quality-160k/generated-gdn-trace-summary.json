@@ -56,7 +56,20 @@
       "recurrence_variants_bitwise_equal": true,
       "chunked_variant": "not exercised on Orin by this executable"
     },
-    "scope": "These existing synthetic operator checks pass, but do not replay the captured long-context state/input pair or establish cross-backend correctness for the 160K cell."
+    "captured_trace_fp64_replay": {
+      "tool": "tools/integration/gdn_trace_oracle.py",
+      "positions": 46,
+      "state_position": 163839,
+      "state_source": "separately captured same-task paired boundary record; layer-2 states were bitwise equal",
+      "strata_worst_relative_l2": 3.521306420322021e-7,
+      "ninfer_worst_relative_l2": 3.5769798191582405e-7,
+      "strata_position_163840_relative_l2": 8.644283348473704e-8,
+      "ninfer_position_163840_relative_l2": 8.551428776903403e-8,
+      "strata_position_163877_relative_l2": 2.6803744141727876e-7,
+      "ninfer_position_163877_relative_l2": 2.687135422944541e-7,
+      "interpretation": "Both raw-o traces follow the independent FP64 recurrence closely. The large cross-backend o split at position 163877 occurs after captured h, gate and beta inputs have split. The state snapshot came from a separate paired run, so same-run trajectory parity remains unproven."
+    },
+    "scope": "Synthetic operator checks and captured-input FP64 replay pass their bounded numerical checks; neither locates the upstream model-layer operation or independently proves the exact same-run trajectory at 160K."
   },
   "raw_arrays_and_supervisor_logs_committed": false
 }
