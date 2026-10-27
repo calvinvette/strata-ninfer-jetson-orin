@@ -1235,3 +1235,13 @@ maps across all pairs. Median changes were −0.46% prompt TPS, 0% decode TPS,
 +0.31% first-visible TTFT and −1.16% client time; minimum available memory
 was 8.36 GiB. No median met the screen threshold. Pair 3 had a decode-rate
 outlier. See the [128K 2K-prompt report](../../bench/results/2026-10-26-e6-q2-staged-compute-128k-pp2048-screen/README.md).
+
+A repeated 256K 2,048+128 three-pair capture diverged on all three measured
+output hashes, despite temperature zero and identical resident maps. Median
+prompt TPS, TTFT and client-time changes crossed the 5% screen (+5.57%,
+−5.27%, −5.66%), but the output gate failed, so timings are not qualified and
+no confirmation was run. Distinct completion hashes recur across pair and arm
+positions; the evidence does not isolate the backend as the cause. This
+generic generation prompt has no independent task-quality oracle. Minimum
+available memory was 7.15 GiB. The earlier one-pair matching text-capture
+diagnostic is superseded by this repeat. See the [captured repeat report](../../bench/results/2026-10-27-e6-q2-staged-compute-256k-pp2048-repeat/README.md).

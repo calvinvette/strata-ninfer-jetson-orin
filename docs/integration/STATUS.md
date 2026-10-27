@@ -13,10 +13,15 @@ The active E6 staged-compute capacity screens now include a three-pair 256K
 configured-capacity request (2,048 prompt + 128 generated tokens). Median paired
 changes were +1.57% prompt TPS, 0% decode TPS, −0.80% first-visible TTFT and
 −1.09% client time; no metric reached the 5% screen threshold. One of three
-measured NInfer outputs differed, so this is not a quality qualification. A
-text-captured diagnostic rerun matched on measured output but did not explain
-the original mismatch. Minimum available memory was 7.14 GiB, above the guard.
+measured NInfer outputs differed, so this was not a quality qualification. A
+later text-captured three-pair repeat found output hashes differed in all three
+pairs, even though the median prompt-TPS/TTFT/client changes were +5.57%/
+−5.27%/−5.66%. Output variants recurred across different arm/pair positions,
+leaving request-history or numerical sensitivity unresolved; there is no
+independent task-quality oracle for this generic generation prompt. Timings are
+therefore unqualified. Minimum available memory was 7.15 GiB, above the guard.
 This short-request capacity test is not evidence for 256K prompt performance.
+See the [captured repeat](../../bench/results/2026-10-27-e6-q2-staged-compute-256k-pp2048-repeat/README.md).
 The matching 1K staged-compute cell (512+64) completed all three pairs with
 matching output and resident-map hashes. Median changes were −1.64% prompt TPS,
 −1.10% decode TPS, +1.24% first-visible TTFT and +1.08% client time, again
