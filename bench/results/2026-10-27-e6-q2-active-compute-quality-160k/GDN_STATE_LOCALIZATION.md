@@ -66,12 +66,36 @@ captured raw `o` across all 46 generated positions with worst relative L2
 `o` differs by `5.11e-4` between backends, the captured recurrence inputs have
 already split substantially: 10,233/10,240 `h` values differ, and all 48 gate
 and beta values differ. The first input differences in this trace appear at
-position 163844 (`x`: 2,047/6,144 values, gate: 10/48, beta: 15/48). This
+position 163844 (`x`: 2,047/2,560 values, gate: 10/48, beta: 15/48). This
 places the large raw-output split downstream of a changed layer-2 input, not in
 the recurrence equation itself. The FP64 replay uses a separately captured
 prompt-boundary state rather than a state snapshot from the exact raw-`o` run,
 so it does not prove same-run trajectory equivalence or locate which earlier
 model-layer operation first changed the activation.
+
+## Same-run boundary and fused read follow-up
+
+A same-run paired trace captured committed layer-2 GDN state at accepted
+positions 163839, 163840, 163844, 163877 and 163886, plus the model-layer-1
+boundary at generated position 163844. The previous separate-run claim that
+layer-2 state was bitwise equal at the prompt boundary does not hold for this
+same-run pair: at accepted position 163839, 109,395/786,432 state values differ
+(relative L2 `1.701e-8`). The delta remains small at position 163844
+(`1.923e-8`) and rises to `2.114e-4` at 163877. At the captured layer-1 / next
+layer-2 boundary at 163844, all eight compared fields are bitwise equal across
+the arms. The first same-run layer-2 GDN input deltas are already visible at
+163844: `x` differs in 2,047/2,560 values, gate in 10/48 and beta in 15/48.
+This places the first observed change between the captured equal boundary and
+GDN input, but the capture so far does not include each fused read output.
+
+An opt-in capture for the fused grouped-residual read was validated on the
+2,048-token held-out control. Its `xn`, `lo`, `rs`, `inj_out` and `mixed`
+payloads were all bitwise equal for model layer 2 at position 2048; final state
+also matched. The control took 181.6 seconds and minimum available RAM was
+12.40 GiB. A same-run 160K capture at layer 2 / position 163844 is in progress;
+its result will distinguish divergence inside the fused read from a difference
+after that operation. The short-control capture and comparator are diagnostic
+only and are opt-in.
 
 The diagnostic's default-path control, with raw capture disabled, passed the
 same 2,048-token held-out task: exact answer, token IDs, residency and all nine
@@ -80,10 +104,8 @@ elapsed time was 182.2 seconds. This validates the ordinary no-capture path at
 this short context only. The opt-in trace and short control metrics are
 summarized in
 [`gdn-o-trace-summary.json`](generated-gdn-trace/gdn-o-trace-summary.json);
-raw arrays remain local. Next use an independent focused GDN arithmetic oracle
-and compare the active CUDA backend's recurrence/reduction order against the
-reference contract before another expensive long-context run. Keep the memory
-guard in place and do not infer equivalence from final text.
+raw arrays remain local. Keep the memory guard in place and do not infer
+equivalence from final text.
 
 The existing Orin operator checks also passed during this follow-up. The
 independent `gdn_parity --selftest` measured recurrence-output relative L2
@@ -93,6 +115,4 @@ separate `gdn_rec_parity` reported bitwise-equal recurrence variants for the
 tested lengths 1–4099. These synthetic checks validate bounded operator
 contracts. The focused trace replay adds captured-input numerical evidence,
 with the separate-state limitation above; it still does not identify the
-earlier model-layer operation. Next capture same-run recurrent state at the
-prompt boundary and the residual boundary entering model layer 2 around
-positions 163843–163844 to locate the earliest upstream activation split.
+earlier model-layer operation.

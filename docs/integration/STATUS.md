@@ -6296,6 +6296,12 @@ from a separate prompt-boundary state capture, so it is not same-run trajectory
 proof. The 53.96-minute capture run kept minimum available RAM at 7.20 GiB
 above the floor, with peak swap 5.98 GiB. A separate no-capture 2K control
 passed exact answer, token, residency and all-state checks with 11.55 GiB
-minimum available RAM. Next capture same-run boundary state and the residual
-entering model layer 2 around positions 163843–163844. See the
+minimum available RAM. A later same-run trace found a tiny layer-2 state delta
+at accepted position 163839 (`1.701e-8` relative L2), while all eight captured
+model-layer-1 / next-layer-2 boundary tensors at generated position 163844
+were bitwise equal. At that position, layer-2 GDN `x` differed in 2,047/2,560
+values, gate in 10/48 and beta in 15/48. The opt-in fused grouped-residual
+read capture passed a 2K control with all five outputs bitwise equal and full
+final-state parity; a matching 160K capture at position 163844 is running to
+localize the difference within or after that read. See the
 [localization note](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/GDN_STATE_LOCALIZATION.md).

@@ -1311,7 +1311,8 @@ qualification; text equality alone is insufficient. See the [160K report](../../
 A corrected accepted-prefix GDN dump for the 160K mismatch found layer 0 exact,
 a tiny layer-1 difference (relative L2 `6.87e-10`), then growth at layer 2
 (`3.41e-6`) and layer 3 (`4.41e-3`), with global relative L2 `3.60%`. A
-follow-up capture found bitwise-equal layer-2 state at the prompt boundary,
+follow-up capture found bitwise-equal layer-2 state at the prompt boundary in
+one separate run; the later same-run trace below corrects that inference,
 then a first observed `y` difference on the first generated token (relative L2
 `2.50e-8`, max absolute delta `5.96e-8`). A raw pre-normalization `o` capture
 now shows that the difference is already present before normalization at
@@ -1325,8 +1326,13 @@ substantially; the first layer-2 input differences in this trace occur at
 163844. The replay starts from a separate same-task boundary-state capture, so
 it does not establish same-run trajectory parity or locate the upstream layer
 operation. An opt-in instrumentation control with capture disabled passed the
-2K task with full state parity. Next capture the recurrent boundary state and
-the residual entering model layer 2 around positions 163843–163844 in the same
-paired run. See the
+2K task with full state parity. A same-run accepted-prefix trace later found a
+tiny layer-2 state delta at position 163839 (`1.701e-8` relative L2), but
+bitwise-equal captured layer-1 output and next-layer-2 boundary tensors at
+generated position 163844. At that position GDN `x`, gate and beta differed.
+The fused grouped-residual read capture passed the 2K control with all five
+captured outputs equal and final state exact; a same-run 160K capture at
+position 163844 is running to distinguish read-output from downstream
+differences. See the
 [GDN localization
 note](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/GDN_STATE_LOCALIZATION.md).

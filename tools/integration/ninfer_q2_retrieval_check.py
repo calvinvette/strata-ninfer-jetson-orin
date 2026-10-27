@@ -57,6 +57,10 @@ def main() -> int:
                     help='capture residual/hyperconnection boundaries after one model layer')
     ap.add_argument('--capture-boundary-position', type=int,
                     help='token position for the residual-boundary capture')
+    ap.add_argument('--capture-gr-read-layer', type=int,
+                    help='capture fused hyperconnection read inputs and outputs for one model layer')
+    ap.add_argument('--capture-gr-read-position', type=int,
+                    help='token position for the fused hyperconnection read capture')
     ap.add_argument('--capture-qsa-layer', type=int,
                     help='capture selected QSA attention stages at one model layer')
     ap.add_argument('--capture-qsa-position', type=int,
@@ -98,6 +102,12 @@ def main() -> int:
         ap.error('--capture-boundary-layer must be in [0, 46]')
     if a.capture_boundary_position is not None and a.capture_boundary_position < 0:
         ap.error('--capture-boundary-position must be nonnegative')
+    if (a.capture_gr_read_layer is None) != (a.capture_gr_read_position is None):
+        ap.error('--capture-gr-read-layer and --capture-gr-read-position must be used together')
+    if a.capture_gr_read_layer is not None and not 0 <= a.capture_gr_read_layer < 48:
+        ap.error('--capture-gr-read-layer must be in [0, 47]')
+    if a.capture_gr_read_position is not None and a.capture_gr_read_position < 0:
+        ap.error('--capture-gr-read-position must be nonnegative')
     if (a.capture_qsa_layer is None) != (a.capture_qsa_position is None):
         ap.error('--capture-qsa-layer and --capture-qsa-position must be used together')
     if a.capture_qsa_layer is not None and not 0 <= a.capture_qsa_layer < 48:
@@ -214,6 +224,11 @@ def main() -> int:
             arm_env['STRATA_VERIFY_DUMP_BOUNDARY_POSITION'] = str(a.capture_boundary_position)
             arm_env['STRATA_VERIFY_DUMP_BOUNDARY_PATH'] = str(
                 (a.output / f'{name}.boundary').resolve())
+        if a.capture_gr_read_layer is not None:
+            arm_env['STRATA_VERIFY_DUMP_GR_READ_LAYER'] = str(a.capture_gr_read_layer)
+            arm_env['STRATA_VERIFY_DUMP_GR_READ_POSITION'] = str(a.capture_gr_read_position)
+            arm_env['STRATA_VERIFY_DUMP_GR_READ_PATH'] = str(
+                (a.output / f'{name}.gr-read').resolve())
         if a.capture_qsa_layer is not None:
             arm_env['STRATA_PREFILL_QSA_LAYER'] = str(a.capture_qsa_layer)
             arm_env['STRATA_PREFILL_QSA_POSITION'] = str(a.capture_qsa_position)
