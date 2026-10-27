@@ -1279,3 +1279,12 @@ The held-out exact-answer task now passes through 32,768 prompt tokens under a
 47 output token IDs, residency map and all nine final state fields match;
 minimum available RAM was 10.03 GiB. This is sequential correctness evidence,
 not a 64K near-limit or performance result. See the [32K report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-32k/README.md).
+
+
+At 65,536 prompt tokens under a 128K cap, the held-out task passed for both
+active staged grouped-compute backends: exact answer, all 47 output token IDs,
+resident map and all nine final state fields matched. Minimum sampled
+available memory was 8.53 GiB; peak swap use was 6.95 GiB, with zero OOM events
+and the six-GiB guard maintained. This is correctness evidence with observed
+memory pressure, not a 128K near-limit or performance result. See the [64K
+report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-64k/README.md).

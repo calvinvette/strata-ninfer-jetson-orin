@@ -6243,3 +6243,13 @@ map and all nine final persistent-state fields. Minimum available memory was
 10.03 GiB; supervisor OOM counters were zero. This extends bounded functional
 coverage through a 32K prompt, not near-limit 64K ingestion, broad natural-gen
 quality or performance qualification. See the [32K active-compute report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-32k/README.md).
+
+
+The held-out exact-answer check passed at 65,536 prompt tokens under a 128K
+cap. Both active staged grouped-compute backends returned the exact answer in
+47 tokens and matched token IDs, residency and all nine final state fields.
+Minimum sampled available memory was 8.53 GiB and peak swap use was 6.95 GiB;
+zero OOM events were recorded and the six-GiB guard remained satisfied. Swap
+growth signals material memory pressure. This is bounded functional evidence,
+not near-limit 128K ingestion, broad quality or performance qualification. See
+the [64K active-compute report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-64k/README.md).
