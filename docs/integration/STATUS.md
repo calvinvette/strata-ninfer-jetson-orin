@@ -29,6 +29,11 @@ all token IDs and all nine final state fields, and used the same resident map.
 Minimum available memory was 11.59 GiB. This closes one bounded held-out
 task/state cell, not broad natural-generation quality or performance. See the
 [active-compute quality check](../../bench/results/2026-10-27-e6-q2-active-compute-quality-2k/README.md).
+The same held-out test was extended to an exact 4,096-token prompt. Both active
+staged-compute backends again returned the exact answer in 47 tokens and
+matched token IDs, residency and all nine final state fields. Minimum
+available memory was 11.62 GiB. This adds a second bounded quality/state point
+but no performance evidence. See the [4K quality check](../../bench/results/2026-10-27-e6-q2-active-compute-quality-4k/README.md).
 The matching 1K staged-compute cell (512+64) completed all three pairs with
 matching output and resident-map hashes. Median changes were −1.64% prompt TPS,
 −1.10% decode TPS, +1.24% first-visible TTFT and +1.08% client time, again

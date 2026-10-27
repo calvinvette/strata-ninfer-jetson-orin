@@ -1253,3 +1253,10 @@ map, and all nine final persistent-state fields matched. Minimum available
 memory was 11.59 GiB. This passes one bounded held-out task/state cell, but the
 sequential diagnostic supplies no timing evidence and does not close the broad
 quality or performance exits. See the [active-compute quality report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-2k/README.md).
+
+The same exact-answer task was extended to a 4,096-token prompt. Strata and
+strict NInfer staged compute again returned the expected answer in 47 tokens,
+with identical token IDs, residency and all nine final state fields. Minimum
+available memory was 11.62 GiB. This strengthens correctness coverage through
+4K prompt length but is not a timing estimate or near-limit context test. See
+the [4K active-compute quality report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-4k/README.md).
