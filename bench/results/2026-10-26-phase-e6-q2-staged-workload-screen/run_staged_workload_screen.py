@@ -130,6 +130,7 @@ def main():
     global OUT
     global CAPTURE_TEXT
     global CAPTURE_STATE
+    global CONTEXT
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, default=OUT, help="campaign output directory")
@@ -140,10 +141,14 @@ def main():
     parser.add_argument("--comparison", choices=("cpu-miss-staged", "staged-compute"),
                         default="cpu-miss-staged",
                         help="compare CPU miss vs staged NInfer, or Strata vs NInfer compute with identical staging")
+    parser.add_argument("--context", type=int,
+                        choices=(1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144),
+                        default=CONTEXT, help="configured context capacity in tokens")
     args = parser.parse_args()
     OUT = args.out.resolve()
     CAPTURE_TEXT = args.capture_text
     CAPTURE_STATE = args.capture_state
+    CONTEXT = args.context
     ARMS = (("cpu-miss", "ninfer-staged") if args.comparison == "cpu-miss-staged"
             else ("strata-staged", "ninfer-staged"))
     OUT.mkdir(parents=True, exist_ok=True)
