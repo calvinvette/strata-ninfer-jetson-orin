@@ -1,0 +1,762 @@
+{
+  "schema": 1,
+  "date": "2026-10-26",
+  "comparison": "Strata grouped vs strict NInfer grouped compute; both arms staged with --pcie-frac 1.0",
+  "screen": "3 randomized process pairs; one measured sample per workload per arm, each arm warmed on all five shapes; no state hash or trace",
+  "model": "Qwen3.8-Flash-Next GSQ RCO Q2_0, two GGUF shards; 3000 expert slots, 6-GiB resident budget, 3-GiB workspace reserve, 8K configured context, MTP-2, prefill 128, 8 workers",
+  "model_shard_sha256": [
+    "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720",
+    "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+  ],
+  "runtime_binary_sha256": "44c358706192a57ced038cff0478cec05ae3c7476258c7a90e5b1f1ef9a4374e",
+  "runtime_code_commit": "35051742ab28b6be669e6650064936d1dd899bd5",
+  "checkout_commit_at_run": "a43e3c79ee40efe74c1160976d02c9ee2eb5ee68",
+  "runner_commit": "b6be3cf9",
+  "runner_sha256": "9ecf0945e7a6727a4f8458183fa8d27a6cb9103abcc92c66e92ed4456b725407",
+  "resident_map_sha256": "a02fd81e6337273a299b4b834ab1b694c16e5f97512e5dfec9d4fec08cd5ddf7",
+  "pairs": [
+    {
+      "pair": 1,
+      "order": [
+        "strata-staged",
+        "ninfer-staged"
+      ],
+      "arms": {
+        "strata-staged": {
+          "residency_sha256": "a02fd81e6337273a299b4b834ab1b694c16e5f97512e5dfec9d4fec08cd5ddf7",
+          "minimum_available_bytes": 12323889152,
+          "minimum_admission_available_bytes": 12323889152,
+          "gpu_clock_mhz_min_median_max": [
+            306.0,
+            918.0,
+            1300.5
+          ],
+          "emc_clock": "unavailable (read permission denied)",
+          "energy": "not measured",
+          "cgroup_memory_events_max": {
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0
+          },
+          "samples": {
+            "pp512+tg64": {
+              "prompt_tokens_per_second": 35.3,
+              "decode_tokens_per_second": 10.3,
+              "ttft_first_visible_seconds": 14.647146347444504,
+              "client_seconds": 20.737934779841453,
+              "output_sha256": "4a7ec1ebd61dc2be1dee07887644a5891e034bd488088155171f3fcb6eb69e85",
+              "status": "pass"
+            },
+            "pp2048+tg128": {
+              "prompt_tokens_per_second": 58.7,
+              "decode_tokens_per_second": 9.8,
+              "ttft_first_visible_seconds": 35.008501154370606,
+              "client_seconds": 47.941810904070735,
+              "output_sha256": "a868c12065a20f134dd5dbd9ec87132a8a471cb9743019ed60ca1292596e3376",
+              "status": "pass"
+            },
+            "pp172+tg64": {
+              "prompt_tokens_per_second": 20.0,
+              "decode_tokens_per_second": 10.3,
+              "ttft_first_visible_seconds": 8.779765730258077,
+              "client_seconds": 14.850690493360162,
+              "output_sha256": "0c5e2bb1386b48cd33888f8bbddda97ffe4556f22a70fb8125c15eff898ca4fe",
+              "status": "pass"
+            },
+            "pp557+tg64": {
+              "prompt_tokens_per_second": 41.3,
+              "decode_tokens_per_second": 11.2,
+              "ttft_first_visible_seconds": 13.613013176247478,
+              "client_seconds": 19.208590869791806,
+              "output_sha256": "2334bb6bdbd7448d2dfb9dd345a6b17a0f35320cd7ae3fbbf453799073bfd066",
+              "status": "pass"
+            },
+            "pp1069+tg64": {
+              "prompt_tokens_per_second": 51.5,
+              "decode_tokens_per_second": 12.3,
+              "ttft_first_visible_seconds": 20.885007353965193,
+              "client_seconds": 25.962550193071365,
+              "output_sha256": "aaeb70114752870c5786178e6183a3279ff1f0dcf3db97e428c0fd1627849341",
+              "status": "pass"
+            }
+          }
+        },
+        "ninfer-staged": {
+          "residency_sha256": "a02fd81e6337273a299b4b834ab1b694c16e5f97512e5dfec9d4fec08cd5ddf7",
+          "minimum_available_bytes": 12412964864,
+          "minimum_admission_available_bytes": 12412964864,
+          "gpu_clock_mhz_min_median_max": [
+            306.0,
+            918.0,
+            1300.5
+          ],
+          "emc_clock": "unavailable (read permission denied)",
+          "energy": "not measured",
+          "cgroup_memory_events_max": {
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0
+          },
+          "samples": {
+            "pp512+tg64": {
+              "prompt_tokens_per_second": 34.9,
+              "decode_tokens_per_second": 10.3,
+              "ttft_first_visible_seconds": 14.794946264941245,
+              "client_seconds": 20.88491567131132,
+              "output_sha256": "4a7ec1ebd61dc2be1dee07887644a5891e034bd488088155171f3fcb6eb69e85",
+              "status": "pass"
+            },
+            "pp2048+tg128": {
+              "prompt_tokens_per_second": 58.4,
+              "decode_tokens_per_second": 9.8,
+              "ttft_first_visible_seconds": 35.22521861596033,
+              "client_seconds": 48.12470705015585,
+              "output_sha256": "a868c12065a20f134dd5dbd9ec87132a8a471cb9743019ed60ca1292596e3376",
+              "status": "pass"
+            },
+            "pp172+tg64": {
+              "prompt_tokens_per_second": 18.5,
+              "decode_tokens_per_second": 10.4,
+              "ttft_first_visible_seconds": 9.47966639092192,
+              "client_seconds": 15.495697724167258,
+              "output_sha256": "0c5e2bb1386b48cd33888f8bbddda97ffe4556f22a70fb8125c15eff898ca4fe",
+              "status": "pass"
+            },
+            "pp557+tg64": {
+              "prompt_tokens_per_second": 42.5,
+              "decode_tokens_per_second": 11.8,
+              "ttft_first_visible_seconds": 13.216288525611162,
+              "client_seconds": 18.535159160848707,
+              "output_sha256": "2334bb6bdbd7448d2dfb9dd345a6b17a0f35320cd7ae3fbbf453799073bfd066",
+              "status": "pass"
+            },
+            "pp1069+tg64": {
+              "prompt_tokens_per_second": 50.4,
+              "decode_tokens_per_second": 12.2,
+              "ttft_first_visible_seconds": 21.33601264609024,
+              "client_seconds": 26.45841896114871,
+              "output_sha256": "aaeb70114752870c5786178e6183a3279ff1f0dcf3db97e428c0fd1627849341",
+              "status": "pass"
+            }
+          }
+        }
+      },
+      "workloads": {
+        "pp1069+tg64": {
+          "ninfer_change_percent": {
+            "prompt_tps_pct": -2.1359223300970953,
+            "decode_tps_pct": -0.8130081300813163,
+            "ttft_pct": 2.1594691564205792,
+            "client_pct": 1.9099386015233533
+          },
+          "outputs_equal": true
+        },
+        "pp172+tg64": {
+          "ninfer_change_percent": {
+            "prompt_tps_pct": -7.499999999999996,
+            "decode_tps_pct": 0.9708737864077666,
+            "ttft_pct": 7.971746424300896,
+            "client_pct": 4.343281082421613
+          },
+          "outputs_equal": true
+        },
+        "pp2048+tg128": {
+          "ninfer_change_percent": {
+            "prompt_tps_pct": -0.5110732538330609,
+            "decode_tps_pct": 0.0,
+            "ttft_pct": 0.6190423881162532,
+            "client_pct": 0.38149611505304826
+          },
+          "outputs_equal": true
+        },
+        "pp512+tg64": {
+          "ninfer_change_percent": {
+            "prompt_tps_pct": -1.1331444759206777,
+            "decode_tps_pct": 0.0,
+            "ttft_pct": 1.0090697122209669,
+            "client_pct": 0.7087537550399592
+          },
+          "outputs_equal": true
+        },
+        "pp557+tg64": {
+          "ninfer_change_percent": {
+            "prompt_tps_pct": 2.9055690072639306,
+            "decode_tps_pct": 5.35714285714286,
+            "ttft_pct": -2.9143044636769755,
+            "client_pct": -3.505888138843982
+          },
+          "outputs_equal": true
+        }
+      },
+      "outputs_equal_all_workloads": true,
+      "residency_equal": true
+    },
+    {
+      "pair": 2,
+      "order": [
+        "ninfer-staged",
+        "strata-staged"
+      ],
+      "arms": {
+        "strata-staged": {
+          "residency_sha256": "a02fd81e6337273a299b4b834ab1b694c16e5f97512e5dfec9d4fec08cd5ddf7",
+          "minimum_available_bytes": 12391297024,
+          "minimum_admission_available_bytes": 12391297024,
+          "gpu_clock_mhz_min_median_max": [
+            306.0,
+            816.0,
+            1300.5
+          ],
+          "emc_clock": "unavailable (read permission denied)",
+          "energy": "not measured",
+          "cgroup_memory_events_max": {
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0
+          },
+          "samples": {
+            "pp512+tg64": {
+              "prompt_tokens_per_second": 33.7,
+              "decode_tokens_per_second": 10.2,
+              "ttft_first_visible_seconds": 15.363911639899015,
+              "client_seconds": 21.44641186390072,
+              "output_sha256": "4a7ec1ebd61dc2be1dee07887644a5891e034bd488088155171f3fcb6eb69e85",
+              "status": "pass"
+            },
+            "pp2048+tg128": {
+              "prompt_tokens_per_second": 54.9,
+              "decode_tokens_per_second": 9.4,
+              "ttft_first_visible_seconds": 37.56509830290452,
+              "client_seconds": 51.00901247188449,
+              "output_sha256": "a868c12065a20f134dd5dbd9ec87132a8a471cb9743019ed60ca1292596e3376",
+              "status": "pass"
+            },
+            "pp172+tg64": {
+              "prompt_tokens_per_second": 16.1,
+              "decode_tokens_per_second": 10.1,
+              "ttft_first_visible_seconds": 10.886088307015598,
+              "client_seconds": 17.079801716376096,
+              "output_sha256": "0c5e2bb1386b48cd33888f8bbddda97ffe4556f22a70fb8125c15eff898ca4fe",
+              "status": "pass"
+            },
+            "pp557+tg64": {
+              "prompt_tokens_per_second": 42.8,
+              "decode_tokens_per_second": 11.6,
+              "ttft_first_visible_seconds": 13.153182878624648,
+              "client_seconds": 18.52603870863095,
+              "output_sha256": "2334bb6bdbd7448d2dfb9dd345a6b17a0f35320cd7ae3fbbf453799073bfd066",
+              "status": "pass"
+            },
+            "pp1069+tg64": {
+              "prompt_tokens_per_second": 48.8,
+              "decode_tokens_per_second": 12.0,
+              "ttft_first_visible_seconds": 22.022968715056777,
+              "client_seconds": 27.242771725170314,
+              "output_sha256": "aaeb70114752870c5786178e6183a3279ff1f0dcf3db97e428c0fd1627849341",
+              "status": "pass"
+            }
+          }
+        },
+        "ninfer-staged": {
+          "residency_sha256": "a02fd81e6337273a299b4b834ab1b694c16e5f97512e5dfec9d4fec08cd5ddf7",
+          "minimum_available_bytes": 12372963328,
+          "minimum_admission_available_bytes": 12372963328,
+          "gpu_clock_mhz_min_median_max": [
+            306.0,
+            918.0,
+            1300.5
+          ],
+          "emc_clock": "unavailable (read permission denied)",
+          "energy": "not measured",
+          "cgroup_memory_events_max": {
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0
+          },
+          "samples": {
+            "pp512+tg64": {
+              "prompt_tokens_per_second": 33.3,
+              "decode_tokens_per_second": 10.4,
+              "ttft_first_visible_seconds": 15.496876066084951,
+              "client_seconds": 21.557644258718938,
+              "output_sha256": "4a7ec1ebd61dc2be1dee07887644a5891e034bd488088155171f3fcb6eb69e85",
+              "status": "pass"
+            },
+            "pp2048+tg128": {
+              "prompt_tokens_per_second": 51.8,
+              "decode_tokens_per_second": 9.4,
+              "ttft_first_visible_seconds": 39.75181883526966,
+              "client_seconds": 53.12902054283768,
+              "output_sha256": "a868c12065a20f134dd5dbd9ec87132a8a471cb9743019ed60ca1292596e3376",
+              "status": "pass"
+            },
+            "pp172+tg64": {
+              "prompt_tokens_per_second": 15.6,
+              "decode_tokens_per_second": 10.1,
+              "ttft_first_visible_seconds": 11.200540978927165,
+              "client_seconds": 17.361943771131337,
+              "output_sha256": "0c5e2bb1386b48cd33888f8bbddda97ffe4556f22a70fb8125c15eff898ca4fe",
+              "status": "pass"
+            },
+            "pp557+tg64": {
+              "prompt_tokens_per_second": 41.1,
+              "decode_tokens_per_second": 11.7,
+              "ttft_first_visible_seconds": 13.683118207845837,
+              "client_seconds": 19.043899251613766,
+              "output_sha256": "2334bb6bdbd7448d2dfb9dd345a6b17a0f35320cd7ae3fbbf453799073bfd066",
+              "status": "pass"
+            },
+            "pp1069+tg64": {
+              "prompt_tokens_per_second": 49.3,
+              "decode_tokens_per_second": 11.7,
+              "ttft_first_visible_seconds": 21.827476766891778,
+              "client_seconds": 27.150133571587503,
+              "output_sha256": "aaeb70114752870c5786178e6183a3279ff1f0dcf3db97e428c0fd1627849341",
+              "status": "pass"
+            }
+          }
+        }
+      },
+      "workloads": {
+        "pp1069+tg64": {
+          "ninfer_change_percent": {
+            "prompt_tps_pct": 1.0245901639344357,
+            "decode_tps_pct": -2.500000000000002,
+            "ttft_pct": -0.8876730049175663,
+            "client_pct": -0.3400467269533358
+          },
+          "outputs_equal": true
+        },
+        "pp172+tg64": {
+          "ninfer_change_percent": {
+            "prompt_tps_pct": -3.105590062111807,
+            "decode_tps_pct": 0.0,
+            "ttft_pct": 2.888573590836274,
+            "client_pct": 1.6519047436289735
+          },
+          "outputs_equal": true
+        },
+        "pp2048+tg128": {
+          "ninfer_change_percent": {
+            "prompt_tps_pct": -5.64663023679417,
+            "decode_tps_pct": 0.0,
+            "ttft_pct": 5.821149500881417,
+            "client_pct": 4.156144116927796
+          },
+          "outputs_equal": true
+        },
+        "pp512+tg64": {
+          "ninfer_change_percent": {
+            "prompt_tps_pct": -1.1869436201780603,
+            "decode_tps_pct": 1.9607843137255054,
+            "ttft_pct": 0.8654334215294268,
+            "client_pct": 0.5186527029514165
+          },
+          "outputs_equal": true
+        },
+        "pp557+tg64": {
+          "ninfer_change_percent": {
+            "prompt_tps_pct": -3.971962616822422,
+            "decode_tps_pct": 0.8620689655172376,
+            "ttft_pct": 4.028951274465986,
+            "client_pct": 2.7953117832014263
+          },
+          "outputs_equal": true
+        }
+      },
+      "outputs_equal_all_workloads": true,
+      "residency_equal": true
+    },
+    {
+      "pair": 3,
+      "order": [
+        "strata-staged",
+        "ninfer-staged"
+      ],
+      "arms": {
+        "strata-staged": {
+          "residency_sha256": "a02fd81e6337273a299b4b834ab1b694c16e5f97512e5dfec9d4fec08cd5ddf7",
+          "minimum_available_bytes": 12339671040,
+          "minimum_admission_available_bytes": 12339671040,
+          "gpu_clock_mhz_min_median_max": [
+            306.0,
+            816.0,
+            1300.5
+          ],
+          "emc_clock": "unavailable (read permission denied)",
+          "energy": "not measured",
+          "cgroup_memory_events_max": {
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0
+          },
+          "samples": {
+            "pp512+tg64": {
+              "prompt_tokens_per_second": 33.9,
+              "decode_tokens_per_second": 10.3,
+              "ttft_first_visible_seconds": 15.26332474919036,
+              "client_seconds": 21.35229701688513,
+              "output_sha256": "4a7ec1ebd61dc2be1dee07887644a5891e034bd488088155171f3fcb6eb69e85",
+              "status": "pass"
+            },
+            "pp2048+tg128": {
+              "prompt_tokens_per_second": 57.6,
+              "decode_tokens_per_second": 9.5,
+              "ttft_first_visible_seconds": 35.83960352698341,
+              "client_seconds": 49.071579557843506,
+              "output_sha256": "a868c12065a20f134dd5dbd9ec87132a8a471cb9743019ed60ca1292596e3376",
+              "status": "pass"
+            },
+            "pp172+tg64": {
+              "prompt_tokens_per_second": 17.0,
+              "decode_tokens_per_second": 10.1,
+              "ttft_first_visible_seconds": 10.333346073981375,
+              "client_seconds": 16.544912403449416,
+              "output_sha256": "0c5e2bb1386b48cd33888f8bbddda97ffe4556f22a70fb8125c15eff898ca4fe",
+              "status": "pass"
+            },
+            "pp557+tg64": {
+              "prompt_tokens_per_second": 42.0,
+              "decode_tokens_per_second": 11.5,
+              "ttft_first_visible_seconds": 13.393546191044152,
+              "client_seconds": 18.833825611975044,
+              "output_sha256": "2334bb6bdbd7448d2dfb9dd345a6b17a0f35320cd7ae3fbbf453799073bfd066",
+              "status": "pass"
+            },
+            "pp1069+tg64": {
+              "prompt_tokens_per_second": 48.7,
+              "decode_tokens_per_second": 12.2,
+              "ttft_first_visible_seconds": 22.115524411201477,
+              "client_seconds": 27.219787215813994,
+              "output_sha256": "aaeb70114752870c5786178e6183a3279ff1f0dcf3db97e428c0fd1627849341",
+              "status": "pass"
+            }
+          }
+        },
+        "ninfer-staged": {
+          "residency_sha256": "a02fd81e6337273a299b4b834ab1b694c16e5f97512e5dfec9d4fec08cd5ddf7",
+          "minimum_available_bytes": 12390670336,
+          "minimum_admission_available_bytes": 12390670336,
+          "gpu_clock_mhz_min_median_max": [
+            306.0,
+            918.0,
+            1300.5
+          ],
+          "emc_clock": "unavailable (read permission denied)",
+          "energy": "not measured",
+          "cgroup_memory_events_max": {
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0
+          },
+          "samples": {
+            "pp512+tg64": {
+              "prompt_tokens_per_second": 33.9,
+              "decode_tokens_per_second": 10.3,
+              "ttft_first_visible_seconds": 15.245877121109515,
+              "client_seconds": 21.309814684093,
+              "output_sha256": "4a7ec1ebd61dc2be1dee07887644a5891e034bd488088155171f3fcb6eb69e85",
+              "status": "pass"
+            },
+            "pp2048+tg128": {
+              "prompt_tokens_per_second": 58.2,
+              "decode_tokens_per_second": 9.6,
+              "ttft_first_visible_seconds": 35.41307615023106,
+              "client_seconds": 48.50436105998233,
+              "output_sha256": "a868c12065a20f134dd5dbd9ec87132a8a471cb9743019ed60ca1292596e3376",
+              "status": "pass"
+            },
+            "pp172+tg64": {
+              "prompt_tokens_per_second": 16.3,
+              "decode_tokens_per_second": 9.8,
+              "ttft_first_visible_seconds": 10.778097936883569,
+              "client_seconds": 17.1381230680272,
+              "output_sha256": "0c5e2bb1386b48cd33888f8bbddda97ffe4556f22a70fb8125c15eff898ca4fe",
+              "status": "pass"
+            },
+            "pp557+tg64": {
+              "prompt_tokens_per_second": 42.5,
+              "decode_tokens_per_second": 11.2,
+              "ttft_first_visible_seconds": 13.322105512954295,
+              "client_seconds": 18.843223799951375,
+              "output_sha256": "2334bb6bdbd7448d2dfb9dd345a6b17a0f35320cd7ae3fbbf453799073bfd066",
+              "status": "pass"
+            },
+            "pp1069+tg64": {
+              "prompt_tokens_per_second": 48.9,
+              "decode_tokens_per_second": 12.1,
+              "ttft_first_visible_seconds": 21.987146268598735,
+              "client_seconds": 27.14715156983584,
+              "output_sha256": "aaeb70114752870c5786178e6183a3279ff1f0dcf3db97e428c0fd1627849341",
+              "status": "pass"
+            }
+          }
+        }
+      },
+      "workloads": {
+        "pp1069+tg64": {
+          "ninfer_change_percent": {
+            "prompt_tps_pct": 0.4106776180698102,
+            "decode_tps_pct": -0.8196721311475419,
+            "ttft_pct": -0.5804888015122911,
+            "client_pct": -0.266848691366528
+          },
+          "outputs_equal": true
+        },
+        "pp172+tg64": {
+          "ninfer_change_percent": {
+            "prompt_tps_pct": -4.117647058823525,
+            "decode_tps_pct": -2.970297029702962,
+            "ttft_pct": 4.304044979409416,
+            "client_pct": 3.5854566655433295
+          },
+          "outputs_equal": true
+        },
+        "pp2048+tg128": {
+          "ninfer_change_percent": {
+            "prompt_tps_pct": 1.041666666666674,
+            "decode_tps_pct": 1.0526315789473717,
+            "ttft_pct": -1.1901007119992757,
+            "client_pct": -1.1559002236570803
+          },
+          "outputs_equal": true
+        },
+        "pp512+tg64": {
+          "ninfer_change_percent": {
+            "prompt_tps_pct": 0.0,
+            "decode_tps_pct": 0.0,
+            "ttft_pct": -0.1143107964191814,
+            "client_pct": -0.1989590757309978
+          },
+          "outputs_equal": true
+        },
+        "pp557+tg64": {
+          "ninfer_change_percent": {
+            "prompt_tps_pct": 1.1904761904761862,
+            "decode_tps_pct": -2.60869565217392,
+            "ttft_pct": -0.533396287068677,
+            "client_pct": 0.04990057872444886
+          },
+          "outputs_equal": true
+        }
+      },
+      "outputs_equal_all_workloads": true,
+      "residency_equal": true
+    }
+  ],
+  "workload_summary": {
+    "pp1069+tg64": {
+      "prompt_tps_pct": {
+        "paired_median_percent": 0.4106776180698102,
+        "paired_range_percent": [
+          -2.1359223300970953,
+          1.0245901639344357
+        ]
+      },
+      "decode_tps_pct": {
+        "paired_median_percent": -0.8196721311475419,
+        "paired_range_percent": [
+          -2.500000000000002,
+          -0.8130081300813163
+        ]
+      },
+      "ttft_pct": {
+        "paired_median_percent": -0.5804888015122911,
+        "paired_range_percent": [
+          -0.8876730049175663,
+          2.1594691564205792
+        ]
+      },
+      "client_pct": {
+        "paired_median_percent": -0.266848691366528,
+        "paired_range_percent": [
+          -0.3400467269533358,
+          1.9099386015233533
+        ]
+      },
+      "absolute_tps_medians": {
+        "strata-staged": {
+          "prompt": 48.8,
+          "decode": 12.2
+        },
+        "ninfer-staged": {
+          "prompt": 49.3,
+          "decode": 12.1
+        }
+      }
+    },
+    "pp172+tg64": {
+      "prompt_tps_pct": {
+        "paired_median_percent": -4.117647058823525,
+        "paired_range_percent": [
+          -7.499999999999996,
+          -3.105590062111807
+        ]
+      },
+      "decode_tps_pct": {
+        "paired_median_percent": 0.0,
+        "paired_range_percent": [
+          -2.970297029702962,
+          0.9708737864077666
+        ]
+      },
+      "ttft_pct": {
+        "paired_median_percent": 4.304044979409416,
+        "paired_range_percent": [
+          2.888573590836274,
+          7.971746424300896
+        ]
+      },
+      "client_pct": {
+        "paired_median_percent": 3.5854566655433295,
+        "paired_range_percent": [
+          1.6519047436289735,
+          4.343281082421613
+        ]
+      },
+      "absolute_tps_medians": {
+        "strata-staged": {
+          "prompt": 17.0,
+          "decode": 10.1
+        },
+        "ninfer-staged": {
+          "prompt": 16.3,
+          "decode": 10.1
+        }
+      }
+    },
+    "pp2048+tg128": {
+      "prompt_tps_pct": {
+        "paired_median_percent": -0.5110732538330609,
+        "paired_range_percent": [
+          -5.64663023679417,
+          1.041666666666674
+        ]
+      },
+      "decode_tps_pct": {
+        "paired_median_percent": 0.0,
+        "paired_range_percent": [
+          0.0,
+          1.0526315789473717
+        ]
+      },
+      "ttft_pct": {
+        "paired_median_percent": 0.6190423881162532,
+        "paired_range_percent": [
+          -1.1901007119992757,
+          5.821149500881417
+        ]
+      },
+      "client_pct": {
+        "paired_median_percent": 0.38149611505304826,
+        "paired_range_percent": [
+          -1.1559002236570803,
+          4.156144116927796
+        ]
+      },
+      "absolute_tps_medians": {
+        "strata-staged": {
+          "prompt": 57.6,
+          "decode": 9.5
+        },
+        "ninfer-staged": {
+          "prompt": 58.2,
+          "decode": 9.6
+        }
+      }
+    },
+    "pp512+tg64": {
+      "prompt_tps_pct": {
+        "paired_median_percent": -1.1331444759206777,
+        "paired_range_percent": [
+          -1.1869436201780603,
+          0.0
+        ]
+      },
+      "decode_tps_pct": {
+        "paired_median_percent": 0.0,
+        "paired_range_percent": [
+          0.0,
+          1.9607843137255054
+        ]
+      },
+      "ttft_pct": {
+        "paired_median_percent": 0.8654334215294268,
+        "paired_range_percent": [
+          -0.1143107964191814,
+          1.0090697122209669
+        ]
+      },
+      "client_pct": {
+        "paired_median_percent": 0.5186527029514165,
+        "paired_range_percent": [
+          -0.1989590757309978,
+          0.7087537550399592
+        ]
+      },
+      "absolute_tps_medians": {
+        "strata-staged": {
+          "prompt": 33.9,
+          "decode": 10.3
+        },
+        "ninfer-staged": {
+          "prompt": 33.9,
+          "decode": 10.3
+        }
+      }
+    },
+    "pp557+tg64": {
+      "prompt_tps_pct": {
+        "paired_median_percent": 1.1904761904761862,
+        "paired_range_percent": [
+          -3.971962616822422,
+          2.9055690072639306
+        ]
+      },
+      "decode_tps_pct": {
+        "paired_median_percent": 0.8620689655172376,
+        "paired_range_percent": [
+          -2.60869565217392,
+          5.35714285714286
+        ]
+      },
+      "ttft_pct": {
+        "paired_median_percent": -0.533396287068677,
+        "paired_range_percent": [
+          -2.9143044636769755,
+          4.028951274465986
+        ]
+      },
+      "client_pct": {
+        "paired_median_percent": 0.04990057872444886,
+        "paired_range_percent": [
+          -3.505888138843982,
+          2.7953117832014263
+        ]
+      },
+      "absolute_tps_medians": {
+        "strata-staged": {
+          "prompt": 42.0,
+          "decode": 11.5
+        },
+        "ninfer-staged": {
+          "prompt": 42.5,
+          "decode": 11.7
+        }
+      }
+    }
+  },
+  "minimum_available_bytes": 12323889152,
+  "gpu_clock_mhz_observed": [
+    306.0,
+    1300.5
+  ],
+  "threshold_decision": "No per-workload paired median reached the 5% useful-effect screen; no seven-pair confirmation triggered. Screening only; no paired confidence interval claim.",
+  "telemetry_limits": "Clocks left dynamic and sampled read-only. EMC clock readback denied. Energy not measured. Cgroup high/max/oom/oom_kill stayed zero."
+}

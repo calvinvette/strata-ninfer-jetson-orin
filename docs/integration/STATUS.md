@@ -6118,3 +6118,13 @@ from per-layer mirroring to held-out task-quality and paired request
 measurements. HIP and SYCL builds of the selector change and help checks
 passed on maestro1, which is x86_64 compile/startup evidence only.
 [Oracle and operator report](../../bench/results/2026-10-26-e6-q2-staged-retrieval-2k/evidence/layer-boundary-localization/README.md#oracle-check-cpu-fallback-versus-cuda-expert-arithmetic), [staged-compute request screen](../../bench/results/2026-10-26-e6-q2-staged-compute-screen/README.md), [backend build record](../../bench/results/2026-10-26-e7-maestro-current-source-builds/README.md#2026-10-26-follow-up-on-per-layer-q8_1-mirror-filters).
+
+A larger three-pair randomized 8K staged-compute screen covered the 512, 2,048,
+172, 557 and 1,069-token workloads. All 15 paired output hashes and resident
+maps matched. Per-workload paired median changes ranged from −4.12% to +1.19%
+for prompt TPS, −0.82% to +0.86% for decode TPS, and −0.27% to +3.59% for
+client time; no 5% screen threshold was met. Minimum available RAM was
+11.48 GiB. This does not demonstrate a useful end-to-end gain for active
+NInfer compute on the screened shapes, and does not compare staged versus
+CPU-miss. E6 still needs the remaining planned context/workload coverage and
+quality gates. [Full staged-compute screen](../../bench/results/2026-10-26-e6-q2-staged-compute-full-screen/README.md).

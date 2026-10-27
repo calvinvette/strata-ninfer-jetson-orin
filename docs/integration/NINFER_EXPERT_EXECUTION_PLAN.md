@@ -1122,3 +1122,13 @@ available memory was 11.43 GiB. This narrows the product result: the active
 NInfer grouped path has no demonstrated request-level gain on this shape.
 Continue to other planned shapes and the task-quality gate before E6 closeout.
 See the [staged-compute screen](../../bench/results/2026-10-26-e6-q2-staged-compute-screen/README.md).
+
+The same comparison was expanded to three randomized pairs across all five
+8K natural-generation shapes (512+64, 2,048+128, 172+64, 557+64 and
+1,069+64). All 15 output hashes and residency maps matched. Paired median
+prompt-TPS changes ranged from −4.12% to +1.19%, decode-TPS changes from
+−0.82% to +0.86%, and client-time changes from −0.27% to +3.59%. No workload
+met the 5% screen threshold, so no seven-pair confirmation was triggered.
+Minimum available memory was 11.48 GiB. This completes the 8K staged-compute
+screen only; the prescribed context-capacity coverage and remaining task-
+quality gates are still open. See the [full 8K screen](../../bench/results/2026-10-26-e6-q2-staged-compute-full-screen/README.md).
