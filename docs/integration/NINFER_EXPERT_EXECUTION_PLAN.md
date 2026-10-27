@@ -1245,3 +1245,11 @@ positions; the evidence does not isolate the backend as the cause. This
 generic generation prompt has no independent task-quality oracle. Minimum
 available memory was 7.15 GiB. The earlier one-pair matching text-capture
 diagnostic is superseded by this repeat. See the [captured repeat report](../../bench/results/2026-10-27-e6-q2-staged-compute-256k-pp2048-repeat/README.md).
+
+An independent 2,048-token retrieval/arithmetic task was also run with the
+active staged Strata and strict NInfer grouped-compute paths. Both returned
+the exact expected answer in 47 tokens; token IDs, the identical residency
+map, and all nine final persistent-state fields matched. Minimum available
+memory was 11.59 GiB. This passes one bounded held-out task/state cell, but the
+sequential diagnostic supplies no timing evidence and does not close the broad
+quality or performance exits. See the [active-compute quality report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-2k/README.md).

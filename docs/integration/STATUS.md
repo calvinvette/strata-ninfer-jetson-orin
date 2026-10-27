@@ -22,6 +22,13 @@ independent task-quality oracle for this generic generation prompt. Timings are
 therefore unqualified. Minimum available memory was 7.15 GiB, above the guard.
 This short-request capacity test is not evidence for 256K prompt performance.
 See the [captured repeat](../../bench/results/2026-10-27-e6-q2-staged-compute-256k-pp2048-repeat/README.md).
+An independent exact-answer 2,048-token retrieval/arithmetic task was then run
+through the active Strata-grouped and strict-NInfer-grouped paths with staging
+enabled in both. Both returned the exact expected answer in 47 tokens, matched
+all token IDs and all nine final state fields, and used the same resident map.
+Minimum available memory was 11.59 GiB. This closes one bounded held-out
+task/state cell, not broad natural-generation quality or performance. See the
+[active-compute quality check](../../bench/results/2026-10-27-e6-q2-active-compute-quality-2k/README.md).
 The matching 1K staged-compute cell (512+64) completed all three pairs with
 matching output and resident-map hashes. Median changes were −1.64% prompt TPS,
 −1.10% decode TPS, +1.24% first-visible TTFT and +1.08% client time, again
