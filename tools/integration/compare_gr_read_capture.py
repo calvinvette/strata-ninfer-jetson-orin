@@ -45,34 +45,53 @@ def metrics(reference: tuple[float, ...], candidate: tuple[float, ...]) -> dict:
             "max_abs": max((abs(b - a) for a, b in zip(reference, candidate)), default=0.0)}
 
 
-def read_gdn_x(path: Path) -> tuple[dict, tuple[float, ...]]:
+def read_gdn_rows(path: Path) -> dict[int, tuple[dict, tuple[float, ...]]]:
     raw = path.read_bytes()
-    if len(raw) < 12:
-        raise ValueError(f"{path}: truncated GDN diagnostic header")
-    magic = raw[:8]
-    if magic == b"STGDIAG4":
-        header_struct = GDN_V4_HEADER
-        values = header_struct.unpack_from(raw)
-        _, version, layer, rows, pos0, n_embd, conv, heads, value_dim, _state, *tokens = values
-        position = pos0
-        token = tokens[0]
-    elif magic == b"STGDIAG5":
-        header_struct = GDN_V5_HEADER
-        values = header_struct.unpack_from(raw)
-        _, version, layer, rows, pos0, n_embd, conv, heads, value_dim, _state, *tail = values
-        positions, slots, tokens = tail[:8], tail[8:16], tail[16:24]
-        position, token = positions[0], tokens[0]
-    else:
-        raise ValueError(f"{path}: expected STGDIAG4 or STGDIAG5")
-    if version not in (4, 5) or rows != 1 or n_embd == 0 or conv == 0 or heads == 0 or value_dim == 0:
-        raise ValueError(f"{path}: expected one valid GDN row")
-    payload = raw[header_struct.size:]
-    expected = (n_embd + 2 * conv + 2 * heads + 2 * value_dim + 3 * n_embd) * 4
-    if len(payload) != expected:
-        raise ValueError(f"{path}: payload has {len(payload)} bytes; expected {expected}")
-    x = struct.unpack_from(f"<{n_embd}f", payload)
-    return ({"layer": layer, "position": position, "token": token,
-             "n_embd": n_embd, "slot": -1 if magic == b"STGDIAG4" else slots[0]}, x)
+    rows_by_position: dict[int, tuple[dict, tuple[float, ...]]] = {}
+    offset = 0
+    while offset < len(raw):
+        if len(raw) - offset < 12:
+            raise ValueError(f"{path}: truncated GDN diagnostic header")
+        magic = raw[offset:offset + 8]
+        if magic == b"STGDIAG4":
+            header_struct = GDN_V4_HEADER
+            if len(raw) - offset < header_struct.size:
+                raise ValueError(f"{path}: truncated STGDIAG4 header")
+            values = header_struct.unpack_from(raw, offset)
+            _, version, layer, rows, pos0, n_embd, conv, heads, value_dim, _state, *tokens = values
+            positions = tuple(pos0 + i for i in range(rows))
+            slots = (-1,) * rows
+        elif magic == b"STGDIAG5":
+            header_struct = GDN_V5_HEADER
+            if len(raw) - offset < header_struct.size:
+                raise ValueError(f"{path}: truncated STGDIAG5 header")
+            values = header_struct.unpack_from(raw, offset)
+            _, version, layer, rows, pos0, n_embd, conv, heads, value_dim, _state, *tail = values
+            all_positions, all_slots, all_tokens = tail[:8], tail[8:16], tail[16:24]
+            positions = tuple(all_positions[:rows])
+            slots = tuple(all_slots[:rows])
+            tokens = all_tokens
+        else:
+            raise ValueError(f"{path}: expected STGDIAG4 or STGDIAG5 at byte {offset}")
+        if (version not in (4, 5) or not 1 <= rows <= 8 or n_embd == 0 or
+                conv == 0 or heads == 0 or value_dim == 0):
+            raise ValueError(f"{path}: invalid GDN diagnostic dimensions")
+        record_bytes = rows * (4 * n_embd + 2 * conv + 2 * heads + 2 * value_dim) * 4
+        payload_start = offset + header_struct.size
+        payload_end = payload_start + record_bytes
+        if payload_end > len(raw):
+            raise ValueError(f"{path}: truncated GDN diagnostic payload")
+        payload = raw[payload_start:payload_end]
+        for row, position in enumerate(positions):
+            if position in rows_by_position:
+                raise ValueError(f"{path}: duplicate GDN row for position {position}")
+            x = struct.unpack_from(f"<{n_embd}f", payload, row * n_embd * 4)
+            rows_by_position[position] = ({"layer": layer, "position": position,
+                "token": tokens[row], "n_embd": n_embd, "slot": slots[row]}, x)
+        offset = payload_end
+    if not rows_by_position:
+        raise ValueError(f"{path}: no GDN diagnostic rows")
+    return rows_by_position
 
 
 def compare(reference: Path, candidate: Path, strata_gdn: Path | None = None,
@@ -87,17 +106,34 @@ def compare(reference: Path, candidate: Path, strata_gdn: Path | None = None,
     if (strata_gdn is None) != (ninfer_gdn is None):
         raise ValueError("provide both GDN diagnostic paths or neither")
     if strata_gdn is not None and ninfer_gdn is not None:
-        sg_header, sg_x = read_gdn_x(strata_gdn)
-        ng_header, ng_x = read_gdn_x(ninfer_gdn)
+        sg_rows = read_gdn_rows(strata_gdn)
+        ng_rows = read_gdn_rows(ninfer_gdn)
+        position = ah["position"]
+        if position not in sg_rows or position not in ng_rows:
+            raise ValueError(f"GDN diagnostics do not contain GR-read position {position}")
+        sg_header, sg_x = sg_rows[position]
+        ng_header, ng_x = ng_rows[position]
         for label, header in (("Strata", sg_header), ("NInfer", ng_header)):
             for field in ("layer", "position", "token", "n_embd"):
                 if header[field] != ah[field]:
                     raise ValueError(f"{label} GDN/read {field} mismatch: {header[field]} vs {ah[field]}")
+        common_positions = sorted(set(sg_rows) & set(ng_rows))
+        gdn_comparisons = []
+        for pos in common_positions:
+            sh, sx = sg_rows[pos]
+            nh, nx = ng_rows[pos]
+            if sh["token"] != nh["token"] or sh["n_embd"] != nh["n_embd"] or sh["layer"] != nh["layer"]:
+                raise ValueError(f"GDN diagnostic metadata differs at position {pos}")
+            gdn_comparisons.append({"position": pos, "token": sh["token"],
+                                    "x": metrics(sx, nx)})
         result["gdn_x_to_gr_mixed"] = {
             "strata": metrics(a["mixed"], sg_x),
             "ninfer": metrics(b["mixed"], ng_x),
         }
         result["gdn_x_cross_backend"] = metrics(sg_x, ng_x)
+        result["gdn_x_positions_compared"] = gdn_comparisons
+        result["first_differing_gdn_x_position"] = next(
+            (row["position"] for row in gdn_comparisons if row["x"]["different"]), None)
     return result
 
 
