@@ -57,6 +57,10 @@ At 32K capacity, the 2,048+128 cell also matched outputs and resident maps in
 all pairs. Median changes were −0.44% prompt TPS, −2.30% decode TPS, +0.59%
 first-visible TTFT and +0.56% client time; minimum available memory was
 10.88 GiB. No median reached threshold. See the [32K 2K-prompt report](../../bench/results/2026-10-26-e6-q2-staged-compute-32k-pp2048-screen/README.md).
+At 64K, the same 2,048+128 shape matched outputs and residency. Median changes
+were +0.89% prompt TPS, −1.20% decode TPS, −1.01% first-visible TTFT and
+−0.48% client time; minimum available memory was 10.05 GiB. No metric passed
+the threshold. See the [64K 2K-prompt report](../../bench/results/2026-10-26-e6-q2-staged-compute-64k-pp2048-screen/README.md).
 The 16K 512+64 cell matched outputs and resident maps across all pairs. Median
 changes were −2.92% prompt TPS, 0% decode TPS, +1.83% first-visible TTFT and
 +1.09% client time; minimum available memory was 11.32 GiB. No median reached

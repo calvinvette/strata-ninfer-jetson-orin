@@ -1223,3 +1223,9 @@ in all pairs. Median changes were −0.44% prompt TPS, −2.30% decode TPS, +0.5
 first-visible TTFT and +0.56% client time; minimum available memory was
 10.88 GiB. No performance screen threshold was met. See the [32K 2K-prompt
 report](../../bench/results/2026-10-26-e6-q2-staged-compute-32k-pp2048-screen/README.md).
+
+At 64K capacity, the 2,048+128 workload also matched output and resident-map
+hashes across three pairs. Median changes were +0.89% prompt TPS, −1.20%
+decode TPS, −1.01% first-visible TTFT and −0.48% client time; minimum
+available memory was 10.05 GiB. No metric reached the 5% threshold. See the
+[64K 2K-prompt report](../../bench/results/2026-10-26-e6-q2-staged-compute-64k-pp2048-screen/README.md).
