@@ -26,3 +26,17 @@ layer 0, a tiny first difference at layer 1 (relative L2 `6.87e-10`), then
 amplification at layer 2 (`3.41e-6`) and layer 3 (`4.41e-3`). The all-layer
 relative L2 was `3.60%`; the originating operation remains unknown. See the
 [GDN localization note](GDN_STATE_LOCALIZATION.md).
+
+A generated-token trace of layer-2 GDN intermediates then recorded 46 positions
+(163840–163885). At the prompt boundary (163839), the separately captured
+layer-2 state was bitwise equal. At the first generated token, only `y` differed
+in the trace (579/6,144 values, max absolute delta `5.96e-8`, relative L2
+`2.50e-8`); captured `gdn_out` and FFN values were exact. Differences appeared
+in `x`, `gate`, `beta` and FFN intermediates at position 163849, then in `qkv`,
+`h`, `z` and `gdn_out` at 163877. Final answer, token IDs and residency still
+matched, while the same five persistent-state fields did not. Minimum available
+RAM was 6.70 GiB and peak swap 4.72 GiB. This localizes the first observed
+generated-side difference but not its underlying arithmetic cause or which
+backend is correct; it is not performance evidence. See the [expanded
+localization note](GDN_STATE_LOCALIZATION.md) and [compact trace
+metrics](generated-gdn-trace/generated-token-trace-summary.json).

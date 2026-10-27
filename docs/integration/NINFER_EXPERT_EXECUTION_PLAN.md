@@ -1310,8 +1310,13 @@ qualification; text equality alone is insufficient. See the [160K report](../../
 
 A corrected accepted-prefix GDN dump for the 160K mismatch found layer 0 exact,
 a tiny layer-1 difference (relative L2 `6.87e-10`), then growth at layer 2
-(`3.41e-6`) and layer 3 (`4.41e-3`), with global relative L2 `3.60%`. This
-shows numerical amplification in recurrent state but does not identify the
-first differing operation or the correct backend. The next planned diagnostic
-is sparse committed-state capture along the prompt. See the [GDN localization
+(`3.41e-6`) and layer 3 (`4.41e-3`), with global relative L2 `3.60%`. A
+follow-up capture found bitwise-equal layer-2 state at the prompt boundary,
+then a first observed `y` difference on the first generated token (relative L2
+`2.50e-8`, max absolute delta `5.96e-8`). Differences spread to other
+intermediates by generated positions 163849 and 163877. This narrows the
+observed divergence to generation-side recurrent computation but does not
+identify the underlying operation or which backend is correct. Next inspect
+the `y` computation and backend-specific reduction/rounding paths with a focused
+oracle before another long-context run. See the [GDN localization
 note](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/GDN_STATE_LOCALIZATION.md).

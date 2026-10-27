@@ -6278,7 +6278,13 @@ length. See the [160K report](../../bench/results/2026-10-27-e6-q2-active-comput
 A corrected accepted-prefix GDN capture for the 160K failed cell shows exact
 layer-0 state, a first tiny difference at layer 1 (relative L2 `6.87e-10`),
 and growing state deltas at layers 2 (`3.41e-6`) and 3 (`4.41e-3`); global
-relative L2 is `3.60%`. This localizes numerical growth in recurrent state but
-does not identify the originating operation or say which path is correct.
-Sparse committed-state checkpoints across the prompt are the next step. See
-the [localization note](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/GDN_STATE_LOCALIZATION.md).
+relative L2 is `3.60%`. A separate layer-2 generated-token trace found the
+prompt-boundary state exact; the first differing captured segment was `y` at
+generated position 163840 (relative L2 `2.50e-8`, max absolute delta
+`5.96e-8`). Differences spread to other intermediates at positions 163849 and
+163877. The final answer and token IDs still match, but five state fields do
+not. This narrows the observed divergence to generation-side recurrent
+computation without identifying the underlying operation or correct backend.
+Minimum available RAM was 6.70 GiB with peak swap 4.72 GiB. Next inspect the
+`y` computation and backend-specific reduction/rounding paths using a focused
+oracle before another long run. See the [localization note](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/GDN_STATE_LOCALIZATION.md).
