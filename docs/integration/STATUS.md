@@ -6234,3 +6234,12 @@ client time; no 5% screen threshold was met. Minimum available RAM was
 NInfer compute on the screened shapes, and does not compare staged versus
 CPU-miss. E6 still needs the remaining planned context/workload coverage and
 quality gates. [Full staged-compute screen](../../bench/results/2026-10-26-e6-q2-staged-compute-full-screen/README.md).
+
+
+The held-out exact-answer retrieval/arithmetic check passed at 32,768 prompt
+tokens under a 64K cap. Strata and strict NInfer staged grouped compute both
+returned the expected answer in 47 tokens, with matching token IDs, resident
+map and all nine final persistent-state fields. Minimum available memory was
+10.03 GiB; supervisor OOM counters were zero. This extends bounded functional
+coverage through a 32K prompt, not near-limit 64K ingestion, broad natural-gen
+quality or performance qualification. See the [32K active-compute report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-32k/README.md).

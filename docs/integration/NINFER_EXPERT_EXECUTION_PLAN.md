@@ -1272,3 +1272,10 @@ Both staged backends matched answer, token IDs, residency and all nine final
 state fields. Minimum available memory was 11.00 GiB; OOM counters were zero.
 This is bounded correctness evidence, not near-limit 32K throughput. See the
 [16K active-compute report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-16k/README.md).
+
+
+The held-out exact-answer task now passes through 32,768 prompt tokens under a
+64K configured cap for both active staged grouped-compute backends. Answer, all
+47 output token IDs, residency map and all nine final state fields match;
+minimum available RAM was 10.03 GiB. This is sequential correctness evidence,
+not a 64K near-limit or performance result. See the [32K report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-32k/README.md).
