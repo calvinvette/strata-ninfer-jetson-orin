@@ -9,6 +9,17 @@ Phase 6 is complete for the tested factor domains under their closeouts. The
 release profile still excludes unresolved multi-live/adaptive paths and does
 not promote a universal parametric profile. This records tested cells, not general product support.
 
+The active E6 staged-compute capacity screens now include a three-pair 256K
+configured-capacity request (2,048 prompt + 128 generated tokens). Median paired
+changes were +1.57% prompt TPS, 0% decode TPS, −0.80% first-visible TTFT and
+−1.09% client time; no metric reached the 5% screen threshold. One of three
+measured NInfer outputs differed, so this is not a quality qualification. A
+text-captured diagnostic rerun matched on measured output but did not explain
+the original mismatch. Minimum available memory was 7.14 GiB, above the guard.
+This short-request capacity test is not evidence for 256K prompt performance.
+The 1K staged-compute paired screen is in progress. See the [256K screen
+report](../../bench/results/2026-10-26-e6-q2-staged-compute-256k-screen/README.md).
+
 The [NInfer expert execution plan](NINFER_EXPERT_EXECUTION_PLAN.md) is now in
 progress: E0 is complete for bounded controls and Q2_0 timing; E1–E4 have
 bounded Q2_0 prototype evidence, including 3/64/128-token grouped parity

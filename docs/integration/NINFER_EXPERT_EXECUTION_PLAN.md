@@ -1132,3 +1132,12 @@ met the 5% screen threshold, so no seven-pair confirmation was triggered.
 Minimum available memory was 11.48 GiB. This completes the 8K staged-compute
 screen only; the prescribed context-capacity coverage and remaining task-
 quality gates are still open. See the [full 8K screen](../../bench/results/2026-10-26-e6-q2-staged-compute-full-screen/README.md).
+
+The 256K configured-capacity extension used the same paired staged-compute
+comparison for a short 2,048+128 request. Its paired medians were +1.57% prompt
+TPS, 0% decode TPS, −0.80% first-visible TTFT and −1.09% client time. One
+measured output differed in pair 3; a text-capture rerun did not reproduce the
+mismatch but did not explain it. Therefore this screen is unqualified for task
+quality or performance, and does not establish long-prompt behavior. Minimum
+available memory was 7.14 GiB. The low-capacity 1K staged-compute cell is now
+running; E6 remains open. See the [256K report](../../bench/results/2026-10-26-e6-q2-staged-compute-256k-screen/README.md).
