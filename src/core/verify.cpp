@@ -1016,21 +1016,33 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
     {
         const char* layer = std::getenv("STRATA_VERIFY_DUMP_GR_READ_LAYER");
         const char* position = std::getenv("STRATA_VERIFY_DUMP_GR_READ_POSITION");
+        const char* positions = std::getenv("STRATA_VERIFY_DUMP_GR_READ_POSITIONS");
         const char* path = std::getenv("STRATA_VERIFY_DUMP_GR_READ_PATH");
-        if ((layer != nullptr) != (position != nullptr) || (layer != nullptr) != (path != nullptr)) {
-            err = "verify: fused GR-read capture layer, position, and path must be set together";
+        const bool has_position_filter = position != nullptr || positions != nullptr;
+        if ((position != nullptr && positions != nullptr) || (layer != nullptr) != has_position_filter ||
+            (layer != nullptr) != (path != nullptr)) {
+            err = "verify: fused GR-read capture layer, position filter, and path must be set together";
             return false;
         }
         if (layer != nullptr) {
             char* layer_end = nullptr;
-            char* position_end = nullptr;
             errno = 0;
             const long parsed_layer = std::strtol(layer, &layer_end, 10);
-            const long long parsed_position = std::strtoll(position, &position_end, 10);
             if (errno != 0 || layer_end == layer || *layer_end != '\0' || parsed_layer < 0 ||
-                parsed_layer >= g.n_layers || position_end == position || *position_end != '\0' ||
-                parsed_position < 0 || !*path) {
-                err = "verify: invalid fused GR-read capture layer, position, or path";
+                parsed_layer >= g.n_layers || !*path) {
+                err = "verify: invalid fused GR-read capture layer or path";
+                return false;
+            }
+            if (position != nullptr) {
+                char* position_end = nullptr;
+                errno = 0;
+                const long long parsed_position = std::strtoll(position, &position_end, 10);
+                if (errno != 0 || position_end == position || *position_end != '\0' || parsed_position < 0) {
+                    err = "verify: invalid fused GR-read capture position";
+                    return false;
+                }
+                gr_read_diag_positions_.push_back((int64_t) parsed_position);
+            } else if (!parse_diag_positions(positions, gr_read_diag_positions_, "fused GR-read capture", err)) {
                 return false;
             }
             const uint64_t floats = (uint64_t) g.hc * (uint64_t) g.n_embd + 2 * (uint64_t) g.n_embd +
@@ -1040,7 +1052,7 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
                 return false;
             }
             gr_read_diag_layer_ = (int) parsed_layer;
-            gr_read_diag_position_ = (int64_t) parsed_position;
+            gr_read_diag_position_ = gr_read_diag_positions_.front();
             gr_read_diag_path_ = path;
             gr_read_diag_capacity_ = (size_t) floats * sizeof(float);
             if (cudaHostAlloc((void**) &gr_read_diag_host_, gr_read_diag_capacity_, cudaHostAllocPortable) != cudaSuccess) {
@@ -1050,8 +1062,8 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
             }
             strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "allocate", this,
                                                         gr_read_diag_host_, gr_read_diag_capacity_, -1);
-            std::fprintf(stderr, "strata verify: opt-in fused GR-read capture at layer %d position %lld -> %s (%zu bytes)\n",
-                         gr_read_diag_layer_, (long long) gr_read_diag_position_, gr_read_diag_path_.c_str(),
+            std::fprintf(stderr, "strata verify: opt-in fused GR-read capture at layer %d for %zu positions -> %s (%zu bytes per row)\n",
+                         gr_read_diag_layer_, gr_read_diag_positions_.size(), gr_read_diag_path_.c_str(),
                          gr_read_diag_capacity_);
         }
     }
@@ -3085,7 +3097,9 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
     SessionState& ss = *ss_;
     if (pos0 + T > ss.qsa_states[ss.qsa_primary()].max_cells) { err = "verify: the window runs past the context"; return false; }
     refresh_ar();
-    const bool gr_read_target_in_window = gr_read_diag_position_ >= pos0 && gr_read_diag_position_ < pos0 + T;
+    const auto gr_read_target = std::lower_bound(gr_read_diag_positions_.begin(), gr_read_diag_positions_.end(), pos0);
+    const bool gr_read_target_in_window = gr_read_diag_host_ != nullptr && gr_read_target != gr_read_diag_positions_.end() &&
+                                          *gr_read_target < pos0 + T;
     if (qsa_diag_h_ != nullptr || (gr_read_diag_host_ != nullptr && gr_read_target_in_window)) {
         // The diagnostic copy rows are selected while the CUDA graph is recorded. Refresh the selected
         // window's inputs first, then rebuild this opt-in graph so the position filter sees them.
@@ -3311,7 +3325,8 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
         err = "verify: configured fused GR-read capture did not reach its selected layer";
         return false;
     }
-    if (gr_read_diag_captured_ && T == 1 && pos0 == gr_read_diag_position_) {
+    if (gr_read_diag_captured_ && T == 1 &&
+        std::binary_search(gr_read_diag_positions_.begin(), gr_read_diag_positions_.end(), pos0)) {
         struct GrReadHeader {
             char magic[8];
             uint32_t version;

@@ -440,7 +440,8 @@ private:
     std::string gdn_commit_diag_path_;
     int gr_read_diag_layer_ = -1;
     int64_t gr_read_diag_position_ = -1;
-    float* gr_read_diag_host_ = nullptr; ///< xn/lo/rs/inject/mixed outputs from one fused GR read
+    std::vector<int64_t> gr_read_diag_positions_;
+    float* gr_read_diag_host_ = nullptr; ///< raw R and fused GR-read inputs/outputs for one selected row
     size_t gr_read_diag_capacity_ = 0;
     std::string gr_read_diag_path_;
     bool gr_read_diag_captured_ = false;

@@ -17,11 +17,13 @@ def write_capture(path: Path, mixed_value: float) -> None:
     path.write_bytes(previous + header + payload)
 
 
-def write_capture_v2(path: Path, residual: tuple[float, float], mixed: tuple[float, float]) -> None:
+def write_capture_v2(path: Path, residual: tuple[float, float], mixed: tuple[float, float],
+                     position: int = 17) -> None:
     # R[2], xn[4], lo[1], rs[2], inj_out[2], mixed[2].
-    header = HEADER.pack(b"STGRRD2\0", 2, 3, 17, 99, 0, 2, 2, 1)
+    header = HEADER.pack(b"STGRRD2\0", 2, 3, position, 99, 0, 2, 2, 1)
     payload = struct.pack("<13f", *residual, *([1.0] * 9), *mixed)
-    path.write_bytes(header + payload)
+    previous = path.read_bytes() if path.exists() else b""
+    path.write_bytes(previous + header + payload)
 
 
 def write_gr(path: Path, mixed: tuple[float, float] = (2.0, 3.0), position: int = 17) -> None:
@@ -93,6 +95,26 @@ class CompareGrReadCaptureTests(unittest.TestCase):
             self.assertEqual(result["fields"]["R"]["different"], 0)
             self.assertEqual(result["fields"]["xn"]["different"], 0)
             self.assertIsNone(result["first_differing_field"])
+
+    def test_compares_concatenated_gr_rows_and_finds_first_split(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            strata, ninfer = root / "strata.gr", root / "ninfer.gr"
+            for path in (strata, ninfer):
+                write_capture_v2(path, (1.0, 2.0), (4.0, 5.0), position=10)
+                write_capture_v2(path, (1.0, 2.0), (4.0, 5.0), position=11)
+                write_capture_v2(path, (1.0, 2.0), (4.0, 5.0), position=12)
+            # Rewrite the candidate with an R divergence at the second row.
+            ninfer.write_bytes(b"")
+            write_capture_v2(ninfer, (1.0, 2.0), (4.0, 5.0), position=10)
+            write_capture_v2(ninfer, (1.0, 2.001), (4.0, 5.0), position=11)
+            write_capture_v2(ninfer, (1.0, 2.0), (4.0, 5.0), position=12)
+            result = compare(strata, ninfer)
+            self.assertEqual(result["positions_compared"], [10, 11, 12])
+            self.assertEqual(result["first_differing_position"], 11)
+            self.assertEqual(result["first_differing_field"], "R")
+            self.assertEqual(result["per_position"][0]["first_differing_field"], None)
+            self.assertEqual(result["per_position"][1]["first_differing_field"], "R")
 
     def test_compares_multiple_gdn_positions_and_links_selected_row(self):
         with tempfile.TemporaryDirectory() as tmp:
