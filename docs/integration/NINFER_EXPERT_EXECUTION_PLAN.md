@@ -1193,3 +1193,9 @@ Median changes were −2.89% prompt TPS, 0% decode TPS, +3.17% first-visible
 TTFT and +2.51% client time, but paired spreads were wide and no median passed
 the threshold. This does not erase the one output mismatch in the separate
 2,048+128 256K screen. See the [512-token 256K report](../../bench/results/2026-10-26-e6-q2-staged-compute-256k-pp512-screen/README.md).
+
+A 4K-capacity 1,069+64 request also completed three randomized staged-compute
+pairs with matching outputs and residency. Median paired changes were −0.98%
+prompt TPS, 0% decode TPS, +1.10% first-visible TTFT and +1.00% client time;
+minimum available memory was 11.59 GiB. No metric passed the 5% screen. See the
+[4K 1,069-token report](../../bench/results/2026-10-26-e6-q2-staged-compute-4k-pp1069-screen/README.md).

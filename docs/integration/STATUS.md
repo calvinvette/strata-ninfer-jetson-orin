@@ -35,6 +35,11 @@ all pairs. Median changes were −1.44% prompt TPS, +2.30% decode TPS, +1.43%
 first-visible TTFT and +0.50% client time; minimum available memory was
 11.63 GiB. No metric reached the 5% screen threshold. See the [4K 2K-prompt
 report](../../bench/results/2026-10-26-e6-q2-staged-compute-4k-pp2048-screen/README.md).
+At 4K capacity, the 1,069+64 cell matched outputs and resident maps in all
+pairs. Median changes were −0.98% prompt TPS, 0% decode TPS, +1.10%
+first-visible TTFT and +1.00% client time; minimum available memory was
+11.59 GiB. No metric reached the 5% screen threshold. See the [4K 1,069-token
+report](../../bench/results/2026-10-26-e6-q2-staged-compute-4k-pp1069-screen/README.md).
 The 16K 512+64 cell matched outputs and resident maps across all pairs. Median
 changes were −2.92% prompt TPS, 0% decode TPS, +1.83% first-visible TTFT and
 +1.09% client time; minimum available memory was 11.32 GiB. No median reached
