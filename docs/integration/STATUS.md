@@ -21,7 +21,11 @@ The matching 1K staged-compute cell (512+64) completed all three pairs with
 matching output and resident-map hashes. Median changes were −1.64% prompt TPS,
 −1.10% decode TPS, +1.24% first-visible TTFT and +1.08% client time, again
 below the 5% screen threshold; minimum available memory was 11.67 GiB. Both
-capacity cells remain screen-only and E6 is open. See the [256K report](../../bench/results/2026-10-26-e6-q2-staged-compute-256k-screen/README.md) and [1K report](../../bench/results/2026-10-26-e6-q2-staged-compute-1k-screen/README.md).
+capacity cells remain screen-only and E6 is open. The 2K 512+64 cell also
+completed with matching output and resident maps for all pairs; median changes
+were −0.65% prompt TPS, +3.41% decode TPS, +0.54% first-visible TTFT and
+−0.40% client time. Minimum available memory was 11.65 GiB; no median passed
+the 5% screen. See the [256K report](../../bench/results/2026-10-26-e6-q2-staged-compute-256k-screen/README.md), [1K report](../../bench/results/2026-10-26-e6-q2-staged-compute-1k-screen/README.md), and [2K report](../../bench/results/2026-10-26-e6-q2-staged-compute-2k-pp512-screen/README.md).
 
 The [NInfer expert execution plan](NINFER_EXPERT_EXECUTION_PLAN.md) is now in
 progress: E0 is complete for bounded controls and Q2_0 timing; E1–E4 have

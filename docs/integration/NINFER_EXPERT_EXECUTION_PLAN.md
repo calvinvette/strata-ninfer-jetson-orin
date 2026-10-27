@@ -1146,3 +1146,9 @@ TPS, +1.24% first-visible TTFT and +1.08% client time. No 1K median reached
 the 5% screen threshold; minimum available memory was 11.67 GiB. These are
 capacity-boundary screens only and do not close task-quality or performance
 gates. E6 remains open. See the [256K report](../../bench/results/2026-10-26-e6-q2-staged-compute-256k-screen/README.md) and [1K report](../../bench/results/2026-10-26-e6-q2-staged-compute-1k-screen/README.md).
+
+The 2K capacity 512+64 staged-compute cell has also completed three randomized
+pairs. Outputs and resident maps matched throughout. Median paired changes
+were −0.65% prompt TPS, +3.41% decode TPS, +0.54% first-visible TTFT and
+−0.40% client time; none reached the 5% threshold. Minimum available memory
+was 11.65 GiB. This remains a screen only. See the [2K report](../../bench/results/2026-10-26-e6-q2-staged-compute-2k-pp512-screen/README.md).
