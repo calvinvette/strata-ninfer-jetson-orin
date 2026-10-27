@@ -6302,6 +6302,11 @@ model-layer-1 / next-layer-2 boundary tensors at generated position 163844
 were bitwise equal. At that position, layer-2 GDN `x` differed in 2,047/2,560
 values, gate in 10/48 and beta in 15/48. The opt-in fused grouped-residual
 read capture passed a 2K control with all five outputs bitwise equal and full
-final-state parity; a matching 160K capture at position 163844 is running to
-localize the difference within or after that read. See the
+final-state parity. At 160K, all five fused read outputs at position 163844
+also matched bitwise, although the request again failed in the same five final
+state fields. This conflicts with the GDN-input delta at that position in a
+separate pair; because GDN `x` is copied directly from fused-read `mixed`, a
+simultaneous capture is needed to explain the between-run discrepancy. The
+53.97-minute diagnostic kept minimum available RAM at 7.09 GiB, with 6.36 GiB
+peak swap and zero OOM events. See the
 [localization note](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/GDN_STATE_LOCALIZATION.md).

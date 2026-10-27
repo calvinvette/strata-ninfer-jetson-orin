@@ -5,13 +5,34 @@ import struct
 import tempfile
 import unittest
 
-from compare_gr_read_capture import HEADER, compare, read_capture
+from compare_gr_read_capture import (GDN_V4_HEADER, GDN_V5_HEADER, HEADER, compare,
+                                     read_capture)
 
 
 def write_capture(path: Path, mixed_value: float) -> None:
     # HC=2, N=2, HC_LR=1: xn[4], lo[1], rs[2], inj_out[2], mixed[2].
     header = HEADER.pack(b"STGRRD1\0", 1, 3, 17, 99, 0, 2, 2, 1)
     payload = struct.pack("<11f", *([1.0] * 9), 2.0, mixed_value)
+    path.write_bytes(header + payload)
+
+
+def write_gr(path: Path, mixed: tuple[float, float] = (2.0, 3.0)) -> None:
+    header = HEADER.pack(b"STGRRD1\0", 1, 3, 17, 99, 0, 2, 2, 1)
+    payload = struct.pack("<11f", *([1.0] * 9), *mixed)
+    path.write_bytes(header + payload)
+
+
+def write_gdn(path: Path, magic: bytes, x: tuple[float, float]) -> None:
+    tokens = (99, 0, 0, 0, 0, 0, 0, 0)
+    if magic == b"STGDIAG4":
+        header = GDN_V4_HEADER.pack(magic, 4, 3, 1, 17, 2, 2, 1, 2, 5, *tokens)
+    else:
+        positions = (17, 0, 0, 0, 0, 0, 0, 0)
+        slots = (-1, 0, 0, 0, 0, 0, 0, 0)
+        header = GDN_V5_HEADER.pack(magic, 5, 3, 1, 17, 2, 2, 1, 2, 5,
+                                    *positions, *slots, *tokens)
+    # n=2, conv=2, heads=1, value=2 => 18 float32 stage values.
+    payload = struct.pack("<18f", *x, *([1.0] * 16))
     path.write_bytes(header + payload)
 
 
@@ -34,6 +55,23 @@ class CompareGrReadCaptureTests(unittest.TestCase):
             path.write_bytes(path.read_bytes()[:-1])
             with self.assertRaisesRegex(ValueError, "payload"):
                 read_capture(path)
+
+    def test_links_same_run_gdn_x_to_fused_mixed_v4_and_v5(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for version, magic in ((4, b"STGDIAG4"), (5, b"STGDIAG5")):
+                strata_read = root / f"strata-{version}.gr"
+                ninfer_read = root / f"ninfer-{version}.gr"
+                strata_gdn = root / f"strata-{version}.gdn"
+                ninfer_gdn = root / f"ninfer-{version}.gdn"
+                write_gr(strata_read)
+                write_gr(ninfer_read)
+                write_gdn(strata_gdn, magic, (2.0, 3.0))
+                write_gdn(ninfer_gdn, magic, (2.0, 4.0))
+                result = compare(strata_read, ninfer_read, strata_gdn, ninfer_gdn)
+                self.assertEqual(result["gdn_x_to_gr_mixed"]["strata"]["different"], 0)
+                self.assertEqual(result["gdn_x_to_gr_mixed"]["ninfer"]["different"], 1)
+                self.assertEqual(result["gdn_x_cross_backend"]["different"], 1)
 
 
 if __name__ == "__main__":

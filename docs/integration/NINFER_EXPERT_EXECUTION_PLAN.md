@@ -1331,8 +1331,11 @@ tiny layer-2 state delta at position 163839 (`1.701e-8` relative L2), but
 bitwise-equal captured layer-1 output and next-layer-2 boundary tensors at
 generated position 163844. At that position GDN `x`, gate and beta differed.
 The fused grouped-residual read capture passed the 2K control with all five
-captured outputs equal and final state exact; a same-run 160K capture at
-position 163844 is running to distinguish read-output from downstream
-differences. See the
+captured outputs equal and final state exact. A 160K capture at position
+163844 also found all five fused-read outputs bitwise equal even though final
+state still failed. Since a separate pair showed GDN `x` differing at that
+same position and the GDN diagnostic copies `mixed` directly as `x`, repeat
+with both captures enabled in one pair to resolve the between-run discrepancy.
+See the
 [GDN localization
 note](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/GDN_STATE_LOCALIZATION.md).

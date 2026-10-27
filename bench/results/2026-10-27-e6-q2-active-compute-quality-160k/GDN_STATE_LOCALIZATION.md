@@ -92,10 +92,21 @@ An opt-in capture for the fused grouped-residual read was validated on the
 2,048-token held-out control. Its `xn`, `lo`, `rs`, `inj_out` and `mixed`
 payloads were all bitwise equal for model layer 2 at position 2048; final state
 also matched. The control took 181.6 seconds and minimum available RAM was
-12.40 GiB. A same-run 160K capture at layer 2 / position 163844 is in progress;
-its result will distinguish divergence inside the fused read from a difference
-after that operation. The short-control capture and comparator are diagnostic
-only and are opt-in.
+12.40 GiB. A same-run 160K capture at layer 2 / position 163844 then found all
+five read outputs bitwise equal (`xn`, `lo`, `rs`, `inj_out`, `mixed`), even
+though the paired request still returned exact answer, token IDs and residency
+with the same five persistent-state fields different. It took 53.97 minutes;
+minimum available RAM was 7.09 GiB, peak swap 6.36 GiB and OOM counters were
+zero. The run ended on the expected checker failure, not the memory guard.
+
+This exact read capture does not reproduce the GDN `x` difference seen at
+163844 in the other same-run trace. The fused read writes `mixed_`, which the
+GDN diagnostic copies directly as `x`; however, that `x` was not captured in
+this read-capture pair, so the two observations should not be treated as a
+simultaneous stage-to-stage proof. They indicate run-to-run variation in the
+observed onset or an instrumentation-sensitive path. Next capture both fused
+read outputs and GDN intermediates at position 163844 in the same pair. The
+short-control capture and comparator are diagnostic only and opt-in.
 
 The diagnostic's default-path control, with raw capture disabled, passed the
 same 2,048-token held-out task: exact answer, token IDs, residency and all nine

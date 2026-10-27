@@ -10,6 +10,8 @@ import struct
 import sys
 
 HEADER = struct.Struct("<8sIIqiiQQQ")
+GDN_V4_HEADER = struct.Struct("<8sIiiqQQQQQ8i")
+GDN_V5_HEADER = struct.Struct("<8sIiiqQQQQQ8q8i8i")
 
 
 def read_capture(path: Path) -> tuple[dict, dict[str, tuple[float, ...]]]:
@@ -43,24 +45,74 @@ def metrics(reference: tuple[float, ...], candidate: tuple[float, ...]) -> dict:
             "max_abs": max((abs(b - a) for a, b in zip(reference, candidate)), default=0.0)}
 
 
-def compare(reference: Path, candidate: Path) -> dict:
+def read_gdn_x(path: Path) -> tuple[dict, tuple[float, ...]]:
+    raw = path.read_bytes()
+    if len(raw) < 12:
+        raise ValueError(f"{path}: truncated GDN diagnostic header")
+    magic = raw[:8]
+    if magic == b"STGDIAG4":
+        header_struct = GDN_V4_HEADER
+        values = header_struct.unpack_from(raw)
+        _, version, layer, rows, pos0, n_embd, conv, heads, value_dim, _state, *tokens = values
+        position = pos0
+        token = tokens[0]
+    elif magic == b"STGDIAG5":
+        header_struct = GDN_V5_HEADER
+        values = header_struct.unpack_from(raw)
+        _, version, layer, rows, pos0, n_embd, conv, heads, value_dim, _state, *tail = values
+        positions, slots, tokens = tail[:8], tail[8:16], tail[16:24]
+        position, token = positions[0], tokens[0]
+    else:
+        raise ValueError(f"{path}: expected STGDIAG4 or STGDIAG5")
+    if version not in (4, 5) or rows != 1 or n_embd == 0 or conv == 0 or heads == 0 or value_dim == 0:
+        raise ValueError(f"{path}: expected one valid GDN row")
+    payload = raw[header_struct.size:]
+    expected = (n_embd + 2 * conv + 2 * heads + 2 * value_dim + 3 * n_embd) * 4
+    if len(payload) != expected:
+        raise ValueError(f"{path}: payload has {len(payload)} bytes; expected {expected}")
+    x = struct.unpack_from(f"<{n_embd}f", payload)
+    return ({"layer": layer, "position": position, "token": token,
+             "n_embd": n_embd, "slot": -1 if magic == b"STGDIAG4" else slots[0]}, x)
+
+
+def compare(reference: Path, candidate: Path, strata_gdn: Path | None = None,
+            ninfer_gdn: Path | None = None) -> dict:
     ah, a = read_capture(reference)
     bh, b = read_capture(candidate)
     if ah != bh:
         raise ValueError(f"capture headers differ: {ah} vs {bh}")
-    return {"schema": 1, "header": ah,
-            "fields": {name: metrics(a[name], b[name]) for name in a},
-            "first_differing_field": next((name for name in a if a[name] != b[name]), None)}
+    result = {"schema": 1, "header": ah,
+              "fields": {name: metrics(a[name], b[name]) for name in a},
+              "first_differing_field": next((name for name in a if a[name] != b[name]), None)}
+    if (strata_gdn is None) != (ninfer_gdn is None):
+        raise ValueError("provide both GDN diagnostic paths or neither")
+    if strata_gdn is not None and ninfer_gdn is not None:
+        sg_header, sg_x = read_gdn_x(strata_gdn)
+        ng_header, ng_x = read_gdn_x(ninfer_gdn)
+        for label, header in (("Strata", sg_header), ("NInfer", ng_header)):
+            for field in ("layer", "position", "token", "n_embd"):
+                if header[field] != ah[field]:
+                    raise ValueError(f"{label} GDN/read {field} mismatch: {header[field]} vs {ah[field]}")
+        result["gdn_x_to_gr_mixed"] = {
+            "strata": metrics(a["mixed"], sg_x),
+            "ninfer": metrics(b["mixed"], ng_x),
+        }
+        result["gdn_x_cross_backend"] = metrics(sg_x, ng_x)
+    return result
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("reference", type=Path)
     parser.add_argument("candidate", type=Path)
+    parser.add_argument("--strata-gdn", type=Path,
+                        help="same-run STGDIAG4/5 capture from the Strata arm")
+    parser.add_argument("--ninfer-gdn", type=Path,
+                        help="same-run STGDIAG4/5 capture from the NInfer arm")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     try:
-        result = compare(args.reference, args.candidate)
+        result = compare(args.reference, args.candidate, args.strata_gdn, args.ninfer_gdn)
     except (OSError, ValueError, struct.error) as exc:
         print(f"compare_gr_read_capture: {exc}", file=sys.stderr)
         return 2
@@ -69,7 +121,8 @@ def main() -> int:
     args.output.write_text(rendered)
     print(json.dumps({"layer": result["header"]["layer"],
                       "position": result["header"]["position"],
-                      "first_differing_field": result["first_differing_field"]}, indent=2))
+                      "first_differing_field": result["first_differing_field"],
+                      "gdn_x_to_gr_mixed": result.get("gdn_x_to_gr_mixed")}, indent=2))
     return 0
 
 

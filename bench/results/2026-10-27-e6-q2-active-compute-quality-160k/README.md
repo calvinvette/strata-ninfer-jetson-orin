@@ -42,9 +42,7 @@ substantially (`h`: 10,233/10,240 values; gate and beta: 48/48 each), which
 explains why their raw outputs separate there. The first differences in this
 trace's layer-2 `x`, gate and beta inputs appeared at position 163844. The
 replay starts from a separate same-task prompt-boundary capture, so it does not
-establish a same-run trajectory. Next capture that boundary state and the
-residual entering model layer 2 in the same paired run to localize the earlier
-activation split.
+establish a same-run trajectory.
 
 
 A corrected accepted-prefix GDN-array diagnostic found exact equality at GDN
@@ -66,3 +64,14 @@ generated-side difference but not its underlying arithmetic cause or which
 backend is correct; it is not performance evidence. See the [expanded
 localization note](GDN_STATE_LOCALIZATION.md) and [compact trace
 metrics](generated-gdn-trace/generated-token-trace-summary.json).
+
+A subsequent 160K pair captured the fused grouped-residual read at model layer
+2 / position 163844. All five outputs (`xn`, `lo`, `rs`, `inj_out`, `mixed`)
+matched bitwise, while the request again returned the exact answer, all token
+IDs and the same residency with differing `gdn`, `tail`, `pooled`,
+`pooled_full` and `kv` state. The pair took 53.97 minutes; minimum available
+RAM was 7.09 GiB, peak swap 6.36 GiB and OOM counters were zero. This does not
+match the GDN `x` delta at the same position in a separate paired trace. Since
+the GDN capture copies the fused read's `mixed` input as `x`, capture both in
+the same run next to resolve the between-run discrepancy. Raw read captures
+remain local; the compact comparison is in the localization note.
