@@ -48,6 +48,10 @@ available memory was 10.09 GiB. Median changes were −0.37% prompt TPS, +1.15%
 decode TPS, +0.45% first-visible TTFT and +0.06% client time, but pair spreads
 were wide (−9.47% to +9.92% prompt TPS). This is inconclusive and not a gain;
 no confirmation was triggered. See the [64K report](../../bench/results/2026-10-26-e6-q2-staged-compute-64k-pp512-screen/README.md).
+At 128K, all outputs and resident maps matched; minimum available memory was
+8.47 GiB. Median changes were +0.45% prompt TPS, 0% decode TPS, −0.59%
+first-visible TTFT and −0.08% client time, below the threshold. See the [128K
+report](../../bench/results/2026-10-26-e6-q2-staged-compute-128k-pp512-screen/README.md).
 
 The [NInfer expert execution plan](NINFER_EXPERT_EXECUTION_PLAN.md) is now in
 progress: E0 is complete for bounded controls and Q2_0 timing; E1–E4 have

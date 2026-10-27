@@ -1181,3 +1181,8 @@ At 64K capacity, three 512+64 pairs matched outputs and resident maps, with
 +1.15% decode TPS, +0.45% first-visible TTFT and +0.06% client time. Pair
 spreads were wide (prompt TPS −9.47% to +9.92%), making this inconclusive; it
 does not qualify a gain. See the [64K report](../../bench/results/2026-10-26-e6-q2-staged-compute-64k-pp512-screen/README.md).
+
+At 128K capacity, the 512+64 cell matched all measured output and residency
+hashes. Median paired changes were +0.45% prompt TPS, 0% decode TPS, −0.59%
+first-visible TTFT and −0.08% client time; minimum available memory was
+8.47 GiB. No median reached the screen threshold. See the [128K report](../../bench/results/2026-10-26-e6-q2-staged-compute-128k-pp512-screen/README.md).
