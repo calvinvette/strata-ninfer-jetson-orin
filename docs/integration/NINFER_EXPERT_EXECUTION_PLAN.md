@@ -1266,3 +1266,9 @@ token-ID, resident-map and all-nine-field final-state comparisons between the
 active staged compute backends. Minimum available memory was 11.40 GiB. This
 extends bounded correctness coverage through an 8K prompt; it is neither
 near-limit 16K ingestion nor performance evidence. See the [8K report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-8k/README.md).
+
+The exact-answer task also passed at a 16,384-token prompt under a 32K cap.
+Both staged backends matched answer, token IDs, residency and all nine final
+state fields. Minimum available memory was 11.00 GiB; OOM counters were zero.
+This is bounded correctness evidence, not near-limit 32K throughput. See the
+[16K active-compute report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-16k/README.md).
