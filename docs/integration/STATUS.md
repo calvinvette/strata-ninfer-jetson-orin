@@ -48,6 +48,11 @@ The 4K 172+64 cell matched outputs and residency across all pairs. Median
 changes were −1.35% prompt TPS, 0% decode TPS, +1.18% first-visible TTFT and
 +0.46% client time; minimum available memory was 11.57 GiB. One pair's large
 decode/client improvement did not repeat. See the [4K 172-token report](../../bench/results/2026-10-26-e6-q2-staged-compute-4k-pp172-screen/README.md).
+At 16K capacity, the 2,048+128 cell matched outputs and residency in all
+pairs. Median changes were −2.58% prompt TPS, 0% decode TPS, +2.56% first-visible
+TTFT and +1.83% client time; minimum available memory was 11.29 GiB. Pair
+direction varied and no median reached threshold. See the [16K 2K-prompt
+report](../../bench/results/2026-10-26-e6-q2-staged-compute-16k-pp2048-screen/README.md).
 The 16K 512+64 cell matched outputs and resident maps across all pairs. Median
 changes were −2.92% prompt TPS, 0% decode TPS, +1.83% first-visible TTFT and
 +1.09% client time; minimum available memory was 11.32 GiB. No median reached
