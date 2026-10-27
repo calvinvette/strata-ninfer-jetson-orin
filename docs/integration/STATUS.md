@@ -6334,8 +6334,14 @@ position 163844 also produced fully nonzero, bitwise-equal GR-read payloads;
 its `mixed` vector matched same-run GDN `x` for each backend. The task text and
 tokens matched, but the same five final-state fields still differed. Minimum
 available memory was 6.72 GiB and peak swap 6.05 GiB with no OOM events. The
-old captures remain invalid zero-filled evidence. Next capture positions
-163849 and 163877 together to locate the later divergence. E6 remains open.
+old captures remain invalid zero-filled evidence. A same-run multi-position trace now finds the first small difference in
+layer-2 fused-read `xn` at 163849 (relative L2 1.38e-8), growing to GDN `x`
+relative L2 6.88e-4 at 163877. The paired comparison is
+[here](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gr-read-gdn-multi-position-163849-877/comparison.json).
+Minimum available memory was 6.51 GiB, peak swap 2.07 GiB, and no OOM events
+were observed. The exact answer/token IDs still match but final persistent
+state does not. E6 remains open pending upstream operation localization and
+correctness qualification.
 
 
 **E6 same-run long-context update (2026-10-27):** the selected 160K capture at
@@ -6347,3 +6353,12 @@ tail, pooled, pooled-full and KV state still differ. The run stayed above the
 This rules out the fused read at 163844 as the source in this paired trajectory
 but does not explain a later recurrence/state split. Next measure same-run
 positions 163849 and 163877.
+
+
+**E6 multi-position update (2026-10-27):** same-run 160K evidence locates the
+first small GR-read input delta at layer 2 / position 163849 (`xn`, relative
+L2 `1.38e-8`); fused `mixed` equals same-run GDN `x` for each backend. GDN `x`
+divergence grows to relative L2 `6.88e-4` by position 163877. Exact output and
+tokens match, but final recurrent/pooling/KV state differs. Next work must trace
+back from `xn` into its producer and independently determine the numerical
+reference.

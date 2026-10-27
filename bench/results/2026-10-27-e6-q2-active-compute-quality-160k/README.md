@@ -121,6 +121,26 @@ not a memory stop. See
 and the paired [results](generated-gdn-trace/gr-read-gdn-fixed-same-run/run/results.json).
 This resolves the between-run contradiction at position 163844: the fused read
 and same-run GDN input are equal there, despite the separate trace that had
-reported a GDN-input delta. It does not locate the later divergence. Next
-capture matching recurrent positions 163849 and 163877 in one paired run; E6
-remains open.
+reported a GDN-input delta. It does not locate the later divergence. A subsequent multi-position paired trace at 163849 and 163877 is now
+recorded below; E6 remains open for causal localization and qualification.
+
+
+**Same-run later-position trace (2026-10-27):** a second paired 160K run
+captured the layer-2 fused read at 163849 and GDN `x` at 163849 and 163877.
+Both backends used token 12 at 163849 and token 15 at 163877. At 163849,
+`xn` was the first differing GR-read field (301/10,240 values, relative L2
+`1.38e-8`, max absolute `4.77e-7`); `lo` and `inj_out` also differed by
+small amounts, while `rs` was exact. The captured `mixed` vector matched the
+same-run GDN `x` exactly for each backend. Cross-backend GDN `x` differed in
+644/2,560 values at 163849 (relative L2 `5.27e-8`, max absolute
+`3.58e-7`), then in 2,559/2,560 values at 163877 (relative L2
+`6.88e-4`, max absolute `1.30e-3`). The full task still returned identical
+exact answer and token IDs, with final divergence in GDN, tail, pooled,
+pooled-full and KV. Runtime was 3,285 seconds; minimum available RAM was
+6.51 GiB, peak swap 2.07 GiB and OOM counters were zero. See the
+[multi-position comparison](generated-gdn-trace/gr-read-gdn-multi-position-163849-877/comparison.json)
+and [paired task results](generated-gdn-trace/gr-read-gdn-multi-position-163849-877/run/results.json).
+The first small difference is now localized to the layer-2 fused-read input
+`xn` at 163849, after exact equality of the captured read and GDN input at
+163844; the later growth is clear by 163877. This does not yet identify which
+upstream operation introduces the small delta or which backend is correct.

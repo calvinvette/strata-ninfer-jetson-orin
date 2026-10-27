@@ -176,6 +176,24 @@ returned exact matching text and token IDs but still differed in final GDN,
 tail, pooled, pooled-full and KV state. The supervised run took 3,238 seconds,
 with 6.72 GiB minimum available memory, 6.05 GiB peak swap and no OOM events.
 See [`comparison.json`](generated-gdn-trace/gr-read-gdn-fixed-same-run/comparison.json).
-Capture the known later split positions 163849 and 163877 together in the next
-paired trace to establish whether the divergence begins there in this same
-trajectory.
+The subsequent paired trace at 163849 and 163877 is summarized below; it establishes the first observed small input divergence at 163849 in this same trajectory.
+
+
+## Same-run multi-position trace (2026-10-27)
+
+At layer 2 / position 163849 (token 12), the first differing fused-read field
+was `xn`: 301/10,240 values differed, relative L2 `1.38e-8`, max absolute
+`4.77e-7`. `lo` differed in 129/320 values (relative L2 `4.38e-8`),
+`inj_out` in 2/4 (relative L2 `7.81e-8`), and `rs` was exact. The fused-read
+`mixed` output matched each backend's same-run GDN `x` exactly. Cross-backend
+GDN `x` differed in 644/2,560 values at 163849 (relative L2 `5.27e-8`, max
+absolute `3.58e-7`). At 163877 (token 15), GDN `x` differed in 2,559/2,560
+values (relative L2 `6.88e-4`, max absolute `1.30e-3`). This establishes the
+first observed small difference at the fused-read input, five tokens after
+the exact 163844 capture, and substantial growth by 163877. It does not yet
+identify the upstream operation that changed `xn` or determine which result is
+correct. The exact answer and token IDs matched, while final GDN, tail, pooled,
+pooled-full and KV state did not. The supervised paired run took 3,285 seconds,
+with 6.51 GiB minimum available memory, 2.07 GiB peak swap and zero observed
+OOMs. See
+[`comparison.json`](generated-gdn-trace/gr-read-gdn-multi-position-163849-877/comparison.json).

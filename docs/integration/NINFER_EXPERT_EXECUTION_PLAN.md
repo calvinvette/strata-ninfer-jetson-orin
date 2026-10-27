@@ -1359,8 +1359,10 @@ state parity also pass. This supersedes the prior note that the 2K capture
 guard remained unresolved, while preserving the retraction of the old
 zero-filled 2K/160K data. The simultaneous 160K capture at position 163844 is complete. Both backends
 match bitwise for the fused read and same-run GDN `x`, but final recurrent and
-KV state still differs by the end of the task. Capture same-run positions
-163849 and 163877 next to locate the later divergence; keep E6 open.
+KV state still differs by the end of the task. The same-run 163849/163877 trace is complete: `xn` first differs slightly at
+163849 (relative L2 `1.38e-8`), and GDN `x` grows to relative L2 `6.88e-4` at
+163877. Continue by tracing the 163849 `xn` input to its producer and checking
+it against an independent numerical oracle; keep E6 open.
 
 
 **E6 long-context diagnostic update (2026-10-27):** repaired fused GR-read and
@@ -1372,3 +1374,12 @@ minimum was 6.72 GiB with no OOMs. The prior separate-run GDN `x` difference
 at 163844 is not reproduced. The next diagnostic is a paired capture of later
 generated positions 163849 and 163877, where earlier traces first observed
 large recurrence deltas. Phase E6 is not complete.
+
+
+**E6 multi-position localization (2026-10-27):** with both fused read and GDN
+records captured in one pair, layer-2 `xn` first differs at generated position
+163849 by relative L2 `1.38e-8`; each fused `mixed` output exactly equals its
+same-run GDN `x`. The GDN `x` delta grows to relative L2 `6.88e-4` at 163877.
+This narrows the earliest observed discrepancy to the producer/input of `xn`,
+without assigning correctness to either backend. Trace the producer and use an
+independent oracle next; full E6 exit criteria remain unmet.
