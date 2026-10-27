@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Three randomized pairs comparing CPU and strict-NInfer staged Q2_0 misses."""
+"""Randomized Q2_0 paired screen for CPU-miss or staged compute backends."""
 import copy
 import hashlib
 import json
@@ -137,10 +137,15 @@ def main():
     parser.add_argument("--pairs", type=int, default=3)
     parser.add_argument("--capture-text", action="store_true", help="save generated output text for mismatch diagnosis")
     parser.add_argument("--capture-state", action="store_true", help="enable final persistent-state fingerprints; diagnostic timing only")
+    parser.add_argument("--comparison", choices=("cpu-miss-staged", "staged-compute"),
+                        default="cpu-miss-staged",
+                        help="compare CPU miss vs staged NInfer, or Strata vs NInfer compute with identical staging")
     args = parser.parse_args()
     OUT = args.out.resolve()
     CAPTURE_TEXT = args.capture_text
     CAPTURE_STATE = args.capture_state
+    ARMS = (("cpu-miss", "ninfer-staged") if args.comparison == "cpu-miss-staged"
+            else ("strata-staged", "ninfer-staged"))
     OUT.mkdir(parents=True, exist_ok=True)
     workload_set = workloads()
     if args.only_workload:
@@ -154,7 +159,10 @@ def main():
         "source_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
         "binary_sha256": hashlib.sha256((ROOT / "build/integration/e0-cuda-build/strata").read_bytes()).hexdigest(),
         "model": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0; 3,000 expert slots; 6-GiB resident budget; 3-GiB workspace reserve; 8K capacity; MTP-2; prefill 128; 8 workers",
-        "comparison": "CPU miss fallback (pcie-frac 0) versus strict NInfer staged misses (pcie-frac 1); same five natural-generation workloads and resident-map hash required",
+        "comparison": ("CPU miss fallback (pcie-frac 0) versus strict NInfer staged misses (pcie-frac 1)"
+                       if args.comparison == "cpu-miss-staged" else
+                       "Strata grouped compute versus strict NInfer grouped compute (pcie-frac 1 in both arms); "
+                       "identical staged residency and workload required"),
         "screen": f"{args.pairs} randomized process pair(s); workload-level output hashes and API token counts checked; supervisor retains physical/admission memory and clock telemetry",
         "state_capture": "final persistent-state hashes enabled; timing is diagnostic only" if CAPTURE_STATE else None,
         "seed": SEED, "contexts": [CONTEXT], "pairs": [],
