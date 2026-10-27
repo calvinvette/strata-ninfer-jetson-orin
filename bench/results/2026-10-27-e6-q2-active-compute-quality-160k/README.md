@@ -144,3 +144,16 @@ The first small difference is now localized to the layer-2 fused-read input
 `xn` at 163849, after exact equality of the captured read and GDN input at
 163844; the later growth is clear by 163877. This does not yet identify which
 upstream operation introduces the small delta or which backend is correct.
+
+
+**GR-read v2 input probe (2026-10-27):** to distinguish an upstream residual
+difference from the normalization step, the opt-in capture now includes raw
+`R` ahead of normalized `xn`. The comparator retains support for historical
+v1 files and now reports multi-position GDN rows. The rebuilt binary passed a
+2K paired 48-token retrieval check with exact answer, tokens and all state
+fields. At layer 2 / position 2048, `R`, `xn`, `lo`, `rs`, `inj_out` and
+`mixed` all matched bitwise; same-run GDN `x` also matched on both backends.
+Five focused comparator tests pass. Compact evidence: [v2 short-run comparison](generated-gdn-trace/gr-read-r-v2-short-check/comparison.json).
+The next 160K trace will capture `R` and `xn` at 163849, along with GDN `x`
+at 163849 and 163877, to determine whether the earliest observed delta is
+already present in the residual input.

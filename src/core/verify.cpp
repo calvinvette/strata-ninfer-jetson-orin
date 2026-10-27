@@ -1033,7 +1033,7 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
                 err = "verify: invalid fused GR-read capture layer, position, or path";
                 return false;
             }
-            const uint64_t floats = (uint64_t) g.hc * (uint64_t) g.n_embd + (uint64_t) g.n_embd +
+            const uint64_t floats = (uint64_t) g.hc * (uint64_t) g.n_embd + 2 * (uint64_t) g.n_embd +
                                     2 * (uint64_t) g.hc + (uint64_t) g.hc_lr;
             if (floats == 0 || floats > SIZE_MAX / sizeof(float)) {
                 err = "verify: fused GR-read capture size overflows";
@@ -1808,7 +1808,8 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                     offset += bytes;
                     return true;
                 };
-                if (!capture(xn_ + (size_t) tb * HC * N, xn_bytes) ||
+                if (!capture(Rt(tb), n_bytes) ||
+                    !capture(xn_ + (size_t) tb * HC * N, xn_bytes) ||
                     !capture(lo_ + (size_t) tb * g.hc_lr, lo_bytes) ||
                     !capture(rs_ + (size_t) tb * HC, hc_bytes) ||
                     !capture(inj_out + (size_t) tb * HC, hc_bytes) ||
@@ -3323,8 +3324,8 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
             uint64_t hc_lr;
         } header{};
         static_assert(sizeof(GrReadHeader) == 56, "STGRRD1 header layout changed");
-        std::memcpy(header.magic, "STGRRD1", sizeof(header.magic));
-        header.version = 1;
+        std::memcpy(header.magic, "STGRRD2", sizeof(header.magic));
+        header.version = 2;
         header.layer = (uint32_t) gr_read_diag_layer_;
         header.position = pos0;
         header.token = tokens[0];

@@ -6362,3 +6362,12 @@ divergence grows to relative L2 `6.88e-4` by position 163877. Exact output and
 tokens match, but final recurrent/pooling/KV state differs. Next work must trace
 back from `xn` into its producer and independently determine the numerical
 reference.
+
+
+**Diagnostic v2 (2026-10-27):** opt-in fused GR-read captures now include raw
+residual input `R` before normalized `xn`; v1 artifacts remain readable. The
+2K paired full-answer control passed with exact answer and full-state parity,
+and all six captured vectors (`R`, `xn`, `lo`, `rs`, `inj_out`, `mixed`) matched
+bitwise. Five comparator tests pass. The next experiment will compare `R` and
+`xn` at the first 160K split (position 163849) to separate an upstream
+residual difference from normalization behavior.

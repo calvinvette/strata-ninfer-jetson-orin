@@ -1383,3 +1383,11 @@ same-run GDN `x`. The GDN `x` delta grows to relative L2 `6.88e-4` at 163877.
 This narrows the earliest observed discrepancy to the producer/input of `xn`,
 without assigning correctness to either backend. Trace the producer and use an
 independent oracle next; full E6 exit criteria remain unmet.
+
+
+**E6 diagnostic v2 (2026-10-27):** the selected fused-read capture now stores
+raw residual `R` before normalized `xn`, with backwards-compatible v1 parsing.
+The 2K paired full-answer task passed exact output and persistent-state checks;
+all six captured stages matched bitwise, and five parser tests pass. At the
+first small 160K split, capture `R` and `xn` together to determine whether the
+delta precedes or arises during normalization. E6 remains open.

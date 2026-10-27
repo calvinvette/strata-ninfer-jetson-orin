@@ -17,6 +17,13 @@ def write_capture(path: Path, mixed_value: float) -> None:
     path.write_bytes(previous + header + payload)
 
 
+def write_capture_v2(path: Path, residual: tuple[float, float], mixed: tuple[float, float]) -> None:
+    # R[2], xn[4], lo[1], rs[2], inj_out[2], mixed[2].
+    header = HEADER.pack(b"STGRRD2\0", 2, 3, 17, 99, 0, 2, 2, 1)
+    payload = struct.pack("<13f", *residual, *([1.0] * 9), *mixed)
+    path.write_bytes(header + payload)
+
+
 def write_gr(path: Path, mixed: tuple[float, float] = (2.0, 3.0), position: int = 17) -> None:
     header = HEADER.pack(b"STGRRD1\0", 1, 3, position, 99, 0, 2, 2, 1)
     payload = struct.pack("<11f", *([1.0] * 9), *mixed)
@@ -74,6 +81,18 @@ class CompareGrReadCaptureTests(unittest.TestCase):
                 self.assertEqual(result["gdn_x_to_gr_mixed"]["strata"]["different"], 0)
                 self.assertEqual(result["gdn_x_to_gr_mixed"]["ninfer"]["different"], 1)
                 self.assertEqual(result["gdn_x_cross_backend"]["different"], 1)
+
+    def test_compares_v2_residual_input_before_normalized_xn(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            a, b = root / "a.v2", root / "b.v2"
+            write_capture_v2(a, (1.0, 2.0), (4.0, 5.0))
+            write_capture_v2(b, (1.0, 2.0), (4.0, 5.0))
+            result = compare(a, b)
+            self.assertEqual(result["header"]["version"], 2)
+            self.assertEqual(result["fields"]["R"]["different"], 0)
+            self.assertEqual(result["fields"]["xn"]["different"], 0)
+            self.assertIsNone(result["first_differing_field"])
 
     def test_compares_multiple_gdn_positions_and_links_selected_row(self):
         with tempfile.TemporaryDirectory() as tmp:

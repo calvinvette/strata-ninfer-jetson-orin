@@ -19,19 +19,24 @@ def read_capture(path: Path) -> tuple[dict, dict[str, tuple[float, ...]]]:
     if len(raw) < HEADER.size:
         raise ValueError(f"{path}: truncated fused GR-read header")
     magic, version, layer, position, token, reserved, n_embd, hc, hc_lr = HEADER.unpack_from(raw)
-    if magic != b"STGRRD1\0" or version != 1 or n_embd == 0 or hc == 0:
-        raise ValueError(f"{path}: invalid STGRRD1 header")
-    count = hc * n_embd + hc_lr + 2 * hc + n_embd
+    if magic not in (b"STGRRD1\0", b"STGRRD2\0") or version not in (1, 2) or n_embd == 0 or hc == 0:
+        raise ValueError(f"{path}: invalid fused GR-read header")
+    if (magic, version) not in ((b"STGRRD1\0", 1), (b"STGRRD2\0", 2)):
+        raise ValueError(f"{path}: fused GR-read magic and version disagree")
+    count = hc * n_embd + hc_lr + 2 * hc + n_embd + (n_embd if version == 2 else 0)
     if len(raw) != HEADER.size + count * 4:
         raise ValueError(f"{path}: payload has {len(raw) - HEADER.size} bytes; expected {count * 4}")
     v = struct.unpack_from(f"<{count}f", raw, HEADER.size)
     i = 0
     fields = {}
-    for name, width in (("xn", hc * n_embd), ("lo", hc_lr), ("rs", hc),
-                        ("inj_out", hc), ("mixed", n_embd)):
+    layout = (("R", n_embd), ("xn", hc * n_embd), ("lo", hc_lr),
+              ("rs", hc), ("inj_out", hc), ("mixed", n_embd)) if version == 2 else (
+              ("xn", hc * n_embd), ("lo", hc_lr), ("rs", hc),
+              ("inj_out", hc), ("mixed", n_embd))
+    for name, width in layout:
         fields[name] = v[i:i + width]
         i += width
-    return ({"layer": layer, "position": position, "token": token,
+    return ({"version": version, "layer": layer, "position": position, "token": token,
              "n_embd": n_embd, "hc": hc, "hc_lr": hc_lr}, fields)
 
 

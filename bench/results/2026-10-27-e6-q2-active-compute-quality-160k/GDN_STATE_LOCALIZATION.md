@@ -197,3 +197,15 @@ pooled-full and KV state did not. The supervised paired run took 3,285 seconds,
 with 6.51 GiB minimum available memory, 2.07 GiB peak swap and zero observed
 OOMs. See
 [`comparison.json`](generated-gdn-trace/gr-read-gdn-multi-position-163849-877/comparison.json).
+
+
+## Raw residual input capture added
+
+GR-read diagnostic format v2 adds the raw residual `R` immediately before the
+read and normalization, while retaining the v1 parser for earlier files. A
+paired 2K control produced exact values for `R`, `xn`, all three read stages,
+and GDN `x`; full output and persistent-state parity passed. At the 160K first
+split (163849), comparing raw `R` to `xn` will show whether the small mismatch
+is present before normalization or is introduced in that step. The short-run
+comparison is
+[`gr-read-r-v2-short-check/comparison.json`](generated-gdn-trace/gr-read-r-v2-short-check/comparison.json).
