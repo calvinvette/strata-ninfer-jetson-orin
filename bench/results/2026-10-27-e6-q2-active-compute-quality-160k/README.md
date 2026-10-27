@@ -179,3 +179,22 @@ and [compact run summary](generated-gdn-trace/gr-read-r-v2-all-generated/summary
 Next capture the residual producer and preceding layer boundary at every
 generated position, then check the first raw-`R` delta against an independent
 oracle. E6 remains open.
+
+**Selected-boundary repeat at 163849 (2026-10-27):** a follow-up paired run
+captured the layer-1 output and all layer-2 pre-read/post-read boundary fields,
+the v2 GR-read record, and GDN `x` at the previously reported first split.
+All eight boundary fields and all six GR-read fields were bitwise equal across
+backends; same-run GR `mixed` also matched GDN `x` on both backends. Thus the
+all-position trace's small `R`/`xn`/`x` delta at 163849 was not reproduced in
+this selected-boundary pair. The result establishes run-to-run or capture
+configuration sensitivity, but cannot distinguish them. The final task still
+returned identical exact text, 47 token IDs and residency while GDN, tail,
+pooled, pooled-full and KV state differed. Elapsed time was 3,287 seconds;
+minimum available memory was 6.70 GiB, peak swap 0.86 GiB and sampled OOM
+counters were zero. This is another correctness failure and not performance
+evidence. See [boundary comparison](generated-gdn-trace/gr-read-r-v2-boundary-163849-retry2/run/boundary-comparison.json),
+[GR/GDN comparison](generated-gdn-trace/gr-read-r-v2-boundary-163849-retry2/run/gr-gdn-comparison.json)
+and [compact summary](generated-gdn-trace/gr-read-r-v2-boundary-163849-retry2/summary.json).
+Next capture residual boundaries across model layers at a fixed accepted token
+to find where this trajectory first changes, then repeat positions if needed.
+E6 remains open.

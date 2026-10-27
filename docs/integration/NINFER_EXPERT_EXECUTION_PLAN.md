@@ -1394,13 +1394,18 @@ differs at 163849 (58/2,560 values; relative L2 `3.72e-9`), before `xn`
 normalization. The first nine positions matched exactly. `R`/GDN `x` differences
 also appeared at 163854 and 163875, grew sharply at 163877 (`R` relative L2
 `3.70e-5`, GDN `x` `6.88e-4`), then shrank at 163878. Each same-run GDN `x`
-equals that backend's GR `mixed` output at every captured position. A previous
-selected-position capture found exact GDN `x` at 163877, so the effect of
-run-to-run and capture density remains unresolved. The answer, all 47 token
+equals that backend's GR `mixed` output at every captured position. A
+selected-boundary repeat at 163849 then found the layer-1 output, all eight
+boundary tensors, every GR-read v2 field and same-run GDN `x` bitwise equal.
+The earlier `R`/`xn`/`x` split at this position was not reproduced, so the
+onset is not stable enough to assign to its producer. The answer, all 47 token
 IDs and resident map match, but final GDN, tail, pooled, pooled-full and KV
-state differ. The supervised diagnostic stayed above the 6-GiB floor (6.55
-GiB minimum, 1.76 GiB peak swap, zero sampled OOMs); it provides no performance
-qualification. See the [all-position evidence](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/GDN_STATE_LOCALIZATION.md#all-generated-position-gr-read-v2-capture).
-Next trace the producer of residual `R` and the preceding layer boundary over
-the generated trajectory, then evaluate the first split against an independent
-oracle. E6 remains open.
+state differ. The all-position diagnostic stayed above the 6-GiB floor (6.55
+GiB minimum, 1.76 GiB peak swap); the selected-boundary repeat also stayed
+above it (6.70 GiB minimum, 0.86 GiB peak swap). Both had zero sampled OOMs
+and neither provides performance qualification. See the [all-position
+evidence](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/GDN_STATE_LOCALIZATION.md#all-generated-position-gr-read-v2-capture)
+and [selected-boundary repeat](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/GDN_STATE_LOCALIZATION.md#selected-boundary-repeat-at-the-reported-first-split).
+Next add bounded multi-layer boundary capture at a fixed accepted position,
+repeat with identical capture settings, and locate the first reproducible
+boundary difference before applying an independent oracle. E6 remains open.

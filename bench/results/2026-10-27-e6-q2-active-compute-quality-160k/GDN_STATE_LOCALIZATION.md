@@ -170,6 +170,35 @@ supervisor telemetry remain local. Next capture the residual producer and
 preceding layer boundary at all generated positions, then evaluate the first
 `R` difference with an independent numerical oracle.
 
+## Selected boundary repeat at the reported first split
+
+A second supervised paired 160K run captured the layer-1 output and the
+layer-2 boundary/read tensors at position 163849, token 12, where the
+all-position run had first found a small raw-`R` split. In this pair, all eight
+boundary fields matched bitwise: the layer-1 residual/MoE/injection outputs,
+the next-layer residual/MoE/injection inputs, the post-read residual and `xn`.
+All six GR-read v2 fields (`R`, `xn`, `lo`, `rs`, `inj_out`, `mixed`) also
+matched bitwise. For each backend, same-run `mixed` equalled GDN `x` exactly.
+
+The earlier 163849 `R` split and same-layer GDN `x` delta therefore do not
+reproduce in this selected-boundary pair. The previous all-position capture
+found those deltas in five positions, while an earlier selected-position pair
+reported a small raw-`R` delta at 163849. These observations establish
+run-to-run or capture-configuration sensitivity; they do not identify which
+factor causes it. The current pair still returned the exact expected answer,
+all 47 token IDs and the same resident map, but final GDN, tail, pooled,
+pooled-full and KV state differed. The checker exited for that state mismatch.
+
+The pair took 3,286.7 seconds; minimum available memory was 6.70 GiB, peak
+swap was 0.86 GiB and sampled OOM counters were zero. This is diagnostic
+evidence, not a performance result. Compact per-field evidence is in
+[`boundary-comparison.json`](generated-gdn-trace/gr-read-r-v2-boundary-163849-retry2/run/boundary-comparison.json),
+[`gr-gdn-comparison.json`](generated-gdn-trace/gr-read-r-v2-boundary-163849-retry2/run/gr-gdn-comparison.json)
+and [`summary.json`](generated-gdn-trace/gr-read-r-v2-boundary-163849-retry2/summary.json).
+To localize the persistent-state mismatch without assuming that 163849 is a
+stable onset, capture boundary records across model layers at a fixed accepted
+token and repeat with identical capture settings.
+
 ## Correction: fused residual-read capture is not valid yet
 
 The fused-read equality claims recorded above are withdrawn. The earlier 2K

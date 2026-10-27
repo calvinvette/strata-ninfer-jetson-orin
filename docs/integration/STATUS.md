@@ -6385,3 +6385,20 @@ and [localization note](../../bench/results/2026-10-27-e6-q2-active-compute-qual
 Next capture the residual producer and preceding layer boundary across the
 generated trajectory and test the first `R` delta with an independent oracle.
 E6 remains open.
+
+**E6 selected-boundary repeat (2026-10-27):** at layer-2 position 163849, a
+same-run capture of the layer-1 output, all eight boundary tensors, all six
+GR-read v2 fields and GDN `x` found bitwise equality across the two backends.
+Each backend's `mixed` also matched its same-run GDN `x`. This does not
+reproduce the small `R`/`xn`/`x` difference found at that position in the
+all-position trace, so the observed onset depends on run or capture conditions
+that are not yet controlled. The paired task again matched exact answer, all
+47 token IDs and resident map, but differed in final GDN, tail, pooled,
+pooled-full and KV state. Minimum available memory was 6.70 GiB, peak swap
+0.86 GiB and sampled OOM counters were zero; the checker failed on state
+parity. This adds no performance qualification. See the [boundary
+comparison](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gr-read-r-v2-boundary-163849-retry2/run/boundary-comparison.json)
+and [GR/GDN comparison](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gr-read-r-v2-boundary-163849-retry2/run/gr-gdn-comparison.json).
+Next add a bounded multi-layer boundary capture at a fixed accepted position
+and repeat with identical capture settings to find the first reproducible
+boundary difference. E6 remains open.

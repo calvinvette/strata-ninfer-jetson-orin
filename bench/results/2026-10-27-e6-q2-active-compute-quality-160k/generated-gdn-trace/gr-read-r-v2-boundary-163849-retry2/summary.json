@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "date": "2026-10-27",
+  "hardware": "Jetson Orin AGX",
+  "source_commit": "655a6755",
+  "binary_sha256": "d3bbd6194d8cf48101c150627873b7fa2b6002e07aab9fa5228b6c498c086feb",
+  "model": "Qwen3.8-Flash-Next GSQ-RCO Q2_0",
+  "prompt_tokens": 163840,
+  "selected_position": 163849,
+  "token_id": 12,
+  "boundary_capture_layer": 1,
+  "answer_and_token_ids_equal": true,
+  "resident_map_equal": true,
+  "final_state_equal": false,
+  "differing_final_state_fields": [
+    "gdn",
+    "tail",
+    "pooled",
+    "pooled_full",
+    "kv"
+  ],
+  "boundary_capture_all_fields_bitwise_equal": true,
+  "boundary_fields": {
+    "layer_output_rt": {
+      "different": 0,
+      "relative_l2": 0.0,
+      "max_abs": 0.0
+    },
+    "layer_output_moe": {
+      "different": 0,
+      "relative_l2": 0.0,
+      "max_abs": 0.0
+    },
+    "layer_output_inj2": {
+      "different": 0,
+      "relative_l2": 0.0,
+      "max_abs": 0.0
+    },
+    "next_layer_rt": {
+      "different": 0,
+      "relative_l2": 0.0,
+      "max_abs": 0.0
+    },
+    "next_layer_moe": {
+      "different": 0,
+      "relative_l2": 0.0,
+      "max_abs": 0.0
+    },
+    "next_layer_inj2": {
+      "different": 0,
+      "relative_l2": 0.0,
+      "max_abs": 0.0
+    },
+    "next_layer_postread_rt": {
+      "different": 0,
+      "relative_l2": 0.0,
+      "max_abs": 0.0
+    },
+    "next_layer_xn": {
+      "different": 0,
+      "relative_l2": 0.0,
+      "max_abs": 0.0
+    }
+  },
+  "gr_read_all_fields_bitwise_equal": true,
+  "gr_read_fields": {
+    "R": {
+      "different": 0,
+      "relative_l2": 0.0,
+      "max_abs": 0.0
+    },
+    "inj_out": {
+      "different": 0,
+      "relative_l2": 0.0,
+      "max_abs": 0.0
+    },
+    "lo": {
+      "different": 0,
+      "relative_l2": 0.0,
+      "max_abs": 0.0
+    },
+    "mixed": {
+      "different": 0,
+      "relative_l2": 0.0,
+      "max_abs": 0.0
+    },
+    "rs": {
+      "different": 0,
+      "relative_l2": 0.0,
+      "max_abs": 0.0
+    },
+    "xn": {
+      "different": 0,
+      "relative_l2": 0.0,
+      "max_abs": 0.0
+    }
+  },
+  "same_run_mixed_equals_gdn_x": true,
+  "supervisor_status": "fail",
+  "supervisor_returncode": 1,
+  "elapsed_seconds": 3286.6818890031427,
+  "minimum_available_memory_gib": 6.7010345458984375,
+  "peak_swap_used_gib": 0.8596954345703125,
+  "oom_and_oom_kill_counters": "0 across sampled cgroups",
+  "performance_qualification": "none; instrumented diagnostic ended with final-state mismatch",
+  "interpretation": "The earlier selected/all-position raw-R split at 163849 was not reproduced in this pair: layer-1 output, all captured boundary tensors, raw R, normalized xn, and later GR-read fields were bitwise equal across backends at this position. The final state still differs, so the divergence lies elsewhere in this trajectory or is sensitive to run/capture conditions.",
+  "raw_artifacts": "large boundary, GR and GDN captures plus supervisor telemetry remain local"
+}
