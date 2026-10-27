@@ -128,6 +128,48 @@ contracts. The focused trace replay adds captured-input numerical evidence,
 with the separate-state limitation above; it still does not identify the
 earlier model-layer operation.
 
+## All-generated-position GR-read v2 capture
+
+A paired 160K run on source `655a6755` (binary SHA-256
+`d3bbd6194d8cf48101c150627873b7fa2b6002e07aab9fa5228b6c498c086feb`)
+recorded concatenated STGRRD2 rows plus GDN `x` at layer 2 for every generated
+position where a regular verifier row was produced: 163840–163885 (46 rows).
+The request generated 47 tokens and stopped at the requested terminal position
+163886, which has no regular capture row.
+
+The first nine rows, 163840–163848, are bitwise equal across backends. At
+163849 raw residual `R` is the first differing GR-read field: 58/2,560 values
+differ, relative L2 `3.719e-9`, maximum absolute delta `2.328e-10`. The same
+position has 301/10,240 `xn` values differing (relative L2 `1.381e-8`) and
+644/2,560 `mixed` values differing (relative L2 `5.269e-8`). This shows the
+first observed mismatch precedes normalization and is already present in the
+layer-2 residual input. The earliest differing rows after that are 163854 and
+163875; all fields return to exact equality between those positions.
+
+At 163877, the divergence becomes large: `R` differs in 2,558/2,560 values
+(relative L2 `3.704e-5`), `xn` in 10,226/10,240 (`5.282e-4`), and `mixed` and
+same-run GDN `x` in 2,559/2,560 (`6.880e-4`). At 163878 the relative-L2
+difference in GDN `x` falls to `8.625e-8`. Across all 46 positions, each
+backend's `mixed` equals its same-run GDN `x` bitwise. Cross-backend GDN `x`
+differs only at 163849, 163854, 163875, 163877 and 163878.
+
+A preceding selected-position pair reported bitwise-equal GDN `x` at 163877.
+The current all-position run reproduces the large split there, but because the
+capture density differs, run-to-run and instrumentation sensitivity remain
+unresolved. Do not assign this variation to a specific runtime operation.
+Both arms still produced the exact expected text, identical 47 token IDs and
+the same resident map; final state differed in GDN, tail, pooled, pooled-full
+and KV. This is a correctness failure and diagnostic trace, not performance
+evidence. The checker exited 1 for final-state mismatch. The supervised pair
+took 3,260.8 seconds; minimum available memory was 6.55 GiB, peak swap 1.76
+GiB and sampled OOM counters were zero.
+
+The compact comparison and task outputs are committed beside this note under
+`generated-gdn-trace/gr-read-r-v2-all-generated/`. Large GR/GDN arrays and
+supervisor telemetry remain local. Next capture the residual producer and
+preceding layer boundary at all generated positions, then evaluate the first
+`R` difference with an independent numerical oracle.
+
 ## Correction: fused residual-read capture is not valid yet
 
 The fused-read equality claims recorded above are withdrawn. The earlier 2K

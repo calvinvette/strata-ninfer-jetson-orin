@@ -1388,6 +1388,19 @@ independent oracle next; full E6 exit criteria remain unmet.
 **E6 diagnostic v2 (2026-10-27):** the selected fused-read capture now stores
 raw residual `R` before normalized `xn`, with backwards-compatible v1 parsing.
 The 2K paired full-answer task passed exact output and persistent-state checks;
-all six captured stages matched bitwise, and five parser tests pass. At the
-first small 160K split, capture `R` and `xn` together to determine whether the
-delta precedes or arises during normalization. E6 remains open.
+all six captured stages matched bitwise, and six comparator tests pass. At the
+first small 160K split, a 46-row all-generated-position trace found `R` already
+differs at 163849 (58/2,560 values; relative L2 `3.72e-9`), before `xn`
+normalization. The first nine positions matched exactly. `R`/GDN `x` differences
+also appeared at 163854 and 163875, grew sharply at 163877 (`R` relative L2
+`3.70e-5`, GDN `x` `6.88e-4`), then shrank at 163878. Each same-run GDN `x`
+equals that backend's GR `mixed` output at every captured position. A previous
+selected-position capture found exact GDN `x` at 163877, so the effect of
+run-to-run and capture density remains unresolved. The answer, all 47 token
+IDs and resident map match, but final GDN, tail, pooled, pooled-full and KV
+state differ. The supervised diagnostic stayed above the 6-GiB floor (6.55
+GiB minimum, 1.76 GiB peak swap, zero sampled OOMs); it provides no performance
+qualification. See the [all-position evidence](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/GDN_STATE_LOCALIZATION.md#all-generated-position-gr-read-v2-capture).
+Next trace the producer of residual `R` and the preceding layer boundary over
+the generated trajectory, then evaluate the first split against an independent
+oracle. E6 remains open.

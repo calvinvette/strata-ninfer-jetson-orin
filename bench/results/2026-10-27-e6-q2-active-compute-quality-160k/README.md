@@ -149,11 +149,33 @@ upstream operation introduces the small delta or which backend is correct.
 **GR-read v2 input probe (2026-10-27):** to distinguish an upstream residual
 difference from the normalization step, the opt-in capture now includes raw
 `R` ahead of normalized `xn`. The comparator retains support for historical
-v1 files and now reports multi-position GDN rows. The rebuilt binary passed a
-2K paired 48-token retrieval check with exact answer, tokens and all state
-fields. At layer 2 / position 2048, `R`, `xn`, `lo`, `rs`, `inj_out` and
-`mixed` all matched bitwise; same-run GDN `x` also matched on both backends.
-Five focused comparator tests pass. Compact evidence: [v2 short-run comparison](generated-gdn-trace/gr-read-r-v2-short-check/comparison.json).
-The next 160K trace will capture `R` and `xn` at 163849, along with GDN `x`
-at 163849 and 163877, to determine whether the earliest observed delta is
-already present in the residual input.
+v1 files and parses concatenated rows. A 2K paired 48-token retrieval check
+passed with exact answer, tokens and all state fields; at layer 2 / position
+2048, all six captured stages (`R`, `xn`, `lo`, `rs`, `inj_out`, `mixed`) and
+same-run GDN `x` matched bitwise. Six focused comparator tests pass. Compact
+evidence: [v2 short-run comparison](generated-gdn-trace/gr-read-r-v2-short-check/comparison.json).
+
+**All-generated-position v2 trace (2026-10-27):** a paired 160K run captured
+46 rows per backend at layer 2, positions 163840–163885. `R` first differs at
+163849 (58/2,560 values, relative L2 `3.72e-9`, max absolute `2.33e-10`); the
+preceding nine rows are bitwise equal. `R`, normalized `xn`, `mixed` and GDN
+`x` differ together at positions 163849, 163854, 163875, 163877 and 163878.
+At 163877 the split grows to relative L2 `3.70e-5` in `R`, `5.28e-4` in
+`xn`, and `6.88e-4` in `mixed`/GDN `x`; at 163878 it shrinks again. At every
+captured position, each backend's `mixed` equals its same-run GDN `x` bitwise.
+This confirms that the first observed small difference is already in the
+layer-2 residual input, before GR normalization. A previous selected-position
+pair found GDN `x` bitwise equal at 163877, so run-to-run or capture-density
+sensitivity at that later position remains unresolved.
+
+The run returned the exact answer and all 47 token IDs with the same resident
+map, but final `gdn`, `tail`, `pooled`, `pooled_full` and `kv` state differed.
+The checker therefore exited with the expected state-parity failure. It took
+3,261 seconds; minimum available memory was 6.55 GiB, peak swap 1.76 GiB and
+sampled OOM counters remained zero. This instrumented diagnostic is not
+performance evidence. See the [per-position comparison](generated-gdn-trace/gr-read-r-v2-all-generated/run/comparison.json),
+[paired task result](generated-gdn-trace/gr-read-r-v2-all-generated/run/results.json)
+and [compact run summary](generated-gdn-trace/gr-read-r-v2-all-generated/summary.json).
+Next capture the residual producer and preceding layer boundary at every
+generated position, then check the first raw-`R` delta against an independent
+oracle. E6 remains open.

@@ -6368,6 +6368,20 @@ reference.
 residual input `R` before normalized `xn`; v1 artifacts remain readable. The
 2K paired full-answer control passed with exact answer and full-state parity,
 and all six captured vectors (`R`, `xn`, `lo`, `rs`, `inj_out`, `mixed`) matched
-bitwise. Five comparator tests pass. The next experiment will compare `R` and
-`xn` at the first 160K split (position 163849) to separate an upstream
-residual difference from normalization behavior.
+bitwise. Six focused comparator tests pass. The follow-up 160K capture covered
+46 generated positions at layer 2 (163840–163885). The first nine rows matched;
+at 163849, `R` differs in 58/2,560 values (relative L2 `3.72e-9`), so the
+first observed delta precedes normalization. Cross-backend `R` and GDN `x`
+differences recur at 163854 and 163875, become large at 163877 (`R` relative
+L2 `3.70e-5`, GDN `x` `6.88e-4`), then shrink at 163878. In every row each
+backend's GR `mixed` equals its same-run GDN `x` bitwise. A previous capture
+with fewer selected positions had equal GDN `x` at 163877, leaving run-to-run
+or capture-density sensitivity unresolved. Exact answer, all 47 token IDs and
+resident map match, while final GDN, tail, pooled, pooled-full and KV state
+still differ; this is not a correctness or performance qualification. Minimum
+available memory was 6.55 GiB, peak swap 1.76 GiB and sampled OOM counters were
+zero. See the [all-position comparison](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gr-read-r-v2-all-generated/run/comparison.json)
+and [localization note](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/GDN_STATE_LOCALIZATION.md).
+Next capture the residual producer and preceding layer boundary across the
+generated trajectory and test the first `R` delta with an independent oracle.
+E6 remains open.
