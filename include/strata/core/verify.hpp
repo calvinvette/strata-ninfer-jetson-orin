@@ -395,6 +395,11 @@ private:
     bool gdn_diag_multi_position_filter_ = false;
     float* gdn_diag_h_ = nullptr;       ///< opt-in pinned capture of one live GDN verifier layer
     size_t gdn_diag_capacity_ = 0;
+    bool gdn_diag_o_enabled_ = false;   ///< opt-in sidecar capture of the pre-normalization GDN output
+    float* gdn_diag_o_d_ = nullptr;
+    float* gdn_diag_o_h_ = nullptr;
+    size_t gdn_diag_o_capacity_ = 0;
+    std::string gdn_diag_o_path_;
     std::string gdn_diag_path_;
     bool gdn_diag_captured_ = false;
     int gdn_state_diag_layer_ = -1;

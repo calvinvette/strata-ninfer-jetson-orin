@@ -203,7 +203,7 @@ __device__ __forceinline__ void gdn_q8_1_store(GdnQ81* __restrict__ xq, size_t i
     if (idx % 32 == 0) xq[idx / 32].ds = q8_1_ds(d, sum);   // #606: clamped (the QFUSE path bypassed the finite helper)
 }
 
-template <bool ALL_OUT, bool Q>
+template <bool ALL_OUT, bool Q, bool CAPTURE_O>
 __global__ void __launch_bounds__(S * RG) gdn_step_norm_multi_kernel(float* __restrict__ state,
                                                                      const float* __restrict__ hbuf, int C,
                                                                      const float* __restrict__ gate,
@@ -212,7 +212,8 @@ __global__ void __launch_bounds__(S * RG) gdn_step_norm_multi_kernel(float* __re
                                                                      const float* __restrict__ gamma, float eps,
                                                                      float* __restrict__ y, int h_k, int h_v, int T,
                                                                      const int32_t* __restrict__ n_keep, int t_out_begin,
-                                                                     GdnQ81* __restrict__ xq) {
+                                                                     GdnQ81* __restrict__ xq,
+                                                                     float* __restrict__ o_capture) {
     __shared__ float sk[2][S], sq[2][S];
     __shared__ float red_kv[RG][S];
     __shared__ float red_o[RG][S];
@@ -268,7 +269,9 @@ __global__ void __launch_bounds__(S * RG) gdn_step_norm_multi_kernel(float* __re
         __syncthreads();
         float oc = 0.0f, sq_part = 0.0f;
         if (rg == 0) {
-            oc = (red_o[0][col] + red_o[1][col] + red_o[2][col] + red_o[3][col]) * rsqrtf((float) S);
+            const float raw_o = red_o[0][col] + red_o[1][col] + red_o[2][col] + red_o[3][col];
+            if constexpr (CAPTURE_O) o_capture[(size_t) t * value_dim + head * S + col] = raw_o;
+            oc = raw_o * rsqrtf((float) S);
             sq_part = oc * oc;
         }
         // every thread takes the shuffles, as the single-token kernel does: inside the `rg == 0` branch hipcc on
@@ -289,6 +292,15 @@ __global__ void __launch_bounds__(S * RG) gdn_step_norm_multi_kernel(float* __re
 #pragma unroll
         for (int r = 0; r < RPG; ++r) base[r * row_stride] = s[r];
     }
+}
+
+template <bool ALL_OUT, bool Q, bool CAPTURE_O>
+void launch_gdn_step_norm_multi_kernel(dim3 grid, dim3 block, cudaStream_t stream, float* state, const float* h,
+                                       int conv_channels, const float* gate, const float* beta, const float* z,
+                                       const float* gamma, float eps, float* y, int h_k, int h_v, int n_tok,
+                                       const int32_t* n_keep, int t_out_begin, GdnQ81* xq, float* o_capture) {
+    gdn_step_norm_multi_kernel<ALL_OUT, Q, CAPTURE_O><<<grid, block, 0, stream>>>(
+        state, h, conv_channels, gate, beta, z, gamma, eps, y, h_k, h_v, n_tok, n_keep, t_out_begin, xq, o_capture);
 }
 
 // S25 (STRATA_GDN_SPLIT=1): the same recurrence with each head's 128 state columns over 4 blocks of 32 columns
@@ -911,7 +923,7 @@ void gdn_ab_multi(const float* x, const uint16_t* w_alpha, const uint16_t* w_bet
 
 void gdn_step_norm_multi(float* state, const float* h, int conv_channels, const float* gate, const float* beta,
                          const float* z, const float* gamma, float eps, float* y, int h_k, int h_v, int n_tok,
-                         const int32_t* n_keep, void* stream, int t_out_begin, void* xq_out) {
+                         const int32_t* n_keep, void* stream, int t_out_begin, void* xq_out, float* o_capture) {
     GdnQ81* const xq = static_cast<GdnQ81*>(xq_out);   // S26: non-null = also the outputs' q8_1 (STRATA_QFUSE)
     if (!state || !h || !gate || !beta || !z || !gamma || !y || h_k <= 0 || h_v % h_k || n_tok < 1 ||
         n_tok > kVerifyMaxT) {
@@ -921,7 +933,7 @@ void gdn_step_norm_multi(float* state, const float* h, int conv_channels, const 
     static const bool split = [] { const char* v = std::getenv("STRATA_GDN_SPLIT"); return v && v[0] == '1'; }();
     // S26: the split runs where it is faster (gfx1151 harness, h_v 48: the commit 8-19% per call; a window of 2+ rows
     // 3-13%; one row: no gain, the old kernel stays) - bitwise equal in every case
-    if (split && (t_out_begin >= n_tok || n_tok - t_out_begin >= 2)) {
+    if (o_capture == nullptr && split && (t_out_begin >= n_tok || n_tok - t_out_begin >= 2)) {
         const dim3 grid((unsigned) h_v, S / GS_COLS), block(GS_COLS, RG);
         if (t_out_begin >= n_tok) {   // no outputs (the commit): the state only
             gdn_state_replay_kernel<kVerifyMaxT><<<grid, block, 0, (cudaStream_t) stream>>>(
@@ -940,7 +952,7 @@ void gdn_step_norm_multi(float* state, const float* h, int conv_channels, const 
         const char* e = std::getenv("STRATA_GDN_COMMIT_SPLIT");
         return !e || e[0] != '0';
     }();
-    if (commit_split && n_keep != nullptr && t_out_begin >= n_tok) {
+    if (o_capture == nullptr && commit_split && n_keep != nullptr && t_out_begin >= n_tok) {
         static const bool dbg = [] { const char* e = std::getenv("STRATA_DBG_GDN"); return e && e[0] == '1'; }();
         if (dbg) gdn_step_commit_kernel<true><<<dim3((unsigned) h_v, 4u), dim3(32, RG), 0, (cudaStream_t) stream>>>(
             state, h, conv_channels, gate, beta, h_k, h_v, n_keep, n_tok);
@@ -952,16 +964,27 @@ void gdn_step_norm_multi(float* state, const float* h, int conv_channels, const 
     const dim3 g1((unsigned) h_v), b1(S, RG);
     const bool all_out = n_keep == nullptr && t_out_begin <= 0;
     if (xq && t_out_begin < n_tok) {
-        if (all_out) gdn_step_norm_multi_kernel<true, true><<<g1, b1, 0, (cudaStream_t) stream>>>(
-            state, h, conv_channels, gate, beta, z, gamma, eps, y, h_k, h_v, n_tok, nullptr, 0, xq);
-        else gdn_step_norm_multi_kernel<false, true><<<g1, b1, 0, (cudaStream_t) stream>>>(
-            state, h, conv_channels, gate, beta, z, gamma, eps, y, h_k, h_v, n_tok, n_keep, t_out_begin, xq);
+        if (all_out) {
+            if (o_capture) launch_gdn_step_norm_multi_kernel<true, true, true>(g1, b1, (cudaStream_t) stream,
+                state, h, conv_channels, gate, beta, z, gamma, eps, y, h_k, h_v, n_tok, nullptr, 0, xq, o_capture);
+            else launch_gdn_step_norm_multi_kernel<true, true, false>(g1, b1, (cudaStream_t) stream,
+                state, h, conv_channels, gate, beta, z, gamma, eps, y, h_k, h_v, n_tok, nullptr, 0, xq, nullptr);
+        } else {
+            if (o_capture) launch_gdn_step_norm_multi_kernel<false, true, true>(g1, b1, (cudaStream_t) stream,
+                state, h, conv_channels, gate, beta, z, gamma, eps, y, h_k, h_v, n_tok, n_keep, t_out_begin, xq, o_capture);
+            else launch_gdn_step_norm_multi_kernel<false, true, false>(g1, b1, (cudaStream_t) stream,
+                state, h, conv_channels, gate, beta, z, gamma, eps, y, h_k, h_v, n_tok, n_keep, t_out_begin, xq, nullptr);
+        }
     } else if (all_out) {
-        gdn_step_norm_multi_kernel<true, false><<<g1, b1, 0, (cudaStream_t) stream>>>(
-            state, h, conv_channels, gate, beta, z, gamma, eps, y, h_k, h_v, n_tok, nullptr, 0, nullptr);
+        if (o_capture) launch_gdn_step_norm_multi_kernel<true, false, true>(g1, b1, (cudaStream_t) stream,
+            state, h, conv_channels, gate, beta, z, gamma, eps, y, h_k, h_v, n_tok, nullptr, 0, nullptr, o_capture);
+        else launch_gdn_step_norm_multi_kernel<true, false, false>(g1, b1, (cudaStream_t) stream,
+            state, h, conv_channels, gate, beta, z, gamma, eps, y, h_k, h_v, n_tok, nullptr, 0, nullptr, nullptr);
     } else {
-        gdn_step_norm_multi_kernel<false, false><<<g1, b1, 0, (cudaStream_t) stream>>>(
-            state, h, conv_channels, gate, beta, z, gamma, eps, y, h_k, h_v, n_tok, n_keep, t_out_begin, nullptr);
+        if (o_capture) launch_gdn_step_norm_multi_kernel<false, false, true>(g1, b1, (cudaStream_t) stream,
+            state, h, conv_channels, gate, beta, z, gamma, eps, y, h_k, h_v, n_tok, n_keep, t_out_begin, nullptr, o_capture);
+        else launch_gdn_step_norm_multi_kernel<false, false, false>(g1, b1, (cudaStream_t) stream,
+            state, h, conv_channels, gate, beta, z, gamma, eps, y, h_k, h_v, n_tok, n_keep, t_out_begin, nullptr, nullptr);
     }
     check("gdn_step_norm_multi");
 }

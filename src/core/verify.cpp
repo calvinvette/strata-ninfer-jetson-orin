@@ -88,6 +88,15 @@ struct GdnDiagHeaderV5 {
     int32_t tokens[strata::kernels::kVerifyMaxT];
 };
 static_assert(sizeof(GdnDiagHeaderV5) == 196, "STGDIAG5 header layout changed");
+struct GdnOutputDiagHeaderV1 {
+    char magic[8];
+    uint32_t version;
+    int32_t layer, rows;
+    int64_t pos0;
+    uint64_t value_dim;
+    int32_t tokens[strata::kernels::kVerifyMaxT];
+};
+static_assert(sizeof(GdnOutputDiagHeaderV1) == 68, "STGDOO1 header layout changed");
 struct BoundaryDiagHeaderV2 {
     char magic[8];
     uint32_t version;
@@ -557,6 +566,12 @@ Verifier::~Verifier() {
     if (gdn_diag_h_ && cudaFreeHost(gdn_diag_h_) == cudaSuccess)
         strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
                                                     gdn_diag_h_, 0, -1);
+    if (gdn_diag_o_d_ && cudaFree(gdn_diag_o_d_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-diagnostic-device", "free", this,
+                                                    gdn_diag_o_d_, 0, device_);
+    if (gdn_diag_o_h_ && cudaFreeHost(gdn_diag_o_h_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
+                                                    gdn_diag_o_h_, 0, -1);
     if (gdn_state_diag_h_ && cudaFreeHost(gdn_state_diag_h_) == cudaSuccess)
         strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
                                                     gdn_state_diag_h_, 0, -1);
@@ -674,6 +689,8 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
 
     const char* gdn_layer_env = std::getenv("STRATA_VERIFY_DUMP_GDN_LAYER");
     const char* gdn_batch_env = std::getenv("STRATA_VERIFY_DUMP_GDN_BATCH");
+    const char* gdn_o_env = std::getenv("STRATA_VERIFY_DUMP_GDN_O");
+    gdn_diag_o_enabled_ = gdn_o_env != nullptr && gdn_o_env[0] != '\0' && std::strcmp(gdn_o_env, "0") != 0;
     gdn_diag_include_batch_ = gdn_batch_env != nullptr && gdn_batch_env[0] != '\0' &&
                              std::strcmp(gdn_batch_env, "0") != 0;
     const char* gdn_positions_env = std::getenv("STRATA_VERIFY_DUMP_GDN_POSITIONS");
@@ -681,6 +698,14 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
                                    std::getenv("STRATA_VERIFY_DUMP_GDN_POSITION") : nullptr;
     if ((gdn_positions_env != nullptr || gdn_position_env != nullptr) && gdn_layer_env == nullptr) {
         err = "verify: GDN diagnostic positions need the GDN layer and path";
+        return false;
+    }
+    if (gdn_diag_o_enabled_ && gdn_layer_env == nullptr) {
+        err = "verify: STRATA_VERIFY_DUMP_GDN_O needs the GDN layer and path";
+        return false;
+    }
+    if (gdn_diag_o_enabled_ && gdn_diag_include_batch_) {
+        err = "verify: GDN raw-o capture does not support batch-slot diagnostics";
         return false;
     }
     if (const char* layer = gdn_layer_env) {
@@ -739,6 +764,21 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
         }
         strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "allocate", this,
                                                     gdn_diag_h_, gdn_diag_capacity_, -1);
+        if (gdn_diag_o_enabled_) {
+            gdn_diag_o_path_ = gdn_diag_path_ + ".o";
+            gdn_diag_o_capacity_ = (size_t) max_t * (size_t) ZV * sizeof(float);
+            if (cudaMalloc((void**) &gdn_diag_o_d_, gdn_diag_o_capacity_) != cudaSuccess ||
+                cudaHostAlloc((void**) &gdn_diag_o_h_, gdn_diag_o_capacity_, cudaHostAllocPortable) != cudaSuccess) {
+                if (gdn_diag_o_d_) { cudaFree(gdn_diag_o_d_); gdn_diag_o_d_ = nullptr; }
+                if (gdn_diag_o_h_) { cudaFreeHost(gdn_diag_o_h_); gdn_diag_o_h_ = nullptr; }
+                err = "verify: could not allocate opt-in raw GDN output capture buffers";
+                return false;
+            }
+            strata::platform::integration_trace::event("verifier-diagnostic-device", "allocate", this,
+                                                        gdn_diag_o_d_, gdn_diag_o_capacity_, device_);
+            strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "allocate", this,
+                                                        gdn_diag_o_h_, gdn_diag_o_capacity_, -1);
+        }
         std::fprintf(stderr, "strata verify: opt-in GDN activation dump at layer %d%s -> %s (%zu bytes)\n",
                      gdn_diag_layer_, gdn_diag_include_batch_ ? " including batch windows" : "",
                      gdn_diag_path_.c_str(), gdn_diag_capacity_);
@@ -1878,6 +1918,10 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                 mm(wg, z_ + (size_t) tb * ZV, (int) N, (int) ZV);
                 stamp(l, 5, grp);
                 }
+                if (gdn_diag_o_enabled_ && l == gdn_diag_layer_ && batch_rec_) {
+                    err = "verify: raw GDN o capture requires a single-request verifier window";
+                    return false;
+                }
                 const bool dump_gdn = gdn_diag_h_ != nullptr && l == gdn_diag_layer_ &&
                                       (!batch_rec_ || gdn_diag_include_batch_);
                 GdnDiagOffsets diag{};
@@ -1917,11 +1961,21 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                         gdn_step_norm_multi(stx, hb + (size_t) first * C, (int) C, gate + (size_t) first * HV,
                                             beta + (size_t) first * HV, z_ + (size_t) first * ZV,
                                             (const float*) wnm->data, EPS, y_ + (size_t) first * ZV,
-                                            (int) HK, (int) HV, t - first, nullptr, cs, 0);
+                                            (int) HK, (int) HV, t - first, nullptr, cs, 0, nullptr,
+                                            gdn_diag_o_enabled_ && dump_gdn ? gdn_diag_o_d_ + (size_t) first * ZV : nullptr);
                     }
                 } else
                 gdn_step_norm_multi(state, hb, (int) C, gate, beta, z_, (const float*) wnm->data, EPS, y_, (int) HK,
-                                    (int) HV, te, self_commit ? one_ : nullptr, cs, tb, g_qfuse() ? (void*) xq_ : nullptr);
+                                    (int) HV, te, self_commit ? one_ : nullptr, cs, tb,
+                                    g_qfuse() ? (void*) xq_ : nullptr,
+                                    gdn_diag_o_enabled_ && dump_gdn ? gdn_diag_o_d_ : nullptr);
+                if (dump_gdn && gdn_diag_o_enabled_ &&
+                    cudaMemcpyAsync(gdn_diag_o_h_ + (size_t) tb * ZV,
+                                    gdn_diag_o_d_ + (size_t) tb * ZV,
+                                    (size_t) n * (size_t) ZV * sizeof(float), cudaMemcpyDeviceToHost, cs) != cudaSuccess) {
+                    err = "verify: could not capture opt-in raw GDN output";
+                    return false;
+                }
                 if (gdn_state_diag_h_ != nullptr && l == gdn_state_diag_layer_ && T == 1 && !batch_rec_) {
                     const size_t state_floats = (size_t) gdn_floats;
                     const size_t state_bytes = state_floats * sizeof(float);
@@ -3347,6 +3401,29 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
         if (!written) {
             err = "verify: could not write opt-in GDN layer diagnostic";
             return false;
+        }
+        if (gdn_diag_o_enabled_) {
+            GdnOutputDiagHeaderV1 o_header{};
+            std::memcpy(o_header.magic, "STGDOO1", sizeof(o_header.magic));
+            o_header.version = 1;
+            o_header.layer = gdn_diag_layer_;
+            o_header.rows = T;
+            o_header.pos0 = pos0;
+            o_header.value_dim = (uint64_t) g.ssm_value_dim;
+            for (int t = 0; t < T; ++t) o_header.tokens[t] = tokens[t];
+            std::FILE* o_dump = std::fopen(gdn_diag_o_path_.c_str(), "ab");
+            bool o_written = o_dump != nullptr;
+            if (o_written) {
+                o_written = std::fwrite(&o_header, sizeof(o_header), 1, o_dump) == 1 &&
+                            std::fwrite(gdn_diag_o_h_, sizeof(float), (size_t) T * (size_t) g.ssm_value_dim,
+                                        o_dump) == (size_t) T * (size_t) g.ssm_value_dim;
+                if (std::fflush(o_dump) != 0) o_written = false;
+                if (std::fclose(o_dump) != 0) o_written = false;
+            }
+            if (!o_written) {
+                err = "verify: could not write opt-in raw GDN output sidecar";
+                return false;
+            }
         }
     }
     if (gdn_state_diag_captured_ && T == 1 &&

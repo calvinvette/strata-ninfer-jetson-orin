@@ -47,6 +47,8 @@ def main() -> int:
                     help='filter the GDN capture to one token position')
     ap.add_argument('--capture-gdn-positions', type=int, nargs='+',
                     help='filter the GDN capture to several increasing token positions')
+    ap.add_argument('--capture-gdn-o', action='store_true',
+                    help='also capture raw pre-normalization GDN output to a .gdn-diag.o sidecar')
     ap.add_argument('--capture-gdn-commit-layer', type=int,
                     help='capture committed GDN state at one GDN layer')
     ap.add_argument('--capture-gdn-commit-positions', type=int, nargs='+',
@@ -106,6 +108,8 @@ def main() -> int:
         ap.error('--capture-qsa-kv requires --capture-qsa-layer and --capture-qsa-position')
     if a.capture_gdn_position is not None and a.capture_gdn_layer is None:
         ap.error('--capture-gdn-position requires --capture-gdn-layer')
+    if a.capture_gdn_o and a.capture_gdn_layer is None:
+        ap.error('--capture-gdn-o requires --capture-gdn-layer')
     if a.capture_gdn_layer is not None and not 0 <= a.capture_gdn_layer < 48:
         ap.error('--capture-gdn-layer must be in [0, 47]')
     if a.capture_gdn_position is not None and a.capture_gdn_position < 0:
@@ -197,6 +201,8 @@ def main() -> int:
                 arm_env['STRATA_VERIFY_DUMP_GDN_POSITIONS'] = ','.join(map(str, a.capture_gdn_positions))
             elif a.capture_gdn_position is not None:
                 arm_env['STRATA_VERIFY_DUMP_GDN_POSITION'] = str(a.capture_gdn_position)
+            if a.capture_gdn_o:
+                arm_env['STRATA_VERIFY_DUMP_GDN_O'] = '1'
         if a.capture_gdn_commit_layer is not None:
             arm_env['STRATA_VERIFY_DUMP_GDN_COMMIT_LAYER'] = str(a.capture_gdn_commit_layer)
             arm_env['STRATA_VERIFY_DUMP_GDN_COMMIT_PATH'] = str(
