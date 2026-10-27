@@ -1199,3 +1199,9 @@ pairs with matching outputs and residency. Median paired changes were −0.98%
 prompt TPS, 0% decode TPS, +1.10% first-visible TTFT and +1.00% client time;
 minimum available memory was 11.59 GiB. No metric passed the 5% screen. See the
 [4K 1,069-token report](../../bench/results/2026-10-26-e6-q2-staged-compute-4k-pp1069-screen/README.md).
+
+The 4K 557+64 cell matched output and residency hashes in all pairs. Median
+changes were −1.01% prompt TPS, 0% decode TPS, +0.92% first-visible TTFT and
++0.18% client time; minimum available memory was 11.58 GiB. One pair showed a
+decode outlier without output divergence, so no stable performance effect is
+claimed. See the [4K 557-token report](../../bench/results/2026-10-26-e6-q2-staged-compute-4k-pp557-screen/README.md).
