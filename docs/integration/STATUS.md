@@ -6263,3 +6263,13 @@ resident map and nine final state fields matched. Minimum available RAM was
 minutes. This is bounded correctness evidence under recorded host conditions,
 not performance evidence or near-limit 256K ingestion; the narrow memory margin
 should constrain follow-up. See the [128K report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-128k/README.md).
+
+
+The 163,840-token held-out task under a 256K cap returned the same exact answer
+and 47 token IDs on both active staged backends, with matching residency, but
+failed final-state parity in GDN, tail, pooled, pooled-full and KV. The
+supervisor ended after checker failure, not a memory abort; minimum available
+RAM was 6.79 GiB, peak swap 1.71 GiB and OOM counters were zero. This is a
+correctness failure, not an unsupported memory cell. Do not treat matching text
+as qualification; diagnose the divergence before claiming parity at this
+length. See the [160K report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/README.md).

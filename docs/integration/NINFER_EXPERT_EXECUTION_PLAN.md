@@ -1297,3 +1297,12 @@ and all nine final state fields match. Minimum available memory was 6.80 GiB
 The 43.7-minute sequential diagnostic is not performance evidence. This
 correctness cell has a narrow memory margin and does not establish near-limit
 256K ingestion. See the [128K report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-128k/README.md).
+
+
+A 163,840-token held-out retrieval/arithmetic check returned identical exact
+text, token IDs and residency for the two active staged grouped-compute paths,
+but failed final-state parity in GDN, tail, pooled, pooled-full and KV.
+Minimum available RAM was 6.79 GiB, peak swap 1.71 GiB; the supervisor ended on
+the checker failure, not the memory guard. This is a correctness failure, not
+a memory-unsupported result. Diagnose the source before accepting larger-context
+qualification; text equality alone is insufficient. See the [160K report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/README.md).
