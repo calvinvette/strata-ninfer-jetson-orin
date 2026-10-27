@@ -1164,3 +1164,9 @@ pairs with matching output and residency hashes. Median paired changes were
 −1.44% prompt TPS, +2.30% decode TPS, +1.43% first-visible TTFT and +0.50%
 client time; minimum available memory was 11.63 GiB. No performance gate was
 reached. See the [4K 2K-prompt report](../../bench/results/2026-10-26-e6-q2-staged-compute-4k-pp2048-screen/README.md).
+
+At configured 16K capacity, the 512+64 staged-compute cell also matched output
+and resident-map hashes in all three pairs. Median changes were −2.92% prompt
+TPS, 0% decode TPS, +1.83% first-visible TTFT and +1.09% client time. Minimum
+available memory was 11.32 GiB. No median met the 5% threshold. See the [16K
+report](../../bench/results/2026-10-26-e6-q2-staged-compute-16k-pp512-screen/README.md).
