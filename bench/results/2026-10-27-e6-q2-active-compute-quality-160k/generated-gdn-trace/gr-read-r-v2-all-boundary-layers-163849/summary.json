@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "experiment": "e6-q2-160k-all-layer-boundary-capture",
+  "source_commit": "1587c8f0f1556a62dbbc6d228a2164b979d00345",
+  "cuda_binary_sha256": "68ec69f5d12ead24a5a7d72c53c3a08cc66d6d6a02f4c4d9fcc2a6650901e46a",
+  "model": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0",
+  "prompt_tokens": 163840,
+  "generated_tokens": [
+    47,
+    47
+  ],
+  "expected_text": "EARLY=AMBER-QUARTZ-618, MIDDLE=SILVER-MEADOW-243, LATE=INDIGO-LANTERN-907, SUM=1768",
+  "answers_equal": true,
+  "token_ids_equal": true,
+  "residency_equal": true,
+  "final_state_equal": false,
+  "final_state_differing_fields": [
+    "gdn",
+    "tail",
+    "pooled",
+    "pooled_full",
+    "kv"
+  ],
+  "capture": {
+    "position": 163849,
+    "token_id": 12,
+    "layers": 47,
+    "schema": "STBNDY2"
+  },
+  "first_boundary_divergence": {
+    "layer": 1,
+    "field": "layer_output_moe",
+    "count": 2560,
+    "different": 488,
+    "relative_l2": 2.894978458142776e-08,
+    "max_abs": 3.725290298461914e-09,
+    "layer0_all_fields_bitwise_equal": true,
+    "layer1_other_early_fields_bitwise_equal": [
+      "layer_output_rt",
+      "layer_output_inj2"
+    ]
+  },
+  "boundary_followthrough": {
+    "layer1_next_layer_xn": {
+      "count": 10240,
+      "different": 301,
+      "relative_l2": 1.38120646165838e-08,
+      "max_abs": 4.76837158203125e-07
+    },
+    "layer2_next_layer_xn": {
+      "count": 10240,
+      "different": 5021,
+      "relative_l2": 1.4325748542481946e-07,
+      "max_abs": 2.86102294921875e-06
+    },
+    "layer3_next_layer_xn": {
+      "count": 10240,
+      "different": 10240,
+      "relative_l2": 0.0024303215463088498,
+      "max_abs": 0.024974822998046875
+    }
+  },
+  "gr_gdn": {
+    "first_differing_field": "R",
+    "R": {
+      "count": 2560,
+      "different": 58,
+      "relative_l2": 3.719343095535913e-09,
+      "max_abs": 2.3283064365386963e-10
+    },
+    "xn": {
+      "count": 10240,
+      "different": 301,
+      "relative_l2": 1.38120646165838e-08,
+      "max_abs": 4.76837158203125e-07
+    },
+    "mixed": {
+      "count": 2560,
+      "different": 644,
+      "relative_l2": 5.2694076193801826e-08,
+      "max_abs": 3.5762786865234375e-07
+    },
+    "same_run_mixed_equals_gdn_x": true
+  },
+  "supervisor": {
+    "status": "fail",
+    "returncode": 1,
+    "elapsed_s": 3239.8570458590984,
+    "minimum_available_gib": 6.610469818115234,
+    "peak_swap_gib": 5.165435791015625,
+    "oom_events": 0,
+    "oom_kill_events": 0
+  },
+  "qualification": "diagnostic only; final persistent state differs; no performance claim",
+  "interpretation": "The first split observed in this all-layer capture is at layer 1 MoE output, but prior single-layer capture at the same accepted position was bitwise equal. Repeat with identical all-layer settings and capture layer-1 routing, inputs, expert parts and output before assigning cause."
+}

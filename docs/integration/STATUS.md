@@ -6413,9 +6413,33 @@ with two build jobs; the final binary SHA256 was
 `68ec69f5d12ead24a5a7d72c53c3a08cc66d6d6a02f4c4d9fcc2a6650901e46a`. The
 integration Python suite passed (204 tests), Python syntax checks and `strata
 --help` passed. No model workload has used this new multi-layer capture yet.
-HIP/SYCL qualification remains pending: maestro1 currently has only 1.1 GiB
-free on its root filesystem, insufficient for the project builds. This tooling
-change does not resolve the nondeterministic 160K final-state mismatch and
-adds no performance evidence. Next, build the affected backends when scratch
-space is available, then repeat the fixed-position 160K capture across the
-model layers with identical settings. E6 remains open.
+maestro1's root filesystem has 1.1 GiB free, but its `/mnt/sda2` scratch volume
+has 56 GiB free. A clean source snapshot at commit `1587c8f0` configured for
+both backends, and the changed `verify.cpp` translation unit compiled for HIP
+and SYCL. The full HIP build is being resumed with one job; the full SYCL link
+is still pending. maestro1 supplies compile evidence only. This tooling change
+does not resolve the nondeterministic 160K final-state mismatch and adds no
+performance evidence. E6 remains open.
+
+**E6 all-layer boundary result (2026-10-27):** the 160K paired capture completed
+with records for all 47 model layers at accepted position 163849. In this
+capture, layer 0 is bitwise equal and the first observed difference is layer 1
+`layer_output_moe` (488/2,560 values; relative L2 `2.895e-8`, maximum absolute
+`3.73e-9`). Differences grow through later layers; at layer 3 the captured
+`next_layer_xn` relative L2 is `2.43e-3`. The run's GR-read capture also first
+differs in `R` (58/2,560; relative L2 `3.72e-9`). Both arms produced the exact
+answer, all 47 token IDs and identical residency, but final GDN, tail, pooled,
+pooled-full and KV state differed. Minimum available memory was 6.61 GiB, peak
+swap 5.17 GiB and sampled OOM counters were zero. A prior less-dense capture at
+the same position had bitwise-equal layer-1 and GR-read boundaries, so this is
+a candidate earliest split, not a reproducible cause or proven backend defect.
+Repeat with the same all-layer settings plus layer-1 MoE route, input,
+expert-part and output capture, then compare against an independent oracle.
+E6 remains open; this is diagnostic, not performance evidence.
+
+The exact `1587c8f0` source completed full HIP and SYCL `strata` builds on
+maestro1 with one build job, against the pinned ggml revision. The HIP binary
+SHA256 is `a2edc59edb38fc4e9c859af985a42895b55521fb77f9e0133910cdf0a4e1776b`.
+The SYCL build has not yet been confirmed complete; record its hash after a
+successful finish. These builds are compile evidence only, not runtime or Orin
+performance evidence.

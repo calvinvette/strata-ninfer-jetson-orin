@@ -1414,8 +1414,23 @@ boundary difference before applying an independent oracle. E6 remains open.
 multiple residual boundaries at one fixed token position. Each layer is emitted
 as an existing `STBNDY2` record, and the comparator aligns concatenated records
 by layer; the legacy singular capture remains available. Orin CUDA build and
-204 integration Python tests pass. HIP/SYCL builds are pending because
-maestro1 has 1.1 GiB free. No multi-layer model run or new quality/performance
-qualification has been completed. Next, qualify the shared verifier change on
-HIP/SYCL, then run the paired long-context capture and continue the independent
-oracle investigation. E6 remains open.
+204 integration Python tests pass. The exact source configures for HIP and SYCL
+on maestro1, and the changed verifier translation unit compiles for both. A
+one-job full HIP build is in progress; full SYCL linking remains pending. The
+root filesystem has 1.1 GiB free, while `/mnt/sda2` has 56 GiB free. No
+multi-layer model result is available yet. The paired long-context capture is
+running on Orin; it preserves the 6 GiB physical-memory floor. maestro1 is used
+for compilation only. E6 remains open.
+
+**E6 multi-layer localization update (2026-10-27):** an all-layer 160K pair
+captured position 163849 across all 47 model layers. Layer 0 matched exactly;
+the first observed split was layer-1 `layer_output_moe` (488/2,560 values,
+relative L2 `2.895e-8`), with growing downstream differences. Layer-2 GR-read
+raw `R` also differed slightly. The task text, generated token IDs and
+residency matched, but final persistent state did not. A lower-density capture
+at the same position had matched bitwise, so this does not yet establish a
+reproducible MoE discrepancy. The 6-GiB floor held (6.61 GiB minimum; no OOM).
+The next paired capture repeats all-layer, GR-read and GDN settings while
+adding layer-1 route/input/expert-part/output data, followed by an independent
+oracle if the split reproduces. E6 remains open. The exact-source HIP full
+build passed on maestro1; the matching SYCL full build is still underway.

@@ -280,3 +280,35 @@ split (163849), comparing raw `R` to `xn` will show whether the small mismatch
 is present before normalization or is introduced in that step. The short-run
 comparison is
 [`gr-read-r-v2-short-check/comparison.json`](generated-gdn-trace/gr-read-r-v2-short-check/comparison.json).
+
+## Multi-layer boundary capture at position 163849
+
+On 2026-10-27, a paired 160K run captured the accepted-token boundary at all 47
+model layers, plus layer-2 GR-read and GDN state. The source is commit
+`1587c8f0`; the CUDA binary SHA256 is
+`68ec69f5d12ead24a5a7d72c53c3a08cc66d6d6a02f4c4d9fcc2a6650901e46a`. Both
+arms returned the expected retrieval/arithmetic answer, identical 47 token IDs
+and identical residency, but final GDN, tail, pooled, pooled-full and KV state
+differed. The checker exited 1 for this state mismatch. Runtime was 3,239.9 s;
+minimum available memory was 6.61 GiB, peak swap 5.17 GiB, and sampled OOM
+counters were zero. This is diagnostic only, not performance evidence.
+
+Layer 0 was bitwise equal. The first observed split was layer-1
+`layer_output_moe`: 488/2,560 values differed (relative L2 `2.895e-8`, maximum
+absolute `3.725e-9`), while that layer's earlier captured runtime and injection
+outputs remained equal. The split propagates: layer-1 next-layer `xn` differed
+in 301/10,240 values (relative L2 `1.381e-8`), layer-2 `xn` in 5,021/10,240
+(`1.433e-7`), and layer-3 `xn` in all 10,240 (`2.430e-3`). In the same run,
+layer-2 raw residual `R` differed in 58/2,560 values (`3.719e-9` relative L2)
+and `mixed` in 644/2,560 (`5.269e-8`). Each backend's `mixed` equalled its
+same-run GDN `x` bitwise.
+
+Do not assign this to the MoE operator yet: a prior selected single-layer
+capture at the same token position found exact equality. Capture density or
+run-level behavior remains a confound. A repeat with identical all-layer,
+GR-read and GDN settings is in progress, adding layer-1 MoE routing, input,
+expert-part and output capture. If the split reproduces, compare those values
+with an independent mathematical oracle to determine whether either backend
+differs from the reference result. See the compact [capture summary](generated-gdn-trace/gr-read-r-v2-all-boundary-layers-163849/summary.json),
+[boundary comparison](generated-gdn-trace/gr-read-r-v2-all-boundary-layers-163849/run/boundary-comparison.json)
+and [GR/GDN comparison](generated-gdn-trace/gr-read-r-v2-all-boundary-layers-163849/run/gr-gdn-comparison.json).
