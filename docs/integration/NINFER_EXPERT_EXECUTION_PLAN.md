@@ -1583,3 +1583,14 @@ oracle. The exact answer, tokens and residency matched, but persistent state
 did not. Minimum available memory was 6.56 GiB, peak swap 1.31 GiB, OOM kills
 zero. Next compare the layer-8 input with layer-7 residual/MoE captures at this
 same position. See the [focused step report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-first-split-163842/README.md). E6 remains open.
+
+**E6 same-position upstream capture repeat (2026-10-28):** adding layer-7 MoE
+and layer-7/8 boundary captures at 163842 changed the observed result again.
+All boundary fields through layer 8, layer-7 expert internals, layer-8 raw `o`,
+normalized `y`, and pre/post states matched bitwise; both recurrence oracles
+were at `1.32e-7` relative L2. Final persistent state nevertheless differed.
+This conflicts with the preceding same-position GDN capture, which showed
+`3.90e-4` input and `9.10e-4` post-state deltas. The instrumentation-sensitive
+trajectories do not establish a stable earliest split. Do not change the
+backend based on these captures. E6 remains open for minimally instrumented
+paired repeatability and state parity. See the [same-position report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-upstream-layer7-163842/README.md).

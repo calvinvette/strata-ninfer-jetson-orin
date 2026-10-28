@@ -100,6 +100,17 @@ unlocalized. Exact answer, tokens and residency matched, but final persistent
 state did not. Minimum available RAM was 6.56 GiB, peak swap 1.31 GiB and OOM
 kills were zero. See the [focused step report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-first-split-163842/README.md).
 
+A same-position repeat added layer-7 MoE and layer-7/8 boundary captures. At
+163,842, all captured layer-7/8 boundaries, layer-7 expert outputs, layer-8 raw
+GDN `o`/`y`, and layer-8 pre/post states matched bitwise; both recurrence
+oracles reported relative L2 `1.32e-7`. Yet final persistent state still
+differed. This directly contradicts the prior same-position capture's material
+GDN-input and post-state deltas, confirming strong capture/run sensitivity.
+The first divergent operation is not stable enough to guide a backend change;
+E6 remains open pending minimally instrumented repeatability. Minimum available
+RAM was 6.51 GiB, peak swap 1.50 GiB, and OOM kills were zero. See the [same-
+position upstream capture report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-upstream-layer7-163842/README.md).
+
 The active E6 staged-compute capacity screens now include a three-pair 256K
 configured-capacity request (2,048 prompt + 128 generated tokens). Median paired
 changes were +1.57% prompt TPS, 0% decode TPS, −0.80% first-visible TTFT and
