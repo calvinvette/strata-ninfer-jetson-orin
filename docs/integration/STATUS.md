@@ -69,6 +69,16 @@ incoming recurrent states diverge earlier. Minimum available RAM was 7.14 GiB,
 peak swap 6.58 GiB, and OOM counters were zero. Diagnostic only; see the [state
 and recurrence replay](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/moe-gdn-oracle-163849/README.md).
 
+A further state-only timeline captured layer-8 committed state at positions
+163,840–163,849. State matched bitwise through position 163,846; the first
+observed recurrent-state difference was at 163,847 (relative L2 `1.37e-8`, max
+absolute `1.49e-8`). Recurrent-state differences remained about `1.3e-8`
+through 163,849, while convolution state stayed bitwise equal. This contrasts
+with the broader capture's `2.64e-4` difference at position 163,848 and
+confirms strong capture/run sensitivity. The final persistent-state parity
+check still fails. Minimum available RAM was 6.87 GiB, peak swap 4.50 GiB and
+OOM kills zero. Diagnostic only; see the [layer-8 state timeline](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-state-timeline-163840-163849/README.md).
+
 The active E6 staged-compute capacity screens now include a three-pair 256K
 configured-capacity request (2,048 prompt + 128 generated tokens). Median paired
 changes were +1.57% prompt TPS, 0% decode TPS, −0.80% first-visible TTFT and

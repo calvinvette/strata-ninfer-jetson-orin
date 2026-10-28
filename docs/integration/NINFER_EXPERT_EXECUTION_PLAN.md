@@ -1545,3 +1545,17 @@ divergence. Minimum available memory was 7.14 GiB, peak swap 6.58 GiB, OOM
 kills zero. Next trace the earliest divergent layer-8 state update across the
 preceding accepted positions, using the least intrusive practical capture.
 See the [oracle repeat report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/moe-gdn-oracle-163849/README.md). E6 remains open.
+
+**E6 layer-8 state timeline (2026-10-28):** a state-only paired capture at
+positions 163840–163849 matched exactly through position 163846. The first
+recurrent-state delta appeared at 163847 (relative L2 `1.37e-8`, max
+`1.49e-8`) and stayed near `1.3e-8` through 163849; convolution state remained
+bitwise equal. This sharply differs from the preceding broader capture, where
+the position-163848 recurrent state differed by `2.64e-4`. Thus even state-only
+and instrumented runs produce different trajectories; neither identifies a
+stable root cause. Both arms returned matching exact text, tokens and
+residency, but final persistent state differed. Minimum available memory was
+6.87 GiB, peak swap 4.50 GiB, OOM kills zero. Next determine whether divergence
+reappears after position 163849 with a minimal state-only timeline extended
+through the generated answer, then compare the first differing update against
+the independent recurrence oracle. See the [timeline report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-state-timeline-163840-163849/README.md). E6 remains open.
