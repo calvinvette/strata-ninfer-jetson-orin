@@ -6683,3 +6683,20 @@ change arithmetic yet. The next diagnostic is repeated accepted-prefix state
 capture at selected decode positions, under identical minimal capture settings,
 to test whether divergence is already present after prefill or grows during
 decode. E6 remains open. [Numeric repeat report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control-gdn-dump-repeat2/README.md).
+
+**E6 accepted-prefix capture tooling and 2K smoke (2026-10-28):** exposed the
+runtime's existing all-layer GDN commit dump and end-of-prefill state snapshot
+through opt-in harness flags, and added an independent prefill-state
+comparator. Unit tests and CLI help checks passed. Three 2K/262K-context
+smokes produced the requested 36-layer commit captures and selected prefill
+snapshots while preserving exact answer, token IDs, and residency. Captured
+prefill state was exact across engines at layer 4 in one pair and layer 6 in
+another; at the selected generated prefix, the first material state delta
+moved between model layer 6 and model layer 4 across capture settings. The
+commit-only pair aligned with the layer-6 capture pair, but the layer-4 pair
+did not. These checks validate the tooling but do not localize a stable
+divergence. The previous 2K baseline used an 8K configured context and is not a
+matched control. Minimum available memory was 7.11 GiB; sampled OOM events were
+zero. Next use all-layer captures at several accepted decode positions on the
+160K workload with identical settings across both backends; treat any onset as
+provisional until repeated. [Smoke report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-2k/gdn-capture-cli-smoke/README.md).

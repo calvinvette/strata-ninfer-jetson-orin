@@ -1662,3 +1662,17 @@ generated prefix already contains the drift or whether it accumulates during
 decode. Keep exact state parity as the release criterion, and do not change a
 backend until the mismatch is reproducible and independently attributed. See
 the [numeric repeat report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control-gdn-dump-repeat2/README.md).
+
+The capture harness now exposes the runtime's `all` GDN commit mode and its
+end-of-prefill state snapshot, with a comparator for the latter. Short
+2K-workload smoke pairs validated 36-layer accepted-prefix records and selected
+prefill snapshots. The prefill snapshot matched at the selected layer, but the
+first material cross-backend commit delta moved from model layer 6 to layer 4
+across pairs with different capture settings. A commit-only pair aligned with
+the layer-6 capture pair. The baseline 2K result used a different configured
+context and is not a valid control. This smoke work validates capture plumbing,
+not state parity or a root cause. Next collect all-layer state at early, middle
+and final accepted decode positions on the 160K task with one fixed capture
+configuration in both arms. Repeat that same configuration before assigning
+an onset; preserve ordinary-path checks as the correctness reference. See the
+[capture smoke report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-2k/gdn-capture-cli-smoke/README.md).

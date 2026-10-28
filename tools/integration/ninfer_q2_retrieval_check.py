@@ -17,6 +17,18 @@ from serve.frontend import ChatTemplate
 from serve.server import StrataEngine, child_env
 
 
+def parse_gdn_commit_layer(value: str) -> int | str:
+    if value == 'all':
+        return value
+    try:
+        layer = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("must be a GDN layer index or 'all'") from exc
+    if not 0 <= layer < 48:
+        raise argparse.ArgumentTypeError("must be in [0, 47] or 'all'")
+    return layer
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--config', type=Path, required=True)
@@ -53,10 +65,12 @@ def main() -> int:
                     help='filter the GDN capture to several increasing token positions')
     ap.add_argument('--capture-gdn-o', action='store_true',
                     help='also capture raw pre-normalization GDN output to a .gdn-diag.o sidecar')
-    ap.add_argument('--capture-gdn-commit-layer', type=int,
-                    help='capture committed GDN state at one GDN layer')
+    ap.add_argument('--capture-gdn-commit-layer', type=parse_gdn_commit_layer,
+                    help="capture committed GDN state at one GDN layer, or 'all' GDN layers")
     ap.add_argument('--capture-gdn-commit-positions', type=int, nargs='+',
                     help='filter committed GDN state to several increasing token positions')
+    ap.add_argument('--capture-prefill-gdn-state-layer', type=int,
+                    help='capture the selected GDN layer state at the end of prompt prefill')
     ap.add_argument('--capture-boundary-layer', type=int,
                     help='capture residual/hyperconnection boundaries after one model layer')
     ap.add_argument('--capture-boundary-layers', type=int, nargs='+',
@@ -109,12 +123,16 @@ def main() -> int:
         ap.error('--capture-gdn-positions must be unique, increasing, nonnegative integers')
     if (a.capture_gdn_commit_layer is None) != (a.capture_gdn_commit_positions is None):
         ap.error('--capture-gdn-commit-layer and --capture-gdn-commit-positions must be used together')
-    if a.capture_gdn_commit_layer is not None and not 0 <= a.capture_gdn_commit_layer < 48:
-        ap.error('--capture-gdn-commit-layer must be in [0, 47]')
+    if (a.capture_gdn_commit_layer is not None and a.capture_gdn_commit_layer != 'all' and
+            not 0 <= a.capture_gdn_commit_layer < 48):
+        ap.error("--capture-gdn-commit-layer must be in [0, 47] or 'all'")
     if a.capture_gdn_commit_positions is not None and (
             not a.capture_gdn_commit_positions or any(x < 0 for x in a.capture_gdn_commit_positions) or
             a.capture_gdn_commit_positions != sorted(set(a.capture_gdn_commit_positions))):
         ap.error('--capture-gdn-commit-positions must be unique, increasing, nonnegative integers')
+    if (a.capture_prefill_gdn_state_layer is not None and
+            not 0 <= a.capture_prefill_gdn_state_layer < 47):
+        ap.error('--capture-prefill-gdn-state-layer must be in [0, 46]')
     if a.capture_boundary_layer is not None and a.capture_boundary_layers is not None:
         ap.error('use only one of --capture-boundary-layer and --capture-boundary-layers')
     boundary_layers = a.capture_boundary_layers
@@ -258,6 +276,10 @@ def main() -> int:
                 (a.output / f'{name}.gdn-commit').resolve())
             arm_env['STRATA_VERIFY_DUMP_GDN_COMMIT_POSITIONS'] = ','.join(
                 map(str, a.capture_gdn_commit_positions))
+        if a.capture_prefill_gdn_state_layer is not None:
+            arm_env['STRATA_PREFILL_GDN_STATE_TRACE_LAYER'] = str(a.capture_prefill_gdn_state_layer)
+            arm_env['STRATA_PREFILL_GDN_STATE_TRACE_PATH'] = str(
+                (a.output / f'{name}.prefill-gdn-state').resolve())
         if boundary_layers is not None:
             arm_env['STRATA_VERIFY_DUMP_BOUNDARY_LAYERS'] = ','.join(map(str, boundary_layers))
             arm_env['STRATA_VERIFY_DUMP_BOUNDARY_POSITION'] = str(a.capture_boundary_position)
