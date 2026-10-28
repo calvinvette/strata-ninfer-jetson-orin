@@ -584,8 +584,13 @@ inputs, expert outputs and combined outputs across three selected layers, and
 matching final persistent state. The writer had previously been called only
 from the batch verifier path, so requested bundles were silently absent for
 ordinary windows. See the [writer follow-up](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/moe-bundle-debug7-2049/README.md).
-This closes the capture-tooling defect only; the 160K state mismatch and E6
-performance/quality gates remain open.
+The corrected 160K run then found the first observed backend difference in
+layer-7 MoE output (relative L2 `3.82e-8`) after exact agreement through layer
+6; the layer-8 MoE input had grown to `6.54e-4`, and route weights changed
+without changing expert IDs. Five final persistent-state fields still differ.
+The capture-tooling defect is closed, but the amplification path, operator
+accuracy, and E6 performance/quality gates remain open. See the [160K bundle
+and boundary analysis](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/moe-bundle-fixed-163849/README.md).
 
 Follow [BENCHMARKS.md](BENCHMARKS.md). Use three screening blocks followed by at
 least seven independent randomized paired confirmation blocks on held-out prompts.

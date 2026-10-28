@@ -21,6 +21,18 @@ available memory was 11.77 GiB; this is a correctness diagnostic, not a
 performance result. The 160K state divergence remains unresolved and E6 stays
 open. See the [bundle-writer follow-up](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/moe-bundle-debug7-2049/README.md).
 
+The corrected writer was then rerun on the 163,840-token retrieval prompt.
+Both backends emitted valid all-layer boundary traces and the requested MoE
+bundles. Boundaries matched through model layer 6; the first observed change
+was a tiny layer-7 expert-output delta (relative L2 `3.82e-8`) with identical
+routes and input. At layer 8, the MoE input had grown to relative L2 `6.54e-4`
+and route weights differed, while route IDs still matched. The request returned
+the same exact answer and token IDs, but the same five persistent fields still
+differed. Minimum available memory was 6.87 GiB, peak swap 6.08 GiB and OOM
+counters remained zero. This localizes the first perturbation and its later
+amplification, but not the intervening operation or which backend is more
+accurate. E6 remains open; see the [160K bundle and boundary analysis](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/moe-bundle-fixed-163849/README.md).
+
 The active E6 staged-compute capacity screens now include a three-pair 256K
 configured-capacity request (2,048 prompt + 128 generated tokens). Median paired
 changes were +1.57% prompt TPS, 0% decode TPS, −0.80% first-visible TTFT and

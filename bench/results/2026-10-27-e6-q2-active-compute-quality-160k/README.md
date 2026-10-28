@@ -198,3 +198,15 @@ and [compact summary](generated-gdn-trace/gr-read-r-v2-boundary-163849-retry2/su
 Next capture residual boundaries across model layers at a fixed accepted token
 to find where this trajectory first changes, then repeat positions if needed.
 E6 remains open.
+
+**Corrected MoE bundle rerun (2026-10-28):** the ordinary verifier serializer
+fix is now validated at 160K. A paired run at position 163849 wrote both
+three-layer MoE bundles and all 47 boundary records. Layers 0–6 matched
+bitwise. The first difference was layer-7 expert output (relative L2
+`3.82e-8`) with identical routes and MoE input; layer 8's MoE input later
+reached relative L2 `6.54e-4`, with different route weights but identical
+expert IDs. The exact answer, 47 token IDs and residency still matched while
+`gdn`, `tail`, `pooled`, `pooled_full` and `kv` differed. The run took 54.44
+minutes, minimum available memory was 6.87 GiB, peak swap 6.08 GiB and OOM
+counters were zero. This replaces the earlier missing-bundle diagnostic only;
+the persistent-state failure remains. See the [bundle and boundary analysis](generated-gdn-trace/moe-bundle-fixed-163849/README.md).
