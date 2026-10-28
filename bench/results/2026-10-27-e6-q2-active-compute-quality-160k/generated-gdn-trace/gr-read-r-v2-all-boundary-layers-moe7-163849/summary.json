@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "experiment": "e6-q2-160k-all-layer-boundary-capture-with-moe-layer7",
+  "source_commit": "1587c8f0f1556a62dbbc6d228a2164b979d00345",
+  "cuda_binary_sha256": "68ec69f5d12ead24a5a7d72c53c3a08cc66d6d6a02f4c4d9fcc2a6650901e46a",
+  "model": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0",
+  "prompt_tokens": 163840,
+  "generated_tokens": [
+    47,
+    47
+  ],
+  "answers_equal": true,
+  "token_ids_equal": true,
+  "residency_equal": true,
+  "final_state_equal": false,
+  "final_state_differing_fields": [
+    "gdn",
+    "tail",
+    "pooled",
+    "pooled_full",
+    "kv"
+  ],
+  "layer7_moe_capture": {
+    "route_byte_equal": true,
+    "input_byte_equal": true,
+    "expert_parts_byte_equal": true,
+    "shared_and_combined_output_byte_equal": true
+  },
+  "layer0_through_layer7_boundaries_equal": true,
+  "boundary_first_divergence": {
+    "layer": 8,
+    "fields": {
+      "layer_output_rt": {
+        "count": 10240,
+        "different": 10131,
+        "relative_l2": 0.0002772569268003463,
+        "max_abs": 4.0588900446891785e-05
+      },
+      "layer_output_moe": {
+        "count": 2560,
+        "different": 2560,
+        "relative_l2": 0.007623594147908862,
+        "max_abs": 0.0004716147668659687
+      },
+      "layer_output_inj2": {
+        "count": 4,
+        "different": 4,
+        "relative_l2": 5.3508620423357034e-05,
+        "max_abs": 0.00304412841796875
+      },
+      "next_layer_rt": {
+        "count": 10240,
+        "different": 10131,
+        "relative_l2": 0.0002772569268003463,
+        "max_abs": 4.0588900446891785e-05
+      },
+      "next_layer_moe": {
+        "count": 2560,
+        "different": 2560,
+        "relative_l2": 0.007623594147908862,
+        "max_abs": 0.0004716147668659687
+      },
+      "next_layer_inj2": {
+        "count": 4,
+        "different": 4,
+        "relative_l2": 5.3508620423357034e-05,
+        "max_abs": 0.00304412841796875
+      },
+      "next_layer_postread_rt": {
+        "count": 10240,
+        "different": 10141,
+        "relative_l2": 0.0005320528169017016,
+        "max_abs": 6.128847599029541e-05
+      },
+      "next_layer_xn": {
+        "count": 10240,
+        "different": 10107,
+        "relative_l2": 0.0016346335208287774,
+        "max_abs": 0.017008066177368164
+      }
+    }
+  },
+  "layer2_gr_gdn_exact": true,
+  "supervisor": {
+    "status": "fail",
+    "returncode": 1,
+    "elapsed_s": 3233.2130355061963,
+    "minimum_available_gib": 6.663539886474609,
+    "peak_swap_gib": 1.8047943115234375,
+    "oom_events": 0,
+    "oom_kill_events": 0
+  },
+  "qualification": "diagnostic only; final persistent state differs; no performance claim",
+  "interpretation": "The layer-7 route, input, expert parts, shared output and combined output are byte-identical. Boundaries match through layer 7. The first difference in this run is a large activation split at layer 8, after the prior run observed a tiny layer-7 MoE output split. This further confirms that the observed onset varies by run or capture conditions. Next capture layer-8 MoE internals with all-layer settings and evaluate the first reproducible split."
+}

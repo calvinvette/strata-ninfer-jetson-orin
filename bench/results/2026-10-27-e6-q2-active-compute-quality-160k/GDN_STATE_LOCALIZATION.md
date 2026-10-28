@@ -338,3 +338,27 @@ and [GR/GDN comparison](generated-gdn-trace/gr-read-r-v2-all-boundary-layers-moe
 record the result. Next capture layer-7 MoE route, input, expert parts and
 output under the same all-layer settings, then use an independent mathematical
 oracle if the split repeats.
+
+## All-layer repeat with layer-7 MoE internals
+
+A third paired run repeated the all-layer boundary, layer-2 GR-read and GDN
+capture at position 163849, adding layer-7 MoE route, input, expert parts and
+shared/combined output. All four layer-7 MoE captures are byte-identical across
+backends, and boundary records match through layer 7. The first difference in
+this pair is at layer 8: 10,131/10,240 runtime-output values differ (relative
+L2 `2.773e-4`), 2,560/2,560 MoE-output values differ (`7.624e-3`), and the
+next-layer `xn` difference is `1.635e-3`. Layer-2 GR-read and GDN `x` remain
+bitwise equal in this run.
+
+This differs from the previous pair, where a tiny split first appeared at
+layer 7. Together with the earlier layer-1 split, these results show that the
+first observed divergence is not stable across long-context pairs or capture
+settings. They do not identify a backend defect or a correct answer. Both arms
+again returned identical expected text, 47 token IDs and residency while final
+GDN, tail, pooled, pooled-full and KV state differed. Runtime was 3,233 s;
+minimum available memory was 6.66 GiB, peak swap 1.80 GiB, and sampled OOM
+counters were zero. This is diagnostic only. Next capture layer-8 MoE route,
+input, expert parts and shared/combined output under the same all-layer settings.
+See the compact [summary](generated-gdn-trace/gr-read-r-v2-all-boundary-layers-moe7-163849/summary.json),
+[boundary comparison](generated-gdn-trace/gr-read-r-v2-all-boundary-layers-moe7-163849/run/boundary-comparison.json)
+and [GR/GDN comparison](generated-gdn-trace/gr-read-r-v2-all-boundary-layers-moe7-163849/run/gr-gdn-comparison.json).

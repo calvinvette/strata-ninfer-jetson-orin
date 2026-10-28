@@ -6466,3 +6466,15 @@ SYCL executable links successfully after setting the toolchain library path,
 but maestro1 has no available SYCL device, so it cannot provide runtime evidence.
 Both builds are compile evidence only; maestro1 provides no Orin performance
 results.
+
+**E6 layer-7 MoE capture (2026-10-27):** layer-7 route, input, expert parts,
+shared output and combined output are byte-identical across the paired 160K
+run. All captured boundaries through layer 7 match; the first difference is at
+layer 8 (runtime output relative L2 `2.77e-4`, MoE output `7.62e-3`, next-layer
+`xn` `1.63e-3`). Layer-2 GR-read and GDN `x` match exactly. This moves the
+observed onset again: the prior repeat saw a tiny layer-7 split, and an earlier
+one saw layer 1. These are not stable enough to assign a cause. Final persistent
+state still differs despite matching answer, tokens and residency. Minimum
+available memory was 6.66 GiB, peak swap 1.80 GiB, and OOM events were zero.
+Diagnostic only. Next capture layer-8 MoE internals using the same all-layer
+settings. E6 remains open.

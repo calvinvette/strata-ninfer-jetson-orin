@@ -1453,3 +1453,14 @@ binary SHA256:
 `373288b3696c83016f67961f6427124b4a7d9dc025a9885e554afda1d6e685e4`. SYCL
 links successfully, but no suitable device is available on maestro1 for runtime
 launch. These checks establish compilation only, not accelerator qualification.
+
+**E6 layer-7 MoE capture (2026-10-27):** adding layer-7 route/input/parts/output
+to the all-layer 160K pair found all four MoE captures byte-identical and all
+boundaries through layer 7 equal. The first difference in this run is at layer
+8 (runtime output relative L2 `2.77e-4`, MoE output `7.62e-3`, next-layer `xn`
+`1.63e-3`); layer-2 GR-read and GDN `x` are exact. The previous run had instead
+shown a tiny layer-7 split, while a prior run split at layer 1. This changing
+onset is run/capture-sensitive and does not assign a fault. Exact text, tokens
+and residency still match, but final state does not. Minimum available memory
+was 6.66 GiB with zero OOMs. Next capture layer-8 MoE internals at the same
+position with all-layer settings. E6 remains open.
