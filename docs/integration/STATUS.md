@@ -56,6 +56,19 @@ and beta deltas preceded `y` at `7.08e-4` and projected GDN output at
 `2.41e-3`. This localizes the growth to recurrence/normalization for this pair,
 without establishing a stable cause. Details are in the linked report.
 
+A reduced-capture paired repeat saved the committed layer-8 state immediately
+before position 163,849 and passed both raw recurrence outputs against the
+independent FP64 GDN equation oracle: relative L2 `1.11e-7` for Strata and
+`7.99e-8` for NInfer. The two incoming recurrent states already differed by
+`2.64e-4` relative L2, while convolution state matched. At the captured step,
+`qkv`, `h`, and `z` again matched; small `x`/gate/beta deltas preceded larger
+`y` and projected-output deltas. Both arms matched answer, tokens and residency,
+but the same five persistent state fields differed. This supports correct
+per-arm recurrence arithmetic and shifts the unresolved question to how the
+incoming recurrent states diverge earlier. Minimum available RAM was 7.14 GiB,
+peak swap 6.58 GiB, and OOM counters were zero. Diagnostic only; see the [state
+and recurrence replay](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/moe-gdn-oracle-163849/README.md).
+
 The active E6 staged-compute capacity screens now include a three-pair 256K
 configured-capacity request (2,048 prompt + 128 generated tokens). Median paired
 changes were +1.57% prompt TPS, 0% decode TPS, −0.80% first-visible TTFT and

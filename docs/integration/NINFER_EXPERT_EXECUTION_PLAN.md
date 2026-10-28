@@ -1528,3 +1528,20 @@ in this pair, but does not establish a stable cause or end-to-end state parity.
 Next repeat with controlled GDN stage captures. See the [diagnostic
 report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/moe-layer8-gdn-163849/README.md).
 E6 remains open.
+
+**E6 reduced-capture GDN oracle repeat (2026-10-28):** a paired 160K run
+captured the committed layer-8 state at 163848 and recurrence inputs/raw output
+at 163849, with only layer-7/8 MoE bundles. The independent FP64 recurrence
+oracle reproduced raw `o` at relative L2 `1.11e-7` for Strata and `7.99e-8`
+for NInfer. Both arms' recurrence calculations are consistent with the
+equation oracle for their own inputs and states; NInfer is slightly closer in
+this sample. However, the incoming recurrent states already differed by
+`2.64e-4` relative L2 at 163848, while the convolution portions matched exactly.
+At 163849, `qkv`, convolution output `h`, and `z` matched; small `x`/gate/beta
+deltas preceded larger `y` and projected-output differences. The 47-token exact
+answer and residency matched but the persistent state did not. Thus this
+isolates correct per-arm recurrence execution, not the origin of earlier state
+divergence. Minimum available memory was 7.14 GiB, peak swap 6.58 GiB, OOM
+kills zero. Next trace the earliest divergent layer-8 state update across the
+preceding accepted positions, using the least intrusive practical capture.
+See the [oracle repeat report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/moe-gdn-oracle-163849/README.md). E6 remains open.
