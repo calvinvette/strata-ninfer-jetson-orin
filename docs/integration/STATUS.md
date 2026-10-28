@@ -6730,3 +6730,14 @@ preserving arm names while running NInfer first. Five focused unit tests, CLI
 help, Python compilation, and `git diff --check` pass. Use the reverse-order
 switch for the next same-settings accepted-prefix capture; E6 remains open.
 [Crossover report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-repeat/README.md).
+
+**E6 reversed-order accepted-prefix trial (2026-10-28):** ran the same 160K
+pair with NInfer first. Exact answer, 47 token IDs and residency matched, but
+final persistent state differed. Prompt-boundary GDN state was bitwise equal
+across all 36 layers; first material generated-prefix differences appeared at
+layer 8 (`3.237e-3`) and layer 5 (`7.424e-4`). The two Strata-first pairs had
+shown their first material differences at layer 12 for the prompt and layer 4
+for generated prefixes. This is consistent with possible arm-order
+sensitivity, but one reversed-order pair does not establish causality. Minimum
+available memory was 6.70 GiB. Repeat reversed order with unchanged settings.
+[Report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-reversed/README.md).

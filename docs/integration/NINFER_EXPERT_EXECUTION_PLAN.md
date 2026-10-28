@@ -1707,3 +1707,13 @@ justified. The retrieval harness now has an opt-in
 coverage for both orders. Use it for the next paired capture with all other
 settings fixed; compare arm order and backend separately. See the
 [repeat/crossover report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-repeat/README.md).
+
+**E6 reversed-order accepted-prefix trial (2026-10-28):** the exact paired
+capture was run with NInfer first. Answer, token IDs and residency matched;
+final persistent state still differed. Unlike the two Strata-first pairs,
+the prompt-boundary GDN state matched bitwise across all 36 layers. At generated
+positions, the first material differences were at model layer 8 (relative L2
+`3.237e-3`) and layer 5 (`7.424e-4`). This single reversed-order trial is
+consistent with arm-order sensitivity but cannot establish it, especially
+given the same-order cross-run state crossover. Repeat reversed order before
+assigning cause. See the [reversed-order report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-reversed/README.md).
