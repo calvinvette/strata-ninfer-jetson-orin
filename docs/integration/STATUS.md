@@ -111,6 +111,14 @@ E6 remains open pending minimally instrumented repeatability. Minimum available
 RAM was 6.51 GiB, peak swap 1.50 GiB, and OOM kills were zero. See the [same-
 position upstream capture report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-upstream-layer7-163842/README.md).
 
+The no-capture 160K paired control confirms persistent-state divergence on the
+ordinary path: both arms matched the exact 47-token answer and residency, but
+`gdn`, `tail`, `pooled`, `pooled_full`, and `kv` differed. This rules out
+diagnostic sidecars as the sole cause, although one pair does not establish
+repeatability. Minimum available RAM was 6.64 GiB, peak swap 4.55 GiB, and OOM
+kills were zero. A second no-capture pair is underway. See the [minimal
+control report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control/README.md).
+
 The active E6 staged-compute capacity screens now include a three-pair 256K
 configured-capacity request (2,048 prompt + 128 generated tokens). Median paired
 changes were +1.57% prompt TPS, 0% decode TPS, −0.80% first-visible TTFT and

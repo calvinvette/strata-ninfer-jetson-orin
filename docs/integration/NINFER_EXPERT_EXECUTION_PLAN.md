@@ -1594,3 +1594,12 @@ This conflicts with the preceding same-position GDN capture, which showed
 trajectories do not establish a stable earliest split. Do not change the
 backend based on these captures. E6 remains open for minimally instrumented
 paired repeatability and state parity. See the [same-position report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-upstream-layer7-163842/README.md).
+
+**E6 ordinary-path long-context control (2026-10-28):** a paired 160K Q2_0
+retrieval ran with no optional capture sidecars. Both arms matched all 47 token
+IDs, exact answer, and residency, but final `gdn`, `tail`, `pooled`,
+`pooled_full`, and `kv` state differed. Thus the persistent-state mismatch is
+present on the ordinary path and is not solely caused by diagnostic capture;
+its source and repeatability are still unresolved. Minimum available memory
+was 6.64 GiB, peak swap 4.55 GiB, OOM kills zero. Repeat this no-capture pair
+before continuing layer-level localization. See the [minimal control report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control/README.md). E6 remains open.
