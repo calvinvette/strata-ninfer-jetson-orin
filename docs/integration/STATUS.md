@@ -79,6 +79,17 @@ confirms strong capture/run sensitivity. The final persistent-state parity
 check still fails. Minimum available RAM was 6.87 GiB, peak swap 4.50 GiB and
 OOM kills zero. Diagnostic only; see the [layer-8 state timeline](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-state-timeline-163840-163849/README.md).
 
+Extending the state-only capture over the full answer produced a different
+trajectory: layer-8 recurrent and convolution states matched at positions
+163,840–163,841, then both differed at 163,842 (relative L2 `2.30e-4` and
+`9.10e-4`). Recurrent-state difference peaked at `3.81e-3` by 163,869. This
+contradicts the preceding state-only pair, where the first split was the tiny
+`1.37e-8` delta at 163,847. It confirms run sensitivity and makes the exact
+source unresolved. The exact answer, tokens and residency matched; persistent
+state still differed. Minimum available RAM was 6.54 GiB, peak swap 1.40 GiB,
+and OOM kills were zero. Next capture GDN inputs and the state update at 163,842
+for an independent recurrence check. See the [full-answer timeline report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-state-timeline-full-answer/README.md).
+
 The active E6 staged-compute capacity screens now include a three-pair 256K
 configured-capacity request (2,048 prompt + 128 generated tokens). Median paired
 changes were +1.57% prompt TPS, 0% decode TPS, −0.80% first-visible TTFT and

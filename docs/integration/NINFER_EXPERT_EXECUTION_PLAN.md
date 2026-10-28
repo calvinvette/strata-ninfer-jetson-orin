@@ -1559,3 +1559,16 @@ residency, but final persistent state differed. Minimum available memory was
 reappears after position 163849 with a minimal state-only timeline extended
 through the generated answer, then compare the first differing update against
 the independent recurrence oracle. See the [timeline report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-state-timeline-163840-163849/README.md). E6 remains open.
+
+**E6 full-answer layer-8 state timeline (2026-10-28):** the state-only
+capture extended through all accepted input positions for the 47-token answer.
+Layer-8 recurrent and convolution states matched at 163840–163841, then both
+split at 163842 (relative L2 `2.30e-4` and `9.10e-4`). Recurrent difference
+peaked at `3.81e-3` by position 163869. This conflicts with the preceding
+state-only pair, which first split at 163847 by only `1.37e-8`; broad capture
+had also produced a different magnitude. The run confirms strong trajectory
+sensitivity, not a stable cause. Text, tokens and residency matched; final
+persistent state did not. Minimum available memory was 6.54 GiB, peak swap
+1.40 GiB, and OOM kills were zero. Next capture layer-8 GDN inputs and the
+state update at 163842 and check against the independent recurrence oracle.
+See the [full-answer timeline report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-state-timeline-full-answer/README.md). E6 remains open.
