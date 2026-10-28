@@ -50,6 +50,11 @@ both backend outputs within relative L2 `5.7e-8`–`9.4e-8`; NInfer was closer
 for one expert and the two were equal at reported precision for the other nine.
 This supports the active-expert operator calculation for this sample, but does
 not explain the layer-8 GDN amplification or establish full state parity.
+Parsing the same GDN capture showed layer-8 `x` differed by relative L2
+`6.22e-8`; `qkv`, convolution output `h`, and `z` matched exactly. Small gate
+and beta deltas preceded `y` at `7.08e-4` and projected GDN output at
+`2.41e-3`. This localizes the growth to recurrence/normalization for this pair,
+without establishing a stable cause. Details are in the linked report.
 
 The active E6 staged-compute capacity screens now include a three-pair 256K
 configured-capacity request (2,048 prompt + 128 generated tokens). Median paired

@@ -43,6 +43,17 @@ NInfer expert parts were equally close to the oracle (relative L2 approximately
 systematic backend winner in this sample; they do not establish end-to-end
 correctness or explain the layer-8 propagation.
 
+The layer-8 diagnostic payload also captures recurrence inputs and downstream
+stages. At the captured position, GDN `x` differed at relative L2 `6.22e-8`
+(1,060/2,560 values); `qkv`, convolution output `h`, and `z` were bitwise
+equal. `gate` and `beta` showed small differences (relative L2 `2.32e-7` and
+`3.88e-8`). After recurrence/normalization, `y` was at `7.08e-4`; projected
+GDN output was `2.41e-3`, and the later layer-8 MoE input was `7.37e-4`.
+This pair therefore localizes substantial growth to the recurrence/normalizer
+path given tiny `x`, gate, and beta deltas. The capture alone cannot distinguish
+rounding sensitivity from a backend defect; controlled repeats and a state
+oracle remain necessary.
+
 The supervisor sampled 3,066 records over about 54 minutes. Minimum available
 memory was 6.58 GiB, peak swap 1.38 GiB and sampled cgroup OOM-kill counters
 were zero. Clocks were observed without control; energy was not measured.
