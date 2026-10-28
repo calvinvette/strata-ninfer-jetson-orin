@@ -124,6 +124,18 @@ in pair 1 and 6.59 GiB in pair 2; peak swap was 4.55 and 1.30 GiB respectively;
 sampled OOM kills were zero in both. See the [first control report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control/README.md)
 and [repeat 2 report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control-repeat2/README.md).
 
+A GDN-only final fingerprint repeat completed normally and localized the raw
+state variation: of 36 GDN ordinals, ordinal 0 matched across backends and
+across both runs with per-ordinal hashes; ordinal 1 was the first backend split,
+and ordinals 1–35 varied between repeated runs for both backends. Both arms
+still matched the exact answer, tokens, and residency, while the same five
+persistent fields differed. A preceding attempt to hash each QSA/KV layer
+individually exceeded the 60-second request watchdog after generation; it
+emitted GDN hashes but is not a valid completed state comparison. The active
+variation appears in GDN state from ordinal 1 onward, but its numerical size
+and cause are unknown. See the [GDN-only report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control-gdn-layer-hashes/README.md)
+and [QSA hash watchdog report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control-layer-hashes/README.md).
+
 The active E6 staged-compute capacity screens now include a three-pair 256K
 configured-capacity request (2,048 prompt + 128 generated tokens). Median paired
 changes were +1.57% prompt TPS, 0% decode TPS, −0.80% first-visible TTFT and

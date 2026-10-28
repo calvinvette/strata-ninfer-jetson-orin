@@ -1607,4 +1607,16 @@ capture trajectories cannot yet support a backend change. Minimum available
 memory was 6.64 and 6.59 GiB; peak swap was 4.55 and 1.30 GiB; sampled OOM kills
 were zero in each run. See the [first control report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control/README.md)
 and [repeat 2 report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control-repeat2/README.md).
+**Follow-up GDN ordinal hashes (2026-10-28):** a GDN-only per-ordinal hash pair
+completed with matching answer, token IDs, and residency, but the same five
+final persistent state fields still differed. Ordinal 0 matched across both
+backends and both runs with per-ordinal hashes; ordinal 1 was the first
+cross-backend difference, and ordinals 1–35 changed across repeated runs for
+each backend. This localizes observed run-to-run byte variation to GDN state
+from ordinal 1 onward, without quantifying numerical deltas or identifying a
+cause. A preceding all-QSA-layer hash attempt exceeded the request watchdog
+after generation and is not a valid final-state comparison. Do not use that
+QSA-layer setting at this context under the current watchdog. See the
+[GDN-only report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control-gdn-layer-hashes/README.md)
+and [watchdog report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control-layer-hashes/README.md).
 E6 remains open.
