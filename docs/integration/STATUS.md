@@ -1,3 +1,10 @@
+> **Graph campaign (2026-10-28):** The active plan on this branch is
+> [Graph Experiments](../graph-experiments/PLAN.md), with
+> [campaign status](../graph-experiments/STATUS.md) and a
+> [one-page cross-branch dashboard](QUICK_STATUS.md).
+> JP7/final-NInfer performance is not yet measured. Maestro HIP/SYCL builds are
+> excluded from this campaign. The integration evidence below is historical and preserved.
+
 # Integration status
 
 Updated: 2026-10-28. Phases 1 through 4 are complete for their documented tested

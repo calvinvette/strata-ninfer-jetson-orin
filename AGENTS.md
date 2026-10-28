@@ -1,5 +1,20 @@
 # AGENTS.md
 
+## Graph experiment campaign override (2026-10-28)
+
+On `feat/graph-experiments` and its `feat/graph-gN-*` component descendants,
+read [the graph plan](docs/graph-experiments/PLAN.md),
+[study](docs/graph-experiments/STUDY.md) and [workflow](docs/graph-experiments/WORKFLOW.md) first.
+The user explicitly scopes this campaign to CUDA/Orin: do not run or require maestro HIP/SYCL
+builds, even for shared-file changes. This overrides conflicting inherited all-backend build
+instructions below for this campaign only. Preserve CPU oracles, CUDA builds and service checks.
+Upstream compatibility is deferred and must be disclosed, not implied.
+Take a fresh measured JP7/final-NInfer baseline before experiments; expected gains are not evidence.
+Commit every coherent component milestone and before ending a session.
+Update graph STATUS and the <=60-line integration QUICK_STATUS after each experiment batch,
+blocker or phase change. Follow branch ancestry and reporting rules in the workflow.
+Architecture changes must be opt-in and version model/pack/cache contracts explicitly.
+
 ## Strata + NInfer integration fork
 
 This repository starts from the validated Strata Orin port. Read
