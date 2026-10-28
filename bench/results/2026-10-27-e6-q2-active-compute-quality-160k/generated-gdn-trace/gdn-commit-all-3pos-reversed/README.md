@@ -34,3 +34,8 @@ The paired harness failed only its expected persistent-state parity check;
 see `run/results.json`. Raw GDN records, comparator JSON, logs and supervisor
 samples remain local-only in `run/` and `supervisor/`. Models remain in
 `~/models/strata-orin-validation/`.
+
+The reverse-order capture was repeated. Prompt-boundary parity remained within
+`1e-6`, but the generated-prefix material onset moved from layers 8/5 to layer
+4 at both positions. Same-backend run-to-run differences also remain. See the
+[repeat report](../gdn-commit-all-3pos-reversed-repeat/README.md).

@@ -6741,3 +6741,16 @@ for generated prefixes. This is consistent with possible arm-order
 sensitivity, but one reversed-order pair does not establish causality. Minimum
 available memory was 6.70 GiB. Repeat reversed order with unchanged settings.
 [Report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-reversed/README.md).
+
+**E6 repeated reversed-order pair (2026-10-28):** a second NInfer-first pair
+matched answer, token IDs and residency but still failed final-state parity.
+The prompt-boundary GDN difference remained below `1e-6`; generated-prefix
+cross-backend drift began materially at layer 4 in both sampled positions,
+unlike the layer-8/layer-5 onsets in the first reverse-order pair. Same-backend
+state also varied between reverse-order runs: prompt-boundary differences
+first became material at layer 12 (`1.169e-4`) and generated onsets differed
+by engine and position. This supports possible order sensitivity in prompt
+alignment but does not prove it; run-to-run variation remains a confounder.
+The repeat took 3,231.7 s; minimum available memory was 6.61 GiB and peak swap
+5.24 GiB. Next define a small pre-registered process-order/initialization
+matrix before more operator localization. [Report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-reversed-repeat/README.md).

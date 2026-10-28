@@ -1717,3 +1717,17 @@ positions, the first material differences were at model layer 8 (relative L2
 consistent with arm-order sensitivity but cannot establish it, especially
 given the same-order cross-run state crossover. Repeat reversed order before
 assigning cause. See the [reversed-order report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-reversed/README.md).
+
+**E6 repeated reversed-order pair (2026-10-28):** a second NInfer-first pair
+again matched answer, token IDs and residency but failed final-state parity.
+The prompt-boundary capture remained within relative L2 `1e-6`; generated
+prefixes instead first showed material cross-backend differences at layer 4
+for both positions, rather than layers 8 and 5 in the first reverse-order
+pair. Across the two reverse-order runs, same-backend prompt-boundary state
+also changed materially at layer 12 (`1.169e-4`), and generated same-backend
+onsets varied. This suggests possible order sensitivity for prompt-boundary
+alignment but does not establish causality; run-to-run state drift remains a
+confounder. Next use a small pre-registered process-initialization/run-order
+control matrix before further operator localization. The repeat took 3,231.7 s;
+minimum available memory was 6.61 GiB, peak swap 5.24 GiB. See the
+[repeat report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-reversed-repeat/README.md).
