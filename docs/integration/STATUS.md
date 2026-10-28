@@ -33,6 +33,24 @@ counters remained zero. This localizes the first perturbation and its later
 amplification, but not the intervening operation or which backend is more
 accurate. E6 remains open; see the [160K bundle and boundary analysis](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/moe-bundle-fixed-163849/README.md).
 
+**E6 layer-8 GDN diagnostic (2026-10-28):** a paired capture at the same
+accepted position again found a layer-7 expert-output split at rounding-scale
+magnitude (relative L2 `3.82e-8`). At layer 8, raw GDN `o` and normalized `y`
+had relative L2 differences `6.49e-5` and `7.08e-4`; the subsequent MoE input
+was `7.37e-4`. Route IDs remained exact but all ten route weights differed
+(relative L2 `2.91e-4`); layer-8 combined MoE output differed by `8.25e-3`.
+Both arms still matched exact answer, token IDs and residency while persistent
+GDN/tail/pooled/pooled-full/KV state differed. This supports propagation through
+layer-8 GDN as a candidate amplifier, but run-to-run instrumentation sensitivity
+means causality and backend accuracy remain unknown. Minimum available memory
+was 6.58 GiB, peak swap 1.38 GiB and sampled OOM kills were zero. Diagnostic
+only; E6 remains open. See the [GDN/MoE capture report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/moe-layer8-gdn-163849/README.md).
+An independent Q2_0/Q8_1 oracle check of all ten layer-7 selected experts found
+both backend outputs within relative L2 `5.7e-8`–`9.4e-8`; NInfer was closer
+for one expert and the two were equal at reported precision for the other nine.
+This supports the active-expert operator calculation for this sample, but does
+not explain the layer-8 GDN amplification or establish full state parity.
+
 The active E6 staged-compute capacity screens now include a three-pair 256K
 configured-capacity request (2,048 prompt + 128 generated tokens). Median paired
 changes were +1.57% prompt TPS, 0% decode TPS, −0.80% first-visible TTFT and

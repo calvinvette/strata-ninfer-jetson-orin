@@ -1505,3 +1505,21 @@ been applied to this run. Minimum available memory was 7.04 GiB, peak swap
 Next instrument the writer call/lifecycle on a short workload that emits a
 boundary record, fix and retest the bundle path, then repeat the paired 160K
 capture before applying independent expert oracles. E6 remains open.
+
+**E6 layer-8 GDN diagnostic (2026-10-28):** after fixing ordinary verifier
+bundle serialization, a paired 160K run captured residual boundaries, layer-7
+and layer-8 MoE bundles, and layer-8 GDN `o`/`y`. The first observed MoE delta
+was again layer 7 expert arithmetic at relative L2 `3.82e-8`; at layer 8,
+GDN `o`/`y` differed by `6.49e-5`/`7.08e-4`, followed by MoE input at
+`7.37e-4`. Routes stayed identical but layer-8 route weights changed; combined
+MoE output differed by relative L2 `8.25e-3`. This makes GDN propagation a
+candidate amplifier, not a proven cause: repeated captures remain sensitive to
+instrumentation and run conditions. Both arms returned matching exact text,
+token IDs and residency, but persistent GDN/tail/pooled/pooled-full/KV states
+diverged. Minimum available memory was 6.58 GiB, peak swap 1.38 GiB, and OOM
+kills were zero. The captured layer-7 outputs for all ten selected experts
+were compared with the independent Q2_0/Q8_1 oracle: relative L2 was about
+`5.7e-8`–`9.4e-8`, with NInfer closer for one expert and equal reported
+precision for nine. This supports the operator calculation for this sample,
+but does not establish end-to-end state parity. Next capture layer-8 GDN stage
+inputs in a controlled repeat. See the [diagnostic report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/moe-layer8-gdn-163849/README.md). E6 remains open.
