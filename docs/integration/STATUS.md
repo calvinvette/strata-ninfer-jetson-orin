@@ -1,6 +1,6 @@
 # Integration status
 
-Updated: 2026-10-27. Phases 1 through 4 are complete for their documented tested
+Updated: 2026-10-28. Phases 1 through 4 are complete for their documented tested
 Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 is
 complete for its bounded Orin qualification matrix under [its closeout]
 (PHASE7_CLOSEOUT.md), and Phase 8 is complete for the bounded Q2_0 release
@@ -8,6 +8,18 @@ profile under [its closeout](PHASE8_CLOSEOUT.md). Phase 5 is complete for the te
 Phase 6 is complete for the tested factor domains under their closeouts. The
 release profile still excludes unresolved multi-live/adaptive paths and does
 not promote a universal parametric profile. This records tested cells, not general product support.
+
+An E6 diagnostic found and fixed the missing multi-layer MoE bundle write on
+ordinary single-request verifier windows. The bundle buffers were captured, but
+the serializer had only been called by the batch verifier path; this held-out
+retrieval workload uses the ordinary path. A paired 2,048-token Q2_0 run now
+emits valid three-layer bundles at position 2,049 for both Strata and strict
+NInfer execution. Route IDs/weights, inputs, expert outputs, shared outputs and
+combined outputs matched exactly on layers 1, 7 and 8. The expected answer,
+token IDs, resident map and all nine final state fields also matched. Minimum
+available memory was 11.77 GiB; this is a correctness diagnostic, not a
+performance result. The 160K state divergence remains unresolved and E6 stays
+open. See the [bundle-writer follow-up](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/moe-bundle-debug7-2049/README.md).
 
 The active E6 staged-compute capacity screens now include a three-pair 256K
 configured-capacity request (2,048 prompt + 128 generated tokens). Median paired

@@ -3738,6 +3738,15 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
             return false;
         }
     }
+    if (moe_bundle_diag_h_ != nullptr && !batch_rec_) {
+        int bundle_slots[strata::kernels::kVerifyMaxT];
+        int64_t bundle_positions[strata::kernels::kVerifyMaxT];
+        for (int row = 0; row < T; ++row) {
+            bundle_slots[row] = -1;
+            bundle_positions[row] = pos0 + row;
+        }
+        if (!write_moe_bundle_diag_batch(T, bundle_slots, tokens, bundle_positions, err)) return false;
+    }
     if (boundary_diag_h_ != nullptr && !batch_rec_) {
         int target_row = -1;
         for (int row = 0; row < T; ++row) {

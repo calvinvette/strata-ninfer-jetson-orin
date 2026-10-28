@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **E0–E5 bounded implementation evidence complete; current-source HIP/SYCL builds pass on maestro1; a 6-GiB staged TTFT cell passed seven-pair confirmation, but a new multi-shape screen found unresolved output divergence, so E6 and E7 release gates remain open (updated 2026-10-26)**.
+Status: **E0–E5 bounded implementation evidence complete; current-source HIP/SYCL builds pass on maestro1; E6 screens and correctness diagnostics continue, with unresolved long-context output/state divergence; E6 and E7 release gates remain open (updated 2026-10-28)**.
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -576,6 +576,16 @@ See the [E5 closeout](NINFER_E5_CLOSEOUT.md). Keep NInfer opt-in and do not
 treat exact short-task text as sufficient evidence for other tasks.
 
 ### E6 — Demonstrate end-to-end performance and context behavior
+
+The ordinary single-request verifier path now invokes the opt-in multi-layer
+MoE bundle serializer after its captured device results are available. A
+held-out 2K retrieval diagnostic confirmed exact backend equality for routes,
+inputs, expert outputs and combined outputs across three selected layers, and
+matching final persistent state. The writer had previously been called only
+from the batch verifier path, so requested bundles were silently absent for
+ordinary windows. See the [writer follow-up](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/moe-bundle-debug7-2049/README.md).
+This closes the capture-tooling defect only; the 160K state mismatch and E6
+performance/quality gates remain open.
 
 Follow [BENCHMARKS.md](BENCHMARKS.md). Use three screening blocks followed by at
 least seven independent randomized paired confirmation blocks on held-out prompts.
