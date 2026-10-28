@@ -1702,5 +1702,8 @@ Their generated states split only later (first material at layer 36 and 21,
 respectively). The early delta therefore does not yet follow a backend label;
 run/arm variation is at least as significant in this sample. Matching answer,
 tokens and residency do not establish state parity. No backend change is
-justified. Next test alternating arm order and process initialization with the
-capture configuration fixed. See the [repeat/crossover report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-repeat/README.md).
+justified. The retrieval harness now has an opt-in
+`--reverse-staged-backends` flag to run strict NInfer before Strata, with unit
+coverage for both orders. Use it for the next paired capture with all other
+settings fixed; compare arm order and backend separately. See the
+[repeat/crossover report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-repeat/README.md).

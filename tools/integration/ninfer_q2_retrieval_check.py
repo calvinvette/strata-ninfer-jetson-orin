@@ -29,6 +29,12 @@ def parse_gdn_commit_layer(value: str) -> int | str:
     return layer
 
 
+def staged_backend_arms(reverse: bool = False) -> tuple[tuple[str, str, int], ...]:
+    """Return the paired staged backends in the requested process order."""
+    arms = (('strata-staged', 'strata', 0), ('ninfer-staged', 'ninfer', 0))
+    return tuple(reversed(arms)) if reverse else arms
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--config', type=Path, required=True)
@@ -41,6 +47,8 @@ def main() -> int:
                     help='compare MTP-off CPU miss fallback against strict NInfer staging')
     ap.add_argument('--compare-staged-backends', action='store_true',
                     help='compare Strata and strict NInfer compute with staging enabled in both arms')
+    ap.add_argument('--reverse-staged-backends', action='store_true',
+                    help='run strict NInfer before Strata (requires --compare-staged-backends)')
     ap.add_argument('--dump-gdn', action='store_true',
                     help='write final accepted-prefix GDN arrays for numeric comparison')
     ap.add_argument('--dump-gdn-at', type=int,
@@ -98,6 +106,8 @@ def main() -> int:
     comparison_modes = (a.compare_strata_control, a.compare_cpu_miss_staged, a.compare_staged_backends)
     if sum(comparison_modes) > 1:
         ap.error('choose only one comparison mode')
+    if a.reverse_staged_backends and not a.compare_staged_backends:
+        ap.error('--reverse-staged-backends requires --compare-staged-backends')
     if a.capture_moe_position is not None and a.capture_moe_positions is not None:
         ap.error('use only one of --capture-moe-position and --capture-moe-positions')
     if a.capture_moe_positions is not None and (
@@ -220,7 +230,7 @@ def main() -> int:
     elif a.compare_cpu_miss_staged:
         arms = (('cpu-miss', 'strata', 0), ('ninfer-staged', 'ninfer', 0))
     elif a.compare_staged_backends:
-        arms = (('strata-staged', 'strata', 0), ('ninfer-staged', 'ninfer', 0))
+        arms = staged_backend_arms(a.reverse_staged_backends)
     else:
         arms = (('mtp-off', 'ninfer', 0), ('mtp4', 'ninfer', 4))
     for name, backend, window in arms:
@@ -333,18 +343,18 @@ def main() -> int:
         finally:
             engine.close()
     if len(result['arms']) == 2:
-        off, mtp = result['arms']
-        result['token_ids_equal'] = off['ids'] == mtp['ids']
-        result['final_state_equal'] = all(off['state'].get(k) == mtp['state'].get(k) for k in STATE_KEYS)
-        result['residency_equal'] = (off.get('residency_sha256') is not None and
-                                     off.get('residency_sha256') == mtp.get('residency_sha256'))
-        result['state_differing_fields'] = [k for k in STATE_KEYS if off['state'].get(k) != mtp['state'].get(k)]
+        first, second = result['arms']
+        result['token_ids_equal'] = first['ids'] == second['ids']
+        result['final_state_equal'] = all(first['state'].get(k) == second['state'].get(k) for k in STATE_KEYS)
+        result['residency_equal'] = (first.get('residency_sha256') is not None and
+                                     first.get('residency_sha256') == second.get('residency_sha256'))
+        result['state_differing_fields'] = [k for k in STATE_KEYS if first['state'].get(k) != second['state'].get(k)]
         if not result['token_ids_equal']:
-            result['failures'].append(f"{off['name']} and {mtp['name']} token IDs differ")
+            result['failures'].append(f"{first['name']} and {second['name']} token IDs differ")
         if not result['final_state_equal']:
-            result['failures'].append(f"{off['name']} and {mtp['name']} final state differ")
+            result['failures'].append(f"{first['name']} and {second['name']} final state differ")
         if (a.compare_cpu_miss_staged or a.compare_staged_backends) and not result['residency_equal']:
-            result['failures'].append(f"{off['name']} and {mtp['name']} resident maps differ or were not captured")
+            result['failures'].append(f"{first['name']} and {second['name']} resident maps differ or were not captured")
     result['exact_answer_check'] = expected is not None and max_new == workload['generate_tokens']
     result['passed'] = not result['failures'] and len(result['arms']) == 2
     (a.output / 'results.json').write_text(json.dumps(result, indent=2) + '\n')

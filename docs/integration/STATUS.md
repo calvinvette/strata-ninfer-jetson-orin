@@ -6724,6 +6724,9 @@ states split only later in generation. This means the observed early split
 switches backend labels across runs, so it cannot be assigned to backend
 arithmetic yet. Both pairs match answer, token IDs and residency but fail
 persistent-state parity. Minimum available memory in the repeat was 6.52 GiB;
-energy was not measured. Next investigate arm order/process initialization
-under the same capture settings before resuming operator attribution.
+energy was not measured. The retrieval harness now supports opt-in reverse
+order for this staged Strata/NInfer pair (`--reverse-staged-backends`),
+preserving arm names while running NInfer first. Five focused unit tests, CLI
+help, Python compilation, and `git diff --check` pass. Use the reverse-order
+switch for the next same-settings accepted-prefix capture; E6 remains open.
 [Crossover report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-repeat/README.md).

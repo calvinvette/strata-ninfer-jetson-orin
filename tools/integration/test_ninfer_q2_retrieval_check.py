@@ -8,7 +8,7 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from ninfer_q2_retrieval_check import parse_gdn_commit_layer
+from ninfer_q2_retrieval_check import parse_gdn_commit_layer, staged_backend_arms
 
 
 class GdnCommitLayerArgumentTests(unittest.TestCase):
@@ -22,6 +22,16 @@ class GdnCommitLayerArgumentTests(unittest.TestCase):
         for value in ('many', '-1', '48'):
             with self.subTest(value=value), self.assertRaises(argparse.ArgumentTypeError):
                 parse_gdn_commit_layer(value)
+
+
+class StagedBackendOrderTests(unittest.TestCase):
+    def test_default_order_runs_strata_first(self):
+        self.assertEqual(staged_backend_arms(), (
+            ('strata-staged', 'strata', 0), ('ninfer-staged', 'ninfer', 0)))
+
+    def test_reverse_order_runs_ninfer_first(self):
+        self.assertEqual(staged_backend_arms(reverse=True), (
+            ('ninfer-staged', 'ninfer', 0), ('strata-staged', 'strata', 0)))
 
 
 if __name__ == '__main__':
