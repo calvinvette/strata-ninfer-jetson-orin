@@ -6700,3 +6700,16 @@ matched control. Minimum available memory was 7.11 GiB; sampled OOM events were
 zero. Next use all-layer captures at several accepted decode positions on the
 160K workload with identical settings across both backends; treat any onset as
 provisional until repeated. [Smoke report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-2k/gdn-capture-cli-smoke/README.md).
+
+**E6 three-position accepted-prefix capture (2026-10-28):** the planned 160K
+pair captured all GDN layers at positions 163840, 163862, and 163885. Exact
+answer, 47 token IDs, and residency matched, while final persistent state did
+not. At the prompt boundary, GDN layers 0–10 matched and the first material
+split was layer 12 (relative L2 `1.169e-4`). At generated positions 163862 and
+163885, layer 0 matched; differences at layers 1–2 were at float32 rounding
+scale, followed by material drift at layer 4 (`3.255e-3` and `2.829e-3`).
+This points to small early numeric differences growing through subsequent
+recurrent layers, but the trace is a single pair and earlier traces disagree
+on onset. Repeat this exact capture before attributing the split or changing a
+backend. Run time was 3,232.6 s; minimum available memory was 6.51 GiB; no
+clock controls were used and energy was not measured. [Report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos/README.md).

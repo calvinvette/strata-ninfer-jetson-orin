@@ -1676,3 +1676,18 @@ and final accepted decode positions on the 160K task with one fixed capture
 configuration in both arms. Repeat that same configuration before assigning
 an onset; preserve ordinary-path checks as the correctness reference. See the
 [capture smoke report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-2k/gdn-capture-cli-smoke/README.md).
+
+**E6 three-position accepted-prefix capture (2026-10-28):** one minimally
+instrumented paired 160K Q2_0 retrieval captured all 36 GDN layers at accepted
+positions 163840, 163862, and 163885. Answer, all 47 token IDs, and residency
+matched; final GDN, tail, pooled, pooled-full, and KV fingerprints differed.
+At the prompt boundary, layers 0–10 matched bitwise and model layer 12 was the
+first material delta (relative L2 `1.169e-4`). At positions 163862 and 163885,
+layer 0 matched; layers 1–2 differed only at float32 rounding scale (relative
+L2 below `1.84e-9`), then layer 4 showed material deltas (`3.255e-3` and
+`2.829e-3`). This is evidence of small numerical differences amplifying
+through recurrent layers, not a root-cause attribution: it is one captured
+pair, and prior instrumented traces had inconsistent onsets. Repeat the same
+capture exactly before attributing the split or changing a backend. Run time
+was 3,232.6 s; minimum available memory 6.51 GiB; energy was not measured.
+See the [three-position report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos/README.md).
