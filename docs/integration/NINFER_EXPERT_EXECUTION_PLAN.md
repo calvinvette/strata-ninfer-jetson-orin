@@ -1647,3 +1647,18 @@ stable root cause or alter a backend from this evidence. E6's next gate is
 repeatability and accepted-prefix state parity under minimally instrumented
 ordinary-path paired runs; return to operator localization only if that gate
 produces a reproducible split. See the [layer-3 upstream report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-upstream-layer3-163885/README.md).
+
+The repeated ordinary-path numeric GDN dump gate did not pass. Across two
+identically configured 160K pairs with matching output token IDs and the same
+residency map, same-backend run-to-run GDN relative L2 was `2.857e-2` for
+Strata and `2.692e-2` for NInfer. The cross-backend GDN delta in the second
+pair was `3.613e-2`, making that comparison confounded by the measured
+run-to-run variation. The first material drift occurred at ordinal 3 for
+Strata and ordinal 10 for NInfer. This establishes repeatability failure but
+does not identify whether it begins in prompt processing or decode. Next
+capture accepted-prefix GDN state at selected decode positions in repeated
+pairs with identical minimal capture settings; determine whether the first
+generated prefix already contains the drift or whether it accumulates during
+decode. Keep exact state parity as the release criterion, and do not change a
+backend until the mismatch is reproducible and independently attributed. See
+the [numeric repeat report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control-gdn-dump-repeat2/README.md).

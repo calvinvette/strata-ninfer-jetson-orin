@@ -6667,3 +6667,19 @@ events were zero. Since previous traces moved the apparent first split, this
 single instrumented run is not enough to select a backend change. Keep E6 open
 and use minimally instrumented repeatability/state-parity checks before further
 localization. [Run report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-upstream-layer3-163885/README.md).
+
+**E6 ordinary-path numeric GDN repeat (2026-10-28):** a corrected second
+160K paired dump used the exact accepted length `163886`. Both runs returned
+the exact answer and identical 47 token IDs; the residency fingerprint matched
+between backends and across runs. Nevertheless, final GDN arrays changed
+substantially between repeated runs of the same backend: relative L2 was
+`2.857e-2` for Strata and `2.692e-2` for NInfer. The cross-backend difference
+in the second run was `3.613e-2`, so run-to-run variation is a major confounder
+for attributing that delta. The first material change appeared at GDN ordinal
+3 for Strata and ordinal 10 for NInfer; the arrays do not localize the token
+where the drift arose. Minimum available memory was 6.57 GiB, peak swap 1.14
+GiB, and OOM events were zero. Do not attribute the cross-backend delta or
+change arithmetic yet. The next diagnostic is repeated accepted-prefix state
+capture at selected decode positions, under identical minimal capture settings,
+to test whether divergence is already present after prefill or grows during
+decode. E6 remains open. [Numeric repeat report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control-gdn-dump-repeat2/README.md).
