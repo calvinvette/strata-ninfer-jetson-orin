@@ -1476,3 +1476,17 @@ state does not. Minimum available memory was 6.74 GiB, with zero OOMs. Next
 implement one-position multi-layer MoE capture for simultaneous layer 1, 7 and
 8 diagnostics, then use an independent oracle on a reproducible split. E6
 remains open.
+
+**E6 simultaneous MoE bundle attempt (2026-10-27):** the opt-in packed
+multi-layer capture and comparator are implemented and committed as
+`754bb6e5`. A paired 160K Q2_0 run captured all 47 residual boundaries at
+position 163849, but emitted no MoE bundle for either arm. Both arms still
+matched exact output, token IDs and residency while persistent state differed;
+the new harness correctly marks missing requested bundles as failure. The
+capture failure cause is unresolved, so no expert arithmetic oracles have yet
+been applied to this run. Minimum available memory was 7.04 GiB, peak swap
+6.01 GiB, and sampled OOM-kill counters were zero. See the
+[run report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/moe-bundle-163849/README.md).
+Next instrument the writer call/lifecycle on a short workload that emits a
+boundary record, fix and retest the bundle path, then repeat the paired 160K
+capture before applying independent expert oracles. E6 remains open.

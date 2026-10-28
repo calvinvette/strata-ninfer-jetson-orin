@@ -6490,3 +6490,15 @@ pairs still fail persistent-state parity while matching text, tokens and
 residency. Minimum available memory was 6.74 GiB; OOM counters were zero.
 Next add multi-layer MoE capture so layers 1, 7 and 8 can be inspected together.
 E6 remains open.
+
+**E6 multi-layer MoE bundle attempt (2026-10-27):** the paired 160K Q2_0
+retrieval run completed in 3,236 s. Both arms returned the expected answer,
+matched all 47 token IDs and matched residency, while persistent GDN, tail,
+pooled, pooled-full and KV state still differed. All 47 residual-boundary
+records at token 163849 were emitted for both arms, but the requested packed
+MoE records for layers 1, 7 and 8 were missing in both. The retrieval harness
+now fails explicitly when a requested bundle is absent. The reason for the
+missing bundle remains unresolved; this attempt does not localize active-expert
+arithmetic. Minimum available memory was 7.04 GiB, peak swap 6.01 GiB and
+sampled OOM-kill counters were zero. This is correctness diagnosis only; E6
+remains open. [Run report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/moe-bundle-163849/README.md).
