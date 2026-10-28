@@ -6713,3 +6713,17 @@ recurrent layers, but the trace is a single pair and earlier traces disagree
 on onset. Repeat this exact capture before attributing the split or changing a
 backend. Run time was 3,232.6 s; minimum available memory was 6.51 GiB; no
 clock controls were used and energy was not measured. [Report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos/README.md).
+
+**E6 exact three-position repeat and trajectory crossover (2026-10-28):** the
+identically configured 160K pair reproduced the first material cross-backend
+delta at layer 12 for the prompt boundary and layer 4 at both generated
+positions, with nearly identical relative L2 values. But the whole Strata
+capture from pair 1 is byte-identical to NInfer from pair 2; at the prompt
+boundary, NInfer from pair 1 also matches Strata from pair 2 bitwise. The latter
+states split only later in generation. This means the observed early split
+switches backend labels across runs, so it cannot be assigned to backend
+arithmetic yet. Both pairs match answer, token IDs and residency but fail
+persistent-state parity. Minimum available memory in the repeat was 6.52 GiB;
+energy was not measured. Next investigate arm order/process initialization
+under the same capture settings before resuming operator attribution.
+[Crossover report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-repeat/README.md).

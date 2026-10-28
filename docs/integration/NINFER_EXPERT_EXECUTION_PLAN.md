@@ -1691,3 +1691,16 @@ pair, and prior instrumented traces had inconsistent onsets. Repeat the same
 capture exactly before attributing the split or changing a backend. Run time
 was 3,232.6 s; minimum available memory 6.51 GiB; energy was not measured.
 See the [three-position report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos/README.md).
+
+**E6 exact three-position repeat and trajectory crossover (2026-10-28):**
+the same pair reproduced the first material cross-backend delta at the same
+sampled layers and nearly the same magnitude: layer 12 at the prompt boundary,
+then layer 4 at accepted positions 163862 and 163885. But whole-capture hashes
+revealed a crossover: first-pair Strata is byte-identical to repeat NInfer,
+while first-pair NInfer matches repeat Strata bitwise at the prompt boundary.
+Their generated states split only later (first material at layer 36 and 21,
+respectively). The early delta therefore does not yet follow a backend label;
+run/arm variation is at least as significant in this sample. Matching answer,
+tokens and residency do not establish state parity. No backend change is
+justified. Next test alternating arm order and process initialization with the
+capture configuration fixed. See the [repeat/crossover report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-repeat/README.md).

@@ -50,3 +50,8 @@ Clocks were observed, not controlled; energy was not measured.
 The raw commit captures, comparator JSON, logs and supervisor samples remain
 local-only in `run/` and `supervisor/`. Model files remain in
 `~/models/strata-orin-validation/`.
+
+The exact capture was repeated with the same settings. The repeat report finds
+the same cross-backend onset but also a cross-run state crossover, so the
+onset cannot yet be attributed to a backend. See the
+[repeat report](../gdn-commit-all-3pos-repeat/README.md).
