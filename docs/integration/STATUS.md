@@ -6443,3 +6443,26 @@ SHA256 is `a2edc59edb38fc4e9c859af985a42895b55521fb77f9e0133910cdf0a4e1776b`.
 The SYCL build has not yet been confirmed complete; record its hash after a
 successful finish. These builds are compile evidence only, not runtime or Orin
 performance evidence.
+
+**E6 targeted MoE repeat (2026-10-27):** repeating the all-layer position
+163849 capture with layer-1 MoE internals changed the observed onset. Layer-1
+route, input, expert parts and combined output are byte-identical across
+backends; layers 0–6 match. The first boundary split is at layer-7 MoE output
+(638/2,560; relative L2 `3.82e-8`), followed by small downstream differences.
+Layer-2 GR-read and GDN `x` are bitwise equal in this pair. This contradicts the
+previous run's layer-1 split and confirms run/capture sensitivity. The exact
+answer, token IDs and residency match, but final GDN, tail, pooled, pooled-full
+and KV differ. Minimum available memory was 6.69 GiB, peak swap 4.19 GiB, and
+OOM counters were zero. This is diagnostic only. Next capture layer-7 MoE
+internals with the same all-layer settings and test the split against an
+independent oracle. E6 remains open.
+
+The exact `1587c8f0` source also completed the full maestro1 HIP and SYCL builds
+with one build job. HIP binary SHA256:
+`a2edc59edb38fc4e9c859af985a42895b55521fb77f9e0133910cdf0a4e1776b`; SYCL
+binary SHA256:
+`373288b3696c83016f67961f6427124b4a7d9dc025a9885e554afda1d6e685e4`. The
+SYCL executable links successfully after setting the toolchain library path,
+but maestro1 has no available SYCL device, so it cannot provide runtime evidence.
+Both builds are compile evidence only; maestro1 provides no Orin performance
+results.

@@ -312,3 +312,29 @@ with an independent mathematical oracle to determine whether either backend
 differs from the reference result. See the compact [capture summary](generated-gdn-trace/gr-read-r-v2-all-boundary-layers-163849/summary.json),
 [boundary comparison](generated-gdn-trace/gr-read-r-v2-all-boundary-layers-163849/run/boundary-comparison.json)
 and [GR/GDN comparison](generated-gdn-trace/gr-read-r-v2-all-boundary-layers-163849/run/gr-gdn-comparison.json).
+
+## All-layer repeat with layer-1 MoE internals
+
+A second paired 160K run repeated the all-layer boundary, layer-2 GR-read and
+GDN captures at position 163849, adding layer-1 MoE route, input, expert parts
+and shared/combined output. All four layer-1 MoE captures are byte-identical
+across Strata and NInfer. The boundary records for layers 0 through 6 also
+match bitwise. In this pair the first boundary split is at layer 7
+`layer_output_moe`: 638/2,560 values differ (relative L2 `3.821e-8`, maximum
+absolute `3.725e-9`). The split reaches the next boundary (`xn` relative L2
+`4.847e-8`) and grows at layer 8. Layer-2 GR-read fields and GDN `x` are all
+bitwise equal in this run.
+
+This result does not reproduce the prior layer-1/GR-read split. It shows that
+the first visible difference varies across long-context runs or capture
+conditions. No cause is assigned. Both arms returned the same expected answer,
+47 token IDs and residency, but final GDN, tail, pooled, pooled-full and KV
+state still differ. The checker exited 1 for final-state mismatch. Runtime was
+3,237 s; minimum available memory was 6.69 GiB, peak swap 4.19 GiB and sampled
+OOM counters were zero. This is diagnostic, not performance evidence. The
+compact [summary](generated-gdn-trace/gr-read-r-v2-all-boundary-layers-moe1-163849/summary.json),
+[boundary comparison](generated-gdn-trace/gr-read-r-v2-all-boundary-layers-moe1-163849/run/boundary-comparison.json)
+and [GR/GDN comparison](generated-gdn-trace/gr-read-r-v2-all-boundary-layers-moe1-163849/run/gr-gdn-comparison.json)
+record the result. Next capture layer-7 MoE route, input, expert parts and
+output under the same all-layer settings, then use an independent mathematical
+oracle if the split repeats.

@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "experiment": "e6-q2-160k-all-layer-boundary-capture-with-moe-layer1",
+  "source_commit": "1587c8f0f1556a62dbbc6d228a2164b979d00345",
+  "cuda_binary_sha256": "68ec69f5d12ead24a5a7d72c53c3a08cc66d6d6a02f4c4d9fcc2a6650901e46a",
+  "model": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0",
+  "prompt_tokens": 163840,
+  "generated_tokens": [
+    47,
+    47
+  ],
+  "answers_equal": true,
+  "token_ids_equal": true,
+  "residency_equal": true,
+  "final_state_equal": false,
+  "final_state_differing_fields": [
+    "gdn",
+    "tail",
+    "pooled",
+    "pooled_full",
+    "kv"
+  ],
+  "layer1_moe_capture": {
+    "route_sha256_equal": true,
+    "input_sha256_equal": true,
+    "expert_parts_sha256_equal": true,
+    "shared_combined_output_sha256_equal": true
+  },
+  "boundary_first_divergence": {
+    "layer": 7,
+    "fields": {
+      "layer_output_moe": {
+        "count": 2560,
+        "different": 638,
+        "relative_l2": 3.821329617192728e-08,
+        "max_abs": 3.725290298461914e-09
+      },
+      "next_layer_moe": {
+        "count": 2560,
+        "different": 638,
+        "relative_l2": 3.821329617192728e-08,
+        "max_abs": 3.725290298461914e-09
+      },
+      "next_layer_postread_rt": {
+        "count": 10240,
+        "different": 773,
+        "relative_l2": 9.371507910443028e-09,
+        "max_abs": 3.725290298461914e-09
+      },
+      "next_layer_xn": {
+        "count": 10240,
+        "different": 2450,
+        "relative_l2": 4.846796831147747e-08,
+        "max_abs": 7.152557373046875e-07
+      }
+    }
+  },
+  "layer0_through_layer6_equal": true,
+  "layer2_gr_gdn_exact": true,
+  "supervisor": {
+    "status": "fail",
+    "returncode": 1,
+    "elapsed_s": 3237.0464567979798,
+    "minimum_available_gib": 6.69073486328125,
+    "peak_swap_gib": 4.191246032714844,
+    "oom_events": 0,
+    "oom_kill_events": 0
+  },
+  "qualification": "diagnostic only; final persistent state differs; no performance claim",
+  "interpretation": "Layer-1 MoE route, input, expert parts and output are byte-identical across backends. Layers 0-6 match. The first observed boundary difference is layer 7 MoE output, while layer-2 GR-read and GDN x are exact in this run. This conflicts with the prior capture showing a layer-1 split, confirming run/capture sensitivity. Next capture MoE internals at layer 7 and use an independent oracle if the split reproduces."
+}

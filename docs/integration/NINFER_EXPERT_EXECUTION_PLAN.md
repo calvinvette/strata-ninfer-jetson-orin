@@ -1434,3 +1434,22 @@ The next paired capture repeats all-layer, GR-read and GDN settings while
 adding layer-1 route/input/expert-part/output data, followed by an independent
 oracle if the split reproduces. E6 remains open. The exact-source HIP full
 build passed on maestro1; the matching SYCL full build is still underway.
+
+**E6 targeted MoE repeat (2026-10-27):** with all 47 boundary layers captured
+at position 163849, adding layer-1 MoE internals showed byte-identical route,
+input, per-expert parts and combined output across backends. Layers 0–6 match;
+the first difference in this run is layer-7 `layer_output_moe` (638/2,560
+values; relative L2 `3.82e-8`). Layer-2 GR-read and GDN `x` are exact in this
+pair. This differs from the prior run's layer-1 split, confirming onset
+sensitivity to run or instrumentation. Both arms match text, token IDs and
+residency but fail final persistent-state parity; minimum available memory was
+6.69 GiB and OOM counters remained zero. Diagnostic only, not performance
+qualification. Next repeat with layer-7 route/input/parts/output capture, then
+compare against an independent oracle if reproducible. E6 remains open.
+
+The exact-source maestro1 builds completed for HIP and SYCL. HIP binary SHA256:
+`a2edc59edb38fc4e9c859af985a42895b55521fb77f9e0133910cdf0a4e1776b`; SYCL
+binary SHA256:
+`373288b3696c83016f67961f6427124b4a7d9dc025a9885e554afda1d6e685e4`. SYCL
+links successfully, but no suitable device is available on maestro1 for runtime
+launch. These checks establish compilation only, not accelerator qualification.
