@@ -136,6 +136,17 @@ variation appears in GDN state from ordinal 1 onward, but its numerical size
 and cause are unknown. See the [GDN-only report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control-gdn-layer-hashes/README.md)
 and [QSA hash watchdog report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control-layer-hashes/README.md).
 
+A final-state numeric dump now quantifies the GDN difference in an ordinary
+160K pair. The 36-layer GDN arrays match exactly at ordinal 0; ordinals 1 and 2
+differ only at relative L2 `5.98e-10` and `1.09e-9`. At GDN ordinal 3 (model
+layer 4), relative L2 is `2.985e-3`, then reaches `6.73e-2` at ordinal 26. The
+whole GDN array has relative L2 `3.042e-2`, with 27,185,540 of 29,417,472
+values changed. Both arms still have the exact answer, matching tokens and
+residency, and the same five final persistent-state fields differ. These are
+end-of-request values; they do not locate the first divergence during prefill.
+Next compare the inputs and recurrence stages around model layer 4 in a
+focused paired capture. See the [numeric GDN report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control-gdn-dump/README.md).
+
 The active E6 staged-compute capacity screens now include a three-pair 256K
 configured-capacity request (2,048 prompt + 128 generated tokens). Median paired
 changes were +1.57% prompt TPS, 0% decode TPS, −0.80% first-visible TTFT and

@@ -1619,4 +1619,14 @@ after generation and is not a valid final-state comparison. Do not use that
 QSA-layer setting at this context under the current watchdog. See the
 [GDN-only report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control-gdn-layer-hashes/README.md)
 and [watchdog report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control-layer-hashes/README.md).
+**E6 final-state GDN numeric dump (2026-10-28):** a no-capture 160K pair wrote
+both final accepted-prefix GDN arrays. Ordinals 0–2 match or differ only at
+relative L2 below `1.1e-9`; ordinal 3 (model layer 4) is `2.985e-3`, rising to
+`6.73e-2` at ordinal 26. Whole-array relative L2 is `3.042e-2`. The exact
+answer, tokens, and residency match; final persistent-state parity still fails
+in the same five fields. These end-state measurements do not identify the
+first divergence during prompt processing. Next capture the inputs and GDN
+stages around model layer 4 at a fixed accepted position, with a boundary
+capture after model layer 3, then repeat under identical capture settings
+before attributing the split. See the [numeric dump report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control-gdn-dump/README.md).
 E6 remains open.
