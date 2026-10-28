@@ -144,6 +144,15 @@ struct MoePartsHeaderV2 {
     int32_t slot, token;
 };
 static_assert(sizeof(MoePartsHeaderV2) == 48, "STMPART2 header layout changed");
+struct MoeBundleHeaderV1 {
+    char magic[8];
+    uint32_t version;
+    uint32_t layer, k, reserved;
+    uint64_t n_embd;
+    int64_t position;
+    int32_t slot, token;
+};
+static_assert(sizeof(MoeBundleHeaderV1) == 48, "STMOEBN1 header layout changed");
 #pragma pack(pop)
 std::mutex moe_output_dump_mutex;
 std::mutex moe_route_dump_mutex;
@@ -197,6 +206,38 @@ bool parse_diag_positions(const char* text, std::vector<int64_t>& positions,
         }
     }
     return !positions.empty();
+}
+
+bool parse_diag_layers(const char* text, int layer_count, std::vector<int>& layers,
+                       const char* label, std::string& err) {
+    if (text == nullptr || *text == '\0') {
+        err = std::string("verify: empty opt-in ") + label + " layer list";
+        return false;
+    }
+    const char* cursor = text;
+    while (*cursor) {
+        char* end = nullptr;
+        errno = 0;
+        const long selected = std::strtol(cursor, &end, 10);
+        if (errno != 0 || end == cursor || selected < 0 || selected >= layer_count ||
+            (*end != '\0' && *end != ',') ||
+            (!layers.empty() && selected <= layers.back())) {
+            err = std::string("verify: ") + label +
+                  " layers must be strictly increasing in-range integers";
+            return false;
+        }
+        layers.push_back((int) selected);
+        if (*end == ',') {
+            cursor = end + 1;
+            if (*cursor == '\0') {
+                err = std::string("verify: invalid trailing separator in ") + label + " layers";
+                return false;
+            }
+        } else {
+            cursor = end;
+        }
+    }
+    return !layers.empty();
 }
 
 bool diag_position_matches(int64_t selected, const std::vector<int64_t>& positions,
@@ -600,6 +641,9 @@ Verifier::~Verifier() {
     if (moe_output_diag_h_ && cudaFreeHost(moe_output_diag_h_) == cudaSuccess)
         strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
                                                     moe_output_diag_h_, 0, -1);
+    if (moe_bundle_diag_h_ && cudaFreeHost(moe_bundle_diag_h_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
+                                                    moe_bundle_diag_h_, 0, -1);
     if (gr_read_diag_host_ && cudaFreeHost(gr_read_diag_host_) == cudaSuccess)
         strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
                                                     gr_read_diag_host_, 0, -1);
@@ -1316,6 +1360,71 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
             std::fprintf(stderr, "strata verify: opt-in MoE shared/combined output dump at layer %d%s -> %s (%zu bytes)\n",
                          moe_output_diag_layer_, moe_output_diag_include_batch_ ? " including batch windows" : "",
                          moe_output_diag_path_.c_str(), moe_output_diag_capacity_);
+        }
+    }
+    {
+        const char* layers = std::getenv("STRATA_VERIFY_DUMP_MOE_BUNDLE_LAYERS");
+        const char* position = std::getenv("STRATA_VERIFY_DUMP_MOE_BUNDLE_POSITION");
+        const char* path = std::getenv("STRATA_VERIFY_DUMP_MOE_BUNDLE_PATH");
+        if ((layers != nullptr) != (position != nullptr) || (layers != nullptr) != (path != nullptr)) {
+            err = "verify: STRATA_VERIFY_DUMP_MOE_BUNDLE_LAYERS, _POSITION and _PATH must be set together";
+            return false;
+        }
+        if (layers != nullptr) {
+            if (!parse_diag_layers(layers, g.n_layers, moe_bundle_diag_layers_, "MoE bundle", err) ||
+                path[0] == '\0') return false;
+            char* end = nullptr;
+            errno = 0;
+            const long long selected = std::strtoll(position, &end, 10);
+            if (errno != 0 || end == position || *end != '\0' || selected < 0) {
+                err = "verify: invalid opt-in MoE bundle position";
+                return false;
+            }
+            moe_bundle_diag_position_ = (int64_t) selected;
+            moe_bundle_diag_path_ = path;
+            moe_bundle_diag_max_t_ = (size_t) max_t;
+            moe_bundle_diag_k_ = (size_t) ss.k;
+            moe_bundle_diag_n_ = (size_t) g.n_embd;
+            if (moe_bundle_diag_max_t_ > SIZE_MAX / moe_bundle_diag_k_ ||
+                moe_bundle_diag_max_t_ * moe_bundle_diag_k_ > SIZE_MAX / moe_bundle_diag_n_) {
+                err = "verify: opt-in MoE bundle size overflows";
+                return false;
+            }
+            const size_t rows_k = moe_bundle_diag_max_t_ * moe_bundle_diag_k_;
+            const size_t rows_n = moe_bundle_diag_max_t_ * moe_bundle_diag_n_;
+            const size_t rows_kn = rows_k * moe_bundle_diag_n_;
+            if (rows_kn > SIZE_MAX / sizeof(float) || rows_n > SIZE_MAX / (2 * sizeof(float)) ||
+                rows_k > SIZE_MAX / (2 * sizeof(float))) {
+                err = "verify: opt-in MoE bundle byte size overflows";
+                return false;
+            }
+            const size_t ids_weights_bytes = rows_k * 2 * sizeof(float);
+            const size_t input_bytes = rows_n * sizeof(float);
+            const size_t parts_bytes = rows_kn * sizeof(float);
+            const size_t outputs_bytes = 2 * rows_n * sizeof(float);
+            if (ids_weights_bytes > SIZE_MAX - input_bytes ||
+                ids_weights_bytes + input_bytes > SIZE_MAX - parts_bytes ||
+                ids_weights_bytes + input_bytes + parts_bytes > SIZE_MAX - outputs_bytes) {
+                err = "verify: opt-in MoE bundle layer stride overflows";
+                return false;
+            }
+            moe_bundle_diag_layer_stride_ = ids_weights_bytes + input_bytes + parts_bytes + outputs_bytes;
+            if (moe_bundle_diag_layers_.size() > SIZE_MAX / moe_bundle_diag_layer_stride_) {
+                err = "verify: opt-in MoE bundle allocation size overflows";
+                return false;
+            }
+            moe_bundle_diag_capacity_ = moe_bundle_diag_layers_.size() * moe_bundle_diag_layer_stride_;
+            moe_bundle_diag_captured_layers_.assign(moe_bundle_diag_layers_.size(), 0);
+            if (cudaHostAlloc((void**) &moe_bundle_diag_h_, moe_bundle_diag_capacity_, cudaHostAllocPortable) != cudaSuccess) {
+                moe_bundle_diag_h_ = nullptr;
+                err = "verify: could not allocate opt-in MoE bundle diagnostic buffer";
+                return false;
+            }
+            strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "allocate", this,
+                                                        moe_bundle_diag_h_, moe_bundle_diag_capacity_, -1);
+            std::fprintf(stderr, "strata verify: opt-in MoE bundle capture at %zu layers, position %lld -> %s (%zu bytes)\n",
+                         moe_bundle_diag_layers_.size(), (long long) moe_bundle_diag_position_,
+                         moe_bundle_diag_path_.c_str(), moe_bundle_diag_capacity_);
         }
     }
 
@@ -2451,6 +2560,41 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
             }
             moe_route_diag_captured_ = true;
         }
+        if (moe_bundle_diag_h_ != nullptr) {
+            const auto layer_it = std::lower_bound(moe_bundle_diag_layers_.begin(), moe_bundle_diag_layers_.end(), l);
+            if (layer_it != moe_bundle_diag_layers_.end() && *layer_it == l) {
+                const size_t layer_index = (size_t) (layer_it - moe_bundle_diag_layers_.begin());
+                uint8_t* layer_host = moe_bundle_diag_h_ + layer_index * moe_bundle_diag_layer_stride_;
+                const size_t rows_k = moe_bundle_diag_max_t_ * moe_bundle_diag_k_;
+                const size_t rows_n = moe_bundle_diag_max_t_ * moe_bundle_diag_n_;
+                const size_t ids_bytes = rows_k * sizeof(int32_t);
+                const size_t input_offset = rows_k * 2 * sizeof(float);
+                const size_t parts_offset = input_offset + rows_n * sizeof(float);
+                const size_t shared_offset = parts_offset + rows_k * moe_bundle_diag_n_ * sizeof(float);
+                const size_t row_ids = (size_t) n * moe_bundle_diag_k_ * sizeof(int32_t);
+                const size_t row_floats_k = (size_t) n * moe_bundle_diag_k_;
+                const size_t row_floats_n = (size_t) n * moe_bundle_diag_n_;
+                const size_t row_bytes_n = row_floats_n * sizeof(float);
+                const size_t row_bytes_k = row_floats_k * sizeof(float);
+                cudaError_t copy_error = cudaMemcpyAsync(layer_host + (size_t) tb * moe_bundle_diag_k_ * sizeof(int32_t),
+                                                         ids_ + (size_t) tb * moe_bundle_diag_k_, row_ids,
+                                                         cudaMemcpyDeviceToHost, cs);
+                if (copy_error == cudaSuccess)
+                    copy_error = cudaMemcpyAsync(layer_host + ids_bytes + (size_t) tb * moe_bundle_diag_k_ * sizeof(float),
+                                                 w_ + (size_t) tb * moe_bundle_diag_k_, row_bytes_k,
+                                                 cudaMemcpyDeviceToHost, cs);
+                if (copy_error == cudaSuccess)
+                    copy_error = cudaMemcpyAsync(layer_host + input_offset + (size_t) tb * moe_bundle_diag_n_ * sizeof(float),
+                                                 mixed_ + (size_t) tb * moe_bundle_diag_n_, row_bytes_n,
+                                                 cudaMemcpyDeviceToHost, cs);
+                if (copy_error != cudaSuccess) {
+                    err = std::string("verify: could not queue opt-in MoE bundle route/input capture: ") +
+                          cudaGetErrorString(copy_error);
+                    return false;
+                }
+                (void) shared_offset;
+            }
+        }
         if (ar_on()) {
             resident_plan(ids_ + tb * K, n * (int) K, (int) K, hits_.d_res + l * g.n_expert, (int) g.n_expert,
                           hits_.cache_base, slot_off_d_, (long long) hits_.blob,
@@ -2655,6 +2799,27 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
             }
             moe_parts_diag_captured_ = true;
         }
+        if (moe_bundle_diag_h_ != nullptr) {
+            const auto layer_it = std::lower_bound(moe_bundle_diag_layers_.begin(), moe_bundle_diag_layers_.end(), l);
+            if (layer_it != moe_bundle_diag_layers_.end() && *layer_it == l) {
+                const size_t layer_index = (size_t) (layer_it - moe_bundle_diag_layers_.begin());
+                uint8_t* layer_host = moe_bundle_diag_h_ + layer_index * moe_bundle_diag_layer_stride_;
+                const size_t rows_k = moe_bundle_diag_max_t_ * moe_bundle_diag_k_;
+                const size_t rows_n = moe_bundle_diag_max_t_ * moe_bundle_diag_n_;
+                const size_t parts_offset = rows_k * 2 * sizeof(float) + rows_n * sizeof(float);
+                const size_t row_bytes = (size_t) n * moe_bundle_diag_k_ * moe_bundle_diag_n_ * sizeof(float);
+                const cudaError_t copy_error = cudaMemcpyAsync(layer_host + parts_offset +
+                                                                    (size_t) tb * moe_bundle_diag_k_ *
+                                                                        moe_bundle_diag_n_ * sizeof(float),
+                                                                parts_out, row_bytes, cudaMemcpyDeviceToHost, cs);
+                if (copy_error != cudaSuccess) {
+                    err = std::string("verify: could not queue opt-in MoE bundle expert-parts capture: ") +
+                          cudaGetErrorString(copy_error);
+                    return false;
+                }
+                moe_bundle_diag_captured_layers_[layer_index] = 1;
+            }
+        }
         // Same condition as `sh_fork` above, which is per group and out of scope here: wait only when the fork
         // actually ran (a wait on an event never recorded is a no-op, but saying it outright reads better).
         if (sh_stream_on() && !prof_on_ && sh_cs_ != nullptr && ev_fork_ != nullptr && ev_join_ != nullptr) {
@@ -2673,6 +2838,27 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                 return false;
             }
             moe_output_diag_captured_ = true;
+        }
+        if (moe_bundle_diag_h_ != nullptr) {
+            const auto layer_it = std::lower_bound(moe_bundle_diag_layers_.begin(), moe_bundle_diag_layers_.end(), l);
+            if (layer_it != moe_bundle_diag_layers_.end() && *layer_it == l) {
+                const size_t layer_index = (size_t) (layer_it - moe_bundle_diag_layers_.begin());
+                uint8_t* layer_host = moe_bundle_diag_h_ + layer_index * moe_bundle_diag_layer_stride_;
+                const size_t rows_k = moe_bundle_diag_max_t_ * moe_bundle_diag_k_;
+                const size_t rows_n = moe_bundle_diag_max_t_ * moe_bundle_diag_n_;
+                const size_t shared_offset = rows_k * 2 * sizeof(float) + rows_n * sizeof(float) +
+                                             rows_k * moe_bundle_diag_n_ * sizeof(float);
+                const size_t row_bytes = (size_t) n * moe_bundle_diag_n_ * sizeof(float);
+                const cudaError_t copy_error = cudaMemcpyAsync(layer_host + shared_offset +
+                                                                    (size_t) tb * moe_bundle_diag_n_ * sizeof(float),
+                                                                shared_ + (size_t) tb * moe_bundle_diag_n_, row_bytes,
+                                                                cudaMemcpyDeviceToHost, cs);
+                if (copy_error != cudaSuccess) {
+                    err = std::string("verify: could not queue opt-in MoE bundle shared output capture: ") +
+                          cudaGetErrorString(copy_error);
+                    return false;
+                }
+            }
         }
         if (sg_gated_[grp]) {   // STRATA_LFUSE: the shared expert's gate was not applied: the combine applies it (all rows are hits)
             try {
@@ -2703,6 +2889,28 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                 err = std::string("verify: could not queue opt-in combined MoE output capture: ") +
                       cudaGetErrorString(copy_error);
                 return false;
+            }
+        }
+        if (moe_bundle_diag_h_ != nullptr) {
+            const auto layer_it = std::lower_bound(moe_bundle_diag_layers_.begin(), moe_bundle_diag_layers_.end(), l);
+            if (layer_it != moe_bundle_diag_layers_.end() && *layer_it == l) {
+                const size_t layer_index = (size_t) (layer_it - moe_bundle_diag_layers_.begin());
+                uint8_t* layer_host = moe_bundle_diag_h_ + layer_index * moe_bundle_diag_layer_stride_;
+                const size_t rows_k = moe_bundle_diag_max_t_ * moe_bundle_diag_k_;
+                const size_t rows_n = moe_bundle_diag_max_t_ * moe_bundle_diag_n_;
+                const size_t combined_offset = rows_k * 2 * sizeof(float) + rows_n * sizeof(float) +
+                                               rows_k * moe_bundle_diag_n_ * sizeof(float) +
+                                               rows_n * sizeof(float);
+                const size_t row_bytes = (size_t) n * moe_bundle_diag_n_ * sizeof(float);
+                const cudaError_t copy_error = cudaMemcpyAsync(layer_host + combined_offset +
+                                                                    (size_t) tb * moe_bundle_diag_n_ * sizeof(float),
+                                                                bo_ + (size_t) tb * moe_bundle_diag_n_, row_bytes,
+                                                                cudaMemcpyDeviceToHost, cs);
+                if (copy_error != cudaSuccess) {
+                    err = std::string("verify: could not queue opt-in MoE bundle combined output capture: ") +
+                          cudaGetErrorString(copy_error);
+                    return false;
+                }
             }
         }
         if (gdn_diag_h_ != nullptr && l == gdn_diag_layer_ &&
@@ -4659,6 +4867,62 @@ bool Verifier::write_moe_parts_diag_batch(int T, const int* slots, const int32_t
     return true;
 }
 
+bool Verifier::write_moe_bundle_diag_batch(int T, const int* slots, const int32_t* tokens,
+                                           const int64_t* positions, std::string& err) {
+    if (moe_bundle_diag_h_ == nullptr || T <= 0 || T > strata::kernels::kVerifyMaxT) return true;
+    int selected_row = -1;
+    for (int t = 0; t < T; ++t)
+        if (positions[t] == moe_bundle_diag_position_) { selected_row = t; break; }
+    if (selected_row < 0) return true;
+    for (size_t i = 0; i < moe_bundle_diag_layers_.size(); ++i) {
+        if (!moe_bundle_diag_captured_layers_[i]) {
+            err = "verify: selected token reached bundle writer without a captured MoE layer";
+            return false;
+        }
+    }
+    static std::mutex moe_bundle_dump_mutex;
+    std::lock_guard<std::mutex> lock(moe_bundle_dump_mutex);
+    std::FILE* dump = std::fopen(moe_bundle_diag_path_.c_str(), "ab");
+    bool written = dump != nullptr;
+    const size_t row_k = moe_bundle_diag_k_;
+    const size_t row_n = moe_bundle_diag_n_;
+    const size_t ids_bytes = moe_bundle_diag_max_t_ * row_k * sizeof(int32_t);
+    const size_t weights_offset = ids_bytes;
+    const size_t input_offset = 2 * ids_bytes;
+    const size_t parts_offset = input_offset + moe_bundle_diag_max_t_ * row_n * sizeof(float);
+    const size_t shared_offset = parts_offset + moe_bundle_diag_max_t_ * row_k * row_n * sizeof(float);
+    const size_t combined_offset = shared_offset + moe_bundle_diag_max_t_ * row_n * sizeof(float);
+    for (size_t i = 0; i < moe_bundle_diag_layers_.size() && written; ++i) {
+        const uint8_t* layer_host = moe_bundle_diag_h_ + i * moe_bundle_diag_layer_stride_;
+        const size_t row = (size_t) selected_row;
+        MoeBundleHeaderV1 header{};
+        std::memcpy(header.magic, "STMOEBN1", sizeof(header.magic));
+        header.version = 1;
+        header.layer = (uint32_t) moe_bundle_diag_layers_[i];
+        header.k = (uint32_t) row_k;
+        header.n_embd = (uint64_t) row_n;
+        header.position = positions[row];
+        header.slot = slots[row];
+        header.token = tokens[row];
+        written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
+                  std::fwrite(layer_host + row * row_k * sizeof(int32_t), sizeof(int32_t), row_k, dump) == row_k &&
+                  std::fwrite(layer_host + weights_offset + row * row_k * sizeof(float), sizeof(float), row_k, dump) == row_k &&
+                  std::fwrite(layer_host + input_offset + row * row_n * sizeof(float), sizeof(float), row_n, dump) == row_n &&
+                  std::fwrite(layer_host + parts_offset + row * row_k * row_n * sizeof(float), sizeof(float), row_k * row_n, dump) == row_k * row_n &&
+                  std::fwrite(layer_host + shared_offset + row * row_n * sizeof(float), sizeof(float), row_n, dump) == row_n &&
+                  std::fwrite(layer_host + combined_offset + row * row_n * sizeof(float), sizeof(float), row_n, dump) == row_n;
+    }
+    if (dump != nullptr) {
+        if (std::fflush(dump) != 0) written = false;
+        if (std::fclose(dump) != 0) written = false;
+    }
+    if (!written) {
+        err = "verify: could not write opt-in multi-layer MoE bundle capture";
+        return false;
+    }
+    return true;
+}
+
 bool Verifier::run_slot_rows(const int* rows, int S, const int32_t* tokens, const int64_t* pos, PoolMultiFn pool,
                              void* user, int32_t* out, std::string& err) {
     using namespace strata::kernels;
@@ -4693,6 +4957,7 @@ bool Verifier::run_slot_rows(const int* rows, int S, const int32_t* tokens, cons
         if (!write_moe_output_diag_batch(S, rows, tokens, pos, err)) return false;
         if (!write_moe_route_diag_batch(S, rows, tokens, pos, err)) return false;
         if (!write_moe_parts_diag_batch(S, rows, tokens, pos, err)) return false;
+        if (!write_moe_bundle_diag_batch(S, rows, tokens, pos, err)) return false;
         if (prof_on_) collect_profile();
         ++windows;
         if (le_ < g.n_layers) return next_ == nullptr || next_->run_slot_rows(rows, S, tokens, pos, pool, next_user_, out, err);
@@ -4759,6 +5024,7 @@ bool Verifier::run_slot_rows(const int* rows, int S, const int32_t* tokens, cons
     if (!write_moe_output_diag_batch(S, rows, tokens, pos, err)) return false;
     if (!write_moe_route_diag_batch(S, rows, tokens, pos, err)) return false;
     if (!write_moe_parts_diag_batch(S, rows, tokens, pos, err)) return false;
+    if (!write_moe_bundle_diag_batch(S, rows, tokens, pos, err)) return false;
     if (prof_on_) collect_profile();
     ++windows;
     if (le_ < g.n_layers) return next_ == nullptr || next_->run_slot_rows(rows, S, tokens, pos, pool, next_user_, out, err);

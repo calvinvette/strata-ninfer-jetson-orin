@@ -381,6 +381,8 @@ private:
                                     const int64_t* positions, std::string& err);
     bool write_moe_parts_diag_batch(int rows, const int* slots, const int32_t* tokens,
                                     const int64_t* positions, std::string& err);
+    bool write_moe_bundle_diag_batch(int rows, const int* slots, const int32_t* tokens,
+                                     const int64_t* positions, std::string& err);
     bool record_window(int T, cudaStream_t cs, std::string& err);
     // #649: STRATA_VERIFY_TRACE=1 - a host event ring (trace_ev) and GPU breadcrumbs: the profiler's stamp points,
     // per layer and token group, written to mapped memory (null when the trace is off)
@@ -483,6 +485,16 @@ private:
     size_t moe_output_diag_capacity_ = 0;
     std::string moe_output_diag_path_;
     bool moe_output_diag_captured_ = false;
+    std::vector<int> moe_bundle_diag_layers_;
+    int64_t moe_bundle_diag_position_ = -1;
+    uint8_t* moe_bundle_diag_h_ = nullptr;
+    size_t moe_bundle_diag_capacity_ = 0;
+    size_t moe_bundle_diag_layer_stride_ = 0;
+    size_t moe_bundle_diag_max_t_ = 0;
+    size_t moe_bundle_diag_k_ = 0;
+    size_t moe_bundle_diag_n_ = 0;
+    std::string moe_bundle_diag_path_;
+    std::vector<uint8_t> moe_bundle_diag_captured_layers_;
     static constexpr int kProfPer = 33;              // stamps per layer (32 left the hc-read second
                                       // half's up-stamp at slot 32 = the next layer's slot 0: D8)
     bool prof_on_ = false;

@@ -41,6 +41,10 @@ def main() -> int:
                     help='filter the MoE capture to one token position')
     ap.add_argument('--capture-moe-positions', type=int, nargs='+',
                     help='filter the MoE capture to several increasing token positions')
+    ap.add_argument('--capture-moe-bundle-layers', type=int, nargs='+',
+                    help='capture route, input, expert parts and outputs for several layers in one binary bundle')
+    ap.add_argument('--capture-moe-bundle-position', type=int,
+                    help='token position for the multi-layer MoE bundle capture')
     ap.add_argument('--capture-gdn-layer', type=int,
                     help='capture GDN and feed-forward intermediates for one verifier layer')
     ap.add_argument('--capture-gdn-position', type=int,
@@ -86,6 +90,17 @@ def main() -> int:
             not a.capture_moe_positions or any(x < 0 for x in a.capture_moe_positions) or
             a.capture_moe_positions != sorted(set(a.capture_moe_positions))):
         ap.error('--capture-moe-positions must be unique, increasing, nonnegative integers')
+    if a.capture_moe_layer is not None and a.capture_moe_bundle_layers is not None:
+        ap.error('choose either --capture-moe-layer or --capture-moe-bundle-layers')
+    if (a.capture_moe_bundle_layers is None) != (a.capture_moe_bundle_position is None):
+        ap.error('--capture-moe-bundle-layers and --capture-moe-bundle-position must be used together')
+    if a.capture_moe_bundle_layers is not None and (
+            not a.capture_moe_bundle_layers or
+            any(not 0 <= x < 47 for x in a.capture_moe_bundle_layers) or
+            a.capture_moe_bundle_layers != sorted(set(a.capture_moe_bundle_layers))):
+        ap.error('--capture-moe-bundle-layers must be unique, increasing model layers in [0, 46]')
+    if a.capture_moe_bundle_position is not None and a.capture_moe_bundle_position < 0:
+        ap.error('--capture-moe-bundle-position must be nonnegative')
     if a.capture_gdn_position is not None and a.capture_gdn_positions is not None:
         ap.error('use only one of --capture-gdn-position and --capture-gdn-positions')
     if a.capture_gdn_positions is not None and (
@@ -222,6 +237,11 @@ def main() -> int:
                     arm_env[f'{stem}_POSITIONS'] = ','.join(map(str, a.capture_moe_positions))
                 elif a.capture_moe_position is not None:
                     arm_env[f'{stem}_POSITION'] = str(a.capture_moe_position)
+        if a.capture_moe_bundle_layers is not None:
+            arm_env['STRATA_VERIFY_DUMP_MOE_BUNDLE_LAYERS'] = ','.join(map(str, a.capture_moe_bundle_layers))
+            arm_env['STRATA_VERIFY_DUMP_MOE_BUNDLE_POSITION'] = str(a.capture_moe_bundle_position)
+            arm_env['STRATA_VERIFY_DUMP_MOE_BUNDLE_PATH'] = str(
+                (a.output / f'{name}.moe-bundle').resolve())
         if a.capture_gdn_layer is not None:
             arm_env['STRATA_VERIFY_DUMP_GDN_LAYER'] = str(a.capture_gdn_layer)
             arm_env['STRATA_VERIFY_DUMP_GDN_PATH'] = str(
@@ -279,6 +299,11 @@ def main() -> int:
                        (a.output / f'{name}.residency.csv').read_bytes()).hexdigest()
                        if (a.output / f'{name}.residency.csv').exists() else None}
             result['arms'].append(arm)
+            if a.capture_moe_bundle_layers is not None:
+                bundle_path = a.output / f'{name}.moe-bundle'
+                if not bundle_path.is_file() or bundle_path.stat().st_size == 0:
+                    result['failures'].append(
+                        f'{name}: requested MoE bundle position {a.capture_moe_bundle_position} was not captured')
             if expected is not None and max_new == workload['generate_tokens'] and text != expected:
                 result['failures'].append(f'{name}: exact answer mismatch: {text!r}')
         except Exception as exc:
