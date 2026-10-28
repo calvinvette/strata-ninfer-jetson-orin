@@ -111,13 +111,18 @@ E6 remains open pending minimally instrumented repeatability. Minimum available
 RAM was 6.51 GiB, peak swap 1.50 GiB, and OOM kills were zero. See the [same-
 position upstream capture report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-upstream-layer7-163842/README.md).
 
-The no-capture 160K paired control confirms persistent-state divergence on the
-ordinary path: both arms matched the exact 47-token answer and residency, but
-`gdn`, `tail`, `pooled`, `pooled_full`, and `kv` differed. This rules out
-diagnostic sidecars as the sole cause, although one pair does not establish
-repeatability. Minimum available RAM was 6.64 GiB, peak swap 4.55 GiB, and OOM
-kills were zero. A second no-capture pair is underway. See the [minimal
-control report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control/README.md).
+Two no-capture 160K paired controls confirm persistent-state divergence on the
+ordinary path: both backends matched the exact 47-token answer and residency in
+both pairs, but `gdn`, `tail`, `pooled`, `pooled_full`, and `kv` differed within
+each pair. Those same five raw-byte fingerprints also changed between the two
+runs for each backend, while `ple`, `dead`, and `ple_prev` stayed equal. This
+is genuine variation in the bytes covered by the state fingerprints, not hash
+metadata such as pointers; the hashes do not quantify the numerical delta.
+The result makes capture sidecars an insufficient explanation but leaves the
+source of run-to-run variation unresolved. Minimum available RAM was 6.64 GiB
+in pair 1 and 6.59 GiB in pair 2; peak swap was 4.55 and 1.30 GiB respectively;
+sampled OOM kills were zero in both. See the [first control report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control/README.md)
+and [repeat 2 report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control-repeat2/README.md).
 
 The active E6 staged-compute capacity screens now include a three-pair 256K
 configured-capacity request (2,048 prompt + 128 generated tokens). Median paired
