@@ -362,3 +362,25 @@ input, expert parts and shared/combined output under the same all-layer settings
 See the compact [summary](generated-gdn-trace/gr-read-r-v2-all-boundary-layers-moe7-163849/summary.json),
 [boundary comparison](generated-gdn-trace/gr-read-r-v2-all-boundary-layers-moe7-163849/run/boundary-comparison.json)
 and [GR/GDN comparison](generated-gdn-trace/gr-read-r-v2-all-boundary-layers-moe7-163849/run/gr-gdn-comparison.json).
+
+## All-layer repeat with layer-8 MoE internals
+
+A fourth paired 160K run added layer-8 MoE route, input, expert parts and
+shared/combined output to the all-layer boundary, layer-2 GR-read and GDN
+capture at position 163849. This pair's first boundary difference is again a
+small layer-7 MoE output delta (638/2,560; relative L2 `3.821e-8`). The
+layer-8 MoE input differs in 577/2,560 values (relative L2 `4.780e-8`, maximum
+absolute `3.576e-7`), while layer-8 routing, expert parts, shared output and
+combined output are byte-identical. Layer-2 GR-read and GDN `x` remain exact.
+
+This is materially different from the preceding run without layer-8 MoE
+capture, which first split at layer 8 with much larger activation deltas. The
+capture setting changes the observed trajectory, so no layer or operation can
+yet be called the reproducible cause. All four paired runs still produce the
+same answer, token IDs and residency, but final GDN, tail, pooled, pooled-full
+and KV differ. Runtime was 3,238 s; minimum available memory was 6.74 GiB, peak
+swap 1.23 GiB, and OOM counters were zero. Diagnostic only. The next tooling
+change is one-position multi-layer MoE capture so layers 1, 7 and 8 can be
+captured simultaneously with the same settings. See [summary](generated-gdn-trace/gr-read-r-v2-all-boundary-layers-moe8-163849/summary.json),
+[boundary comparison](generated-gdn-trace/gr-read-r-v2-all-boundary-layers-moe8-163849/run/boundary-comparison.json)
+and [GR/GDN comparison](generated-gdn-trace/gr-read-r-v2-all-boundary-layers-moe8-163849/run/gr-gdn-comparison.json).

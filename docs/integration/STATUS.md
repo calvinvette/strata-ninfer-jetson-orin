@@ -6478,3 +6478,15 @@ state still differs despite matching answer, tokens and residency. Minimum
 available memory was 6.66 GiB, peak swap 1.80 GiB, and OOM events were zero.
 Diagnostic only. Next capture layer-8 MoE internals using the same all-layer
 settings. E6 remains open.
+
+**E6 layer-8 MoE capture (2026-10-27):** in the all-layer repeat with layer-8
+MoE capture, the first boundary split was again the small layer-7 MoE delta
+(relative L2 `3.82e-8`). Layer-8 input had a small delta (577/2,560 values;
+relative L2 `4.78e-8`), but route, expert parts, shared output and combined
+output matched byte-for-byte. Layer-2 GR-read and GDN `x` matched exactly. The
+preceding pair without layer-8 capture showed a much larger layer-8 split, so
+instrumentation changes the observed trajectory; no cause is assigned. Both
+pairs still fail persistent-state parity while matching text, tokens and
+residency. Minimum available memory was 6.74 GiB; OOM counters were zero.
+Next add multi-layer MoE capture so layers 1, 7 and 8 can be inspected together.
+E6 remains open.

@@ -1464,3 +1464,15 @@ onset is run/capture-sensitive and does not assign a fault. Exact text, tokens
 and residency still match, but final state does not. Minimum available memory
 was 6.66 GiB with zero OOMs. Next capture layer-8 MoE internals at the same
 position with all-layer settings. E6 remains open.
+
+**E6 layer-8 MoE capture (2026-10-27):** capturing layer-8 MoE internals with
+all boundaries moved the observed first difference back to a small layer-7
+MoE-output delta (`3.82e-8` relative L2). Layer-8 input differs slightly, but
+route, expert parts and shared/combined output are byte-identical. The prior
+pair without layer-8 capture showed a large layer-8 split. This confirms the
+instrumentation changes the observed trajectory and prevents assigning a stable
+source yet. Exact answer, tokens and residency still match; final persistent
+state does not. Minimum available memory was 6.74 GiB, with zero OOMs. Next
+implement one-position multi-layer MoE capture for simultaneous layer 1, 7 and
+8 diagnostics, then use an independent oracle on a reproducible split. E6
+remains open.

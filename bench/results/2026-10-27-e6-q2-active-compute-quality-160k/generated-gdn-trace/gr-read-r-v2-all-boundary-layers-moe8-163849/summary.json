@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "experiment": "e6-q2-160k-all-layer-boundary-capture-with-moe-layer8",
+  "source_commit": "1587c8f0f1556a62dbbc6d228a2164b979d00345",
+  "cuda_binary_sha256": "68ec69f5d12ead24a5a7d72c53c3a08cc66d6d6a02f4c4d9fcc2a6650901e46a",
+  "model": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0",
+  "prompt_tokens": 163840,
+  "generated_tokens": [
+    47,
+    47
+  ],
+  "answers_equal": true,
+  "token_ids_equal": true,
+  "residency_equal": true,
+  "final_state_equal": false,
+  "final_state_differing_fields": [
+    "gdn",
+    "tail",
+    "pooled",
+    "pooled_full",
+    "kv"
+  ],
+  "layer8_moe_capture": {
+    "route_byte_equal": true,
+    "input": {
+      "different": 577,
+      "count": 2560,
+      "relative_l2": 4.77983657953288e-08,
+      "max_abs": 3.5762786865234375e-07
+    },
+    "expert_parts_byte_equal": true,
+    "shared_and_combined_output_byte_equal": true
+  },
+  "boundary_first_divergence": {
+    "layer": 7,
+    "fields": {
+      "layer_output_moe": {
+        "count": 2560,
+        "different": 638,
+        "relative_l2": 3.821329617192728e-08,
+        "max_abs": 3.725290298461914e-09
+      },
+      "next_layer_moe": {
+        "count": 2560,
+        "different": 638,
+        "relative_l2": 3.821329617192728e-08,
+        "max_abs": 3.725290298461914e-09
+      },
+      "next_layer_postread_rt": {
+        "count": 10240,
+        "different": 773,
+        "relative_l2": 9.371507910443028e-09,
+        "max_abs": 3.725290298461914e-09
+      },
+      "next_layer_xn": {
+        "count": 10240,
+        "different": 2450,
+        "relative_l2": 4.846796831147747e-08,
+        "max_abs": 7.152557373046875e-07
+      }
+    }
+  },
+  "layer2_gr_gdn_exact": true,
+  "supervisor": {
+    "status": "fail",
+    "returncode": 1,
+    "elapsed_s": 3238.1445221961476,
+    "minimum_available_gib": 6.744365692138672,
+    "peak_swap_gib": 1.2344818115234375,
+    "oom_events": 0,
+    "oom_kill_events": 0
+  },
+  "qualification": "diagnostic only; final persistent state differs; no performance claim",
+  "interpretation": "The first boundary split is again a small layer-7 delta. Layer-8 MoE input differs slightly, but layer-8 route, expert parts, shared output and combined output match byte-for-byte. This differs from the prior run without a layer-8 capture, which showed a large layer-8 split. Instrumentation changes the observed divergence. Add multi-layer MoE capture and capture relevant layers simultaneously under one setting."
+}
