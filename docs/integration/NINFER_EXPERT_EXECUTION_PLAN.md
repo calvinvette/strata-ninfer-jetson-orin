@@ -1572,3 +1572,14 @@ persistent state did not. Minimum available memory was 6.54 GiB, peak swap
 1.40 GiB, and OOM kills were zero. Next capture layer-8 GDN inputs and the
 state update at 163842 and check against the independent recurrence oracle.
 See the [full-answer timeline report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-state-timeline-full-answer/README.md). E6 remains open.
+
+**E6 focused layer-8 step at 163842 (2026-10-28):** the committed pre-step
+layer-8 state matched bitwise, but incoming GDN `x` already differed by
+relative L2 `3.90e-4`. The independent FP64 recurrence oracle reproduced raw
+`o` within `1.0e-7` for both backends, while post-step recurrent/convolution
+state differed by `2.30e-4`/`9.10e-4`. This locates the cause upstream of the
+layer-8 recurrence for this sample; the recurrence formula itself matches the
+oracle. The exact answer, tokens and residency matched, but persistent state
+did not. Minimum available memory was 6.56 GiB, peak swap 1.31 GiB, OOM kills
+zero. Next compare the layer-8 input with layer-7 residual/MoE captures at this
+same position. See the [focused step report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-first-split-163842/README.md). E6 remains open.

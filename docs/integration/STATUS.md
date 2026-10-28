@@ -90,6 +90,16 @@ state still differed. Minimum available RAM was 6.54 GiB, peak swap 1.40 GiB,
 and OOM kills were zero. Next capture GDN inputs and the state update at 163,842
 for an independent recurrence check. See the [full-answer timeline report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-state-timeline-full-answer/README.md).
 
+A focused repeat at position 163,842 found the layer-8 pre-step state was
+bitwise equal, but incoming GDN `x` already differed by relative L2
+`3.90e-4`. The independent recurrence oracle reproduced each backend's raw
+output within `1.0e-7`, so the post-step recurrent/convolution state delta
+(`2.30e-4`/`9.10e-4`) comes from differing inputs rather than the recurrence
+formula for this step. The GDN input is produced upstream; its source remains
+unlocalized. Exact answer, tokens and residency matched, but final persistent
+state did not. Minimum available RAM was 6.56 GiB, peak swap 1.31 GiB and OOM
+kills were zero. See the [focused step report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-first-split-163842/README.md).
+
 The active E6 staged-compute capacity screens now include a three-pair 256K
 configured-capacity request (2,048 prompt + 128 generated tokens). Median paired
 changes were +1.57% prompt TPS, 0% decode TPS, −0.80% first-visible TTFT and
