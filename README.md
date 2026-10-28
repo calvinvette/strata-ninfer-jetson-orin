@@ -1,3 +1,12 @@
+> **Graph research campaign:** This branch is `feat/graph-experiments`.
+> Start with the [phased build plan](docs/graph-experiments/PLAN.md),
+> [parametric study](docs/graph-experiments/STUDY.md),
+> [one-page branch dashboard](docs/integration/QUICK_STATUS.md), and
+> [research references](docs/graph-experiments/REFERENCES.md).
+> First measure a fresh baseline on the verified JP7/final-NInfer configuration.
+> No graph experiment results exist yet. Qualification is CUDA/Orin only;
+> maestro HIP/SYCL builds are deferred. The runtime history below predates this campaign.
+
 <h1 align="center">Strata + NInfer for Jetson Orin</h1>
 
 This repository is a derivative of **[Strata by Niko1221 and its contributors](https://github.com/Niko1221/Strata)**,
