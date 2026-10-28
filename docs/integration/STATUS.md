@@ -6524,6 +6524,7 @@ Next capture the residual producer and preceding layer boundary across the
 generated trajectory and test the first `R` delta with an independent oracle.
 E6 remains open.
 
+
 **E6 selected-boundary repeat (2026-10-27):** at layer-2 position 163849, a
 same-run capture of the layer-1 output, all eight boundary tensors, all six
 GR-read v2 fields and GDN `x` found bitwise equality across the two backends.
@@ -6640,3 +6641,12 @@ missing bundle remains unresolved; this attempt does not localize active-expert
 arithmetic. Minimum available memory was 7.04 GiB, peak swap 6.01 GiB and
 sampled OOM-kill counters were zero. This is correctness diagnosis only; E6
 remains open. [Run report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/moe-bundle-163849/README.md).
+
+**E6 layer-4 GDN capture at position 163885 (2026-10-28):** the boundary after
+layer 3 already differed (residual relative L2 `1.05e-3`, MoE row `1.48e-2`,
+next-layer `xn` `4.75e-3`). Layer-4 GDN input `x` differed by `5.74e-3` before
+the recurrence; raw `o` differed by `2.53e-3`. Exact answer, token IDs, and
+residency matched, but final state still differed. The run did not capture
+pre-step recurrent state, so recurrence replay and attribution to QSA versus
+MoE are unresolved. Next capture layer-3 QSA/MoE stages and layer-4 pre/post
+state at the same position. See the [layer-4 capture report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-layer4-163885/README.md).

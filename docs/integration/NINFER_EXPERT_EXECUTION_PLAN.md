@@ -1628,5 +1628,10 @@ in the same five fields. These end-state measurements do not identify the
 first divergence during prompt processing. Next capture the inputs and GDN
 stages around model layer 4 at a fixed accepted position, with a boundary
 capture after model layer 3, then repeat under identical capture settings
-before attributing the split. See the [numeric dump report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control-gdn-dump/README.md).
+before attributing the split. That focused pair found layer-4 `x` already
+differs by `5.74e-3` relative L2; layer-3's MoE row differs by `1.48e-2`, while
+layer-4 raw GDN `o` differs by `2.53e-3`. It did not capture the pre-step
+layer-4 recurrent state. Next capture layer-3 QSA and MoE stages plus layer-4
+pre/post state at the same position. See the [numeric dump report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control-gdn-dump/README.md)
+and [focused layer-4 report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-layer4-163885/README.md).
 E6 remains open.
