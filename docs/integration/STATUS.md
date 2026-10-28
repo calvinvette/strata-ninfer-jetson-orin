@@ -6650,3 +6650,20 @@ residency matched, but final state still differed. The run did not capture
 pre-step recurrent state, so recurrence replay and attribution to QSA versus
 MoE are unresolved. Next capture layer-3 QSA/MoE stages and layer-4 pre/post
 state at the same position. See the [layer-4 capture report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-layer4-163885/README.md).
+
+**E6 layer-3 upstream and layer-4 state capture (2026-10-28):** in the next
+paired 160K trace, boundary differences were already visible after model layer
+2 (runtime relative L2 `9.70e-5`, MoE row `3.86e-3`, next-layer `xn`
+`1.14e-3`). At layer 3, QSA selection metadata matched but its numerical
+inputs/outputs differed; route IDs matched while expert parts differed by
+`1.26e-2` relative L2. Layer-4 GDN state differed before token 23
+(`4.48e-3` relative L2), and an independent FP64 recurrence replay matched
+each engine's captured raw output within `8.7e-8` and `8.1e-8`. This pair
+therefore does not implicate the layer-4 recurrence, but it also cannot assign
+the earlier numerical differences to a stable cause. Exact answer, tokens and
+residency matched; final GDN, tail, pooled, pooled-full and KV state did not.
+Minimum available memory was 6.65 GiB, peak swap 2.14 GiB, and sampled OOM
+events were zero. Since previous traces moved the apparent first split, this
+single instrumented run is not enough to select a backend change. Keep E6 open
+and use minimally instrumented repeatability/state-parity checks before further
+localization. [Run report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-upstream-layer3-163885/README.md).

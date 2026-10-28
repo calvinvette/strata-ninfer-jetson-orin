@@ -1635,3 +1635,15 @@ layer-4 recurrent state. Next capture layer-3 QSA and MoE stages plus layer-4
 pre/post state at the same position. See the [numeric dump report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/minimal-paired-control-gdn-dump/README.md)
 and [focused layer-4 report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-layer4-163885/README.md).
 E6 remains open.
+
+The subsequent layer-3 QSA/MoE and layer-4 pre/post capture found differences
+already present after model layer 2. Layer-3 QSA selections and MoE route IDs
+matched, while their numerical tensors differed; layer-4 state also differed
+before token 23. Independent FP64 replay matched each captured GDN recurrence
+output within `8.7e-8` and `8.1e-8`, so this pair does not implicate the
+layer-4 recurrence. Earlier paired captures disagree on where the first small
+split occurs, and instrumentation can change the trajectory. Do not assign a
+stable root cause or alter a backend from this evidence. E6's next gate is
+repeatability and accepted-prefix state parity under minimally instrumented
+ordinary-path paired runs; return to operator localization only if that gate
+produces a reproducible split. See the [layer-3 upstream report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-upstream-layer3-163885/README.md).
