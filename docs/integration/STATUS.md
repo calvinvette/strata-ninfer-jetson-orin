@@ -7087,3 +7087,16 @@ functional near-limit evidence, not performance confirmation or broad 256K
 quality evidence. Energy was not measured and clocks remained dynamic. The
 checker verified final-state fingerprints but did not capture accepted-prefix
 state. E6/E7 remain open. [Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/quality-retrieval-256k-README.md).
+
+**E6 minimally instrumented 16K API screen (2026-10-29):** three fresh-process
+Strata/strict-NInfer pairs measured a 16,384-token formatted prompt and 128
+generated tokens at 32,768 configured context, with PCIe staging and prompt
+cache disabled and tracing off. All six processes passed and warmup/measured
+content matched within every pair. Median paired NInfer changes were -0.12%
+prompt TPS, 0.00% decode TPS, +0.19% first-visible TTFT and +0.18% client
+total; all paired-bootstrap intervals included zero and effects were below the
+5% threshold. All three randomized draws happened to run NInfer first, so
+order remains a limitation. This generic generation workload did not capture
+state or provide a semantic oracle. Minimum available memory was 10.78 GiB,
+sampled OOM/pressure counters stayed zero, energy was not measured, and clocks
+remained dynamic. No confirmation is warranted. [Report and chart](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp16384-cap32768-README.md).

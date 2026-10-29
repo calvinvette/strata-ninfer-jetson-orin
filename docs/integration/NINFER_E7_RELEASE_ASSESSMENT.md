@@ -278,3 +278,15 @@ three codes and suffix sum, with all generated IDs, nine persistent-state
 fingerprints and residency matching. This adds a small-prompt functional point;
 it is still one synthetic task and does not close broad quality or E6/E7 gates.
 See the [functional report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/quality-retrieval-2k-README.md).
+
+The near-limit Q2_0 retrieval ladder now includes one exact 256,000-token
+Strata/strict-NInfer pair at 262,144 capacity. Answer, all 47 IDs, nine final
+state fingerprints and residency matched; the minimum available RAM was
+6.56 GiB, just 0.56 GiB above the required floor. This extends functional
+coverage only and does not establish broad 256K quality or sustained service.
+A separate three-pair no-trace API screen at 16K prompt/32K capacity found
+median changes of -0.12% prompt TPS, 0.00% decode TPS, +0.19% TTFT and +0.18%
+client total; all intervals included zero. All pairs ran NInfer first, and the
+generic workload had neither a semantic oracle nor state capture. Neither
+result changes the no-release decision. See the [256K retrieval report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/quality-retrieval-256k-README.md)
+and [16K API screen](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp16384-cap32768-README.md).

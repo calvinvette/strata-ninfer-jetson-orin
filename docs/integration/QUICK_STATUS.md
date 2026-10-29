@@ -46,6 +46,12 @@ state fingerprints and residency. NInfer's single-pair rates were only +0.10%
 prompt and +1.98% decode over Strata; this is functional coverage, not
 performance confirmation. Minimum available RAM stayed above the six-GiB floor
 (6.56 GiB in the full sample series). See the [256K report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/quality-retrieval-256k-README.md).
+The new 16K no-trace API screen also found no qualifying effect: median changes
+were -0.12% prompt TPS, 0.00% decode TPS, +0.19% TTFT and +0.18% total time
+across three pairs; all bootstrap intervals included zero. All pairs ran
+NInfer first and did not collect semantic/state evidence. Its [report and
+paired-effect chart](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp16384-cap32768-README.md)
+join the existing 1K/4K screens.
 See the [integration status](STATUS.md) and
 [latest E7 assessment](NINFER_E7_RELEASE_ASSESSMENT.md).
 

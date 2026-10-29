@@ -2081,6 +2081,18 @@ Final-state fingerprints matched, but accepted-prefix state was not captured.
 Energy was not measured and clocks remained dynamic. E6/E7 remain open. See
 the [report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/quality-retrieval-256k-README.md).
 
+**No-trace 16K API screen (2026-10-29):** three fresh-process Strata/strict-
+NInfer pairs completed a 16,384-token prompt and 128-token generation at
+32,768 capacity, with PCIe staging/cache and tracing disabled. All six
+processes passed and matched warmup/measured content within pairs. Median
+paired changes were -0.12% prompt TPS, 0.00% decode TPS, +0.19% TTFT and +0.18%
+client total; all bootstrap intervals included zero and no effect met the 5%
+screen threshold. Each randomized block happened to run NInfer first, leaving
+order as a limitation. The generic workload had no semantic oracle or state
+capture. Minimum available memory was 10.78 GiB and sampled cgroup
+pressure/OOM counters stayed zero. No confirmation is warranted. E6/E7 remain
+open. See the [screen report and chart](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp16384-cap32768-README.md).
+
 **Minimally instrumented pp512+tg64 API screen (2026-10-29):** three
 randomized fresh-process pairs at 1,024 context used a warmup and measured
 request per process, with PCIe staging, prompt cache and tracing disabled. All
