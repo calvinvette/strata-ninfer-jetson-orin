@@ -49,11 +49,24 @@ reproduces the capacity-associated effect across both engines, although the
 quantify run-to-run variability. Raw pair captures and comparator JSON remain
 local-only.
 
-Next, repeat both 16K capacity cells with identical capture settings, then add
-another pair per 32K capacity cell and a capacity-matched length control where
-memory permits. If the capacity interaction remains, inspect capacity-
-dependent allocation/dispatch and state initialization before changing
-backend math.
+**16K/262,144 replication:** a second pair per backend also reproduced the
+state failure. Both backends matched answer, all 47 token IDs, and residency,
+while final persistent-state fingerprints differed. At positions 16,384,
+16,406 and 16,429, the first sampled material GDN layers were 14, 2 and 2 for
+both backends, with relative L2 `1.478e-5`, `1.479e-5` and `7.689e-6`.
+Maximum layer relative L2 values at those positions were `0.0837–0.0921`,
+`0.0920–0.0921`, and `0.0612–0.0614` respectively across the two backends.
+Pair wall times were 609.3 s (NInfer, minimum RAM 7.19 GiB) and 606.9 s
+(Strata, 7.13 GiB); neither recorded OOM kills. This reproduces the 16K
+large-capacity failure for both implementations and its sampled GDN trajectory.
+The shared onset/magnitude is a useful cross-backend clue, not proof of a
+common root cause.
+
+Next, repeat both 16K/32K lower-capacity cells with identical capture settings,
+then add another pair per 32K capacity cell and a capacity-matched length
+control where memory permits. If the capacity interaction remains, inspect
+capacity-dependent allocation/dispatch and state initialization before
+changing backend math.
 
 The 32K/65,536 measurements are in the local-only `32k-capacity-65536-*`
 directories. Earlier 2K/16K controls and 262,144-capacity runs are in the

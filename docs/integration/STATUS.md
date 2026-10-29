@@ -6824,3 +6824,13 @@ This strengthens the capacity-associated repeatability finding across both
 backends, without establishing the mechanism. Next repeat the 16K capacity
 cells with matching capture settings and add another pair at both 32K
 capacities. [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**E6 repeated 16K/262K controls (2026-10-29):** second pairs for both backends
+again matched output, tokens and residency but failed exact final-state
+parity. Both reproduced sampled GDN onset at layers 14, 2 and 2 for positions
+16,384, 16,406 and 16,429, with relative L2 `1.478e-5`, `1.479e-5` and
+`7.689e-6`; later layers diverged more. Available RAM minima were 7.19 GiB
+(NInfer) and 7.13 GiB (Strata), with no OOM kills. Together with the exact
+16K/32K-capacity repeats, this strengthens the capacity association, but the
+matching cross-backend signature does not reveal the mechanism. Next repeat
+the 16K lower-capacity pairs with these capture settings. [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

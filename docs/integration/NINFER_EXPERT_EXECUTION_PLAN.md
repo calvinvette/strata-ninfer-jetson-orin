@@ -1822,3 +1822,15 @@ Repeat the 16K capacity cells with the same capture configuration, and add a
 second matched 32K pair at each capacity before assigning a causal mechanism.
 The gate remains exact persistent-state parity; no arithmetic changes are
 justified. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**E6 replicated 16K/262K capacity cell (2026-10-29):** second same-backend
+pairs reproduced the final-state failure for both NInfer and Strata while
+answer, tokens and residency remained equal. At prompt boundary and generated
+positions, both backends again first crossed relative-L2 `1e-6` at GDN layers
+14, 2 and 2, with relative-L2 values `1.478e-5`, `1.479e-5` and `7.689e-6`.
+The maximum sampled layer differences were large (`0.061–0.092`). Minimum
+available memory was 7.19 GiB (NInfer) and 7.13 GiB (Strata), with no OOM
+kills. The corresponding low-capacity 16K pairs had exact state parity, so
+repeat the low-capacity cells under these same capture settings next. The
+matching onset across backends is a diagnostic clue only; keep exact state as
+the gate and do not change arithmetic. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
