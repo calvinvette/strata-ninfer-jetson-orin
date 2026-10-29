@@ -89,6 +89,16 @@ therefore compares different execution tiers. NInfer handles the staged GPU
 group; the CPU miss uses Strata's CPU expert implementation. This is not an
 NInfer-kernel-only capacity comparison.
 
+The single-expert result was checked with `native_expert_parity` on the same
+Q2_0 model weights and the captured 2,560-float layer-2 activation. The
+captured 32,768-capacity NInfer output was bitwise identical to the harness's
+CUDA output; the 262,144-capacity CPU output was bitwise identical to its CPU
+output. The cross-tier comparison was 1,825/2,560 outputs different, relative
+L2 `1.064e-7`, max absolute `7.45e-9`; the independent CPU/GPU expert parity
+test passed. This directly attributes the small layer-2 delta to the CPU/GPU
+expert execution difference for this row. It does not explain the later state
+divergence or exclude other capacity-sensitive causes.
+
 Startup logs show the corresponding pinned-expert change: 32,768 runs mapped a
 6.00 GiB pinned expert complement and reported 11.2–11.4 GiB shared RAM
 available after loading. At 262,144, the pinned complement was 3.97–4.11 GiB
@@ -100,12 +110,12 @@ available RAM was 7.12 GiB, above the six-GiB floor, with no OOM kills. These
 captures establish owner/path evidence, not a passing state result or proof
 that context allocation alone caused the smaller pinned prefix.
 
-Next hold expert ownership constant while comparing CPU and staged-GPU
-expert-130 outputs from the same activation and model weights. Capture route
-owners in paired state-repeatability controls and identify which allocations
-reduce the pinned prefix at larger capacities. Do not attribute the observed
-drift to NInfer arithmetic or change the kernel until those controls separate
-tier assignment from context-capacity effects.
+Next capture owners in paired state-repeatability controls at 32K/65,536 and
+262,144 capacities, and inspect early layers to learn whether other experts
+also change tier before the first material MoE output delta. Identify which
+allocations reduce the pinned prefix at larger configured capacities. Keep
+the persistent-state gate; do not infer that this single expert explains the
+full state divergence or change the kernel based on it.
 
 The 32K/65,536 measurements are in the local-only `32k-capacity-65536-*`
 directories. Earlier 2K/16K controls and 262,144-capacity runs are in the

@@ -6851,11 +6851,17 @@ model layer 2 routed the same ten experts at both 32,768 and 262,144 configured
 capacity, but expert 130 changed from PCIe-staged GPU to CPU ownership. Its
 small per-expert output delta therefore compares NInfer's staged GPU path with
 Strata's CPU path; it is not isolated evidence of capacity-dependent NInfer
-arithmetic. The pinned expert complement was 6.00 GiB at 32,768 and 3.97–4.11
-GiB at 262,144, with the same 3,000-entry GPU cache. Full 47-token captures
+arithmetic. The independent `native_expert_parity` test used the same captured
+activation and GGUF weights: the CPU output matched the 262,144 runtime output
+bitwise and the CUDA output matched the 32,768 NInfer output bitwise. The
+CPU/GPU delta was 1,825/2,560 values, relative L2 `1.064e-7`, max absolute
+`7.45e-9`; the parity test passed. The pinned expert complement was 6.00 GiB
+at 32,768 and 3.97–4.11 GiB at 262,144, with the same 3,000-entry GPU cache.
+Full 47-token captures
 matched answer, tokens and residency but still failed exact persistent-state
 parity across MTP modes at 262,144; minimum available RAM was 7.12 GiB and OOM
-kills were zero. Next compare CPU and staged-GPU expert 130 from the same
-activation and model weights, record owners in repeatability controls, and
-identify allocations that shrink pinned coverage. Keep the state gate and make
-no arithmetic changes. [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+kills were zero. This attributes the small layer-2 delta to execution-tier
+arithmetic for expert 130, but does not explain full state divergence. Next
+capture owners in 32K/65,536 and 262,144 repeatability controls, inspect earlier
+layers and identify allocations that shrink pinned coverage. Keep the state
+gate and make no arithmetic changes. [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

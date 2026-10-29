@@ -1859,7 +1859,13 @@ the pinned expert complement fell from 6.00 GiB at 32,768 to 3.97–4.11 GiB at
 tail, pooled, pooled-full and KV state parity across MTP modes; minimum
 available RAM was 7.12 GiB and OOM kills were zero. Owner captures isolate a
 real tier-assignment change but do not establish why the pinned prefix shrinks
-or pass the state gate. Next compare expert 130 on CPU and staged GPU using the
-same activation and weight bytes, capture owners in repeatability controls,
-and account for allocations that reduce pinned coverage. Hold arithmetic
-unchanged. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+or pass the state gate. On the same captured activation and GGUF weights,
+`native_expert_parity`'s CPU output matched the 262,144-capacity runtime CPU
+output bitwise, and its CUDA output matched the 32,768-capacity NInfer output
+bitwise. CPU/GPU outputs differed in 1,825/2,560 values (relative L2
+`1.064e-7`, max absolute `7.45e-9`); the independent parity harness passed.
+This isolates the small layer-2 change to execution-tier arithmetic for this
+expert, without explaining the later state divergence. Next capture owners in
+paired controls at 32K/65,536 and 262,144, inspect earlier layers, and account
+for allocations that reduce pinned coverage. Hold arithmetic unchanged.
+[Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
