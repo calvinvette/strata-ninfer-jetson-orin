@@ -249,3 +249,16 @@ format matching alone therefore does not guarantee state parity when upstream
 activations sit near a scale boundary. This does not create a supported
 approximate-state contract; E7 remains a no-release assessment. [Cross-owner
 scale trace](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#remaining-layer-3-activation-scale-boundary).
+
+## 2026-10-29 no-staging API follow-up
+
+The no-release decision is unchanged. A minimally instrumented three-pair
+pp512+tg64 API screen disabled both PCIe staging and prompt caching. All six
+requests completed and each pair's measured content matched. Median NInfer
+changes were -0.97% prompt TPS, +1.16% decode TPS, +0.88% first-visible TTFT,
+and +0.84% client time; all 95% paired bootstrap intervals crossed zero. The
+screen did not meet the 5% useful-effect threshold. It also did not capture
+state hashes or establish semantic quality, and it measured only one synthetic
+workload at 1K context. No confirmation or release profile is warranted from
+this cell. The broader E6 quality, context and workload exits remain open.
+See the [API screen report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp512-cap1024-README.md).

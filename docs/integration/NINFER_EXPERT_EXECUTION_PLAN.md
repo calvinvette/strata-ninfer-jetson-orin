@@ -2065,3 +2065,14 @@ threshold, so confirmation is not justified for this cell. Minimum available
 RAM was 11.58–11.64 GiB and OOM kills zero. The synthetic workload has no
 expected answer; TTFT and energy were not measured; clocks remained dynamic.
 See the [screen report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**Minimally instrumented pp512+tg64 API screen (2026-10-29):** three
+randomized fresh-process pairs at 1,024 context used a warmup and measured
+request per process, with PCIe staging, prompt cache and tracing disabled. All
+six requests passed and measured content matched within each pair. Median
+NInfer/Strata changes were -0.97% prompt TPS, +1.16% decode TPS, +0.88%
+first-visible TTFT, and +0.84% client time; all 95% paired bootstrap intervals
+crossed zero. No median met the 5% screen threshold; no confirmation is
+indicated. Minimum available RAM was 11.66–11.70 GiB, OOM kills zero. State was
+not captured, and content equality is not an independent task-quality oracle.
+Energy was not measured and clocks remained dynamic. See the [API screen report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp512-cap1024-README.md).

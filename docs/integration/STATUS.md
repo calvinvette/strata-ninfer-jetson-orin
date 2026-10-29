@@ -7033,3 +7033,15 @@ the second block. Neither median reaches 5%, so confirmation is not justified
 for this cell. Minimum available RAM was 11.58–11.64 GiB, with zero OOM kills.
 The generic workload has no expected semantic answer; TTFT and energy were not
 measured and clocks remained dynamic. [Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**E6 minimally instrumented pp512+tg64 API screen (2026-10-29):** three
+randomized fresh-process Strata/strict-NInfer pairs at 1,024 context, with PCIe
+staging and prompt cache disabled, each used one warmup and one measured
+request. All six runs passed; output content matched within every pair. Median
+paired changes were -0.97% prompt TPS, +1.16% decode TPS, +0.88% first-visible
+TTFT and +0.84% client time (positive latency means slower); every 95% paired
+bootstrap median interval crossed zero. No 5% threshold was met, so no
+confirmation is indicated. Minimum available RAM was 11.66–11.70 GiB, OOM
+kills zero. This no-trace screen did not capture persistent state, and matching
+content is not an independent semantic-quality check. Energy was not measured;
+clocks were dynamic. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp512-cap1024-README.md).
