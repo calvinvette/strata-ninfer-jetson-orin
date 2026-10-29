@@ -40,6 +40,12 @@ pp2048+tg128 (median tied decode TPS, -2.34% client time); the latter had one
 unrepeated decode outlier. Both matched content within pairs but lacked an
 independent task-quality oracle. A separate 2K held-out retrieval check passed
 exact answer, token, persistent-state, and residency gates for both backends.
+The follow-up 256K exact retrieval check also passed: one 256,000-token
+Strata/strict-NInfer pair matched the exact answer, all 47 tokens, nine final
+state fingerprints and residency. NInfer's single-pair rates were only +0.10%
+prompt and +1.98% decode over Strata; this is functional coverage, not
+performance confirmation. Minimum available RAM stayed above the six-GiB floor
+(6.56 GiB in the full sample series). See the [256K report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/quality-retrieval-256k-README.md).
 See the [integration status](STATUS.md) and
 [latest E7 assessment](NINFER_E7_RELEASE_ASSESSMENT.md).
 

@@ -2066,6 +2066,21 @@ RAM was 11.58–11.64 GiB and OOM kills zero. The synthetic workload has no
 expected answer; TTFT and energy were not measured; clocks remained dynamic.
 See the [screen report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
 
+**Exact 256K retrieval/state check (2026-10-29):** one fresh-process
+Strata/strict-NInfer pair passed a held-out 256,000-token retrieval/arithmetic
+task at 262,144 configured context with PCIe staging disabled. Both returned
+the expected three markers and sum; all 47 generated token IDs, nine final
+state fingerprints and residency hash matched. The supervisor recorded 7.04
+GB (6.56 GiB) minimum available memory, 0.56 GiB above the six-GiB floor;
+peak sampled swap was 6.32 GiB and sampled cgroup pressure/OOM counters stayed
+at zero. Prompt rates were 99.68/99.78 tok/s and decode rates 3.88/3.96 tok/s
+(Strata/NInfer), differences of +0.10%/+1.98% for NInfer in this single pair.
+The approximately 89-minute run establishes one functional near-limit cell,
+not a performance advantage, broad quality or sustained-service qualification.
+Final-state fingerprints matched, but accepted-prefix state was not captured.
+Energy was not measured and clocks remained dynamic. E6/E7 remain open. See
+the [report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/quality-retrieval-256k-README.md).
+
 **Minimally instrumented pp512+tg64 API screen (2026-10-29):** three
 randomized fresh-process pairs at 1,024 context used a warmup and measured
 request per process, with PCIe staging, prompt cache and tracing disabled. All

@@ -7073,3 +7073,17 @@ The two no-trace API workload screens now have a combined paired-effect figure
 with each block and its three-block bootstrap interval, plus sanitized JSON/CSV
 source data. The chart displays the small or unstable effects and makes no
 product-performance claim. [Figure and source data](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md#combined-no-trace-api-paired-effect-chart).
+
+**E6 exact 256K retrieval/state check (2026-10-29):** one fresh-process
+Strata/strict-NInfer pair passed a held-out 256,000-token retrieval/arithmetic
+task at 262,144 configured context with PCIe staging disabled. Both returned
+the exact three markers and sum; all 47 generated token IDs, nine final-state
+fingerprints and residency hash matched. The supervised run recorded 7.04 GB
+(6.56 GiB) minimum available memory, 0.56 GiB above the six-GiB floor; peak
+sampled swap was 6.32 GiB and sampled cgroup pressure/OOM counters stayed at
+zero. Prompt rates were 99.68/99.78 tok/s and decode rates 3.88/3.96 tok/s
+(Strata/NInfer), only +0.10%/+1.98% for NInfer in this single pair. This is
+functional near-limit evidence, not performance confirmation or broad 256K
+quality evidence. Energy was not measured and clocks remained dynamic. The
+checker verified final-state fingerprints but did not capture accepted-prefix
+state. E6/E7 remain open. [Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/quality-retrieval-256k-README.md).
