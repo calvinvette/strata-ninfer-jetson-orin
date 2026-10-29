@@ -2076,3 +2076,16 @@ crossed zero. No median met the 5% screen threshold; no confirmation is
 indicated. Minimum available RAM was 11.66–11.70 GiB, OOM kills zero. State was
 not captured, and content equality is not an independent task-quality oracle.
 Energy was not measured and clocks remained dynamic. See the [API screen report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp512-cap1024-README.md).
+
+**Minimally instrumented pp2048+tg128 API screen (2026-10-29):** three
+randomized fresh-process pairs at 4,096 context used a warmup and measured
+request per process, with PCIe staging, prompt cache and tracing disabled. All
+six requests passed and content matched within each pair. Median NInfer changes
+were +4.48% prompt TPS, +0.00% decode TPS, -4.39% first-visible TTFT, and
+-2.34% client time; the corresponding 95% paired-bootstrap intervals were
++0.62% to +6.11%, -4.30% to +47.62%, -6.13% to -0.53%, and -14.10% to -0.39%.
+The large decode result was isolated to one unusually slow Strata baseline. The
+TTFT median remains below 5%; decode is tied, so confirmation is not indicated.
+Minimum available RAM was 11.58–11.63 GiB, OOM kills zero. State was not
+captured; content equality does not establish task quality. Energy was not
+measured and clocks remained dynamic. See the [API screen report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp2048-cap4096-README.md).

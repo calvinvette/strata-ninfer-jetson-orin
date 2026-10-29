@@ -1,6 +1,6 @@
 # Quick status
 
-Updated: 2026-10-24
+Updated: 2026-10-29
 
 This is a short orientation to the integration. The [plan](PLAN.md) defines
 phase gates; the detailed [status](STATUS.md) is the evidence record, and the
@@ -31,6 +31,15 @@ execution evidence. See the [CTest report](../../bench/results/2026-10-24-orin-c
 Older dated entries below preserve the evidence and phase state at the time each
 experiment was recorded. Models stay in `~/models/`; generated builds,
 telemetry and raw captures are not committed.
+
+The NInfer expert integration itself remains experimental: E6 correctness,
+quality, context, and performance gates are still open, and E7 proposes no
+general release profile. New no-staging 3-pair API screens found no qualifying
+benefit at pp512+tg64 (median +1.16% decode TPS, +0.84% client time) or
+pp2048+tg128 (median tied decode TPS, -2.34% client time); the latter had one
+unrepeated decode outlier. Both matched content within pairs but lacked an
+independent task-quality oracle. See the [integration status](STATUS.md) and
+[latest E7 assessment](NINFER_E7_RELEASE_ASSESSMENT.md).
 
 ## Performance observed
 

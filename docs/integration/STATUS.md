@@ -7045,3 +7045,17 @@ confirmation is indicated. Minimum available RAM was 11.66–11.70 GiB, OOM
 kills zero. This no-trace screen did not capture persistent state, and matching
 content is not an independent semantic-quality check. Energy was not measured;
 clocks were dynamic. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp512-cap1024-README.md).
+
+**E6 minimally instrumented pp2048+tg128 API screen (2026-10-29):** three
+randomized fresh-process Strata/strict-NInfer pairs at 4,096 context, with PCIe
+staging and prompt cache disabled, each used one warmup and one measured
+request. All six runs passed and measured content matched per pair. Median
+paired changes were +4.48% prompt TPS, +0.00% decode TPS, -4.39% first-visible
+TTFT, and -2.34% client time (negative latency means faster); paired 95%
+bootstrap intervals were +0.62% to +6.11%, -4.30% to +47.62%, -6.13% to -0.53%,
+and -14.10% to -0.39%, respectively. The isolated +47.62% decode result came
+from a slower Strata baseline and did not repeat. The TTFT median remained below
+the 5% useful-effect threshold; no confirmation is indicated. Minimum available
+RAM was 11.58–11.63 GiB, with zero OOM kills. State was not captured and content
+equality is not independent semantic-quality evidence. Energy was not measured;
+clocks were dynamic. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp2048-cap4096-README.md).

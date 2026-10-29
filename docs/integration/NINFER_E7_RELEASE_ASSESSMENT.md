@@ -262,3 +262,12 @@ state hashes or establish semantic quality, and it measured only one synthetic
 workload at 1K context. No confirmation or release profile is warranted from
 this cell. The broader E6 quality, context and workload exits remain open.
 See the [API screen report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp512-cap1024-README.md).
+
+A second minimally instrumented API screen covered pp2048+tg128 at 4K context
+in three randomized pairs. All six requests completed and content matched
+within pairs. Median NInfer changes were +4.48% prompt TPS, +0.00% decode TPS,
+-4.39% first-visible TTFT, and -2.34% client time. One +47.62% decode result
+was isolated to an unusually slow Strata baseline; the median decode effect
+was tied. The TTFT median was below the 5% useful-effect threshold. No
+confirmation or profile promotion is warranted. State and semantic task quality
+were not established by this no-trace screen. See the [API report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp2048-cap4096-README.md).
