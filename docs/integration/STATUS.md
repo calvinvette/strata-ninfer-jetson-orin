@@ -6767,3 +6767,13 @@ gate; next isolate process history with matched single-backend repeats and a
 preregistered control matrix. Run time was 3,233.6 s; minimum available memory
 was 6.63 GiB, peak swap 5.05 GiB, and sampled OOM kills were zero.
 [Report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-strata-first-repeat2/README.md).
+
+**E6 update (2026-10-28):** completed six accepted-prefix GDN capture pairs,
+three per backend arm order. Answer, 47 token IDs, and residency matched within
+every pair, but final persistent-state parity failed every time. Prompt-boundary
+GDN state stayed below the material-delta threshold in four of six pairs;
+generated-prefix first-difference layers varied between repeats, with overlapping
+relative-L2 ranges across arm orders. Same-backend run-to-run drift remains a
+confounder, so backend causation is unresolved and arithmetic is unchanged. Next
+is a preregistered process-history control matrix with matched single-backend
+repeats. See the [balanced-order report](../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-order-balanced/README.md).

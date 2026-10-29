@@ -1744,3 +1744,15 @@ state gate open; next isolate process history with matched single-backend
 repeats and a preregistered control matrix before operator localization. Run
 time was 3,233.6 s; minimum available memory 6.63 GiB, peak swap 5.05 GiB, and
 sampled OOM kills zero. See the [third pair report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-strata-first-repeat2/README.md).
+
+**E6 order-balanced GDN repeats (2026-10-28):** completed three pairs in each
+arm order. All six matched answer, generated token IDs, and residency across
+engines, while all six failed final persistent-state parity. Prompt-boundary
+GDN state was below the `1e-6` relative-L2 threshold across engines in four of
+six pairs. Generated-prefix first-material-layer values vary across repeated
+runs and overlap across arm orders; same-backend drift is material. This
+suggests a possible prompt-boundary order interaction but does not establish
+it. Do not attribute the divergence to an engine or modify arithmetic yet.
+Next run a small preregistered process-history control matrix with matched
+single-backend repeats, then return to localization only if trajectories are
+repeatable. See the [order-balanced report](../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-order-balanced/README.md).
