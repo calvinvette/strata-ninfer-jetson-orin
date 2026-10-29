@@ -35,6 +35,14 @@ def staged_backend_arms(reverse: bool = False) -> tuple[tuple[str, str, int], ..
     return tuple(reversed(arms)) if reverse else arms
 
 
+def repeated_staged_backend_arms(backend: str) -> tuple[tuple[str, str, int], ...]:
+    """Run one staged backend twice in fresh engine processes."""
+    if backend not in ('strata', 'ninfer'):
+        raise ValueError("backend must be 'strata' or 'ninfer'")
+    return ((f'{backend}-repeat-1', backend, 0),
+            (f'{backend}-repeat-2', backend, 0))
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--config', type=Path, required=True)
@@ -49,6 +57,8 @@ def main() -> int:
                     help='compare Strata and strict NInfer compute with staging enabled in both arms')
     ap.add_argument('--reverse-staged-backends', action='store_true',
                     help='run strict NInfer before Strata (requires --compare-staged-backends)')
+    ap.add_argument('--repeat-staged-backend', choices=('strata', 'ninfer'),
+                    help='run the selected staged backend twice in fresh processes')
     ap.add_argument('--dump-gdn', action='store_true',
                     help='write final accepted-prefix GDN arrays for numeric comparison')
     ap.add_argument('--dump-gdn-at', type=int,
@@ -103,7 +113,8 @@ def main() -> int:
                     help='limit the CPU Q8_1 dot selector to comma-separated expert IDs, or per-layer layer=IDs clauses separated by semicolons')
     ap.add_argument('--run', action='store_true')
     a = ap.parse_args()
-    comparison_modes = (a.compare_strata_control, a.compare_cpu_miss_staged, a.compare_staged_backends)
+    comparison_modes = (a.compare_strata_control, a.compare_cpu_miss_staged,
+                        a.compare_staged_backends, a.repeat_staged_backend is not None)
     if sum(comparison_modes) > 1:
         ap.error('choose only one comparison mode')
     if a.reverse_staged_backends and not a.compare_staged_backends:
@@ -231,6 +242,8 @@ def main() -> int:
         arms = (('cpu-miss', 'strata', 0), ('ninfer-staged', 'ninfer', 0))
     elif a.compare_staged_backends:
         arms = staged_backend_arms(a.reverse_staged_backends)
+    elif a.repeat_staged_backend is not None:
+        arms = repeated_staged_backend_arms(a.repeat_staged_backend)
     else:
         arms = (('mtp-off', 'ninfer', 0), ('mtp4', 'ninfer', 4))
     for name, backend, window in arms:
@@ -241,7 +254,9 @@ def main() -> int:
                 command[command.index('--expert-backend') + 1] = 'strata'
             if '--expert-backend-strict' in command:
                 command.remove('--expert-backend-strict')
-        if (a.compare_cpu_miss_staged or a.compare_staged_backends) and '--pcie-frac' in command:
+        staged_mode = (a.compare_cpu_miss_staged or a.compare_staged_backends or
+                       a.repeat_staged_backend is not None)
+        if staged_mode and '--pcie-frac' in command:
             command[command.index('--pcie-frac') + 1] = (
                 '0.0' if a.compare_cpu_miss_staged and backend == 'strata' else '1.0')
         arm_env = dict(env)
@@ -353,7 +368,8 @@ def main() -> int:
             result['failures'].append(f"{first['name']} and {second['name']} token IDs differ")
         if not result['final_state_equal']:
             result['failures'].append(f"{first['name']} and {second['name']} final state differ")
-        if (a.compare_cpu_miss_staged or a.compare_staged_backends) and not result['residency_equal']:
+        if (a.compare_cpu_miss_staged or a.compare_staged_backends or
+                a.repeat_staged_backend is not None) and not result['residency_equal']:
             result['failures'].append(f"{first['name']} and {second['name']} resident maps differ or were not captured")
     result['exact_answer_check'] = expected is not None and max_new == workload['generate_tokens']
     result['passed'] = not result['failures'] and len(result['arms']) == 2

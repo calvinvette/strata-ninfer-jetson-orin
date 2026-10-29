@@ -8,7 +8,9 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from ninfer_q2_retrieval_check import parse_gdn_commit_layer, staged_backend_arms
+from ninfer_q2_retrieval_check import (parse_gdn_commit_layer,
+                                       repeated_staged_backend_arms,
+                                       staged_backend_arms)
 
 
 class GdnCommitLayerArgumentTests(unittest.TestCase):
@@ -32,6 +34,16 @@ class StagedBackendOrderTests(unittest.TestCase):
     def test_reverse_order_runs_ninfer_first(self):
         self.assertEqual(staged_backend_arms(reverse=True), (
             ('ninfer-staged', 'ninfer', 0), ('strata-staged', 'strata', 0)))
+
+    def test_same_backend_repeat_uses_two_fresh_arm_names(self):
+        self.assertEqual(repeated_staged_backend_arms('strata'), (
+            ('strata-repeat-1', 'strata', 0), ('strata-repeat-2', 'strata', 0)))
+        self.assertEqual(repeated_staged_backend_arms('ninfer'), (
+            ('ninfer-repeat-1', 'ninfer', 0), ('ninfer-repeat-2', 'ninfer', 0)))
+
+    def test_same_backend_repeat_rejects_unknown_backend(self):
+        with self.assertRaises(ValueError):
+            repeated_staged_backend_arms('other')
 
 
 if __name__ == '__main__':
