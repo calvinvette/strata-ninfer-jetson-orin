@@ -299,3 +299,20 @@ and the ignored `fixed-capacity-262144/` directory. Owner captures and the
 `32k-capacity-65536-owner-repeat3/`, and `moe-bundle-32k-cap262144-ninfer/`
 directories. Raw captures, comparator JSON, configs, logs, and supervisor
 samples remain local-only.
+
+**16K no-staging Strata/NInfer pilot:** a same-day, single ordered pair used
+the same Q2_0 retrieval prompt and 262,144 configured capacity with PCIe
+staging disabled, strict NInfer selected for the second arm, and the
+diagnostic-capable binary. Both arms returned the exact expected answer and
+all 47 token IDs; all nine persistent state fingerprints and residency hashes
+matched exactly. The reported prompt durations correspond to 61.0 tokens/s for
+Strata (268.395 s) and 62.8 tokens/s for NInfer (261.007 s). Decode durations
+correspond to 4.01 and 4.12 generated tokens/s (11.708 and 11.413 s). These
+single observations put NInfer about 2.8% ahead on prompt throughput and 2.6%
+on decode throughput, but the fixed-order, one-pair diagnostic run is not a
+performance qualification and does not establish a repeatable gain. TTFT was
+not separately reported by the harness, so it is unavailable here. End-to-end
+pair runtime was 606.4 s; minimum available RAM was 7.11 GiB and OOM kills
+were zero. Energy was not measured, clocks remained dynamic, and raw logs and
+supervisor samples remain local-only. Repeat with balanced arm order and the
+minimally instrumented measurement path before making a performance claim.

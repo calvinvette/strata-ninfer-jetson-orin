@@ -9,6 +9,16 @@ Phase 6 is complete for the tested factor domains under their closeouts. The
 release profile still excludes unresolved multi-live/adaptive paths and does
 not promote a universal parametric profile. This records tested cells, not general product support.
 
+The latest E6 pilot repeated the 16K Q2_0 retrieval fixture at 262,144
+capacity with PCIe staging disabled, comparing Strata with strict NInfer.
+Both arms matched the exact answer, all 47 tokens, all persistent-state
+fingerprints and residency. One ordered pair measured 61.0 versus 62.8 prompt
+tokens/s and 4.01 versus 4.12 generated tokens/s (Strata versus NInfer).
+Because this was one fixed-order diagnostic pair, it is not evidence of a
+repeatable speedup; TTFT and energy were not measured. Minimum available RAM
+was 7.11 GiB with zero OOM kills. E6/E7 remain open. See the [E6
+report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
 An E6 diagnostic found and fixed the missing multi-layer MoE bundle write on
 ordinary single-request verifier windows. The bundle buffers were captured, but
 the serializer had only been called by the batch verifier path; this held-out

@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **E0–E5 bounded implementation evidence complete; current-source HIP/SYCL builds pass on maestro1; E6 screens and correctness diagnostics continue, with unresolved long-context output/state divergence; E6 and E7 release gates remain open (updated 2026-10-28)**.
+Status: **E0–E5 bounded implementation evidence complete; current-source HIP/SYCL builds pass on maestro1; E6 screens and correctness diagnostics continue; E6 and E7 release gates remain open (updated 2026-10-29)**.
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -1959,4 +1959,15 @@ lengths in the 262,144-capacity cell. Energy and performance were not measured.
 Next maintain the exact-state condition while preparing minimally-instrumented
 same-day performance pairs, then continue the planned E6 workload/context
 matrix. The staged path remains experimental. [Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**16K no-staging backend parity and pilot timing (2026-10-29):** at 262,144
+capacity, a same-day Strata-first pair with PCIe staging disabled passed exact
+answer, token, persistent-state and residency checks for both Strata and strict
+NInfer. Prompt throughput was 61.0 versus 62.8 tokens/s and decode throughput
+4.01 versus 4.12 tokens/s. These are single-run observations from an ordered
+diagnostic pair, not performance qualification; TTFT and energy were not
+measured. Minimum available RAM was 7.11 GiB and OOM kills were zero. Next
+repeat under the minimally instrumented protocol with balanced arm order,
+then extend the comparison to other prompt lengths while preserving state and
+quality gates. E6 and E7 remain open. [Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
 [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
