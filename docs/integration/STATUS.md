@@ -6793,3 +6793,11 @@ at 163862, then first crossed `1e-6` at layer 13 (`5.49e-4`) at 163885. This,
 with the NInfer repeat, confirms run-to-run drift on both paths; one pair per
 backend cannot identify a cause or a stable backend-specific profile. Minimum
 available memory was 6.47 GiB and OOM kills were zero. [Report](../bench/results/2026-10-28-e6-q2-active-compute-quality-160k/same-backend-strata-repeat/README.md).
+
+**E6 repeatability by context (2026-10-28):** fresh-process same-backend pairs
+for NInfer and Strata were bitwise identical in final state and all captured
+GDN floats at both 2K and 16K. At 160K, same-backend pairs failed final-state
+parity. This points to a long-context condition but does not locate the
+threshold; configured context also differed between the 16K and 160K fixtures.
+Next hold capacity fixed and screen 32K, then 64K if exact parity continues.
+[Length-screen report](../../bench/results/2026-10-28-e6-q2-state-repeatability-length-screen/README.md).

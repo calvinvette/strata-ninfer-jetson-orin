@@ -1783,3 +1783,16 @@ is larger in the NInfer sample, but one pair per backend is insufficient to
 establish distinct backend profiles or a cause. Next repeat these controls if
 causal attribution is needed, or proceed to the task-quality gate without
 changing arithmetic. See the [Strata repeat report](../bench/results/2026-10-28-e6-q2-active-compute-quality-160k/same-backend-strata-repeat/README.md).
+
+**E6 same-backend context repeatability screen (2026-10-28):** at both 2K and
+16K, fresh-process NInfer/NInfer and Strata/Strata pairs matched answer, 47
+token IDs, residency, all nine final state fields, and every captured float in
+36-layer GDN snapshots at prompt boundary and two generated positions. Pair
+runtimes were about 180 seconds at 2K and 471–477 seconds at 16K; minimum
+available memory ranged from 10.98 to 11.79 GiB, with no OOM kills. This
+contrasts with the 160K same-backend pairs, where final state and GDN diverged.
+It supports a long-context repeatability issue but does not locate a threshold
+or establish context length as the only cause; the 16K and 160K configured
+capacities differ. Next hold configured capacity fixed and screen 32K, then
+advance to 64K if repeatability holds. Repeat near any transition before
+operator localization. See the [length screen](../../bench/results/2026-10-28-e6-q2-state-repeatability-length-screen/README.md).
