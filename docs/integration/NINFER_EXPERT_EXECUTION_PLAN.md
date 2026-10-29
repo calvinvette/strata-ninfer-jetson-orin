@@ -1769,3 +1769,17 @@ confounded. The run took 3,230.7 s; minimum available memory was 6.96 GiB and
 sampled OOM kills were zero. Next repeat Strata/Strata under the same settings
 to test whether the drift is specific to NInfer or shared. See the
 [NInfer repeat report](../bench/results/2026-10-28-e6-q2-active-compute-quality-160k/same-backend-ninfer-repeat/README.md).
+
+**E6 same-backend Strata repeat (2026-10-28):** two fresh Strata engine
+processes ran the same 160K workload and captures. They matched answer, 47
+token IDs, and residency, but final `gdn`, `tail`, `pooled`, `pooled_full`,
+and `kv` state differed. The captured GDN arrays were bitwise equal at prompt
+boundary 163840; at position 163862 the maximum relative L2 was `1.65e-9`;
+at position 163885 it first crossed `1e-6` at layer 13 (`5.4927e-4`) and
+reached `5.2191e-2` at its largest layer. Minimum available memory was 6.47
+GiB, with zero sampled OOM kills. Together with the NInfer/NInfer repeat, this
+shows within-backend state drift on both paths; the measured early-prefix drift
+is larger in the NInfer sample, but one pair per backend is insufficient to
+establish distinct backend profiles or a cause. Next repeat these controls if
+causal attribution is needed, or proceed to the task-quality gate without
+changing arithmetic. See the [Strata repeat report](../bench/results/2026-10-28-e6-q2-active-compute-quality-160k/same-backend-strata-repeat/README.md).
