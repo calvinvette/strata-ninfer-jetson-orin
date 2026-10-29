@@ -6777,3 +6777,11 @@ relative-L2 ranges across arm orders. Same-backend run-to-run drift remains a
 confounder, so backend causation is unresolved and arithmetic is unchanged. Next
 is a preregistered process-history control matrix with matched single-backend
 repeats. See the [balanced-order report](../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-order-balanced/README.md).
+
+**E6 same-backend control (2026-10-28):** a fresh-process NInfer/NInfer pair
+matched exact output, 47 token IDs, and residency but failed GDN/tail/pooled/
+pooled-full/KV state parity. Relative-L2 GDN drift crossed `1e-6` at layers
+12, 4, and 2 for positions 163840, 163862, and 163885. This directly confirms
+within-backend run-to-run variation, so prior cross-backend onset attribution
+is confounded. Minimum available memory was 6.96 GiB; sampled OOM kills were
+zero. Next run the matched Strata/Strata control. [Report](../bench/results/2026-10-28-e6-q2-active-compute-quality-160k/same-backend-ninfer-repeat/README.md).

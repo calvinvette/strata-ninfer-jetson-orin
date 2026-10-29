@@ -1756,3 +1756,16 @@ it. Do not attribute the divergence to an engine or modify arithmetic yet.
 Next run a small preregistered process-history control matrix with matched
 single-backend repeats, then return to localization only if trajectories are
 repeatable. See the [order-balanced report](../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-order-balanced/README.md).
+
+**E6 same-backend NInfer repeat (2026-10-28):** two fresh strict-NInfer engine
+processes ran the identical 160K workload and capture positions. They matched
+the expected answer, 47 token IDs, and residency, but differed in final
+`gdn`, `tail`, `pooled`, `pooled_full`, and `kv` state. Layerwise GDN relative
+L2 first crossed `1e-6` at layer 12 at the prompt boundary (`1.1694e-4`), layer
+4 at position 163862 (`3.2549e-3`), and layer 2 at position 163885
+(`3.4067e-6`). This establishes material within-NInfer run-to-run drift under
+the paired harness and confirms that cross-backend attribution remains
+confounded. The run took 3,230.7 s; minimum available memory was 6.96 GiB and
+sampled OOM kills were zero. Next repeat Strata/Strata under the same settings
+to test whether the drift is specific to NInfer or shared. See the
+[NInfer repeat report](../bench/results/2026-10-28-e6-q2-active-compute-quality-160k/same-backend-ninfer-repeat/README.md).
