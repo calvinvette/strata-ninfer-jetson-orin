@@ -427,12 +427,13 @@ confirmation is not indicated for this cell. Minimum available RAM was
 was not measured. TTFT and energy were not measured, and clocks remained
 dynamic. Raw captures remain local-only.
 
-**Combined no-trace API paired-effect chart:** the 1K, 4K and 16K three-block
-screens are shown together with paired bootstrap intervals. Values are
+**Combined no-trace API paired-effect chart:** the 1K, 4K, 16K and 32K
+three-block screens are shown together with paired bootstrap intervals. Values are
 candidate NInfer relative to Strata; positive TPS is faster, while positive
 latency is slower. The plot preserves every pair and does not interpolate.
-The 16K screen's paired results and limitations are documented in the
-[dedicated report](no-trace-api-pp16384-cap32768-README.md).
+The [16K](no-trace-api-pp16384-cap32768-README.md) and
+[32K](no-trace-api-pp32768-cap65536-README.md) screen reports document their
+paired results and limits.
 
 ![No-staging Q2_0 paired API effects](no-trace-api-effects-chart/paired-effects.svg)
 

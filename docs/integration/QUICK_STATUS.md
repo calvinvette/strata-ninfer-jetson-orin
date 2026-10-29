@@ -52,6 +52,12 @@ across three pairs; all bootstrap intervals included zero. All pairs ran
 NInfer first and did not collect semantic/state evidence. Its [report and
 paired-effect chart](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp16384-cap32768-README.md)
 join the existing 1K/4K screens.
+The 32K prompt/64K capacity no-trace API screen was also flat: median changes
+were +0.12% prompt TPS, -1.12% decode TPS, -0.07% TTFT and +0.01% total time
+across three mixed-order pairs; all intervals included zero. Minimum available
+RAM was 9.95 GiB. The generic workload did not collect state or provide an
+answer oracle. See the [32K report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp32768-cap65536-README.md)
+and combined paired-effect chart.
 See the [integration status](STATUS.md) and
 [latest E7 assessment](NINFER_E7_RELEASE_ASSESSMENT.md).
 

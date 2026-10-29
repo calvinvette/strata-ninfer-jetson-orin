@@ -290,3 +290,11 @@ client total; all intervals included zero. All pairs ran NInfer first, and the
 generic workload had neither a semantic oracle nor state capture. Neither
 result changes the no-release decision. See the [256K retrieval report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/quality-retrieval-256k-README.md)
 and [16K API screen](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp16384-cap32768-README.md).
+
+A further three-pair no-trace API screen used a 32K prompt at 64K context with
+mixed order. Median NInfer changes were +0.12% prompt TPS, -1.12% decode TPS,
+-0.07% TTFT and +0.01% client total; each paired interval included zero. The
+6 GiB host-memory floor was preserved (minimum available RAM 9.95 GiB). This
+generic timing workload did not capture state or semantic quality and adds no
+release evidence. The [32K report and updated chart](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp32768-cap65536-README.md)
+record the cell.
