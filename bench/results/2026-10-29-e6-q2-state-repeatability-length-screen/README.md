@@ -146,16 +146,45 @@ session was 1.73 GiB and pinned complement was 6.00 GiB. Pair wall time was
 repeats NInfer's exact 32K/65,536 state result and owner plan; the earlier
 Strata pair at this cell also passed state parity.
 
-Next capture 32K-prompt layer-2 owners and MoE outputs at 262,144 capacity to
-compare with the repeated 65,536 control, then inspect earlier layers to learn
-whether other experts change tier before the first material MoE output delta.
-Identify which allocations reduce the pinned prefix at larger configured
-capacities. Keep the persistent-state gate; do not infer that expert 130 alone
-explains the full state divergence or change the kernel based on it.
+The 16K and 32K owner captures show that this high-capacity configuration
+changes the tier of a different active expert at each prompt boundary. This
+confirms capacity-sensitive owner assignment, while state causality remains a
+separate question.
+
+**32K/262,144 owner and MoE capture:** the 47-token MTP-off/MTP-4 pair
+matched answer, tokens and residency but failed exact GDN, tail, pooled,
+pooled-full and KV state parity. At model layer 2/position 32,768, both arms
+routed the same IDs as the 65,536 pair, but expert 152 changed from
+PCIe-staged GPU to CPU ownership. The device-0 session remained 7.04 GiB and
+the pinned complement 4.11 GiB. Minimum available RAM was 6.91 GiB, above the
+6 GiB floor, with zero OOM kills; pair runtime was 881.8 s.
+
+The high-capacity MTP arms had bitwise-identical route IDs, MoE inputs, expert
+parts and combined outputs at model layers 0–7, including the layer-2 CPU-owned
+expert 152. However, captured GDN state first differed at GDN layer 2 at the
+prompt boundary (relative L2 `3.49e-10`, max absolute `1.49e-8`); the first
+changed GDN layer at the next two captured positions was layer 1. This grows
+substantially in later state entries. Neither arm offered or accepted draft
+tokens, so the mismatch is not explained by different speculative acceptance.
+The single-expert `native_expert_parity` test passed on expert 152 and the same
+captured activation; runtime CPU output matched the parity harness CPU output
+bitwise, while CPU and CUDA outputs differed in 1,766/2,560 values (relative
+L2 `9.72e-8`, max absolute `1.49e-8`). This supports the owner-path numeric
+difference but does not explain the within-capacity GDN mismatch, since the
+captured early MoE outputs were identical between arms. These are correctness
+diagnostics; energy was not measured and the runtimes are not performance
+qualification.
+
+Next capture the 32K/65,536 MoE bundle at the same prompt boundary for direct
+cross-capacity comparison of inputs and expert outputs. Keep the within-capacity
+GDN mismatch as a separate open issue; do not attribute it to the layer-2 owner
+switch without further evidence.
 
 The 32K/65,536 measurements are in the local-only `32k-capacity-65536-*`
 directories. Earlier 2K/16K controls and 262,144-capacity runs are in the
 [prior screen](../2026-10-28-e6-q2-state-repeatability-length-screen/README.md)
-and the ignored `fixed-capacity-262144/` directory. Owner captures are in
-local-only `moe-owner-16k-cap*` directories. Raw captures, comparator JSON,
-configs, logs, and supervisor samples remain local-only.
+and the ignored `fixed-capacity-262144/` directory. Owner captures and the
+32K/262,144 MoE bundle are in local-only `moe-owner-16k-cap*`,
+`32k-capacity-65536-owner-repeat3/`, and `moe-bundle-32k-cap262144-ninfer/`
+directories. Raw captures, comparator JSON, configs, logs, and supervisor
+samples remain local-only.

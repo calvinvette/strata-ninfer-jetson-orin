@@ -1879,8 +1879,18 @@ minimum available RAM was 10.01 GiB. A third NInfer repeat at 32K prompt and
 65,536 capacity also passed all state checks; GDN at all three captured
 positions was bitwise identical, and layer-2 owners matched across repeats.
 The session remained 1.73 GiB, pinned complement 6.00 GiB, and minimum
-available RAM 10.07 GiB. Next capture layer-2 owners and MoE outputs at a 32K
-prompt/262,144 capacity, then inspect earlier layers and compare the pinned
-coverage before treating the relationship as a threshold or sole cause. Hold
-arithmetic unchanged.
+available RAM 10.07 GiB. The matched 32K-prompt/262,144 capture then showed
+expert 152 changing from staged GPU at 65,536 capacity to CPU at 262,144; all
+other layer-2 owners and route IDs matched. At 262,144, session allocation was
+7.04 GiB, pinned complement 4.11 GiB, minimum available RAM 6.91 GiB, and OOM
+kills zero. The MTP-off/MTP-4 pair matched answer, tokens and residency but
+failed exact persistent-state parity. The high-capacity MoE bundles for model
+layers 0–7 were identical between MTP arms, while GDN first differed at entry
+2 at the prompt boundary (`3.49e-10` relative L2); later GDN state diverged.
+The independent Q2_0 expert-152 parity run passed; the high-capacity runtime
+CPU output matched its CPU oracle exactly, while CPU/GPU parity differed in
+1,766/2,560 outputs (`9.72e-8` relative L2). This supports a tier-dependent
+expert arithmetic difference but does not explain within-capacity GDN drift.
+Next capture the 32K/65,536 MoE bundle at the same boundary for direct
+cross-capacity output comparison. Keep the state gate and arithmetic unchanged.
 [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

@@ -6874,7 +6874,16 @@ tracing shows the device-0 session grows from
 0.92 GiB at 32,768 to 6.56 GiB at 262,144; QSA state and buffers in
 `session_bytes()` scale with `max_context`. This is consistent with less pinned
 expert coverage on Orin's shared physical memory, while preserving the six-GiB
-headroom. Next capture layer-2 owners and MoE outputs at a 32K prompt/262,144
-capacity, then inspect early layers and allocations that shrink pinned
-coverage. Keep the state gate and make no arithmetic changes.
+headroom. At a 32K prompt/262,144 capacity, expert 152 changed from staged GPU
+at 65,536 to CPU ownership; the other layer-2 route IDs and owner classes
+matched. The high-capacity session was 7.04 GiB, pinned complement 4.11 GiB,
+minimum available RAM 6.91 GiB, and OOM kills zero. The full pair matched
+answer, tokens and residency but failed persistent-state parity. MoE bundles
+for model layers 0–7 were bitwise identical between MTP arms; prompt-boundary
+GDN first differed at GDN layer 2 (`3.49e-10` relative L2) and diverged later.
+The same-activation expert-152 CPU/GPU parity test passed; the runtime CPU
+output matched the oracle bitwise, and CPU/GPU outputs differed in 1,766/2,560
+values (`9.72e-8` relative L2). Next capture the 32K/65,536 MoE bundle at the
+same boundary for direct cross-capacity output comparison. Keep the state gate
+and make no arithmetic changes.
 [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
