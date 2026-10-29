@@ -340,3 +340,18 @@ seven-block confirmation or a performance claim. Minimum available RAM was
 observations: no independent client TTFT or energy was measured, clocks were
 dynamic, and raw logs stay local-only. Continue E6 at other prompt lengths and
 workload sizes under the correctness and memory gates.
+
+**32K no-staging Strata/NInfer screen:** three 32,768-token retrieval pairs at
+262,144 capacity completed in Strata-first, NInfer-first, Strata-first order.
+All three passed the exact answer, all 47 token IDs, nine persistent state
+fields and residency checks. Prompt/decode rates (tokens/s) were Strata
+75.59/3.91 versus NInfer 81.55/4.02 in pair 1; NInfer 81.91/3.93 versus
+Strata 81.97/3.95 in pair 2; and Strata 81.79/4.00 versus NInfer 82.26/4.00
+in pair 3. The median paired NInfer/Strata differences were +0.57% prompt and
++0.01% decode; paired ranges were -0.07% to +7.90% prompt and -0.46% to +2.76%
+decode. The first pair's apparent prompt advantage did not repeat. Neither
+median meets the 5% screen threshold, so this 32K cell does not proceed to
+confirmation. End-to-end pair times were 885–922 s; minimum available RAM was
+6.97–7.08 GiB, with zero OOM kills. This is not a performance qualification;
+TTFT and energy were not measured, and clocks were dynamic. Raw captures and
+supervisor samples remain local-only.

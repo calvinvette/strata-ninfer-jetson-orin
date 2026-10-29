@@ -1992,3 +1992,15 @@ OOM kills. This is not product-performance qualification; TTFT and energy were
 not measured. Next extend screened correctness/performance observations across
 other prompt lengths and workload shapes, keeping failed and unsupported cells
 explicit. [Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**32K no-staging backend screen (2026-10-29):** three 32,768-token Q2_0
+retrieval pairs at 262,144 capacity passed exact answer, token, residency and
+persistent-state checks. The median paired NInfer/Strata rate differences
+were +0.57% prompt and +0.01% decode; ranges were -0.07% to +7.90% prompt
+and -0.46% to +2.76% decode. The +7.90% prompt result occurred only in the
+first pair and did not repeat. This cell also misses the initial 5% threshold
+and does not proceed to confirmation. Minimum available RAM ranged from 6.97
+to 7.08 GiB, with no OOM kills. TTFT and energy were not measured; clocks
+remained dynamic. Continue the E6 screen across additional prompt sizes and
+the planned pp/tg shapes, preserving quality, state and memory gates. [Detailed
+report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

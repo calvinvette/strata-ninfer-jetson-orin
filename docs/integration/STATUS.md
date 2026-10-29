@@ -33,6 +33,14 @@ zero. This 16K/262K no-staging resident-backend screen does not proceed to
 confirmation. Minimum available RAM stayed at 7.10–7.31 GiB, with no OOM
 kills. Continue the E6 screen at other context lengths and workload sizes.
 
+At 32K prompt / 262K capacity, three no-staging Strata/NInfer retrieval pairs
+also passed exact answer, token, residency and persistent-state checks. Median
+paired throughput differences were +0.57% for prompt and +0.01% for decode;
+the first pair's +7.90% prompt result did not repeat. This cell also misses
+the 5% screen threshold. Minimum available RAM was 6.97–7.08 GiB and OOM
+kills were zero. TTFT and energy were not measured. E6 remains open; see the
+[measurement report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
 An E6 diagnostic found and fixed the missing multi-layer MoE bundle write on
 ordinary single-request verifier windows. The bundle buffers were captured, but
 the serializer had only been called by the batch verifier path; this held-out
