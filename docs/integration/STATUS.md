@@ -6841,6 +6841,7 @@ backends; second pairs at 262,144 capacity again failed exact state parity for
 both. Prompt, workload, build and capture settings were matched, and lower-
 capacity memory minima were 10.96 GiB with zero OOM kills. This makes configured
 capacity the leading condition in the current experiment, while mechanism is
-unknown. Next repeat 32K at 65,536 capacity and inspect shared capacity-driven
-GDN state allocation/layout and dispatch before proposing code changes.
+unknown. Next repeat 32K at 65,536 capacity and inspect capacity-driven QSA
+allocation/layout, selection and attention dispatch that can propagate into
+later GDN state before proposing code changes.
 [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

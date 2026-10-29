@@ -1843,6 +1843,6 @@ These are matched prompt length, workload, engine build and capture settings;
 minimum available RAM was 10.96 GiB for the lower-capacity pairs, with no OOM
 kills. The repeated 16K capacity contrast makes configured capacity the
 leading condition in the current screen. Next add a second 32K/65,536 pair,
-then audit shared capacity-dependent GDN allocation/layout, dispatch and
-initialization before testing a proposed mechanism. Keep the exact state gate;
+then audit capacity-dependent QSA allocation/layout, selection and attention
+dispatch that can propagate into later GDN state. Keep the exact state gate;
 do not change arithmetic yet. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

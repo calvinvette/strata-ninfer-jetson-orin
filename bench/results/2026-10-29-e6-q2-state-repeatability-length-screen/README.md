@@ -73,9 +73,9 @@ exact result currently has one pair per backend. This supports configured
 capacity as the leading condition in this screen, while the exact mechanism
 and possible interactions with allocation/layout remain unresolved.
 
-Next, add a second 32K pair at 65,536 capacity, then inspect shared capacity-
-dependent state allocation, layout, dispatch and initialization paths in the
-two runtimes. Use focused controls before changing backend math.
+Next, add a second 32K pair at 65,536 capacity, then inspect capacity-driven
+QSA allocation/layout, selection and attention dispatch that can propagate
+into later GDN state. Use focused controls before changing backend math.
 
 The 32K/65,536 measurements are in the local-only `32k-capacity-65536-*`
 directories. Earlier 2K/16K controls and 262,144-capacity runs are in the
