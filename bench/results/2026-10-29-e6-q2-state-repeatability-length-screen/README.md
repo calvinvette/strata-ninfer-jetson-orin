@@ -355,3 +355,16 @@ confirmation. End-to-end pair times were 885–922 s; minimum available RAM was
 6.97–7.08 GiB, with zero OOM kills. This is not a performance qualification;
 TTFT and energy were not measured, and clocks were dynamic. Raw captures and
 supervisor samples remain local-only.
+
+**64K no-staging pilot:** one Strata-first pair used the held-out 65,536-token
+Q2_0 retrieval fixture at 131,072 configured capacity, with PCIe staging
+disabled for both arms. It passed exact answer, all 47 token IDs, residency,
+and all nine persistent-state fields. Strata measured 102.65 prompt and 4.55
+decode tokens/s; strict NInfer measured 102.52 and 4.68 tokens/s. The paired
+NInfer/Strata changes were -0.13% prompt and +2.76% decode, below the 5%
+screen threshold in both metrics. This single pair does not qualify
+performance. Pair runtime was 1,383.5 s; minimum available RAM was 8.19 GiB,
+peak swap was 5.34 GiB, and OOM kills were zero. TTFT and energy were not
+measured; clocks remained dynamic. This extends the no-staging exact-state
+check to a 64K prompt, but does not establish near-limit 131K ingestion. Raw
+logs and supervisor samples remain local-only.

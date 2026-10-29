@@ -41,6 +41,14 @@ the 5% screen threshold. Minimum available RAM was 6.97–7.08 GiB and OOM
 kills were zero. TTFT and energy were not measured. E6 remains open; see the
 [measurement report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
 
+One 64K prompt / 131K capacity no-staging pair also passed exact answer,
+tokens, residency and persistent-state checks. Strata/NInfer prompt rates were
+102.65/102.52 tokens/s and decode rates 4.55/4.68 tokens/s. The NInfer
+differences (-0.13% prompt, +2.76% decode) are below the 5% threshold and
+remain one-pair observations. Minimum available RAM was 8.19 GiB, peak swap
+5.34 GiB, with no OOM kills. This is not near-limit 131K ingestion or
+performance qualification. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
 An E6 diagnostic found and fixed the missing multi-layer MoE bundle write on
 ordinary single-request verifier windows. The bundle buffers were captured, but
 the serializer had only been called by the batch verifier path; this held-out

@@ -1993,6 +1993,16 @@ not measured. Next extend screened correctness/performance observations across
 other prompt lengths and workload shapes, keeping failed and unsupported cells
 explicit. [Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
 
+**64K no-staging pilot (2026-10-29):** one Strata-first Q2_0 retrieval pair
+at 131,072 configured capacity passed exact answer, token, residency and
+persistent-state gates. Strata/NInfer prompt rates were 102.65/102.52 tokens/s
+and decode rates were 4.55/4.68 tokens/s; the paired differences (-0.13% and
++2.76%) did not reach the 5% screen threshold. This is not a performance
+qualification. Minimum available RAM was 8.19 GiB, peak swap 5.34 GiB and OOM
+kills zero. The test exercised a 65,536-token prompt, not near-limit 131K
+ingestion. Continue with matched screens for other planned pp/tg shapes and
+context cells; E6/E7 remain open. [Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
 **32K no-staging backend screen (2026-10-29):** three 32,768-token Q2_0
 retrieval pairs at 262,144 capacity passed exact answer, token, residency and
 persistent-state checks. The median paired NInfer/Strata rate differences
