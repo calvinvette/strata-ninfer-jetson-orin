@@ -1979,3 +1979,16 @@ cache/order sensitivity. Do not rank backends from these two pairs. Next add
 one more pair in each order, then continue the broader E6 context/workload
 screen under the memory reserve. [Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
 [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**Balanced 16K backend screen (2026-10-29):** four ordered pairs, two in each
+arm order, passed exact answer, token, persistent-state and residency gates.
+The descriptive median paired NInfer/Strata rate differences were +0.67% for
+prompt throughput and +1.17% for decode throughput; paired ranges crossed zero
+and remained within -6.13% to +2.86% for decode and -5.76% to +2.83% for
+prompt. The screen does not meet the initial 5% useful-effect threshold, so
+seven-block performance confirmation is not justified for this 16K/262K
+no-staging cell. Minimum available RAM ranged from 7.10 to 7.31 GiB, with no
+OOM kills. This is not product-performance qualification; TTFT and energy were
+not measured. Next extend screened correctness/performance observations across
+other prompt lengths and workload shapes, keeping failed and unsupported cells
+explicit. [Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

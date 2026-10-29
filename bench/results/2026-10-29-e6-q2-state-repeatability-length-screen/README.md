@@ -326,3 +326,17 @@ pair) to Strata (in this pair), and the apparent lead changed with it, these
 two blocks show material order/cache sensitivity. They do not support a
 backend performance ranking. Add another pair in each order before assessing
 whether a stable backend effect remains.
+
+Two additional blocks completed the balanced-order screen. All four pairs
+(Strata-first, NInfer-first, Strata-first, NInfer-first) passed exact answer,
+47-token, all-field persistent-state and residency checks. Across the four
+paired NInfer/Strata rate ratios, the descriptive median was +0.67% for prompt
+throughput and +1.17% for decode throughput; ranges were -5.76% to +2.83% and
+-6.13% to +2.86%, respectively. Neither median reaches the plan's initial 5%
+screening threshold, and the broad ranges show the estimate is noisy. This
+16K/262,144 no-staging resident-backend screen therefore does not justify
+seven-block confirmation or a performance claim. Minimum available RAM was
+7.10–7.31 GiB with zero OOM kills. These remain one-request-per-arm diagnostic
+observations: no independent client TTFT or energy was measured, clocks were
+dynamic, and raw logs stay local-only. Continue E6 at other prompt lengths and
+workload sizes under the correctness and memory gates.

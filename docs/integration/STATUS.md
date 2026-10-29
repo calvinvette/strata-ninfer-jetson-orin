@@ -22,8 +22,16 @@ report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/R
 An order-reversed repeat passed the same correctness gates, with NInfer first
 at 61.1/4.00 prompt/decode tokens/s and Strata second at 64.9/4.26. The
 apparent faster backend switched with arm order, indicating strong order/cache
-sensitivity. No backend performance ranking is supported; collect another
-pair in each order. E6/E7 remain open.
+sensitivity. At that point, no backend performance ranking was supported.
+E6/E7 remain open.
+
+The completed four-pair balanced-order screen (two pairs per order) passed
+exact answer, token, residency and persistent-state checks in every block.
+Median paired NInfer/Strata differences were +0.67% prompt throughput and
++1.17% decode throughput, below the 5% screen threshold; paired ranges crossed
+zero. This 16K/262K no-staging resident-backend screen does not proceed to
+confirmation. Minimum available RAM stayed at 7.10–7.31 GiB, with no OOM
+kills. Continue the E6 screen at other context lengths and workload sizes.
 
 An E6 diagnostic found and fixed the missing multi-layer MoE bundle write on
 ordinary single-request verifier windows. The bundle buffers were captured, but
