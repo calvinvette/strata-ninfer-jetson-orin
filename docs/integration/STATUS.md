@@ -6754,3 +6754,16 @@ alignment but does not prove it; run-to-run variation remains a confounder.
 The repeat took 3,231.7 s; minimum available memory was 6.61 GiB and peak swap
 5.24 GiB. Next define a small pre-registered process-order/initialization
 matrix before more operator localization. [Report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-reversed-repeat/README.md).
+
+**E6 third Strata-first pair (2026-10-28):** a third same-order pair again
+matched exact answer, 47 token IDs and residency, but final persistent state
+still differed. At the prompt boundary and accepted position 163862, all 36
+GDN layers matched bitwise across engines. At 163885, the first material
+cross-engine delta appeared at layer 44 (`6.598e-4`). This differs from the
+layer-12/layer-4 onsets in the two earlier Strata-first pairs. Same-backend
+comparisons across runs show material GDN changes too, so backend attribution
+remains confounded by run-to-run state drift. Keep exact state parity as a
+gate; next isolate process history with matched single-backend repeats and a
+preregistered control matrix. Run time was 3,233.6 s; minimum available memory
+was 6.63 GiB, peak swap 5.05 GiB, and sampled OOM kills were zero.
+[Report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-strata-first-repeat2/README.md).
