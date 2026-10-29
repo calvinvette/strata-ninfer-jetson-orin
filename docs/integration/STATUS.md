@@ -6857,11 +6857,20 @@ bitwise and the CUDA output matched the 32,768 NInfer output bitwise. The
 CPU/GPU delta was 1,825/2,560 values, relative L2 `1.064e-7`, max absolute
 `7.45e-9`; the parity test passed. The pinned expert complement was 6.00 GiB
 at 32,768 and 3.97–4.11 GiB at 262,144, with the same 3,000-entry GPU cache.
-Full 47-token captures
-matched answer, tokens and residency but still failed exact persistent-state
-parity across MTP modes at 262,144; minimum available RAM was 7.12 GiB and OOM
-kills were zero. This attributes the small layer-2 delta to execution-tier
-arithmetic for expert 130, but does not explain full state divergence. Next
-capture owners in 32K/65,536 and 262,144 repeatability controls, inspect earlier
-layers and identify allocations that shrink pinned coverage. Keep the state
-gate and make no arithmetic changes. [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+Full 47-token captures matched answer, tokens and residency but still failed
+exact persistent-state parity across MTP modes at 262,144; minimum available
+RAM was 7.12 GiB and OOM kills were zero. This attributes the small layer-2
+delta to execution-tier arithmetic for expert 130, but does not explain full
+state divergence. At the 16K prompt/65,536-capacity intermediate, a full
+MTP-off/MTP-4 pair passed exact answer, tokens, residency and persistent-state
+checks. Expert
+130 remained PCIe-staged GPU work, the session allocation was 1.73 GiB, and
+the pinned complement remained 6.00 GiB. Minimum available RAM was 10.01 GiB;
+OOM kills were zero. Runtime tracing shows the device-0 session grows from
+0.92 GiB at 32,768 to 6.56 GiB at 262,144; QSA state and buffers in
+`session_bytes()` scale with `max_context`. This is consistent with less pinned
+expert coverage on Orin's shared physical memory, while preserving the six-GiB
+headroom. Next repeat the 32K/65,536 pair with owner capture and inspect early
+layers and allocations that shrink pinned coverage. Keep the state gate and
+make no arithmetic changes.
+[Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

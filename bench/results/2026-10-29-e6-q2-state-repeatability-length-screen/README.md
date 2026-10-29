@@ -110,6 +110,30 @@ available RAM was 7.12 GiB, above the six-GiB floor, with no OOM kills. These
 captures establish owner/path evidence, not a passing state result or proof
 that context allocation alone caused the smaller pinned prefix.
 
+The runtime allocation trace provides a direct capacity-linked memory cost.
+With the same model, 16K prompt, 3,000-entry cache, and reserve, the device-0
+`session` allocation was 991,516,160 bytes (0.92 GiB) at 32,768 capacity and
+7,043,372,544 bytes (6.56 GiB) at 262,144, a 6.05 GiB increase. In
+`session_bytes()`, QSA state and QSA buffers are sized from `max_context`;
+other fixed session components remain in the same allocation. The paired
+startup logs show the 6.00-to-4.0 GiB pinned-complement reduction alongside
+this larger session. This is consistent with the larger context session using
+Orin's shared physical DRAM and leaving less room to page-lock the expert
+complement while preserving the 6 GiB headroom. Measure the intermediate
+65,536 capacity before treating that relationship as a threshold or a sole
+cause.
+
+**16K/65,536 intermediate owner repeat:** a full 47-token MTP-off/MTP-4 pair
+passed answer, token-ID, residency, and exact persistent-state comparisons.
+At layer 2/position 16,383 the ten route IDs and all ten execution owners
+matched the 32,768-capacity capture; expert 130 remained PCIe-staged GPU work.
+The device-0 session allocation was 1,856,067,072 bytes (1.73 GiB), the
+pinned expert complement remained 6.00 GiB, and startup shared RAM available
+was 10.3–10.6 GiB. Minimum available RAM was 10.01 GiB and OOM kills were
+zero. This intermediate capacity did not reproduce the owner switch or state
+failure seen at 262,144. Pair runtime was 513.6 s; this instrumented correctness
+run is not a performance benchmark.
+
 Next capture owners in paired state-repeatability controls at 32K/65,536 and
 262,144 capacities, and inspect early layers to learn whether other experts
 also change tier before the first material MoE output delta. Identify which

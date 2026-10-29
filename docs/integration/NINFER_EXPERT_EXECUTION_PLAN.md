@@ -1867,5 +1867,15 @@ bitwise. CPU/GPU outputs differed in 1,825/2,560 values (relative L2
 This isolates the small layer-2 change to execution-tier arithmetic for this
 expert, without explaining the later state divergence. Next capture owners in
 paired controls at 32K/65,536 and 262,144, inspect earlier layers, and account
-for allocations that reduce pinned coverage. Hold arithmetic unchanged.
+for allocations that reduce pinned coverage. Runtime tracing found the
+device-0 session allocation grows from 0.92 GiB at 32,768 capacity to 6.56
+GiB at 262,144; QSA state and buffers in `session_bytes()` scale with
+`max_context`. This is consistent with the lower pinned expert complement on
+Orin's shared DRAM, while maintaining the required six-GiB headroom. At the
+16K prompt/65,536-capacity intermediate, the session was 1.73 GiB, the pinned
+complement remained 6.00 GiB, expert 130 remained PCIe-staged, and a full
+MTP-off/MTP-4 pair passed all exact state checks. The pair took 513.6 s and
+minimum available RAM was 10.01 GiB. Next repeat the 32K/65,536 pair with
+owner capture and inspect earlier layers before treating this relationship as
+a threshold or sole cause. Hold arithmetic unchanged.
 [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
