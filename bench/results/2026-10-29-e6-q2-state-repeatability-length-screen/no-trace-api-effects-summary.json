@@ -1,0 +1,238 @@
+{
+  "schema": 1,
+  "date": "2026-10-29",
+  "model": "Qwen3.8-Flash-Next GSQ-RCO Q2_0",
+  "comparison": "strict NInfer / Strata expert backend; PCIe staging disabled in both",
+  "capture": "no trace; one warmup and one measured API request per fresh process",
+  "uncertainty": "bootstrap median of whole paired process blocks; 5000 resamples; screening only",
+  "cells": [
+    {
+      "name": "pp512+tg64",
+      "context_tokens": 1024,
+      "paired_blocks": 3,
+      "content_matched_blocks": 3,
+      "warmup_matched_blocks": 3,
+      "metrics": {
+        "prompt_tps": {
+          "kind": "tps",
+          "median_paired_change_pct": -0.9677419354838679,
+          "bootstrap_95_interval_pct": [
+            -1.9607843137254943,
+            1.3114754098360715
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "baseline \u2192 candidate",
+              "value": -1.9607843137254943
+            },
+            {
+              "block": 1,
+              "order": "candidate \u2192 baseline",
+              "value": -0.9677419354838679
+            },
+            {
+              "block": 2,
+              "order": "baseline \u2192 candidate",
+              "value": 1.3114754098360715
+            }
+          ]
+        },
+        "decode_tps": {
+          "kind": "tps",
+          "median_paired_change_pct": 1.1627906976744207,
+          "bootstrap_95_interval_pct": [
+            -1.1363636363636576,
+            2.3255813953488413
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "baseline \u2192 candidate",
+              "value": 2.3255813953488413
+            },
+            {
+              "block": 1,
+              "order": "candidate \u2192 baseline",
+              "value": -1.1363636363636576
+            },
+            {
+              "block": 2,
+              "order": "baseline \u2192 candidate",
+              "value": 1.1627906976744207
+            }
+          ]
+        },
+        "first_visible_ttft_s": {
+          "kind": "latency",
+          "median_paired_change_pct": 0.8818020708417862,
+          "bootstrap_95_interval_pct": [
+            -1.2662539899541692,
+            2.601659857640204
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "baseline \u2192 candidate",
+              "value": 2.601659857640204
+            },
+            {
+              "block": 1,
+              "order": "candidate \u2192 baseline",
+              "value": 0.8818020708417862
+            },
+            {
+              "block": 2,
+              "order": "baseline \u2192 candidate",
+              "value": -1.2662539899541692
+            }
+          ]
+        },
+        "client_total_s": {
+          "kind": "latency",
+          "median_paired_change_pct": 0.841265778484046,
+          "bootstrap_95_interval_pct": [
+            -1.388688621055012,
+            0.9856604154566906
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "baseline \u2192 candidate",
+              "value": 0.9856604154566906
+            },
+            {
+              "block": 1,
+              "order": "candidate \u2192 baseline",
+              "value": 0.841265778484046
+            },
+            {
+              "block": 2,
+              "order": "baseline \u2192 candidate",
+              "value": -1.388688621055012
+            }
+          ]
+        }
+      },
+      "min_available_gib": [
+        11.655731201171875,
+        11.68935775756836,
+        11.698253631591797
+      ]
+    },
+    {
+      "name": "pp2048+tg128",
+      "context_tokens": 4096,
+      "paired_blocks": 3,
+      "content_matched_blocks": 3,
+      "warmup_matched_blocks": 3,
+      "metrics": {
+        "prompt_tps": {
+          "kind": "tps",
+          "median_paired_change_pct": 4.47761194029852,
+          "bootstrap_95_interval_pct": [
+            0.6224066390041472,
+            6.113537117903944
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "candidate \u2192 baseline",
+              "value": 4.47761194029852
+            },
+            {
+              "block": 1,
+              "order": "baseline \u2192 candidate",
+              "value": 0.6224066390041472
+            },
+            {
+              "block": 2,
+              "order": "baseline \u2192 candidate",
+              "value": 6.113537117903944
+            }
+          ]
+        },
+        "decode_tps": {
+          "kind": "tps",
+          "median_paired_change_pct": 0.0,
+          "bootstrap_95_interval_pct": [
+            -4.301075268817211,
+            47.61904761904763
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "candidate \u2192 baseline",
+              "value": -4.301075268817211
+            },
+            {
+              "block": 1,
+              "order": "baseline \u2192 candidate",
+              "value": 0.0
+            },
+            {
+              "block": 2,
+              "order": "baseline \u2192 candidate",
+              "value": 47.61904761904763
+            }
+          ]
+        },
+        "first_visible_ttft_s": {
+          "kind": "latency",
+          "median_paired_change_pct": -4.389211823237737,
+          "bootstrap_95_interval_pct": [
+            -6.131784120461969,
+            -0.5258500920738984
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "candidate \u2192 baseline",
+              "value": -4.389211823237737
+            },
+            {
+              "block": 1,
+              "order": "baseline \u2192 candidate",
+              "value": -0.5258500920738984
+            },
+            {
+              "block": 2,
+              "order": "baseline \u2192 candidate",
+              "value": -6.131784120461969
+            }
+          ]
+        },
+        "client_total_s": {
+          "kind": "latency",
+          "median_paired_change_pct": -2.3366653884211885,
+          "bootstrap_95_interval_pct": [
+            -14.102738367912925,
+            -0.385668683592133
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "candidate \u2192 baseline",
+              "value": -2.3366653884211885
+            },
+            {
+              "block": 1,
+              "order": "baseline \u2192 candidate",
+              "value": -0.385668683592133
+            },
+            {
+              "block": 2,
+              "order": "baseline \u2192 candidate",
+              "value": -14.102738367912925
+            }
+          ]
+        }
+      },
+      "min_available_gib": [
+        11.582630157470703,
+        11.632526397705078,
+        11.599658966064453
+      ]
+    }
+  ]
+}

@@ -7068,3 +7068,8 @@ and residency hashes matched. Minimum available RAM was 11.76 GiB, with zero
 OOM kills. This is one synthetic task and not broad quality qualification.
 Instrumented prompt/decode rates were 35.30/34.97 and 5.341/5.325 tokens/s;
 these are diagnostic only, not performance measurements. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/quality-retrieval-2k-README.md).
+
+The two no-trace API workload screens now have a combined paired-effect figure
+with each block and its three-block bootstrap interval, plus sanitized JSON/CSV
+source data. The chart displays the small or unstable effects and makes no
+product-performance claim. [Figure and source data](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md#combined-no-trace-api-paired-effect-chart).

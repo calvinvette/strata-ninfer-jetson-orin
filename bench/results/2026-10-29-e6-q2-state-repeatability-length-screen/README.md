@@ -426,3 +426,14 @@ confirmation is not indicated for this cell. Minimum available RAM was
 11.58–11.64 GiB. The generic prompt has no expected answer; semantic quality
 was not measured. TTFT and energy were not measured, and clocks remained
 dynamic. Raw captures remain local-only.
+
+**Combined no-trace API paired-effect chart:** the two three-block screens
+above are shown together with paired bootstrap intervals. Values are candidate
+NInfer relative to Strata; positive TPS is faster, while positive latency is
+slower. The plot preserves every pair and does not interpolate.
+
+![No-staging Q2_0 paired API effects](no-trace-api-effects-chart/paired-effects.svg)
+
+Sanitized paired values and intervals are in
+[JSON](no-trace-api-effects-summary.json) and [CSV](no-trace-api-effects-chart/paired-effects.csv).
+Regenerate the SVG and CSV with `python3 tools/integration/plot_ninfer_api_effects.py --summary bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-effects-summary.json --output NEW_OUTPUT_DIRECTORY`.

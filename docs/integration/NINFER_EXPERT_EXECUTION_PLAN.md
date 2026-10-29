@@ -2097,3 +2097,8 @@ numeric suffix sum; all 47 generated IDs, all nine persistent-state fields,
 and residency hashes matched. Minimum available RAM was 11.76 GiB, OOM kills
 zero. This is one synthetic task, not broad quality qualification. Rates from
 the instrumented run are diagnostic only. See the [functional report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/quality-retrieval-2k-README.md).
+
+The 1K `pp512+tg64` and 4K `pp2048+tg128` no-trace API screens are included in
+a combined paired-effect figure with all three blocks and bootstrap intervals.
+This partial chart does not satisfy E6's full context/workload exit. See the
+[figure and sanitized source data](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md#combined-no-trace-api-paired-effect-chart).
