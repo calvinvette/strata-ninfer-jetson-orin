@@ -1875,7 +1875,12 @@ Orin's shared DRAM, while maintaining the required six-GiB headroom. At the
 16K prompt/65,536-capacity intermediate, the session was 1.73 GiB, the pinned
 complement remained 6.00 GiB, expert 130 remained PCIe-staged, and a full
 MTP-off/MTP-4 pair passed all exact state checks. The pair took 513.6 s and
-minimum available RAM was 10.01 GiB. Next repeat the 32K/65,536 pair with
-owner capture and inspect earlier layers before treating this relationship as
-a threshold or sole cause. Hold arithmetic unchanged.
+minimum available RAM was 10.01 GiB. A third NInfer repeat at 32K prompt and
+65,536 capacity also passed all state checks; GDN at all three captured
+positions was bitwise identical, and layer-2 owners matched across repeats.
+The session remained 1.73 GiB, pinned complement 6.00 GiB, and minimum
+available RAM 10.07 GiB. Next capture layer-2 owners and MoE outputs at a 32K
+prompt/262,144 capacity, then inspect earlier layers and compare the pinned
+coverage before treating the relationship as a threshold or sole cause. Hold
+arithmetic unchanged.
 [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

@@ -6866,11 +6866,15 @@ MTP-off/MTP-4 pair passed exact answer, tokens, residency and persistent-state
 checks. Expert
 130 remained PCIe-staged GPU work, the session allocation was 1.73 GiB, and
 the pinned complement remained 6.00 GiB. Minimum available RAM was 10.01 GiB;
-OOM kills were zero. Runtime tracing shows the device-0 session grows from
+OOM kills were zero. A third 32K-prompt NInfer pair at 65,536 capacity also
+passed exact state; its three captured GDN positions were bitwise identical
+and layer-2 owners matched across repeats. The session remained 1.73 GiB and
+the pinned complement 6.00 GiB; minimum available RAM was 10.07 GiB. Runtime
+tracing shows the device-0 session grows from
 0.92 GiB at 32,768 to 6.56 GiB at 262,144; QSA state and buffers in
 `session_bytes()` scale with `max_context`. This is consistent with less pinned
 expert coverage on Orin's shared physical memory, while preserving the six-GiB
-headroom. Next repeat the 32K/65,536 pair with owner capture and inspect early
-layers and allocations that shrink pinned coverage. Keep the state gate and
-make no arithmetic changes.
+headroom. Next capture layer-2 owners and MoE outputs at a 32K prompt/262,144
+capacity, then inspect early layers and allocations that shrink pinned
+coverage. Keep the state gate and make no arithmetic changes.
 [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

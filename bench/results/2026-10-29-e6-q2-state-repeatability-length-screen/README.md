@@ -134,12 +134,24 @@ zero. This intermediate capacity did not reproduce the owner switch or state
 failure seen at 262,144. Pair runtime was 513.6 s; this instrumented correctness
 run is not a performance benchmark.
 
-Next capture owners in paired state-repeatability controls at 32K/65,536 and
-262,144 capacities, and inspect early layers to learn whether other experts
-also change tier before the first material MoE output delta. Identify which
-allocations reduce the pinned prefix at larger configured capacities. Keep
-the persistent-state gate; do not infer that this single expert explains the
-full state divergence or change the kernel based on it.
+**32K/65,536 third NInfer repeat with owner capture:** the fresh-process pair
+matched the expected answer, all 47 token IDs, residency, and exact final state.
+The all-layer GDN captures at positions 32,768, 32,790 and 32,813 were
+bitwise identical between repeats (identical capture SHA-256). At model layer
+2/position 32,768, both repeats routed IDs `230, 260, 75, 283, 42, 349, 22,
+152, 506, 54` with the same owners: CPU for 230, 260, 283, 349 and 506;
+PCIe-staged GPU for 75 and 152; resident GPU for 42, 22 and 54. The device-0
+session was 1.73 GiB and pinned complement was 6.00 GiB. Pair wall time was
+788.8 s, minimum available RAM 10.07 GiB, and OOM kills were zero. This
+repeats NInfer's exact 32K/65,536 state result and owner plan; the earlier
+Strata pair at this cell also passed state parity.
+
+Next capture 32K-prompt layer-2 owners and MoE outputs at 262,144 capacity to
+compare with the repeated 65,536 control, then inspect earlier layers to learn
+whether other experts change tier before the first material MoE output delta.
+Identify which allocations reduce the pinned prefix at larger configured
+capacities. Keep the persistent-state gate; do not infer that expert 130 alone
+explains the full state divergence or change the kernel based on it.
 
 The 32K/65,536 measurements are in the local-only `32k-capacity-65536-*`
 directories. Earlier 2K/16K controls and 262,144-capacity runs are in the
