@@ -2014,3 +2014,14 @@ to 7.08 GiB, with no OOM kills. TTFT and energy were not measured; clocks
 remained dynamic. Continue the E6 screen across additional prompt sizes and
 the planned pp/tg shapes, preserving quality, state and memory gates. [Detailed
 report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**128K no-staging pilot (2026-10-29):** one Strata-first Q2_0 retrieval pair
+at 262,144 configured capacity passed exact answer, token, residency and
+persistent-state checks. Strata/NInfer prompt rates were 105.38/103.19 tokens/s
+and decode rates 3.93/3.83 tokens/s; NInfer was slower by 2.07% and 2.51%.
+This is below the 5% threshold and does not warrant performance confirmation.
+Minimum available RAM was 6.50 GiB, peak swap 1.43 GiB and OOM kills zero; the
+pair ran 2,659.3 s. TTFT and energy were not measured; clocks remained dynamic.
+This completes 128K prompt ingestion under 256K capacity, not near-limit 256K.
+Continue with planned pp/tg workload shapes and other context cells; E6/E7
+remain open. [Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

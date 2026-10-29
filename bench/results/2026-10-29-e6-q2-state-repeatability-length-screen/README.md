@@ -368,3 +368,16 @@ peak swap was 5.34 GiB, and OOM kills were zero. TTFT and energy were not
 measured; clocks remained dynamic. This extends the no-staging exact-state
 check to a 64K prompt, but does not establish near-limit 131K ingestion. Raw
 logs and supervisor samples remain local-only.
+
+**128K no-staging pilot:** one Strata-first pair used the held-out 131,072-token
+Q2_0 retrieval fixture at 262,144 configured capacity, with PCIe staging
+disabled. Both arms passed the exact answer, all 47 token IDs, residency and
+all nine persistent-state fields. Strata measured 105.38 prompt and 3.93
+decode tokens/s; strict NInfer measured 103.19 and 3.83 tokens/s. NInfer was
+2.07% slower on prompt throughput and 2.51% slower on decode in this single
+pair. This does not meet the 5% screen threshold or qualify performance. Pair
+runtime was 2,659.3 s; minimum available RAM was 6.50 GiB (0.50 GiB above the
+floor), peak swap was 1.43 GiB, and OOM kills were zero. TTFT and energy were
+not measured and clocks remained dynamic. The 128K prompt completed under a
+256K capacity; this is not near-limit 256K ingestion. Raw logs and supervisor
+samples remain local-only.

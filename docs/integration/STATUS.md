@@ -49,6 +49,14 @@ remain one-pair observations. Minimum available RAM was 8.19 GiB, peak swap
 5.34 GiB, with no OOM kills. This is not near-limit 131K ingestion or
 performance qualification. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
 
+The 128K prompt / 256K capacity no-staging pair passed exact answer, tokens,
+residency and persistent-state checks. Strata/NInfer prompt throughput was
+105.38/103.19 tokens/s; decode throughput was 3.93/3.83 tokens/s. NInfer was
+2.07% slower on prompt and 2.51% slower on decode in this one pair, so no
+performance confirmation is indicated. Minimum available RAM was 6.50 GiB,
+peak swap 1.43 GiB and OOM kills zero. The run completed 128K ingestion,
+not near-limit 256K. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
 An E6 diagnostic found and fixed the missing multi-layer MoE bundle write on
 ordinary single-request verifier windows. The bundle buffers were captured, but
 the serializer had only been called by the batch verifier path; this held-out
