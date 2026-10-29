@@ -1796,3 +1796,17 @@ or establish context length as the only cause; the 16K and 160K configured
 capacities differ. Next hold configured capacity fixed and screen 32K, then
 advance to 64K if repeatability holds. Repeat near any transition before
 operator localization. See the [length screen](../../bench/results/2026-10-28-e6-q2-state-repeatability-length-screen/README.md).
+
+**E6 prompt-length/capacity screen (2026-10-29):** at 32K prompt length,
+same-backend NInfer/NInfer and Strata/Strata pairs were exact in final state
+and bitwise across all 36 captured GDN layers at 65,536 configured capacity.
+At the same prompt length, both backends failed final-state parity at 262,144
+capacity. At 16K, both backends likewise repeated exactly at 32,768 capacity
+but failed at 262,144. All pairs preserved answer, token IDs, and residency;
+the large-capacity failures stayed above the six-GiB memory floor and had no
+OOM kills. Capacity is a strong candidate condition, but these are single
+pairs per cell and the lower-capacity 16K controls are inherited fixtures;
+repeat matched cells before causal attribution. Next repeat the 16K and 32K
+capacity cells under identical capture settings, then inspect capacity-linked
+allocation, dispatch and initialization if the interaction reproduces. Do not
+change backend arithmetic based on this screen. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

@@ -6801,3 +6801,16 @@ parity. This points to a long-context condition but does not locate the
 threshold; configured context also differed between the 16K and 160K fixtures.
 Next hold capacity fixed and screen 32K, then 64K if exact parity continues.
 [Length-screen report](../../bench/results/2026-10-28-e6-q2-state-repeatability-length-screen/README.md).
+
+**E6 prompt-length/capacity screen (2026-10-29):** 32K NInfer/NInfer and
+Strata/Strata pairs were exactly repeatable at 65,536 configured capacity,
+including all 36 GDN layers at prompt boundary and two generated positions.
+At the same prompt length and 262,144 capacity, both backends matched output,
+token IDs and residency but failed final-state parity. 16K showed the same
+pattern: exact at 32,768 and final-state drift at 262,144. Capacity is a strong
+candidate condition, but each cell currently has one pair; repeat matched
+cells before causal claims. All supervised runs remained above the six-GiB
+memory floor with zero OOM kills. Next repeat the paired capacity cells with
+identical capture settings, then inspect capacity-sensitive allocations,
+dispatch and state initialization if the pattern holds. No arithmetic change
+is justified. [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
