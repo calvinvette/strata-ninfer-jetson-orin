@@ -7059,3 +7059,12 @@ the 5% useful-effect threshold; no confirmation is indicated. Minimum available
 RAM was 11.58–11.63 GiB, with zero OOM kills. State was not captured and content
 equality is not independent semantic-quality evidence. Energy was not measured;
 clocks were dynamic. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp2048-cap4096-README.md).
+
+**E6 exact 2K retrieval/state check (2026-10-29):** a held-out, exact-length
+2,048-token retrieval/arithmetic prompt at 4,096 capacity passed under the
+no-staging Strata/strict-NInfer pair. Both returned the expected three marker
+codes and suffix sum; all 47 token IDs, nine persistent-state fingerprints,
+and residency hashes matched. Minimum available RAM was 11.76 GiB, with zero
+OOM kills. This is one synthetic task and not broad quality qualification.
+Instrumented prompt/decode rates were 35.30/34.97 and 5.341/5.325 tokens/s;
+these are diagnostic only, not performance measurements. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/quality-retrieval-2k-README.md).

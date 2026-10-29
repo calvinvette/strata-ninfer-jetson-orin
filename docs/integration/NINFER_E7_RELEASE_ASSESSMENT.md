@@ -271,3 +271,10 @@ was isolated to an unusually slow Strata baseline; the median decode effect
 was tied. The TTFT median was below the 5% useful-effect threshold. No
 confirmation or profile promotion is warranted. State and semantic task quality
 were not established by this no-trace screen. See the [API report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp2048-cap4096-README.md).
+
+A held-out exact-length 2K retrieval/arithmetic request at 4K capacity also
+passed in one no-staging Strata/strict-NInfer pair. Both returned the exact
+three codes and suffix sum, with all generated IDs, nine persistent-state
+fingerprints and residency matching. This adds a small-prompt functional point;
+it is still one synthetic task and does not close broad quality or E6/E7 gates.
+See the [functional report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/quality-retrieval-2k-README.md).

@@ -2089,3 +2089,11 @@ TTFT median remains below 5%; decode is tied, so confirmation is not indicated.
 Minimum available RAM was 11.58–11.63 GiB, OOM kills zero. State was not
 captured; content equality does not establish task quality. Energy was not
 measured and clocks remained dynamic. See the [API screen report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp2048-cap4096-README.md).
+
+**Held-out 2K retrieval/state check (2026-10-29):** the exact-length
+2,048-token fixture at 4,096 capacity passed with PCIe staging disabled in both
+Strata and strict NInfer. Both returned the expected three retrieval codes and
+numeric suffix sum; all 47 generated IDs, all nine persistent-state fields,
+and residency hashes matched. Minimum available RAM was 11.76 GiB, OOM kills
+zero. This is one synthetic task, not broad quality qualification. Rates from
+the instrumented run are diagnostic only. See the [functional report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/quality-retrieval-2k-README.md).

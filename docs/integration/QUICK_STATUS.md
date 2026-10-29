@@ -38,7 +38,9 @@ general release profile. New no-staging 3-pair API screens found no qualifying
 benefit at pp512+tg64 (median +1.16% decode TPS, +0.84% client time) or
 pp2048+tg128 (median tied decode TPS, -2.34% client time); the latter had one
 unrepeated decode outlier. Both matched content within pairs but lacked an
-independent task-quality oracle. See the [integration status](STATUS.md) and
+independent task-quality oracle. A separate 2K held-out retrieval check passed
+exact answer, token, persistent-state, and residency gates for both backends.
+See the [integration status](STATUS.md) and
 [latest E7 assessment](NINFER_E7_RELEASE_ASSESSMENT.md).
 
 ## Performance observed
