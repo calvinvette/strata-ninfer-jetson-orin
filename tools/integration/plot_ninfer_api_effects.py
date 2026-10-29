@@ -32,7 +32,7 @@ def render(data):
            '<style>text{font-family:Arial,sans-serif;fill:#202124}.title{font-size:22px;font-weight:bold}.sub{font-size:13px;fill:#555}.label{font-size:14px}.small{font-size:12px;fill:#555}.axis{stroke:#777;stroke-width:1}.grid{stroke:#ddd;stroke-width:1}.zero{stroke:#222;stroke-width:1.5;stroke-dasharray:5 4}.ci{stroke-width:2}.pair{opacity:.55}</style>',
            f'<text x="{left}" y="32" class="title">No-staging Q2_0 API screen: paired NInfer effect</text>',
            f'<text x="{left}" y="57" class="sub">Three randomized process pairs per workload; candidate / Strata change in percent; positive TPS is faster and positive latency is slower</text>',
-           f'<text x="{left}" y="78" class="sub">Bootstrap intervals use whole paired blocks (screening only); output matched within each pair; no independent task-quality oracle</text>',
+           f'<text x="{left}" y="78" class="sub">Bootstrap intervals use whole paired blocks (screening only); output equality is listed by cell; no independent task-quality oracle</text>',
            f'<text x="{left}" y="99" class="small">Small circles: individual paired blocks; diamond: paired median; horizontal line: paired bootstrap 95% interval</text>']
 
     for tick in range(-20, 51, 10):

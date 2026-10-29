@@ -58,6 +58,13 @@ across three mixed-order pairs; all intervals included zero. Minimum available
 RAM was 9.95 GiB. The generic workload did not collect state or provide an
 answer oracle. See the [32K report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp32768-cap65536-README.md)
 and combined paired-effect chart.
+The 64K prompt/131K capacity screen was also below the 5% threshold: median
+changes were -0.20% prompt TPS, +3.16% decode TPS, +0.25% TTFT and +0.86%
+client time. All intervals included zero, and one decode outlier made the
+interval wide. Warmups matched but measured output text differed in all three
+pairs, so this does not establish quality-equivalent generation. Minimum
+available RAM was 7.12 GiB; peak sampled swap was 6.33 GiB. See the [64K
+report and combined chart](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp65536-cap131072-README.md).
 See the [integration status](STATUS.md) and
 [latest E7 assessment](NINFER_E7_RELEASE_ASSESSMENT.md).
 

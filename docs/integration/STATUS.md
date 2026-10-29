@@ -9,6 +9,21 @@ Phase 6 is complete for the tested factor domains under their closeouts. The
 release profile still excludes unresolved multi-live/adaptive paths and does
 not promote a universal parametric profile. This records tested cells, not general product support.
 
+**E6 64K no-trace API screen (2026-10-29):** three fresh-process pairs
+measured a 65,536-token prompt plus 128 generated tokens at 131,072 context,
+with PCIe staging, prompt cache and tracing disabled. All six processes and
+both requests per process passed. Warmup content matched in all pairs, but the
+measured response text differed in all three pairs, so this is not
+quality-equivalent generation evidence. Median paired NInfer changes were
+-0.20% prompt TPS, +3.16% decode TPS, +0.25% first-visible TTFT and +0.86%
+client total; all 95% paired bootstrap intervals included zero. One candidate
+decode result was an unrepeated outlier, widening its interval to -56.63% to
++21.58%. Minimum available RAM was 7.12 GiB, peak sampled swap 6.33 GiB, and
+cgroup pressure/OOM counters were zero. Energy was not measured; clocks
+remained dynamic. This does not meet the 5% performance screen or establish
+quality equivalence. E6/E7 remain open. See the [64K report and combined
+chart](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp65536-cap131072-README.md).
+
 The latest E6 pilot repeated the 16K Q2_0 retrieval fixture at 262,144
 capacity with PCIe staging disabled, comparing Strata with strict NInfer.
 Both arms matched the exact answer, all 47 tokens, all persistent-state
@@ -7069,7 +7084,7 @@ OOM kills. This is one synthetic task and not broad quality qualification.
 Instrumented prompt/decode rates were 35.30/34.97 and 5.341/5.325 tokens/s;
 these are diagnostic only, not performance measurements. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/quality-retrieval-2k-README.md).
 
-The two no-trace API workload screens now have a combined paired-effect figure
+The five no-trace API workload screens now have a combined paired-effect figure
 with each block and its three-block bootstrap interval, plus sanitized JSON/CSV
 source data. The chart displays the small or unstable effects and makes no
 product-performance claim. [Figure and source data](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md#combined-no-trace-api-paired-effect-chart).

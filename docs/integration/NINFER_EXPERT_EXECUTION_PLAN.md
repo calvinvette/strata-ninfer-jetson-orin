@@ -2105,6 +2105,24 @@ pressure/OOM counters stayed zero. The generic workload had no semantic oracle
 or state capture. No confirmation is indicated; E6/E7 remain open. See the
 [screen report and chart](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp32768-cap65536-README.md).
 
+**No-trace 64K API screen (2026-10-29):** three fresh-process Strata/strict-
+NInfer pairs measured a 65,536-token formatted prompt plus 128 generated
+tokens at 131,072 configured context, with PCIe staging, prompt cache and
+tracing disabled. All six processes and measured requests passed; warmup
+content matched within each pair, but measured output text differed in all
+three pairs. Median paired NInfer changes were -0.20% prompt TPS, +3.16%
+decode TPS, +0.25% first-visible TTFT and +0.86% client total; every paired
+bootstrap interval included zero. A single NInfer decode outlier widened its
+interval to -56.63%..+21.58%. Minimum available RAM was 7.12 GiB, peak sampled
+swap 6.33 GiB, cgroup pressure/OOM counters zero. This is not
+quality-equivalent evidence and does not meet the 5% screen; no confirmation
+is indicated. The campaign driver stopped before block 2; the persisted third
+pair completed under the same settings and planned order through direct
+supervisor calls, then the manifest was reconciled from terminal records.
+The generic workload has no semantic oracle or state capture; energy was not
+measured and clocks remained dynamic. E6/E7 remain open. See the [64K report
+and combined figure](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp65536-cap131072-README.md).
+
 **Minimally instrumented pp512+tg64 API screen (2026-10-29):** three
 randomized fresh-process pairs at 1,024 context used a warmup and measured
 request per process, with PCIe staging, prompt cache and tracing disabled. All
@@ -2137,7 +2155,8 @@ and residency hashes matched. Minimum available RAM was 11.76 GiB, OOM kills
 zero. This is one synthetic task, not broad quality qualification. Rates from
 the instrumented run are diagnostic only. See the [functional report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/quality-retrieval-2k-README.md).
 
-The 1K `pp512+tg64` and 4K `pp2048+tg128` no-trace API screens are included in
-a combined paired-effect figure with all three blocks and bootstrap intervals.
-This partial chart does not satisfy E6's full context/workload exit. See the
+The 1K `pp512+tg64`, 4K `pp2048+tg128`, 16K, 32K and 64K no-trace API screens
+are included in a combined paired-effect figure with all three blocks and
+bootstrap intervals. The chart does not satisfy E6's full context/workload
+exit. See the
 [figure and sanitized source data](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md#combined-no-trace-api-paired-effect-chart).

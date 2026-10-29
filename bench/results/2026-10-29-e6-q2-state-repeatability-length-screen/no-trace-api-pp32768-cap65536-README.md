@@ -43,7 +43,7 @@ release qualification. Raw captures remain local-only.
 
 ![No-trace Q2_0 API effects across screened workload shapes](no-trace-api-effects-chart/paired-effects.svg)
 
-The combined chart includes the 1K, 4K, 16K and 32K prompt screens. Sanitized
+The combined chart includes the 1K, 4K, 16K, 32K and 64K prompt screens. Sanitized
 paired values and bootstrap intervals are in
 [JSON](no-trace-api-effects-summary.json) and
 [CSV](no-trace-api-effects-chart/paired-effects.csv).

@@ -493,6 +493,305 @@
         "gpu_max": 1300.5,
         "emc": "unavailable (permission denied)"
       }
+    },
+    {
+      "name": "pp65536+tg128",
+      "context_tokens": 131072,
+      "prompt_tokens": 65536,
+      "generated_tokens": 128,
+      "paired_blocks": 3,
+      "content_matched_blocks": 0,
+      "warmup_matched_blocks": 3,
+      "metrics": {
+        "prompt_tps": {
+          "kind": "tps",
+          "median_paired_change_pct": -0.19682044424240708,
+          "bootstrap_95_interval_pct": [
+            -0.9304774290511797,
+            1.1277754855243627
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "Strata \u2192 NInfer",
+              "value": -0.9304774290511797
+            },
+            {
+              "block": 1,
+              "order": "NInfer \u2192 Strata",
+              "value": 1.1277754855243627
+            },
+            {
+              "block": 2,
+              "order": "Strata \u2192 NInfer",
+              "value": -0.19682044424240708
+            }
+          ]
+        },
+        "decode_tps": {
+          "kind": "tps",
+          "median_paired_change_pct": 3.1560260372147875,
+          "bootstrap_95_interval_pct": [
+            -56.62950425206502,
+            21.57995281809324
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "Strata \u2192 NInfer",
+              "value": 3.1560260372147875
+            },
+            {
+              "block": 1,
+              "order": "NInfer \u2192 Strata",
+              "value": -56.62950425206502
+            },
+            {
+              "block": 2,
+              "order": "Strata \u2192 NInfer",
+              "value": 21.57995281809324
+            }
+          ]
+        },
+        "first_visible_ttft_s": {
+          "kind": "latency",
+          "median_paired_change_pct": 0.24784343958186295,
+          "bootstrap_95_interval_pct": [
+            -1.0717225792238994,
+            0.9271919385110738
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "Strata \u2192 NInfer",
+              "value": 0.9271919385110738
+            },
+            {
+              "block": 1,
+              "order": "NInfer \u2192 Strata",
+              "value": -1.0717225792238994
+            },
+            {
+              "block": 2,
+              "order": "Strata \u2192 NInfer",
+              "value": 0.24784343958186295
+            }
+          ]
+        },
+        "client_total_s": {
+          "kind": "latency",
+          "median_paired_change_pct": 0.8555217375094237,
+          "bootstrap_95_interval_pct": [
+            -0.2401499247603467,
+            1.4614766350774744
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "Strata \u2192 NInfer",
+              "value": 0.8555217375094237
+            },
+            {
+              "block": 1,
+              "order": "NInfer \u2192 Strata",
+              "value": 1.4614766350774744
+            },
+            {
+              "block": 2,
+              "order": "Strata \u2192 NInfer",
+              "value": -0.2401499247603467
+            }
+          ]
+        }
+      },
+      "min_available_gib_by_process": [
+        8.300613403320312,
+        8.227642059326172,
+        7.121177673339844,
+        8.339473724365234,
+        8.54250717163086,
+        8.648418426513672
+      ],
+      "minimum_available_gib": 7.121177673339844,
+      "max_sampled_swap_gib": 6.330818176269531,
+      "cgroup_memory_event_maxima": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "clock_observed_mhz": {
+        "cpu_min": 729.6,
+        "cpu_max": 2201.6,
+        "gpu_min": 306.0,
+        "gpu_max": 1300.5,
+        "emc": "unavailable (permission denied)"
+      },
+      "supervised_elapsed_minutes": 157.50627163811586,
+      "arm_median_metrics": {
+        "baseline": {
+          "prompt_tps": 86.78533791802589,
+          "decode_tps": 8.158582446299956,
+          "first_visible_ttft_s": 755.6226672190242,
+          "client_total_s": 773.5212505152449
+        },
+        "candidate": {
+          "prompt_tps": 86.5019887168335,
+          "decode_tps": 8.20554900251295,
+          "first_visible_ttft_s": 758.3565380959772,
+          "client_total_s": 777.619300947059
+        }
+      },
+      "pairs": [
+        {
+          "block": 0,
+          "order": "baseline \u2192 candidate",
+          "strata": {
+            "prompt_tps": 86.78533791802589,
+            "decode_tps": 8.158582446299956,
+            "first_visible_ttft_s": 755.6226672190242,
+            "client_total_s": 771.0230313129723
+          },
+          "ninfer": {
+            "prompt_tps": 85.97781993697286,
+            "decode_tps": 8.416069432572819,
+            "first_visible_ttft_s": 762.6287396750413,
+            "client_total_s": 777.619300947059
+          },
+          "paired_change_pct": {
+            "prompt_tps": -0.9304774290511797,
+            "decode_tps": 3.1560260372147875,
+            "first_visible_ttft_s": 0.9271919385110738,
+            "client_total_s": 0.8555217375094237
+          },
+          "measured_output_sha256": {
+            "strata": "1b098725d74346f0d544f4bd93eeb260f99c3adb3ea3f2a37fe3730279eb404d",
+            "ninfer": "25a0c334c5b4e714ec4e0f314ddd91e95f8720b9912d3602153363549af69671"
+          },
+          "measured_output_equal": false,
+          "warmup_output_equal": true
+        },
+        {
+          "block": 1,
+          "order": "candidate \u2192 baseline",
+          "strata": {
+            "prompt_tps": 85.53731979323086,
+            "decode_tps": 8.374497039484446,
+            "first_visible_ttft_s": 766.5720639918,
+            "client_total_s": 781.620428447146
+          },
+          "ninfer": {
+            "prompt_tps": 86.5019887168335,
+            "decode_tps": 3.632060882420542,
+            "first_visible_ttft_s": 758.3565380959772,
+            "client_total_s": 793.0436283838935
+          },
+          "paired_change_pct": {
+            "prompt_tps": 1.1277754855243627,
+            "decode_tps": -56.62950425206502,
+            "first_visible_ttft_s": -1.0717225792238994,
+            "client_total_s": 1.4614766350774744
+          },
+          "measured_output_sha256": {
+            "strata": "d3e6e8b165fb038d8a708c91e4dbc3070d4233816159985583d0e26016c8d352",
+            "ninfer": "4535584dd3fc786df5ef1d5bca593678847558b175ec291777ca31bfe170b938"
+          },
+          "measured_output_equal": false,
+          "warmup_output_equal": true
+        },
+        {
+          "block": 2,
+          "order": "baseline \u2192 candidate",
+          "strata": {
+            "prompt_tps": 86.87411591177855,
+            "decode_tps": 6.749097044633677,
+            "first_visible_ttft_s": 754.7609765199013,
+            "client_total_s": 773.5212505152449
+          },
+          "ninfer": {
+            "prompt_tps": 86.70312989090932,
+            "decode_tps": 8.20554900251295,
+            "first_visible_ttft_s": 756.6316020847298,
+            "client_total_s": 771.6636398141272
+          },
+          "paired_change_pct": {
+            "prompt_tps": -0.19682044424240708,
+            "decode_tps": 21.57995281809324,
+            "first_visible_ttft_s": 0.24784343958186295,
+            "client_total_s": -0.2401499247603467
+          },
+          "measured_output_sha256": {
+            "strata": "25a0c334c5b4e714ec4e0f314ddd91e95f8720b9912d3602153363549af69671",
+            "ninfer": "2c19df8cd9f7c4a4932406cf64dd0f6ee98c9ffca6ad65550557d09475ca20bc"
+          },
+          "measured_output_equal": false,
+          "warmup_output_equal": true
+        }
+      ],
+      "limitations": [
+        "measured output text differed between backends in each of the three pairs; fixed output length makes timing comparable as a throughput screen, but generation quality equivalence is not established",
+        "no independent task-quality oracle",
+        "no persistent state fingerprints captured",
+        "no energy measurement; tegrastats rails are not process-attributed energy",
+        "dynamic clocks; EMC frequency inaccessible",
+        "three pairs are insufficient to estimate p95 latency reliably",
+        "campaign driver exited before block 2 after completing block 1; block 2 was resumed directly using the persisted planned workload and order"
+      ],
+      "artifact_identity": {
+        "source_revision": "5c94944c6f98869fd8b9d1cb6c0ac3f25bfbe784",
+        "binary_sha256": "fbd40926be198adc92cd9a1b7b7b5d32b431445bef4e909c10de99e027c078e4",
+        "native_gguf_sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720",
+        "ple_gguf_sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113",
+        "ple_dense_sha256": "a43d7d0b69525335f4b000d5197a1d3aefcd3c0014fc3e12b3455e0a5d827ba2",
+        "ple_index_sha256": "c758314d495a1261d06a806b1c415596dfabe62e0cbf44ce592dc84c53229ccd",
+        "expert_profile_sha256": "b3e62120218cd96d175a0547530158869177dd2164b22b40f32bea7d7e85fb8c",
+        "tokenizer_chat_template_sha256": "12827f24b742ea4e80cdc12dbcf9622227056b9f797252a3149263d4f9aaadce",
+        "format": "Q2_0 GGUF, paired native/PLE shard set"
+      },
+      "device": {
+        "platform": "NVIDIA Jetson AGX Orin 64GB",
+        "os": "Linux aarch64, kernel 5.15.148-tegra",
+        "driver": "540.4.0",
+        "cuda": "12.6",
+        "source_worktree_head": "ab22096983c49abd5b7d900ff9584028f6421a5f",
+        "binary_built_from_revision": "5c94944c6f98869fd8b9d1cb6c0ac3f25bfbe784",
+        "observed_cpu_clock_mhz": [
+          729.6,
+          2201.6
+        ],
+        "observed_gpu_clock_mhz": [
+          306.0,
+          1300.5
+        ],
+        "emc": "unavailable (permission denied)",
+        "clock_controls": "none"
+      },
+      "settings": {
+        "configured_context_tokens": 131072,
+        "prompt_tokens": 65536,
+        "generated_tokens": 128,
+        "expert_slots": 3000,
+        "expert_cache_mib": 3955,
+        "prompt_cache": 0,
+        "pcie_staging_fraction": 0.0,
+        "trace": "disabled",
+        "resident_budget_gib": 6,
+        "vram_reserve_mib": 3072,
+        "pool_workers": 8,
+        "speculation_window": 2,
+        "expert_backend_candidate": "ninfer",
+        "candidate_strict": true,
+        "baseline_backend": "strata",
+        "same_processes": "fresh process per arm; 1 warmup then 1 measured request",
+        "temperature": "not explicitly set in request; default sampling settings retained"
+      },
+      "date": "2026-10-29",
+      "randomized_pair_order": [
+        "baseline \u2192 candidate",
+        "candidate \u2192 baseline",
+        "baseline \u2192 candidate"
+      ]
     }
   ]
 }
