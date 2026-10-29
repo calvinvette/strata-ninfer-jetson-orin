@@ -1810,3 +1810,15 @@ repeat matched cells before causal attribution. Next repeat the 16K and 32K
 capacity cells under identical capture settings, then inspect capacity-linked
 allocation, dispatch and initialization if the interaction reproduces. Do not
 change backend arithmetic based on this screen. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**E6 replicated 32K/262K capacity cell (2026-10-29):** a second fresh-process
+NInfer/NInfer pair and a second Strata/Strata pair again matched answer, token
+IDs and residency but failed exact final-state parity. At the prompt boundary,
+both backends reproduced the first material sampled GDN delta at layer 22
+(relative L2 `1.523e-3`); later accepted positions also diverged. Minimum
+available memory was 7.21 GiB (NInfer) and 7.14 GiB (Strata), with no OOM
+kills. The capacity-associated failure now repeats across both backends.
+Repeat the 16K capacity cells with the same capture configuration, and add a
+second matched 32K pair at each capacity before assigning a causal mechanism.
+The gate remains exact persistent-state parity; no arithmetic changes are
+justified. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

@@ -6814,3 +6814,13 @@ memory floor with zero OOM kills. Next repeat the paired capacity cells with
 identical capture settings, then inspect capacity-sensitive allocations,
 dispatch and state initialization if the pattern holds. No arithmetic change
 is justified. [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**E6 repeated 32K/262K controls (2026-10-29):** a second NInfer/NInfer pair
+and a second Strata/Strata pair reproduced exact-state failures at 262,144
+capacity while matching answer, token IDs and residency. Both showed the first
+sampled prompt-boundary GDN delta at layer 22 (`1.523e-3` relative L2). Minimum
+available memory was 7.21 and 7.14 GiB respectively; OOM kills were zero.
+This strengthens the capacity-associated repeatability finding across both
+backends, without establishing the mechanism. Next repeat the 16K capacity
+cells with matching capture settings and add another pair at both 32K
+capacities. [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

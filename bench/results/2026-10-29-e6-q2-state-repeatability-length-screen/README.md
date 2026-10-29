@@ -37,10 +37,23 @@ gate. The 32K/65,536 controls also remained well above the floor. No clocks
 were changed; energy was not measured. These are correctness and
 repeatability observations, not performance claims.
 
-Next, repeat both 16K capacity cells and both 32K capacity cells with identical
-capture settings, then add a capacity-matched length control where memory
-permits. If the capacity interaction repeats, inspect capacity-dependent
-allocation/dispatch and state initialization before changing backend math.
+**32K/262,144 replication:** a second same-backend pair reproduced the
+large-capacity failure for both NInfer and Strata. Both again matched answer,
+47 token IDs, and residency while final persistent-state fingerprints differed.
+At the prompt boundary, both backends had the first sampled material GDN
+delta at layer 22 with relative L2 `1.523e-3`; later sampled positions also
+showed material drift. Pair runtimes were 876.1 s (NInfer, minimum available
+RAM 7.21 GiB) and 883.4 s (Strata, 7.14 GiB), with zero OOM kills. This
+reproduces the capacity-associated effect across both engines, although the
+65K and 262K comparison still needs another matched 32K pair per capacity to
+quantify run-to-run variability. Raw pair captures and comparator JSON remain
+local-only.
+
+Next, repeat both 16K capacity cells with identical capture settings, then add
+another pair per 32K capacity cell and a capacity-matched length control where
+memory permits. If the capacity interaction remains, inspect capacity-
+dependent allocation/dispatch and state initialization before changing
+backend math.
 
 The 32K/65,536 measurements are in the local-only `32k-capacity-65536-*`
 directories. Earlier 2K/16K controls and 262,144-capacity runs are in the
