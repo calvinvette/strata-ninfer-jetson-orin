@@ -19,6 +19,12 @@ repeatable speedup; TTFT and energy were not measured. Minimum available RAM
 was 7.11 GiB with zero OOM kills. E6/E7 remain open. See the [E6
 report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
 
+An order-reversed repeat passed the same correctness gates, with NInfer first
+at 61.1/4.00 prompt/decode tokens/s and Strata second at 64.9/4.26. The
+apparent faster backend switched with arm order, indicating strong order/cache
+sensitivity. No backend performance ranking is supported; collect another
+pair in each order. E6/E7 remain open.
+
 An E6 diagnostic found and fixed the missing multi-layer MoE bundle write on
 ordinary single-request verifier windows. The bundle buffers were captured, but
 the serializer had only been called by the batch verifier path; this held-out

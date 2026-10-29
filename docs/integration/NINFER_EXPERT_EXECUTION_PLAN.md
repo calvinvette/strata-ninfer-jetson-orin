@@ -1970,4 +1970,12 @@ measured. Minimum available RAM was 7.11 GiB and OOM kills were zero. Next
 repeat under the minimally instrumented protocol with balanced arm order,
 then extend the comparison to other prompt lengths while preserving state and
 quality gates. E6 and E7 remain open. [Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**Order-reversed pilot (2026-10-29):** the NInfer-first 16K/262K no-staging
+pair also passed exact output, state and residency checks. NInfer measured
+61.1/4.00 prompt/decode tokens/s first, while Strata measured 64.9/4.26
+second. The apparent lead switched with arm order, consistent with material
+cache/order sensitivity. Do not rank backends from these two pairs. Next add
+one more pair in each order, then continue the broader E6 context/workload
+screen under the memory reserve. [Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
 [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

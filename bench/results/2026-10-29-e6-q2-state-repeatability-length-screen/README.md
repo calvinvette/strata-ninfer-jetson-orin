@@ -316,3 +316,13 @@ pair runtime was 606.4 s; minimum available RAM was 7.11 GiB and OOM kills
 were zero. Energy was not measured, clocks remained dynamic, and raw logs and
 supervisor samples remain local-only. Repeat with balanced arm order and the
 minimally instrumented measurement path before making a performance claim.
+
+The order-reversed repeat also passed exact answer, all 47 token IDs, all
+nine persistent state fingerprints and residency. With NInfer first, its
+prompt/decode rates were 61.1/4.00 tokens/s; the following Strata arm measured
+64.9/4.26 tokens/s. Minimum available RAM was 7.31 GiB and OOM kills were
+zero. Since the backend appearing second changed from NInfer (in the first
+pair) to Strata (in this pair), and the apparent lead changed with it, these
+two blocks show material order/cache sensitivity. They do not support a
+backend performance ranking. Add another pair in each order before assessing
+whether a stable backend effect remains.
