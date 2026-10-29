@@ -1846,3 +1846,20 @@ leading condition in the current screen. Next add a second 32K/65,536 pair,
 then audit capacity-dependent QSA allocation/layout, selection and attention
 dispatch that can propagate into later GDN state. Keep the exact state gate;
 do not change arithmetic yet. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**E6 routed-expert ownership diagnostic (2026-10-29):** at prompt position
+16,383/model layer 2, all routed IDs matched across 32,768 and 262,144
+capacity. Expert 130 (route rank 8) changed from PCIe-staged GPU execution at
+32,768 to CPU execution at 262,144; the other nine owners were unchanged.
+The small expert-part difference first seen at that layer therefore compares
+NInfer's staged GPU group with Strata's CPU miss path. Startup logs also show
+the pinned expert complement fell from 6.00 GiB at 32,768 to 3.97–4.11 GiB at
+262,144, while the GPU expert cache remained 3,000 entries. The 47-token
+262,144 capture matched answer, token IDs and residency but failed exact GDN,
+tail, pooled, pooled-full and KV state parity across MTP modes; minimum
+available RAM was 7.12 GiB and OOM kills were zero. Owner captures isolate a
+real tier-assignment change but do not establish why the pinned prefix shrinks
+or pass the state gate. Next compare expert 130 on CPU and staged GPU using the
+same activation and weight bytes, capture owners in repeatability controls,
+and account for allocations that reduce pinned coverage. Hold arithmetic
+unchanged. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

@@ -75,6 +75,10 @@ def main() -> int:
                     help='capture route, input, expert parts and outputs for several layers in one binary bundle')
     ap.add_argument('--capture-moe-bundle-position', type=int,
                     help='token position for the multi-layer MoE bundle capture')
+    ap.add_argument('--capture-moe-owner-layer', type=int,
+                    help='also capture routed expert execution owners for one verifier layer')
+    ap.add_argument('--capture-moe-owner-position', type=int,
+                    help='token position for the routed expert owner capture')
     ap.add_argument('--capture-gdn-layer', type=int,
                     help='capture GDN and feed-forward intermediates for one verifier layer')
     ap.add_argument('--capture-gdn-position', type=int,
@@ -136,6 +140,12 @@ def main() -> int:
         ap.error('--capture-moe-bundle-layers must be unique, increasing model layers in [0, 46]')
     if a.capture_moe_bundle_position is not None and a.capture_moe_bundle_position < 0:
         ap.error('--capture-moe-bundle-position must be nonnegative')
+    if (a.capture_moe_owner_layer is None) != (a.capture_moe_owner_position is None):
+        ap.error('--capture-moe-owner-layer and --capture-moe-owner-position must be used together')
+    if a.capture_moe_owner_layer is not None and not 0 <= a.capture_moe_owner_layer < 48:
+        ap.error('--capture-moe-owner-layer must be in [0, 47]')
+    if a.capture_moe_owner_position is not None and a.capture_moe_owner_position < 0:
+        ap.error('--capture-moe-owner-position must be nonnegative')
     if a.capture_gdn_position is not None and a.capture_gdn_positions is not None:
         ap.error('use only one of --capture-gdn-position and --capture-gdn-positions')
     if a.capture_gdn_positions is not None and (
@@ -285,6 +295,12 @@ def main() -> int:
             arm_env['STRATA_VERIFY_DUMP_MOE_BUNDLE_POSITION'] = str(a.capture_moe_bundle_position)
             arm_env['STRATA_VERIFY_DUMP_MOE_BUNDLE_PATH'] = str(
                 (a.output / f'{name}.moe-bundle').resolve())
+        if a.capture_moe_owner_layer is not None:
+            arm_env['STRATA_CAPTURE_MOE_PATH'] = str(
+                (a.output / f'{name}.moe-owner.jsonl').resolve())
+            arm_env['STRATA_CAPTURE_MOE_LAYER'] = str(a.capture_moe_owner_layer)
+            arm_env['STRATA_CAPTURE_MOE_POSITION'] = str(a.capture_moe_owner_position)
+            arm_env['STRATA_CAPTURE_MOE_ROWS'] = '1'
         if a.capture_gdn_layer is not None:
             arm_env['STRATA_VERIFY_DUMP_GDN_LAYER'] = str(a.capture_gdn_layer)
             arm_env['STRATA_VERIFY_DUMP_GDN_PATH'] = str(

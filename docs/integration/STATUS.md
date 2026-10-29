@@ -1,6 +1,6 @@
 # Integration status
 
-Updated: 2026-10-28. Phases 1 through 4 are complete for their documented tested
+Updated: 2026-10-29. Phases 1 through 4 are complete for their documented tested
 Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 is
 complete for its bounded Orin qualification matrix under [its closeout]
 (PHASE7_CLOSEOUT.md), and Phase 8 is complete for the bounded Q2_0 release
@@ -6845,3 +6845,17 @@ unknown. Next repeat 32K at 65,536 capacity and inspect capacity-driven QSA
 allocation/layout, selection and attention dispatch that can propagate into
 later GDN state before proposing code changes.
 [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**E6 routed-expert owner capture (2026-10-29):** at the 16K prompt boundary,
+model layer 2 routed the same ten experts at both 32,768 and 262,144 configured
+capacity, but expert 130 changed from PCIe-staged GPU to CPU ownership. Its
+small per-expert output delta therefore compares NInfer's staged GPU path with
+Strata's CPU path; it is not isolated evidence of capacity-dependent NInfer
+arithmetic. The pinned expert complement was 6.00 GiB at 32,768 and 3.97–4.11
+GiB at 262,144, with the same 3,000-entry GPU cache. Full 47-token captures
+matched answer, tokens and residency but still failed exact persistent-state
+parity across MTP modes at 262,144; minimum available RAM was 7.12 GiB and OOM
+kills were zero. Next compare CPU and staged-GPU expert 130 from the same
+activation and model weights, record owners in repeatability controls, and
+identify allocations that shrink pinned coverage. Keep the state gate and make
+no arithmetic changes. [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
