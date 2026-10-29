@@ -2054,3 +2054,14 @@ decode, with ranges -1.42% to +1.30% and -0.10% to +1.74%. This does not
 reach the 5% useful-effect threshold, so confirmation is not justified for this
 cell. Minimum available RAM was 11.70–11.76 GiB, OOM kills zero. Semantic answer
 quality, TTFT and energy were not measured. See the [screen report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**Three-block pp2048+tg128 no-staging screen (2026-10-29):** all three paired
+fresh-process runs passed exact generated-token, nine-field persistent-state,
+and residency checks at 4,096 capacity; block 2 ran NInfer first. Median paired
+NInfer/Strata changes were +0.18% prompt and +0.13% decode throughput. Prompt
+pair differences ranged -0.11% to +1.82%; decode ranged -19.65% to +0.72%, with
+the isolated -19.65% result not repeating. The medians do not meet the 5%
+threshold, so confirmation is not justified for this cell. Minimum available
+RAM was 11.58–11.64 GiB and OOM kills zero. The synthetic workload has no
+expected answer; TTFT and energy were not measured; clocks remained dynamic.
+See the [screen report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

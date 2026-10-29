@@ -7022,3 +7022,14 @@ and -0.10% to +1.74%. Neither reaches the 5% useful-effect screen, so seven-pair
 confirmation is not justified for this cell. Minimum available RAM ranged from
 11.70 to 11.76 GiB, with no OOM kills. The synthetic workload has no semantic
 answer oracle; TTFT and energy were not measured. [Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**E6 pp2048+tg128 three-block no-staging screen (2026-10-29):** two additional
+fresh-process pairs completed at 4,096 capacity, including an NInfer-first
+block. All three pairs passed exact generated-token, all-nine persistent-state,
+and residency checks. Median paired NInfer/Strata changes were +0.18% prompt
+and +0.13% decode throughput. Prompt differences ranged -0.11% to +1.82%;
+decode ranged -19.65% to +0.72%, with the largest decode regression in only
+the second block. Neither median reaches 5%, so confirmation is not justified
+for this cell. Minimum available RAM was 11.58–11.64 GiB, with zero OOM kills.
+The generic workload has no expected semantic answer; TTFT and energy were not
+measured and clocks remained dynamic. [Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

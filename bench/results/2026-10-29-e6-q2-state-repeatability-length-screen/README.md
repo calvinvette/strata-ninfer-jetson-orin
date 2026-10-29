@@ -414,3 +414,15 @@ were -1.42% to +1.30% and -0.10% to +1.74%. Neither reaches the 5% threshold,
 so no confirmation is indicated for this short-context cell. Minimum available
 RAM was 11.70–11.76 GiB. This remains a synthetic workload without a semantic
 answer oracle, and TTFT/energy remain unmeasured.
+
+**Three-block pp2048+tg128 screen:** two more fresh-process pairs completed,
+with arm order reversed in block 2. All three pairs passed exact generated-token,
+nine-field persistent-state and residency checks at 4,096 capacity. Median
+paired NInfer/Strata changes were +0.18% prompt and +0.13% decode throughput;
+prompt differences ranged from -0.11% to +1.82%, while decode ranged from
+-19.65% to +0.72%. The decode spread is wide and the single -19.65% result did
+not repeat in the third block. Neither median reaches the 5% threshold, so
+confirmation is not indicated for this cell. Minimum available RAM was
+11.58–11.64 GiB. The generic prompt has no expected answer; semantic quality
+was not measured. TTFT and energy were not measured, and clocks remained
+dynamic. Raw captures remain local-only.
