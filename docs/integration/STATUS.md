@@ -6895,7 +6895,20 @@ bitwise. CPU/GPU deltas reproduced the observed layer-1 changes exactly:
 `2.58e-4`, combined output `4.87e-3` relative L2). This attributes the
 cross-capacity MoE delta to CPU/GPU execution-tier arithmetic for the first
 changed experts. It does not account for the separate within-capacity GDN
-mismatch. Next compare matched 32K capacity runs with PCIe staging disabled
-so all nonresident experts use CPU execution in both arms; retain the full
-exact-state gate and make no arithmetic changes.
+mismatch. The follow-up PCIe-disabled control is now complete: at both 65,536
+and 262,144 capacity, MTP-off/MTP-4 runs passed answer, token, residency and
+exact state gates. Final state fingerprints also matched across capacities.
+Layer-2 owner traces confirm all nonresident active experts used CPU in both
+cells, while the same three experts stayed resident on GPU. The 8-layer
+prompt-boundary MoE bundles were bitwise identical across capacities in routes,
+route weights, inputs, expert parts and shared/combined outputs. No active
+expert used the PCIe-staged GPU tier. The earlier high-capacity MTP state
+mismatch and cross-capacity MoE drift therefore did not reproduce when this
+owner path was held constant. Minimum available RAM was 10.06 GiB at 65,536
+and 6.98 GiB at 262,144, with zero OOM kills; the latter is 0.98 GiB above the
+required six-GiB floor. This implicates staging/owner-path configuration in
+the prior differences, but does not isolate CPU/GPU arithmetic from transfer
+or other staged-path interactions. No performance claim is made; energy was
+not measured. Next localize the staged-path effect using same-capacity
+MoE/state controls. [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
 [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

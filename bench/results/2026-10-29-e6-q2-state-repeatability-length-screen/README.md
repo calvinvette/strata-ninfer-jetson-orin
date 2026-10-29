@@ -198,12 +198,54 @@ combined-output relative L2. This directly links the first cross-capacity MoE
 drift to CPU-versus-GPU active-expert arithmetic for experts 157 and 152. It
 does not explain the separate within-capacity GDN mismatch at 262,144.
 
-Next run matched 32K/65,536 and 32K/262,144 NInfer repeats with PCIe staging
-disabled in both configurations. That puts nonresident experts on CPU in both
-arms while retaining the same resident GPU cache, testing whether the early
-cross-capacity MoE delta disappears when the owner tier is held constant. Keep
-the within-capacity GDN mismatch as a separate open issue and preserve the
-exact persistent-state gate.
+**Matched owner-tier control with PCIe staging disabled:** set `--pcie-frac
+0.0` at both 65,536 and 262,144 capacity, retaining the same 3,000-expert GPU
+cache and running the full 32K retrieval fixture in fresh MTP-off/MTP-4
+processes. Both capacity cells returned the exact answer, all 47 token IDs,
+identical residency across MTP modes, and identical exact persistent state
+between MTP modes. More strongly, the final state fingerprints were identical
+across the two capacities as well. The 65,536 pair took 790.9 s and its
+minimum available RAM was 10.06 GiB; the 262,144 pair took 877.5 s and minimum
+available RAM was 6.98 GiB, 0.98 GiB above the required floor. Neither cell
+recorded an OOM kill. Energy was not measured; clocks remained dynamic and
+uncontrolled. These are correctness diagnostics, not performance benchmarks.
+
+At model layer 2 / position 32,768, the two capacities routed the same ten
+experts with the same owner classes: experts 230, 260, 75, 283, 349, 152 and
+506 used CPU; 42, 22 and 54 used resident GPU. No active expert used the
+PCIe-staged GPU tier. Comparing the MTP-off 8-layer bundles at the prompt
+boundary showed bitwise identity for every captured field (route IDs/weights,
+input, all ten expert outputs, shared output and combined output) at layers
+0–7. The capacity-associated owner-tier differences and early MoE drift from
+the staging-enabled runs therefore disappeared under this matched CPU/GPU
+owner assignment. The previously observed 262,144 MTP state mismatch also
+did not reproduce with staging disabled: both modes and both capacities had
+the same state fingerprints. This strongly implicates the staging/owner-path
+configuration in the earlier numeric and state differences; it does not
+isolate whether the cause is CPU-versus-GPU expert arithmetic, transfer-time
+data, or another interaction in the staged path. Do not infer that disabling
+staging is a faster profile; performance was not measured here.
+
+The MTP-off bundles from each PCIe-disabled cell also differ from their
+staging-enabled counterpart beginning at layer 1, consistent with different
+CPU versus staged-GPU active-expert arithmetic. Raw captures and comparator
+JSON remain local-only under `pcie-disabled/`; they are excluded from Git.
+Next investigate the staged path itself with same-capacity bundle and
+accepted-state controls, preserving the exact answer/token/residency/state
+gates. Keep the within-capacity mismatch as an issue specific to the staged
+configuration until its trigger is localized.
+
+**Diagnostic execution notes:** the first repeat attempt was stopped after
+process inspection showed the harness's staged-backend mode had overridden
+the configured PCIe fraction back to `1.0`. Added `--staged-pcie-frac` to make
+that override explicit and verifiable. A completed repeat at 65,536 with the
+correct `0.0` value used an older local executable that did not contain the
+current MoE-bundle diagnostic; it passed repeated answer/token/residency/state
+checks and wrote owner traces, but the harness correctly reported the missing
+requested bundle. It is not used for bundle conclusions. The completed paired
+cells above use the diagnostic-capable `/tmp/strata-e6-boundary-build/strata`
+and captured all requested MoE bundles. The preliminary raw files are retained
+locally with the captures; none are included in Git.
 
 The 32K/65,536 measurements are in the local-only `32k-capacity-65536-*`
 directories. Earlier 2K/16K controls and 262,144-capacity runs are in the

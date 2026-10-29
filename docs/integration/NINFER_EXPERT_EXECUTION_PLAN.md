@@ -1906,4 +1906,24 @@ state mismatch at 262,144. Next hold the nonresident owner tier fixed by
 disabling PCIe staging in paired 32K/65,536 and 32K/262,144 runs. Keep exact
 persistent-state validation and do not change arithmetic until that control is
 complete. Detailed data: [E6 report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**PCIe-disabled owner-tier control (2026-10-29):** repeated the 32K Q2_0
+retrieval fixture at 65,536 and 262,144 configured capacity with `--pcie-frac
+0.0`, leaving the 3,000-expert GPU cache unchanged. At each capacity, MTP-off
+and MTP-4 returned the exact answer and 47 token IDs with identical residency
+and exact persistent state. The resulting state fingerprints also matched
+across capacities. Layer-2 routing at position 32,768 had the same ten IDs
+and owner assignment in both cells: seven nonresident experts on CPU and
+three resident experts on GPU, with no PCIe-staged expert. All captured MoE
+fields at layers 0–7 were bitwise identical across capacities. This control
+eliminated the prior cross-capacity MoE drift and the 262,144 within-capacity
+MTP state mismatch observed with staging enabled. It implicates the staging
+and owner-path configuration but does not distinguish numeric CPU/GPU
+differences from transfer-time data or other staged-path interactions. Pair
+times were 790.9 s and 877.5 s; minimum available RAM was 10.06 and 6.98 GiB
+respectively, with no OOM kills. These correctness runs are not performance
+measurements; energy was not measured and clocks remained dynamic. Next isolate
+the staged-path trigger using same-capacity MoE and accepted-state controls;
+do not change arithmetic or recommend the no-staging profile as a performance
+improvement without measurement. [Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
 [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
