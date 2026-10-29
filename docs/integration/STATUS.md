@@ -6846,6 +6846,39 @@ allocation/layout, selection and attention dispatch that can propagate into
 later GDN state before proposing code changes.
 [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
 
+**E6 staged-path localization at 32K/262K (2026-10-29):** at model layer 1,
+position 32,768, changing only `--pcie-frac` from 1.0 to 0.0 preserved route
+IDs/weights, input and shared output; expert 86 was the only changed active
+expert part (1,846/2,560 values, relative L2 `1.0366e-7`). On the exact
+captured activation and Q2_0 weights, independent `native_expert_parity`
+matched the staged-config runtime output bitwise to CUDA and the no-staging
+runtime output bitwise to CPU; the oracle CPU/GPU delta exactly matched the
+runtime delta. Committed GDN comparison at the prompt boundary first differs
+at GDN layer 1 (260,744/817,152 values, relative L2 `8.8824e-10`). Two fresh
+no-staging repeats were bitwise identical across all 36 GDN layers; the
+no-staging MTP-off/MTP-4 pair passed exact final-state parity. This ties the
+onset of the high-capacity state trajectory difference to staged-config
+active-expert arithmetic, although later drift may have additional causes.
+The exact layer-1 owner label was not directly captured: a one-token diagnostic
+did not reach the selected position. The execution arithmetic is independently
+confirmed. One initial parity invocation lacked its output directory; the
+rerun passed. No performance claim is made. Next test whether disabling the
+staged path also removes the 16K/262K state failure, then proceed to
+minimally-instrumented performance controls. [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**E6 staged-path replication at 16K/262K (2026-10-29):** the 16K Q2_0
+MTP-off/MTP-4 pair with PCIe staging disabled also passed exact answer, token,
+residency and persistent-state checks. Compared with the staging-enabled
+capture, committed GDN first differed at layer 1 (298,674/817,152 values,
+relative L2 `8.2257e-10`, maximum absolute `2.98e-8`), matching the 32K
+localization. Minimum available RAM was 7.36 GiB, zero OOM kills, and pair
+runtime was 597.2 s. Together, the 16K and 32K controls show that this
+high-capacity state mismatch is conditional on the staging configuration at
+both tested prompt lengths. No energy or performance qualification was done.
+Next run minimally-instrumented paired performance controls only after
+preserving the exact-state condition, and keep the staged path experimental.
+[Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
 **E6 routed-expert owner capture (2026-10-29):** at the 16K prompt boundary,
 model layer 2 routed the same ten experts at both 32,768 and 262,144 configured
 capacity, but expert 130 changed from PCIe-staged GPU to CPU ownership. Its

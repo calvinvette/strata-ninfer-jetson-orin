@@ -1926,4 +1926,37 @@ measurements; energy was not measured and clocks remained dynamic. Next isolate
 the staged-path trigger using same-capacity MoE and accepted-state controls;
 do not change arithmetic or recommend the no-staging profile as a performance
 improvement without measurement. [Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**Staged-path numeric localization (2026-10-29):** at 32K prompt / 262,144
+capacity, the first MoE bundle difference between `--pcie-frac 1.0` and `0.0`
+is confined to expert 86 at model layer 1; routes, route weights, input and
+shared output are identical. An independent Q2_0 `native_expert_parity` run on
+the exact input showed the staged-config runtime output bitwise equal to CUDA,
+and the no-staging runtime output bitwise equal to CPU. Their CPU/GPU delta
+exactly equals the runtime difference (1,846/2,560 values, relative L2
+`1.0366e-7`). The corresponding prompt-boundary committed GDN state first
+differs at layer 1 (260,744/817,152 values, relative L2 `8.8824e-10`). Fresh
+no-staging repeats were bitwise exact across all 36 GDN layers, and both MTP
+modes at this capacity passed final-state parity when staging was disabled.
+This localizes the initial high-capacity state trajectory divergence to the
+staged-config active-expert arithmetic path, without claiming that the first
+small delta alone explains all later state drift. The exact layer-1 owner
+label was not directly captured; the one-token diagnostic did not reach the
+selected position. Next repeat the 16K/262,144 state cell with staging
+disabled, then run minimally-instrumented same-day performance controls. No
+arithmetic changes or performance conclusions until those measurements.
+[Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**16K/262K replication (2026-10-29):** disabling PCIe staging at the 16K
+prompt / 262,144 capacity also restored exact MTP-off/MTP-4 final-state
+parity, with exact answer, tokens and residency. Staged-versus-no-staging
+committed GDN state first diverged at layer 1 at the prompt boundary
+(298,674/817,152 values, relative L2 `8.2257e-10`, max absolute
+`2.98e-8`), consistent with the 32K finding. Minimum available RAM was
+7.36 GiB, zero OOM kills, pair runtime 597.2 s. The staged-path state mismatch
+is therefore reproduced as a configuration-dependent effect at two prompt
+lengths in the 262,144-capacity cell. Energy and performance were not measured.
+Next maintain the exact-state condition while preparing minimally-instrumented
+same-day performance pairs, then continue the planned E6 workload/context
+matrix. The staged path remains experimental. [Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
 [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

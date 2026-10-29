@@ -235,6 +235,32 @@ accepted-state controls, preserving the exact answer/token/residency/state
 gates. Keep the within-capacity mismatch as an issue specific to the staged
 configuration until its trigger is localized.
 
+**Same-capacity staged-path localization at 262,144:** comparing the staged
+(`--pcie-frac 1.0`) and no-staging (`0.0`) MTP-off bundles at layer 1 / prompt
+position 32,768 shows identical route IDs and weights, MoE input, and shared
+output. Only active expert 86's output changes: 1,846/2,560 values, relative
+L2 `1.0366e-7`, maximum absolute `7.45e-9`. An independent `native_expert_parity`
+run used the exact captured activation and Q2_0 model weights. The staged
+runtime output was bitwise identical to the CUDA parity output; the no-staging
+runtime output was bitwise identical to the CPU parity output. The CPU/GPU
+oracle difference exactly matched the runtime delta. Thus the first layer-1
+MoE change follows the CPU-versus-CUDA active-expert arithmetic path. The
+one-token owner-label capture did not emit a layer-1 record, so the specific
+runtime owner label (for example, staged versus resident GPU) was not directly
+captured for expert 86; the arithmetic path itself is independently confirmed.
+
+At the same prompt boundary, committed GDN state first differs between the
+staged and no-staging runs at GDN layer 1: 260,744/817,152 values, relative L2
+`8.8824e-10`, maximum absolute `2.98e-8`. Two fresh no-staging runs were
+bitwise identical across all 36 captured GDN layers. The high-capacity
+no-staging MTP-off/MTP-4 pair also retained identical final state, whereas the
+staging-enabled pair had failed that gate. This localizes the beginning of the
+state trajectory divergence immediately after the first expert-part
+difference, and strongly ties the earlier high-capacity state failure to
+staging-dependent active-expert arithmetic. It does not establish whether
+later divergence is caused only by this small first delta. Neither these
+correctness captures nor their runtimes qualify a faster profile.
+
 **Diagnostic execution notes:** the first repeat attempt was stopped after
 process inspection showed the harness's staged-backend mode had overridden
 the configured PCIe fraction back to `1.0`. Added `--staged-pcie-frac` to make
@@ -246,6 +272,24 @@ requested bundle. It is not used for bundle conclusions. The completed paired
 cells above use the diagnostic-capable `/tmp/strata-e6-boundary-build/strata`
 and captured all requested MoE bundles. The preliminary raw files are retained
 locally with the captures; none are included in Git.
+
+The first expert-86 parity invocation failed because its requested dump
+directory did not yet exist; it was rerun successfully after creating that
+directory. The one-token owner-label capture at layer 1/position 32,768
+returned no matching row and is not used as owner evidence. Raw command logs
+and parity outputs remain local-only.
+
+**16K/262,144 no-staging confirmation:** with the same `--pcie-frac 0.0`
+control, the 16K retrieval pair also returned the exact answer, all 47 token
+IDs, identical residency and exact final persistent state between MTP-off and
+MTP-4. This reproduces the staging-disabled state recovery at a second prompt
+length. Minimum available RAM was 7.36 GiB, 1.36 GiB above the reserve floor,
+with zero OOM kills; pair runtime was 597.2 s. Comparing the staged and
+no-staging committed state at the prompt boundary again found the first
+difference at GDN layer 1 (298,674/817,152 values, relative L2 `8.2257e-10`,
+maximum absolute `2.98e-8`). This confirms the layer-1 state divergence at
+16K as well as 32K when the staged configuration is compared with the
+CPU-fallback configuration. No energy or performance qualification was done.
 
 The 32K/65,536 measurements are in the local-only `32k-capacity-65536-*`
 directories. Earlier 2K/16K controls and 262,144-capacity runs are in the
