@@ -1834,3 +1834,15 @@ kills. The corresponding low-capacity 16K pairs had exact state parity, so
 repeat the low-capacity cells under these same capture settings next. The
 matching onset across backends is a diagnostic clue only; keep exact state as
 the gate and do not change arithmetic. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**E6 matched 16K capacity replication (2026-10-29):** second pairs at
+32,768 configured capacity were bitwise exact in final state and all 36 GDN
+layers at the prompt boundary and two generated positions for both backends.
+Second pairs at 262,144 capacity failed final-state parity on both paths.
+These are matched prompt length, workload, engine build and capture settings;
+minimum available RAM was 10.96 GiB for the lower-capacity pairs, with no OOM
+kills. The repeated 16K capacity contrast makes configured capacity the
+leading condition in the current screen. Next add a second 32K/65,536 pair,
+then audit shared capacity-dependent GDN allocation/layout, dispatch and
+initialization before testing a proposed mechanism. Keep the exact state gate;
+do not change arithmetic yet. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

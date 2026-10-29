@@ -6834,3 +6834,13 @@ parity. Both reproduced sampled GDN onset at layers 14, 2 and 2 for positions
 16K/32K-capacity repeats, this strengthens the capacity association, but the
 matching cross-backend signature does not reveal the mechanism. Next repeat
 the 16K lower-capacity pairs with these capture settings. [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**E6 matched 16K capacity repeats (2026-10-29):** second pairs at 32,768
+capacity were exact in final state and sampled GDN across all layers for both
+backends; second pairs at 262,144 capacity again failed exact state parity for
+both. Prompt, workload, build and capture settings were matched, and lower-
+capacity memory minima were 10.96 GiB with zero OOM kills. This makes configured
+capacity the leading condition in the current experiment, while mechanism is
+unknown. Next repeat 32K at 65,536 capacity and inspect shared capacity-driven
+GDN state allocation/layout and dispatch before proposing code changes.
+[Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

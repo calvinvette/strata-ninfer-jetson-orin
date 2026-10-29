@@ -62,11 +62,20 @@ large-capacity failure for both implementations and its sampled GDN trajectory.
 The shared onset/magnitude is a useful cross-backend clue, not proof of a
 common root cause.
 
-Next, repeat both 16K/32K lower-capacity cells with identical capture settings,
-then add another pair per 32K capacity cell and a capacity-matched length
-control where memory permits. If the capacity interaction remains, inspect
-capacity-dependent allocation/dispatch and state initialization before
-changing backend math.
+**Matched 16K/32,768 replication:** a second pair per backend under the same
+capture settings was again exact in final persistent state and bitwise across
+all GDN layers at positions 16,384, 16,406 and 16,429. Pair wall times were
+489.6 s (NInfer, minimum RAM 10.96 GiB) and 484.3 s (Strata, 10.96 GiB), with
+no OOM kills. Together with the repeated 16K/262,144 failures, this is a
+matched-length capacity contrast reproduced across both backends. At 32K,
+262,144-capacity failure also reproduced for both backends; the 65,536-capacity
+exact result currently has one pair per backend. This supports configured
+capacity as the leading condition in this screen, while the exact mechanism
+and possible interactions with allocation/layout remain unresolved.
+
+Next, add a second 32K pair at 65,536 capacity, then inspect shared capacity-
+dependent state allocation, layout, dispatch and initialization paths in the
+two runtimes. Use focused controls before changing backend math.
 
 The 32K/65,536 measurements are in the local-only `32k-capacity-65536-*`
 directories. Earlier 2K/16K controls and 262,144-capacity runs are in the
