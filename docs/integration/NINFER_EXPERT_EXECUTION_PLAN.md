@@ -2025,3 +2025,13 @@ pair ran 2,659.3 s. TTFT and energy were not measured; clocks remained dynamic.
 This completes 128K prompt ingestion under 256K capacity, not near-limit 256K.
 Continue with planned pp/tg workload shapes and other context cells; E6/E7
 remain open. [Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**pp2048+tg128 no-staging screen (2026-10-29):** one paired Q2_0 synthetic
+long-form request at 4,096 configured capacity passed exact generated-token,
+all-nine persistent-state and residency checks with PCIe staging disabled.
+Strata/NInfer prompt throughput was 44.47/44.55 tokens/s and decode throughput
+5.35/5.35 tokens/s; the approximate NInfer gains (+0.18% prompt, +0.12% decode)
+are below the 5% screen threshold. Minimum available RAM was 11.58 GiB and OOM
+kills were zero. This one-pair instrumented diagnostic has no expected answer,
+so it establishes token/state repeatability but not semantic task quality; TTFT
+and energy were not measured. E6/E7 remain open. See the [detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

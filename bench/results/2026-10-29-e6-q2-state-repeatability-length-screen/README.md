@@ -381,3 +381,15 @@ floor), peak swap was 1.43 GiB, and OOM kills were zero. TTFT and energy were
 not measured and clocks remained dynamic. The 128K prompt completed under a
 256K capacity; this is not near-limit 256K ingestion. Raw logs and supervisor
 samples remain local-only.
+
+**pp2048+tg128 no-staging pilot:** one paired Q2_0 run at 4,096 configured
+capacity used the same synthetic long-form prompt in fresh Strata and strict
+NInfer processes, with PCIe staging disabled for both. Both generated the same
+128 token IDs; all nine persistent-state fields and residency hashes matched.
+Strata/NInfer prompt throughput was 44.47/44.55 tokens/s, and decode throughput
+was 5.35/5.35 tokens/s (about +0.18%/+0.12% for NInfer). The pair took 184.7 s;
+minimum available RAM was 11.58 GiB and OOM kills were zero. This single pair
+is a diagnostic screen, does not qualify a performance gain, and does not test
+semantic answer quality because this generic workload has no expected answer.
+TTFT and energy were not measured; clocks remained dynamic. The harness ran with
+instrumentation and raw captures remain local-only.

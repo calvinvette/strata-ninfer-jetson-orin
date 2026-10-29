@@ -6993,3 +6993,13 @@ or other staged-path interactions. No performance claim is made; energy was
 not measured. Next localize the staged-path effect using same-capacity
 MoE/state controls. [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
 [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**E6 pp2048+tg128 no-staging pilot (2026-10-29):** at 4,096 configured
+capacity, one paired synthetic long-form Q2_0 request with PCIe staging disabled
+passed exact generated-token, all-nine persistent-state, and residency checks.
+Strata/NInfer prompt throughput was 44.47/44.55 tokens/s; decode throughput was
+5.35/5.35 tokens/s (about +0.18%/+0.12% for NInfer). Minimum available RAM was
+11.58 GiB, with zero OOM kills. This is below the 5% screen threshold and is
+not performance qualification. The workload has no expected answer, so semantic
+quality was not established. TTFT and energy were not measured. [Detailed
+report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
