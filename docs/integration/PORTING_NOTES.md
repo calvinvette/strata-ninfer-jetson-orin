@@ -3216,3 +3216,32 @@ qualified. Use
 [`compare_q8_1_activation_capture.py`](../../tools/integration/compare_q8_1_activation_capture.py)
 to compare F32 inputs, integer codes and FP16 scales independently. The paired captures and numerical details are in the [E6
 report](../../bench/results/2026-10-26-e6-q2-prefix-context-state-sweep/README.md#remaining-layer-3-activation-scale-boundary).
+
+## 2026-10-29: separate resident-kernel and client-level results
+
+The Q2_0 no-staging controls show why an accelerated expert operator must be
+measured at two levels. In one-request-per-process diagnostics, Strata and
+strict NInfer matched generated token IDs, all nine persistent-state fields,
+and residency at both pp512+tg64/1K and pp2048+tg128/4K. Three-block diagnostic
+medians were below 1% for prompt and decode TPS in both cells, although the
+2048-token decode observations had a wide range. With tracing disabled and one
+warmup plus one measured API request per process, the paired 512+64 screen had
+median changes of -0.97% prompt TPS, +1.16% decode TPS, +0.88% TTFT and +0.84%
+client time. The 2048+128 screen had +4.48% prompt TPS, tied decode TPS,
+-4.39% TTFT and -2.34% client time; one unusually slow Strata baseline produced
+a non-repeating +47.62% NInfer decode observation. No median reached the 5%
+useful-effect threshold. API output equality on these synthetic prompts is not
+a semantic-quality oracle, and the timing runs did not capture persistent
+state. Details: [pp512 API](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp512-cap1024-README.md)
+and [pp2048 API](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp2048-cap4096-README.md).
+
+For future Strata + Splash work, retain this separation: (1) same-activation
+operator tests with independent arithmetic oracles; (2) same routes, resident
+IDs/bytes, and fallback policy in backend comparisons; (3) no-staging controls
+to isolate resident compute; and (4) randomized, no-trace API pairs with client
+TTFT, total time, output checks, physical-memory headroom, and actual clock
+observations. Report resident hit counts and CPU/GPU owner for active experts;
+a fast kernel cannot accelerate rows that remain on CPU, and changed residency
+must be labeled as a different policy. Keep one physical memory authority and
+the existing six-GiB host reserve. These Orin Q2_0 measurements do not predict
+Metal performance or validate a Splash kernel.
