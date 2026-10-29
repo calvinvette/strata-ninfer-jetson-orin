@@ -393,3 +393,15 @@ is a diagnostic screen, does not qualify a performance gain, and does not test
 semantic answer quality because this generic workload has no expected answer.
 TTFT and energy were not measured; clocks remained dynamic. The harness ran with
 instrumentation and raw captures remain local-only.
+
+**pp512+tg64 no-staging pilot:** one paired synthetic Q2_0 request at 1,024
+configured capacity used fresh Strata and strict NInfer processes with PCIe
+staging disabled. Both generated the same 64 token IDs; all nine persistent
+state fields and residency hashes matched. Strata/NInfer prompt throughput was
+22.0/21.7 tokens/s and decode throughput was 5.1/5.1 tokens/s (about -1.43%
+for NInfer prompt throughput and +0.47% decode). Pair runtime was 115.8 s;
+minimum available RAM was 11.70 GiB and OOM kills were zero. This single
+instrumented diagnostic is below the 5% screen threshold and is not
+performance qualification. The synthetic workload has no expected answer, so
+semantic quality is not established. TTFT and energy were not measured; clocks
+remained dynamic. Raw captures remain local-only.

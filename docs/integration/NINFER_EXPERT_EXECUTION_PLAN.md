@@ -2035,3 +2035,13 @@ are below the 5% screen threshold. Minimum available RAM was 11.58 GiB and OOM
 kills were zero. This one-pair instrumented diagnostic has no expected answer,
 so it establishes token/state repeatability but not semantic task quality; TTFT
 and energy were not measured. E6/E7 remain open. See the [detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**pp512+tg64 no-staging screen (2026-10-29):** one paired synthetic Q2_0
+request at 1,024 configured capacity passed exact generated-token, all-nine
+persistent-state and residency checks with PCIe staging disabled. Strata/NInfer
+prompt throughput was 22.0/21.7 tokens/s and decode throughput 5.1/5.1
+tokens/s; approximate NInfer changes (-1.43% prompt, +0.47% decode) are below
+the 5% screen threshold. Minimum available RAM was 11.70 GiB, with zero OOM
+kills. This one-pair instrumented diagnostic lacks an expected answer, so it
+does not establish semantic task quality; TTFT and energy were not measured.
+E6/E7 remain open. See the [detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

@@ -7003,3 +7003,12 @@ Strata/NInfer prompt throughput was 44.47/44.55 tokens/s; decode throughput was
 not performance qualification. The workload has no expected answer, so semantic
 quality was not established. TTFT and energy were not measured. [Detailed
 report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**E6 pp512+tg64 no-staging pilot (2026-10-29):** at 1,024 configured
+capacity, one paired synthetic Q2_0 request with PCIe staging disabled passed
+exact generated-token, all-nine persistent-state, and residency checks.
+Strata/NInfer prompt throughput was 22.0/21.7 tokens/s and decode throughput
+5.1/5.1 tokens/s (about -1.43% prompt and +0.47% decode for NInfer). Minimum
+available RAM was 11.70 GiB, with zero OOM kills. This is below the 5% screen
+threshold and not performance qualification; semantic quality, TTFT, and energy
+were not measured. [Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
