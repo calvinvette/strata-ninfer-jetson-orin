@@ -59,6 +59,8 @@ def main() -> int:
                     help='run strict NInfer before Strata (requires --compare-staged-backends)')
     ap.add_argument('--repeat-staged-backend', choices=('strata', 'ninfer'),
                     help='run the selected staged backend twice in fresh processes')
+    ap.add_argument('--staged-pcie-frac', type=float,
+                    help='override --pcie-frac for staged/repeat arms (range 0..1)')
     ap.add_argument('--dump-gdn', action='store_true',
                     help='write final accepted-prefix GDN arrays for numeric comparison')
     ap.add_argument('--dump-gdn-at', type=int,
@@ -123,6 +125,11 @@ def main() -> int:
         ap.error('choose only one comparison mode')
     if a.reverse_staged_backends and not a.compare_staged_backends:
         ap.error('--reverse-staged-backends requires --compare-staged-backends')
+    if a.staged_pcie_frac is not None and not 0.0 <= a.staged_pcie_frac <= 1.0:
+        ap.error('--staged-pcie-frac must be between 0 and 1')
+    if a.staged_pcie_frac is not None and not (
+            a.compare_staged_backends or a.repeat_staged_backend is not None):
+        ap.error('--staged-pcie-frac requires --compare-staged-backends or --repeat-staged-backend')
     if a.capture_moe_position is not None and a.capture_moe_positions is not None:
         ap.error('use only one of --capture-moe-position and --capture-moe-positions')
     if a.capture_moe_positions is not None and (
@@ -267,8 +274,11 @@ def main() -> int:
         staged_mode = (a.compare_cpu_miss_staged or a.compare_staged_backends or
                        a.repeat_staged_backend is not None)
         if staged_mode and '--pcie-frac' in command:
-            command[command.index('--pcie-frac') + 1] = (
+            default_pcie_frac = (
                 '0.0' if a.compare_cpu_miss_staged and backend == 'strata' else '1.0')
+            command[command.index('--pcie-frac') + 1] = (
+                str(a.staged_pcie_frac) if a.staged_pcie_frac is not None
+                else default_pcie_frac)
         arm_env = dict(env)
         if a.cpu_q8_1_selector is not None and name == 'cpu-miss':
             arm_env['STRATA_NATIVE_CPU_Q8_1_DOT'] = a.cpu_q8_1_selector
