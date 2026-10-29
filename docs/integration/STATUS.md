@@ -7012,3 +7012,13 @@ Strata/NInfer prompt throughput was 22.0/21.7 tokens/s and decode throughput
 available RAM was 11.70 GiB, with zero OOM kills. This is below the 5% screen
 threshold and not performance qualification; semantic quality, TTFT, and energy
 were not measured. [Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**E6 pp512+tg64 three-block no-staging screen (2026-10-29):** two additional
+fresh-process pairs completed, including an NInfer-first block. All three
+pairs passed exact generated-token, all-nine persistent-state, and residency
+checks at 1,024 configured capacity. The median paired NInfer/Strata changes
+were +0.22% prompt and +0.47% decode throughput; ranges were -1.42% to +1.30%
+and -0.10% to +1.74%. Neither reaches the 5% useful-effect screen, so seven-pair
+confirmation is not justified for this cell. Minimum available RAM ranged from
+11.70 to 11.76 GiB, with no OOM kills. The synthetic workload has no semantic
+answer oracle; TTFT and energy were not measured. [Detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

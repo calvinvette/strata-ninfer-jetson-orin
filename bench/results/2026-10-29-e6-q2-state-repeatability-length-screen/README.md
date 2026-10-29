@@ -405,3 +405,12 @@ instrumented diagnostic is below the 5% screen threshold and is not
 performance qualification. The synthetic workload has no expected answer, so
 semantic quality is not established. TTFT and energy were not measured; clocks
 remained dynamic. Raw captures remain local-only.
+
+**Three-block pp512+tg64 screen:** two more fresh-process pairs completed, with
+arm order reversed in block 2. All three pairs passed exact generated-token,
+nine-field persistent-state, and residency checks. Within-pair NInfer/Strata
+throughput differences had medians of +0.22% prompt and +0.47% decode; ranges
+were -1.42% to +1.30% and -0.10% to +1.74%. Neither reaches the 5% threshold,
+so no confirmation is indicated for this short-context cell. Minimum available
+RAM was 11.70–11.76 GiB. This remains a synthetic workload without a semantic
+answer oracle, and TTFT/energy remain unmeasured.

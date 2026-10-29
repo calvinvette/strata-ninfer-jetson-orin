@@ -2045,3 +2045,12 @@ the 5% screen threshold. Minimum available RAM was 11.70 GiB, with zero OOM
 kills. This one-pair instrumented diagnostic lacks an expected answer, so it
 does not establish semantic task quality; TTFT and energy were not measured.
 E6/E7 remain open. See the [detailed report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+
+**Three-block pp512+tg64 no-staging screen (2026-10-29):** all three paired
+fresh-process runs passed exact generated-token, nine-field persistent-state,
+and residency checks at 1,024 capacity; one block used NInfer-first order.
+Median paired NInfer/Strata throughput changes were +0.22% prompt and +0.47%
+decode, with ranges -1.42% to +1.30% and -0.10% to +1.74%. This does not
+reach the 5% useful-effect threshold, so confirmation is not justified for this
+cell. Minimum available RAM was 11.70–11.76 GiB, OOM kills zero. Semantic answer
+quality, TTFT and energy were not measured. See the [screen report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
