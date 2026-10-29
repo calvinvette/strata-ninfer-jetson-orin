@@ -6883,7 +6883,19 @@ for model layers 0–7 were bitwise identical between MTP arms; prompt-boundary
 GDN first differed at GDN layer 2 (`3.49e-10` relative L2) and diverged later.
 The same-activation expert-152 CPU/GPU parity test passed; the runtime CPU
 output matched the oracle bitwise, and CPU/GPU outputs differed in 1,766/2,560
-values (`9.72e-8` relative L2). Next capture the 32K/65,536 MoE bundle at the
-same boundary for direct cross-capacity output comparison. Keep the state gate
-and make no arithmetic changes.
+values (`9.72e-8` relative L2). The matched 32K/65,536 cross-capacity MoE
+capture now shows the first difference at model layer 1: routes, route weights,
+input and shared output were exact, while experts 157 and 152 differed. Their
+65,536-capacity runtime outputs matched independent CUDA parity outputs
+bitwise; the 262,144-capacity outputs matched the independent CPU results
+bitwise. CPU/GPU deltas reproduced the observed layer-1 changes exactly:
+1,873/2,560 values (`1.201e-7` relative L2) for expert 157 and 1,916/2,560
+(`1.123e-7`) for expert 152. Layer 2 expert 152 likewise accounts for all
+1,766 changed expert-part values. Later bundle drift grows (layer-7 input
+`2.58e-4`, combined output `4.87e-3` relative L2). This attributes the
+cross-capacity MoE delta to CPU/GPU execution-tier arithmetic for the first
+changed experts. It does not account for the separate within-capacity GDN
+mismatch. Next compare matched 32K capacity runs with PCIe staging disabled
+so all nonresident experts use CPU execution in both arms; retain the full
+exact-state gate and make no arithmetic changes.
 [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).

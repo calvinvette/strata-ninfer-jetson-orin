@@ -176,9 +176,34 @@ diagnostics; energy was not measured and the runtimes are not performance
 qualification.
 
 Next capture the 32K/65,536 MoE bundle at the same prompt boundary for direct
-cross-capacity comparison of inputs and expert outputs. Keep the within-capacity
-GDN mismatch as a separate open issue; do not attribute it to the layer-2 owner
-switch without further evidence.
+cross-capacity comparison of inputs and expert outputs. **That matched
+comparison is now complete:** at model layer 1, routes, route weights, input,
+and shared output were bitwise identical, but only experts 157 and 152 had
+different outputs. For both experts, the 65,536-capacity NInfer outputs matched
+the independent CUDA expert parity outputs bitwise, while the 262,144-capacity
+runtime outputs matched the independent CPU outputs bitwise. CPU/GPU parity
+differences exactly reproduced the cross-capacity deltas:
+
+| Layer-1 expert | Changed outputs | Relative L2 | Max absolute |
+| ---: | ---: | ---: | ---: |
+| 157 | 1,873 / 2,560 | `1.201e-7` | `1.118e-8` |
+| 152 | 1,916 / 2,560 | `1.123e-7` | `7.451e-9` |
+
+At model layer 2, expert 152 again matched the CUDA output at 65,536 and the
+CPU output at 262,144; it accounts for all 1,766 changed expert-part values
+there (`9.724e-8` relative L2, max absolute `1.490e-8`). The MoE bundles show
+the small owner-dependent differences accumulating: layer-2 input is already
+different, and layer 7 reaches `2.58e-4` input relative L2 and `4.87e-3`
+combined-output relative L2. This directly links the first cross-capacity MoE
+drift to CPU-versus-GPU active-expert arithmetic for experts 157 and 152. It
+does not explain the separate within-capacity GDN mismatch at 262,144.
+
+Next run matched 32K/65,536 and 32K/262,144 NInfer repeats with PCIe staging
+disabled in both configurations. That puts nonresident experts on CPU in both
+arms while retaining the same resident GPU cache, testing whether the early
+cross-capacity MoE delta disappears when the owner tier is held constant. Keep
+the within-capacity GDN mismatch as a separate open issue and preserve the
+exact persistent-state gate.
 
 The 32K/65,536 measurements are in the local-only `32k-capacity-65536-*`
 directories. Earlier 2K/16K controls and 262,144-capacity runs are in the

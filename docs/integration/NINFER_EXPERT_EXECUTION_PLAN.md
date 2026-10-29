@@ -1891,6 +1891,19 @@ The independent Q2_0 expert-152 parity run passed; the high-capacity runtime
 CPU output matched its CPU oracle exactly, while CPU/GPU parity differed in
 1,766/2,560 outputs (`9.72e-8` relative L2). This supports a tier-dependent
 expert arithmetic difference but does not explain within-capacity GDN drift.
-Next capture the 32K/65,536 MoE bundle at the same boundary for direct
-cross-capacity output comparison. Keep the state gate and arithmetic unchanged.
+The matched 32K cross-capacity MoE bundles locate the first numerical change
+at model layer 1. Inputs, routes, route weights and shared output are bitwise
+identical; only active experts 157 and 152 differ. Their 65,536-capacity
+NInfer outputs match independent CUDA parity outputs bitwise, while the
+262,144-capacity outputs match independent CPU parity outputs bitwise. The
+CPU/GPU oracle deltas exactly reproduce runtime differences for both experts
+(1,873/2,560 values and `1.201e-7` relative L2 for expert 157; 1,916/2,560
+and `1.123e-7` for expert 152). Layer 2 expert 152 likewise explains every
+changed expert-part output there. This attributes the early cross-capacity MoE
+drift to the active expert execution tier; subsequent differences accumulate
+through later layers. It does not explain the separate within-capacity GDN
+state mismatch at 262,144. Next hold the nonresident owner tier fixed by
+disabling PCIe staging in paired 32K/65,536 and 32K/262,144 runs. Keep exact
+persistent-state validation and do not change arithmetic until that control is
+complete. Detailed data: [E6 report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
 [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
