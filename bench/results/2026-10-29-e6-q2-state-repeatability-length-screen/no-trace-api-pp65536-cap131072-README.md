@@ -15,6 +15,9 @@ The two Q2_0 GGUF shards were verified by SHA-256:
 - PLE index: `c758314d495a1261d06a806b1c415596dfabe62e0cbf44ce592dc84c53229ccd`
 - Expert profile: `b3e62120218cd96d175a0547530158869177dd2164b22b40f32bea7d7e85fb8c`
 - Tokenizer chat template: `12827f24b742ea4e80cdc12dbcf9622227056b9f797252a3149263d4f9aaadce`
+- Tokenizer vocabulary: `4ba64f0332abcfb0b600b7df1537d1e836e68009d5fb7cdb77339738dc6365c4`
+- Tokenizer merges: `4ba698529766c7a2f5052083ea10cdf2485577f5237a332ee291054eb11e3332`
+- Tokenizer token types: `5088c8c298fc06af8382ddb3b76c888703ac2634e82263b97eedcc2ad202738b`
 
 ## Method and limitations
 
@@ -24,16 +27,26 @@ with strict NInfer at 131,072 configured context. Each request used an exactly
 GGUFs, PLE pack, expert profile, tokenizer, 3,000-slot expert cache, 8 workers,
 MTP window 2, 3 GiB workspace reserve, and 6 GiB available-memory admission
 floor. Prompt cache, PCIe staging and request tracing were disabled. Each fresh
-process sent one warmup followed by one measured streaming API request. Pair
-order was Strata → NInfer, NInfer → Strata, then Strata → NInfer. Clock rates
-were observed without setting clocks.
+process sent one warmup followed by one measured streaming API request. The
+benchmark explicitly set `temperature=0` (greedy). Pair order was Strata →
+NInfer, NInfer → Strata, then Strata → NInfer. Clock rates were observed
+without setting clocks.
 
-All six processes passed and all warmup outputs matched within each pair. The
-three measured Strata/NInfer response texts did **not** match within any pair
-(0/3 matched). Each emitted 128 tokens. There is no independent task-quality
-oracle and persistent state was not captured. The timing values below are
-therefore a throughput/latency screen only; they do not show quality-equivalent
-generation or qualify a production profile.
+All six processes passed and warmup response text matched byte-for-byte across
+the two backends in all three pairs. However, measured text differed between
+Strata and NInfer in every pair. The first differing character followed a
+common prefix of 52, 613 and 325 characters in pairs 0, 1 and 2. Within the
+same process, measured text also differed from warmup in five of six cases
+(both requests emitted 128 tokens); the only exact repeat was Strata in pair
+1. Since decoding was greedy, these differences are not explained by
+stochastic sampling. They expose a repeatability or persistent-state issue
+that this timing-only run did not instrument. No independent task-quality
+oracle or persistent-state fingerprints were captured.
+
+Prompt TPS and first-visible TTFT describe the common prompt workload, but
+decode TPS and client total include backend-dependent generated text paths and
+must not be read as isolated kernel effects. The results do not establish
+quality-equivalent generation or qualify a production profile.
 
 | Pair | Order | Prompt TPS change | Decode TPS change | First-visible TTFT change | Client total change |
 | --- | --- | ---: | ---: | ---: | ---: |
@@ -47,7 +60,9 @@ The 95% paired bootstrap intervals were -0.93% to +1.13% for prompt TPS,
 and -0.24% to +1.46% for client total. Every interval includes zero; no median
 meets the 5% useful-effect screen. The wide decode interval reflects a 3.63 tok/s
 NInfer result in pair 1 against 8.37 tok/s for Strata; this outlier was not
-reproduced by the other two pairs. Median arm rates were 86.79/86.50 prompt
+reproduced by the other two pairs. Since the measured token paths differed,
+the decode and client-total effects are confounded and cannot qualify the
+backend. Median arm rates were 86.79/86.50 prompt
 tok/s and 8.16/8.21 decode tok/s (Strata/NInfer); median first-visible TTFT was
 755.62/758.36 s and median client total was 773.52/777.62 s. No confirmation
 campaign or acceleration claim is justified.
@@ -63,8 +78,9 @@ planned Strata-then-NInfer order, identical control settings, and normal
 supervisor records; the campaign manifest was reconciled from those records.
 
 This is a three-pair screen for one synthetic 64K API workload, not a full E6
-exit or release qualification. The full output hashes, arm timings, resource
-summaries, bootstrap samples summary and artifact identities are in the
+exit or release qualification. The full output hashes, common-prefix lengths,
+within-process repeatability results, arm timings, resource summaries,
+bootstrap summaries and artifact identities are in the
 [combined sanitized data](no-trace-api-effects-summary.json). Raw request,
 server, memory and tegrastats captures remain local-only.
 

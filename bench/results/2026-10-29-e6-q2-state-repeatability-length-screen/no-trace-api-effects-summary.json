@@ -670,7 +670,23 @@
             "ninfer": "25a0c334c5b4e714ec4e0f314ddd91e95f8720b9912d3602153363549af69671"
           },
           "measured_output_equal": false,
-          "warmup_output_equal": true
+          "warmup_output_equal": true,
+          "within_process_repeatability": {
+            "strata": {
+              "warmup_text_chars": 708,
+              "measured_text_chars": 744,
+              "warmup_equals_measured": false,
+              "first_differing_character_index": 52
+            },
+            "ninfer": {
+              "warmup_text_chars": 708,
+              "measured_text_chars": 717,
+              "warmup_equals_measured": false,
+              "first_differing_character_index": 577
+            }
+          },
+          "warmup_cross_arm_text_equal": true,
+          "measured_cross_arm_text_first_differing_character_index": 52
         },
         {
           "block": 1,
@@ -698,7 +714,23 @@
             "ninfer": "4535584dd3fc786df5ef1d5bca593678847558b175ec291777ca31bfe170b938"
           },
           "measured_output_equal": false,
-          "warmup_output_equal": true
+          "warmup_output_equal": true,
+          "within_process_repeatability": {
+            "strata": {
+              "warmup_text_chars": 708,
+              "measured_text_chars": 708,
+              "warmup_equals_measured": true,
+              "first_differing_character_index": null
+            },
+            "ninfer": {
+              "warmup_text_chars": 708,
+              "measured_text_chars": 713,
+              "warmup_equals_measured": false,
+              "first_differing_character_index": 613
+            }
+          },
+          "warmup_cross_arm_text_equal": true,
+          "measured_cross_arm_text_first_differing_character_index": 613
         },
         {
           "block": 2,
@@ -726,13 +758,31 @@
             "ninfer": "2c19df8cd9f7c4a4932406cf64dd0f6ee98c9ffca6ad65550557d09475ca20bc"
           },
           "measured_output_equal": false,
-          "warmup_output_equal": true
+          "warmup_output_equal": true,
+          "within_process_repeatability": {
+            "strata": {
+              "warmup_text_chars": 708,
+              "measured_text_chars": 717,
+              "warmup_equals_measured": false,
+              "first_differing_character_index": 577
+            },
+            "ninfer": {
+              "warmup_text_chars": 708,
+              "measured_text_chars": 758,
+              "warmup_equals_measured": false,
+              "first_differing_character_index": 325
+            }
+          },
+          "warmup_cross_arm_text_equal": true,
+          "measured_cross_arm_text_first_differing_character_index": 325
         }
       ],
       "limitations": [
-        "measured output text differed between backends in each of the three pairs; fixed output length makes timing comparable as a throughput screen, but generation quality equivalence is not established",
+        "measured response text differed between backends in all three pairs after warmup text matched exactly in all three blocks",
+        "temperature was explicitly zero (greedy); five of six same-process warmup-to-measured outputs differed, and the cause was not captured",
+        "decode TPS and client total include backend-dependent generated text trajectories and are not isolated kernel effects; prompt TPS and first-visible TTFT share the same formatted prompt but do not prove state or quality equivalence",
         "no independent task-quality oracle",
-        "no persistent state fingerprints captured",
+        "no persistent-state fingerprints or accepted-prefix state were captured, so the source of same-process output drift remains unresolved",
         "no energy measurement; tegrastats rails are not process-attributed energy",
         "dynamic clocks; EMC frequency inaccessible",
         "three pairs are insufficient to estimate p95 latency reliably",
@@ -747,7 +797,10 @@
         "ple_index_sha256": "c758314d495a1261d06a806b1c415596dfabe62e0cbf44ce592dc84c53229ccd",
         "expert_profile_sha256": "b3e62120218cd96d175a0547530158869177dd2164b22b40f32bea7d7e85fb8c",
         "tokenizer_chat_template_sha256": "12827f24b742ea4e80cdc12dbcf9622227056b9f797252a3149263d4f9aaadce",
-        "format": "Q2_0 GGUF, paired native/PLE shard set"
+        "format": "Q2_0 GGUF, paired native/PLE shard set",
+        "tokenizer_vocab_sha256": "4ba64f0332abcfb0b600b7df1537d1e836e68009d5fb7cdb77339738dc6365c4",
+        "tokenizer_merges_sha256": "4ba698529766c7a2f5052083ea10cdf2485577f5237a332ee291054eb11e3332",
+        "tokenizer_token_types_sha256": "5088c8c298fc06af8382ddb3b76c888703ac2634e82263b97eedcc2ad202738b"
       },
       "device": {
         "platform": "NVIDIA Jetson AGX Orin 64GB",
@@ -784,14 +837,42 @@
         "candidate_strict": true,
         "baseline_backend": "strata",
         "same_processes": "fresh process per arm; 1 warmup then 1 measured request",
-        "temperature": "not explicitly set in request; default sampling settings retained"
+        "sampling": "greedy (benchmark_control.py explicitly sends temperature=0)"
       },
       "date": "2026-10-29",
       "randomized_pair_order": [
         "baseline \u2192 candidate",
         "candidate \u2192 baseline",
         "baseline \u2192 candidate"
-      ]
+      ],
+      "measured_same_backend_repeat_match_count": 1,
+      "bootstrap": {
+        "resamples": 5000,
+        "seed": 20261029,
+        "interval": "percentile 2.5th and 97.5th quantiles of the median of resampled paired-block changes"
+      },
+      "output_repeatability": {
+        "temperature": 0,
+        "sampling": "greedy",
+        "warmup_cross_backend_text_equal_pairs": 3,
+        "measured_cross_backend_text_equal_pairs": 0,
+        "within_process_warmup_to_measured_text_equal_runs": 1,
+        "within_process_warmup_to_measured_runs": 6,
+        "first_cross_backend_measured_text_difference_after_common_prefix_characters": [
+          52,
+          613,
+          325
+        ],
+        "within_process_first_difference_after_common_prefix_characters": {
+          "block_0_strata": 52,
+          "block_0_ninfer": 577,
+          "block_1_strata": null,
+          "block_1_ninfer": 613,
+          "block_2_strata": 577,
+          "block_2_ninfer": 325
+        },
+        "note": "API text was compared; engine token IDs and accepted-prefix state were not captured"
+      }
     }
   ]
 }

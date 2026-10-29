@@ -304,8 +304,11 @@ pairs. Median NInfer effects were -0.20% prompt TPS, +3.16% decode TPS, +0.25%
 first-visible TTFT and +0.86% client time; all bootstrap intervals included
 zero, with a wide decode interval caused by one unrepeated slow candidate
 request. Warmup responses matched, but measured response text differed in all
-three pairs. The timing screen therefore does not establish quality-equivalent
-generation, semantic quality or persistent-state parity. Minimum available
-RAM was 7.12 GiB and peak sampled swap was 6.33 GiB. This adds no release
-evidence; the no-release decision and open E6/E7 gates remain. See the [64K
+three pairs. Temperature was 0, so this is an unresolved repeatability/state
+issue rather than sampling noise. Decode and client-total effects are
+confounded by the changed text paths. The timing screen therefore does not
+establish quality-equivalent generation, semantic quality or persistent-state
+parity. Minimum available RAM was 7.12 GiB and peak sampled swap was 6.33 GiB.
+This adds no release evidence; the no-release decision and open E6/E7 gates
+remain. See the [64K
 report and combined chart](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp65536-cap131072-README.md).

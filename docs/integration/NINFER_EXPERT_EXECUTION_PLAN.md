@@ -2109,14 +2109,20 @@ or state capture. No confirmation is indicated; E6/E7 remain open. See the
 NInfer pairs measured a 65,536-token formatted prompt plus 128 generated
 tokens at 131,072 configured context, with PCIe staging, prompt cache and
 tracing disabled. All six processes and measured requests passed; warmup
-content matched within each pair, but measured output text differed in all
-three pairs. Median paired NInfer changes were -0.20% prompt TPS, +3.16%
+content matched byte-for-byte within each pair, but measured output text differed
+in all three pairs. The benchmark sets temperature 0 (greedy); five of six
+same-process warmup-to-measured responses also differed, so this reveals an
+unresolved repeatability/state issue rather than sampling noise. Median paired
+NInfer changes were -0.20% prompt TPS, +3.16%
 decode TPS, +0.25% first-visible TTFT and +0.86% client total; every paired
 bootstrap interval included zero. A single NInfer decode outlier widened its
 interval to -56.63%..+21.58%. Minimum available RAM was 7.12 GiB, peak sampled
 swap 6.33 GiB, cgroup pressure/OOM counters zero. This is not
-quality-equivalent evidence and does not meet the 5% screen; no confirmation
-is indicated. The campaign driver stopped before block 2; the persisted third
+quality-equivalent evidence; decode and client-total effects are confounded by
+the changed generated text paths. It does not meet the 5% screen, so no
+confirmation is indicated. Next capture accepted-prefix state over repeated
+same-request runs under minimal instrumentation before using generated-token
+timings as a kernel comparison. The campaign driver stopped before block 2; the persisted third
 pair completed under the same settings and planned order through direct
 supervisor calls, then the manifest was reconciled from terminal records.
 The generic workload has no semantic oracle or state capture; energy was not

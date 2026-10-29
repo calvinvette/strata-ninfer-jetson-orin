@@ -12,16 +12,23 @@ not promote a universal parametric profile. This records tested cells, not gener
 **E6 64K no-trace API screen (2026-10-29):** three fresh-process pairs
 measured a 65,536-token prompt plus 128 generated tokens at 131,072 context,
 with PCIe staging, prompt cache and tracing disabled. All six processes and
-both requests per process passed. Warmup content matched in all pairs, but the
-measured response text differed in all three pairs, so this is not
-quality-equivalent generation evidence. Median paired NInfer changes were
+both requests per process passed. The benchmark explicitly set temperature 0
+(greedy). Warmup content matched byte-for-byte in all pairs, but measured
+response text differed in all three pairs. Five of six same-process
+warmup-to-measured comparisons also differed. This is not quality-equivalent
+generation evidence and indicates an unresolved repeatability/state issue.
+Median paired NInfer changes were
 -0.20% prompt TPS, +3.16% decode TPS, +0.25% first-visible TTFT and +0.86%
 client total; all 95% paired bootstrap intervals included zero. One candidate
 decode result was an unrepeated outlier, widening its interval to -56.63% to
 +21.58%. Minimum available RAM was 7.12 GiB, peak sampled swap 6.33 GiB, and
 cgroup pressure/OOM counters were zero. Energy was not measured; clocks
-remained dynamic. This does not meet the 5% performance screen or establish
-quality equivalence. E6/E7 remain open. See the [64K report and combined
+remained dynamic. Decode and client-total comparisons are confounded by the
+different generated text paths. This does not meet the 5% performance screen
+or establish quality equivalence. E6/E7 remain open. Next, capture and compare
+accepted-prefix state over repeated same-request runs under minimal
+instrumentation before using generated-token timing as a kernel comparison.
+See the [64K report and combined
 chart](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp65536-cap131072-README.md).
 
 The latest E6 pilot repeated the 16K Q2_0 retrieval fixture at 262,144
