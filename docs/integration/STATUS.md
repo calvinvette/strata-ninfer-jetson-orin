@@ -110,9 +110,14 @@ and output; post-window recurrent state differed in 784,908/786,432 values
 (relative L2 `1.91276e-04`). The preceding model-layer-1 boundary capture
 found the residual stream and hyperconnection term exact, but 1,658/2,560
 values in its MoE/output vector differed (maximum `1.73e-06`, relative L2
-`5.56115e-05`). The next diagnostic captures layer 1's GDN projections,
-recurrence, FFN and pre/post state to locate the first changed internal field.
-It has not identified the cause. See the [layer-1 boundary report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-boundary-transition.md),
+`5.56115e-05`). The model-layer-1 GDN intermediates (`x`, QKV, recurrent
+projections, `y`, GDN output), its MoE input and pre/post recurrent state all
+matched exactly. The first changed captured field is the combined MoE output:
+1,658/2,560 values differ by at most `1.73e-06` (relative L2 `5.56115e-05`).
+Next capture layer 1's route IDs, weights, expert parts and output to identify
+which MoE stage introduces the difference. See the [layer-1 GDN-to-MoE
+report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-gdn-to-moe-transition.md),
+the [layer-1 boundary report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-boundary-transition.md),
 the [raw layer-2 transition
 report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/gdn-layer2-raw-transition.md),
 the
