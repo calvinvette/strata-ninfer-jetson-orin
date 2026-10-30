@@ -17,12 +17,14 @@ TRACE_ENV_KEYS = (
 )
 
 
-def configure_trace_environment(config_env, inherited_env, no_trace):
+def configure_trace_environment(config_env, inherited_env, no_trace, accepted_prefix_trace=False):
     """Build the environment the server and its engine child will inherit."""
     config_env = dict(config_env or {})
     inherited_env = dict(inherited_env)
     if no_trace:
         for key in TRACE_ENV_KEYS:
+            if key == 'STRATA_ACCEPTED_PREFIX_TRACE' and accepted_prefix_trace:
+                continue
             config_env.pop(key, None)
             inherited_env.pop(key, None)
     else:
@@ -58,6 +60,8 @@ def main():
     parser.add_argument('--require-kv-streaming', action='store_true')
     parser.add_argument('--no-trace', action='store_true',
                         help='do not force STRATA_TRACE for timing-only API cells')
+    parser.add_argument('--accepted-prefix-trace', action='store_true',
+                        help='retain accepted-prefix state tracing while --no-trace disables full tracing')
     parser.add_argument('--state-hash', action='store_true',
                         help='enable final persistent-state fingerprints without enabling STRATA_TRACE')
     args = parser.parse_args()
@@ -67,7 +71,7 @@ def main():
     check_port(cfg['port'])
     cfg['log'] = str((args.output.parent / 'engine.log').resolve())
     cfg['env'], server_env = configure_trace_environment(cfg.get('env', {}), os.environ,
-                                                        args.no_trace)
+                                                        args.no_trace, args.accepted_prefix_trace)
     if args.state_hash:
         cfg['env']['STRATA_STATE_HASH'] = '1'
         server_env['STRATA_STATE_HASH'] = '1'

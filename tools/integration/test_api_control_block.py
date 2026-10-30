@@ -63,6 +63,16 @@ class ApiControlBlockTests(unittest.TestCase):
         self.assertEqual(result_env['STRATA_TRACE'], '1')
         self.assertEqual(result_env['PATH'], '/bin')
 
+    def test_no_trace_can_retain_explicit_accepted_prefix_capture(self):
+        config = {'STRATA_TRACE': '1', 'STRATA_ACCEPTED_PREFIX_TRACE': '1', 'APP_SETTING': 'kept'}
+        inherited = {'STRATA_TRACE': '1', 'STRATA_ACCEPTED_PREFIX_TRACE': '1', 'PATH': '/bin'}
+        result_config, result_env = configure_trace_environment(config, inherited, True,
+                                                                accepted_prefix_trace=True)
+        self.assertNotIn('STRATA_TRACE', result_config)
+        self.assertNotIn('STRATA_TRACE', result_env)
+        self.assertEqual(result_config['STRATA_ACCEPTED_PREFIX_TRACE'], '1')
+        self.assertEqual(result_env['STRATA_ACCEPTED_PREFIX_TRACE'], '1')
+
 
 if __name__ == '__main__':
     unittest.main()

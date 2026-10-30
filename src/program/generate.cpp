@@ -10603,6 +10603,19 @@ int main(int argc, char** argv) {
             for (int64_t i = 0; i < n - 1; ++i) consumed.push_back((int32_t) ids[(size_t) i]);
             static const bool state_hash = std::getenv("STRATA_STATE_HASH") != nullptr;
             static const bool accepted_prefix_trace = std::getenv("STRATA_ACCEPTED_PREFIX_TRACE") != nullptr;
+            static const int accepted_prefix_trace_stride = accepted_prefix_trace ? [] {
+                    const char* value = std::getenv("STRATA_ACCEPTED_PREFIX_TRACE_STRIDE");
+                    if (value == nullptr) return 1;
+                    char* end = nullptr;
+                    errno = 0;
+                    const long parsed = std::strtol(value, &end, 10);
+                    return errno == 0 && end != value && *end == '\0' && parsed >= 1 &&
+                           parsed <= std::numeric_limits<int>::max() ? (int) parsed : 1;
+                }() : 1;
+            if (accepted_prefix_trace && accepted_prefix_trace_stride > 1)
+                std::fprintf(stderr,
+                             "strata serve: ACCEPTED_PREFIX_CAPTURE_CONFIG stride=%d first=1 final=1\n",
+                             accepted_prefix_trace_stride);
             auto hash_session_state = [&](int64_t state_cells, std::string& state_fingerprint) -> bool {
                 // DEBUG: a fingerprint of every part of the session over the positions it holds ([0, L)), and
                 // separately of what lies past them in the last KV page (stale cells, fine unless something reads them)
@@ -11647,19 +11660,26 @@ int main(int argc, char** argv) {
                     adapt_thr = std::thread([&] { adapt_ok = adapt(); });
                 }
                 if (accepted_prefix_trace) {
-                    if (!ver.wait_commit(err)) {
-                        if (adapt_thr.joinable()) adapt_thr.join();
-                        std::fprintf(stderr, "strata serve: accepted-prefix commit wait: %s\n", err.c_str());
-                        return 1;
+                    const int64_t accepted_total = produced_n + publish_n;
+                    const bool sample_due = accepted_prefix_trace_stride <= 1 ||
+                                             accepted_total == 1 ||
+                                             accepted_total % accepted_prefix_trace_stride == 0 ||
+                                             eos || accepted_total >= max_new;
+                    if (sample_due) {
+                        if (!ver.wait_commit(err)) {
+                            if (adapt_thr.joinable()) adapt_thr.join();
+                            std::fprintf(stderr, "strata serve: accepted-prefix commit wait: %s\n", err.c_str());
+                            return 1;
+                        }
+                        std::string fingerprint;
+                        if (!hash_session_state((int64_t) consumed.size() + publish_n, fingerprint)) return 1;
+                        std::fprintf(stderr, "strata serve: ACCEPTED_PREFIX position=%lld window=%d accepted_drafts=%d committed=%d tokens=",
+                                     (long long) p, T, a, publish_n);
+                        for (int i = 0; i < publish_n; ++i)
+                            std::fprintf(stderr, "%s%d", i ? "," : "", (int) outv[(size_t) i]);
+                        std::fprintf(stderr, " state={%s}\n", fingerprint.c_str());
+                        std::fflush(stderr);
                     }
-                    std::string fingerprint;
-                    if (!hash_session_state((int64_t) consumed.size() + publish_n, fingerprint)) return 1;
-                    std::fprintf(stderr, "strata serve: ACCEPTED_PREFIX position=%lld window=%d accepted_drafts=%d committed=%d tokens=",
-                                 (long long) p, T, a, publish_n);
-                    for (int i = 0; i < publish_n; ++i)
-                        std::fprintf(stderr, "%s%d", i ? "," : "", (int) outv[(size_t) i]);
-                    std::fprintf(stderr, " state={%s}\n", fingerprint.c_str());
-                    std::fflush(stderr);
                 }
                 // Only inputs corresponding to outputs retained by the request are committed.
                 for (int i = 0; i < publish_n; ++i) consumed.push_back(window[(size_t) i]);
