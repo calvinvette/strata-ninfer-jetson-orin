@@ -7365,3 +7365,10 @@ its help invocation aborts because maestro1 has no SYCL device. Root storage
 remains nearly full, while `/mnt/sda2` has 55 GiB free. These results add only
 x86_64 compile/link evidence, not device execution or Orin performance. See the
 [build record](../../bench/results/2026-10-30-e7-maestro-current-source-builds/README.md).
+
+The request-tagged trace change at `d321286f` was then rebuilt on maestro1 with
+one job for HIP and SYCL. HIP `strata --help` and
+`shared_memory_budget_test` passed. The SYCL service target compiled and
+linked, while help startup reached the expected no-device failure. This adds
+x86 compile/link evidence only; no HIP/SYCL device execution is claimed. Exact
+binary hashes and logs are in the [follow-up record](../../bench/results/2026-10-30-e7-maestro-current-source-builds/README.md#2026-10-30-follow-up-request-tagged-route-trace-change).

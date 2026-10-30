@@ -2348,15 +2348,19 @@ output hashes and cache-hit counts exactly (8.50 GiB minimum availability).
 The same capture filter recorded two rows for consecutive standalone 8K calls,
 so the missing replay row is specific to the long→prefix route-position path.
 Widening that filter to positions 8188–8195 with a larger row cap still found
-only the first request's layer-1 row. Instrument actual route positions across
-all calls in the long→prefix process before attempting a causal owner claim.
-Instrumented rates are diagnostic only. Add request-ID route capture and
-accepted-prefix state around the transfer before causal attribution.
+only the first request's layer-1 row. The follow-up opt-in position trace
+recorded all 32 late-decode layer-1 rows in request 0 and the replay's layer-1
+row at position 8191 in request 1; its routed experts and owner kinds matched
+the short two-8K control. This resolves the missing-row observation, but the
+replay's persistent state still differs after adaptive residency and the
+selected row does not identify the cause. Next capture accepted-prefix state
+across layers around the first adaptive swap and corresponding replay point.
+Instrumented rates are diagnostic only. See the
 [Report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
 
 **Current-source portability rebuild (2026-10-30):** full HIP and SYCL target
-trees rebuilt at source commit `4229c00e` on maestro1 with one build job. HIP
+trees rebuilt at source commit `d321286f` on maestro1 with one build job. HIP
 `strata --help` and the host-only shared-memory budget CTest passed. SYCL
 compiled and linked after loading oneMKL; CLI startup aborts because maestro1
 has no SYCL device. This is x86_64 build evidence only. See the
-[build record](../../bench/results/2026-10-30-e7-maestro-current-source-builds/README.md).
+[build record](../../bench/results/2026-10-30-e7-maestro-current-source-builds/README.md#2026-10-30-follow-up-request-tagged-route-trace-change).

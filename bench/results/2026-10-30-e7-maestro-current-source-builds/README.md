@@ -34,3 +34,26 @@ as `logs/sycl-build-4229c00e.log`; it failed only because the oneMKL variables
 were not loaded. CLI logs are `logs/hip-help-4229c00e.log` and
 `logs/sycl-help-4229c00e.log`. No build products or toolchains were copied into
 the repository.
+
+## 2026-10-30 follow-up: request-tagged route trace change
+
+The shared C++ change at `d321286f` was rebuilt on the same maestro1 source
+worktree and configured trees, with one build job. Both backend build commands
+passed. The HIP `strata --help` check passed after adding the ROCm development
+library directory to `LD_LIBRARY_PATH`; `shared_memory_budget_test` passed
+again. The SYCL `strata` target built and linked. With the compiler and oneMKL
+environment scripts sourced, its `--help` invocation reached runtime and
+aborted because maestro1 has no SYCL device. No accelerator runtime test was
+performed.
+
+| Backend | Build | CLI/help | SHA256 |
+| --- | --- | --- | --- |
+| HIP | Passed, one job | Passed, exit 0 | `ce9f653d5bf60ec0f0dae2561bada509d11f54d741d725b0ac279b2c5017cbf0` |
+| SYCL | Passed, one job | Unsupported: no SYCL device | `dad18286e8a2a3a6fc278817b26623e17137f629a4a2dff91ca23aeb6aefa85e` |
+
+The HIP log is `logs/hip-build-d321286f.log`; the SYCL full build log is
+`logs/sycl-build-d321286f.log` and its explicit service-target build log is
+`logs/sycl-strata-d321286f.log`. The exact-source binaries and logs remain on
+maestro1 under `/mnt/sda2/tmp/calvin/strata-ninfer-build-e0-03806747/`.
+This follow-up is x86 compile/link and HIP startup evidence only; it says
+nothing about Orin performance or SYCL device execution.
