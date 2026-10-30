@@ -1,6 +1,6 @@
 # NInfer E7 release assessment
 
-Date: 2026-10-25. Branch: `feat/ninfer-expert-e0`.
+Updated: 2026-10-30. Branch: `feat/ninfer-expert-e0`.
 
 ## Decision
 
@@ -21,6 +21,32 @@ workload-specific TTFT effect is confirmed; a general performance-qualified
 release profile is **not achieved**.
 
 ## Evidence and limits
+
+### Current owner-repeatability finding (2026-10-30)
+
+A same-process 65K/32 repeat localized expert 320's request-order output change
+to it moving from a CPU miss to GPU residency. Exact-input CPU and GPU replays
+matched their corresponding service rows. Static fixed-CPU and fixed-GPU
+repeats then matched prompt-boundary state, final recorded state and the full
+layer-1 MoE bundle within each owner mode. The fixed-GPU `STMOEX01` captures
+also matched both 1,382,400-byte weight payloads and 2,880-byte Q8_1 rows in
+each pair.
+
+Accepted-prefix tracing at five commit lengths repeated exactly within each
+owner mode, including token IDs and all eleven persistent fields. CPU- and
+GPU-owned prompt-boundary states differ, and sampled output IDs split at the
+third commit. This supports owner-dependent arithmetic/state as the cause of
+the sampled change, but does not compare NInfer against Strata while holding
+the GPU owner fixed, and does not qualify generation quality. Trace-enabled
+rates are excluded because synchronized hashing substantially slowed decode.
+These controls improve attribution; they do not add a performance win or
+change the no-release decision. See the [owner-repeat report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md).
+
+The next comparison should hold expert weights, GPU residency, active routes,
+miss policy and prompt fixed while toggling only the resident backend; first
+use an independent task oracle and accepted-prefix state, then run a no-trace
+screen with actual cache-hit telemetry. Any 5% effect still needs the planned
+seven randomized confirmation pairs.
 
 - The CUDA path is limited to Q2_0 gate/up and Q2_0 down weights with
   Flash-Next 2560/640 geometry. It is guarded by a CUDA build definition. The
