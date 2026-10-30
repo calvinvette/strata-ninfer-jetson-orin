@@ -2338,8 +2338,11 @@ adaptive request, replaying its exact first 8,192 token IDs produced different
 GDN, PLE, KV and pooled state fingerprints at the 8K boundary while returning
 the same first generated token as standalone short-prefix controls. Three
 standalone 8K repeats had identical state with adaptation enabled and with it
-disabled. The long request is therefore associated with the change, but a
-one-row route capture did not establish an owner transition or cause. Minimum
-available memory was 8.58 GiB; sampled OOM kills were zero. Instrumented rates
-are diagnostic only. Repair request-ID route capture before isolating the
-history effect. [Report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
+disabled. A matched 65K→8K repeat with adaptation disabled and the same
+profile returned the standalone fixed-profile state, implicating adaptive
+residency history in the change. A one-row route capture did not identify the
+specific transfer or its arithmetic effect. Minimum available memory was
+8.58 GiB adaptive and 8.68 GiB fixed-owner; sampled OOM kills were zero.
+Instrumented rates are diagnostic only. Add request-ID route capture and
+accepted-prefix state around the transfer before causal attribution.
+[Report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).

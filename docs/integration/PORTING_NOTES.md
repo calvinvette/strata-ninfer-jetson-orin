@@ -3298,10 +3298,10 @@ clock/energy telemetry before attributing service-rate differences.
 
 A same-process Q2_0 diagnostic adds a history control for a future Splash port:
 after a 65K request, replaying its exact 8K token prefix produced different
-GDN, PLE, KV and pooled fingerprints from the first 8K boundary, while the
-first generated token stayed the same. The same 8K prefix repeated identical
-state over three calls when run alone, both with adaptive swaps on and off.
-The second-request owner trace was incomplete, so this does not establish an
-owner-migration cause. Preserve explicit request IDs in owner captures and
+GDN, PLE, KV and pooled fingerprints with adaptive residency enabled. With the
+same profile and prompt sequence but adaptation disabled, the 8K replay
+matched the standalone fixed-profile state. This implicates adaptive residency
+history, but a one-row owner trace did not identify the specific transfer or
+its arithmetic effect. Preserve explicit request IDs in owner captures and
 compare accepted-prefix state alongside output tokens; cache hit-rate changes
 alone cannot identify which operation moved persistent state.

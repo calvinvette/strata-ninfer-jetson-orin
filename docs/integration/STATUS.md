@@ -7313,11 +7313,13 @@ This is screening evidence only; broader E6/E7 gates remain open. See the
 NInfer process, a 65,536-token Q2_0 request followed by the exact first 8,192
 token IDs produced a different persistent-state fingerprint at the replay's
 8K boundary than at position 8K of the long request. Both paths emitted the
-same first next-token ID. Standalone 8K repeats had matched state with
-adaptation both enabled and disabled, so request history is implicated, but
-the incomplete one-row route capture does not identify expert ownership as the
-cause. The long request had 32.9% GPU cache hits; the replay had 10.4%, which
-is diagnostic only. Minimum available RAM was 8.58 GiB and sampled OOM kills
-were zero. Rates are instrumented and not performance evidence. Next, repair
-the capture harness to record both requests with request IDs and compare owner
-maps before attributing the state change. [Report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
+same first next-token ID. A controlled repeat with adaptation disabled, the
+same original expert profile and same request sequence matched the standalone
+8K fixed-profile state exactly, implicating adaptive residency history in the
+replay state change. The one-row route capture still does not identify the
+specific transfer or its arithmetic effect. Adaptive-arm cache hits were
+32.9% for 65K and 10.4% for the 8K replay; fixed-owner hits were 12.0% and
+11.2%. These are diagnostic rates, not a performance comparison. Minimum
+available RAM was 8.58 GiB adaptive and 8.68 GiB fixed-owner; sampled OOM kills
+were zero. Next capture request-tagged owner rows and accepted-prefix state
+around a swap. [Report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
