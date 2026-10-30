@@ -41,6 +41,7 @@ class ApiControlBlockTests(unittest.TestCase):
             'STRATA_INTEGRATION_TRACE': '1',
             'STRATA_PROMPT_BOUNDARY_STATE_HASH': '1',
             'STRATA_REQUEST_RESET_STATE_HASH': '1',
+            'STRATA_PREFILL_STATE_HASH_AT': '8192,16384',
             'APP_SETTING': 'kept',
         }
         inherited = {
@@ -56,7 +57,8 @@ class ApiControlBlockTests(unittest.TestCase):
 
         for key in ('STRATA_TRACE', 'STRATA_STATE_HASH', 'STRATA_STATE_HASH_GDN',
                     'STRATA_INTEGRATION_TRACE', 'STRATA_ACCEPTED_PREFIX_TRACE',
-                    'STRATA_PROMPT_BOUNDARY_STATE_HASH', 'STRATA_REQUEST_RESET_STATE_HASH'):
+                    'STRATA_PROMPT_BOUNDARY_STATE_HASH', 'STRATA_REQUEST_RESET_STATE_HASH',
+                    'STRATA_PREFILL_STATE_HASH_AT'):
             self.assertNotIn(key, result_config)
             self.assertNotIn(key, result_env)
         self.assertEqual(result_config['APP_SETTING'], 'kept')
@@ -97,6 +99,16 @@ class ApiControlBlockTests(unittest.TestCase):
         self.assertNotIn('STRATA_TRACE', result_env)
         self.assertEqual(result_config['STRATA_REQUEST_RESET_STATE_HASH'], '1')
         self.assertEqual(result_env['STRATA_REQUEST_RESET_STATE_HASH'], '1')
+
+    def test_no_trace_can_retain_explicit_prefill_state_positions(self):
+        config = {'STRATA_TRACE': '1', 'STRATA_PREFILL_STATE_HASH_AT': '8192,16384'}
+        inherited = {'STRATA_TRACE': '1', 'STRATA_PREFILL_STATE_HASH_AT': '8192,16384', 'PATH': '/bin'}
+        result_config, result_env = configure_trace_environment(
+            config, inherited, True, prefill_state_hash_at='8192,16384')
+        self.assertNotIn('STRATA_TRACE', result_config)
+        self.assertNotIn('STRATA_TRACE', result_env)
+        self.assertEqual(result_config['STRATA_PREFILL_STATE_HASH_AT'], '8192,16384')
+        self.assertEqual(result_env['STRATA_PREFILL_STATE_HASH_AT'], '8192,16384')
 
 
 if __name__ == '__main__':

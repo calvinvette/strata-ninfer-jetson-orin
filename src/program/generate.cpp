@@ -9958,8 +9958,28 @@ int main(int argc, char** argv) {
             int64_t reread_to = -1;   // STRATA_CKPT_REREAD only: read [0, reread_to) again instead of restoring
             static const bool request_reset_state_hash =
                 std::getenv("STRATA_REQUEST_RESET_STATE_HASH") != nullptr;
-            auto hash_reset_state = [&](const strata::core::SessionState& state,
-                                        const char* label) -> bool {
+            static const std::vector<int64_t> prefill_state_hash_at = [] {
+                std::vector<int64_t> positions;
+                const char* value = std::getenv("STRATA_PREFILL_STATE_HASH_AT");
+                if (value == nullptr) return positions;
+                std::string list(value);
+                size_t begin = 0;
+                while (begin < list.size()) {
+                    const size_t end = list.find(',', begin);
+                    const std::string item = list.substr(begin, end == std::string::npos ? end : end - begin);
+                    char* tail = nullptr;
+                    const long long position = std::strtoll(item.c_str(), &tail, 10);
+                    if (tail != item.c_str() && *tail == '\0' && position > 0)
+                        positions.push_back((int64_t) position);
+                    if (end == std::string::npos) break;
+                    begin = end + 1;
+                }
+                std::sort(positions.begin(), positions.end());
+                positions.erase(std::unique(positions.begin(), positions.end()), positions.end());
+                return positions;
+            }();
+            auto hash_request_state = [&](const strata::core::SessionState& state,
+                                          const char* label, int64_t position) -> bool {
                 if (cudaDeviceSynchronize() != cudaSuccess) return false;
                 strata::core::ConversationStateSizes sizes;
                 std::string size_error;
@@ -10003,9 +10023,9 @@ int main(int argc, char** argv) {
                     return false;
                 }
                 std::fprintf(stderr,
-                             "strata serve: REQUEST_RESET_STATE session=%s gdn=%016llx ple=%016llx "
+                             "strata serve: REQUEST_STATE_CAPTURE session=%s position=%lld gdn=%016llx ple=%016llx "
                              "tail=%016llx dead=%016llx pooled_full=%016llx ple_prev=%d,%d\n",
-                             label, (unsigned long long) gdn, (unsigned long long) ple,
+                             label, (long long) position, (unsigned long long) gdn, (unsigned long long) ple,
                              (unsigned long long) tail, (unsigned long long) dead,
                              (unsigned long long) pooled, state.ple_prev[0], state.ple_prev[1]);
                 return true;
@@ -10019,10 +10039,10 @@ int main(int argc, char** argv) {
                     cudaStreamSynchronize(st->stream);
                 }
                 if (request_reset_state_hash) {
-                    if (!hash_reset_state(ss, "main")) return 1;
+                    if (!hash_request_state(ss, "main", 0)) return 1;
                     for (size_t i = 0; i < stages.size(); ++i) {
                         const strata::core::OnDevice on(stages[i]->dev);
-                        if (!hash_reset_state(stages[i]->ss, ("stage" + std::to_string(i)).c_str())) return 1;
+                        if (!hash_request_state(stages[i]->ss, ("stage" + std::to_string(i)).c_str(), 0)) return 1;
                     }
                 }
                 checks.clear();
@@ -10400,13 +10420,27 @@ int main(int argc, char** argv) {
             // continues from the slot with the same chunks.  #656's cooperative preemption, with a slot as the park.
             auto read_part = [&](int64_t a0, int64_t b0, std::string& e) -> bool {
                 // (a layer split reads its stages as a pipeline over one run's chunks: in pieces only beside slots)
-                if (o.batch <= 0 || piped || (!stages.empty() && !batch_on())) return sp.run(ids.data() + a0, b0 - a0, a0, e);
+                if (o.batch <= 0 || piped || (!stages.empty() && !batch_on())) {
+                    if (prefill_state_hash_at.empty()) return sp.run(ids.data() + a0, b0 - a0, a0, e);
+                    int64_t q = a0;
+                    for (int64_t position : prefill_state_hash_at) {
+                        if (position <= q || position > b0) continue;
+                        if (!sp.run(ids.data() + q, position - q, q, e)) return false;
+                        q = position;
+                        if (!hash_request_state(ss, "main", q)) return false;
+                    }
+                    if (q < b0 && !sp.run(ids.data() + q, b0 - q, q, e)) return false;
+                    return true;
+                }
                 const int64_t C = std::max<int64_t>(sp.chunk(), 1);
                 for (int64_t q = a0; q < b0;) {
                     const int64_t r = std::min(b0, q + C);
                     const auto tq = Clock::now();
                     if (!sp.run(ids.data() + q, r - q, q, e)) return false;
                     q = r;
+                    for (int64_t position : prefill_state_hash_at) {
+                        if (position == q && !hash_request_state(ss, "main", q)) return false;
+                    }
                     if (q >= b0) continue;
                     int ys = -1;
                     {   // a BSTOP that came meanwhile ends its slot at its next window; a BYIELD is for this read

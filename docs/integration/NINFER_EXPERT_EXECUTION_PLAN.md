@@ -693,9 +693,19 @@ boundary in GDN, pooled, KV and pooled-full state; response hashes differed as
 well. This places the variation after reset and by prompt completion, but the
 extra synchronization can perturb the trajectory and the result does not
 identify a kernel. The Strata-backend repeat without this reset hook also
-diverged, so the behavior is not unique to NInfer. Next localize the earliest
-prompt position where state differs under matched capture settings. See the
-[reset-state repeat report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/reset-state-65k-repeat.md).
+diverged, so the behavior is not unique to NInfer. A follow-up added opt-in
+`STRATA_PREFILL_STATE_HASH_AT` checkpoints and the harness flag
+`--prefill-state-hash-at`. The repeated 65K prompt has matching reset and
+recurrent/index fingerprints at 8,192, 16,384, 32,768 and 49,152 tokens; its
+final boundary at 65,535 reproduces the prior GDN, pooled, KV and pooled-full
+divergence. The earliest observed mismatch is bracketed after 49,152 and at
+or before 65,535. Captures synchronize and copy state, so this remains a
+diagnostic and not performance or kernel attribution evidence. The 65,536
+target emitted no separate sample because the prompt's internal boundary is
+65,535. See the [reset-state repeat
+report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/reset-state-65k-repeat.md)
+and [prompt-position checkpoint
+report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/prompt-position-checkpoints.md).
 
 **Exit:** operator effects and complete-request effects are both documented;
 per-model and combined charts include matched controls and uncertainty. Keep

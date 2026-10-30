@@ -91,10 +91,14 @@ reset fingerprints, then differed at prompt boundary in GDN, pooled, KV and
 pooled-full state. The output hashes also differed. This indicates divergence
 after reset and by prompt completion, but the synchronizing capture may alter
 execution and does not identify the operation. The earlier Strata-backend
-repeat also diverged, so the behavior is not unique to NInfer. Next localize
-the earliest prompt position where state differs under matched capture
-settings. See the
-[reset-state repeat report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/reset-state-65k-repeat.md).
+repeat also diverged, so the behavior is not unique to NInfer. A follow-up
+same-process repeat now matches reset and compact recurrent/index hashes at
+8,192, 16,384, 32,768 and 49,152 prompt tokens. At the final boundary
+(position 65,535), the earlier GDN, pooled, KV and pooled-full differences
+recurred. The earliest observed divergence is bracketed after 49,152 and at
+or before 65,535; no finer position has been tested. See the [reset-state
+repeat](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/reset-state-65k-repeat.md)
+and [prompt-position checkpoint report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/prompt-position-checkpoints.md).
 
 The latest E6 pilot repeated the 16K Q2_0 retrieval fixture at 262,144
 capacity with PCIe staging disabled, comparing Strata with strict NInfer.
