@@ -642,6 +642,21 @@ inspect prompt-cache/session reset and recurrent-state lifecycle, then repeat
 minimal boundary controls before resuming throughput qualification. See the
 [sampled-capture report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/accepted-prefix-instrumentation-README.md).
 
+**Matched 65K same-backend repeat (2026-10-30):** the current CUDA binary ran
+the same 65,536-token prompt twice in one strict-NInfer process, with prompt
+cache and PCIe staging disabled and both requests limited to one generated
+token. Both prompt-boundary fingerprints matched exactly across all recorded
+fields, both responses were `A`, and both requests passed. This confirms
+repeatability for this exact input and matched request shape; it does not
+resolve the earlier 128-token-warmup/32-token-measurement state difference or
+qualify Strata/NInfer parity. The dedicated prompt-boundary hook, absent from
+the earlier stale-binary attempt, emitted correctly on the current binary.
+That first attempt used the Oct 28 binary and is excluded from project
+evidence. No performance, minimum-memory-over-time, energy, or clock result is
+claimed; raw logs remain under `/tmp`. Next compare two identical 65K requests
+with a 32-token generation limit to isolate the earlier request-shape change.
+See the [matched repeat report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/README.md).
+
 **Exit:** operator effects and complete-request effects are both documented;
 per-model and combined charts include matched controls and uncertainty. Keep
 historical unmatched charts labeled as observations. There is no universal

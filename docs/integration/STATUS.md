@@ -56,6 +56,18 @@ it is not performance evidence. E6/E7 remain open pending request-state
 lifecycle investigation. See
 the [accepted-prefix report and sanitized summary](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/accepted-prefix-instrumentation-README.md).
 
+A current-source same-backend repeat then sent the exact 65K prompt twice
+through one strict-NInfer process, with cache disabled and both requests
+limited to one generated token. Both passed, returned `A`, and had identical
+prompt-boundary and final persistent-state fingerprints. This supports
+repeatability for that matched request shape, but does not explain the earlier
+128-token-warmup/32-token-measured divergence or establish cross-backend
+parity. The hook emitted on the current binary; an initial attempt used an
+older Oct 28 binary and is excluded. The diagnostic did not collect continuous
+memory, clock, or energy telemetry and is not performance evidence. Next
+repeat the exact 65K prompt with a matched 32-token generation limit. See the
+[current-source repeat report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/README.md).
+
 The latest E6 pilot repeated the 16K Q2_0 retrieval fixture at 262,144
 capacity with PCIe staging disabled, comparing Strata with strict NInfer.
 Both arms matched the exact answer, all 47 tokens, all persistent-state
