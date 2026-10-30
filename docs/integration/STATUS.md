@@ -65,8 +65,18 @@ repeatability for that matched request shape, but does not explain the earlier
 parity. The hook emitted on the current binary; an initial attempt used an
 older Oct 28 binary and is excluded. The diagnostic did not collect continuous
 memory, clock, or energy telemetry and is not performance evidence. Next
-repeat the exact 65K prompt with a matched 32-token generation limit. See the
+the exact 65K prompt was repeated with a matched 32-token generation limit. See the
 [current-source repeat report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/README.md).
+
+In that matched 65K/32 repeat, the first strict-NInfer request's boundary
+fingerprint matched the one-token repeat, but the second identical request
+differed in GDN, tail, pooled, KV, dead and pooled-full state; PLE, MTP, stale
+and PLE previous-token fields matched. Both API calls passed, but the 32-token
+response hashes differed. Since prompt reuse was disabled and the source calls
+`session_zero` at `resume == 0`, the divergence is present after the explicit
+reset and by prompt completion. This does not identify the computation or
+attribute the issue to an NInfer kernel. The current-source Strata-backend
+repeat is next. See the [32-token repeat report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/32-token-repeat.md).
 
 The latest E6 pilot repeated the 16K Q2_0 retrieval fixture at 262,144
 capacity with PCIe staging disabled, comparing Strata with strict NInfer.

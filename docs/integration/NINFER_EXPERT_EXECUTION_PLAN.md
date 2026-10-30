@@ -653,9 +653,24 @@ qualify Strata/NInfer parity. The dedicated prompt-boundary hook, absent from
 the earlier stale-binary attempt, emitted correctly on the current binary.
 That first attempt used the Oct 28 binary and is excluded from project
 evidence. No performance, minimum-memory-over-time, energy, or clock result is
-claimed; raw logs remain under `/tmp`. Next compare two identical 65K requests
-with a 32-token generation limit to isolate the earlier request-shape change.
+claimed; raw logs remain under `/tmp`. A follow-up used a matched 32-token
+generation limit; see below.
 See the [matched repeat report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/README.md).
+
+**Matched 65K 32-token repeat (2026-10-30):** on the same current binary and
+strict-NInfer setup, the identical prompt and generation limit were sent twice
+through one process with prompt cache disabled. The first prompt-boundary
+fingerprint matched the prior one-token run. The second differed in GDN, tail,
+pooled, KV, dead and pooled-full state; PLE, MTP, stale and PLE previous-token
+fields matched. Both requests passed, but their 32-token response hashes
+differed (`9eb4258b…` then `a26d04bc…`). Thus exact matched request settings
+do not guarantee repeatable long-context state or output within one NInfer
+process. `session_zero` is called on the no-resume path before each prompt, so
+the evidence points to divergence during prompt evaluation or another
+request-history-sensitive path after reset; it does not isolate an NInfer
+kernel as the cause. No performance or sustained resource claim is made. The
+next control is the same repeated 65K/32 request with Strata's expert backend.
+See the [32-token repeat report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/32-token-repeat.md).
 
 **Exit:** operator effects and complete-request effects are both documented;
 per-model and combined charts include matched controls and uncertainty. Keep
