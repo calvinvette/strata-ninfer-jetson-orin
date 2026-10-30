@@ -1215,6 +1215,7 @@ struct Drive {
     strata::core::ExpertDispatch d;
     double cpu_ms = 0;
     int64_t calls = 0;
+    uint64_t capture_request_sequence = 0;
     /// THE ROUTING TRACE, which is P0.S8 and a stated prerequisite of Phase 3.  `drive_pool` is called once
     /// per layer from the main loop - the workers live inside `expert_pool_dispatch` - so a single FILE* here
     /// needs no locking.  `d.layers` is the CURRENT layer on entry (the adapter increments it as it walks the
@@ -10030,6 +10031,7 @@ int main(int argc, char** argv) {
                              (unsigned long long) pooled, state.ple_prev[0], state.ple_prev[1]);
                 return true;
             };
+            drive.d.capture_request_id = drive.capture_request_sequence++;
             if (resume == 0) {
                 strata::core::session_zero(ss, g, nullptr, main_cs);
                 cudaStreamSynchronize(main_stream);

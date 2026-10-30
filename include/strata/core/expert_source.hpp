@@ -289,6 +289,7 @@ struct GpuPlanSink {
 struct ForesightSwap;
 
 struct ExpertDispatch {
+    uint64_t capture_request_id = 0; ///< request sequence for opt-in route diagnostics only
     ForesightSwap* fs = nullptr;   ///< Foresight swap space (STRATA_FS_SLOTS; null = off)
     strata::kernels::cpu::ExpertPool* pool = nullptr;
     ExpertSource* src = nullptr;

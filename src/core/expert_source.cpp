@@ -3116,11 +3116,18 @@ static_assert(strata::kernels::cpu::MAXT * 10 <= kMaxWindowEntries, "a verify wi
 // Opt-in diagnostic for reproducing expert CPU/GPU differences on an actual verifier activation.
 // Each JSONL row contains one verifier-row activation, its absolute input token key, and every routed expert and its
 // final owner: -1 CPU, 0 primary VRAM/foresight, 1 PCIe, 2 peer/helper GPU. No token text is recorded.
-uint64_t capture_moe_window(int64_t layer, const float* x, const int32_t* ids, const int32_t* kind,
+uint64_t capture_moe_window(uint64_t request_id, int64_t layer, const float* x, const int32_t* ids, const int32_t* kind,
                             int64_t n_tok, int64_t k, int64_t n_embd, const int32_t* row_tokens,
                             const int64_t* row_positions, int64_t position0) {
     static const char* const path = std::getenv("STRATA_CAPTURE_MOE_PATH");
-    if (path == nullptr || *path == '\0') return 0;
+    static const char* const position_trace_path = std::getenv("STRATA_TRACE_MOE_POSITION_PATH");
+    static const int64_t position_trace_layer = [] {
+        const char* p = std::getenv("STRATA_TRACE_MOE_POSITION_LAYER");
+        return p == nullptr ? (int64_t) 1 : std::max<int64_t>(0, std::strtoll(p, nullptr, 10));
+    }();
+    const bool capture_enabled = path != nullptr && *path != '\0';
+    const bool position_trace_enabled = position_trace_path != nullptr && *position_trace_path != '\0';
+    if (!capture_enabled && !position_trace_enabled) return 0;
     static const int64_t selected_layer = [] {
         const char* p = std::getenv("STRATA_CAPTURE_MOE_LAYER");
         return p == nullptr ? (int64_t) -1 : (int64_t) std::strtoll(p, nullptr, 10);
@@ -3175,14 +3182,50 @@ uint64_t capture_moe_window(int64_t layer, const float* x, const int32_t* ids, c
         int64_t seen_rows = 0;
         uint64_t dispatch = 0;
         FILE* file = nullptr;
+        FILE* position_trace_file = nullptr;
         bool failed = false;
+        bool position_trace_failed = false;
         std::mutex mutex;
-        ~State() { if (file != nullptr) std::fclose(file); }
+        ~State() {
+            if (file != nullptr) std::fclose(file);
+            if (position_trace_file != nullptr) std::fclose(position_trace_file);
+        }
     };
     static State capture;
     std::lock_guard<std::mutex> lock(capture.mutex);
     const uint64_t dispatch = capture.dispatch++;
-    if (capture.failed || capture.rows >= limit || (selected_layer >= 0 && layer != selected_layer)) return dispatch;
+    if (position_trace_path != nullptr && *position_trace_path != '\0' && !capture.position_trace_failed &&
+        (position_trace_layer < 0 || layer == position_trace_layer)) {
+        int64_t position_min = INT64_MAX, position_max = -1;
+        for (int64_t t = 0; t < n_tok; ++t) {
+            const int64_t position = row_positions != nullptr ? row_positions[t] : position0 + t;
+            position_min = std::min(position_min, position);
+            position_max = std::max(position_max, position);
+        }
+        if (capture.position_trace_file == nullptr) {
+            capture.position_trace_file = std::fopen(position_trace_path, "wb");
+            if (capture.position_trace_file == nullptr) {
+                capture.position_trace_failed = true;
+                std::fprintf(stderr, "strata: cannot open MoE position trace path '%s': %s\n",
+                             position_trace_path, std::strerror(errno));
+            } else {
+                std::fprintf(capture.position_trace_file,
+                             "{\"format\":\"strata-moe-position-trace-v1\",\"layer\":%lld}\n",
+                             (long long) layer);
+            }
+        }
+        if (capture.position_trace_file != nullptr) {
+            std::fprintf(capture.position_trace_file,
+                         "{\"request\":%llu,\"dispatch\":%llu,\"n_tok\":%lld,"
+                         "\"position0\":%lld,\"position_min\":%lld,\"position_max\":%lld}\n",
+                         (unsigned long long) request_id, (unsigned long long) dispatch,
+                         (long long) n_tok, (long long) position0, (long long) position_min,
+                         (long long) position_max);
+            std::fflush(capture.position_trace_file);
+        }
+    }
+    if (!capture_enabled || capture.failed || capture.rows >= limit ||
+        (selected_layer >= 0 && layer != selected_layer)) return dispatch;
     for (int64_t t = 0; t < n_tok && capture.rows < limit; ++t) {
         const int64_t stream_row = capture.seen_rows++;
         if (stream_row < start_row) continue;
@@ -3456,7 +3499,7 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
             for (int64_t i = 0; i < n; ++i) if (d.remote[r]->owns(i)) kind[i] = 2;
         }
     }
-    const uint64_t capture_dispatch = capture_moe_window(d.layers, x_f, ids, kind, n_tok, k, H,
+    const uint64_t capture_dispatch = capture_moe_window(d.capture_request_id, d.layers, x_f, ids, kind, n_tok, k, H,
                                                           row_tokens, row_positions, position0);
     static const bool dec_batch = [] { const char* v = std::getenv("STRATA_DEC_BATCH"); return v == nullptr || std::atoi(v) != 0; }();
     // the GPU's copy_rows_from_mapped zeroes the rows it computed itself (dec_batch); STRATA_VERIFY_DEVICE_PLAN's

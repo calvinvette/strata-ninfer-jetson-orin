@@ -7343,6 +7343,20 @@ state and token hashes reproduced. The replay row's selected-layer position
 mapping or dispatch path remains unobserved; trace positions across all calls
 before adding causal claims.
 
+**E6 request-tagged route-position trace (2026-10-30):** an opt-in trace now
+records every selected-layer dispatch with its request sequence and absolute
+token position. On the adaptive 65K→8K replay, it recorded request 0's 32
+late-decode rows at positions 65,535–65,566 and request 1's layer-1 dispatch
+at position 8,191. The paired owner record was present and matched the short
+two-8K route IDs and owner kinds. The previous one-row observation reflected
+the limited route capture view, not a missing replay dispatch. State and output
+hashes reproduced, while the 8K replay state still differs from standalone
+and fixed-owner controls. This resolves route-row observability only; it does
+not attribute the state delta to the selected row or a particular expert
+transfer. The run passed with 9.16 GiB minimum available RAM and zero sampled
+OOM kills. Instrumented prefill rates are not benchmark comparisons. See the
+[updated diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
+
 **E7 current-source portability rebuild (2026-10-30):** full HIP and SYCL
 target trees rebuilt at source `4229c00e` on maestro1 with one-job builds. HIP
 `strata --help` passed and the host-only `shared_memory_budget_test` passed.

@@ -106,10 +106,44 @@ The supervisor passed with 8.54 GiB minimum available memory and zero sampled
 OOM kills. Raw data is in `/tmp/e6-65k-long-prefix-owner-window/` and
 `/tmp/e6-65k-long-prefix-owner-window-supervisor/` on the Orin.
 
+### Request-tagged selected-layer position trace
+
+An opt-in route-position trace was added for selected-layer MoE dispatches.
+Unlike the owner capture filter, it records every observed dispatch position
+and the request sequence number. On the adaptive 65K→8K rerun it recorded 32
+layer-1 decode dispatches for request 0, at positions 65,535–65,566, then one
+layer-1 row for request 1 at position 8,191 (dispatch 1,537). The owner capture
+also emitted that replay row: token ID 2438, routed experts
+`[155, 500, 67, 499, 12, 6, 439, 153, 232, 160]`, owner kinds
+`[-1, -1, -1, -1, 0, 0, -1, -1, -1, -1]`. Thus the selected-layer replay
+dispatch was present at the expected position; the earlier apparent omission
+came from interpreting a capture that sampled late decode positions during
+the 65K request as a complete per-request dispatch trace. The short two-8K
+control and this long→prefix trace now both show the replay's layer-1 row.
+
+The run reproduced the adaptive state and output hashes: 65K boundary GDN
+`85907b6a2b85d24e`, PLE `df3795d240365f69`, tail `c4a5d96bb5c4e077`,
+pooled-full `f2e8d94d3fe3944a`; replay GDN `994f4c41001157d9`, PLE
+`8f834c5fe472a9e5`, tail `2f18de91a9aab11b`, pooled-full
+`f3ce497f5331f3e7`; generated token IDs and hashes matched prior adaptive
+runs. The replay route IDs/owner kinds therefore do not by themselves explain
+the state change. A causal link to another layer, an earlier state update, or
+an adaptive transfer remains unproven. The supervisor passed with 9.16 GiB
+minimum available physical memory, above the six-GiB floor, and zero sampled
+OOM kills. Instrumented prompt rates were 86.6 tok/s for 65K and 76.1 tok/s
+for 8K; these are diagnostic observations, not comparable performance data.
+Raw files are in `/tmp/e6-65k-long-prefix-request-trace/` and
+`/tmp/e6-65k-long-prefix-request-trace-supervisor/` on the Orin.
+
+The trace is opt-in via `STRATA_TRACE_MOE_POSITION_PATH` and
+`STRATA_TRACE_MOE_POSITION_LAYER`. `STRATA_CAPTURE_MOE_PATH` now shares the
+dispatch hook and adds a request sequence to its internal call, but the owner
+JSON schema is unchanged. No default serving behavior or cache policy changed.
+
 ## Next diagnostic
 
-Instrument the selected layer's observed route positions across all calls in
-the long→prefix sequence, tag captures by request ID, then capture
-accepted-prefix state around the first adaptive swap and corresponding replay
-position. The controlled toggle supports adaptation as a factor but does not
-connect a specific expert transfer to the state delta.
+Capture accepted-prefix state across additional layers around the first
+adaptive swap and corresponding replay position. The selected layer-1 replay
+row is now observable and its route/owner record matches the short control,
+but the controlled toggle still does not connect a specific expert transfer
+to the state delta.

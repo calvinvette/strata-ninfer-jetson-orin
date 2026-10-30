@@ -3314,3 +3314,13 @@ In the 65K→8K case, widening the layer-1 filter to eight nearby positions and
 raising its row cap still did not expose the replay row. Instrument and retain
 all observed route positions for that layer per request before interpreting a
 missing filtered row as an ownership event.
+
+The follow-up request-tagged trace resolved this observability issue: it showed
+32 selected-layer dispatches late in request 0 and the replay dispatch at
+position 8191 in request 1. The owner capture for that row matched the short
+two-request control. For Splash, tag trace rows with request sequence and
+absolute token position at the dispatch boundary, and distinguish filtered
+owner captures from full position traces. Do not infer that a request skipped
+a layer or route merely because a narrow position filter emitted no row. The
+replay state difference persisted despite the matching sampled route row, so
+trace adjacent layers/state boundaries before assigning a causal mechanism.
