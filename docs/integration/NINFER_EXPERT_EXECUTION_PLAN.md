@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **E0–E5 bounded prototype evidence complete; E6 same-process 65K repeats show request-dependent state/output changes, now localized to expert 320 changing owner from CPU miss to resident GPU between requests while the recorded grouped Q8_1 row remains byte-identical. E6/E7 remain open pending owner-controlled parity, repeatability and end-to-end performance qualification. HIP/SYCL rebuilds for the latest diagnostic changes are pending compiler availability (updated 2026-10-30).**
+Status: **E0–E5 bounded prototype evidence complete; E6 same-process 65K repeats show request-dependent state/output changes, localized to expert 320 changing owner from CPU miss to resident GPU between requests while the recorded grouped Q8_1 row remains byte-identical. Exact-input CPU/GPU replay matched each request's captured expert row. E6/E7 remain open pending fixed-owner service repeats, broader repeatability and end-to-end performance qualification. HIP/SYCL rebuilds for the latest diagnostic changes are pending compiler availability (updated 2026-10-30).**
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -755,8 +755,11 @@ expert result differs from the independent GPU oracle and the request-2 result
 matches it, making the CPU-miss to resident-GPU ownership transition the direct
 explanation for this pair's expert-row change. This is not evidence of an
 NInfer kernel changing under fixed inputs. Next force and verify fixed CPU and
-GPU ownership across repeated requests, capture the CPU-miss expert row, and
-then compare request performance with actual ownership/hit-rate telemetry.
+GPU ownership across repeated service requests, check their accepted-prefix
+state, and compare request performance with actual ownership/hit-rate
+telemetry. The exact-input `native_expert_parity` replay matched the service's
+CPU-owned request-1 row and GPU-owned request-2 row bit-for-bit; see the
+[ownership report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md).
 E6/E7 remain open.
 
 **Exit:** operator effects and complete-request effects are both documented;

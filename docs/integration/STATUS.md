@@ -15,10 +15,13 @@ position 65,535, request 1 had no GPU cache slot for expert 320 (CPU miss),
 while request 2 used resident GPU slot 145. The grouped Q8_1 capture was
 byte-identical; request 2's 1,382,400 device weight bytes were captured. The
 previous per-expert bundle shows request 2 matches the independent GPU oracle
-and request 1 does not. This points to CPU-versus-GPU execution under changing
-cache residency, not an NInfer kernel changing under fixed GPU inputs. The
-supervised run passed with 8.54 GiB minimum available RAM and zero cgroup OOM
-kills; its timing is diagnostic only. E6/E7 remain open. See the
+and request 1 does not. Exact-input native CPU/GPU replay matched the
+corresponding service rows bit-for-bit; cross-owner outputs differed in
+2,220/2,560 values (relative L2 `5.25e-4`). This attributes the change to
+CPU-versus-GPU execution under changing cache residency, not an NInfer kernel
+changing under fixed GPU inputs. The supervised run passed with 8.54 GiB
+minimum available RAM and zero cgroup OOM kills; its timing is diagnostic
+only. E6/E7 remain open. See the
 [expert-320 ownership report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md).
 
 **E6 64K no-trace API screen (2026-10-29):** three fresh-process pairs

@@ -96,6 +96,16 @@ oracle, while the second matches it at relative L2 `5.79e-08`. The changing
 row is consistent with a CPU-to-GPU owner transition, rather than a changing
 NInfer kernel for fixed GPU inputs.
 
+To check that attribution directly, `native_expert_parity` replayed the
+captured F32 MoE input and model-layer-1/expert-320 GGUF weights through
+Strata's native CPU path and grouped GPU path. The CPU replay matched request
+1's captured service row bit-for-bit; the GPU replay matched request 2's row
+bit-for-bit. Comparing the two owners changed 2,220/2,560 output values, with
+maximum absolute difference `3.18438e-05` and relative L2 `5.24527e-04`.
+The test passed. Together with the prior fixed-input NInfer/Strata grouped
+replay, this attributes the captured row change to the cache-driven CPU/GPU
+owner transition, not nondeterminism within either tested kernel path.
+
 This also bounds what the integration accelerates. NInfer handles supported
 experts only while they are GPU-resident; active routed experts can still be
 computed by Strata's CPU pool. The two requests' decode GPU-cache hit rates
@@ -110,13 +120,12 @@ and supervisor telemetry remain under
 
 This is evidence of request-to-request variation in one expert row with fixed
 route IDs and input but different execution owners, reproduced byte-for-byte
-under both backend configurations. It is a correctness localization finding,
-not a general determinism claim. The owner transition localizes the observed
-output change to the CPU-miss versus resident-GPU computation path for expert
-320. Next hold
-that expert's owner fixed across repeated requests and compare CPU and GPU
-expert rows, then measure end-to-end performance with the actual residency and
-hit-rate distribution recorded.
+under both backend configurations. The output change is explained by the
+CPU-miss versus resident-GPU computation path for expert 320. This does not
+establish a general determinism guarantee or quantify an end-to-end speedup.
+Next hold that expert's owner fixed across repeated service requests, verify
+the accepted-prefix state, then measure end-to-end performance with actual
+residency and hit-rate distributions recorded.
 
 Both requests passed. The initial bundle run recorded 8.61 GiB minimum
 available RAM, 4.18 GiB peak swap use, and no cgroup OOM kills. The follow-up
