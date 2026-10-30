@@ -86,9 +86,15 @@ and [Strata control](../../bench/results/2026-10-30-e6-q2-identical-65k-request-
 An opt-in post-`session_zero` fingerprint hook is now built and smoke-tested.
 It captures recurrent and QSA index state before prompt evaluation; the two
 512-token requests had identical reset and prompt-boundary hashes. The 8
-harness tests pass. This does not qualify the hook at long context. Next use
-it on the 65K/32 NInfer repeat to determine whether reset state already
-differs or diverges during prompt processing.
+harness tests pass. At 65K/32, both NInfer requests had identical immediate
+reset fingerprints, then differed at prompt boundary in GDN, pooled, KV and
+pooled-full state. The output hashes also differed. This indicates divergence
+after reset and by prompt completion, but the synchronizing capture may alter
+execution and does not identify the operation. The earlier Strata-backend
+repeat also diverged, so the behavior is not unique to NInfer. Next localize
+the earliest prompt position where state differs under matched capture
+settings. See the
+[reset-state repeat report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/reset-state-65k-repeat.md).
 
 The latest E6 pilot repeated the 16K Q2_0 retrieval fixture at 262,144
 capacity with PCIe staging disabled, comparing Strata with strict NInfer.

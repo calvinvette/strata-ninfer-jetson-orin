@@ -687,8 +687,15 @@ index state, and the PLE previous-token window. It does not hash KV bytes:
 their old streamed host contents are not live before a request writes cells.
 The CUDA build succeeded and the harness tests passed 8/8. A repeated 512-token
 smoke produced identical reset fingerprints (`ple_prev=-1,-1`) and identical
-prompt-boundary fingerprints. This only validates the hook and short-context
-reset behavior; the matched 65K/32 request repeat with the hook is pending.
+prompt-boundary fingerprints. A current-source 65K/32 repeated NInfer pair
+then had identical immediate reset fingerprints but differed at the prompt
+boundary in GDN, pooled, KV and pooled-full state; response hashes differed as
+well. This places the variation after reset and by prompt completion, but the
+extra synchronization can perturb the trajectory and the result does not
+identify a kernel. The Strata-backend repeat without this reset hook also
+diverged, so the behavior is not unique to NInfer. Next localize the earliest
+prompt position where state differs under matched capture settings. See the
+[reset-state repeat report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/reset-state-65k-repeat.md).
 
 **Exit:** operator effects and complete-request effects are both documented;
 per-model and combined charts include matched controls and uncertainty. Keep
