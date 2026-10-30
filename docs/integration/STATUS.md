@@ -101,8 +101,17 @@ window for the final prompt token, before any generated-token commit. It does
 not identify an operator or arithmetic cause, and both captures synchronize
 and copy state. Per-layer hashes immediately after that window match for the
 first two GDN state ordinals and first differ at ordinal 2 (model layer 2);
-all QSA layer hashes from model layer 3 onward differ. The next diagnostic is
-to capture model layer 2's pre/post state and verifier activation. See the
+all QSA layer hashes from model layer 3 onward differ. The model-layer-2 raw
+capture found its entering recurrent matrix and convolution history bit-identical,
+while its 2,560-value input activation already differed in 2,554 values
+(relative L2 `3.10649e-05`). Differences propagated through the projections
+and output; post-window recurrent state differed in 784,908/786,432 values
+(relative L2 `5.5023e-05`) and convolution history in 10,237/30,720
+(relative L2 `1.91276e-04`). The next capture targets the preceding
+model-layer-1 output/residual boundary; this does not identify the source of
+the small incoming activation difference. See the [raw layer-2 transition
+report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/gdn-layer2-raw-transition.md),
+the
 [reset-state repeat](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/reset-state-65k-repeat.md),
 [position checkpoints](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/prompt-position-checkpoints.md)
 and [per-layer verifier report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/verifier-first-layer-state-hashes.md).

@@ -717,9 +717,14 @@ change to a kernel or arithmetic cause. See the [final-prompt-token verifier
 report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/final-prompt-token-verifier-transition.md).
 Per-layer hashes after this window match for the first two ordered GDN states
 and first differ at GDN ordinal 2, model layer 2; all 12 QSA layer hashes from
-model layer 3 onward differ. Next capture model layer 2's pre/post recurrent
-state and verifier activation. See the [per-layer state
-report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/verifier-first-layer-state-hashes.md).
+model layer 3 onward differ. A raw verifier capture then found model layer 2's
+entering recurrent and convolution state exactly equal, but its input activation
+already differed in 2,554/2,560 values (relative L2 `3.10649e-05`). The
+difference propagates through layer-2 projections and post-state. This moves
+the next capture to the model-layer-1 output/residual boundary; it does not
+attribute the small input difference to a specific operation. See the
+[per-layer state report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/verifier-first-layer-state-hashes.md)
+and [raw layer-2 transition report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/gdn-layer2-raw-transition.md).
 
 **Exit:** operator effects and complete-request effects are both documented;
 per-model and combined charts include matched controls and uncertainty. Keep
