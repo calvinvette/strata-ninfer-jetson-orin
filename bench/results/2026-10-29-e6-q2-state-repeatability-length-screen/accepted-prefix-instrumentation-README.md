@@ -82,9 +82,13 @@ This narrows the unresolved issue: the long-warmup control state matches across
 backends, but measured state differs by the first post-prefill checkpoint,
 before sampled token IDs diverge. The capture does not show whether the
 underlying state difference first arises during prompt processing or when the
-first verifier commit is published. A prompt-boundary state comparison is the
-next targeted diagnostic. E6 and E7 remain open, and no backend performance
-claim or release profile is justified.
+first verifier commit is published. An opt-in prompt-boundary hash now records
+state after the first verifier window has processed the final prompt token and
+before the first commit. The CUDA build and a short API smoke passed; both the
+512-token warmup and measured request emitted exactly one prompt-boundary
+record, with full `STRATA_TRACE` disabled. The next diagnostic is to run this
+capture on the matched 65K pair. E6 and E7 remain open, and no backend
+performance claim or release profile is justified.
 
 Sanitized paired results and the first-checkpoint state comparison are in
 [accepted-prefix-instrumentation-summary.json](accepted-prefix-instrumentation-summary.json).

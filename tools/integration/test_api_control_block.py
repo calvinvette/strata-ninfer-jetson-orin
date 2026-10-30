@@ -39,19 +39,22 @@ class ApiControlBlockTests(unittest.TestCase):
             'STRATA_TRACE': '1',
             'STRATA_STATE_HASH': '1',
             'STRATA_INTEGRATION_TRACE': '1',
+            'STRATA_PROMPT_BOUNDARY_STATE_HASH': '1',
             'APP_SETTING': 'kept',
         }
         inherited = {
             'STRATA_TRACE': '1',
             'STRATA_STATE_HASH_GDN': '1',
             'STRATA_ACCEPTED_PREFIX_TRACE': '1',
+            'STRATA_PROMPT_BOUNDARY_STATE_HASH': '1',
             'PATH': '/bin',
         }
 
         result_config, result_env = configure_trace_environment(config, inherited, True)
 
         for key in ('STRATA_TRACE', 'STRATA_STATE_HASH', 'STRATA_STATE_HASH_GDN',
-                    'STRATA_INTEGRATION_TRACE', 'STRATA_ACCEPTED_PREFIX_TRACE'):
+                    'STRATA_INTEGRATION_TRACE', 'STRATA_ACCEPTED_PREFIX_TRACE',
+                    'STRATA_PROMPT_BOUNDARY_STATE_HASH'):
             self.assertNotIn(key, result_config)
             self.assertNotIn(key, result_env)
         self.assertEqual(result_config['APP_SETTING'], 'kept')
@@ -72,6 +75,16 @@ class ApiControlBlockTests(unittest.TestCase):
         self.assertNotIn('STRATA_TRACE', result_env)
         self.assertEqual(result_config['STRATA_ACCEPTED_PREFIX_TRACE'], '1')
         self.assertEqual(result_env['STRATA_ACCEPTED_PREFIX_TRACE'], '1')
+
+    def test_no_trace_can_retain_explicit_prompt_boundary_hash(self):
+        config = {'STRATA_TRACE': '1', 'STRATA_PROMPT_BOUNDARY_STATE_HASH': '1'}
+        inherited = {'STRATA_TRACE': '1', 'STRATA_PROMPT_BOUNDARY_STATE_HASH': '1', 'PATH': '/bin'}
+        result_config, result_env = configure_trace_environment(
+            config, inherited, True, prompt_boundary_state_hash=True)
+        self.assertNotIn('STRATA_TRACE', result_config)
+        self.assertNotIn('STRATA_TRACE', result_env)
+        self.assertEqual(result_config['STRATA_PROMPT_BOUNDARY_STATE_HASH'], '1')
+        self.assertEqual(result_env['STRATA_PROMPT_BOUNDARY_STATE_HASH'], '1')
 
 
 if __name__ == '__main__':

@@ -10603,6 +10603,8 @@ int main(int argc, char** argv) {
             for (int64_t i = 0; i < n - 1; ++i) consumed.push_back((int32_t) ids[(size_t) i]);
             static const bool state_hash = std::getenv("STRATA_STATE_HASH") != nullptr;
             static const bool accepted_prefix_trace = std::getenv("STRATA_ACCEPTED_PREFIX_TRACE") != nullptr;
+            static const bool prompt_boundary_state_hash =
+                std::getenv("STRATA_PROMPT_BOUNDARY_STATE_HASH") != nullptr;
             static const int accepted_prefix_trace_stride = accepted_prefix_trace ? [] {
                     const char* value = std::getenv("STRATA_ACCEPTED_PREFIX_TRACE_STRIDE");
                     if (value == nullptr) return 1;
@@ -11595,6 +11597,14 @@ int main(int argc, char** argv) {
                         std::fprintf(stderr, "strata serve: serial verifier logits trace failed\n");
                         return 1;
                     }
+                if (first_window && prompt_boundary_state_hash) {
+                    std::string fingerprint;
+                    if (!hash_session_state(n, fingerprint)) return 1;
+                    std::fprintf(stderr,
+                                 "strata serve: PROMPT_BOUNDARY_STATE position=%lld state={%s}\n",
+                                 (long long) p, fingerprint.c_str());
+                    std::fflush(stderr);
+                }
                 // Diagnostics (as in generate): STRATA_DUMP_FIRST_LOGITS=<path> writes the logits of each request's first
                 // window to <path>.<n>, so the prompt paths (a peer card's share, a split) can be compared by KL
                 if (first_window) {

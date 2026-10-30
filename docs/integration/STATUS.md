@@ -44,9 +44,11 @@ measured output matched its warmup; NInfer measured output did not. Prompt TPS
 was 85.8/86.0 and decode TPS 0.3/0.3 (Strata/NInfer), but a single pair with
 different outputs is not a performance comparison. Minimum available RAM was
 8.60/8.67 GiB and peak swap 0.73/1.83 GiB; OOM counters were zero. The sampled
-hashing still synchronizes. Next, compare persistent state at the prompt
-boundary before the first generated-token commit to tell whether the measured
-state difference originates during prefill or commit. E6/E7 remain open. See
+hashing still synchronizes. The opt-in prompt-boundary hash now passes a
+two-request 512-token API smoke with full tracing disabled; the 65K matched
+capture is pending. That comparison should tell whether the measured state
+difference originates during prompt processing or the first commit. E6/E7
+remain open. See
 the [accepted-prefix report and sanitized summary](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/accepted-prefix-instrumentation-README.md).
 
 The latest E6 pilot repeated the 16K Q2_0 retrieval fixture at 262,144
