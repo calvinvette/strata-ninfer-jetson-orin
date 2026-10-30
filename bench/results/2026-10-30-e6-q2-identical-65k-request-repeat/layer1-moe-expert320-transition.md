@@ -72,17 +72,53 @@ fixed-input one-entry replay. The unchanged backend output therefore narrows
 the cause to shared service/runtime context (for example, the live expert
 weight view or cache-slot ownership) but does not establish which one.
 
+## Service execution ownership capture
+
+A follow-up current-source strict-NInfer run captured the grouped Q8_1 row and
+expert-320 resident-cache entry at model layer 1, position 65,535, for the same
+65K/32 repeated-request workload. Both capture records used token 271. The
+supervised run passed with 8.54 GiB minimum available RAM, 4.52 GiB peak swap,
+and zero cgroup OOM kills; instrumentation makes its timing unsuitable as
+performance evidence.
+
+| Request | Expert-320 owner evidence | Captured expert weights | Grouped Q8_1 row |
+| --- | --- | --- | --- |
+| 1 | No GPU resident slot (`slot = -1`) | Not present in the device cache | SHA-256 `61ad484b…fed17599` |
+| 2 | GPU resident slot 145 | 1,382,400 bytes; SHA-256 `932d559a…5e42781` | SHA-256 `61ad484b…fed17599` |
+
+The Q8_1 rows were byte-identical (0 of 2,880 bytes changed). The earlier MoE
+bundle shows the F32 MoE input was also byte-identical, while the expert-320
+output changed. At request 1 expert 320 was not in the GPU grouped dispatch and
+was served by the CPU miss path; by request 2 it occupied a GPU cache slot and
+went through the resident grouped path. This owner change explains the two
+per-expert results: the first differs from the independent GPU Q2_0 × Q8_1
+oracle, while the second matches it at relative L2 `5.79e-08`. The changing
+row is consistent with a CPU-to-GPU owner transition, rather than a changing
+NInfer kernel for fixed GPU inputs.
+
+This also bounds what the integration accelerates. NInfer handles supported
+experts only while they are GPU-resident; active routed experts can still be
+computed by Strata's CPU pool. The two requests' decode GPU-cache hit rates
+were 32.9% and 62.5%, respectively. Future performance comparisons must record
+actual expert ownership and hit rates, and distinguish backend arithmetic at
+fixed residency from end-to-end cache-policy results. Raw `STMOEX01` records
+and supervisor telemetry remain under
+`/tmp/e6-65k-moe-exec-service-repeated-3.moe-exec` and
+`/tmp/e6-65k-moe-exec-supervisor-4/`.
+
 ## Interpretation and limits
 
-This is evidence of request-to-request variation in a single resident expert
-row with fixed route IDs, weights and input, reproduced byte-for-byte by both
-backends. It is a correctness localization finding, not a general
-determinism claim. The next investigation should compare the exact expert-320
-weight bytes and Q8_1 activation bytes presented to the service grouped
-dispatch across both requests, then isolate the first changed intermediate
-in that grouped sequence.
+This is evidence of request-to-request variation in one expert row with fixed
+route IDs and input but different execution owners, reproduced byte-for-byte
+under both backend configurations. It is a correctness localization finding,
+not a general determinism claim. The owner transition localizes the observed
+output change to the CPU-miss versus resident-GPU computation path for expert
+320. Next hold
+that expert's owner fixed across repeated requests and compare CPU and GPU
+expert rows, then measure end-to-end performance with the actual residency and
+hit-rate distribution recorded.
 
-Both requests passed. Supervised telemetry recorded 8.61 GiB minimum
-available RAM, 4.18 GiB peak swap use, and no cgroup OOM kills. Full raw
-capture, logs, oracle data, and telemetry remain under
-`/tmp/e6-65k-ninfer-moe-layer1-capture/`.
+Both requests passed. The initial bundle run recorded 8.61 GiB minimum
+available RAM, 4.18 GiB peak swap use, and no cgroup OOM kills. The follow-up
+execution capture's resource data is listed above. Full raw bundle, logs,
+oracle data, and telemetry remain under `/tmp/e6-65k-ninfer-moe-layer1-capture/`.
