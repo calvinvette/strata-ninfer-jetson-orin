@@ -116,6 +116,23 @@ and supervisor telemetry remain under
 `/tmp/e6-65k-moe-exec-service-repeated-3.moe-exec` and
 `/tmp/e6-65k-moe-exec-supervisor-4/`.
 
+## Fixed-CPU-owner repeat control
+
+A second same-process 65K/32 strict-NInfer pair disabled cache adaptation
+(`--adapt-every 0 --adapt-swaps 0`) to keep the profile-ranked GPU cache fixed.
+Expert 320 was CPU-owned at the target layer/position for both requests
+(`route_kind = -1`). Both requests had the same prompt-boundary fingerprints
+and the same final fingerprints in every recorded persistent-state field.
+The complete 133,248-byte layer-1 MoE bundle records were byte-identical
+(SHA-256 `a8b809a2…22bc059e`); this includes route IDs/weights, MoE input,
+expert rows, shared output and combined output. The decode GPU-cache hit rate
+was 12.0% in each request, consistent with the intentionally static cache
+policy. The supervised run passed with 8.74 GiB minimum available RAM, 1.64
+GiB peak swap and no cgroup OOM kills. This instrumented low-residency control
+is correctness evidence, not a performance result. Raw captures and telemetry
+remain under `/tmp/e6-65k-moe-fixed-cpu-repeat-2.*` and
+`/tmp/e6-65k-moe-fixed-cpu-supervisor-2/`.
+
 ## Interpretation and limits
 
 This is evidence of request-to-request variation in one expert row with fixed
@@ -123,9 +140,11 @@ route IDs and input but different execution owners, reproduced byte-for-byte
 under both backend configurations. The output change is explained by the
 CPU-miss versus resident-GPU computation path for expert 320. This does not
 establish a general determinism guarantee or quantify an end-to-end speedup.
-Next hold that expert's owner fixed across repeated service requests, verify
-the accepted-prefix state, then measure end-to-end performance with actual
-residency and hit-rate distributions recorded.
+The fixed-CPU-owner repeated-service control now matches state and MoE outputs
+exactly, supporting this attribution for the tested case. A corresponding
+fixed-GPU-owner repeated-service control and accepted-prefix check remain.
+Then measure end-to-end performance with actual residency and hit-rate
+distributions recorded.
 
 Both requests passed. The initial bundle run recorded 8.61 GiB minimum
 available RAM, 4.18 GiB peak swap use, and no cgroup OOM kills. The follow-up

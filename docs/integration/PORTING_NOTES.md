@@ -1,5 +1,29 @@
 # Integration notebook and future Strata + Splash work
 
+## 2026-10-30 — Record the actual owner of each routed expert
+
+The Q2_0 NInfer service trace showed that a routed expert is not necessarily
+computed by the accelerator backend. In an identical 65K request pair, layer-1
+expert 320 was a CPU miss on request 1 and occupied GPU slot 145 on request 2.
+The F32 MoE input and grouped Q8_1 row matched, while the CPU and GPU expert
+rows differed by relative L2 `5.25e-4`. Replaying the exact activation and
+GGUF weights through Strata's CPU and grouped GPU paths matched each captured
+service row bit-for-bit. With adaptation disabled and expert 320 CPU-owned in
+both requests, the complete MoE bundle and recorded prompt-boundary/final
+state hashes matched exactly.
+
+For a future Strata + Splash integration, capture each routed expert's actual
+execution owner and cache slot alongside route IDs, weights, activation bytes,
+expert weight bytes and output row. Hold ownership fixed before attributing a
+numeric difference to a backend kernel. Hold it fixed for performance tests as
+well, then report the real residency/hit-rate and CPU-miss distribution in
+separate end-to-end tests. A GPU kernel optimization cannot accelerate an
+active expert handled by the CPU fallback; cache adaptation can also move the
+same expert between numerically distinct CPU and accelerator paths across
+requests. This Orin result concerns one Q2_0 model and one request pair; it is
+a method to reuse, not a general CPU/Metal parity claim. See the [full
+expert-320 report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md).
+
 ## 2026-10-09 — Start at the measurement boundary
 
 The first implementation adds Python harnesses outside the engine. No NInfer

@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **E0–E5 bounded prototype evidence complete; E6 same-process 65K repeats show request-dependent state/output changes, localized to expert 320 changing owner from CPU miss to resident GPU between requests while the recorded grouped Q8_1 row remains byte-identical. Exact-input CPU/GPU replay matched each request's captured expert row. E6/E7 remain open pending fixed-owner service repeats, broader repeatability and end-to-end performance qualification. HIP/SYCL rebuilds for the latest diagnostic changes are pending compiler availability (updated 2026-10-30).**
+Status: **E0–E5 bounded prototype evidence complete; E6 same-process 65K repeats show request-dependent state/output changes, localized to expert 320 changing owner from CPU miss to resident GPU between requests while the recorded grouped Q8_1 row remains byte-identical. Exact-input CPU/GPU replay matched each captured expert row, and a fixed-CPU-owner service repeat matched all recorded state and MoE output bytes. E6/E7 remain open pending fixed-GPU service repeatability, broader quality/repeatability and end-to-end performance qualification. HIP/SYCL rebuilds for the latest diagnostic changes are pending compiler availability (updated 2026-10-30).**
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -736,11 +736,9 @@ expert row without identifying the runtime cause. The matched Strata-backend
 pair reproduced the same per-request change, with all captured MoE data
 byte-identical to NInfer. A focused single-entry grouped replay passed 32
 fixed-input repetitions for both backends; direct NInfer D3/D4 matched the
-independent FP64 oracle at relative L2 `1.57e-07`. This narrows the issue to
-shared service/runtime context. Next capture the actual expert-320 device
-weight bytes and Q8_1 activation at the grouped service dispatch, then locate
-the first changed intermediate. This remains a request-specific diagnostic,
-not a performance conclusion.
+independent FP64 oracle at relative L2 `1.57e-07`. The subsequent service
+execution capture and fixed-CPU-owner control are summarized below. This
+remains request-specific correctness evidence, not a performance conclusion.
 See the
 [per-layer state report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/verifier-first-layer-state-hashes.md)
 and [raw layer-2 transition report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/gdn-layer2-raw-transition.md),
@@ -754,11 +752,13 @@ the request-2 device weight bytes were captured and hashed. The request-1
 expert result differs from the independent GPU oracle and the request-2 result
 matches it, making the CPU-miss to resident-GPU ownership transition the direct
 explanation for this pair's expert-row change. This is not evidence of an
-NInfer kernel changing under fixed inputs. Next force and verify fixed CPU and
-GPU ownership across repeated service requests, check their accepted-prefix
-state, and compare request performance with actual ownership/hit-rate
-telemetry. The exact-input `native_expert_parity` replay matched the service's
-CPU-owned request-1 row and GPU-owned request-2 row bit-for-bit; see the
+NInfer kernel changing under fixed inputs. A static-cache fixed-CPU-owner pair
+now matched all recorded prompt-boundary/final state fields and the complete
+layer-1 MoE bundle byte-for-byte. Next establish a fixed-GPU-owner repeated
+service pair, check accepted-prefix state in both owner modes, then compare
+request performance with actual ownership/hit-rate telemetry. The exact-input
+`native_expert_parity` replay matched the service's CPU-owned request-1 row and
+GPU-owned request-2 row bit-for-bit; see the
 [ownership report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md).
 E6/E7 remain open.
 

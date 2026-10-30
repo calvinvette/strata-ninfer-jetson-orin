@@ -1,6 +1,6 @@
 # Quick status
 
-Updated: 2026-10-29
+Updated: 2026-10-30
 
 This is a short orientation to the integration. The [plan](PLAN.md) defines
 phase gates; the detailed [status](STATUS.md) is the evidence record, and the
@@ -46,6 +46,15 @@ state fingerprints and residency. NInfer's single-pair rates were only +0.10%
 prompt and +1.98% decode over Strata; this is functional coverage, not
 performance confirmation. Minimum available RAM stayed above the six-GiB floor
 (6.56 GiB in the full sample series). See the [256K report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/quality-retrieval-256k-README.md).
+The latest 65K repeat localized the expert-row/output change to a cache-owner
+transition: expert 320 was CPU-served on request 1 and GPU-resident on request
+2. Exact-input CPU/GPU replay matched each service row; with cache adaptation
+disabled and the expert kept CPU-owned, both repeated requests matched all
+captured state and MoE bytes. This explains the observed request-order change
+for that expert, while showing that NInfer covers only GPU-resident work. It
+does not establish an end-to-end speedup. E6/E7 still require a fixed-GPU
+service control, broader quality/repeatability evidence, and no-trace
+performance qualification. See the [ownership report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md).
 The new 16K no-trace API screen also found no qualifying effect: median changes
 were -0.12% prompt TPS, 0.00% decode TPS, +0.19% TTFT and +0.18% total time
 across three pairs; all bootstrap intervals included zero. All pairs ran
