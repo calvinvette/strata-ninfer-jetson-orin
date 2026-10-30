@@ -8,6 +8,12 @@ phase gates; the detailed [status](STATUS.md) is the evidence record, and the
 [porting notes](PORTING_NOTES.md) preserve lessons for repeating this work with
 Strata and Splash.
 
+Portability is current at source `4229c00e`: maestro1 rebuilt HIP and SYCL
+with one build job. HIP help and the host shared-memory test passed; SYCL
+compiled and linked after loading oneMKL, but cannot start without an available
+SYCL device. This is x86 build evidence only. Scratch has space despite the
+nearly full root filesystem. [Build record](../../bench/results/2026-10-30-e7-maestro-current-source-builds/README.md).
+
 The latest adaptive-history diagnostic found different 8K persistent state
 after a 65K request despite the same first generated token. Disabling adaptive
 residency restored the standalone 8K state under the same profile and prompt,

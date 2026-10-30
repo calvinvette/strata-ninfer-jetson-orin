@@ -7323,3 +7323,12 @@ specific transfer or its arithmetic effect. Adaptive-arm cache hits were
 available RAM was 8.58 GiB adaptive and 8.68 GiB fixed-owner; sampled OOM kills
 were zero. Next capture request-tagged owner rows and accepted-prefix state
 around a swap. [Report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
+
+**E7 current-source portability rebuild (2026-10-30):** full HIP and SYCL
+target trees rebuilt at source `4229c00e` on maestro1 with one-job builds. HIP
+`strata --help` passed and the host-only `shared_memory_budget_test` passed.
+SYCL compiled and linked after loading the compiler and oneMKL environments;
+its help invocation aborts because maestro1 has no SYCL device. Root storage
+remains nearly full, while `/mnt/sda2` has 55 GiB free. These results add only
+x86_64 compile/link evidence, not device execution or Orin performance. See the
+[build record](../../bench/results/2026-10-30-e7-maestro-current-source-builds/README.md).

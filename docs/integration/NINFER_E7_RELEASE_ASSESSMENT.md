@@ -198,6 +198,15 @@ no general NInfer release profile is proposed.
 
 ## Sustained service and next entry criteria
 
+### 2026-10-30 current-source portability follow-up
+
+At exact source commit `4229c00ec9bbe04c62c92d2e907c6aeed9679a38`, the full
+HIP and SYCL target trees rebuilt on maestro1 with parallelism one. HIP
+`strata --help` and the host-only `shared_memory_budget_test` passed. SYCL
+compile/link passed after loading oneAPI compiler and oneMKL environments;
+CLI startup aborts because maestro1 exposes no SYCL device. These are x86_64
+build results only. See the [build record](../../bench/results/2026-10-30-e7-maestro-current-source-builds/README.md).
+
 No 30-minute NInfer soak was started because no general release profile is
 proposed. Existing Strata services, clocks and system configuration were left
 alone. E7 remains open for broader task-quality checks on the corrected
