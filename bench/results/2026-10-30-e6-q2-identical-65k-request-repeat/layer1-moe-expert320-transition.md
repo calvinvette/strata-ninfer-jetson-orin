@@ -175,6 +175,26 @@ zero sampled cgroup OOM kills. Raw trace log and supervisor data are under
 `/tmp/e6-65k-moe-fixed-gpu-repeat.log` and
 `/tmp/e6-65k-moe-fixed-gpu-prefix-supervisor/`.
 
+## Fixed-CPU-owner accepted-prefix repeat
+
+The original static profile kept expert 320 CPU-owned (`route_kind = -1`) in
+both requests. The same accepted-prefix sampling produced five records per
+request, and both 32-token sequences and all eleven persistent-state
+fingerprints matched exactly at every sampled commit. The checker passed.
+The supervised run recorded 8.74 GiB minimum available RAM, 1.96 GiB peak
+swap, and zero sampled cgroup OOM kills. Synchronized tracing again made the
+decode rates unsuitable for performance use. Captures and telemetry remain
+under `/tmp/e6-65k-moe-fixed-cpu-prefix-repeat.*` and
+`/tmp/e6-65k-moe-fixed-cpu-prefix-supervisor/`.
+
+Comparing one repeated request from each fixed-owner mode shows the expected
+cross-owner split: the prompt-boundary persistent state already differs;
+sampled token IDs match at the first two checkpoints, then differ at the third
+(CPU `279`, GPU `11`) and later checkpoints. Each owner is repeatable against
+itself in this test, but the state trajectories are not interchangeable. This
+is consistent with the measured CPU/GPU expert-row numerical delta and is not
+a NInfer-versus-Strata backend comparison.
+
 ## Interpretation and limits
 
 This is evidence of request-to-request variation in one expert row with fixed
@@ -185,9 +205,12 @@ establish a general determinism guarantee or quantify an end-to-end speedup.
 Both fixed-CPU-owner and fixed-GPU-owner repeated-service controls now match
 recorded state and MoE outputs exactly for their sampled boundary. Fixed-GPU
 accepted-prefix state also repeats exactly over the sampled 65K/32 generation.
-The remaining paired owner-mode prefix check is the CPU-owner repeat, followed
-by broader quality/repeatability checks and no-trace performance comparisons
-that record real residency and hit-rate distributions.
+Both CPU and GPU owner modes now match repeated accepted-prefix traces exactly
+within their respective fixed-owner controls. Their cross-owner state and
+eventual token trajectories differ, reinforcing that owner is part of the
+arithmetic condition. The next gates are broader quality/repeatability checks
+and no-trace performance comparisons that record real residency and hit-rate
+distributions.
 
 Both requests passed. The initial bundle run recorded 8.61 GiB minimum
 available RAM, 4.18 GiB peak swap use, and no cgroup OOM kills. The follow-up

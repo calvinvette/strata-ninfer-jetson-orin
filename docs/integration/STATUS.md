@@ -40,9 +40,15 @@ accepted-prefix repeat under this fixed-GPU profile matched all 32 token IDs
 and eleven persistent-state fields at five sampled commit lengths in both
 requests. Trace synchronization made 32-token decode take about 119 seconds;
 these rates are diagnostic only. Minimum available RAM was 8.75 GiB, peak
-swap 3.41 GiB and sampled cgroup OOM kills zero. The fixed-CPU accepted-prefix
-repeat is next, then resume quality and no-trace performance qualification.
-E6/E7 remain open. See the
+swap 3.41 GiB and sampled cgroup OOM kills zero. The matching fixed-CPU
+accepted-prefix repeat also matched both 32-token sequences and all eleven
+state fingerprints at five sampled commits. Its minimum available RAM was
+8.74 GiB, peak swap 1.96 GiB, and sampled cgroup OOM kills zero. CPU- and
+GPU-owned prompt states differ; sampled output tokens first split at the third
+checkpoint, although each owner mode repeats exactly against itself. Trace
+rates are excluded because synchronization slowed 32-token decode to about
+119 seconds. Next resume broader quality and no-trace performance
+qualification. E6/E7 remain open. See the
 [expert-320 ownership report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md).
 
 **E6 64K no-trace API screen (2026-10-29):** three fresh-process pairs
