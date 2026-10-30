@@ -90,9 +90,26 @@ long→prefix sequence or its layer-1 route-position path, not a general
 single-row/global-limit behavior. Raw data is in `/tmp/e6-two8k-owner-capture/`
 and `/tmp/e6-two8k-owner-capture-supervisor/` on the Orin.
 
+### Long→prefix boundary position-window capture
+
+The adaptive 65K→8K sequence was repeated with the layer-1 capture filter
+widened to positions 8188–8195 and the row cap raised to 64. The state and
+output hashes reproduced the prior adaptive runs exactly. The owner dump still
+contained only one row: the first request's layer-1 record at position 8191,
+dispatch 1537, stream row 32, with the same expert IDs and owner kinds as the
+first long→prefix attempt. No layer-1 route row in that position window was
+emitted for the replay request. Since the two-8K control emitted both rows,
+raising the cap and widening the position filter do not explain the missing
+replay record. This does not show whether the replay's selected-layer
+`row_positions` shifted elsewhere or whether that dispatch used another path.
+The supervisor passed with 8.54 GiB minimum available memory and zero sampled
+OOM kills. Raw data is in `/tmp/e6-65k-long-prefix-owner-window/` and
+`/tmp/e6-65k-long-prefix-owner-window-supervisor/` on the Orin.
+
 ## Next diagnostic
 
-Fix route capture so both requests are tagged by request ID, then capture
-accepted-prefix state around the first adaptive swap and the corresponding
-replay position. The controlled toggle supports adaptation as a factor but
-does not connect a specific expert transfer to the state delta.
+Instrument the selected layer's observed route positions across all calls in
+the long→prefix sequence, tag captures by request ID, then capture
+accepted-prefix state around the first adaptive swap and corresponding replay
+position. The controlled toggle supports adaptation as a factor but does not
+connect a specific expert transfer to the state delta.

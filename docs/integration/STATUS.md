@@ -7337,6 +7337,12 @@ expert IDs, owner kinds, state and output. The missing second row in the
 65K→8K trace is specific to that longer request sequence or route-position
 path, not a general one-row capture limit. [Diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
 
+Widening the long→prefix owner filter to positions 8188–8195 and raising the
+row cap still produced only the first request's layer-1 row. The same adaptive
+state and token hashes reproduced. The replay row's selected-layer position
+mapping or dispatch path remains unobserved; trace positions across all calls
+before adding causal claims.
+
 **E7 current-source portability rebuild (2026-10-30):** full HIP and SYCL
 target trees rebuilt at source `4229c00e` on maestro1 with one-job builds. HIP
 `strata --help` passed and the host-only `shared_memory_budget_test` passed.

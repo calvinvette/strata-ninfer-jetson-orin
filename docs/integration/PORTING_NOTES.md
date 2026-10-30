@@ -3310,3 +3310,7 @@ A short repeated-position control confirms the existing hook emits multiple
 matching rows in one process, so missing rows after a 65K prompt should be
 debugged against that longer route-position path rather than assumed to be a
 global capture cap.
+In the 65K→8K case, widening the layer-1 filter to eight nearby positions and
+raising its row cap still did not expose the replay row. Instrument and retain
+all observed route positions for that layer per request before interpreting a
+missing filtered row as an ownership event.

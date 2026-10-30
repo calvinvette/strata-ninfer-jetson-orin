@@ -2347,6 +2347,9 @@ second adaptation-on run with route capture disabled reproduced the state,
 output hashes and cache-hit counts exactly (8.50 GiB minimum availability).
 The same capture filter recorded two rows for consecutive standalone 8K calls,
 so the missing replay row is specific to the long→prefix route-position path.
+Widening that filter to positions 8188–8195 with a larger row cap still found
+only the first request's layer-1 row. Instrument actual route positions across
+all calls in the long→prefix process before attempting a causal owner claim.
 Instrumented rates are diagnostic only. Add request-ID route capture and
 accepted-prefix state around the transfer before causal attribution.
 [Report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
