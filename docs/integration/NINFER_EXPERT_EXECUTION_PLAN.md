@@ -2129,6 +2129,20 @@ The generic workload has no semantic oracle or state capture; energy was not
 measured and clocks remained dynamic. E6/E7 remain open. See the [64K report
 and combined figure](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp65536-cap131072-README.md).
 
+**Accepted-prefix instrumentation follow-up (2026-10-29):** a paired 65K
+prompt/128-token warmup with a 32-token measured continuation captured accepted
+prefixes under `STRATA_TRACE`, accepted-prefix tracing and state hashing. All
+32 token IDs and all ten state fingerprints matched across Strata and NInfer.
+This heavy trace did not reproduce the no-trace divergence: the original
+block-0 no-trace measured outputs differed after 52 common characters, while
+the traced outputs matched for 32 tokens. Within NInfer, the first measured
+token ID stayed the same after changing warmup history, but GDN, pooled,
+pooled-full and KV fingerprints changed. The changed warmup also changes prompt
+length, so it does not isolate a cause. The trace takes about 76 minutes per
+arm and perturbs execution; its rates are excluded. Next use buffered or sampled
+state checkpoints, first checking that instrumentation preserves the no-trace
+output path. E6/E7 remain open. See the [accepted-prefix diagnostic](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/accepted-prefix-instrumentation-README.md).
+
 **Minimally instrumented pp512+tg64 API screen (2026-10-29):** three
 randomized fresh-process pairs at 1,024 context used a warmup and measured
 request per process, with PCIe staging, prompt cache and tracing disabled. All

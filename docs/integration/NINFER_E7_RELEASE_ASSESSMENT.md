@@ -312,3 +312,15 @@ parity. Minimum available RAM was 7.12 GiB and peak sampled swap was 6.33 GiB.
 This adds no release evidence; the no-release decision and open E6/E7 gates
 remain. See the [64K
 report and combined chart](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp65536-cap131072-README.md).
+
+The accepted-prefix follow-up used the same 65K prompt, 128-token warmup and
+32-token measured continuation on each backend. All 32 token IDs and every
+captured state fingerprint matched across Strata and NInfer. This result is
+instrumentation-sensitive: the no-trace block-0 outputs diverged after 52
+common characters, but the traced outputs matched. NInfer's first measured
+state hashes changed between short and long warmup histories while the first
+token ID stayed the same; those warmups also used different prompt lengths, so
+the cause is unresolved. Each traced arm took about 76 minutes. This adds no
+performance or release evidence. A buffered or sampled checkpoint diagnostic
+must first preserve the no-trace output path. The no-release decision and E6/E7
+gates remain. See the [accepted-prefix diagnostic](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/accepted-prefix-instrumentation-README.md).

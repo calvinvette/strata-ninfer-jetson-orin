@@ -67,6 +67,13 @@ same-process repeats also changed. This flags an unresolved repeatability/state
 issue, and decode/total-time effects are confounded by different generated
 paths. Minimum available RAM was 7.12 GiB; peak sampled swap was 6.33 GiB. See the [64K
 report and combined chart](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp65536-cap131072-README.md).
+The accepted-prefix follow-up matched all 32 token IDs and state fingerprints
+across ports under heavy tracing, but it did not reproduce the no-trace output
+divergence. NInfer's first measured state hashes changed after different
+warmup history even though its first token stayed the same. The tracing run took
+about 76 minutes per arm, so the result is correctness-only and may perturb the
+path. Next use buffered or sampled checkpoints and verify no-trace output
+preservation. See the [diagnostic report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/accepted-prefix-instrumentation-README.md).
 See the [integration status](STATUS.md) and
 [latest E7 assessment](NINFER_E7_RELEASE_ASSESSMENT.md).
 

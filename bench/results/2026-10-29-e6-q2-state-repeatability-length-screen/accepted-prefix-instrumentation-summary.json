@@ -1,0 +1,217 @@
+{
+  "date": "2026-10-29",
+  "model": "Qwen3.8-Flash-Next Q2_0; exact model/profile identities inherit from the parent 64K no-trace report",
+  "context_tokens": 131072,
+  "prompt_tokens": 65536,
+  "temperature": 0,
+  "warmup": {
+    "prompt_tokens": 65536,
+    "generation_tokens": 128
+  },
+  "measured_generation_tokens": 32,
+  "trace_environment": [
+    "STRATA_TRACE=1",
+    "STRATA_ACCEPTED_PREFIX_TRACE=1",
+    "STRATA_STATE_HASH=1"
+  ],
+  "instrumented_pair": {
+    "block-0-candidate-warm128-32": {
+      "supervisor_status": "pass",
+      "elapsed_seconds": 4581.405,
+      "min_available_gib": 8.649,
+      "max_sampled_swap_gib": 1.154,
+      "max_cgroup_oom_kill": 0,
+      "requests": [
+        {
+          "round": -1,
+          "status": "pass",
+          "completion_tokens": 128,
+          "response_text_sha256": "d3e6e8b165fb038d8a708c91e4dbc3070d4233816159985583d0e26016c8d352"
+        },
+        {
+          "round": 0,
+          "status": "pass",
+          "completion_tokens": 32,
+          "response_text_sha256": "9eb4258bd7960b7d229788732574e77e3d1de986c5ac8c1a071e5a97521f9101"
+        }
+      ],
+      "measured_prefix_checkpoints": 32,
+      "measured_token_ids": [
+        32,
+        6165,
+        11036,
+        1928,
+        1472,
+        264,
+        6150,
+        11,
+        45016,
+        8240,
+        314,
+        7289,
+        421,
+        11690,
+        440,
+        279,
+        8358,
+        8427,
+        4821,
+        11,
+        466,
+        17128,
+        13,
+        561,
+        17128,
+        369,
+        279,
+        7853,
+        314,
+        279,
+        6165,
+        11
+      ],
+      "state_fields_per_checkpoint": [
+        "L",
+        "dead",
+        "gdn",
+        "kv",
+        "mtp",
+        "ple",
+        "ple_prev",
+        "pooled",
+        "pooled_full",
+        "stale",
+        "tail"
+      ]
+    },
+    "block-0-baseline-warm128-32": {
+      "supervisor_status": "pass",
+      "elapsed_seconds": 4591.905,
+      "min_available_gib": 8.649,
+      "max_sampled_swap_gib": 1.122,
+      "max_cgroup_oom_kill": 0,
+      "requests": [
+        {
+          "round": -1,
+          "status": "pass",
+          "completion_tokens": 128,
+          "response_text_sha256": "d3e6e8b165fb038d8a708c91e4dbc3070d4233816159985583d0e26016c8d352"
+        },
+        {
+          "round": 0,
+          "status": "pass",
+          "completion_tokens": 32,
+          "response_text_sha256": "9eb4258bd7960b7d229788732574e77e3d1de986c5ac8c1a071e5a97521f9101"
+        }
+      ],
+      "measured_prefix_checkpoints": 32,
+      "measured_token_ids": [
+        32,
+        6165,
+        11036,
+        1928,
+        1472,
+        264,
+        6150,
+        11,
+        45016,
+        8240,
+        314,
+        7289,
+        421,
+        11690,
+        440,
+        279,
+        8358,
+        8427,
+        4821,
+        11,
+        466,
+        17128,
+        13,
+        561,
+        17128,
+        369,
+        279,
+        7853,
+        314,
+        279,
+        6165,
+        11
+      ],
+      "state_fields_per_checkpoint": [
+        "L",
+        "dead",
+        "gdn",
+        "kv",
+        "mtp",
+        "ple",
+        "ple_prev",
+        "pooled",
+        "pooled_full",
+        "stale",
+        "tail"
+      ]
+    }
+  },
+  "cross_backend_comparison": {
+    "shared_checkpoints": 32,
+    "all_token_ids_equal": true,
+    "all_state_fingerprints_equal": true,
+    "first_divergence": null
+  },
+  "within_ninfer_warmup_history_comparison": {
+    "short_warmup_prompt_tokens": 512,
+    "short_warmup_generation_tokens": 1,
+    "long_warmup_prompt_tokens": 65536,
+    "long_warmup_generation_tokens": 128,
+    "same_first_measured_token_ids": true,
+    "changed_state_fingerprint_fields": [
+      "gdn",
+      "pooled",
+      "pooled_full",
+      "kv"
+    ],
+    "short_warmup_state": {
+      "L": "65536",
+      "gdn": "85907b6a2b85d24e",
+      "ple": "df3795d240365f69",
+      "tail": "c4a5d96bb5c4e077",
+      "dead": "40ccf57e6c30218e",
+      "pooled": "daf9928c718c7b33",
+      "pooled_full": "f2e8d94d3fe3944a",
+      "kv": "0552810263e21418",
+      "mtp": "14650fb0739d0383",
+      "stale": "14650fb0739d0383",
+      "ple_prev": "248069,271"
+    },
+    "long_warmup_state": {
+      "L": "65536",
+      "gdn": "95e400b1a3fb482d",
+      "ple": "df3795d240365f69",
+      "tail": "c4a5d96bb5c4e077",
+      "dead": "40ccf57e6c30218e",
+      "pooled": "2b22477fb72e893c",
+      "pooled_full": "d4b90a6b87af90bd",
+      "kv": "07f180b954830f2f",
+      "mtp": "14650fb0739d0383",
+      "stale": "14650fb0739d0383",
+      "ple_prev": "248069,271"
+    }
+  },
+  "no_trace_reference_block_0": {
+    "warmup_outputs_equal": true,
+    "measured_outputs_equal": false,
+    "measured_common_prefix_characters": 52,
+    "baseline_measured_text_sha256": "1b098725d74346f0d544f4bd93eeb260f99c3adb3ea3f2a37fe3730279eb404d",
+    "candidate_measured_text_sha256": "25a0c334c5b4e714ec4e0f314ddd91e95f8720b9912d3602153363549af69671"
+  },
+  "limitations": [
+    "Trace-enabled execution did not reproduce the no-trace text divergence within the first 32 generated tokens.",
+    "Tracing and state-hash environment materially increase runtime and may perturb timing or execution behavior; this diagnostic does not explain the no-trace divergence.",
+    "The warmup-history state comparison changes both warmup prompt length and generation length; it does not isolate either factor.",
+    "Hashes are equality fingerprints, not numerical error magnitudes. No semantic quality oracle was used.",
+    "Instrumented rates are not performance evidence."
+  ],
+  "raw_captures": "Remain local-only in the state-hash-diagnostic/accepted-prefix/ directory."
+}

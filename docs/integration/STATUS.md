@@ -31,6 +31,19 @@ instrumentation before using generated-token timing as a kernel comparison.
 See the [64K report and combined
 chart](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp65536-cap131072-README.md).
 
+The accepted-prefix follow-up traced one 128-token warmup and a 32-token
+measured continuation at 65K prompt length. Strata and NInfer matched every
+token ID and all ten state fingerprints across the 32 measured checkpoints.
+That instrumented run did not reproduce the no-trace divergence: the original
+block-0 no-trace outputs split after 52 common characters, while the traced
+outputs stayed identical. In NInfer, changing warmup history changed the
+first measured state fingerprints for GDN, pooled, pooled-full and KV while
+the first token ID remained 32; prompt length and generation length both
+changed, so the cause is not isolated. The trace took about 76 minutes per arm
+and is not performance evidence. The next diagnostic is buffered or sampled
+state capture that first preserves the no-trace output path. E6/E7 remain
+open. See the [accepted-prefix report and sanitized summary](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/accepted-prefix-instrumentation-README.md).
+
 The latest E6 pilot repeated the 16K Q2_0 retrieval fixture at 262,144
 capacity with PCIe staging disabled, comparing Strata with strict NInfer.
 Both arms matched the exact answer, all 47 tokens, all persistent-state
