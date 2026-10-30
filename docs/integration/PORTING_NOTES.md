@@ -3333,3 +3333,14 @@ accepted prefixes. For Splash, pair accepted-prefix checkpoints at the actual
 adaptation cadence and label synchronized state-hash runs as diagnostic only;
 compare equal committed token prefixes across matched ownership policies before
 claiming that migration changed recurrent state.
+
+A matched Q2_0 adaptive versus fixed-owner 65K request used identical tokens
+and state sampling at accepted prefixes 1, 8, 16, 24 and 32. State matched at
+prefix 1 and first differed at the prefix-8 sample, after an adaptive choice
+batch had applied; generated token IDs still matched. Fixed-owner 8K replay
+state returned to the standalone baseline, while adaptive replay state did not.
+For a Splash port, sample both policies at identical committed token prefixes
+and capture the exact update schedule. This associates a state change with a
+policy interval but does not prove which transfer or owner arithmetic caused
+it. Keep the trace low overhead: combined per-layer GDN/QSA hashing with
+accepted-prefix tracing tripped Strata's no-progress watchdog in this cell.

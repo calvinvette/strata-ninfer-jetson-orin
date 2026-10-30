@@ -168,6 +168,57 @@ The supervisor took 1,034 seconds. Raw logs and checkpoints are in
 `/tmp/e6-65k-adaptive-prefix-state-trace/` and
 `/tmp/e6-65k-adaptive-prefix-state-trace-supervisor/` on the Orin.
 
+### Matched adaptive/fixed accepted-prefix comparison
+
+The accepted-prefix trace was then run with the same 65K→8K input, Q2 profile,
+binary, and sampling in a matched adaptation-disabled arm (`--adapt-every 0
+--adapt-swaps 0`). Both arms passed supervision and emitted identical full
+32-token outputs for the long request (SHA256
+`2d5f3da8f9890f8c9262231bada2cfab088196528565a1c08ab685d86074c650`) and the
+same one-token replay (SHA256
+`201a8bab084b2a57aa2f6a8ceb51b3609f4c5a297d952bf51dbf4cd321e16151`). Their
+65K prompt-boundary state hashes matched exactly. At accepted prefix 1, the
+state hashes also matched. At the first later sample, accepted prefix 8, all
+eight generated token IDs still matched, but GDN, QSA tail, pooled, KV and
+pooled-full hashes differed; PLE remained equal. The same five fields differed
+at accepted prefixes 16 and 24. At accepted prefix 32, PLE also differed.
+This locates the first *sampled* state divergence between accepted prefixes 1
+and 8 while the generated text remains identical. In the adaptive arm,
+96-choice update batches were scheduled/applied at rounds 4 and 8 before the
+prefix-8 sample. This associates the first sampled divergence with the period
+containing adaptation updates, but does not prove which transfer, owner
+arithmetic, or state operation caused it. The round-4 batch was applied before
+the prefix-8 checkpoint; the round-8 batch was scheduled at that checkpoint
+and applied immediately afterward.
+
+On the subsequent exact 8K replay, the fixed-owner boundary matched the
+standalone fixed-profile state exactly (GDN `6d34cf6a8ae091cd`, PLE
+`8f834c5fe472a9e5`, tail `2f18de91a9aab11b`, pooled `49c796bf956da6ea`, KV
+`e9f0ae23370d9ddb`, pooled-full `c3e68b858e40805f`). The adaptive replay again
+had the previously recorded state (GDN `994f4c41001157d9`, PLE
+`8f834c5fe472a9e5`, tail `2f18de91a9aab11b`, pooled `1572532cee713cae`, KV
+`94ed00cf754f7d1d`, pooled-full `f3ce497f5331f3e7`). Both replay prompts
+returned token `248046`. Thus PLE and tail matched at this boundary; GDN,
+pooled, KV and pooled-full did not.
+
+The adaptive arm's minimum available memory was 8.52 GiB; the fixed arm's was
+8.65 GiB. Both stayed above the six-GiB reserve, with zero sampled OOM kills.
+The accepted-prefix hash instrumentation slowed decode to about 0.3 tok/s;
+these are state-diagnostic runs, not performance comparisons. The fixed arm
+took 1,030 seconds. Its raw logs and supervisor records are in
+`/tmp/e6-65k-fixed-prefix-accepted-trace/` and
+`/tmp/e6-65k-fixed-prefix-accepted-trace-supervisor/` on the Orin.
+
+An additional attempt combined accepted-prefix tracing with
+`STRATA_STATE_HASH_GDN=1` and `STRATA_STATE_HASH_QSA_LAYERS=1` for layer-level
+localization. The fixed-owner process emitted its 65K boundary fingerprints,
+then hit Strata's 60-second no-progress watchdog before its first generated
+token; the supervisor failed with return code 1, minimum available memory
+8.67 GiB and no OOM kills. This combination produced no accepted-prefix
+result and is not evidence of state divergence. It is retained as a failed
+instrumentation cell in `/tmp/e6-65k-fixed-per-layer-prefix-trace/` and
+`/tmp/e6-65k-fixed-per-layer-prefix-trace-supervisor/`.
+
 ## Next diagnostic
 
 Compare the same accepted prefixes against a matched fixed-owner 65K request,

@@ -22,10 +22,13 @@ capture reproduced the state and outputs exactly. An opt-in request-tagged
 trace then captured the long→prefix replay's layer-1 row at position 8191 with
 the same routed experts and owner kinds as the short repeated-position
 control. The route row is now observable, but the specific transfer and
-arithmetic link still need capture. A repeat with adaptive-event logging and
-stride-eight accepted-prefix hashing reproduced state/output and showed
-policy batches at decode rounds 4–32; tracing is too slow for performance
-measurement and still lacks a fixed-owner accepted-prefix comparison. The fixed-GPU
+arithmetic link still need capture. A matched fixed-owner accepted-prefix
+trace found matching state after commit 1, then different GDN/tail/pooled/KV
+hashes at commit 8 despite identical tokens; the round-4 adaptive update had
+applied by then. Fixed-owner replay matched standalone state, while adaptive
+replay retained its divergence. This narrows the onset but does not identify a
+specific transfer or math step. State-hash runs are too slow for performance
+measurement. A per-layer trace combination hit the no-progress watchdog. The fixed-GPU
 no-trace screen remains effectively tied
 (-0.46% prefill, 0.00% decode median for NInfer), with no ≥5% win. E6/E7 are
 still open. [Diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).

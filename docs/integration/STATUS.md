@@ -7367,6 +7367,22 @@ the adaptation events because no fixed-owner comparison was captured at the
 same accepted prefixes. Next compare that paired prefix state and locate the
 first differing per-layer replay state. [Diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
 
+The matched fixed-owner accepted-prefix trace is now complete. Adaptive and
+fixed arms had identical 65K prompt-boundary hashes, identical output tokens,
+and matching state at accepted prefix 1. Their first sampled state difference
+was at prefix 8, where GDN/tail/pooled/KV/pooled-full differed while PLE
+matched; the same five fields differed at prefixes 16 and 24, and PLE differed
+by prefix 32. The adaptive round-4 residency batch had been applied before
+prefix 8; the round-8 update was applied immediately after that checkpoint.
+The subsequent fixed-owner 8K replay matched standalone fixed-profile state,
+while the adaptive replay reproduced its different state; both returned token
+248046. This narrows the onset to commits 2–8 around adaptation, not to one
+specific transfer or arithmetic operation. Both runs passed supervision with
+at least 8.52 GiB available and no sampled OOM kills. A combined per-layer
+GDN/QSA plus accepted-prefix trace hit the 60-second no-progress watchdog
+after the 65K boundary and produced no accepted-prefix result. See the
+[paired diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
+
 **E7 current-source portability rebuild (2026-10-30):** full HIP and SYCL
 target trees rebuilt at source `4229c00e` on maestro1 with one-job builds. HIP
 `strata --help` passed and the host-only `shared_memory_budget_test` passed.

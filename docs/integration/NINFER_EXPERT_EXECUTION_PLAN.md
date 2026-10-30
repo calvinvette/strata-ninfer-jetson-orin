@@ -2357,10 +2357,18 @@ selected row does not identify the cause. An adaptive trace with state hashes
 sampled every eight commits reproduced the same output/state and logged choice
 batches at decode rounds 4 through 32. Its final replay boundary reproduced
 the adaptive 8K hash and token, but did not compare matching accepted prefixes
-against a fixed-owner 65K arm. State hashing cut decode to 0.3 tok/s, so those
-rates are instrumentation artifacts. Next compare the same accepted prefixes
-against a matched fixed-owner 65K request and capture per-layer state at the
-replay boundary. Instrumented rates are diagnostic only. See the
+against a fixed-owner 65K arm. That matched trace is now complete: prompt
+boundary and accepted prefix 1 state matched; the first sampled difference
+was at prefix 8 despite identical tokens, after the adaptive round-4 batch had
+applied and before the round-8 batch applied. GDN, tail, pooled, KV and
+pooled-full differed, while PLE remained equal through prefix 24; PLE differed
+by prefix 32. The fixed-owner replay exactly matched standalone fixed-profile
+state, unlike the adaptive replay. This narrows the onset but does not identify
+the responsible transfer or arithmetic. State hashing cut decode to 0.3
+tok/s, so those rates are instrumentation artifacts. A combined per-layer
+GDN/QSA trace hit the no-progress watchdog after the long boundary; use a
+lower-cost layer-local capture method to locate the first changed component.
+Instrumented rates are diagnostic only. See the
 [Report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
 
 **Current-source portability rebuild (2026-10-30):** full HIP and SYCL target
