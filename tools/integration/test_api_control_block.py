@@ -42,6 +42,7 @@ class ApiControlBlockTests(unittest.TestCase):
             'STRATA_PROMPT_BOUNDARY_STATE_HASH': '1',
             'STRATA_REQUEST_RESET_STATE_HASH': '1',
             'STRATA_PREFILL_STATE_HASH_AT': '8192,16384',
+            'STRATA_STATE_HASH_QSA_LAYERS': '1',
             'APP_SETTING': 'kept',
         }
         inherited = {
@@ -61,6 +62,8 @@ class ApiControlBlockTests(unittest.TestCase):
                     'STRATA_PREFILL_STATE_HASH_AT'):
             self.assertNotIn(key, result_config)
             self.assertNotIn(key, result_env)
+        self.assertNotIn('STRATA_STATE_HASH_QSA_LAYERS', result_config)
+        self.assertNotIn('STRATA_STATE_HASH_QSA_LAYERS', result_env)
         self.assertEqual(result_config['APP_SETTING'], 'kept')
         self.assertEqual(result_env['PATH'], '/bin')
 
@@ -109,6 +112,20 @@ class ApiControlBlockTests(unittest.TestCase):
         self.assertNotIn('STRATA_TRACE', result_env)
         self.assertEqual(result_config['STRATA_PREFILL_STATE_HASH_AT'], '8192,16384')
         self.assertEqual(result_env['STRATA_PREFILL_STATE_HASH_AT'], '8192,16384')
+
+    def test_no_trace_can_retain_explicit_per_layer_state_hashes(self):
+        config = {'STRATA_TRACE': '1', 'STRATA_STATE_HASH_GDN': '1',
+                  'STRATA_STATE_HASH_QSA_LAYERS': '1'}
+        inherited = {'STRATA_TRACE': '1', 'STRATA_STATE_HASH_GDN': '1',
+                     'STRATA_STATE_HASH_QSA_LAYERS': '1', 'PATH': '/bin'}
+        result_config, result_env = configure_trace_environment(
+            config, inherited, True, state_hash_gdn=True, state_hash_qsa_layers=True)
+        self.assertNotIn('STRATA_TRACE', result_config)
+        self.assertNotIn('STRATA_TRACE', result_env)
+        self.assertEqual(result_config['STRATA_STATE_HASH_GDN'], '1')
+        self.assertEqual(result_env['STRATA_STATE_HASH_GDN'], '1')
+        self.assertEqual(result_config['STRATA_STATE_HASH_QSA_LAYERS'], '1')
+        self.assertEqual(result_env['STRATA_STATE_HASH_QSA_LAYERS'], '1')
 
 
 if __name__ == '__main__':

@@ -15,13 +15,14 @@ TRACE_ENV_KEYS = (
     'STRATA_TRACE', 'STRATA_STATE_HASH', 'STRATA_STATE_HASH_GDN',
     'STRATA_INTEGRATION_TRACE', 'STRATA_ACCEPTED_PREFIX_TRACE',
     'STRATA_PROMPT_BOUNDARY_STATE_HASH', 'STRATA_REQUEST_RESET_STATE_HASH',
-    'STRATA_PREFILL_STATE_HASH_AT',
+    'STRATA_PREFILL_STATE_HASH_AT', 'STRATA_STATE_HASH_QSA_LAYERS',
 )
 
 
 def configure_trace_environment(config_env, inherited_env, no_trace, accepted_prefix_trace=False,
                                 prompt_boundary_state_hash=False, request_reset_state_hash=False,
-                                prefill_state_hash_at=None):
+                                prefill_state_hash_at=None, state_hash_gdn=False,
+                                state_hash_qsa_layers=False):
     """Build the environment the server and its engine child will inherit."""
     config_env = dict(config_env or {})
     inherited_env = dict(inherited_env)
@@ -34,6 +35,10 @@ def configure_trace_environment(config_env, inherited_env, no_trace, accepted_pr
             if key == 'STRATA_REQUEST_RESET_STATE_HASH' and request_reset_state_hash:
                 continue
             if key == 'STRATA_PREFILL_STATE_HASH_AT' and prefill_state_hash_at:
+                continue
+            if key == 'STRATA_STATE_HASH_GDN' and state_hash_gdn:
+                continue
+            if key == 'STRATA_STATE_HASH_QSA_LAYERS' and state_hash_qsa_layers:
                 continue
             config_env.pop(key, None)
             inherited_env.pop(key, None)
@@ -78,6 +83,10 @@ def main():
                         help='retain one post-reset fingerprint while --no-trace disables full tracing')
     parser.add_argument('--prefill-state-hash-at',
                         help='comma-separated prompt token counts for compact prefill state captures')
+    parser.add_argument('--state-hash-gdn', action='store_true',
+                        help='retain per-GDN-layer state hashes while --no-trace disables full tracing')
+    parser.add_argument('--state-hash-qsa-layers', action='store_true',
+                        help='retain per-QSA-layer state hashes while --no-trace disables full tracing')
     parser.add_argument('--state-hash', action='store_true',
                         help='enable final persistent-state fingerprints without enabling STRATA_TRACE')
     args = parser.parse_args()
@@ -90,10 +99,18 @@ def main():
                                                         args.no_trace, args.accepted_prefix_trace,
                                                         args.prompt_boundary_state_hash,
                                                         args.request_reset_state_hash,
-                                                        args.prefill_state_hash_at)
+                                                        args.prefill_state_hash_at,
+                                                        args.state_hash_gdn,
+                                                        args.state_hash_qsa_layers)
     if args.prefill_state_hash_at:
         cfg['env']['STRATA_PREFILL_STATE_HASH_AT'] = args.prefill_state_hash_at
         server_env['STRATA_PREFILL_STATE_HASH_AT'] = args.prefill_state_hash_at
+    if args.state_hash_gdn:
+        cfg['env']['STRATA_STATE_HASH_GDN'] = '1'
+        server_env['STRATA_STATE_HASH_GDN'] = '1'
+    if args.state_hash_qsa_layers:
+        cfg['env']['STRATA_STATE_HASH_QSA_LAYERS'] = '1'
+        server_env['STRATA_STATE_HASH_QSA_LAYERS'] = '1'
     if args.state_hash:
         cfg['env']['STRATA_STATE_HASH'] = '1'
         server_env['STRATA_STATE_HASH'] = '1'

@@ -99,9 +99,13 @@ capture occurs after the verifier processes the last prompt token at position
 This localizes the first observed state transition to the one-token verifier
 window for the final prompt token, before any generated-token commit. It does
 not identify an operator or arithmetic cause, and both captures synchronize
-and copy state. See the [reset-state repeat](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/reset-state-65k-repeat.md),
+and copy state. Per-layer hashes immediately after that window match for the
+first two GDN state ordinals and first differ at ordinal 2 (model layer 2);
+all QSA layer hashes from model layer 3 onward differ. The next diagnostic is
+to capture model layer 2's pre/post state and verifier activation. See the
+[reset-state repeat](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/reset-state-65k-repeat.md),
 [position checkpoints](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/prompt-position-checkpoints.md)
-and [final-token transition report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/final-prompt-token-verifier-transition.md).
+and [per-layer verifier report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/verifier-first-layer-state-hashes.md).
 
 The latest E6 pilot repeated the 16K Q2_0 retrieval fixture at 262,144
 capacity with PCIe staging disabled, comparing Strata with strict NInfer.

@@ -715,6 +715,11 @@ the transition in the verifier window and state publication for the last
 prompt token, before generated-token commit. It still does not attribute the
 change to a kernel or arithmetic cause. See the [final-prompt-token verifier
 report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/final-prompt-token-verifier-transition.md).
+Per-layer hashes after this window match for the first two ordered GDN states
+and first differ at GDN ordinal 2, model layer 2; all 12 QSA layer hashes from
+model layer 3 onward differ. Next capture model layer 2's pre/post recurrent
+state and verifier activation. See the [per-layer state
+report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/verifier-first-layer-state-hashes.md).
 
 **Exit:** operator effects and complete-request effects are both documented;
 per-model and combined charts include matched controls and uncertainty. Keep
