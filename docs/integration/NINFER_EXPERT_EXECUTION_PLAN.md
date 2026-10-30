@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **E0–E5 bounded implementation evidence complete; current-source HIP/SYCL builds pass on maestro1; E6 screens and correctness diagnostics continue; E6 and E7 release gates remain open (updated 2026-10-29)**.
+Status: **E0–E5 bounded prototype evidence complete; sampled accepted-prefix capture is CUDA-built and smoke-tested; the 65K E6 diagnostic reproduces measured state/output divergence with full tracing disabled; E6 and E7 remain open. HIP/SYCL rebuilds for the capture change are pending compiler availability (updated 2026-10-30).**
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -625,6 +625,19 @@ An enlarged representation may reduce cache capacity. Measure its deployment
 tradeoff separately from the controlled kernel comparison; do not conceal the
 changed cache in the same label. Record cold/fill costs and the requests needed
 to amortize transformation or packing.
+
+**Current E6 decision (2026-10-30):** a sampled accepted-prefix diagnostic used
+the same 65K prompt and 128-token warmup for both backends, then a 32-token
+measured request, with full `STRATA_TRACE` disabled and state hashing sampled
+every eight accepted tokens. Warmup text and all 17 sampled state checkpoints
+matched. On the measured request, state fingerprints already differed at the
+first sampled checkpoint; token IDs matched at the 1- and 8-token checkpoints
+and diverged by the 16-token checkpoint. Response text differed after 52 common
+characters. This reproduces the output divergence without full tracing, while
+the sampled hashing still adds synchronization. One pair is not performance
+evidence. The next diagnostic should compare persistent state at the prompt
+boundary before the first generated-token commit. See the
+[sampled-capture report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/accepted-prefix-instrumentation-README.md).
 
 **Exit:** operator effects and complete-request effects are both documented;
 per-model and combined charts include matched controls and uncertainty. Keep

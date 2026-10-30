@@ -1,6 +1,6 @@
 # Integration status
 
-Updated: 2026-10-29. Phases 1 through 4 are complete for their documented tested
+Updated: 2026-10-30. Phases 1 through 4 are complete for their documented tested
 Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 is
 complete for its bounded Orin qualification matrix under [its closeout]
 (PHASE7_CLOSEOUT.md), and Phase 8 is complete for the bounded Q2_0 release
@@ -25,24 +25,29 @@ decode result was an unrepeated outlier, widening its interval to -56.63% to
 cgroup pressure/OOM counters were zero. Energy was not measured; clocks
 remained dynamic. Decode and client-total comparisons are confounded by the
 different generated text paths. This does not meet the 5% performance screen
-or establish quality equivalence. E6/E7 remain open. Next, capture and compare
-accepted-prefix state over repeated same-request runs under minimal
-instrumentation before using generated-token timing as a kernel comparison.
+or establish quality equivalence. E6/E7 remain open. The next capture compared
+sampled accepted-prefix state with full tracing disabled.
 See the [64K report and combined
 chart](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp65536-cap131072-README.md).
 
-The accepted-prefix follow-up traced one 128-token warmup and a 32-token
+The first accepted-prefix follow-up traced one 128-token warmup and a 32-token
 measured continuation at 65K prompt length. Strata and NInfer matched every
 token ID and all ten state fingerprints across the 32 measured checkpoints.
-That instrumented run did not reproduce the no-trace divergence: the original
-block-0 no-trace outputs split after 52 common characters, while the traced
-outputs stayed identical. In NInfer, changing warmup history changed the
-first measured state fingerprints for GDN, pooled, pooled-full and KV while
-the first token ID remained 32; prompt length and generation length both
-changed, so the cause is not isolated. The trace took about 76 minutes per arm
-and is not performance evidence. The next diagnostic is buffered or sampled
-state capture that first preserves the no-trace output path. E6/E7 remain
-open. See the [accepted-prefix report and sanitized summary](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/accepted-prefix-instrumentation-README.md).
+That instrumented run did not reproduce the no-trace divergence; it took about
+76 minutes per arm and is not performance evidence. A second diagnostic used
+sampled accepted-prefix state with full tracing disabled. The identical
+65K/128 warmup text and all 17 sampled state checkpoints matched across
+backends. On the measured 65K/32 request, state fingerprints already differed
+at the first checkpoint; sampled token IDs matched at lengths 1 and 8, then
+diverged by length 16. Output text split after 52 common characters. Baseline
+measured output matched its warmup; NInfer measured output did not. Prompt TPS
+was 85.8/86.0 and decode TPS 0.3/0.3 (Strata/NInfer), but a single pair with
+different outputs is not a performance comparison. Minimum available RAM was
+8.60/8.67 GiB and peak swap 0.73/1.83 GiB; OOM counters were zero. The sampled
+hashing still synchronizes. Next, compare persistent state at the prompt
+boundary before the first generated-token commit to tell whether the measured
+state difference originates during prefill or commit. E6/E7 remain open. See
+the [accepted-prefix report and sanitized summary](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/accepted-prefix-instrumentation-README.md).
 
 The latest E6 pilot repeated the 16K Q2_0 retrieval fixture at 262,144
 capacity with PCIe staging disabled, comparing Strata with strict NInfer.

@@ -42,14 +42,49 @@ synchronization and logging may change execution behavior; the result leaves
 the no-trace cause unresolved. Fingerprints show equality only, not numerical
 error magnitude, and no semantic quality oracle was used.
 
-## Next diagnostic
+## Sampled capture with full tracing disabled — 2026-10-30
 
-Replace per-commit synchronous logging with an opt-in buffered or sampled
-checkpoint capture, then repeat the same no-trace workload with matched
-warmup and measured requests. First verify that the diagnostic preserves the
-no-trace output path. Do not use these instrumented rates as performance
-evidence. E6 and E7 remain open, and no backend performance claim or release
-profile is justified.
+The per-commit path was changed to support an opt-in stride while retaining the
+first and final checkpoint. The API harness gained
+`--accepted-prefix-trace`, which keeps this capture enabled alongside
+`--no-trace` while leaving full `STRATA_TRACE` disabled. The default stride is
+still one, preserving full accepted-prefix capture. The diagnostic used stride
+8, `STRATA_STATE_HASH=1`, the same 65,536-token prompt and 128-token warmup,
+then a 32-token measured request. It ran one NInfer arm and one Strata arm on
+the current CUDA build. Both supervisor records passed.
+
+Warmup outputs matched byte-for-byte, and all 17 sampled accepted-token IDs and
+all persistent-state fingerprints matched across backends. On the measured
+request, the first and eighth sampled token IDs still matched, but the state
+fingerprints differed at the first sampled checkpoint, after the shared first
+token. The differing fields were GDN, tail, pooled, pooled-full and KV. By the
+16-token checkpoint, sampled token IDs also differed; the first visible text
+difference followed 52 common characters. Strata's measured text matched its
+warmup text, while NInfer's did not. This reproduces the divergence with full
+tracing disabled and coarse state sampling enabled. The capture still performs
+synchronization and state hashing at checkpoints, so it is not equivalent to a
+completely uninstrumented run.
+
+| Arm | Measured prompt tok/s | Measured decode tok/s | Elapsed | Minimum available RAM | Peak swap |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Strata | 85.8 | 0.3 | 2,012.4 s | 8.60 GiB | 0.73 GiB |
+| NInfer | 86.0 | 0.3 | 2,009.7 s | 8.67 GiB | 1.83 GiB |
+
+These are single-arm diagnostic readings, not a performance comparison: the
+measured outputs diverged and there was one run per backend. Minimum available
+RAM stayed above the 6 GiB floor, swap peaked at 1.83 GiB, and cgroup OOM-kill
+counters remained zero. Energy was not measured. The sanitized comparison,
+sampled token checkpoints and field-level state differences are in the
+[updated summary JSON](accepted-prefix-instrumentation-summary.json); raw logs
+and telemetry remain local-only.
+
+This narrows the unresolved issue: the long-warmup control state matches across
+backends, but measured state differs by the first post-prefill checkpoint,
+before sampled token IDs diverge. The capture does not show whether the
+underlying state difference first arises during prompt processing or when the
+first verifier commit is published. A prompt-boundary state comparison is the
+next targeted diagnostic. E6 and E7 remain open, and no backend performance
+claim or release profile is justified.
 
 Sanitized paired results and the first-checkpoint state comparison are in
 [accepted-prefix-instrumentation-summary.json](accepted-prefix-instrumentation-summary.json).
