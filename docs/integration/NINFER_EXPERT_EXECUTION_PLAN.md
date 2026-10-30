@@ -678,6 +678,18 @@ Next fingerprint session state immediately after `session_zero`, before
 prompt processing, to distinguish reset-state differences from prompt-path
 divergence.
 
+**Post-reset capture hook (2026-10-30):** added opt-in
+`STRATA_REQUEST_RESET_STATE_HASH` and the API harness flag
+`--request-reset-state-hash`. The hook runs directly after the no-resume
+`session_zero` calls and stream synchronization, before prompt evaluation. It
+fingerprints the full allocated GDN and PLE histories, QSA tail/dead/pooled
+index state, and the PLE previous-token window. It does not hash KV bytes:
+their old streamed host contents are not live before a request writes cells.
+The CUDA build succeeded and the harness tests passed 8/8. A repeated 512-token
+smoke produced identical reset fingerprints (`ple_prev=-1,-1`) and identical
+prompt-boundary fingerprints. This only validates the hook and short-context
+reset behavior; the matched 65K/32 request repeat with the hook is pending.
+
 **Exit:** operator effects and complete-request effects are both documented;
 per-model and combined charts include matched controls and uncertainty. Keep
 historical unmatched charts labeled as observations. There is no universal

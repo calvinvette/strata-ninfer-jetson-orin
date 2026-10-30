@@ -14,12 +14,12 @@ from benchmark_control import request
 TRACE_ENV_KEYS = (
     'STRATA_TRACE', 'STRATA_STATE_HASH', 'STRATA_STATE_HASH_GDN',
     'STRATA_INTEGRATION_TRACE', 'STRATA_ACCEPTED_PREFIX_TRACE',
-    'STRATA_PROMPT_BOUNDARY_STATE_HASH',
+    'STRATA_PROMPT_BOUNDARY_STATE_HASH', 'STRATA_REQUEST_RESET_STATE_HASH',
 )
 
 
 def configure_trace_environment(config_env, inherited_env, no_trace, accepted_prefix_trace=False,
-                                prompt_boundary_state_hash=False):
+                                prompt_boundary_state_hash=False, request_reset_state_hash=False):
     """Build the environment the server and its engine child will inherit."""
     config_env = dict(config_env or {})
     inherited_env = dict(inherited_env)
@@ -28,6 +28,8 @@ def configure_trace_environment(config_env, inherited_env, no_trace, accepted_pr
             if key == 'STRATA_ACCEPTED_PREFIX_TRACE' and accepted_prefix_trace:
                 continue
             if key == 'STRATA_PROMPT_BOUNDARY_STATE_HASH' and prompt_boundary_state_hash:
+                continue
+            if key == 'STRATA_REQUEST_RESET_STATE_HASH' and request_reset_state_hash:
                 continue
             config_env.pop(key, None)
             inherited_env.pop(key, None)
@@ -68,6 +70,8 @@ def main():
                         help='retain accepted-prefix state tracing while --no-trace disables full tracing')
     parser.add_argument('--prompt-boundary-state-hash', action='store_true',
                         help='retain one prompt-boundary fingerprint while --no-trace disables full tracing')
+    parser.add_argument('--request-reset-state-hash', action='store_true',
+                        help='retain one post-reset fingerprint while --no-trace disables full tracing')
     parser.add_argument('--state-hash', action='store_true',
                         help='enable final persistent-state fingerprints without enabling STRATA_TRACE')
     args = parser.parse_args()
@@ -78,7 +82,8 @@ def main():
     cfg['log'] = str((args.output.parent / 'engine.log').resolve())
     cfg['env'], server_env = configure_trace_environment(cfg.get('env', {}), os.environ,
                                                         args.no_trace, args.accepted_prefix_trace,
-                                                        args.prompt_boundary_state_hash)
+                                                        args.prompt_boundary_state_hash,
+                                                        args.request_reset_state_hash)
     if args.state_hash:
         cfg['env']['STRATA_STATE_HASH'] = '1'
         server_env['STRATA_STATE_HASH'] = '1'

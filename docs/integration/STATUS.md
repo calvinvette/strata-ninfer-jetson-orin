@@ -83,6 +83,13 @@ after `session_zero` to check whether the reset itself is repeatable. See the
 [NInfer repeat](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/32-token-repeat.md)
 and [Strata control](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/strata-backend-repeat.md) reports.
 
+An opt-in post-`session_zero` fingerprint hook is now built and smoke-tested.
+It captures recurrent and QSA index state before prompt evaluation; the two
+512-token requests had identical reset and prompt-boundary hashes. The 8
+harness tests pass. This does not qualify the hook at long context. Next use
+it on the 65K/32 NInfer repeat to determine whether reset state already
+differs or diverges during prompt processing.
+
 The latest E6 pilot repeated the 16K Q2_0 retrieval fixture at 262,144
 capacity with PCIe staging disabled, comparing Strata with strict NInfer.
 Both arms matched the exact answer, all 47 tokens, all persistent-state

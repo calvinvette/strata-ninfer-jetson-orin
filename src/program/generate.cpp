@@ -9956,6 +9956,60 @@ int main(int argc, char** argv) {
                 }
             }
             int64_t reread_to = -1;   // STRATA_CKPT_REREAD only: read [0, reread_to) again instead of restoring
+            static const bool request_reset_state_hash =
+                std::getenv("STRATA_REQUEST_RESET_STATE_HASH") != nullptr;
+            auto hash_reset_state = [&](const strata::core::SessionState& state,
+                                        const char* label) -> bool {
+                if (cudaDeviceSynchronize() != cudaSuccess) return false;
+                strata::core::ConversationStateSizes sizes;
+                std::string size_error;
+                if (!strata::core::conversation_session_sizes(g, state, sizes, size_error)) {
+                    std::fprintf(stderr, "strata serve: reset-state fingerprint sizes: %s\n", size_error.c_str());
+                    return false;
+                }
+                bool ok = true;
+                std::array<uint8_t, 65536> buffer;
+                auto hash_bytes = [&](const void* pointer, size_t bytes) {
+                    uint64_t hash = 1469598103934665603ull;
+                    for (size_t offset = 0; ok && offset < bytes;) {
+                        const size_t count = std::min(buffer.size(), bytes - offset);
+                        if (cudaMemcpy(buffer.data(), static_cast<const uint8_t*>(pointer) + offset, count,
+                                       cudaMemcpyDefault) != cudaSuccess) {
+                            ok = false;
+                            break;
+                        }
+                        hash = fnv1a(buffer.data(), count, hash);
+                        offset += count;
+                    }
+                    return hash;
+                };
+                const uint64_t gdn = hash_bytes(state.gdn_state, sizes.gdn);
+                const uint64_t ple = hash_bytes(state.ple_hist, state.ple_hist ? sizes.ple : 0);
+                uint64_t tail = 1469598103934665603ull, dead = tail, pooled = tail;
+                strata::kernels::QsaShapes qs = strata::kernels::qsa_real_shapes();
+                qs.n_head_kv = g.n_head_kv; qs.head_dim = g.head_dim; qs.idx_dim = g.idx_key_dim;
+                for (int64_t j = 0; ok && j < state.qsa_alloc; ++j) {
+                    const strata::core::QsaState& q = state.qsa_states[state.qsa_ord0 + j];
+                    const uint64_t q_tail = hash_bytes(q.idx_tail, sizes.tail);
+                    const uint64_t q_dead = hash_bytes(q.idx_dead, sizes.dead);
+                    const uint64_t q_pooled = hash_bytes(q.idx_pooled,
+                        (size_t) q.idx_pooled_rows * (size_t) qs.idx_dim * sizeof(float));
+                    tail = fnv1a(&q_tail, sizeof(q_tail), tail);
+                    dead = fnv1a(&q_dead, sizeof(q_dead), dead);
+                    pooled = fnv1a(&q_pooled, sizeof(q_pooled), pooled);
+                }
+                if (!ok) {
+                    std::fprintf(stderr, "strata serve: ERR reading reset-state fingerprint (%s)\n", label);
+                    return false;
+                }
+                std::fprintf(stderr,
+                             "strata serve: REQUEST_RESET_STATE session=%s gdn=%016llx ple=%016llx "
+                             "tail=%016llx dead=%016llx pooled_full=%016llx ple_prev=%d,%d\n",
+                             label, (unsigned long long) gdn, (unsigned long long) ple,
+                             (unsigned long long) tail, (unsigned long long) dead,
+                             (unsigned long long) pooled, state.ple_prev[0], state.ple_prev[1]);
+                return true;
+            };
             if (resume == 0) {
                 strata::core::session_zero(ss, g, nullptr, main_cs);
                 cudaStreamSynchronize(main_stream);
@@ -9963,6 +10017,13 @@ int main(int argc, char** argv) {
                     const strata::core::OnDevice on(st->dev);
                     strata::core::session_zero(st->ss, g, nullptr, (void*) st->stream);
                     cudaStreamSynchronize(st->stream);
+                }
+                if (request_reset_state_hash) {
+                    if (!hash_reset_state(ss, "main")) return 1;
+                    for (size_t i = 0; i < stages.size(); ++i) {
+                        const strata::core::OnDevice on(stages[i]->dev);
+                        if (!hash_reset_state(stages[i]->ss, ("stage" + std::to_string(i)).c_str())) return 1;
+                    }
                 }
                 checks.clear();
             } else if (!from_live) {
