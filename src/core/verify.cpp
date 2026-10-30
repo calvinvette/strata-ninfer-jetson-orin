@@ -153,6 +153,21 @@ struct MoeBundleHeaderV1 {
     int32_t slot, token;
 };
 static_assert(sizeof(MoeBundleHeaderV1) == 48, "STMOEBN1 header layout changed");
+struct MoeExecHeaderV1 {
+    char magic[8];
+    uint32_t version;
+    uint32_t layer;
+    int32_t expert;
+    int32_t slot;
+    uint64_t position;
+    int32_t token;
+    uint32_t weight_bytes;
+    uint32_t q8_bytes;
+    uint32_t flags;
+    uint64_t cache_address;
+    uint64_t reserved;
+};
+static_assert(sizeof(MoeExecHeaderV1) == 64, "STMOEX01 header layout changed");
 #pragma pack(pop)
 std::mutex moe_output_dump_mutex;
 std::mutex moe_route_dump_mutex;
@@ -644,6 +659,9 @@ Verifier::~Verifier() {
     if (moe_bundle_diag_h_ && cudaFreeHost(moe_bundle_diag_h_) == cudaSuccess)
         strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
                                                     moe_bundle_diag_h_, 0, -1);
+    if (moe_exec_diag_q8_h_ && cudaFreeHost(moe_exec_diag_q8_h_) == cudaSuccess)
+        strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
+                                                    moe_exec_diag_q8_h_, 0, -1);
     if (gr_read_diag_host_ && cudaFreeHost(gr_read_diag_host_) == cudaSuccess)
         strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "free", this,
                                                     gr_read_diag_host_, 0, -1);
@@ -1425,6 +1443,66 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
             std::fprintf(stderr, "strata verify: opt-in MoE bundle capture at %zu layers, position %lld -> %s (%zu bytes)\n",
                          moe_bundle_diag_layers_.size(), (long long) moe_bundle_diag_position_,
                          moe_bundle_diag_path_.c_str(), moe_bundle_diag_capacity_);
+        }
+    }
+    {
+        const char* layer = std::getenv("STRATA_VERIFY_DUMP_MOE_EXEC_LAYER");
+        const char* expert = std::getenv("STRATA_VERIFY_DUMP_MOE_EXEC_EXPERT");
+        const char* position = std::getenv("STRATA_VERIFY_DUMP_MOE_EXEC_POSITION");
+        const char* path = std::getenv("STRATA_VERIFY_DUMP_MOE_EXEC_PATH");
+        const bool any = layer || expert || position || path;
+        if (any && !(layer && expert && position && path)) {
+            err = "verify: STRATA_VERIFY_DUMP_MOE_EXEC_LAYER, _EXPERT, _POSITION and _PATH must be set together";
+            return false;
+        }
+        if (any) {
+            auto parse_nonnegative = [](const char* value, long long& parsed) {
+                char* end = nullptr;
+                errno = 0;
+                parsed = std::strtoll(value, &end, 10);
+                return errno == 0 && end != value && *end == '\0' && parsed >= 0;
+            };
+            long long selected_layer = -1, selected_expert = -1, selected_position = -1;
+            if (!parse_nonnegative(layer, selected_layer) || selected_layer >= g.n_layers ||
+                !parse_nonnegative(expert, selected_expert) || selected_expert >= g.n_expert ||
+                !parse_nonnegative(position, selected_position) || path[0] == '\0') {
+                err = "verify: invalid opt-in MoE execution layer, expert, position or path";
+                return false;
+            }
+            const auto& expert_layout = strata::kernels::cpu::expert_layout();
+            if (!expert_layout.native || (size_t) selected_layer >= expert_layout.fmt.size()) {
+                err = "verify: MoE execution capture requires a native expert layout";
+                return false;
+            }
+            const auto& format = expert_layout.fmt[(size_t) selected_layer];
+            const auto native_layout = strata::kernels::native_expert_layout(format.gu_type, format.d_type,
+                                                                             format.n_embd, format.n_ff);
+            if (native_layout.bytes == 0 || g.n_embd % 32 != 0) {
+                err = "verify: MoE execution capture has unsupported weight or Q8_1 geometry";
+                return false;
+            }
+            moe_exec_diag_layer_ = (int) selected_layer;
+            moe_exec_diag_expert_ = (int) selected_expert;
+            moe_exec_diag_position_ = (int64_t) selected_position;
+            moe_exec_diag_weight_bytes_ = native_layout.bytes;
+            moe_exec_diag_q8_row_bytes_ = (size_t) g.n_embd / 32 * 36;
+            moe_exec_diag_path_ = path;
+            moe_exec_diag_weight_.resize(moe_exec_diag_weight_bytes_);
+            if ((size_t) max_t > SIZE_MAX / moe_exec_diag_q8_row_bytes_ ||
+                cudaHostAlloc((void**) &moe_exec_diag_q8_h_,
+                              (size_t) max_t * moe_exec_diag_q8_row_bytes_,
+                              cudaHostAllocPortable) != cudaSuccess) {
+                moe_exec_diag_q8_h_ = nullptr;
+                err = "verify: could not allocate opt-in MoE execution Q8_1 capture buffer";
+                return false;
+            }
+            std::memset(moe_exec_diag_q8_h_, 0, (size_t) max_t * moe_exec_diag_q8_row_bytes_);
+            strata::platform::integration_trace::event("verifier-diagnostic-pinned-host", "allocate", this,
+                                                        moe_exec_diag_q8_h_,
+                                                        (size_t) max_t * moe_exec_diag_q8_row_bytes_, -1);
+            std::fprintf(stderr, "strata verify: opt-in MoE execution capture at layer %d expert %d position %lld -> %s (%zu weight bytes, %zu Q8_1 bytes/row)\n",
+                         moe_exec_diag_layer_, moe_exec_diag_expert_, (long long) moe_exec_diag_position_,
+                         moe_exec_diag_path_.c_str(), moe_exec_diag_weight_bytes_, moe_exec_diag_q8_row_bytes_);
         }
     }
 
@@ -2741,6 +2819,15 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
             }
             return true;
         };
+        if (moe_exec_diag_q8_h_ != nullptr && l == moe_exec_diag_layer_) {
+            const size_t row_bytes = moe_exec_diag_q8_row_bytes_;
+            if (cudaMemcpyAsync(moe_exec_diag_q8_h_ + (size_t) tb * row_bytes,
+                                nat_xq_ + (size_t) tb * row_bytes,
+                                (size_t) n * row_bytes, cudaMemcpyDeviceToHost, cs) != cudaSuccess) {
+                err = "verify: could not capture opt-in grouped-dispatch Q8_1 input";
+                return false;
+            }
+        }
         if (ar_on()) {
             stamp(l, 19, grp);
             if (!grouped(p_ptr, p_start, p_counts, 0, parts_out)) return false;
@@ -3346,6 +3433,44 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
     SessionState& ss = *ss_;
     if (pos0 + T > ss.qsa_states[ss.qsa_primary()].max_cells) { err = "verify: the window runs past the context"; return false; }
     refresh_ar();
+    const int64_t moe_exec_diag_row = moe_exec_diag_q8_h_ != nullptr &&
+                                      moe_exec_diag_position_ >= pos0 &&
+                                      moe_exec_diag_position_ < pos0 + T
+                                      ? moe_exec_diag_position_ - pos0 : -1;
+    if (moe_exec_diag_row >= 0) {
+        moe_exec_diag_slot_ = -1;
+        moe_exec_diag_cache_address_ = 0;
+        moe_exec_diag_weight_present_ = false;
+        if (h_res_ != nullptr && hits_.cache_base != nullptr && hits_.blob > 0) {
+            const int64_t owner = (int64_t) moe_exec_diag_layer_ * g.n_expert + moe_exec_diag_expert_;
+            const int32_t slot = h_res_[owner];
+            if (slot >= 0) {
+                if (slot >= hits_.n_slots) {
+                    err = "verify: opt-in MoE execution capture found an invalid resident slot";
+                    return false;
+                }
+                const uint64_t offset = hits_.slot_off != nullptr
+                                            ? hits_.slot_off[slot]
+                                            : (uint64_t) slot * (uint64_t) hits_.blob;
+                if (moe_exec_diag_weight_bytes_ > (size_t) hits_.blob ||
+                    offset > UINTPTR_MAX - reinterpret_cast<uintptr_t>(hits_.cache_base)) {
+                    err = "verify: opt-in MoE execution capture resident weight span is invalid";
+                    return false;
+                }
+                const uint8_t* source = hits_.cache_base + (size_t) offset;
+                const cudaError_t copy_status = cudaMemcpy(moe_exec_diag_weight_.data(), source,
+                                                            moe_exec_diag_weight_bytes_, cudaMemcpyDeviceToHost);
+                if (copy_status != cudaSuccess) {
+                    err = std::string("verify: could not snapshot opt-in resident expert weights: ") +
+                          cudaGetErrorString(copy_status);
+                    return false;
+                }
+                moe_exec_diag_slot_ = slot;
+                moe_exec_diag_cache_address_ = reinterpret_cast<uintptr_t>(source);
+                moe_exec_diag_weight_present_ = true;
+            }
+        }
+    }
     const auto gr_read_target = std::lower_bound(gr_read_diag_positions_.begin(), gr_read_diag_positions_.end(), pos0);
     const bool gr_read_target_in_window = gr_read_diag_host_ != nullptr && gr_read_target != gr_read_diag_positions_.end() &&
                                           *gr_read_target < pos0 + T;
@@ -3509,6 +3634,35 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
     const cudaError_t se = cudaStreamSynchronize(cs_);
     trace_ev("SYNCED", -1, -1, (int64_t) se);
     if (se != cudaSuccess) { err = std::string("verify: ") + cudaGetErrorString(se); return false; }
+    if (moe_exec_diag_row >= 0) {
+        MoeExecHeaderV1 header{};
+        std::memcpy(header.magic, "STMOEX01", sizeof(header.magic));
+        header.version = 1;
+        header.layer = (uint32_t) moe_exec_diag_layer_;
+        header.expert = moe_exec_diag_expert_;
+        header.slot = moe_exec_diag_slot_;
+        header.position = (uint64_t) moe_exec_diag_position_;
+        header.token = tokens[moe_exec_diag_row];
+        header.weight_bytes = moe_exec_diag_weight_present_ ? (uint32_t) moe_exec_diag_weight_bytes_ : 0;
+        header.q8_bytes = (uint32_t) moe_exec_diag_q8_row_bytes_;
+        header.flags = moe_exec_diag_weight_present_ ? 1u : 0u;
+        header.cache_address = moe_exec_diag_cache_address_;
+        std::FILE* dump = std::fopen(moe_exec_diag_path_.c_str(), "ab");
+        bool written = dump != nullptr;
+        if (written) {
+            written = std::fwrite(&header, sizeof(header), 1, dump) == 1 &&
+                      (!header.weight_bytes || std::fwrite(moe_exec_diag_weight_.data(), 1,
+                                                           header.weight_bytes, dump) == header.weight_bytes) &&
+                      std::fwrite(moe_exec_diag_q8_h_ + (size_t) moe_exec_diag_row *
+                                  moe_exec_diag_q8_row_bytes_, 1, header.q8_bytes, dump) == header.q8_bytes;
+            if (std::fflush(dump) != 0) written = false;
+            if (std::fclose(dump) != 0) written = false;
+        }
+        if (!written) {
+            err = "verify: could not write opt-in grouped MoE execution capture";
+            return false;
+        }
+    }
     if (qsa_diag_captured_ && !qsa_diag_moe_input_captured_) {
         err = "verify: opt-in QSA capture did not reach the MoE input boundary";
         return false;

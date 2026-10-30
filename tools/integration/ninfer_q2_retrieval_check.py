@@ -77,6 +77,12 @@ def main() -> int:
                     help='capture route, input, expert parts and outputs for several layers in one binary bundle')
     ap.add_argument('--capture-moe-bundle-position', type=int,
                     help='token position for the multi-layer MoE bundle capture')
+    ap.add_argument('--capture-moe-exec-layer', type=int,
+                    help='capture the resident native expert bytes and grouped Q8_1 dispatch input')
+    ap.add_argument('--capture-moe-exec-expert', type=int,
+                    help='expert id for --capture-moe-exec-layer')
+    ap.add_argument('--capture-moe-exec-position', type=int,
+                    help='token position for the grouped expert execution capture')
     ap.add_argument('--capture-moe-owner-layer', type=int,
                     help='also capture routed expert execution owners for one verifier layer')
     ap.add_argument('--capture-moe-owner-position', type=int,
@@ -147,6 +153,15 @@ def main() -> int:
         ap.error('--capture-moe-bundle-layers must be unique, increasing model layers in [0, 46]')
     if a.capture_moe_bundle_position is not None and a.capture_moe_bundle_position < 0:
         ap.error('--capture-moe-bundle-position must be nonnegative')
+    exec_values = (a.capture_moe_exec_layer, a.capture_moe_exec_expert, a.capture_moe_exec_position)
+    if any(x is not None for x in exec_values) and any(x is None for x in exec_values):
+        ap.error('--capture-moe-exec-layer, --capture-moe-exec-expert and --capture-moe-exec-position are required together')
+    if a.capture_moe_exec_layer is not None and not 0 <= a.capture_moe_exec_layer < 48:
+        ap.error('--capture-moe-exec-layer must be in [0, 47]')
+    if a.capture_moe_exec_expert is not None and a.capture_moe_exec_expert < 0:
+        ap.error('--capture-moe-exec-expert must be nonnegative')
+    if a.capture_moe_exec_position is not None and a.capture_moe_exec_position < 0:
+        ap.error('--capture-moe-exec-position must be nonnegative')
     if (a.capture_moe_owner_layer is None) != (a.capture_moe_owner_position is None):
         ap.error('--capture-moe-owner-layer and --capture-moe-owner-position must be used together')
     if a.capture_moe_owner_layer is not None and not 0 <= a.capture_moe_owner_layer < 48:
@@ -305,6 +320,12 @@ def main() -> int:
             arm_env['STRATA_VERIFY_DUMP_MOE_BUNDLE_POSITION'] = str(a.capture_moe_bundle_position)
             arm_env['STRATA_VERIFY_DUMP_MOE_BUNDLE_PATH'] = str(
                 (a.output / f'{name}.moe-bundle').resolve())
+        if a.capture_moe_exec_layer is not None:
+            arm_env['STRATA_VERIFY_DUMP_MOE_EXEC_LAYER'] = str(a.capture_moe_exec_layer)
+            arm_env['STRATA_VERIFY_DUMP_MOE_EXEC_EXPERT'] = str(a.capture_moe_exec_expert)
+            arm_env['STRATA_VERIFY_DUMP_MOE_EXEC_POSITION'] = str(a.capture_moe_exec_position)
+            arm_env['STRATA_VERIFY_DUMP_MOE_EXEC_PATH'] = str(
+                (a.output / f'{name}.moe-exec').resolve())
         if a.capture_moe_owner_layer is not None:
             arm_env['STRATA_CAPTURE_MOE_PATH'] = str(
                 (a.output / f'{name}.moe-owner.jsonl').resolve())

@@ -495,6 +495,17 @@ private:
     size_t moe_bundle_diag_n_ = 0;
     std::string moe_bundle_diag_path_;
     std::vector<uint8_t> moe_bundle_diag_captured_layers_;
+    int moe_exec_diag_layer_ = -1;
+    int moe_exec_diag_expert_ = -1;
+    int64_t moe_exec_diag_position_ = -1;
+    size_t moe_exec_diag_weight_bytes_ = 0;
+    size_t moe_exec_diag_q8_row_bytes_ = 0;
+    uint8_t* moe_exec_diag_q8_h_ = nullptr;
+    std::vector<uint8_t> moe_exec_diag_weight_;
+    std::string moe_exec_diag_path_;
+    int32_t moe_exec_diag_slot_ = -1;
+    uint64_t moe_exec_diag_cache_address_ = 0;
+    bool moe_exec_diag_weight_present_ = false;
     static constexpr int kProfPer = 33;              // stamps per layer (32 left the hc-read second
                                       // half's up-stamp at slot 32 = the next layer's slot 0: D8)
     bool prof_on_ = false;
