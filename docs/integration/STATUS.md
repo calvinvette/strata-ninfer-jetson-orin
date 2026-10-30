@@ -115,7 +115,17 @@ projections, `y`, GDN output), its MoE input and pre/post recurrent state all
 matched exactly. The first changed captured field is the combined MoE output:
 1,658/2,560 values differ by at most `1.73e-06` (relative L2 `5.56115e-05`).
 Next capture layer 1's route IDs, weights, expert parts and output to identify
-which MoE stage introduces the difference. See the [layer-1 GDN-to-MoE
+which MoE stage introduces the difference. That bundle found identical route
+IDs, route weights, MoE input and shared output, with only expert 320's row
+changing (2,220/2,560 values; max `3.18e-05`, relative L2 `5.24514e-04`).
+The second request's row matched an independent Q2_0 × Q8_1 oracle to relative
+L2 `5.79e-08`; the first request differed by `5.24529e-04`. Route-weighting
+the expert-row delta predicts the combined-output delta (cosine similarity
+`0.99999980`). This localizes the pair's output change to that expert row but
+does not identify its runtime cause. Next compare expert-320 weight bytes and
+grouped-kernel intermediate state across requests, with the Strata backend as
+a control. See the [expert-320 MoE report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md),
+the [layer-1 GDN-to-MoE
 report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-gdn-to-moe-transition.md),
 the [layer-1 boundary report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-boundary-transition.md),
 the [raw layer-2 transition

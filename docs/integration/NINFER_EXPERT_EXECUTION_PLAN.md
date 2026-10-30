@@ -726,14 +726,23 @@ hyperconnection term exact, while 1,658/2,560 MoE/output values differed
 (maximum `1.73e-06`, relative L2 `5.56115e-05`). A raw layer-1 capture then
 found GDN intermediates, its MoE input and pre/post recurrent state all exact;
 the first changed captured value is the combined MoE output. Next capture
-layer 1's routes, weights, expert parts and combined output to identify which
-MoE stage introduces the difference. This remains a request-specific
-diagnostic, not a general numerical or performance conclusion.
+layer 1's MoE bundle found routes, weights, input and shared output identical;
+only expert 320's per-expert output row differed (2,220/2,560 values, relative
+L2 `5.24514e-04`). The second request matched the independent Q2_0 × Q8_1
+oracle at relative L2 `5.79e-08`, while the first differed at `5.24529e-04`.
+The route-weighted expert-row delta predicts the combined-output delta with
+cosine similarity `0.99999980`. This localizes the pair's change to that
+expert row without identifying the runtime cause. Next compare its exact
+weight view and grouped-kernel intermediates across requests, then run a
+matched Strata-backend control. This remains a request-specific diagnostic,
+not a performance conclusion.
 See the
 [per-layer state report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/verifier-first-layer-state-hashes.md)
 and [raw layer-2 transition report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/gdn-layer2-raw-transition.md),
 the [layer-1 boundary report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-boundary-transition.md),
 and [layer-1 GDN-to-MoE report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-gdn-to-moe-transition.md).
+The [expert-320 bundle/oracle report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md)
+records the per-expert localization.
 
 **Exit:** operator effects and complete-request effects are both documented;
 per-model and combined charts include matched controls and uncertainty. Keep
