@@ -669,8 +669,14 @@ process. `session_zero` is called on the no-resume path before each prompt, so
 the evidence points to divergence during prompt evaluation or another
 request-history-sensitive path after reset; it does not isolate an NInfer
 kernel as the cause. No performance or sustained resource claim is made. The
-next control is the same repeated 65K/32 request with Strata's expert backend.
-See the [32-token repeat report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/32-token-repeat.md).
+matched Strata-backend control also diverged on its second identical 65K/32
+request. Its response hashes matched NInfer by request order, which points to
+a shared order-sensitive path and makes an NInfer-only cause less likely. See
+the [NInfer report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/32-token-repeat.md)
+and [Strata control report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/strata-backend-repeat.md).
+Next fingerprint session state immediately after `session_zero`, before
+prompt processing, to distinguish reset-state differences from prompt-path
+divergence.
 
 **Exit:** operator effects and complete-request effects are both documented;
 per-model and combined charts include matched controls and uncertainty. Keep

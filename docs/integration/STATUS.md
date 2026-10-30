@@ -76,7 +76,12 @@ response hashes differed. Since prompt reuse was disabled and the source calls
 `session_zero` at `resume == 0`, the divergence is present after the explicit
 reset and by prompt completion. This does not identify the computation or
 attribute the issue to an NInfer kernel. The current-source Strata-backend
-repeat is next. See the [32-token repeat report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/32-token-repeat.md).
+repeat also diverged on its second request; both backends produced the same
+response hashes in request order. That points to an order-sensitive shared
+path, not a uniquely NInfer-specific failure. Next capture state immediately
+after `session_zero` to check whether the reset itself is repeatable. See the
+[NInfer repeat](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/32-token-repeat.md)
+and [Strata control](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/strata-backend-repeat.md) reports.
 
 The latest E6 pilot repeated the 16K Q2_0 retrieval fixture at 262,144
 capacity with PCIe staging disabled, comparing Strata with strict NInfer.
