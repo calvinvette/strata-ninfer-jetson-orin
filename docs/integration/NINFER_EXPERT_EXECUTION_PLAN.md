@@ -2345,6 +2345,8 @@ specific transfer or its arithmetic effect. Minimum available memory was
 8.58 GiB adaptive and 8.68 GiB fixed-owner; sampled OOM kills were zero. A
 second adaptation-on run with route capture disabled reproduced the state,
 output hashes and cache-hit counts exactly (8.50 GiB minimum availability).
+The same capture filter recorded two rows for consecutive standalone 8K calls,
+so the missing replay row is specific to the long→prefix route-position path.
 Instrumented rates are diagnostic only. Add request-ID route capture and
 accepted-prefix state around the transfer before causal attribution.
 [Report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).

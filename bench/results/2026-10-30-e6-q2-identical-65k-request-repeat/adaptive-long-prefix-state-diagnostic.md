@@ -75,6 +75,21 @@ hook; it still does not identify a particular expert transfer as the cause.
 Raw run and telemetry are in `/tmp/e6-65k-long-then-prefix-adaptive-repeat/`
 and `/tmp/e6-65k-long-then-prefix-adaptive-repeat-supervisor/` on the Orin.
 
+### Repeated-position capture harness control
+
+To check whether the one-row 65K→8K capture was caused by a global row limit,
+two consecutive identical 8K requests were run with the same layer-1,
+position-8191 capture filter. The hook emitted two data rows plus its header:
+dispatches 1 and 49, stream rows 0 and 1. Both rows had token ID 2438, routed
+experts `[155, 500, 67, 499, 12, 6, 439, 153, 232, 160]`, and owner kinds
+`[-1, -1, -1, -1, 0, 0, -1, -1, -1, -1]`. Both requests also had the same
+prompt-boundary state and generated token ID. The supervisor passed with
+8.53 GiB minimum available memory and zero sampled OOM kills. Thus the capture
+hook can record repeated matches; the missing second row is specific to the
+long→prefix sequence or its layer-1 route-position path, not a general
+single-row/global-limit behavior. Raw data is in `/tmp/e6-two8k-owner-capture/`
+and `/tmp/e6-two8k-owner-capture-supervisor/` on the Orin.
+
 ## Next diagnostic
 
 Fix route capture so both requests are tagged by request ID, then capture

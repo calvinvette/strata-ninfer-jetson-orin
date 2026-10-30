@@ -7331,6 +7331,12 @@ and sampled OOM kills were zero. This confirms repeatability without the
 route-capture hook, not the specific transfer cause. The fixed-owner control
 remains the matched standalone-state result.
 
+The owner-capture hook was separately checked on two identical consecutive
+8K requests: it emitted both layer-1 rows at position 8191 with matching
+expert IDs, owner kinds, state and output. The missing second row in the
+65K→8K trace is specific to that longer request sequence or route-position
+path, not a general one-row capture limit. [Diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
+
 **E7 current-source portability rebuild (2026-10-30):** full HIP and SYCL
 target trees rebuilt at source `4229c00e` on maestro1 with one-job builds. HIP
 `strata --help` passed and the host-only `shared_memory_budget_test` passed.

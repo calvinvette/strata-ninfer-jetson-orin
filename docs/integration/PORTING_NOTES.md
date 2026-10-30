@@ -3306,3 +3306,7 @@ and output hashes exactly. A one-row owner trace did not identify the specific
 transfer or its arithmetic effect. Preserve explicit request IDs in owner
 captures and compare accepted-prefix state alongside output tokens; cache
 hit-rate changes alone cannot identify which operation moved persistent state.
+A short repeated-position control confirms the existing hook emits multiple
+matching rows in one process, so missing rows after a 65K prompt should be
+debugged against that longer route-position path rather than assumed to be a
+global capture cap.

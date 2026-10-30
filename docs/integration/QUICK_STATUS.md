@@ -19,7 +19,9 @@ after a 65K request despite the same first generated token. Disabling adaptive
 residency restored the standalone 8K state under the same profile and prompt,
 implicating request-time adaptation. A second adaptive run without route
 capture reproduced the state and outputs exactly; the specific transfer and
-arithmetic link still need capture. The fixed-GPU no-trace screen remains effectively tied
+arithmetic link still need capture. The short repeated-position control
+captured both owner rows successfully. The fixed-GPU no-trace screen remains
+effectively tied
 (-0.46% prefill, 0.00% decode median for NInfer), with no ≥5% win. E6/E7 are
 still open. [Diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
 
