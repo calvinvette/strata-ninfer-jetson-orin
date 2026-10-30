@@ -3295,3 +3295,13 @@ system telemetry matter even when routes and outputs match. For Splash, change
 the backend while holding the cache map and active routes fixed, capture the
 owner/hit-rate distribution separately, randomize pair order, and collect
 clock/energy telemetry before attributing service-rate differences.
+
+A same-process Q2_0 diagnostic adds a history control for a future Splash port:
+after a 65K request, replaying its exact 8K token prefix produced different
+GDN, PLE, KV and pooled fingerprints from the first 8K boundary, while the
+first generated token stayed the same. The same 8K prefix repeated identical
+state over three calls when run alone, both with adaptive swaps on and off.
+The second-request owner trace was incomplete, so this does not establish an
+owner-migration cause. Preserve explicit request IDs in owner captures and
+compare accepted-prefix state alongside output tokens; cache hit-rate changes
+alone cannot identify which operation moved persistent state.

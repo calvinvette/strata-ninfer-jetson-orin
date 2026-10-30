@@ -2332,3 +2332,14 @@ are included in a combined paired-effect figure with all three blocks and
 bootstrap intervals. The chart does not satisfy E6's full context/workload
 exit. See the
 [figure and sanitized source data](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md#combined-no-trace-api-paired-effect-chart).
+
+**Adaptive request-history diagnostic (2026-10-30):** after one 65,536-token
+adaptive request, replaying its exact first 8,192 token IDs produced different
+GDN, PLE, KV and pooled state fingerprints at the 8K boundary while returning
+the same first generated token as standalone short-prefix controls. Three
+standalone 8K repeats had identical state with adaptation enabled and with it
+disabled. The long request is therefore associated with the change, but a
+one-row route capture did not establish an owner transition or cause. Minimum
+available memory was 8.58 GiB; sampled OOM kills were zero. Instrumented rates
+are diagnostic only. Repair request-ID route capture before isolating the
+history effect. [Report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).

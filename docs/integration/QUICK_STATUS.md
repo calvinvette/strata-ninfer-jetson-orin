@@ -8,6 +8,13 @@ phase gates; the detailed [status](STATUS.md) is the evidence record, and the
 [porting notes](PORTING_NOTES.md) preserve lessons for repeating this work with
 Strata and Splash.
 
+The latest adaptive-history diagnostic found different 8K persistent state
+after a 65K request despite the same first generated token; short 8K-only
+controls repeated exactly. The route capture was incomplete, so expert-owner
+causality remains open. The fixed-GPU no-trace screen remains effectively tied
+(-0.46% prefill, 0.00% decode median for NInfer), with no ≥5% win. E6/E7 are
+still open. [Diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
+
 The fixed-GPU resident-backend screen now has three no-trace pairs: median
 NInfer changes were -0.46% prefill and 0.00% decode, below the 5% screen. One
 Strata decode arm was an unexplained 0.9 tok/s outlier; the opposite-order
