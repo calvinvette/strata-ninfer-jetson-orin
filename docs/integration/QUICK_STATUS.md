@@ -61,6 +61,11 @@ repeated requests. Cross-owner state already differs at the prompt boundary,
 and sampled tokens split at checkpoint three. E6/E7 still need broader
 quality/repeatability and no-trace performance qualification. See the
 [ownership report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md).
+A no-trace fixed-GPU resident-backend pilot then compared Strata with strict
+NInfer on the same 65K prompt/profile. Both arms emitted identical token IDs
+and recorded 12.2% GPU-cache hits. NInfer was 0.46% slower on prompt rate and
+4.88% slower on decode in this single pair. Two more screen pairs remain; this
+is not a performance qualification. [Pilot report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/fixed-gpu-resident-backend-ablation-pilot.md).
 The new 16K no-trace API screen also found no qualifying effect: median changes
 were -0.12% prompt TPS, 0.00% decode TPS, +0.19% TTFT and +0.18% total time
 across three pairs; all bootstrap intervals included zero. All pairs ran

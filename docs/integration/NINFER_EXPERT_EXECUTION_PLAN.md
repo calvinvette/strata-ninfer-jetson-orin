@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **E0–E5 bounded prototype evidence complete; E6 same-process 65K repeats localized one request-dependent expert-320 output change to CPU-miss versus resident-GPU ownership. Exact-input CPU/GPU replay matched each service row. Fixed-CPU and fixed-GPU owner repeats each matched recorded prompt-boundary/final state and full layer-1 MoE bundle; both owner modes also matched all five sampled accepted-prefix records across repeated requests. Cross-owner state and sampled output trajectories differ. E6/E7 remain open pending broader quality/repeatability and end-to-end performance qualification. HIP/SYCL rebuilds for recent shared diagnostic changes remain pending compiler availability (updated 2026-10-30).**
+Status: **E0–E5 bounded prototype evidence complete; E6 same-process 65K repeats localized one request-dependent expert-320 output change to CPU-miss versus resident-GPU ownership. Exact-input CPU/GPU replay matched each service row. Fixed-CPU and fixed-GPU owner repeats each matched prompt-boundary/final state, the full layer-1 MoE bundle and five sampled accepted-prefix records across repeated requests; cross-owner state and sampled output trajectories differ. A first no-trace fixed-GPU backend-ablation pair had exact token parity and 12.2% cache hits, with NInfer 0.46% slower prefill and 4.88% slower decode; two more screen pairs remain. E6/E7 remain open pending broader quality/repeatability and end-to-end performance qualification. maestro1 currently has only 1 GiB free and no HIP/SYCL compiler in PATH, so recent shared-source rebuilds remain pending (updated 2026-10-30).**
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -768,6 +768,10 @@ telemetry. The exact-input
 `native_expert_parity` replay matched the service's CPU-owned request-1 row and
 GPU-owned request-2 row bit-for-bit; see the
 [ownership report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md).
+A first fixed-GPU resident backend ablation emitted the same 32 tokens in both
+arms and recorded matching 12.2% decode cache-hit rates. NInfer was 0.46%
+slower on prompt rate and 4.88% slower on decode in this single pair; two more
+screening pairs remain. See the [pilot report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/fixed-gpu-resident-backend-ablation-pilot.md).
 E6/E7 remain open.
 
 **Exit:** operator effects and complete-request effects are both documented;

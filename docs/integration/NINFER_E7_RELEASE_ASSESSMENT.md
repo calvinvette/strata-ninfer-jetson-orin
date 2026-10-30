@@ -42,11 +42,17 @@ rates are excluded because synchronized hashing substantially slowed decode.
 These controls improve attribution; they do not add a performance win or
 change the no-release decision. See the [owner-repeat report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md).
 
-The next comparison should hold expert weights, GPU residency, active routes,
-miss policy and prompt fixed while toggling only the resident backend; first
-use an independent task oracle and accepted-prefix state, then run a no-trace
-screen with actual cache-hit telemetry. Any 5% effect still needs the planned
-seven randomized confirmation pairs.
+The first no-trace fixed-GPU backend-ablation pair has now been run on the same
+65K/32 prompt/profile. Both arms emitted the same token IDs and recorded a
+12.2% GPU-cache hit rate. NInfer was 0.46% slower on prompt rate and 4.88%
+slower on decode in this one pair. This does not meet the useful-effect
+threshold or establish uncertainty; two randomized screening pairs remain.
+The profile controls residency, while this pilot uses token equality rather
+than an independent task-quality oracle. See the [pilot report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/fixed-gpu-resident-backend-ablation-pilot.md).
+
+Any measured 5% effect still needs the planned seven randomized confirmation
+pairs, an independent task oracle and accepted-prefix state with ownership
+held fixed.
 
 - The CUDA path is limited to Q2_0 gate/up and Q2_0 down weights with
   Flash-Next 2560/640 geometry. It is guarded by a CUDA build definition. The

@@ -3286,3 +3286,10 @@ against itself, while CPU/GPU states differed at the prompt boundary and
 sampled tokens split later. Keep capture formats append-only and parse every
 record against its request boundary; this raw execution dump successfully
 captured both requests in each repeated pair.
+
+A no-trace Strata/strict-NInfer comparison with the fixed GPU profile then
+matched all 32 token IDs and had the same 12.2% aggregate GPU-cache hit rate.
+The single-pair NInfer changes were -0.46% prompt rate and -4.88% decode rate.
+For Splash, a resident-backend comparison should change the backend while
+holding the cache map and active routes fixed, capture the owner/hit-rate
+distribution separately, and treat a one-pair rate as screening evidence.

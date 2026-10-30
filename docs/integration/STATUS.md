@@ -51,6 +51,15 @@ rates are excluded because synchronization slowed 32-token decode to about
 qualification. E6/E7 remain open. See the
 [expert-320 ownership report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md).
 
+**E6 fixed-GPU backend pilot (2026-10-30):** a no-trace 65K/32 pair toggled
+only the resident backend under the same fixed GPU profile. Both arms emitted
+identical token IDs and recorded 12.2% GPU-cache hits. NInfer measured 86.6/3.9
+prompt/decode tok/s versus Strata's 87.0/4.1, changes of -0.46%/-4.88%.
+Minimum available RAM was 8.68 GiB, peak swap 1.69 GiB, and sampled cgroup OOM
+kills zero. This single pair is a pilot only; two randomized screens remain,
+and no confirmation is warranted unless their median reaches the 5% threshold.
+See the [pilot report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/fixed-gpu-resident-backend-ablation-pilot.md).
+
 **E6 64K no-trace API screen (2026-10-29):** three fresh-process pairs
 measured a 65,536-token prompt plus 128 generated tokens at 131,072 context,
 with PCIe staging, prompt cache and tracing disabled. All six processes and
