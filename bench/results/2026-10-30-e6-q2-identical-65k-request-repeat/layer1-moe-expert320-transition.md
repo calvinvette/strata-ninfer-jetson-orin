@@ -144,9 +144,10 @@ bundle records were byte-identical (SHA-256
 `f411b8c800b7147e7196285d37390fc33e1a38af1ea369a5a6f7e7aecb87afcb`), covering
 routes, F32 input, expert rows, shared output and combined output. This closes
 the fixed-GPU-owner repeatability control for this sampled boundary. The
-separate `STMOEX01` execution dump is emitted once per process, so only the
-first request's resident weights and Q8_1 bytes were captured; byte identity
-of those two fields is not claimed.
+append-only `STMOEX01` dump contains both requests in each fixed-GPU pair (four
+records across the ordinary and accepted-prefix repeats). Each pair's
+resident weights (1,382,400 bytes; SHA-256 `932d559a…5e42781`) and Q8_1 row
+(2,880 bytes; SHA-256 `61ad484b…fed17599`) match byte-for-byte.
 
 Instrumented prompt rates were 87.0 and 87.6 tok/s; 32-token decode rates were
 1.2 and 1.3 tok/s. These are repeat diagnostics, not backend performance

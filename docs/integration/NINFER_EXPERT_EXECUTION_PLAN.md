@@ -756,14 +756,15 @@ NInfer kernel changing under fixed inputs. A static-cache fixed-CPU-owner pair
 now matched all recorded prompt-boundary/final state fields and the complete
 layer-1 MoE bundle byte-for-byte. A fixed-GPU-owner repeat then profile-ranked
 expert 320 into slot 0 and matched the two prompt-boundary/final state captures
-and complete layer-1 MoE bundle. The process-level execution dump emitted only
-one record, so repeat identity for weights/Q8_1 bytes is not claimed. Next
-check accepted-prefix state in both owner modes. The fixed-GPU and fixed-CPU
+and complete layer-1 MoE bundle. The append-only execution dump contains four
+records across the ordinary and accepted-prefix pairs; resident weight bytes
+and grouped Q8_1 rows match within each pair. The fixed-GPU and fixed-CPU
 65K/32 repeats each matched token IDs and all eleven persistent fields at five
 sampled commits within each owner mode. Their cross-owner prompt state already
 differs, and sampled tokens split at the third prefix. Trace synchronization
 raised decode time to about 119 seconds for 32 tokens, so these rates are
-diagnostic only. Next compare request performance with actual ownership/hit-rate telemetry. The exact-input
+diagnostic only. Next compare request performance with actual ownership/hit-rate
+telemetry. The exact-input
 `native_expert_parity` replay matched the service's CPU-owned request-1 row and
 GPU-owned request-2 row bit-for-bit; see the
 [ownership report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md).

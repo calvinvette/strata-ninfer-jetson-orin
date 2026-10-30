@@ -34,8 +34,8 @@ fingerprints matched exactly across requests. Its instrumented prefill rates
 were 87.0/87.6 tok/s and decode rates 1.2/1.3 tok/s; these are diagnostics,
 not backend comparisons. The custom static profile had 12.2% GPU-cache hits.
 Minimum available RAM was 8.72 GiB, peak swap 4.13 GiB, and cgroup OOM kills
-zero. The execution dump is process-once, so repeat identity is established by
-the repeated MoE bundle rather than a second raw weight/Q8_1 record. A sampled
+zero. The append-only execution dump captured both requests in each GPU-owned
+pair; weight and Q8_1 bytes matched within each pair. A sampled
 accepted-prefix repeat under this fixed-GPU profile matched all 32 token IDs
 and eleven persistent-state fields at five sampled commit lengths in both
 requests. Trace synchronization made 32-token decode take about 119 seconds;

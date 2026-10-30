@@ -3283,6 +3283,6 @@ selected expert's actual owner with routes and inputs, then repeat
 accepted-prefix/state checks under both fixed owners before attributing a
 delta to backend arithmetic. In this case each owner mode repeated exactly
 against itself, while CPU/GPU states differed at the prompt boundary and
-sampled tokens split later. Ensure diagnostic recorders can emit one sample
-per request: the current raw execution dump is process-once, even though
-bundle and state capture support both requests.
+sampled tokens split later. Keep capture formats append-only and parse every
+record against its request boundary; this raw execution dump successfully
+captured both requests in each repeated pair.
