@@ -107,9 +107,13 @@ while its 2,560-value input activation already differed in 2,554 values
 (relative L2 `3.10649e-05`). Differences propagated through the projections
 and output; post-window recurrent state differed in 784,908/786,432 values
 (relative L2 `5.5023e-05`) and convolution history in 10,237/30,720
-(relative L2 `1.91276e-04`). The next capture targets the preceding
-model-layer-1 output/residual boundary; this does not identify the source of
-the small incoming activation difference. See the [raw layer-2 transition
+(relative L2 `1.91276e-04`). The preceding model-layer-1 boundary capture
+found the residual stream and hyperconnection term exact, but 1,658/2,560
+values in its MoE/output vector differed (maximum `1.73e-06`, relative L2
+`5.56115e-05`). The next diagnostic captures layer 1's GDN projections,
+recurrence, FFN and pre/post state to locate the first changed internal field.
+It has not identified the cause. See the [layer-1 boundary report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-boundary-transition.md),
+the [raw layer-2 transition
 report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/gdn-layer2-raw-transition.md),
 the
 [reset-state repeat](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/reset-state-65k-repeat.md),

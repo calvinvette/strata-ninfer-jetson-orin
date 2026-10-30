@@ -720,11 +720,16 @@ and first differ at GDN ordinal 2, model layer 2; all 12 QSA layer hashes from
 model layer 3 onward differ. A raw verifier capture then found model layer 2's
 entering recurrent and convolution state exactly equal, but its input activation
 already differed in 2,554/2,560 values (relative L2 `3.10649e-05`). The
-difference propagates through layer-2 projections and post-state. This moves
-the next capture to the model-layer-1 output/residual boundary; it does not
-attribute the small input difference to a specific operation. See the
+difference propagates through layer-2 projections and post-state. A capture at
+the preceding model-layer-1 boundary found its residual stream and
+hyperconnection term exact, while 1,658/2,560 MoE/output values differed
+(maximum `1.73e-06`, relative L2 `5.56115e-05`). Next capture layer 1's GDN
+projections, recurrence, FFN and pre/post state to locate the first changed
+internal field. This does not yet attribute the difference to an operation.
+See the
 [per-layer state report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/verifier-first-layer-state-hashes.md)
-and [raw layer-2 transition report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/gdn-layer2-raw-transition.md).
+and [raw layer-2 transition report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/gdn-layer2-raw-transition.md),
+plus the [layer-1 boundary report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-boundary-transition.md).
 
 **Exit:** operator effects and complete-request effects are both documented;
 per-model and combined charts include matched controls and uncertainty. Keep
