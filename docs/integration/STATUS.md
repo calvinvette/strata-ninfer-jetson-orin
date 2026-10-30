@@ -7357,6 +7357,16 @@ transfer. The run passed with 9.16 GiB minimum available RAM and zero sampled
 OOM kills. Instrumented prefill rates are not benchmark comparisons. See the
 [updated diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
 
+A follow-up enabled adaptive-event logs and accepted-prefix state hashes every
+eight commits. The 65K request reproduced its 32-token output hash and final
+state, with choice batches logged at rounds 4–32; replay again reproduced the
+adaptive 8K state and first token. Minimum available memory was 8.52 GiB with
+no sampled OOM kills. Hashing reduced measured decode to 0.3 tok/s, so these
+rates are instrumentation artifacts. This does not attribute state changes to
+the adaptation events because no fixed-owner comparison was captured at the
+same accepted prefixes. Next compare that paired prefix state and locate the
+first differing per-layer replay state. [Diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
+
 **E7 current-source portability rebuild (2026-10-30):** full HIP and SYCL
 target trees rebuilt at source `4229c00e` on maestro1 with one-job builds. HIP
 `strata --help` passed and the host-only `shared_memory_budget_test` passed.

@@ -140,10 +140,38 @@ The trace is opt-in via `STRATA_TRACE_MOE_POSITION_PATH` and
 dispatch hook and adds a request sequence to its internal call, but the owner
 JSON schema is unchanged. No default serving behavior or cache policy changed.
 
+### Adaptive events and sampled accepted-prefix state
+
+The request-tagged run was repeated with `STRATA_TRACE_ADAPT=1` and accepted
+prefix hashes at stride eight, retaining the first and final checkpoints. The
+65K request again produced the same 32-token hash
+`2d5f3da8f9890f8c9262231bada2cfab088196528565a1c08ab685d86074c650` and the
+same final state. During its generated-token phase, the log recorded adaptive
+choice batches of 96 at rounds 4, 8, 12, 16, 20, 24, 28 and 32. The sampled
+accepted prefixes were 1, 8, 16, 24 and 32; the first checkpoint's hash fields
+matched the prompt-boundary hash, and the final checkpoint matched the prior
+adaptive run. Exact long-request fingerprints at accepted prefixes 8, 16 and
+24 are retained in the raw engine log. This trace shows update timing relative
+to sampled commits, but it does not compare the same accepted prefix against a
+fixed-owner arm and cannot attribute state changes to those updates.
+
+After request reset, the 8K replay boundary again had GDN
+`994f4c41001157d9`, PLE `8f834c5fe472a9e5`, tail `2f18de91a9aab11b`, KV
+`94ed00cf754f7d1d`, pooled-full `f3ce497f5331f3e7`; its first accepted token
+was `248046` and its first accepted-prefix hash matched the prompt-boundary
+hash. The trace confirms repeatability at this sampled point, not equivalence
+to the standalone 8K state. Minimum available memory was 9.15 GB (8.52 GiB),
+above the six-GiB floor; sampled OOM kills were zero. State hashing slowed
+decode to 0.3 tok/s on the 65K request and 0.2 tok/s on the replay, so these
+rates are instrumentation artifacts and excluded from performance comparisons.
+The supervisor took 1,034 seconds. Raw logs and checkpoints are in
+`/tmp/e6-65k-adaptive-prefix-state-trace/` and
+`/tmp/e6-65k-adaptive-prefix-state-trace-supervisor/` on the Orin.
+
 ## Next diagnostic
 
-Capture accepted-prefix state across additional layers around the first
-adaptive swap and corresponding replay position. The selected layer-1 replay
-row is now observable and its route/owner record matches the short control,
-but the controlled toggle still does not connect a specific expert transfer
-to the state delta.
+Compare the same accepted prefixes against a matched fixed-owner 65K request,
+and capture per-layer state at the replay boundary to locate the first changed
+component/layer. The selected layer-1 replay row is observable and its
+route/owner record matches the short control, but the controlled toggle still
+does not connect a specific expert transfer to the state delta.

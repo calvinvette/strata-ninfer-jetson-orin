@@ -2353,9 +2353,14 @@ recorded all 32 late-decode layer-1 rows in request 0 and the replay's layer-1
 row at position 8191 in request 1; its routed experts and owner kinds matched
 the short two-8K control. This resolves the missing-row observation, but the
 replay's persistent state still differs after adaptive residency and the
-selected row does not identify the cause. Next capture accepted-prefix state
-across layers around the first adaptive swap and corresponding replay point.
-Instrumented rates are diagnostic only. See the
+selected row does not identify the cause. An adaptive trace with state hashes
+sampled every eight commits reproduced the same output/state and logged choice
+batches at decode rounds 4 through 32. Its final replay boundary reproduced
+the adaptive 8K hash and token, but did not compare matching accepted prefixes
+against a fixed-owner 65K arm. State hashing cut decode to 0.3 tok/s, so those
+rates are instrumentation artifacts. Next compare the same accepted prefixes
+against a matched fixed-owner 65K request and capture per-layer state at the
+replay boundary. Instrumented rates are diagnostic only. See the
 [Report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
 
 **Current-source portability rebuild (2026-10-30):** full HIP and SYCL target

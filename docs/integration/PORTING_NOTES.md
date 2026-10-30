@@ -3324,3 +3324,12 @@ owner captures from full position traces. Do not infer that a request skipped
 a layer or route merely because a narrow position filter emitted no row. The
 replay state difference persisted despite the matching sampled route row, so
 trace adjacent layers/state boundaries before assigning a causal mechanism.
+
+An adaptive-event diagnostic with accepted-prefix hashes sampled every eight
+commits reproduced the same long output/state and logged residency choice
+batches at decode rounds 4–32. These hashes were expensive (the traced decode
+rate fell to 0.3 tok/s), and no fixed-owner arm was sampled at the same
+accepted prefixes. For Splash, pair accepted-prefix checkpoints at the actual
+adaptation cadence and label synchronized state-hash runs as diagnostic only;
+compare equal committed token prefixes across matched ownership policies before
+claiming that migration changed recurrent state.
