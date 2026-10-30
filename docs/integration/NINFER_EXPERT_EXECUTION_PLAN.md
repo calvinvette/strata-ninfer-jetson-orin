@@ -732,9 +732,14 @@ L2 `5.24514e-04`). The second request matched the independent Q2_0 × Q8_1
 oracle at relative L2 `5.79e-08`, while the first differed at `5.24529e-04`.
 The route-weighted expert-row delta predicts the combined-output delta with
 cosine similarity `0.99999980`. This localizes the pair's change to that
-expert row without identifying the runtime cause. Next compare its exact
-weight view and grouped-kernel intermediates across requests, then run a
-matched Strata-backend control. This remains a request-specific diagnostic,
+expert row without identifying the runtime cause. The matched Strata-backend
+pair reproduced the same per-request change, with all captured MoE data
+byte-identical to NInfer. A focused single-entry grouped replay passed 32
+fixed-input repetitions for both backends; direct NInfer D3/D4 matched the
+independent FP64 oracle at relative L2 `1.57e-07`. This narrows the issue to
+shared service/runtime context. Next capture the actual expert-320 device
+weight bytes and Q8_1 activation at the grouped service dispatch, then locate
+the first changed intermediate. This remains a request-specific diagnostic,
 not a performance conclusion.
 See the
 [per-layer state report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/verifier-first-layer-state-hashes.md)

@@ -123,8 +123,14 @@ L2 `5.79e-08`; the first request differed by `5.24529e-04`. Route-weighting
 the expert-row delta predicts the combined-output delta (cosine similarity
 `0.99999980`). This localizes the pair's output change to that expert row but
 does not identify its runtime cause. Next compare expert-320 weight bytes and
-grouped-kernel intermediate state across requests, with the Strata backend as
-a control. See the [expert-320 MoE report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md),
+grouped-kernel intermediate state across requests. The matched Strata-backend
+pair reproduced the same per-request change; every captured MoE field was
+byte-identical between backends. A focused single-entry grouped replay then
+passed 32 fixed-input repetitions for both backends, and direct NInfer D3/D4
+matched the independent FP64 oracle at relative L2 `1.57e-07`. This narrows
+the issue to shared service/runtime context, without yet identifying a cause.
+Next capture expert-320's actual device weight bytes and Q8_1 input at the
+grouped service dispatch. See the [expert-320 MoE report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md),
 the [layer-1 GDN-to-MoE
 report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-gdn-to-moe-transition.md),
 the [layer-1 boundary report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-boundary-transition.md),

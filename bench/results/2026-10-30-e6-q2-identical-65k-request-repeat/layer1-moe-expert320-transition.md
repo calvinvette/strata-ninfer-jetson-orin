@@ -45,20 +45,42 @@ expert-320 computation/output row for this pair. The result alone does not
 identify whether the changing factor is a weight view, scratch lifetime,
 kernel race, or another runtime detail.
 
-The focused `ninfer_q2_expert_parity` executable was also run with the same
-model layer, expert ID and input; it exited successfully. That operator check
-does not reproduce the service's changing grouped multi-expert/runtime
-history, so it does not close the issue.
+## Backend control and focused replay
+
+A second same-process 65K pair used the Strata expert backend with the same
+MoE bundle capture. Its repeated request showed the same expert-320 change:
+routes, weights, input and shared output were exact; the expert-320 part and
+combined output had the same changed-value counts and deltas as the NInfer
+pair. More strongly, the per-request route, weight, input, all expert parts,
+shared output and combined output were byte-identical between NInfer and
+Strata. This run does not show a difference unique to the NInfer backend.
+
+The focused `ninfer_q2_expert_parity` check was extended to replay the exact
+one-entry grouped NInfer and Strata dispatch 32 times at fixed input and
+weights. Both outputs remained bit-identical across all 32 calls. The direct
+NInfer D3/D4 row matched an independent FP64 Q2_0/F32 oracle (relative L2
+`1.57e-07`, maximum absolute error `1.34e-08`); grouped NInfer and Strata
+outputs matched exactly for the one-entry case. The process passed. Its
+interleaved operator timings were 24.510 vs 24.673 microseconds (NInfer /
+Strata) for one token, 4,387.924 vs 3,949.398 microseconds for 64 tokens,
+and 8,938.040 vs 7,958.909 microseconds for 128 tokens. Those isolated
+operator timings do not represent end-to-end serving; the larger grouped
+shapes were slower with NInfer in this run.
+
+The service's repeated multi-expert request history is not reproduced by the
+fixed-input one-entry replay. The unchanged backend output therefore narrows
+the cause to shared service/runtime context (for example, the live expert
+weight view or cache-slot ownership) but does not establish which one.
 
 ## Interpretation and limits
 
-This is evidence of request-to-request variation in a single resident NInfer
-expert row with fixed route IDs, weights, and input. It is a correctness
-localization finding, not a general determinism claim or proof that NInfer
-alone causes the variation. The next investigation should compare the exact
-expert-320 weight bytes and grouped-kernel intermediate/output state across
-both service requests, then exercise the same grouped sequence under the
-Strata backend as a control.
+This is evidence of request-to-request variation in a single resident expert
+row with fixed route IDs, weights and input, reproduced byte-for-byte by both
+backends. It is a correctness localization finding, not a general
+determinism claim. The next investigation should compare the exact expert-320
+weight bytes and Q8_1 activation bytes presented to the service grouped
+dispatch across both requests, then isolate the first changed intermediate
+in that grouped sequence.
 
 Both requests passed. Supervised telemetry recorded 8.61 GiB minimum
 available RAM, 4.18 GiB peak swap use, and no cgroup OOM kills. Full raw

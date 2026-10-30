@@ -248,6 +248,32 @@ int main(int argc, char** argv) {
                     route_rel_l1 <= 2.0e-4 && route_unwritten == 0 && calls == 1 ? "PASS" : "FAIL");
         failed += route_rel_l1 <= 2.0e-4 && route_unwritten == 0 && calls == 1 ? 0 : 1;
 
+        // The service capture found one repeated expert row changing while
+        // routes and input stayed fixed. Replay this exact one-entry grouped
+        // ABI repeatedly, checking both candidate and Strata output bytes.
+        std::vector<float> repeated_candidate(kHidden), repeated_native(kHidden);
+        size_t candidate_repeat_differences = 0, native_repeat_differences = 0;
+        for (int repeat = 0; repeat < 32; ++repeat) {
+            strata::kernels::ninfer_q2_0_expert_grouped(layout, device_ptrs, device_starts, device_group_count,
+                                                         device_dst, device_tok, 1, 1, device_xq,
+                                                         candidate_scratch, device_group_output, stream, 1);
+            strata::kernels::native_expert_grouped(layout, device_ptrs, device_starts, device_group_count,
+                                                    device_dst, device_tok, 1, 1, device_xq, native_scratch,
+                                                    device_native_output, stream, 1);
+            cuda_check(cudaMemcpyAsync(repeated_candidate.data(), device_group_output, kHidden * sizeof(float),
+                                       cudaMemcpyDeviceToHost, stream), "copy repeated grouped NInfer output");
+            cuda_check(cudaMemcpyAsync(repeated_native.data(), device_native_output, kHidden * sizeof(float),
+                                       cudaMemcpyDeviceToHost, stream), "copy repeated grouped Strata output");
+            cuda_check(cudaStreamSynchronize(stream), "synchronize repeated grouped outputs");
+            candidate_repeat_differences += float_stage_diff(grouped_output, repeated_candidate);
+            native_repeat_differences += float_stage_diff(native_output, repeated_native);
+        }
+        const bool repeatable = candidate_repeat_differences == 0 && native_repeat_differences == 0;
+        std::printf("fixed-input one-entry grouped repeat (32 calls): NInfer changed values=%zu, "
+                    "Strata changed values=%zu %s\n",
+                    candidate_repeat_differences, native_repeat_differences, repeatable ? "PASS" : "FAIL");
+        failed += repeatable ? 0 : 1;
+
         // Diagnostic device-timeline screen: seven interleaved paired blocks,
         // one resident expert and one token. This excludes model routing,
         // transfers and request overhead; it is not an end-to-end benchmark.
