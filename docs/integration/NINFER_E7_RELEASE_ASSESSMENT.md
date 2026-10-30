@@ -42,13 +42,16 @@ rates are excluded because synchronized hashing substantially slowed decode.
 These controls improve attribution; they do not add a performance win or
 change the no-release decision. See the [owner-repeat report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md).
 
-The first no-trace fixed-GPU backend-ablation pair has now been run on the same
-65K/32 prompt/profile. Both arms emitted the same token IDs and recorded a
-12.2% GPU-cache hit rate. NInfer was 0.46% slower on prompt rate and 4.88%
-slower on decode in this one pair. This does not meet the useful-effect
-threshold or establish uncertainty; two randomized screening pairs remain.
-The profile controls residency, while this pilot uses token equality rather
-than an independent task-quality oracle. See the [pilot report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/fixed-gpu-resident-backend-ablation-pilot.md).
+The three-pair no-trace fixed-GPU backend screen used the same 65K/32
+prompt/profile. All arms emitted identical token IDs and recorded a 12.2%
+GPU-cache hit rate. Median NInfer changes were -0.46% prefill and 0.00%
+decode. One Strata decode arm measured 0.9 tok/s alongside a CPU-frequency
+drop, while the opposite-order pair returned to 4.1 tok/s for both backends;
+the cause remains unknown. Neither metric met the preregistered 5% screen, so
+seven-pair confirmation is not indicated for this fixed-GPU resident path.
+Token equality is not an independent task-quality oracle. See the [pilot
+report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/fixed-gpu-resident-backend-ablation-pilot.md)
+and [three-pair screen](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/fixed-gpu-resident-backend-screen.md).
 
 Any measured 5% effect still needs the planned seven randomized confirmation
 pairs, an independent task oracle and accepted-prefix state with ownership
@@ -85,7 +88,7 @@ held fixed.
   below the 5% screen threshold. See the [corrected capacity screen](../../bench/results/2026-10-25-phase-e6-q2-grouped-throughput/fixed-swiglu-context-check/README.md)
   and [outlier repeat](../../bench/results/2026-10-25-phase-e6-q2-557-repeat3/README.md).
   The corrected-binary randomized three-pair 8K screen covered
-  five natural-generation shapes and three randomized pairs. All measured
+  five natural-generation shapes and three order-mixed pairs. All measured
   outputs and resident maps matched; median TTFT changes ranged from −1.59% to
   +0.21%, and no cell met the threshold. One 2,048+128 pair had a 32.6%
   decode-time regression. No seven-pair confirmation was warranted. Its
@@ -296,7 +299,7 @@ this cell. The broader E6 quality, context and workload exits remain open.
 See the [API screen report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp512-cap1024-README.md).
 
 A second minimally instrumented API screen covered pp2048+tg128 at 4K context
-in three randomized pairs. All six requests completed and content matched
+in three order-mixed pairs. All six requests completed and content matched
 within pairs. Median NInfer changes were +4.48% prompt TPS, +0.00% decode TPS,
 -4.39% first-visible TTFT, and -2.34% client time. One +47.62% decode result
 was isolated to an unusually slow Strata baseline; the median decode effect

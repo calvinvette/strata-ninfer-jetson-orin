@@ -2699,7 +2699,7 @@ the aborted engine; the refused 1 MiB request-path allocation is GEMM host
 buffer backing, not the 32 MiB cuBLAS workspace itself.
 
 The initial [mapped-versus-pread file-tier screen](../../bench/results/2026-10-10-phase3-mapped-pread-screen/README.md)
-ran three randomized pairs on an exact 512-token/64-output request. Tokens and
+ran three order-mixed pairs on an exact 512-token/64-output request. Tokens and
 nine persistent-state fields matched in all pairs, with 8.17 GiB minimum
 availability. Mapped decode median was 22.7% lower, while prompt median was
 1.7% higher; this small screen is not a promotion result. Process page faults
@@ -3239,7 +3239,7 @@ evidence. The current candidate's `ple_parity` and `ple_reader_selftest` passed
 2/2, and integration Python discovery passed 99/99. Phase 3 remains open.
 
 The [mapped/pread × cache-budget interaction screen](../../bench/results/2026-10-11-phase3-transfer-cache-interaction-screen/README.md)
-adds three randomized pairs at each 3,903- and 6,519-slot cache. All pairs
+adds three order-mixed pairs at each 3,903- and 6,519-slot cache. All pairs
 matched tokens and persistent state within cache size; mapped request time was
 lower in all six pairs (median paired deltas −4.75% and −3.54%). Minimum host
 availability was 13.05 and 8.03 GiB. The cache groups ran sequentially, clocks
@@ -3512,7 +3512,7 @@ A fresh [Q2_0 16K prompt admission run at 19 GiB](../../bench/results/2026-10-13
 
 The [Q2_0 19-GiB admission repeat](../../bench/results/2026-10-12-phase3-q2-actual32k-context64k-19G-repeat2/README.md) passed the same exact prompt, cache and context configuration as the earlier 19-GiB run. It reproduced token 32, all prompt-end state fingerprints, and all 36 layer GDN hashes. Minimum effective headroom was 9.11 GiB (the first run reached 6.98 GiB); observed ownership again left only the service-lifetime weight arena. Both runs passed, but differing starting cgroup/page-cache conditions mean this is repeatability evidence, not a capacity boundary. Phase 3 remains open.
 
-The Q2_0 [8K pageable-versus-pinned expert staging screen](../../bench/results/2026-10-12-phase3-q2-stage-pin-8k/README.md) completed three randomized pairs under a 28-GiB cgroup ceiling; all matched output IDs and persistent state. Each stage owner requested 337.5 MiB and balanced 256 allocations/frees per arm. Pinned request-time deltas were −4.80%, +46.16% and +0.83%, with a three-pair bootstrap interval from −4.80% to +46.16%; the result is inconclusive and no mode changed. Minimum host availability was 17.75 GiB and effective headroom 10.60 GiB, with zero OOM events. A separate 24-GiB campaign safely aborted pair 3 at 5.65 GiB after two matching pairs. The harness context-margin fix passed its 9 focused tests and full Python integration discovery passed 120/120.
+The Q2_0 [8K pageable-versus-pinned expert staging screen](../../bench/results/2026-10-12-phase3-q2-stage-pin-8k/README.md) completed three order-mixed pairs under a 28-GiB cgroup ceiling; all matched output IDs and persistent state. Each stage owner requested 337.5 MiB and balanced 256 allocations/frees per arm. Pinned request-time deltas were −4.80%, +46.16% and +0.83%, with a three-pair bootstrap interval from −4.80% to +46.16%; the result is inconclusive and no mode changed. Minimum host availability was 17.75 GiB and effective headroom 10.60 GiB, with zero OOM events. A separate 24-GiB campaign safely aborted pair 3 at 5.65 GiB after two matching pairs. The harness context-margin fix passed its 9 focused tests and full Python integration discovery passed 120/120.
 
 The standalone CUDA [grouped expert-hit parity check](../../bench/results/2026-10-12-phase3-q2-cache-context-state/README.md)
 also passed after a memory-bounded target build. Synthetic Q2_0 host-count,
@@ -7295,3 +7295,16 @@ interval included zero; none met the 5% threshold. The generic workload had no
 semantic oracle or state capture. Minimum available memory was 9.95 GiB, with
 sampled cgroup pressure/OOM counters at zero. Clocks were dynamic and energy
 was not measured. No confirmation is warranted. [Report and chart](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/no-trace-api-pp32768-cap65536-README.md).
+
+**E6 fixed-GPU backend screen (2026-10-30):** three order-mixed no-trace
+65K/32 pairs compared Strata with strict NInfer while holding the expert-320
+GPU profile fixed. All six requests emitted identical token IDs and had the
+same 12.2% cache-hit rate. Median NInfer changes were -0.46% prefill and 0.00%
+decode, below the preregistered 5% screen; no seven-pair confirmation is
+indicated for this owner path. One Strata arm measured 0.9 decode tok/s with a
+CPU median frequency near 729 MHz (versus 2,201 MHz for its NInfer mate); the
+opposite-order pair returned to 4.1 tok/s for both. Cause remains unknown.
+Minimum available RAM was 8.44–8.77 GiB, peak sampled swap 1.45–6.72 GiB, and
+sampled cgroup OOM kills were zero. Energy and GPU clock were not measured.
+This is screening evidence only; broader E6/E7 gates remain open. See the
+[screen report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/fixed-gpu-resident-backend-screen.md).

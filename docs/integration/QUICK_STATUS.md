@@ -8,6 +8,12 @@ phase gates; the detailed [status](STATUS.md) is the evidence record, and the
 [porting notes](PORTING_NOTES.md) preserve lessons for repeating this work with
 Strata and Splash.
 
+The fixed-GPU resident-backend screen now has three no-trace pairs: median
+NInfer changes were -0.46% prefill and 0.00% decode, below the 5% screen. One
+Strata decode arm was an unexplained 0.9 tok/s outlier; the opposite-order
+repeat tied at 4.1 tok/s. No seven-pair confirmation is indicated for this
+fixed-owner path. See the [screen report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/fixed-gpu-resident-backend-screen.md).
+
 ## Overall status
 
 Phases 0–8 are complete for the bounded Orin and backend scopes documented in

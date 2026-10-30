@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **E0–E5 bounded prototype evidence complete; E6 same-process 65K repeats localized one request-dependent expert-320 output change to CPU-miss versus resident-GPU ownership. Exact-input CPU/GPU replay matched each service row. Fixed-CPU and fixed-GPU owner repeats each matched prompt-boundary/final state, the full layer-1 MoE bundle and five sampled accepted-prefix records across repeated requests; cross-owner state and sampled output trajectories differ. A first no-trace fixed-GPU backend-ablation pair had exact token parity and 12.2% cache hits, with NInfer 0.46% slower prefill and 4.88% slower decode; two more screen pairs remain. E6/E7 remain open pending broader quality/repeatability and end-to-end performance qualification. maestro1 currently has only 1 GiB free and no HIP/SYCL compiler in PATH, so recent shared-source rebuilds remain pending (updated 2026-10-30).**
+Status: **E0–E5 bounded prototype evidence complete; E6 same-process 65K repeats localized one request-dependent expert-320 output change to CPU-miss versus resident-GPU ownership. Exact-input CPU/GPU replay matched each service row. Fixed-CPU and fixed-GPU owner repeats each matched prompt-boundary/final state, the full layer-1 MoE bundle and five sampled accepted-prefix records across repeated requests; cross-owner state and sampled output trajectories differ. A three-pair no-trace fixed-GPU backend screen preserved exact token parity and 12.2% cache hits. Median NInfer changes were -0.46% prefill and 0.00% decode; one Strata decode arm was an unexplained 0.9 tok/s outlier. Neither metric met the preregistered 5% screen, so no seven-pair confirmation is indicated for this fixed-owner path. E6/E7 remain open pending broader quality/repeatability and end-to-end performance qualification. maestro1 currently has only 1 GiB free and no HIP/SYCL compiler in PATH, so recent shared-source rebuilds remain pending (updated 2026-10-30).**
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -376,7 +376,7 @@ response-hash matches, and improved median client latency by 0.72% and TTFT by
 below threshold. See the [1,000-slot screen](../../bench/results/2026-10-25-phase-e3-q2-ninfer-cache1k-max-offload/README.md).
 
 Execution note (2026-10-25): a pinned complement sweep at 3,000 slots and
-`--pcie-frac 1.0` tested 2, 4 and 6 GiB complements in three randomized pairs
+`--pcie-frac 1.0` tested 2, 4 and 6 GiB complements in three order-mixed pairs
 per cell. Staged entries increased from 537 (3.9%) to 922 (6.6%) to 1,364
 (9.8%) of routed entries. Median client latency improvements were 1.00%,
 3.29% and 4.09%; TTFT improvements were 1.62%, 3.80% and 6.05%. The 2-GiB
@@ -768,10 +768,14 @@ telemetry. The exact-input
 `native_expert_parity` replay matched the service's CPU-owned request-1 row and
 GPU-owned request-2 row bit-for-bit; see the
 [ownership report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md).
-A first fixed-GPU resident backend ablation emitted the same 32 tokens in both
-arms and recorded matching 12.2% decode cache-hit rates. NInfer was 0.46%
-slower on prompt rate and 4.88% slower on decode in this single pair; two more
-screening pairs remain. See the [pilot report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/fixed-gpu-resident-backend-ablation-pilot.md).
+A three-pair fixed-GPU resident backend screen emitted the same 32 tokens in
+all arms and recorded matching 12.2% decode cache-hit rates. Median NInfer
+changes were -0.46% prefill and 0.00% decode. One Strata decode arm was an
+unexplained 0.9 tok/s outlier with a CPU-frequency drop; an opposite-order
+repeat returned to 4.1 tok/s for both arms. The 5% gain gate was not met, so
+seven-pair confirmation is not indicated for this fixed-owner path. See the
+[pilot report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/fixed-gpu-resident-backend-ablation-pilot.md)
+and [three-pair screen](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/fixed-gpu-resident-backend-screen.md).
 E6/E7 remain open.
 
 **Exit:** operator effects and complete-request effects are both documented;
@@ -1286,7 +1290,7 @@ NInfer grouped path has no demonstrated request-level gain on this shape.
 Continue to other planned shapes and the task-quality gate before E6 closeout.
 See the [staged-compute screen](../../bench/results/2026-10-26-e6-q2-staged-compute-screen/README.md).
 
-The same comparison was expanded to three randomized pairs across all five
+The same comparison was expanded to three order-mixed pairs across all five
 8K natural-generation shapes (512+64, 2,048+128, 172+64, 557+64 and
 1,069+64). All 15 output hashes and residency maps matched. Paired median
 prompt-TPS changes ranged from −4.12% to +1.19%, decode-TPS changes from
@@ -1316,7 +1320,7 @@ were −0.65% prompt TPS, +3.41% decode TPS, +0.54% first-visible TTFT and
 −0.40% client time; none reached the 5% threshold. Minimum available memory
 was 11.65 GiB. This remains a screen only. See the [2K report](../../bench/results/2026-10-26-e6-q2-staged-compute-2k-pp512-screen/README.md).
 
-The 4K 512+64 staged-compute screen likewise completed three randomized pairs
+The 4K 512+64 staged-compute screen likewise completed three order-mixed pairs
 with matching output and resident-map hashes. Median paired changes were
 −1.97% prompt TPS, +2.27% decode TPS, +2.18% first-visible TTFT and +0.95%
 client time. Minimum available memory was 11.60 GiB. None met the 5% threshold;

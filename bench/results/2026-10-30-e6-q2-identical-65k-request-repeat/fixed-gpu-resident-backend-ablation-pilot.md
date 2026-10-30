@@ -36,6 +36,4 @@ counter. Minimum available RAM was 8.68 GiB, peak sampled swap 1.69 GiB, and
 sampled cgroup OOM kills were zero. Energy and clocks were not measured.
 
 Raw outputs and telemetry remain under `/tmp/e6-fixed-gpu-backend-ablation*`.
-Next run two more randomized pairs with the same control. Since this pilot
-does not meet the preregistered 5% improvement screen, no seven-pair
-confirmation is indicated unless the three-pair screen changes that decision.
+The two follow-up pairs are complete; see the [three-pair screen](fixed-gpu-resident-backend-screen.md).
