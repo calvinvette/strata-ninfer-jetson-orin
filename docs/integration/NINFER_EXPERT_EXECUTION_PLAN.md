@@ -706,6 +706,15 @@ target emitted no separate sample because the prompt's internal boundary is
 report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/reset-state-65k-repeat.md)
 and [prompt-position checkpoint
 report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/prompt-position-checkpoints.md).
+A finer same-process repeat matched compact prefill fingerprints at 53,248,
+57,344, 61,440 and 65,535, immediately before the final prompt token is
+verified. The first divergence appears immediately after the one-token
+verifier window at position 65,535: GDN, pooled state and KV differ, while
+PLE, tail, MTP, stale, dead and PLE previous-token state match. This places
+the transition in the verifier window and state publication for the last
+prompt token, before generated-token commit. It still does not attribute the
+change to a kernel or arithmetic cause. See the [final-prompt-token verifier
+report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/final-prompt-token-verifier-transition.md).
 
 **Exit:** operator effects and complete-request effects are both documented;
 per-model and combined charts include matched controls and uncertainty. Keep
