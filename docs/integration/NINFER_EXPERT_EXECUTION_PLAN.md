@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **E0–E5 bounded prototype evidence complete; E6 same-process 65K repeats show request-dependent state/output changes, localized to expert 320 changing owner from CPU miss to resident GPU between requests while the recorded grouped Q8_1 row remains byte-identical. Exact-input CPU/GPU replay matched each captured expert row, and a fixed-CPU-owner service repeat matched all recorded state and MoE output bytes. E6/E7 remain open pending fixed-GPU service repeatability, broader quality/repeatability and end-to-end performance qualification. HIP/SYCL rebuilds for the latest diagnostic changes are pending compiler availability (updated 2026-10-30).**
+Status: **E0–E5 bounded prototype evidence complete; E6 same-process 65K repeats localized one request-dependent expert-320 output change to CPU-miss versus resident-GPU ownership. Exact-input CPU/GPU replay matched each service row. Fixed-CPU and fixed-GPU owner repeats each matched recorded prompt-boundary/final state and full layer-1 MoE bundle across requests. E6/E7 remain open pending accepted-prefix parity with fixed ownership, broader quality/repeatability, and end-to-end performance qualification. HIP/SYCL rebuilds for recent shared diagnostic changes remain pending compiler availability (updated 2026-10-30).**
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -754,9 +754,12 @@ matches it, making the CPU-miss to resident-GPU ownership transition the direct
 explanation for this pair's expert-row change. This is not evidence of an
 NInfer kernel changing under fixed inputs. A static-cache fixed-CPU-owner pair
 now matched all recorded prompt-boundary/final state fields and the complete
-layer-1 MoE bundle byte-for-byte. Next establish a fixed-GPU-owner repeated
-service pair, check accepted-prefix state in both owner modes, then compare
-request performance with actual ownership/hit-rate telemetry. The exact-input
+layer-1 MoE bundle byte-for-byte. A fixed-GPU-owner repeat then profile-ranked
+expert 320 into slot 0 and matched the two prompt-boundary/final state captures
+and complete layer-1 MoE bundle. The process-level execution dump emitted only
+one record, so repeat identity for weights/Q8_1 bytes is not claimed. Next
+check accepted-prefix state in both owner modes, then compare request
+performance with actual ownership/hit-rate telemetry. The exact-input
 `native_expert_parity` replay matched the service's CPU-owned request-1 row and
 GPU-owned request-2 row bit-for-bit; see the
 [ownership report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md).

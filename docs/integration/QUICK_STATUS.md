@@ -52,9 +52,12 @@ transition: expert 320 was CPU-served on request 1 and GPU-resident on request
 disabled and the expert kept CPU-owned, both repeated requests matched all
 captured state and MoE bytes. This explains the observed request-order change
 for that expert, while showing that NInfer covers only GPU-resident work. It
-does not establish an end-to-end speedup. E6/E7 still require a fixed-GPU
-service control, broader quality/repeatability evidence, and no-trace
-performance qualification. See the [ownership report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md).
+does not establish an end-to-end speedup. A fixed-GPU-owner same-process
+control now also matches prompt-boundary/final state and the full captured MoE
+bundle across repeated requests. Both CPU and GPU fixed-owner controls pass
+for the sampled boundary; accepted-prefix parity with ownership held fixed is
+the next correctness step. E6/E7 still need broader quality/repeatability and
+no-trace performance qualification. See the [ownership report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md).
 The new 16K no-trace API screen also found no qualifying effect: median changes
 were -0.12% prompt TPS, 0.00% decode TPS, +0.19% TTFT and +0.18% total time
 across three pairs; all bootstrap intervals included zero. All pairs ran

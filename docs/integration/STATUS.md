@@ -27,9 +27,17 @@ combined output) and every recorded prompt-boundary/final state fingerprint
 matched byte-for-byte. This supports the CPU/GPU owner transition as the cause
 of the earlier request-order change in this case. The fixed-CPU control had a
 12.0% GPU-cache hit rate and is not a performance candidate; minimum available
-RAM was 8.74 GiB, with no cgroup OOM kills. Next establish fixed-GPU service
-repeatability, then resume quality and no-trace performance qualification.
-E6/E7 remain open. See the
+RAM was 8.74 GiB, with no cgroup OOM kills. A follow-up fixed-GPU control
+profile-ranked expert 320 into slot 0 and kept it GPU-owned for both requests.
+The complete layer-1 MoE bundle and recorded prompt-boundary/final state
+fingerprints matched exactly across requests. Its instrumented prefill rates
+were 87.0/87.6 tok/s and decode rates 1.2/1.3 tok/s; these are diagnostics,
+not backend comparisons. The custom static profile had 12.2% GPU-cache hits.
+Minimum available RAM was 8.72 GiB, peak swap 4.13 GiB, and cgroup OOM kills
+zero. The execution dump is process-once, so repeat identity is established by
+the repeated MoE bundle rather than a second raw weight/Q8_1 record. Next run
+accepted-prefix parity with fixed ownership, then resume quality and no-trace
+performance qualification. E6/E7 remain open. See the
 [expert-320 ownership report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md).
 
 **E6 64K no-trace API screen (2026-10-29):** three fresh-process pairs

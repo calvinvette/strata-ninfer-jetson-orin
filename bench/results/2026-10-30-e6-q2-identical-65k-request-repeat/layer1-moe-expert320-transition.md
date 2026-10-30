@@ -133,6 +133,29 @@ is correctness evidence, not a performance result. Raw captures and telemetry
 remain under `/tmp/e6-65k-moe-fixed-cpu-repeat-2.*` and
 `/tmp/e6-65k-moe-fixed-cpu-supervisor-2/`.
 
+## Fixed-GPU-owner repeat control
+
+A second static-cache 65K/32 same-process repeat moved expert 320 to GPU
+profile rank 0, disabled adaptation, and confirmed it remained GPU-owned at
+layer 1 / position 65,535 in both requests (slot 0, `route_kind = 0`). The
+supervised pair passed. Both prompt-boundary fingerprints and all recorded
+final-state fingerprints matched exactly. Its two 133,248-byte layer-1 MoE
+bundle records were byte-identical (SHA-256
+`f411b8c800b7147e7196285d37390fc33e1a38af1ea369a5a6f7e7aecb87afcb`), covering
+routes, F32 input, expert rows, shared output and combined output. This closes
+the fixed-GPU-owner repeatability control for this sampled boundary. The
+separate `STMOEX01` execution dump is emitted once per process, so only the
+first request's resident weights and Q8_1 bytes were captured; byte identity
+of those two fields is not claimed.
+
+Instrumented prompt rates were 87.0 and 87.6 tok/s; 32-token decode rates were
+1.2 and 1.3 tok/s. These are repeat diagnostics, not backend performance
+comparisons. The deliberately modified profile produced only 12.2% GPU-cache
+hits in each request. Supervision recorded 8.72 GiB minimum available memory,
+4.13 GiB peak swap and zero cgroup OOM kills. Raw captures and telemetry are
+under `/tmp/e6-65k-moe-fixed-gpu-repeat.*` and
+`/tmp/e6-65k-moe-fixed-gpu-supervisor/`.
+
 ## Interpretation and limits
 
 This is evidence of request-to-request variation in one expert row with fixed
@@ -140,11 +163,11 @@ route IDs and input but different execution owners, reproduced byte-for-byte
 under both backend configurations. The output change is explained by the
 CPU-miss versus resident-GPU computation path for expert 320. This does not
 establish a general determinism guarantee or quantify an end-to-end speedup.
-The fixed-CPU-owner repeated-service control now matches state and MoE outputs
-exactly, supporting this attribution for the tested case. A corresponding
-fixed-GPU-owner repeated-service control and accepted-prefix check remain.
-Then measure end-to-end performance with actual residency and hit-rate
-distributions recorded.
+Both fixed-CPU-owner and fixed-GPU-owner repeated-service controls now match
+recorded state and MoE outputs exactly for their sampled boundary. The next
+gate is accepted-prefix parity with owner held fixed, followed by broader
+quality/repeatability checks and no-trace performance comparisons that record
+real residency and hit-rate distributions.
 
 Both requests passed. The initial bundle run recorded 8.61 GiB minimum
 available RAM, 4.18 GiB peak swap use, and no cgroup OOM kills. The follow-up
