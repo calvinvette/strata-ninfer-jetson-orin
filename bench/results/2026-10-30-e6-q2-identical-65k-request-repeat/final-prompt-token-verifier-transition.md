@@ -18,6 +18,15 @@ runs immediately after the verifier processes the final prompt token.
 
 Both requests passed and reported 65,536 prompt tokens and 32 generated tokens.
 The immediate post-reset state and all four prefill captures matched exactly.
+The matching prefill fingerprints at each sampled position were:
+
+| Prompt position | GDN | PLE | QSA tail | QSA dead | QSA pooled index state | PLE previous tokens |
+| ---: | --- | --- | --- | --- | --- | --- |
+| 53,248 | `43a5c1cf47f92334` | `6856faead93bf59c` | `077a0026ea836d09` | `ba4d730b89d297e5` | `abe1302b5439428c` | `2438,2438` |
+| 57,344 | `ba4b3e6ece0bd12e` | `b3a0b50b09c26f2d` | `9d954e8cd5f7899e` | `ba4d730b89d297e5` | `37cd2f13e356b95e` | `2438,2438` |
+| 61,440 | `974c5de016552d33` | `8784648768985577` | `14704e23993a3be2` | `ba4d730b89d297e5` | `90f1baee22fb9a4a` | `2438,2438` |
+| 65,535 | `cbf4deefec5b8210` | `c6a7bc535af8f9a8` | `7b1a170e21f8665b` | `ba4d730b89d297e5` | `baf415a1ca99dde6` | `271,248069` |
+
 At position 65,535, after prefill has consumed token indices `[0, 65,535)` and
 before the verifier consumes the final prompt token, both requests had:
 
