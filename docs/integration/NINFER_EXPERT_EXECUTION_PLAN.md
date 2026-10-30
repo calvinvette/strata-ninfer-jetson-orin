@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **E0–E5 bounded prototype evidence complete; sampled accepted-prefix and prompt-boundary captures are CUDA-built and short-smoke tested; the 65K E6 diagnostic reproduces measured state/output divergence with full tracing disabled; high-context prompt-boundary comparison is next. E6 and E7 remain open. HIP/SYCL rebuilds for these capture changes are pending compiler availability (updated 2026-10-30).**
+Status: **E0–E5 bounded prototype evidence complete; sampled accepted-prefix and prompt-boundary captures are CUDA-built and smoke-tested; the matched 65K prompt-boundary pair shows measured state divergence before the first generated-token commit, with state also varying between identical warmup and measured prompts within each backend. E6 and E7 remain open pending request-state lifecycle investigation and performance qualification. HIP/SYCL rebuilds for these capture changes are pending compiler availability (updated 2026-10-30).**
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -626,19 +626,20 @@ tradeoff separately from the controlled kernel comparison; do not conceal the
 changed cache in the same label. Record cold/fill costs and the requests needed
 to amortize transformation or packing.
 
-**Current E6 decision (2026-10-30):** a sampled accepted-prefix diagnostic used
-the same 65K prompt and 128-token warmup for both backends, then a 32-token
-measured request, with full `STRATA_TRACE` disabled and state hashing sampled
-every eight accepted tokens. Warmup text and all 17 sampled state checkpoints
-matched. On the measured request, state fingerprints already differed at the
-first sampled checkpoint; token IDs matched at the 1- and 8-token checkpoints
-and diverged by the 16-token checkpoint. Response text differed after 52 common
-characters. This reproduces the output divergence without full tracing, while
-the sampled hashing still adds synchronization. One pair is not performance
-evidence. The next diagnostic should use the new opt-in prompt-boundary
-fingerprint at this same high-context pair, before the first generated-token
-commit. Its CUDA implementation passed a short exact-length API smoke with full
-tracing disabled. See the
+**Current E6 decision (2026-10-30):** the sampled accepted-prefix diagnostic
+showed matching warmup text/state, then measured state differences at the first
+checkpoint and token divergence by the 16-token checkpoint. A follow-up
+prompt-boundary pair used the same exact 65K prompt for both a 128-token warmup
+and 32-token measured request. Warmup boundary and final states matched across
+backends. Measured boundary state differed across Strata and NInfer before the
+first generated-token commit in GDN, tail, pooled, pooled-full and KV. Within
+each backend, the boundary state also differed between identical warmup and
+measured prompts. Output text differed after 52 common characters. This points
+to request-history or persistent-state variation that precedes generated-token
+commit, but does not locate its source. Both experiments use synchronizing
+instrumentation and one pair; neither supplies performance evidence. Next,
+inspect prompt-cache/session reset and recurrent-state lifecycle, then repeat
+minimal boundary controls before resuming throughput qualification. See the
 [sampled-capture report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/accepted-prefix-instrumentation-README.md).
 
 **Exit:** operator effects and complete-request effects are both documented;

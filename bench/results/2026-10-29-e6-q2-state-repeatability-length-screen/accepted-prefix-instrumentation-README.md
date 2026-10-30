@@ -78,17 +78,45 @@ sampled token checkpoints and field-level state differences are in the
 [updated summary JSON](accepted-prefix-instrumentation-summary.json); raw logs
 and telemetry remain local-only.
 
-This narrows the unresolved issue: the long-warmup control state matches across
-backends, but measured state differs by the first post-prefill checkpoint,
-before sampled token IDs diverge. The capture does not show whether the
-underlying state difference first arises during prompt processing or when the
-first verifier commit is published. An opt-in prompt-boundary hash now records
-state after the first verifier window has processed the final prompt token and
-before the first commit. The CUDA build and a short API smoke passed; both the
-512-token warmup and measured request emitted exactly one prompt-boundary
-record, with full `STRATA_TRACE` disabled. The next diagnostic is to run this
-capture on the matched 65K pair. E6 and E7 remain open, and no backend
-performance claim or release profile is justified.
+The opt-in prompt-boundary hash records state after the first verifier window
+has processed the final prompt token and before the first commit. The CUDA
+build and a short API smoke passed; both 512-token requests emitted one
+boundary record with full `STRATA_TRACE` disabled.
+
+### Prompt-boundary pair — 2026-10-30
+
+The matched high-context pair used the exact same 65,536-token prompt for both
+the 128-token warmup and 32-token measured request. Both arms passed. The
+warmup prompt-boundary fingerprints and final fingerprints matched across
+backends. On the measured request, the Strata and NInfer prompt-boundary
+fingerprints already differed before the first generated-token commit. The
+different fields were GDN, tail, pooled, pooled-full and KV. Within each
+backend, the boundary fingerprint also differed between the warmup and measured
+requests despite identical prompt content: Strata changed those five fields;
+NInfer changed GDN, pooled, pooled-full and KV. Both measured responses
+differed from their warmup response and from each other; the cross-backend
+responses shared 52 initial characters before diverging. This locates the
+measured state difference before the first commit, but does not determine
+whether it originates during prompt evaluation or in request-history/state
+handling.
+
+| Arm | Measured prompt tok/s | Measured decode tok/s | Elapsed | Minimum available RAM | Peak swap |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Strata | 86.2 | 1.4 | 1,637.1 s | 8.57 GiB | 4.72 GiB |
+| NInfer | 86.1 | 1.4 | 1,638.2 s | 8.55 GiB | 1.92 GiB |
+
+These are single-arm diagnostic readings, not a performance comparison: the
+measured outputs differed and there was one run per backend. Cgroup OOM-kill
+counters were zero; energy was not measured. The prompt-boundary hash
+synchronizes the device, so the run is not entirely uninstrumented. The
+sanitized per-request hashes, state fields and resource data are in the
+[summary JSON](accepted-prefix-instrumentation-summary.json); raw logs and
+telemetry remain local-only.
+
+The next work should determine why an identical second prompt does not produce
+the same boundary state after a long warmup, and whether request reset,
+prompt-cache or persistent-state lifecycle explains the result. E6 and E7
+remain open, and no backend performance claim or release profile is justified.
 
 Sanitized paired results and the first-checkpoint state comparison are in
 [accepted-prefix-instrumentation-summary.json](accepted-prefix-instrumentation-summary.json).
