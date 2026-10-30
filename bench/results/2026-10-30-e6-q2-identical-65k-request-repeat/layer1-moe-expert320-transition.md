@@ -156,6 +156,25 @@ hits in each request. Supervision recorded 8.72 GiB minimum available memory,
 under `/tmp/e6-65k-moe-fixed-gpu-repeat.*` and
 `/tmp/e6-65k-moe-fixed-gpu-supervisor/`.
 
+## Fixed-GPU-owner accepted-prefix repeat
+
+The same fixed-GPU setup repeated the 65K prompt twice with 32 generated
+tokens and sampled accepted-prefix state at the first, every eighth, and final
+committed token. Expert 320 was GPU-owned at the sampled prompt-boundary row
+in both requests (`route_kind = 0`). Both requests emitted the same 32 token
+IDs; all five sampled commit records matched exactly, including the eleven
+persistent-state fingerprints at positions 65,535, 65,542, 65,550, 65,558,
+and 65,566. The checker passed. This establishes repeated accepted-prefix
+state for this fixed-GPU 65K/32 case, not cross-owner equivalence or general
+quality.
+
+Accepted-prefix synchronization made decode tracing intrusive: the 32-token
+requests took about 119 seconds to decode, so rates from this run are excluded.
+Supervision recorded 8.75 GiB minimum available RAM, 3.41 GiB peak swap and
+zero sampled cgroup OOM kills. Raw trace log and supervisor data are under
+`/tmp/e6-65k-moe-fixed-gpu-repeat.log` and
+`/tmp/e6-65k-moe-fixed-gpu-prefix-supervisor/`.
+
 ## Interpretation and limits
 
 This is evidence of request-to-request variation in one expert row with fixed
@@ -164,10 +183,11 @@ under both backend configurations. The output change is explained by the
 CPU-miss versus resident-GPU computation path for expert 320. This does not
 establish a general determinism guarantee or quantify an end-to-end speedup.
 Both fixed-CPU-owner and fixed-GPU-owner repeated-service controls now match
-recorded state and MoE outputs exactly for their sampled boundary. The next
-gate is accepted-prefix parity with owner held fixed, followed by broader
-quality/repeatability checks and no-trace performance comparisons that record
-real residency and hit-rate distributions.
+recorded state and MoE outputs exactly for their sampled boundary. Fixed-GPU
+accepted-prefix state also repeats exactly over the sampled 65K/32 generation.
+The remaining paired owner-mode prefix check is the CPU-owner repeat, followed
+by broader quality/repeatability checks and no-trace performance comparisons
+that record real residency and hit-rate distributions.
 
 Both requests passed. The initial bundle run recorded 8.61 GiB minimum
 available RAM, 4.18 GiB peak swap use, and no cgroup OOM kills. The follow-up

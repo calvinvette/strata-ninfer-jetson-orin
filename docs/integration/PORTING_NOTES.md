@@ -3277,8 +3277,10 @@ CPU miss to a GPU-resident slot. Exact-input CPU and GPU replays each matched
 the corresponding service row. Follow-up same-process repeats then held the
 expert on CPU and GPU in separate controls; in both cases the sampled
 prompt-boundary/final state and complete MoE bundle matched across requests.
-For a future Splash backend, record the selected expert's actual owner with
-routes and inputs, then repeat accepted-prefix/state checks under both fixed
-owners before attributing a delta to backend arithmetic. Ensure diagnostic
-recorders can emit one sample per request: the current raw execution dump is
-process-once, even though bundle and state capture support both requests.
+The fixed-GPU repeat also matched token IDs and all persistent-state fields at
+five sampled accepted prefixes. For a future Splash backend, record the
+selected expert's actual owner with routes and inputs, then repeat
+accepted-prefix/state checks under both fixed owners before attributing a
+delta to backend arithmetic. Ensure diagnostic recorders can emit one sample
+per request: the current raw execution dump is process-once, even though
+bundle and state capture support both requests.
