@@ -3301,7 +3301,8 @@ after a 65K request, replaying its exact 8K token prefix produced different
 GDN, PLE, KV and pooled fingerprints with adaptive residency enabled. With the
 same profile and prompt sequence but adaptation disabled, the 8K replay
 matched the standalone fixed-profile state. This implicates adaptive residency
-history, but a one-row owner trace did not identify the specific transfer or
-its arithmetic effect. Preserve explicit request IDs in owner captures and
-compare accepted-prefix state alongside output tokens; cache hit-rate changes
-alone cannot identify which operation moved persistent state.
+history; a second adaptation-on run without route capture reproduced the state
+and output hashes exactly. A one-row owner trace did not identify the specific
+transfer or its arithmetic effect. Preserve explicit request IDs in owner
+captures and compare accepted-prefix state alongside output tokens; cache
+hit-rate changes alone cannot identify which operation moved persistent state.

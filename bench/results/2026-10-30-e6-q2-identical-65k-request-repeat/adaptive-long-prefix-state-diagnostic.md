@@ -58,6 +58,23 @@ in `/tmp/e6-65k-long-then-prefix-fixed/` and
 `/tmp/e6-65k-long-then-prefix-fixed-supervisor/`. The incomplete owner dump
 was not checked in.
 
+### Adaptation-on repeat without route capture
+
+A second adaptation-on process repeated the exact 65K→8K sequence with route
+capture disabled. The full 65K prompt-boundary fingerprint matched the first
+adaptive run byte-for-byte. The following 8K state also reproduced exactly:
+GDN `994f4c41001157d9`, PLE `8f834c5fe472a9e5`, tail
+`2f18de91a9aab11b`, pooled `1572532cee713cae`, KV `94ed00cf754f7d1d`, and
+pooled-full `f3ce497f5331f3e7`. Both response hashes matched the first
+adaptive run: long `2d5f3da8…` and 8K `201a8bab…`; the replay again emitted
+token ID `248046`. Cache hits were again 32.9% for 65K and 10.4% for the 8K
+replay, with 117 and 129 exchanges respectively. The supervisor passed with
+8.50 GiB minimum available physical memory and zero sampled OOM kills. The
+repeat confirms this same-process adaptive pattern without the owner-capture
+hook; it still does not identify a particular expert transfer as the cause.
+Raw run and telemetry are in `/tmp/e6-65k-long-then-prefix-adaptive-repeat/`
+and `/tmp/e6-65k-long-then-prefix-adaptive-repeat-supervisor/` on the Orin.
+
 ## Next diagnostic
 
 Fix route capture so both requests are tagged by request ID, then capture

@@ -2342,7 +2342,9 @@ disabled. A matched 65K→8K repeat with adaptation disabled and the same
 profile returned the standalone fixed-profile state, implicating adaptive
 residency history in the change. A one-row route capture did not identify the
 specific transfer or its arithmetic effect. Minimum available memory was
-8.58 GiB adaptive and 8.68 GiB fixed-owner; sampled OOM kills were zero.
+8.58 GiB adaptive and 8.68 GiB fixed-owner; sampled OOM kills were zero. A
+second adaptation-on run with route capture disabled reproduced the state,
+output hashes and cache-hit counts exactly (8.50 GiB minimum availability).
 Instrumented rates are diagnostic only. Add request-ID route capture and
 accepted-prefix state around the transfer before causal attribution.
 [Report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).

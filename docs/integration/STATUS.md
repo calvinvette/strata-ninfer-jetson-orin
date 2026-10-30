@@ -7324,6 +7324,13 @@ available RAM was 8.58 GiB adaptive and 8.68 GiB fixed-owner; sampled OOM kills
 were zero. Next capture request-tagged owner rows and accepted-prefix state
 around a swap. [Report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
 
+The adaptation-on long→prefix run was repeated with route capture disabled.
+Its full-prompt state, replay state, both output hashes and cache-hit counts
+matched the first adaptive run exactly. Minimum available memory was 8.50 GiB
+and sampled OOM kills were zero. This confirms repeatability without the
+route-capture hook, not the specific transfer cause. The fixed-owner control
+remains the matched standalone-state result.
+
 **E7 current-source portability rebuild (2026-10-30):** full HIP and SYCL
 target trees rebuilt at source `4229c00e` on maestro1 with one-job builds. HIP
 `strata --help` passed and the host-only `shared_memory_budget_test` passed.
