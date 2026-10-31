@@ -238,10 +238,14 @@ file/CPU-owned result: GPU relative L2 was `5.86e-8`–`6.21e-8`, versus
 single activation does not establish a general accuracy advantage. Per-expert
 errors and the oracle/script fingerprint are in the localization JSON.
 
-A direct owner intervention on learned-map expert 320 (layer 1, position 511)
-forced only that GPU-resident row to the CPU path. Its captured output then
-matched the naturally CPU-owned original-map row bit-for-bit at the same input
-and routes; the GPU-owned learned-map row had relative L2 `1.01e-7` against
-that CPU row. The complete layer output remained different because the other
-active experts retained their learned-map owners. This confirms the local
-owner change for one expert and does not identify a generally preferred owner.
+Direct owner interventions now cover all six routed experts whose GPU
+residency changed. For each, only that row was forced to CPU, with engine-log
+confirmation. Inputs, routes, route weights, shared output and the other nine
+expert rows stayed unchanged. Each forced row matched the naturally CPU-owned
+counterpart from the opposite map bit-for-bit and differed from its GPU-owned
+row. Expert 320 used the 128-token request; the other five runs generated only
+one verifier token. These local interventions confirm the owner-dependent row
+arithmetic, not a generally preferred owner or an end-to-end quality effect.
+Two earlier sweeps did not pass the override variable and are excluded; the
+accepted runs used the corrected helper and were checked for the engine log
+before comparison.

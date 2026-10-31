@@ -2705,8 +2705,10 @@ Q2_0 × Q8_1 oracle at the shared input. All six GPU-resident NInfer rows were
 closer (`5.86e-8`–`6.21e-8` relative L2) than their file/CPU-owned counterpart
 (`8.94e-8`–`1.01e-7`). This single activation is local arithmetic evidence;
 it does not establish general accuracy or answer quality.
-A direct owner intervention forcing learned-map layer-1 expert 320 to CPU at
-position 511 reproduced the naturally CPU-owned original-map expert row
-bit-for-bit for the same input and route. This confirms the local owner effect
-for one sampled expert; other changed owners remain, and no general preferred
-owner or task-quality conclusion follows.
+Direct CPU-owner interventions on all six active layer-1 experts whose GPU
+residency changed reproduce each naturally CPU-owned counterpart row
+bit-for-bit. Inputs, route IDs/weights, shared output and other expert rows stay
+unchanged in each intervention. Five runs generated one verifier token and one
+used 128 tokens. Two preliminary sweeps without a forwarded override are
+excluded. This confirms local owner-dependent arithmetic, not a preferred
+owner, quality or performance result.

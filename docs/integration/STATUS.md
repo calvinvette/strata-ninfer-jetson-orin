@@ -7786,7 +7786,10 @@ rows using their shared captured input. The GPU-resident NInfer rows were
 closer for all six (`5.86e-8`–`6.21e-8` relative L2) than the file/CPU-owned
 rows (`8.94e-8`–`1.01e-7`). This is one activation and does not establish a
 general numerical advantage or answer-quality effect; E6 remains open.
-Forcing learned-map expert 320 to CPU at the same layer/token reproduced the
-naturally CPU-owned original-map row bit-for-bit, confirming the local owner
-effect for that one expert; the rest of the layer remained unchanged by this
-single-expert override. See the [localization record](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/resident-map-compute-localization.json).
+Six direct CPU-owner interventions now reproduce the naturally CPU-owned row
+bit-for-bit for each active expert whose residency changed between maps. Each
+override changed only its target row; inputs, routes, weights, shared output
+and the other expert rows were unchanged. Five checks used one verifier token,
+one used the 128-token run. Preliminary runs without a forwarded override were
+excluded. This confirms local arithmetic effects only; E6 remains open. See the
+[localization record](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/resident-map-compute-localization.json).

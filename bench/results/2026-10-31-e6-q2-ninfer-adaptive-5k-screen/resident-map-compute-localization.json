@@ -418,7 +418,8 @@
   "interpretation": "Layer 0 is bit-identical. At layer 1, model input, route IDs/weights and shared output are bit-identical; six routed expert-part rows differ and exactly those six experts change GPU residency between maps. The layer-1 combined output differs only at FP32 rounding scale. This localizes the first recorded map-dependent compute delta to owner-dependent expert execution at layer 1 for this token. It does not establish which owner result is more accurate or whether output quality differs. QSA layer 3 inputs differ at approximately 1e-7 relative L2; by layer 47 all captured fields differ substantially, with equal attention-index selection.",
   "capture_limitations": [
     "Prompt-stage QSA capture at layer 47 position 510 caused engine exit by signal 11 for both map arms; these failed instrumented runs are excluded. Verifier-stage position 511 captures completed.",
-    "One request per map; no semantic answer grading and no performance comparison."
+    "One request per map; no semantic answer grading and no performance comparison.",
+    "Two preliminary one-token sweeps were excluded because stale runner copies did not forward STRATA_EXPERIMENT_FORCE_CPU_EXPERT. The accepted five one-token interventions confirm the owner override in the engine log; expert 320 was separately confirmed in its own 128-token run."
   ],
   "raw_artifacts": "Full MoE bundles, QSA captures, engine logs and failed prompt-stage captures remain under /tmp/e6-ninfer-adapt-5k/maps/matched-complement-profiles/ and are not committed.",
   "independent_q2_0_q8_1_oracle": {
@@ -537,27 +538,84 @@
     ],
     "interpretation": "For this single layer-1 activation, every sampled GPU-resident NInfer result is closer to the independent FP64 Q2_0 x Q8_1 runtime-contract oracle than the corresponding file/CPU result. All errors remain below 1.1e-7 relative L2. This local numerical ordering does not establish general superiority, answer quality, or performance."
   },
-  "single_expert_owner_intervention": {
-    "map": "learned-map",
-    "forced_cpu_expert": "layer 1, expert 320, verifier position 511",
-    "log_confirmation": "EXPERIMENT forced CPU owner for layer 1 expert 320 position 511",
-    "captured_input_route_ids_and_weights_match_original_map": true,
-    "expert_part_comparison": {
-      "forced_cpu_vs_original_cpu": {
-        "different": 0,
-        "count": 2560,
-        "relative_l2": 0.0,
-        "max_abs": 0.0
-      },
-      "forced_cpu_vs_learned_gpu": {
-        "different": 1807,
-        "count": 2560,
-        "relative_l2": 1.0125531343344678e-07,
-        "max_abs": 7.450580596923828e-09
-      }
+  "per_expert_owner_interventions": [
+    {
+      "expert_id": 32,
+      "forced_map": "original-map",
+      "naturally_cpu_owned_comparison_map": "learned-map",
+      "forced_owner_log_confirmed": true,
+      "forced_row_equals_natural_cpu_row_bitwise": true,
+      "forced_row_differs_from_gpu_owner_row": true,
+      "only_targeted_expert_row_changes_within_forced_map": true,
+      "input_route_ids_route_weights_shared_output_unchanged": true,
+      "prompt_tokens": 512,
+      "generated_tokens": 1,
+      "scope": "one verifier token, layer 1 capture; no quality/performance interpretation"
     },
-    "full_response_sha256": "576272a200f58b5b0a72f489ac1a2019098ec2939ac1480a2531f90a8e337cd2",
-    "expected_prefix_passed": true,
-    "interpretation": "Forcing expert 320 to CPU on the learned map reproduces its naturally CPU-owned original-map expert row bit-for-bit at the same input and route. The complete layer output still differs because the other active owner-changed expert rows remain on their learned-map owners."
-  }
+    {
+      "expert_id": 97,
+      "forced_map": "original-map",
+      "naturally_cpu_owned_comparison_map": "learned-map",
+      "forced_owner_log_confirmed": true,
+      "forced_row_equals_natural_cpu_row_bitwise": true,
+      "forced_row_differs_from_gpu_owner_row": true,
+      "only_targeted_expert_row_changes_within_forced_map": true,
+      "input_route_ids_route_weights_shared_output_unchanged": true,
+      "prompt_tokens": 512,
+      "generated_tokens": 1,
+      "scope": "one verifier token, layer 1 capture; no quality/performance interpretation"
+    },
+    {
+      "expert_id": 70,
+      "forced_map": "original-map",
+      "naturally_cpu_owned_comparison_map": "learned-map",
+      "forced_owner_log_confirmed": true,
+      "forced_row_equals_natural_cpu_row_bitwise": true,
+      "forced_row_differs_from_gpu_owner_row": true,
+      "only_targeted_expert_row_changes_within_forced_map": true,
+      "input_route_ids_route_weights_shared_output_unchanged": true,
+      "prompt_tokens": 512,
+      "generated_tokens": 1,
+      "scope": "one verifier token, layer 1 capture; no quality/performance interpretation"
+    },
+    {
+      "expert_id": 74,
+      "forced_map": "original-map",
+      "naturally_cpu_owned_comparison_map": "learned-map",
+      "forced_owner_log_confirmed": true,
+      "forced_row_equals_natural_cpu_row_bitwise": true,
+      "forced_row_differs_from_gpu_owner_row": true,
+      "only_targeted_expert_row_changes_within_forced_map": true,
+      "input_route_ids_route_weights_shared_output_unchanged": true,
+      "prompt_tokens": 512,
+      "generated_tokens": 1,
+      "scope": "one verifier token, layer 1 capture; no quality/performance interpretation"
+    },
+    {
+      "expert_id": 320,
+      "forced_map": "learned-map",
+      "naturally_cpu_owned_comparison_map": "original-map",
+      "forced_owner_log_confirmed": true,
+      "forced_row_equals_natural_cpu_row_bitwise": true,
+      "forced_row_differs_from_gpu_owner_row": true,
+      "only_targeted_expert_row_changes_within_forced_map": true,
+      "input_route_ids_route_weights_shared_output_unchanged": true,
+      "prompt_tokens": 512,
+      "generated_tokens": 128,
+      "scope": "one verifier token, layer 1 capture; no quality/performance interpretation"
+    },
+    {
+      "expert_id": 400,
+      "forced_map": "learned-map",
+      "naturally_cpu_owned_comparison_map": "original-map",
+      "forced_owner_log_confirmed": true,
+      "forced_row_equals_natural_cpu_row_bitwise": true,
+      "forced_row_differs_from_gpu_owner_row": true,
+      "only_targeted_expert_row_changes_within_forced_map": true,
+      "input_route_ids_route_weights_shared_output_unchanged": true,
+      "prompt_tokens": 512,
+      "generated_tokens": 1,
+      "scope": "one verifier token, layer 1 capture; no quality/performance interpretation"
+    }
+  ]
 }
