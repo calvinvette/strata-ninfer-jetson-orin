@@ -8,6 +8,14 @@ forced/adaptive difference. Layers 0–2 remain exact and the earlier local
 layer-1/2 counterfactual stands; the whole-model layer-1 causal effect is not
 repeatable in these captures. [Report](../../bench/results/2026-10-31-e6-q2-owner-intervention/layer1-full-state-repeat.md).
 
+**E6 3K/4K cache screen (2026-10-31):** at 8K capacity with NInfer held
+fixed, three randomized 512+64 pairs found +6.33% median decode TPS for 4K
+slots (bootstrap interval +5.61% to +6.91%), with improved prompt TPS, TTFT
+and total time and 10.15 GiB minimum available RAM. Hit rate rose 72.7%→76.0%.
+Outputs matched, but this synthetic workload is not an independent quality
+oracle. Seven-pair held-out retrieval confirmation is next; 4K is not qualified.
+The separate 4K NInfer-versus-Strata screen did not meet 5%. [Report](../../bench/results/2026-10-31-e6-q2-cache-size-screen/README.md).
+
 Updated: 2026-10-31. Phases 1 through 4 are complete for their documented tested
 Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 is
 complete for its bounded Orin qualification matrix under [its closeout]

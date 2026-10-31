@@ -2533,3 +2533,19 @@ local layer-1/2 counterfactual remains valid, but the repeated full-state data
 do not attribute downstream drift to this intervention. Keep layer 1 local-only
 and leave E6 open. See the [repeat report](../../bench/results/2026-10-31-e6-q2-owner-intervention/layer1-full-state-repeat.md)
 and [comparison JSON](../../bench/results/2026-10-31-e6-q2-owner-intervention/layer1-forced-repeat-gdn.json).
+
+
+**E6 static cache-size screen (2026-10-31):** a same-build, randomized
+three-pair 3,000-versus-4,000-slot strict-NInfer screen at 8K context and
+pp512+tg64 raised median decode TPS by `6.33%` (paired bootstrap interval
+`5.61%` to `6.91%`). Prompt TPS improved `4.10%`, first-visible TTFT `3.75%`,
+and client total `4.44%`; all paired effects favored 4K, and none regressed by
+more than 5%. The observed decode cache-hit rate rose from `72.7%` to `76.0%`.
+Minimum process-level RAM was `10.15 GiB`; OOM kills were zero. Warmup and
+measured output text matched across arms, but the synthetic workload has no
+independent quality oracle. Advance to seven-pair confirmation with held-out
+retrieval prompts before considering any profile qualification. Separately, a
+three-pair 4K backend screen found only `3.38%` median decode improvement for
+NInfer over Strata and no other 5% effect, so no backend confirmation is
+warranted there. See the [cache-size report](../../bench/results/2026-10-31-e6-q2-cache-size-screen/README.md)
+and its [paired summaries](../../bench/results/2026-10-31-e6-q2-cache-size-screen/cache-size-paired-summary.json).

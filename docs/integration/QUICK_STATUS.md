@@ -2,6 +2,11 @@
 
 Updated: 2026-10-31
 
+A same-build NInfer cache-size screen found a promising 3K→4K decode result
+(+6.33%, three paired blocks; 72.7%→76.0% hit rate), with 10.15 GiB minimum
+available RAM. It has no independent quality oracle yet; the 4K profile is
+awaiting seven-pair held-out retrieval confirmation. [Results](../../bench/results/2026-10-31-e6-q2-cache-size-screen/README.md).
+
 Layer-1 expert-3 forced-owner repeats now match locally through layer 2 but
 not across full GDN state: the second forced-CPU run differs from the first by
 relative L2 `0.01078`, similar to forced versus adaptive. Keep that result
