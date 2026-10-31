@@ -962,3 +962,10 @@ the round-4 adaptive swap promoted layer-1 expert 320 into expert 3's slot,
 and the service output rows matched independent CPU/GPU oracle results exactly.
 The tiny local MoE delta aligns with the layer-2 activation and prefix-8 GDN
 differences, while broader E6/E7 attribution remains open.
+
+The layer-13 state sequence now shows identical state through the update at
+position 65,538; the first sampled divergence is the post-state after token
+1,928 at position 65,539 (relative L2 `2.3215e-5`). Captured post/pre states
+are exactly continuous within each arm, outputs match, and both runs retain the
+six-GiB floor. This is onset timing, not root-cause attribution; next capture
+the layer-13 GDN stages at 65,539. [Comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/gdn-layer13-state-sequence-comparison.json).

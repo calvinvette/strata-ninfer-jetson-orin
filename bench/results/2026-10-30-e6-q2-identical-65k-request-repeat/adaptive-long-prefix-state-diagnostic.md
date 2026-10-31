@@ -441,3 +441,35 @@ to determine whether the state delta is present before the sampled recurrent
 update. Then trace its first appearance through the earlier GDN layers and
 accepted prefixes. These remain correctness diagnostics; captured rates are
 not performance evidence.
+
+### Layer-13 state onset across generated positions (2026-10-31)
+
+The fixed-owner and adaptive-owner captures now record layer-13 GDN state
+immediately before and after selected token updates at positions 65,536–65,540.
+Both supervised requests passed, emitted 32 identical token IDs (SHA256
+`2d5f3da8f9890f8c9262231bada2cfab088196528565a1c08ab685d86074c650`), and
+preserved the six-GiB host-memory floor. Minimum available memory was 8.53 GiB
+fixed-owner and 8.39 GiB adaptive; elapsed times were 821.2 and 821.8 seconds.
+These are instrumented diagnostic runs, not throughput measurements.
+
+Layer-13 pre-state and post-state are bit-identical between arms through the
+update at position 65,538. The pre-state at position 65,539 is also identical,
+but the post-state first differs after processing token ID 1,928 at position
+65,539: 786,870 of 817,152 values differ, with relative L2 `2.3215e-5` and
+maximum absolute delta `3.4812e-4`. That exact state appears as the adaptive
+pre-state at position 65,540. After the next update, the state difference is
+795,106 values with relative L2 `2.3541e-5`. Within each arm, every captured
+post-state exactly equals the next position's pre-state, validating alignment
+and continuity of the dump.
+
+This resolves the immediate timing ambiguity: layer 13 does not enter position
+65,540 with a pre-existing cross-arm state difference; the first sampled
+layer-13 divergence is created by the update at position 65,539. The earlier
+position-65,540 stage capture's equal `qkv` but different recurrent `h` is
+consistent with that changed pre-state. The probe does not identify which
+layer-13 input or recurrent operation creates the difference at position
+65,539, nor whether it is the first differing state anywhere in the model.
+The next useful trace is the matched layer-13 GDN stage and input at position
+65,539, followed by upstream layers if the input or recurrent pre-state proves
+different. Raw state binaries remain in `/tmp` on Orin; the compact numeric
+comparison is in [`gdn-layer13-state-sequence-comparison.json`](gdn-layer13-state-sequence-comparison.json).

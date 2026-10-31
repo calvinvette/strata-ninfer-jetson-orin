@@ -7482,3 +7482,15 @@ one job for HIP and SYCL. HIP `strata --help` and
 linked, while help startup reached the expected no-device failure. This adds
 x86 compile/link evidence only; no HIP/SYCL device execution is claimed. Exact
 binary hashes and logs are in the [follow-up record](../../bench/results/2026-10-30-e7-maestro-current-source-builds/README.md#2026-10-30-follow-up-request-tagged-route-trace-change).
+
+A follow-up layer-13 GDN pre/post-state sequence at positions 65,536–65,540
+now places the sampled onset precisely. Fixed and adaptive state is bit-identical
+through the update at 65,538 and the pre-state at 65,539; it first differs in
+the post-state after token 1,928 at position 65,539 (786,870/817,152 values,
+relative L2 `2.3215e-5`). Each arm's post-state equals its next captured
+pre-state exactly. The identical 32-token outputs and six-GiB host-memory floor
+were preserved. This localizes when layer 13 diverges, not which input or
+recurrent operation causes it. E6/E7 remain open; the next trace should capture
+layer-13 stage inputs and recurrence at position 65,539. See the
+[sequence comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/gdn-layer13-state-sequence-comparison.json)
+and [diagnostic report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
