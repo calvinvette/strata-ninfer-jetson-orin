@@ -2,6 +2,8 @@
 
 Updated: 2026-10-31
 
+A same-profile 4K-cache pp512+tg128 backend screen found no NInfer request-level gain on NIMBUS: paired medians were −1.3% prompt TPS and −1.3% decode TPS, with TTFT/client time also about 1.2% slower. All six exact-answer responses matched byte-for-byte; no metric met the 5% screen. [Report](../../bench/results/2026-10-31-e6-q2-ninfer-backend-4k-tg128-screen/README.md).
+
 An opt-in exact-entry-count Q2_0 kernel specialization passed parity and improved
 grouped operator latency 11–12%, but the pp512 and pp2048 API screens showed no
 useful end-to-end gain; ORBIT regressed. It stays experimental and is not a

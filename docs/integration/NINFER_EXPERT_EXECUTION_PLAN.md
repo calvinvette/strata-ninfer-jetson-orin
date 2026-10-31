@@ -2588,3 +2588,12 @@ benefit on NIMBUS and regressed ORBIT decode/client time; a 3-pair pp2048
 retrieval/checksum screen was tied across prompt, decode, TTFT and client time.
 Do not promote or run a service confirmation. The operator effect does not
 establish a product win. See the [combined report](../../bench/results/2026-10-31-e6-ninfer-q2-exact-entry-screen/README.md).
+
+**E6 4K-cache pp512+tg128 backend screen (2026-10-31):** with cache size and
+runtime profile held fixed at 4K, a three-pair NIMBUS comparison of Strata
+against strict NInfer found median paired NInfer effects of −1.30% prompt TPS,
+−1.27% decode TPS, −1.24% first-visible TTFT and −1.20% client time. All six
+128-token answers began with the exact expected value and had one shared
+response hash. No metric met the 5% screen; do not run a seven-pair
+confirmation for this cell. This does not support a NInfer-specific transfer
+of the cache-policy result. See the [backend report](../../bench/results/2026-10-31-e6-q2-ninfer-backend-4k-tg128-screen/README.md).

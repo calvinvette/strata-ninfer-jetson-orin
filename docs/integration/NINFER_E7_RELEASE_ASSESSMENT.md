@@ -22,6 +22,17 @@ release profile is **not achieved**.
 
 ## Evidence and limits
 
+### 2026-10-31 4K-cache 128-token backend screen
+
+A three-pair pp512+tg128 NIMBUS comparison held the Q2_0 4K cache and service
+profile fixed while switching Strata to strict NInfer. NInfer median paired
+effects were −1.30% prompt TPS, −1.27% decode TPS, −1.24% TTFT and −1.20%
+client time. All six responses matched in 128-token length, answer prefix and
+response hash. The intervals include zero and no metric met the 5% screen, so
+there is no basis for service confirmation. This does not attribute the
+separate 3K-to-4K cache-policy gain to NInfer. See the
+[paired report](../../bench/results/2026-10-31-e6-q2-ninfer-backend-4k-tg128-screen/README.md).
+
 ### 2026-10-31 exact-entry operator and request follow-up
 
 An opt-in compile-time specialization improved grouped NInfer Q2_0 operator

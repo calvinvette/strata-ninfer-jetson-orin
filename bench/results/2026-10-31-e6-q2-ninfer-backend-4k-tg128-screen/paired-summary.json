@@ -1,0 +1,242 @@
+{
+  "schema": 1,
+  "experiment": "Q2_0 strict NInfer vs Strata backend, 4K expert cache, pp512+tg128 NIMBUS screen",
+  "date": "2026-10-31",
+  "device": "Jetson AGX Orin Developer Kit, aarch64, SM87, CUDA 12.6",
+  "source_commit": "e781e411c93252be2351feb35468ce06ff6a16a4",
+  "source_file": "src/kernels/cuda/ninfer_q2_expert.cu",
+  "source_file_sha256": "b49d75d02876d1eaa59d74d38e2867f5ecefa509909683adbcdfc6f3c18a02bb",
+  "binary": "build/integration/e0-cuda-build/strata",
+  "binary_sha256": "fd67288c399d895be036dab344e30caab3d081540bfc552f22dac6a5fc33644a",
+  "engine_version": "0.1.41",
+  "model": {
+    "name": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0",
+    "shard_1": {
+      "path": "~/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+      "bytes": 37623740192,
+      "sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720"
+    },
+    "shard_2": {
+      "path": "~/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+      "bytes": 28800138432,
+      "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+    },
+    "ple_pack": "~/models/strata-orin-validation/q2-ple-pack",
+    "expert_profile": "~/models/strata-orin-validation/q2-expert-profile.bin"
+  },
+  "workload": {
+    "task": "NIMBUS-7319 held-out exact-value retrieval",
+    "prompt_tokens": 512,
+    "generation_limit": 128,
+    "actual_output_tokens_per_arm_per_pair": 128,
+    "expected_answer_prefix": "NIMBUS-7319",
+    "prompt_cache": false,
+    "warmup_requests_per_process": 1,
+    "measured_requests_per_process": 1
+  },
+  "profile": {
+    "expert_cache_slots": 4000,
+    "configured_context": 8192,
+    "prefill_chunk": 128,
+    "mtp_window": 2,
+    "pool_workers": 8,
+    "resident_budget_gib": 6,
+    "workspace_reserve_mib": 3072,
+    "host_reserve_gib": 9,
+    "pcie_frac": 0.0,
+    "adaptive_swaps": "default enabled",
+    "temperature": 0,
+    "exact_n_opt_in": false,
+    "cta256_opt_in": false
+  },
+  "backend_arms": {
+    "control": {
+      "expert_backend": "strata"
+    },
+    "candidate": {
+      "expert_backend": "ninfer",
+      "strict": true
+    }
+  },
+  "pair_order": "counterbalanced order-mixed independent processes: Strata\u2192NInfer, NInfer\u2192Strata, Strata\u2192NInfer",
+  "pairs": [
+    {
+      "pair": 0,
+      "order": [
+        "strata",
+        "ninfer"
+      ],
+      "arms": {
+        "strata": {
+          "status": "pass",
+          "min_available_bytes": 11047514112,
+          "completion_tokens": 128,
+          "answer_prefix_passed": true,
+          "response_sha256": "576272a200f58b5b0a72f489ac1a2019098ec2939ac1480a2531f90a8e337cd2",
+          "prompt_tps": 24.1,
+          "decode_tps": 8.4,
+          "ttft_s": 21.426758266054094,
+          "client_total_s": 36.547692217864096,
+          "swap_peak_bytes": 2651496448
+        },
+        "ninfer": {
+          "status": "pass",
+          "min_available_bytes": 10212605952,
+          "completion_tokens": 128,
+          "answer_prefix_passed": true,
+          "response_sha256": "576272a200f58b5b0a72f489ac1a2019098ec2939ac1480a2531f90a8e337cd2",
+          "prompt_tps": 21.6,
+          "decode_tps": 7.9,
+          "ttft_s": 23.946669325698167,
+          "client_total_s": 40.04743622196838,
+          "swap_peak_bytes": 1274454016
+        }
+      }
+    },
+    {
+      "pair": 1,
+      "order": [
+        "ninfer",
+        "strata"
+      ],
+      "arms": {
+        "strata": {
+          "status": "pass",
+          "min_available_bytes": 11054211072,
+          "completion_tokens": 128,
+          "answer_prefix_passed": true,
+          "response_sha256": "576272a200f58b5b0a72f489ac1a2019098ec2939ac1480a2531f90a8e337cd2",
+          "prompt_tps": 23.0,
+          "decode_tps": 7.9,
+          "ttft_s": 22.489335771650076,
+          "client_total_s": 38.43469311809167,
+          "swap_peak_bytes": 1619615744
+        },
+        "ninfer": {
+          "status": "pass",
+          "min_available_bytes": 11043475456,
+          "completion_tokens": 128,
+          "answer_prefix_passed": true,
+          "response_sha256": "576272a200f58b5b0a72f489ac1a2019098ec2939ac1480a2531f90a8e337cd2",
+          "prompt_tps": 22.7,
+          "decode_tps": 7.8,
+          "ttft_s": 22.770838897209615,
+          "client_total_s": 38.900487917941064,
+          "swap_peak_bytes": 1672286208
+        }
+      }
+    },
+    {
+      "pair": 2,
+      "order": [
+        "strata",
+        "ninfer"
+      ],
+      "arms": {
+        "strata": {
+          "status": "pass",
+          "min_available_bytes": 11047313408,
+          "completion_tokens": 128,
+          "answer_prefix_passed": true,
+          "response_sha256": "576272a200f58b5b0a72f489ac1a2019098ec2939ac1480a2531f90a8e337cd2",
+          "prompt_tps": 23.1,
+          "decode_tps": 7.9,
+          "ttft_s": 22.411019034218043,
+          "client_total_s": 38.36928181210533,
+          "swap_peak_bytes": 1670742016
+        },
+        "ninfer": {
+          "status": "pass",
+          "min_available_bytes": 11082207232,
+          "completion_tokens": 128,
+          "answer_prefix_passed": true,
+          "response_sha256": "576272a200f58b5b0a72f489ac1a2019098ec2939ac1480a2531f90a8e337cd2",
+          "prompt_tps": 23.2,
+          "decode_tps": 8.1,
+          "ttft_s": 22.235538959968835,
+          "client_total_s": 37.954330364242196,
+          "swap_peak_bytes": 1713590272
+        }
+      }
+    }
+  ],
+  "metrics": {
+    "prompt_tps": {
+      "direction": "higher_is_better",
+      "strata_median": 23.1,
+      "ninfer_median": 22.7,
+      "paired_effects_percent": [
+        -10.373443983402487,
+        -1.30434782608696,
+        0.43290043290042934
+      ],
+      "median_paired_effect_percent": -1.30434782608696,
+      "paired_bootstrap_95_interval_percent": [
+        -10.373443983402487,
+        0.43290043290042934
+      ]
+    },
+    "decode_tps": {
+      "direction": "higher_is_better",
+      "strata_median": 7.9,
+      "ninfer_median": 7.9,
+      "paired_effects_percent": [
+        -5.952380952380953,
+        -1.2658227848101333,
+        2.5316455696202445
+      ],
+      "median_paired_effect_percent": -1.2658227848101333,
+      "paired_bootstrap_95_interval_percent": [
+        -5.952380952380953,
+        2.5316455696202445
+      ]
+    },
+    "ttft_s": {
+      "direction": "lower_is_better",
+      "strata_median": 22.411019034218043,
+      "ninfer_median": 22.770838897209615,
+      "paired_effects_percent": [
+        -10.523012722023317,
+        -1.236243982183871,
+        0.7891874110410813
+      ],
+      "median_paired_effect_percent": -1.236243982183871,
+      "paired_bootstrap_95_interval_percent": [
+        -10.523012722023317,
+        0.7891874110410813
+      ]
+    },
+    "client_total_s": {
+      "direction": "lower_is_better",
+      "strata_median": 38.36928181210533,
+      "ninfer_median": 38.900487917941064,
+      "paired_effects_percent": [
+        -8.738996385952092,
+        -1.1974009190629298,
+        1.0932914475921596
+      ],
+      "median_paired_effect_percent": -1.1974009190629298,
+      "paired_bootstrap_95_interval_percent": [
+        -8.738996385952092,
+        1.0932914475921596
+      ]
+    }
+  },
+  "resources": {
+    "minimum_available_bytes": 10212605952,
+    "maximum_sampled_swap_bytes": 2651496448,
+    "sampled_oom_kills": 0,
+    "cpu_frequency_mhz_range": [
+      729.6,
+      2201.6
+    ],
+    "gpu_frequency_mhz_range": [
+      306,
+      1300.5
+    ],
+    "emc_readback": "permission denied",
+    "clocks": "dynamic; no clock controls",
+    "energy": "not measured"
+  },
+  "decision": "No metric reached the 5% median effect screen. All three pairs produced identical 128-token response hashes and exact answer prefix. Do not run a seven-pair performance confirmation for this workload based on this result."
+}
