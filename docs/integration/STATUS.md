@@ -22,6 +22,18 @@ evidence or a general/release profile. The separate 4K NInfer-versus-Strata
 screen did not meet 5%. E6/E7 remain open. [Confirmation](../../bench/results/2026-10-31-e6-q2-cache-size-confirm/README.md),
 [screen](../../bench/results/2026-10-31-e6-q2-cache-size-screen/README.md).
 
+**E6 longer-prompt cache-capacity screen (2026-10-31):** at the same 8K
+reservation and adaptive-swap settings, three randomized 3K/4K NInfer pairs
+used a tokenizer-verified pp2048+tg48 retrieval/checksum workload. All six
+responses returned the exact ordered codes and sum; each emitted 47 tokens.
+The 4K arm was 3.79% slower in median decode TPS (three-pair interval −4.28%
+to −3.15%), with no metric crossing a 5% regression threshold. Minimum
+available RAM was 10.28 GiB; peak sampled swap 2.77 GiB; OOM kills were zero.
+This does not replicate the pp512+tg64 decode gain, indicating workload
+dependence and limiting the 4K candidate policy to the previously confirmed
+short-prompt domain. Adaptive swaps remain active, so no fixed-map effect is
+isolated. E6/E7 remain open. [Report](../../bench/results/2026-10-31-e6-q2-cache-capacity-pp2048/README.md).
+
 Updated: 2026-10-31. Phases 1 through 4 are complete for their documented tested
 Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 is
 complete for its bounded Orin qualification matrix under [its closeout]
