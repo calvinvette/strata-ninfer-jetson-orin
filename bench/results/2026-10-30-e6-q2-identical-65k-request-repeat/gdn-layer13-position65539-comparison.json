@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "experiment": "Qwen3.8-Flash-Next Q2_0, 65,536-token prompt + 32 generated tokens; layer-13 GDN intermediates and committed state at position 65,539",
+  "model": "Qwen3.8-Flash-Next Q2_0",
+  "layer": 13,
+  "position": 65539,
+  "token_id": 1928,
+  "output_token_sha256": {
+    "fixed": "2d5f3da8f9890f8c9262231bada2cfab088196528565a1c08ab685d86074c650",
+    "adaptive": "2d5f3da8f9890f8c9262231bada2cfab088196528565a1c08ab685d86074c650"
+  },
+  "same_output_tokens": true,
+  "supervision": {
+    "fixed": {
+      "status": "pass",
+      "elapsed_s": 822.2542708530091,
+      "minimum_available_gib": 8.702594757080078,
+      "floor_gib": 6.0,
+      "oom_kill": null,
+      "sampled_oom_kills": 0,
+      "memory_samples": 779
+    },
+    "adaptive": {
+      "status": "pass",
+      "elapsed_s": 822.0856466628611,
+      "minimum_available_gib": 8.434574127197266,
+      "floor_gib": 6.0,
+      "oom_kill": null,
+      "sampled_oom_kills": 0,
+      "memory_samples": 779
+    }
+  },
+  "stage_comparison": {
+    "x": {
+      "count": 2560,
+      "different": 2143,
+      "relative_l2": 1.803729528877182e-07,
+      "max_abs": 4.76837158203125e-07
+    },
+    "qkv": {
+      "count": 10240,
+      "different": 10236,
+      "relative_l2": 4.260689355818268e-05,
+      "max_abs": 0.00034812092781066895
+    },
+    "h": {
+      "count": 10240,
+      "different": 10157,
+      "relative_l2": 3.0333119479124462e-05,
+      "max_abs": 3.7826597690582275e-05
+    },
+    "gate": {
+      "count": 48,
+      "different": 17,
+      "relative_l2": 8.383911524635163e-08,
+      "max_abs": 2.384185791015625e-07
+    },
+    "beta": {
+      "count": 48,
+      "different": 20,
+      "relative_l2": 7.086855277926318e-08,
+      "max_abs": 1.4901161193847656e-07
+    },
+    "z": {
+      "count": 6144,
+      "different": 6130,
+      "relative_l2": 2.027835026358122e-05,
+      "max_abs": 0.00026154518127441406
+    },
+    "y": {
+      "count": 6144,
+      "different": 6139,
+      "relative_l2": 4.225189489521533e-05,
+      "max_abs": 2.1249055862426758e-05
+    },
+    "gdn_out": {
+      "count": 2560,
+      "different": 2560,
+      "relative_l2": 0.0012475097477044905,
+      "max_abs": 0.00023601949214935303
+    },
+    "ffn_x": {
+      "count": 2560,
+      "different": 2559,
+      "relative_l2": 0.00030725523931838714,
+      "max_abs": 0.000530540943145752
+    },
+    "ffn_y": {
+      "count": 2560,
+      "different": 2560,
+      "relative_l2": 0.005292995427315148,
+      "max_abs": 0.00014363368973135948
+    }
+  },
+  "raw_gdn_o": {
+    "count": 6144,
+    "different": 6141,
+    "relative_l2": 1.3638812714380822e-05,
+    "max_abs": 1.7927959561347961e-06
+  },
+  "committed_state_after_position": {
+    "count": 817152,
+    "different": 786870,
+    "relative_l2": 2.3214974591953616e-05,
+    "max_abs": 0.00034812092781066895,
+    "recurrent": {
+      "count": 786432,
+      "different": 776634,
+      "relative_l2": 9.765346921323224e-06,
+      "max_abs": 5.0961971282958984e-06
+    },
+    "convolution": {
+      "count": 30720,
+      "different": 10236,
+      "relative_l2": 2.321981166430441e-05,
+      "max_abs": 0.00034812092781066895
+    }
+  },
+  "scope": "Instrumented numeric diagnostic only; not performance or model-quality evidence."
+}

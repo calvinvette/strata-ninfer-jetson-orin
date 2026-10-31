@@ -969,3 +969,10 @@ position 65,538; the first sampled divergence is the post-state after token
 are exactly continuous within each arm, outputs match, and both runs retain the
 six-GiB floor. This is onset timing, not root-cause attribution; next capture
 the layer-13 GDN stages at 65,539. [Comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/gdn-layer13-state-sequence-comparison.json).
+
+At the first layer-13 state-divergence update (position 65,539), the incoming
+recurrent state matches exactly. `x` differs by relative L2 `1.80e-7`; projected
+`qkv` differs by `4.26e-5`, followed by recurrent `h` at `3.03e-5`. The update
+creates a `2.32e-5` post-state difference, while output tokens remain identical.
+The projection's sensitivity versus upstream arithmetic is still unresolved.
+[Comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/gdn-layer13-position65539-comparison.json).

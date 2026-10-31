@@ -466,10 +466,35 @@ This resolves the immediate timing ambiguity: layer 13 does not enter position
 65,540 with a pre-existing cross-arm state difference; the first sampled
 layer-13 divergence is created by the update at position 65,539. The earlier
 position-65,540 stage capture's equal `qkv` but different recurrent `h` is
-consistent with that changed pre-state. The probe does not identify which
-layer-13 input or recurrent operation creates the difference at position
-65,539, nor whether it is the first differing state anywhere in the model.
-The next useful trace is the matched layer-13 GDN stage and input at position
-65,539, followed by upstream layers if the input or recurrent pre-state proves
-different. Raw state binaries remain in `/tmp` on Orin; the compact numeric
-comparison is in [`gdn-layer13-state-sequence-comparison.json`](gdn-layer13-state-sequence-comparison.json).
+consistent with that changed pre-state. The sequence alone did not identify which layer-13 input or recurrent
+operation creates the difference at position 65,539, nor whether it is the first
+differing state anywhere in the model. The matched GDN stage capture at that
+position is now recorded below. Raw state binaries remain in `/tmp` on Orin; the
+compact numeric comparison is in
+[`gdn-layer13-state-sequence-comparison.json`](gdn-layer13-state-sequence-comparison.json).
+
+### GDN input and recurrent stages at the first layer-13 state divergence
+
+The matched GDN capture at position 65,539 passed in both arms and again
+produced the same 32 output tokens. Minimum available memory was 8.70 GiB
+fixed-owner and 8.43 GiB adaptive; neither run crossed the six-GiB floor. The
+layer-13 state entering this update was already shown bit-identical by the
+pre/post sequence capture. At the GDN block input `x`, 2,143/2,560 values differ
+(relative L2 `1.80e-7`, max absolute `4.77e-7`). The projected `qkv` then differs
+in 10,236/10,240 values (relative L2 `4.26e-5`, max absolute `3.48e-4`), before
+recurrent output `h` differs by relative L2 `3.03e-5`. The same position's
+post-state differs by relative L2 `2.32e-5`; its convolution history differs
+in 10,236/30,720 values. Gate and beta remain near `1e-7`; `z` differs by
+`2.03e-5`, `y` by `4.23e-5`, and normalized `gdn_out` by `1.25e-3`. The layer's
+MoE input differs by `3.07e-4` and its FFN output by `5.29e-3`.
+
+This places a small input delta before a much larger `qkv` delta at the exact
+update that first changes layer-13 state. The incoming recurrent state is
+identical, so the state mismatch is generated during this update, not inherited
+by layer 13. The capture alone cannot tell whether the qkv change is the
+expected response to the slightly different `x`, a projection arithmetic
+sensitivity, or another upstream execution effect; it also does not identify
+the source of the `x` difference. A fixed-input projection oracle or matched
+single-arm replay of both captured `x` rows is needed before assigning cause.
+The compact comparison is in
+[`gdn-layer13-position65539-comparison.json`](gdn-layer13-position65539-comparison.json).

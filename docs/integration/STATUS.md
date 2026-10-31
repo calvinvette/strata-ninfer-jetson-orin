@@ -7494,3 +7494,14 @@ recurrent operation causes it. E6/E7 remain open; the next trace should capture
 layer-13 stage inputs and recurrence at position 65,539. See the
 [sequence comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/gdn-layer13-state-sequence-comparison.json)
 and [diagnostic report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
+
+The next matched trace captured layer-13 GDN stages at position 65,539, where
+its state sequence first diverges. The pre-update recurrent state is identical;
+`x` differs by relative L2 `1.80e-7`, followed by `qkv` at `4.26e-5` and `h`
+at `3.03e-5`. Post-update state differs by `2.32e-5`, while both arms emit the
+same tokens and remain above six GiB available RAM. This shows the update
+creates the layer-13 delta, but does not determine whether the qkv difference
+is explained by the small `x` delta or where that `x` delta originated. Next
+compare both captured inputs through the same projection oracle/replay. E6/E7
+remain open. See the [comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/gdn-layer13-position65539-comparison.json)
+and [diagnostic report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
