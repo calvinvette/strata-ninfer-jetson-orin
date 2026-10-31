@@ -64,6 +64,31 @@ These are three-pair screens. The decode medians are below the 5% threshold;
 there was no confirmation campaign. The intervals are coarse and do not prove
 that backend effects are exactly zero.
 
+## 2K prompt replication
+
+A separate 2,048-token retrieval/arithmetic fixture placed markers at 10%, 50%
+and 90% of the prompt and asked for their exact codes and numeric suffix sum.
+The response stopped naturally at 47 tokens and matched the complete expected
+string in every measured arm. Three randomized screen pairs followed by seven
+confirmation pairs used the same fixed maps, strict NInfer, context capacity
+8,192 and other launch controls as above.
+
+| Metric | Original map median | Learned map median | Paired change (95% interval) |
+| --- | ---: | ---: | ---: |
+| Decode throughput | 5.07 tok/s | 7.70 tok/s | +52.0% (+50.9%, +58.4%) |
+| Prompt throughput | 31.78 tok/s | 42.15 tok/s | +32.3% (+30.5%, +43.4%) |
+| First visible token | 64.73 s | 48.79 s | −24.4% (−30.2%, −23.4%) |
+| Client request time | 73.72 s | 54.79 s | −25.6% (−31.3%, −24.7%) |
+
+GPU expert-cache hits increased from 21.1% to 47.7%. Minimum request-window
+available RAM was 9.15 GiB, sampled cgroup OOM-kill counters remained zero,
+and the six-GiB floor was maintained. One original-map NIMBUS warmup took
+127.6 s; its measured 2K request was within the campaign range (31.7 prompt
+tok/s and 5.1 decode tok/s), so the block was retained. Energy was not
+measured; EMC readback was unsupported as noted above. This confirms a
+residency-map effect for one 2K prompt. It does not compare NInfer and Strata
+kernels at 2K.
+
 ## Controls and identity
 
 - Model: Qwen3.8-Flash-Next GSQ-RCO Q2_0, two GGUF shards. SHA-256 values:
@@ -85,9 +110,9 @@ that backend effects are exactly zero.
   ORBIT exact-retrieval request. The measured completion was exactly 64 tokens,
   began with `ORBIT-4826`, and matched its paired response byte-for-byte.
   Three randomized screen pairs and seven randomized confirmation pairs were
-  run per backend for the map effect. Separate three-pair screens compared
-  backends on each fixed map. All 26 pair blocks (52 processes) passed the
-  supervisor and workload checks.
+  run per backend for the ORBIT map effect. Separate three-pair screens compared
+  backends on each fixed map. All 26 ORBIT/map and same-map backend pair blocks
+  (52 processes) passed the supervisor and workload checks.
 - Every process retained the six-GiB physical-memory admission floor. Minimum
   request-window available RAM across the campaigns was 9.15 GiB; peak observed
   swap use was 2.61 GiB. Sampled cgroup OOM-kill counters stayed zero. Observed
@@ -110,15 +135,17 @@ fell 27.9%. GPU hit rate increased from 22.1% to 73.8%. All 20 processes passed
 the exact `MAPLE-6159` prefix check. Full explanatory text differed between
 maps, so this does not claim text equivalence or semantic grading.
 
-Both prompts are synthetic exact lookups with the same general request shape.
-The evidence now covers two held-out prompts, one model, one prompt size and
-one output size. It is still not broad quality qualification. These results do
-not qualify other contexts, prompt lengths, models, memory budgets, or sustained
-service loads.
+The evidence covers two held-out 512-token exact lookups and one 2,048-token
+retrieval/arithmetic prompt. The short tasks are in the same synthetic lookup
+family; the long fixture tests exact multi-position retrieval and arithmetic.
+This is still one model and narrow task coverage, not broad quality
+qualification. These results do not qualify other prompt lengths, models,
+memory budgets, or sustained service loads.
 
 The primary finding is that a fixed 5K residency map with more useful experts
-in GPU memory can more than double decode speed on these two exact-lookup
-prompts, under NInfer; the ORBIT map effect was also confirmed under Strata.
+in GPU memory more than doubled decode speed on the two 512-token exact-lookup
+prompts and improved decode 52.0% on the 2K retrieval prompt, under NInfer; the
+512-token ORBIT map effect was also confirmed under Strata.
 The same-map screens did not show a 5% NInfer end-to-end gain. Continue the
 planned context/workload matrix and broader quality/state gates before changing
 release defaults or claiming NInfer acceleration.

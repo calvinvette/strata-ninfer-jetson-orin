@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **E0–E5 are complete for their documented bounded Q2_0 prototype scopes. E6 remains open and E7 has no release profile. On 2026-10-31, held-out exact-lookup prompts produced a +127.9% strict-NInfer decode gain on ORBIT (also +130.1% under Strata) and +113.5% under strict NInfer on a second alpine-seed task when the 5K GPU-resident map changed; cache hits rose from about 21–22% to 74%. Same-map three-pair backend screens measured NInfer decode at +0.7% on the original map and −2.2% on the learned map, below the 5% useful-effect gate. The large improvements track resident-map/cache-hit selection; they do not demonstrate an NInfer-kernel gain. These two 512+64 exact lookups do not close broader quality, context or end-to-end product gates. maestro1 HIP/SYCL evidence remains x86 build-only; no device execution is claimed. Updated 2026-10-31.**
+Status: **E0–E5 are complete for their documented bounded Q2_0 prototype scopes. E6 remains open and E7 has no release profile. On 2026-10-31, changing the 5K GPU-resident map improved strict-NInfer decode +127.9% on held-out ORBIT (also +130.1% under Strata), +113.5% on a second 512-token alpine-seed task, and +52.0% on a 2,048-token retrieval/arithmetic prompt. Cache hits rose from about 21–22% to 74% on the short tasks and from 21.1% to 47.7% at 2K. Same-map three-pair backend screens measured NInfer decode at +0.7% and −2.2% on the original and learned maps at 512 tokens, below the 5% useful-effect gate. The large gains track residency/cache-hit selection; they do not demonstrate an NInfer-kernel gain. Broader quality, context and end-to-end product gates remain. maestro1 HIP/SYCL evidence remains x86 build-only; no device execution is claimed. Updated 2026-10-31.**
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -2748,3 +2748,18 @@ explanations differed between maps. This replicates the map effect on a second
 held-out prompt in the same synthetic lookup family, not broad semantic quality
 or general workload coverage. The result and pair-level evidence are in the
 [fixed-map report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
+
+**E6 actual 2K prompt map confirmation (2026-10-31):** a tokenizer-verified
+2,048-token, three-position retrieval/arithmetic fixture returned the exact
+three codes and suffix sum in every measured arm. In three screen pairs, the
+learned fixed map raised decode +57.2%; seven-pair confirmation measured
++52.0% (5.07 to 7.70 tok/s; paired bootstrap 95% interval +50.9% to +58.4%).
+Prompt throughput improved 32.3%, first-visible latency fell 24.4%, and client
+time fell 25.6%. GPU expert hits rose 21.1% to 47.7%. Minimum available RAM was
+9.15 GiB, with zero sampled cgroup OOM kills and no clock changes. One original
+map warmup had a slow 127.6-second client time; its subsequent measured 2K
+request fell in the campaign range and the pair is retained. This is a map
+effect under strict NInfer; same-map Strata comparison at 2K remains untested.
+The result supports workload/context generalization of the residency effect
+but does not qualify broad quality or context behavior. See the [fixed-map
+report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).

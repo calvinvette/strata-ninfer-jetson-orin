@@ -7821,3 +7821,16 @@ maps, so this confirms exact-answer retrieval only. Minimum available RAM was
 9.18 GiB, sampled cgroup OOM kills remained zero, and no clock controls were
 changed. This is a second prompt in the same synthetic lookup family, not broad
 quality qualification. See the [fixed-map report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
+
+**E6 actual 2K prompt map confirmation (2026-10-31):** a tokenizer-verified
+2,048-token three-position retrieval/arithmetic prompt returned the exact three
+codes and suffix sum in all screen and confirmation arms. The learned fixed map
+improved strict-NInfer decode +52.0% in seven pairs (5.07 to 7.70 tok/s;
+paired 95% interval +50.9% to +58.4%), prompt throughput +32.3%, first-visible
+latency −24.4%, and client time −25.6%. GPU expert hits rose 21.1% to 47.7%.
+Minimum available RAM was 9.15 GiB, cgroup OOM-kill counters remained zero,
+and clocks were not changed. One original-map NIMBUS warmup took 127.6 s; its
+measured 2K request was within the campaign range, so the pair was retained.
+This extends the residency-map result to one actual 2K prompt under strict
+NInfer; same-map Strata 2K performance and broader semantic quality remain
+untested. See the [fixed-map report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
