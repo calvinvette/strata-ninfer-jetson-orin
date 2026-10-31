@@ -2,6 +2,11 @@
 
 Updated: 2026-10-31
 
+An opt-in exact-entry-count Q2_0 kernel specialization passed parity and improved
+grouped operator latency 11–12%, but the pp512 and pp2048 API screens showed no
+useful end-to-end gain; ORBIT regressed. It stays experimental and is not a
+service profile. [Report](../../bench/results/2026-10-31-e6-ninfer-q2-exact-entry-screen/README.md).
+
 A Strata-only 3K/4K cache ablation reproduced higher decode TPS at 4K
 (+16.9% NIMBUS, +20.8% ORBIT medians) with 11–13 point higher cache-hit
 rates, but prompt TPS and TTFT regressed 8–10% and client total was tied.

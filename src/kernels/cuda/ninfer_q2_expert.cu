@@ -206,6 +206,53 @@ __device__ __forceinline__ void dot_q2_q8_1_sub16(const uint8_t* row,
     }
 }
 
+template<int NC>
+__device__ __forceinline__ void dot_q2_q8_1_sub16_exact(const uint8_t* row,
+                                                        const Q8_1Block* const* xq,
+                                                        int width, int lane,
+                                                        float* output) {
+    float acc[NC] = {};
+    float partial[NC] = {};
+    const int blocks32 = width / 32;
+    if (blocks32 == 80) {
+        for (int k = lane; k < 80; k += 32) {
+            const int kbx = k / 2, iqs = k & 1;
+            const PackedQ2_0 w = load_q2_0(row, kbx, iqs);
+#pragma unroll
+            for (int c = 0; c < NC; ++c)
+                acc[c] += apply_q2_q8_1(w, xq[c] + kbx * 2, iqs);
+        }
+        for (int k = lane + 16; k < 64; k += 32) {
+            const int kbx = k / 2, iqs = k & 1;
+            const PackedQ2_0 w = load_q2_0(row, kbx, iqs);
+#pragma unroll
+            for (int c = 0; c < NC; ++c)
+                partial[c] += apply_q2_q8_1(w, xq[c] + kbx * 2, iqs);
+        }
+    } else {
+        const int kbx = lane / 2, iqs = lane & 1;
+        const PackedQ2_0 w = load_q2_0(row, kbx, iqs);
+#pragma unroll
+        for (int c = 0; c < NC; ++c)
+            acc[c] = apply_q2_q8_1(w, xq[c] + kbx * 2, iqs);
+        if (lane < 4) {
+            const int k = lane + 16;
+            const int kbx2 = k / 2, iqs2 = k & 1;
+            const PackedQ2_0 w2 = load_q2_0(row, kbx2, iqs2);
+#pragma unroll
+            for (int c = 0; c < NC; ++c)
+                partial[c] = apply_q2_q8_1(w2, xq[c] + kbx2 * 2, iqs2);
+        }
+    }
+#pragma unroll
+    for (int c = 0; c < NC; ++c) {
+        acc[c] = __fadd_rn(acc[c], partial[c]);
+        for (int offset = 8; offset > 0; offset >>= 1)
+            acc[c] += __shfl_xor_sync(0xffffffffu, acc[c], offset);
+        output[c] = acc[c];
+    }
+}
+
 __global__ void d3_q2_0(const uint8_t* gate, const uint8_t* up, const float* x, float* hidden) {
     const int lane = threadIdx.x & 31;
     const int warp = threadIdx.x >> 5;
@@ -230,7 +277,7 @@ __global__ void d4_q2_0(const uint8_t* down, const float* hidden, float* output)
     if (lane == 0) output[row] = value;
 }
 
-template<int RowsPerCta>
+template<int RowsPerCta, bool ExactN = false>
 __global__ __launch_bounds__(RowsPerCta * 16) void d3_q2_0_grouped(
                                 const unsigned long long* grp_ptr, const int32_t* grp_start,
                                 const int32_t* n_groups, const int32_t* ent_tok,
@@ -259,7 +306,14 @@ __global__ __launch_bounds__(RowsPerCta * 16) void d3_q2_0_grouped(
             float values[4];
             if (n == 1)
                 values[0] = dot_q2_q8_1_sub16_single<80>(weights, activations[0], lane);
-            else
+            else if constexpr (ExactN) {
+                if (n == 2)
+                    dot_q2_q8_1_sub16_exact<2>(weights, activations, static_cast<int>(L.n_embd), lane, values);
+                else if (n == 3)
+                    dot_q2_q8_1_sub16_exact<3>(weights, activations, static_cast<int>(L.n_embd), lane, values);
+                else
+                    dot_q2_q8_1_sub16_exact<4>(weights, activations, static_cast<int>(L.n_embd), lane, values);
+            } else
                 dot_q2_q8_1_sub16<4>(weights, activations, n, static_cast<int>(L.n_embd), lane, values);
             if (lane == 0) {
 #pragma unroll
@@ -270,7 +324,7 @@ __global__ __launch_bounds__(RowsPerCta * 16) void d3_q2_0_grouped(
     }
 }
 
-template<int RowsPerCta>
+template<int RowsPerCta, bool ExactN = false>
 __global__ __launch_bounds__(RowsPerCta * 16) void d4_q2_0_grouped(
                                 const unsigned long long* grp_ptr, const int32_t* grp_start,
                                 const int32_t* n_groups, const int32_t* ent_dst,
@@ -293,7 +347,14 @@ __global__ __launch_bounds__(RowsPerCta * 16) void d4_q2_0_grouped(
             float values[4];
             if (n == 1)
                 values[0] = dot_q2_q8_1_sub16_single<20>(weights, activations[0], lane);
-            else
+            else if constexpr (ExactN) {
+                if (n == 2)
+                    dot_q2_q8_1_sub16_exact<2>(weights, activations, static_cast<int>(L.n_ff), lane, values);
+                else if (n == 3)
+                    dot_q2_q8_1_sub16_exact<3>(weights, activations, static_cast<int>(L.n_ff), lane, values);
+                else
+                    dot_q2_q8_1_sub16_exact<4>(weights, activations, static_cast<int>(L.n_ff), lane, values);
+            } else
                 dot_q2_q8_1_sub16<4>(weights, activations, n, static_cast<int>(L.n_ff), lane, values);
             if (lane == 0) {
 #pragma unroll
@@ -348,6 +409,10 @@ void ninfer_q2_0_expert_grouped(const NativeExpertLayout& L, const unsigned long
     auto* up = reinterpret_cast<float*>(scratch + fa);
     auto* hidden_q8_1 = scratch + 3 * fa;
     const auto s = static_cast<cudaStream_t>(stream);
+    static const bool exact_n = [] {
+        const char* value = std::getenv("STRATA_NINFER_Q2_EXACT_N");
+        return value != nullptr && value[0] == '1';
+    }();
     // The opt-in 256-thread mapping assigns the same 16-lane row groups as
     // Strata's Q2_0 subwarp kernels. It halves CTA count without changing the
     // per-row reduction or weight/activation arithmetic. Keep the 128-thread
@@ -356,10 +421,18 @@ void ninfer_q2_0_expert_grouped(const NativeExpertLayout& L, const unsigned long
         const char* value = std::getenv("STRATA_NINFER_Q2_CTA256");
         return value != nullptr && value[0] == '1';
     }();
-    if (cta256) {
+    if (cta256 && exact_n) {
+        d3_q2_0_grouped<16, true><<<dim3((2 * kIntermediate + 15) / 16, static_cast<unsigned>(gy)),
+                                     256, 0, s>>>(grp_ptr, grp_start, n_groups, ent_tok,
+                                                   static_cast<const Q8_1Block*>(x_q8_1), L, gate, up, gy);
+    } else if (cta256) {
         d3_q2_0_grouped<16><<<dim3((2 * kIntermediate + 15) / 16, static_cast<unsigned>(gy)),
                                256, 0, s>>>(grp_ptr, grp_start, n_groups, ent_tok,
                                              static_cast<const Q8_1Block*>(x_q8_1), L, gate, up, gy);
+    } else if (exact_n) {
+        d3_q2_0_grouped<8, true><<<dim3((2 * kIntermediate + 7) / 8, static_cast<unsigned>(gy)),
+                                    128, 0, s>>>(grp_ptr, grp_start, n_groups, ent_tok,
+                                                  static_cast<const Q8_1Block*>(x_q8_1), L, gate, up, gy);
     } else {
         d3_q2_0_grouped<8><<<dim3((2 * kIntermediate + 7) / 8, static_cast<unsigned>(gy)),
                               128, 0, s>>>(grp_ptr, grp_start, n_groups, ent_tok,
@@ -368,10 +441,18 @@ void ninfer_q2_0_expert_grouped(const NativeExpertLayout& L, const unsigned long
     const int64_t hidden_values = cap_entries * kIntermediate;
     ninfer_swiglu_quantize_q8_1_many<<<static_cast<unsigned>((hidden_values + 255) / 256), 256, 0, s>>>(
         gate, up, reinterpret_cast<Q8_1Block*>(hidden_q8_1), hidden_values);
-    if (cta256) {
+    if (cta256 && exact_n) {
+        d4_q2_0_grouped<16, true><<<dim3((kHidden + 15) / 16, static_cast<unsigned>(gy)),
+                                     256, 0, s>>>(grp_ptr, grp_start, n_groups, ent_dst,
+                                                   reinterpret_cast<const Q8_1Block*>(hidden_q8_1), L, output, gy);
+    } else if (cta256) {
         d4_q2_0_grouped<16><<<dim3((kHidden + 15) / 16, static_cast<unsigned>(gy)),
                                256, 0, s>>>(grp_ptr, grp_start, n_groups, ent_dst,
                                              reinterpret_cast<const Q8_1Block*>(hidden_q8_1), L, output, gy);
+    } else if (exact_n) {
+        d4_q2_0_grouped<8, true><<<dim3((kHidden + 7) / 8, static_cast<unsigned>(gy)),
+                                    128, 0, s>>>(grp_ptr, grp_start, n_groups, ent_dst,
+                                                  reinterpret_cast<const Q8_1Block*>(hidden_q8_1), L, output, gy);
     } else {
         d4_q2_0_grouped<8><<<dim3((kHidden + 7) / 8, static_cast<unsigned>(gy)),
                               128, 0, s>>>(grp_ptr, grp_start, n_groups, ent_dst,

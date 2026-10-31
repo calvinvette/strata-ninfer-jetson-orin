@@ -2578,3 +2578,13 @@ client-total latency was tied. This shows the decode effect is not specific to
 NInfer, though the small sample does not quantify interaction. The profile
 fails the combined regression gate, so do not confirm it. See the
 [Strata cache ablation](../../bench/results/2026-10-31-e6-q2-strata-cache-capacity-ablation/README.md).
+
+
+**E6 grouped exact-entry follow-up (2026-10-31):** an opt-in specialization
+for 2/3/4-entry expert groups cleared the operator screen and seven-pair
+confirmation by 11.03% (64-token groups) and 11.82% (128-token groups), with
+exact oracle/intermediate/output checks. A 3-pair pp512 API screen had no
+benefit on NIMBUS and regressed ORBIT decode/client time; a 3-pair pp2048
+retrieval/checksum screen was tied across prompt, decode, TTFT and client time.
+Do not promote or run a service confirmation. The operator effect does not
+establish a product win. See the [combined report](../../bench/results/2026-10-31-e6-ninfer-q2-exact-entry-screen/README.md).

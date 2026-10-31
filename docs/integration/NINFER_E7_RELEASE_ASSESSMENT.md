@@ -22,6 +22,17 @@ release profile is **not achieved**.
 
 ## Evidence and limits
 
+### 2026-10-31 exact-entry operator and request follow-up
+
+An opt-in compile-time specialization improved grouped NInfer Q2_0 operator
+latency by 11.03%/11.82% at 64/128 tokens in a seven-pair confirmation, but
+slowed the one-token operator by 3.13%. No useful API benefit transferred: a
+pp512+tg64 retrieval/checksum screen was tied or regressed by task, and
+pp2048+tg48 prompt/decode/client changes remained within about 1.2% of baseline.
+All screened answers and hashes matched. Keep this path experimental; no
+service confirmation or release profile is indicated. See the
+[combined report](../../bench/results/2026-10-31-e6-ninfer-q2-exact-entry-screen/README.md).
+
 ### 2026-10-31 cache/backend performance follow-up
 
 At 4,000 cache slots and 8K context, a three-pair pp512+tg64 API screen found
