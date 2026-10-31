@@ -15,6 +15,11 @@ but 4K decode TPS was 3.79% slower (three-pair interval −4.28% to −3.15%).
 The earlier +18%/+25% decode result therefore applies only to pp512+tg64 so far;
 adaptive swaps were active in both experiments. [Longer-prompt screen](../../bench/results/2026-10-31-e6-q2-cache-capacity-pp2048/README.md).
 
+A pp512+tg128 3K/4K screen on the NIMBUS task found +9.40% median decode TPS
+(three-pair interval +3.55% to +10.63%). The second task stopped at 117/128 on
+3K and was excluded, leaving only one eligible task; this needs multi-prompt
+confirmation. [Screen](../../bench/results/2026-10-31-e6-q2-cache-size-tg128/README.md).
+
 Layer-1 expert-3 forced-owner repeats now match locally through layer 2 but
 not across full GDN state: the second forced-CPU run differs from the first by
 relative L2 `0.01078`, similar to forced versus adaptive. Keep that result

@@ -1,0 +1,204 @@
+{
+  "experiment": "Q2_0 configured cache capacity 3K vs 4K with adaptive swaps; pp512+tg128 NIMBUS heldout task",
+  "date": "2026-10-31",
+  "pairs": [
+    {
+      "pair": 0,
+      "name": "pilot",
+      "arms": {
+        "3000": {
+          "process": "partial-process-failure; target task passed",
+          "task_status": "pass",
+          "prompt_tokens": 512,
+          "generated_tokens": 128,
+          "expected_answer_at_start": true,
+          "response_sha256": "1719e86b58f64cf00c23749b67feacac453c76684a351ca0480d026111124e77",
+          "prompt_ms": 20669.0,
+          "prompt_tps": 24.771396777783153,
+          "decode_ms": 16225.5,
+          "decode_tps": 7.888816985609072,
+          "ttft_s": 20.922417470719665,
+          "client_total_s": 36.91830858401954,
+          "minimum_available_ram_gib": 11.551616668701172,
+          "peak_swap_gib": 2.6276588439941406
+        },
+        "4000": {
+          "process": "pass",
+          "task_status": "pass",
+          "prompt_tokens": 512,
+          "generated_tokens": 128,
+          "expected_answer_at_start": true,
+          "response_sha256": "576272a200f58b5b0a72f489ac1a2019098ec2939ac1480a2531f90a8e337cd2",
+          "prompt_ms": 21482.3,
+          "prompt_tps": 23.833574617243034,
+          "decode_ms": 14831.1,
+          "decode_tps": 8.630512908685128,
+          "ttft_s": 21.77030159626156,
+          "client_total_s": 36.35029903007671,
+          "minimum_available_ram_gib": 10.275604248046875,
+          "peak_swap_gib": 2.6709136962890625
+        }
+      },
+      "configured_order": "4000\u21923000"
+    },
+    {
+      "pair": 1,
+      "name": "pair1",
+      "arms": {
+        "3000": {
+          "process": "pass",
+          "task_status": "pass",
+          "prompt_tokens": 512,
+          "generated_tokens": 128,
+          "expected_answer_at_start": true,
+          "response_sha256": "23734ee3eafb9aa7d11114e9ae88b799b5fca9549c53cb24ea5425c8555c2676",
+          "prompt_ms": 22324.7,
+          "prompt_tps": 22.93423875796763,
+          "decode_ms": 16718.0,
+          "decode_tps": 7.656418231845914,
+          "ttft_s": 22.53441368881613,
+          "client_total_s": 39.08617067988962,
+          "minimum_available_ram_gib": 11.58740234375,
+          "peak_swap_gib": 2.439647674560547
+        },
+        "4000": {
+          "process": "pass",
+          "task_status": "pass",
+          "prompt_tokens": 512,
+          "generated_tokens": 128,
+          "expected_answer_at_start": true,
+          "response_sha256": "576272a200f58b5b0a72f489ac1a2019098ec2939ac1480a2531f90a8e337cd2",
+          "prompt_ms": 21676.0,
+          "prompt_tps": 23.620594205572985,
+          "decode_ms": 16144.3,
+          "decode_tps": 7.928494886740212,
+          "ttft_s": 21.888304160907865,
+          "client_total_s": 37.86174991587177,
+          "minimum_available_ram_gib": 10.2803955078125,
+          "peak_swap_gib": 1.660858154296875
+        }
+      },
+      "configured_order": "BASELINE\u2192CANDIDATE"
+    },
+    {
+      "pair": 2,
+      "name": "pair2",
+      "arms": {
+        "3000": {
+          "process": "pass",
+          "task_status": "pass",
+          "prompt_tokens": 512,
+          "generated_tokens": 128,
+          "expected_answer_at_start": true,
+          "response_sha256": "23734ee3eafb9aa7d11114e9ae88b799b5fca9549c53cb24ea5425c8555c2676",
+          "prompt_ms": 22702.4,
+          "prompt_tps": 22.552681654803013,
+          "decode_ms": 17655.7,
+          "decode_tps": 7.249783356083304,
+          "ttft_s": 22.99024137388915,
+          "client_total_s": 40.451396761927754,
+          "minimum_available_ram_gib": 11.583763122558594,
+          "peak_swap_gib": 2.4414825439453125
+        },
+        "4000": {
+          "process": "pass",
+          "task_status": "pass",
+          "prompt_tokens": 512,
+          "generated_tokens": 128,
+          "expected_answer_at_start": true,
+          "response_sha256": "576272a200f58b5b0a72f489ac1a2019098ec2939ac1480a2531f90a8e337cd2",
+          "prompt_ms": 21943.3,
+          "prompt_tps": 23.3328624226985,
+          "decode_ms": 15959.3,
+          "decode_tps": 8.020401897326325,
+          "ttft_s": 22.155600083991885,
+          "client_total_s": 37.940180926118046,
+          "minimum_available_ram_gib": 10.29024887084961,
+          "peak_swap_gib": 1.6256446838378906
+        }
+      },
+      "configured_order": "CANDIDATE\u2192BASELINE"
+    }
+  ],
+  "metrics": {
+    "prompt_tps": {
+      "paired_candidate_advantage_pct": [
+        -3.7859074680085425,
+        2.992710832256895,
+        3.459370286146579
+      ],
+      "median_candidate_advantage_pct": 2.992710832256895,
+      "bootstrap_95_percentile_interval_pct": [
+        -3.7859074680085425,
+        3.459370286146579
+      ],
+      "baseline_median": 22.93423875796763,
+      "candidate_median": 23.620594205572985,
+      "units": "tok/s"
+    },
+    "decode_tps": {
+      "paired_candidate_advantage_pct": [
+        9.40186499989888,
+        3.5535761847834912,
+        10.629538889550316
+      ],
+      "median_candidate_advantage_pct": 9.40186499989888,
+      "bootstrap_95_percentile_interval_pct": [
+        3.5535761847834912,
+        10.629538889550316
+      ],
+      "baseline_median": 7.656418231845914,
+      "candidate_median": 8.020401897326325,
+      "units": "tok/s"
+    },
+    "ttft_s": {
+      "paired_candidate_advantage_pct": [
+        -4.052515091664177,
+        2.8672125080801636,
+        3.6304155155377993
+      ],
+      "median_candidate_advantage_pct": 2.8672125080801636,
+      "bootstrap_95_percentile_interval_pct": [
+        -4.052515091664177,
+        3.6304155155377993
+      ],
+      "baseline_median": 22.53441368881613,
+      "candidate_median": 21.888304160907865,
+      "units": "s"
+    },
+    "client_total_s": {
+      "paired_candidate_advantage_pct": [
+        1.5385579018338258,
+        3.1326188846835024,
+        6.207983003872997
+      ],
+      "median_candidate_advantage_pct": 3.1326188846835024,
+      "bootstrap_95_percentile_interval_pct": [
+        1.5385579018338258,
+        6.207983003872997
+      ],
+      "baseline_median": 39.08617067988962,
+      "candidate_median": 37.86174991587177,
+      "units": "s"
+    }
+  },
+  "quality": {
+    "successful_measured_task_observations": 6,
+    "all_expected_answer_at_start": true,
+    "all_generated_exactly_128_tokens": true,
+    "responses_identical_hash_across_arms_and_pairs": false
+  },
+  "excluded_cell": {
+    "task": "ORBIT-4826 pp512+tg128",
+    "status": "failed fixed-length qualification on 3K baseline: natural early stop at 117/128 tokens; matched candidate task reached 128",
+    "treatment": "excluded from paired effect; retained as a failed cell"
+  },
+  "resources": {
+    "minimum_sampled_available_ram_gib": 10.275604248046875,
+    "maximum_sampled_swap_gib": 2.6709136962890625,
+    "sampled_oom_kills": 0,
+    "clocks": "dynamic, read-only; EMC access denied",
+    "energy": "not request-attributed"
+  },
+  "caveat": "Pair 0 baseline process has a separate failed ORBIT cell after the successful measured NIMBUS cell. Only the NIMBUS task is analyzed. Adaptive swaps are enabled; fixed residency is not established."
+}

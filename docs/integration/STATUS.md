@@ -34,6 +34,16 @@ dependence and limiting the 4K candidate policy to the previously confirmed
 short-prompt domain. Adaptive swaps remain active, so no fixed-map effect is
 isolated. E6/E7 remain open. [Report](../../bench/results/2026-10-31-e6-q2-cache-capacity-pp2048/README.md).
 
+**E6 longer-generation cache-capacity screen (2026-10-31):** at 8K context,
+three randomized 3K/4K pairs used the heldout NIMBUS retrieval task with
+pp512+tg128. All six eligible responses returned the exact answer and 128
+tokens. Median decode TPS favored 4K by 9.40% (paired interval +3.55% to
++10.63%); other medians improved less than 5%. The second heldout ORBIT task
+naturally stopped at 117 tokens on 3K and was excluded, so only one task informs
+the effect. Minimum available RAM was 10.28 GiB; peak sampled swap 2.67 GiB;
+OOM kills were zero. Adaptive swaps were active. This merits a better matched
+multi-prompt confirmation, not a general profile. [Report](../../bench/results/2026-10-31-e6-q2-cache-size-tg128/README.md).
+
 Updated: 2026-10-31. Phases 1 through 4 are complete for their documented tested
 Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 is
 complete for its bounded Orin qualification matrix under [its closeout]
