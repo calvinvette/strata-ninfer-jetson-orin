@@ -427,13 +427,15 @@ confirmation is not indicated for this cell. Minimum available RAM was
 was not measured. TTFT and energy were not measured, and clocks remained
 dynamic. Raw captures remain local-only.
 
-**Combined no-trace API paired-effect chart:** the 1K, 4K, 16K, 32K and 64K
+**Combined no-trace API paired-effect chart:** the 1K, 2K, 4K, 8K, 16K, 32K and 64K
 three-block screens are shown together with paired bootstrap intervals, along
-with 512+64 workloads at 128K and 256K configured capacity. Values are candidate
+with pp512+tg64 workloads at 128K and 256K configured capacity. Values are candidate
 NInfer relative to Strata; positive TPS is faster, while positive latency is
-slower. The plot preserves every pair and does not interpolate. The 256K-cap
-both capacity screens use short workloads and do not represent near-limit
-ingestion; see the [128K report](../2026-10-31-e6-q2-128k-capacity-api-screen/README.md)
+slower. The plot preserves every pair and does not interpolate. The configured-capacity
+screens use short workloads and do not represent near-limit ingestion; see the
+[2K report](../2026-10-31-e6-q2-2k-capacity-api-screen/README.md),
+[8K report](../2026-10-31-e6-q2-8k-capacity-api-screen/README.md),
+[128K report](../2026-10-31-e6-q2-128k-capacity-api-screen/README.md)
 and [256K report](../2026-10-31-e6-q2-256k-capacity-api-screen/README.md).
 The [16K](no-trace-api-pp16384-cap32768-README.md),
 [32K](no-trace-api-pp32768-cap65536-README.md) and
