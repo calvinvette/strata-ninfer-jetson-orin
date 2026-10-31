@@ -51,6 +51,27 @@ rates are excluded because synchronization slowed 32-token decode to about
 qualification. E6/E7 remain open. See the
 [expert-320 ownership report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md).
 
+**E6 adaptive-owner trace follow-up (2026-10-30):** a matched layer-0 capture
+at positions 65,536–65,542 found identical expert IDs, owner kinds and all
+2,560 MoE input values between fixed and adaptive residency. Output-token and
+prefix-8 raw GDN dump hashes also reproduced. Minimum available RAM was 8.57
+GiB fixed-owner and 8.44 GiB adaptive; both passed with no sampled OOM kills.
+This rules out a layer-0 difference only at those sampled dispatches. Together
+with the layer-1 expert-3 GPU→CPU transition and layer-2 input delta documented
+in the [diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md),
+it narrows the observed change to layer 1 for this interval, while other layers
+and unsampled positions remain under investigation.
+
+An all-layer MoE bundle at position 65,540 extends that trace across all 47
+model layers. The first changed MoE part is layer 1 expert 3; the MoE input
+first differs at layer 2. Small differences accumulate through layer 12, then
+layer 13 has input relative L2 `3.45e-4`, expert-parts `6.92e-3`, and combined
+output `5.47e-3`. Route IDs remain equal through layer 16 and first differ at
+layer 17. Both arms still emit the same 32 output tokens, but that is not
+accepted-state parity. The bundle does not separate the layer-13 input drift
+from execution-owner effects. Next capture layer-13 owners and oracle-check its
+service rows. [Comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/all-layer-position65540-comparison.json).
+
 **E6 fixed-GPU backend pilot (2026-10-30):** a no-trace 65K/32 pair toggled
 only the resident backend under the same fixed GPU profile. Both arms emitted
 identical token IDs and recorded 12.2% GPU-cache hits. NInfer measured 86.6/3.9

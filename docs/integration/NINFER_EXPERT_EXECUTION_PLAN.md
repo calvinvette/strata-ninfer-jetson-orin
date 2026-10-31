@@ -2400,6 +2400,22 @@ owner change contributing to persistent-state divergence. Next check other
 active owner changes in layers through model layer 2 during commits 2–8. E6/E7
 remain open; no performance claim follows from this instrumented capture.
 
+A matched layer-0 capture over positions 65,536–65,542 supplies a negative
+control: routes, owner kinds, and all MoE input values matched at all seven
+positions. Both arms reproduced the output-token and prefix-8 GDN dump hashes;
+minimum available RAM was 8.57 GiB fixed-owner and 8.44 GiB adaptive, with no
+sampled OOM kills. An all-47-layer bundle at position 65,540 found the first
+input delta at layer 2, small output drift through layer 12, then a larger
+transition at layer 13 (input relative L2 `3.45e-4`, expert-parts `6.92e-3`,
+combined output `5.47e-3`). Route IDs match through layer 16 and first differ
+at layer 17. The same 32 output tokens were emitted, but accepted-state parity
+is not established. Next capture layer-13 owner kinds and compare affected
+service rows with fixed-input CPU/GPU oracles; the bundle alone cannot separate
+the already-different input from execution-owner effects. This excludes a
+layer-0 difference only at the sampled dispatches, not other positions. See the
+[all-layer comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/all-layer-position65540-comparison.json)
+and [adaptive-state diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
+
 **Current-source portability rebuild (2026-10-30):** full HIP and SYCL target
 trees rebuilt at source commit `d321286f` on maestro1 with one build job. HIP
 `strata --help` and the host-only shared-memory budget CTest passed. SYCL

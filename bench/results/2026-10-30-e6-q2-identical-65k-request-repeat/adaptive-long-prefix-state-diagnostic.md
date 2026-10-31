@@ -343,11 +343,46 @@ parity outputs remain in `/tmp/e6-layer1-position65540-*` and
 `/tmp/e6-layer1-expert3-parity-output/`. These are correctness diagnostics,
 not performance measurements.
 
-## Next diagnostic
+### Layer-0 route and activation control
 
-Check whether other active-owner changes occur in model layers before and
-through layer 2 during accepted commits 2–8, and compare their service rows
-with fixed-input CPU/GPU oracles. Keep the conclusion scoped to the verified
-expert-3 dispatch until those transitions are ruled in or out. Matching QSA
-fingerprints are not raw-byte parity; capture QSA bytes if their aggregate
-mismatch becomes relevant to the causal trace.
+To check for an earlier owner transition, the same seven-position interval was
+captured at model layer 0. At every position, fixed and adaptive runs had the
+same routed expert IDs, owner kinds, and all 2,560 MoE input values. Both runs
+reproduced the same output-token hash and prefix-8 raw GDN dump hashes. Minimum
+available RAM was 8.57 GiB fixed-owner and 8.44 GiB adaptive; both passed with
+zero sampled OOM kills. This rules out a layer-0 route, ownership, or input
+difference at these seven sampled positions. It does not rule out differences
+at unsampled positions or other model layers. Raw captures and supervisor logs
+remain in `/tmp/e6-65k-{fixed,adaptive}-layer0-route*` on Orin.
+
+### All-layer comparison at the changed dispatch
+
+The fixed and adaptive runs were repeated with one all-layer MoE bundle at
+position 65,540. The capture contains route IDs and weights, MoE inputs, each
+selected expert's output, shared output and combined output for all 47 model
+layers. Both runs passed and reproduced the same 32-token output hash
+(`2d5f3da8…`). Minimum available RAM was 8.62 GiB fixed-owner and 8.44 GiB
+adaptive, with zero sampled OOM kills. The raw bundles remain in
+`/tmp/e6-65k-{fixed,adaptive}-all-layer-bundle/`; the compact numeric
+comparison is checked in as
+[`all-layer-position65540-comparison.json`](all-layer-position65540-comparison.json).
+
+The first small MoE-output difference remains layer 1, where only expert 3's
+row changes under the verified GPU→CPU transition. Layer 0 is exact. The
+layer-2 MoE input first differs by relative L2 `5.11e-8`, and small input and
+route-weight changes accumulate through layer 12. A larger change is present
+by layer 13: its input differs by relative L2 `3.45e-4`; all 25,600 captured
+expert-part values differ (combined relative L2 `6.92e-3`); shared output
+differs by `4.29e-3`; and combined output differs by `5.47e-3`. The ten route
+IDs still match there and continue matching through layer 16. Route IDs first
+differ at layer 17 and also differ at layers 18, 22, 23, 24, 32, 39 and 42.
+This identifies a second, later numerical transition after the layer-1 delta
+has propagated, but does not yet attribute it to ownership, input
+quantization, or a kernel. Same-token output does not establish accepted-state
+parity.
+
+Next capture layer-13 owner kinds and compare its per-expert service rows with
+fixed-input CPU/GPU oracles. The adaptive round-4 schedule includes swaps in
+layer 13, while the layer-13 input already differs; the all-layer bundle alone
+cannot separate those effects. Keep the result limited to this prompt, build,
+profile and sampled dispatch.

@@ -35,6 +35,15 @@ the no-progress watchdog. The fixed-GPU no-trace screen remains effectively tied
 (-0.46% prefill, 0.00% decode median for NInfer), with no ≥5% win. E6/E7 are
 still open. [Diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
 
+A matched layer-0 trace across the same seven decode positions found identical
+routes, owners and MoE inputs for fixed versus adaptive residency. The sampled
+layer-1 expert-3 GPU→CPU eviction causes a tiny service-output delta; layer 2
+receives a small activation delta. An all-47-layer bundle at position 65,540
+then found larger drift by layer 13 (combined-output relative L2 `5.47e-3`),
+with route IDs matching through layer 16 and first differing at layer 17. Same
+output tokens do not establish accepted-state parity. Layer-13 owner attribution
+is the next diagnostic. E6/E7 remain open. [Comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/all-layer-position65540-comparison.json).
+
 The fixed-GPU resident-backend screen now has three no-trace pairs: median
 NInfer changes were -0.46% prefill and 0.00% decode, below the 5% screen. One
 Strata decode arm was an unexplained 0.9 tok/s outlier; the opposite-order
