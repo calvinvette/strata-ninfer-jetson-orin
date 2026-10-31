@@ -1,10 +1,10 @@
 {
   "schema": 1,
-  "date": "2026-10-29",
+  "date": "2026-10-31 (extended with 256K capacity screen)",
   "model": "Qwen3.8-Flash-Next GSQ-RCO Q2_0",
   "comparison": "strict NInfer / Strata expert backend; PCIe staging disabled in both",
-  "capture": "no trace; one same-workload warmup and one measured API request per fresh process",
-  "uncertainty": "bootstrap median of whole paired process blocks; 5000 resamples; screening only",
+  "capture": "no trace; one same-workload warmup and one measured API request per fresh process; added 512+64 at 262,144 configured context on 2026-10-31",
+  "uncertainty": "bootstrap median of whole paired process blocks; 5000 resamples; three pairs per cell; screening only",
   "cells": [
     {
       "name": "pp512+tg64",
@@ -872,6 +872,115 @@
           "block_2_ninfer": 325
         },
         "note": "API text was compared; engine token IDs and accepted-prefix state were not captured"
+      }
+    },
+    {
+      "name": "pp512+tg64, 256K cap",
+      "context_tokens": 262144,
+      "paired_blocks": 3,
+      "content_matched_blocks": 3,
+      "warmup_matched_blocks": 3,
+      "metrics": {
+        "prompt_tps": {
+          "kind": "tps",
+          "median_paired_change_pct": -0.23059057730591137,
+          "bootstrap_95_interval_pct": [
+            -2.256825714135402,
+            14.438946736006674
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "NInfer \u2192 Strata",
+              "value": -2.256825714135402
+            },
+            {
+              "block": 1,
+              "order": "Strata \u2192 NInfer",
+              "value": 14.438946736006674
+            },
+            {
+              "block": 2,
+              "order": "Strata \u2192 NInfer",
+              "value": -0.23059057730591137
+            }
+          ]
+        },
+        "decode_tps": {
+          "kind": "tps",
+          "median_paired_change_pct": -0.6782692139928437,
+          "bootstrap_95_interval_pct": [
+            -4.240992444268676,
+            4.309868369107872
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "NInfer \u2192 Strata",
+              "value": -4.240992444268676
+            },
+            {
+              "block": 1,
+              "order": "Strata \u2192 NInfer",
+              "value": 4.309868369107872
+            },
+            {
+              "block": 2,
+              "order": "Strata \u2192 NInfer",
+              "value": -0.6782692139928437
+            }
+          ]
+        },
+        "first_visible_ttft_s": {
+          "kind": "latency",
+          "median_paired_change_pct": 0.2683239776323232,
+          "bootstrap_95_interval_pct": [
+            -12.709982488990956,
+            2.237106170207026
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "NInfer \u2192 Strata",
+              "value": 2.237106170207026
+            },
+            {
+              "block": 1,
+              "order": "Strata \u2192 NInfer",
+              "value": -12.709982488990956
+            },
+            {
+              "block": 2,
+              "order": "Strata \u2192 NInfer",
+              "value": 0.2683239776323232
+            }
+          ]
+        },
+        "client_total_s": {
+          "kind": "latency",
+          "median_paired_change_pct": 0.33471813084313684,
+          "bootstrap_95_interval_pct": [
+            -10.596151744427928,
+            2.812387989830123
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "NInfer \u2192 Strata",
+              "value": 2.812387989830123
+            },
+            {
+              "block": 1,
+              "order": "Strata \u2192 NInfer",
+              "value": -10.596151744427928
+            },
+            {
+              "block": 2,
+              "order": "Strata \u2192 NInfer",
+              "value": 0.33471813084313684
+            }
+          ]
+        }
       }
     }
   ]

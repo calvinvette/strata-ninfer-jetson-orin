@@ -2458,3 +2458,14 @@ drift. All runs preserved the six-GiB guard and identical token IDs. This is
 correctness localization, not a speed result or sole-cause proof. Details are in
 the [65K diagnostic report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md)
 and its linked JSON comparisons.
+
+**E6 256K-capacity short-workload screen (2026-10-31):** three randomized
+no-trace API pairs at 262,144 configured context ran pp512+tg64 with PCIe
+staging disabled. All warmup and measured content matched across arms. Median
+NInfer effects were -0.23% prompt TPS, -0.68% decode TPS, +0.27% first-visible
+TTFT and +0.33% client time; every paired bootstrap interval included zero.
+Minimum available RAM was 7.07 GiB, sampled OOM kills were zero, and peak swap
+was 2.70 GiB. Dynamic clocks and unmeasured energy limit the screen. This adds
+configured-capacity coverage only; it is neither a 256K prompt nor performance
+qualification. See the [screen report](../../bench/results/2026-10-31-e6-q2-256k-capacity-api-screen/README.md)
+and updated [combined chart](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md#combined-no-trace-api-paired-effect-chart).

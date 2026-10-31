@@ -7294,6 +7294,18 @@ with each block and its three-block bootstrap interval, plus sanitized JSON/CSV
 source data. The chart displays the small or unstable effects and makes no
 product-performance claim. [Figure and source data](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md#combined-no-trace-api-paired-effect-chart).
 
+**E6 256K-capacity no-trace API screen (2026-10-31):** three randomized
+pp512+tg64 process pairs at 262,144 configured context passed in both backend
+arms. Warmup and measured text matched across arms in all pairs. Median NInfer
+effects were -0.23% prompt TPS, -0.68% decode TPS, +0.27% first-visible TTFT,
+and +0.33% client time; all paired bootstrap intervals crossed zero. Minimum
+available RAM during measured requests was 7.07 GiB, above the six-GiB floor;
+sampled cgroup OOM-kill counts were zero, although peak sampled swap was
+2.70 GiB. Dynamic GPU clocks ranged from 306 to 1,300.5 MHz, CPU clocks from
+729.6 to 2,201.6 MHz; energy was not measured and EMC readback was unavailable.
+This extends the short-workload configured-capacity screen, not near-limit
+ingestion or quality qualification. See the [report and paired data](../../bench/results/2026-10-31-e6-q2-256k-capacity-api-screen/README.md).
+
 **E6 exact 256K retrieval/state check (2026-10-29):** one fresh-process
 Strata/strict-NInfer pair passed a held-out 256,000-token retrieval/arithmetic
 task at 262,144 configured context with PCIe staging disabled. Both returned

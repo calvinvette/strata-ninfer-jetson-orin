@@ -1,0 +1,306 @@
+{
+  "schema": 1,
+  "date": "2026-10-31",
+  "model": "Qwen3.8-Flash-Next GSQ-RCO Q2_0",
+  "configured_context_tokens": 262144,
+  "workload": "pp512+tg64",
+  "comparison": "strict NInfer / Strata expert backend; PCIe staging disabled in both",
+  "capture": "no trace; three randomized same-day independent-process pairs, one matching warmup and one measured request per process",
+  "summary": {
+    "cell": "e6-pp512-tg64-no-staging",
+    "paired_blocks": 3,
+    "api_content_matching_blocks": 3,
+    "prompt_tps": {
+      "baseline_median": 17.12071104453057,
+      "candidate_median": 16.98739216987392,
+      "median_within_block_candidate_over_baseline": 0.9976940942269409,
+      "paired_bootstrap_95_interval": [
+        0.977431742858646,
+        1.1443894673600667
+      ]
+    },
+    "decode_tps": {
+      "baseline_median": 6.955690080533849,
+      "candidate_median": 6.97897583529617,
+      "median_within_block_candidate_over_baseline": 0.9932173078600716,
+      "paired_bootstrap_95_interval": [
+        0.9575900755573132,
+        1.0430986836910787
+      ]
+    },
+    "client_ttft_s": {
+      "baseline_median": 30.28189159417525,
+      "candidate_median": 30.52090168884024,
+      "median_within_block_candidate_over_baseline": 1.0026832397763232,
+      "paired_bootstrap_95_interval": [
+        0.8729001751100904,
+        1.0223710617020703
+      ]
+    },
+    "client_total_s": {
+      "baseline_median": 39.174181735143065,
+      "candidate_median": 39.333140071015805,
+      "median_within_block_candidate_over_baseline": 1.0033471813084314,
+      "paired_bootstrap_95_interval": [
+        0.8940384825557207,
+        1.0281238798983012
+      ]
+    }
+  },
+  "raw_paired_blocks": [
+    {
+      "block": 0,
+      "candidate": {
+        "prompt_tps": 16.83413120101005,
+        "decode_tps": 6.660699789771662,
+        "client_total_s": 40.04762818897143,
+        "client_ttft_s": 30.780881986953318,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.727,
+        "logical_file_mb": 9036.7,
+        "prompt_tokens": 512,
+        "completion_tokens": 64,
+        "expert_slots": 3000,
+        "expert_cache_mib": 3955,
+        "mtp_max": 0,
+        "native_spec_capacity": 2,
+        "lookup": 0,
+        "kv": "fp16",
+        "gpu_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "emc_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "minimum_available_bytes": 7968542720,
+        "maximum_swap_used_bytes": 1147699200,
+        "rail_energy": {
+          "status": "estimated",
+          "joules_by_named_rail": {
+            "VDD_GPU_SOC": 319.0578845872876,
+            "VDD_CPU_CV": 174.299885399357,
+            "VIN_SYS_5V0": 245.6729302792993
+          },
+          "scope": "each named rail separately; no whole-board or summed-rail claim; includes prefill and decode",
+          "method": "linear integration of instantaneous mW; timestamps have one-second granularity"
+        }
+      },
+      "baseline": {
+        "prompt_tps": 17.222820236813778,
+        "decode_tps": 6.955690080533849,
+        "client_total_s": 38.952142802998424,
+        "client_ttft_s": 30.107348632998765,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.727,
+        "logical_file_mb": 8873.6,
+        "prompt_tokens": 512,
+        "completion_tokens": 64,
+        "expert_slots": 3000,
+        "expert_cache_mib": 3955,
+        "mtp_max": 0,
+        "native_spec_capacity": 2,
+        "lookup": 0,
+        "kv": "fp16",
+        "gpu_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "emc_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "minimum_available_bytes": 7659675648,
+        "maximum_swap_used_bytes": 1176272896,
+        "rail_energy": {
+          "status": "estimated",
+          "joules_by_named_rail": {
+            "VDD_GPU_SOC": 305.2419638508038,
+            "VDD_CPU_CV": 169.00892210453745,
+            "VIN_SYS_5V0": 239.05500840756335
+          },
+          "scope": "each named rail separately; no whole-board or summed-rail claim; includes prefill and decode",
+          "method": "linear integration of instantaneous mW; timestamps have one-second granularity"
+        }
+      },
+      "api_content_matches": true
+    },
+    {
+      "block": 1,
+      "baseline": {
+        "prompt_tps": 17.12071104453057,
+        "decode_tps": 6.920564891109238,
+        "client_total_s": 39.174181735143065,
+        "client_ttft_s": 30.28189159417525,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.727,
+        "logical_file_mb": 8841.8,
+        "prompt_tokens": 512,
+        "completion_tokens": 64,
+        "expert_slots": 3000,
+        "expert_cache_mib": 3955,
+        "mtp_max": 0,
+        "native_spec_capacity": 2,
+        "lookup": 0,
+        "kv": "fp16",
+        "gpu_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "emc_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "minimum_available_bytes": 7631220736,
+        "maximum_swap_used_bytes": 1175224320,
+        "rail_energy": {
+          "status": "estimated",
+          "joules_by_named_rail": {
+            "VDD_GPU_SOC": 312.09917304632273,
+            "VDD_CPU_CV": 173.17997703334032,
+            "VIN_SYS_5V0": 241.3670164453995
+          },
+          "scope": "each named rail separately; no whole-board or summed-rail claim; includes prefill and decode",
+          "method": "linear integration of instantaneous mW; timestamps have one-second granularity"
+        }
+      },
+      "candidate": {
+        "prompt_tps": 19.59276139307595,
+        "decode_tps": 7.21883212831474,
+        "client_total_s": 35.02322599384934,
+        "client_ttft_s": 26.433068475220352,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.727,
+        "logical_file_mb": 8963.5,
+        "prompt_tokens": 512,
+        "completion_tokens": 64,
+        "expert_slots": 3000,
+        "expert_cache_mib": 3955,
+        "mtp_max": 0,
+        "native_spec_capacity": 2,
+        "lookup": 0,
+        "kv": "fp16",
+        "gpu_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "emc_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "minimum_available_bytes": 8872980480,
+        "maximum_swap_used_bytes": 2899587072,
+        "rail_energy": {
+          "status": "estimated",
+          "joules_by_named_rail": {
+            "VDD_GPU_SOC": 293.9329143250967,
+            "VDD_CPU_CV": 162.71351683967066,
+            "VIN_SYS_5V0": 219.7270537195288
+          },
+          "scope": "each named rail separately; no whole-board or summed-rail claim; includes prefill and decode",
+          "method": "linear integration of instantaneous mW; timestamps have one-second granularity"
+        }
+      },
+      "api_content_matches": true
+    },
+    {
+      "block": 2,
+      "baseline": {
+        "prompt_tps": 17.02665402969688,
+        "decode_tps": 7.026635339584111,
+        "client_total_s": 39.20192412333563,
+        "client_ttft_s": 30.439225947018713,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.727,
+        "logical_file_mb": 8897.1,
+        "prompt_tokens": 512,
+        "completion_tokens": 64,
+        "expert_slots": 3000,
+        "expert_cache_mib": 3955,
+        "mtp_max": 0,
+        "native_spec_capacity": 2,
+        "lookup": 0,
+        "kv": "fp16",
+        "gpu_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "emc_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "minimum_available_bytes": 7800987648,
+        "maximum_swap_used_bytes": 1374220288,
+        "rail_energy": {
+          "status": "estimated",
+          "joules_by_named_rail": {
+            "VDD_GPU_SOC": 306.6704009052945,
+            "VDD_CPU_CV": 173.20362414947076,
+            "VIN_SYS_5V0": 240.4635839310892
+          },
+          "scope": "each named rail separately; no whole-board or summed-rail claim; includes prefill and decode",
+          "method": "linear integration of instantaneous mW; timestamps have one-second granularity"
+        }
+      },
+      "candidate": {
+        "prompt_tps": 16.98739216987392,
+        "decode_tps": 6.97897583529617,
+        "client_total_s": 39.333140071015805,
+        "client_ttft_s": 30.52090168884024,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.727,
+        "logical_file_mb": 8800.4,
+        "prompt_tokens": 512,
+        "completion_tokens": 64,
+        "expert_slots": 3000,
+        "expert_cache_mib": 3955,
+        "mtp_max": 0,
+        "native_spec_capacity": 2,
+        "lookup": 0,
+        "kv": "fp16",
+        "gpu_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "emc_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "minimum_available_bytes": 7591206912,
+        "maximum_swap_used_bytes": 1279324160,
+        "rail_energy": {
+          "status": "estimated",
+          "joules_by_named_rail": {
+            "VDD_GPU_SOC": 311.01456954938544,
+            "VDD_CPU_CV": 171.19082800355665,
+            "VIN_SYS_5V0": 241.5939399123709
+          },
+          "scope": "each named rail separately; no whole-board or summed-rail claim; includes prefill and decode",
+          "method": "linear integration of instantaneous mW; timestamps have one-second granularity"
+        }
+      },
+      "api_content_matches": true
+    }
+  ],
+  "uncertainty": "bootstrap whole independent paired processes; three pairs are screening, not confirmation",
+  "scope": "screening only; no performance promotion claim"
+}
