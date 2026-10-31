@@ -498,3 +498,18 @@ the source of the `x` difference. A fixed-input projection oracle or matched
 single-arm replay of both captured `x` rows is needed before assigning cause.
 The compact comparison is in
 [`gdn-layer13-position65539-comparison.json`](gdn-layer13-position65539-comparison.json).
+
+### Layer-12 boundary feeding the layer-13 GDN update
+
+A paired boundary capture at position 65,539 confirms the layer-13 input delta
+is already present at the layer-12/13 boundary. Both runs passed, produced the
+same 32 tokens, and recorded zero sampled cgroup OOM kills; minimum available
+memory was 8.45 GiB fixed-owner and 8.38 GiB adaptive. The layer-12 residual
+stream differs by relative L2 `1.11e-7`, its MoE stream by `2.13e-7`, and the
+next-layer post-read stream by `1.15e-7`. The next-layer `xn` bundle differs by
+`1.53e-7`, close to the layer-13 GDN `x` difference of `1.80e-7` in the paired
+capture. Thus the layer-13 projection is receiving a small upstream boundary
+delta before its `qkv` projection expands it. All boundary fields are reported
+in [`layer12-boundary-position65539-comparison.json`](layer12-boundary-position65539-comparison.json).
+This one-layer boundary does not reveal where the layer-12 difference first
+arose; an all-layer position-65,539 trace is the next localization step.

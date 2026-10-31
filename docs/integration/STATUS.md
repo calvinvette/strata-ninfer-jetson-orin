@@ -7505,3 +7505,12 @@ is explained by the small `x` delta or where that `x` delta originated. Next
 compare both captured inputs through the same projection oracle/replay. E6/E7
 remain open. See the [comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/gdn-layer13-position65539-comparison.json)
 and [diagnostic report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
+
+A matched layer-12/13 residual-boundary capture at position 65,539 confirms
+that the small layer-13 GDN input delta is already present before layer 13:
+the layer-12 residual stream differs by relative L2 `1.11e-7`, the MoE stream
+by `2.13e-7`, and the next-layer activation bundle by `1.53e-7`. Both arms
+emitted the same tokens and had zero sampled OOM kills, with at least 8.38 GiB
+available. The remaining source is earlier in the network. An all-layer trace
+at this position is the next useful localization. See the
+[boundary comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer12-boundary-position65539-comparison.json).

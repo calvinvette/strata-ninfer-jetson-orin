@@ -976,3 +976,9 @@ recurrent state matches exactly. `x` differs by relative L2 `1.80e-7`; projected
 creates a `2.32e-5` post-state difference, while output tokens remain identical.
 The projection's sensitivity versus upstream arithmetic is still unresolved.
 [Comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/gdn-layer13-position65539-comparison.json).
+
+The layer-12/13 boundary at position 65,539 already carries the small delta:
+layer-12 residual relative L2 `1.11e-7`, MoE `2.13e-7`, next-layer activation
+`1.53e-7`; layer-13 GDN `x` is `1.80e-7`. Both arms returned identical tokens
+and stayed above the memory floor. Next localize across earlier layers.
+[Boundary comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer12-boundary-position65539-comparison.json).
