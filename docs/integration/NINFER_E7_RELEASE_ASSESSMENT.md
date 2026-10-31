@@ -1,6 +1,6 @@
 # NInfer E7 release assessment
 
-Updated: 2026-10-30. Branch: `feat/ninfer-expert-e0`.
+Updated: 2026-10-31. Branch: `feat/ninfer-expert-e0`.
 
 ## Decision
 
@@ -21,6 +21,30 @@ workload-specific TTFT effect is confirmed; a general performance-qualified
 release profile is **not achieved**.
 
 ## Evidence and limits
+
+### 2026-10-31 cache/backend performance follow-up
+
+At 4,000 cache slots and 8K context, a three-pair pp512+tg64 API screen found
+only +3.33% median decode TPS for strict NInfer versus Strata; the 95% paired
+interval included zero, and prompt TPS and TTFT were tied. No confirmation was
+warranted. See the [backend comparison](../../bench/results/2026-10-31-e6-q2-ninfer-backend-4k-api-screen/README.md).
+
+A separate Strata-only 3K/4K cache ablation reproduced substantial decode-rate
+increases (+16.92% NIMBUS and +20.83% ORBIT medians) while GPU-cache hit rates
+rose 11–13 percentage points. Prompt TPS and TTFT regressed about 8–10%, and
+client-total latency stayed effectively tied. This demonstrates that larger
+cache capacity with adaptive swaps can improve decode on Strata too; the gain
+is not evidence of NInfer kernel acceleration. The profile fails the combined
+performance gate. See the [cache ablation](../../bench/results/2026-10-31-e6-q2-strata-cache-capacity-ablation/README.md).
+
+An opt-in 256-thread NInfer Q2_0 grouped schedule passed numerical checks but
+was 2.46–2.92% slower than the 128-thread default on tested operator shapes.
+It remains unqualified and does not change the default. Together, these results
+reinforce the no-release decision: no broadly useful NInfer-specific end-to-end
+profile has met the registered effect, regression, quality and state gates.
+E6/E7 remain open; no 30-minute NInfer release-profile soak is indicated until
+a profile first passes those gates. See the [operator schedule screen](../../bench/results/2026-10-31-e6-ninfer-q2-cta256-screen/README.md).
+
 
 ### Current owner-repeatability finding (2026-10-30)
 
