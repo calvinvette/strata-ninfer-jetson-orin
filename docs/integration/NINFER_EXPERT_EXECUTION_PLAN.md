@@ -2401,10 +2401,16 @@ fixed/adaptive route captures then checked model layers 0–2 over positions
 65,536–65,542: the only owner-kind change was layer-1 expert 3 at position
 65,540; layer-2 routes and owners matched, with its first input delta at that
 same dispatch. This closes that bounded owner-transition search, not the causal
-link to persistent-state drift. Next test a targeted fixed-owner counterfactual
-through the affected downstream state path; the current evidence doesn't
-support an end-to-end causal claim. E6/E7 remain open; no performance claim
-follows from this instrumented capture. See the [cross-layer comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer0-2-owner-window-65536-65542.md).
+link to persistent-state drift. A new fixed/adaptive capture at the same
+position and an independent FP64 recurrence replay show the first layer-2
+recurrent-state delta after the owner switch: `x` differs slightly, `qkv` and
+`h` remain bit-identical, and gate/beta differ. Holding pre-state and `h` fixed
+while crossing gate/beta reproduces a local recurrent-state delta, attributing
+that update's effect to those inputs. This remains a captured-input
+counterfactual, not a live owner intervention or whole-request cause. Next
+perform a targeted layer-1 owner intervention through accepted-prefix state
+capture. E6/E7 remain open; no performance claim follows. See the [downstream
+counterfactual report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-expert3-layer2-gdn-counterfactual-65540.md) and [bounded owner scan](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer0-2-owner-window-65536-65542.md).
 
 A matched layer-0 capture over positions 65,536–65,542 supplies a negative
 control: routes, owner kinds, and all MoE input values matched at all seven

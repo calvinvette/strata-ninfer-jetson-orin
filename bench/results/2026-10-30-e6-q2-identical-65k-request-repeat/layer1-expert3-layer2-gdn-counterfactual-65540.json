@@ -1,0 +1,978 @@
+{
+  "schema": 1,
+  "date": "2026-10-31",
+  "device": "Jetson AGX Orin",
+  "source_worktree_head": "d096aed8",
+  "binary_sha256": "0b8eadf1f3894efe449d9b96082f7e83cd9aa2bf616f6161625b95f7001ccf37",
+  "model": "Qwen3.8-Flash-Next GSQ-RCO Q2_0",
+  "prompt_tokens": 65536,
+  "generated_tokens": 32,
+  "context_tokens": 131072,
+  "settings": "3,000 expert slots; 6 GiB resident budget; 3 GiB workspace reserve; original Q2_0 profile; strict NInfer backend; prefill 128; eight workers; MTP2; PCIe staging off; prompt cache off; temperature 0",
+  "arms": {
+    "fixed": {
+      "status": "pass",
+      "minimum_available_gib": 8.542,
+      "token_sha256": "2d5f3da8f9890f8c9262231bada2cfab088196528565a1c08ab685d86074c650"
+    },
+    "adaptive": {
+      "status": "pass",
+      "minimum_available_gib": 8.475,
+      "token_sha256": "2d5f3da8f9890f8c9262231bada2cfab088196528565a1c08ab685d86074c650"
+    }
+  },
+  "output_token_sequences_equal": true,
+  "layer1_moe": {
+    "header": {
+      "version": 1,
+      "layer": 1,
+      "k": 10,
+      "n_embd": 2560,
+      "position": 65540,
+      "slot": -1,
+      "token": 1472
+    },
+    "fields": {
+      "route_ids": {
+        "count": 10,
+        "different": 0,
+        "relative_l2": 0.0,
+        "max_abs": 0.0
+      },
+      "route_weights": {
+        "count": 10,
+        "different": 0,
+        "relative_l2": 0.0,
+        "max_abs": 0.0
+      },
+      "input": {
+        "count": 2560,
+        "different": 0,
+        "relative_l2": 0.0,
+        "max_abs": 0.0
+      },
+      "expert_parts": {
+        "count": 25600,
+        "different": 1840,
+        "relative_l2": 4.12077803500742e-08,
+        "max_abs": 1.4901161193847656e-08
+      },
+      "shared_output": {
+        "count": 2560,
+        "different": 0,
+        "relative_l2": 0.0,
+        "max_abs": 0.0
+      },
+      "combined_output": {
+        "count": 2560,
+        "different": 737,
+        "relative_l2": 4.344755022008854e-08,
+        "max_abs": 3.725290298461914e-09
+      }
+    },
+    "per_expert_rows": [
+      {
+        "route_index": 0,
+        "expert": 189,
+        "metrics": {
+          "count": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      },
+      {
+        "route_index": 1,
+        "expert": 3,
+        "metrics": {
+          "count": 2560,
+          "different": 1840,
+          "relative_l2": 1.0589018965043746e-07,
+          "max_abs": 1.4901161193847656e-08
+        }
+      },
+      {
+        "route_index": 2,
+        "expert": 423,
+        "metrics": {
+          "count": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      },
+      {
+        "route_index": 3,
+        "expert": 164,
+        "metrics": {
+          "count": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      },
+      {
+        "route_index": 4,
+        "expert": 29,
+        "metrics": {
+          "count": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      },
+      {
+        "route_index": 5,
+        "expert": 316,
+        "metrics": {
+          "count": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      },
+      {
+        "route_index": 6,
+        "expert": 211,
+        "metrics": {
+          "count": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      },
+      {
+        "route_index": 7,
+        "expert": 435,
+        "metrics": {
+          "count": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      },
+      {
+        "route_index": 8,
+        "expert": 402,
+        "metrics": {
+          "count": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      },
+      {
+        "route_index": 9,
+        "expert": 5,
+        "metrics": {
+          "count": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      }
+    ],
+    "changed_rows": [
+      {
+        "route_index": 1,
+        "expert": 3,
+        "metrics": {
+          "count": 2560,
+          "different": 1840,
+          "relative_l2": 1.0589018965043746e-07,
+          "max_abs": 1.4901161193847656e-08
+        }
+      }
+    ]
+  },
+  "layer2_positions": [
+    {
+      "position": 65536,
+      "token": 32,
+      "layer2_state": {
+        "recurrent": {
+          "values": 786432,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "convolution": {
+          "values": 30720,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      },
+      "gdn_stage": {
+        "x": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "qkv": {
+          "values": 10240,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "h": {
+          "values": 10240,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "gate": {
+          "values": 48,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "beta": {
+          "values": 48,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "z": {
+          "values": 6144,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "y": {
+          "values": 6144,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "gdn_out": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "ffn_x": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "ffn_y": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      }
+    },
+    {
+      "position": 65537,
+      "token": 6165,
+      "layer2_state": {
+        "recurrent": {
+          "values": 786432,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "convolution": {
+          "values": 30720,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      },
+      "gdn_stage": {
+        "x": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "qkv": {
+          "values": 10240,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "h": {
+          "values": 10240,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "gate": {
+          "values": 48,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "beta": {
+          "values": 48,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "z": {
+          "values": 6144,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "y": {
+          "values": 6144,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "gdn_out": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "ffn_x": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "ffn_y": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      }
+    },
+    {
+      "position": 65538,
+      "token": 11036,
+      "layer2_state": {
+        "recurrent": {
+          "values": 786432,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "convolution": {
+          "values": 30720,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      },
+      "gdn_stage": {
+        "x": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "qkv": {
+          "values": 10240,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "h": {
+          "values": 10240,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "gate": {
+          "values": 48,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "beta": {
+          "values": 48,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "z": {
+          "values": 6144,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "y": {
+          "values": 6144,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "gdn_out": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "ffn_x": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "ffn_y": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      }
+    },
+    {
+      "position": 65539,
+      "token": 1928,
+      "layer2_state": {
+        "recurrent": {
+          "values": 786432,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "convolution": {
+          "values": 30720,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      },
+      "gdn_stage": {
+        "x": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "qkv": {
+          "values": 10240,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "h": {
+          "values": 10240,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "gate": {
+          "values": 48,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "beta": {
+          "values": 48,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "z": {
+          "values": 6144,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "y": {
+          "values": 6144,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "gdn_out": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "ffn_x": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "ffn_y": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      }
+    },
+    {
+      "position": 65540,
+      "token": 1472,
+      "layer2_state": {
+        "recurrent": {
+          "values": 786432,
+          "different": 97439,
+          "relative_l2": 1.6519085447938797e-08,
+          "max_abs": 1.4901161193847656e-08
+        },
+        "convolution": {
+          "values": 30720,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      },
+      "gdn_stage": {
+        "x": {
+          "values": 2560,
+          "different": 786,
+          "relative_l2": 5.570343628960579e-08,
+          "max_abs": 4.76837158203125e-07
+        },
+        "qkv": {
+          "values": 10240,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "h": {
+          "values": 10240,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "gate": {
+          "values": 48,
+          "different": 10,
+          "relative_l2": 1.2039042394623751e-08,
+          "max_abs": 1.1920928955078125e-07
+        },
+        "beta": {
+          "values": 48,
+          "different": 11,
+          "relative_l2": 3.471695105023981e-08,
+          "max_abs": 5.960464477539063e-08
+        },
+        "z": {
+          "values": 6144,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "y": {
+          "values": 6144,
+          "different": 580,
+          "relative_l2": 2.3383966932649964e-08,
+          "max_abs": 4.470348358154297e-08
+        },
+        "gdn_out": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "ffn_x": {
+          "values": 2560,
+          "different": 798,
+          "relative_l2": 5.1125226363836744e-08,
+          "max_abs": 2.384185791015625e-07
+        },
+        "ffn_y": {
+          "values": 2560,
+          "different": 1690,
+          "relative_l2": 8.471343366210478e-08,
+          "max_abs": 5.587935447692871e-09
+        }
+      }
+    },
+    {
+      "position": 65541,
+      "token": 264,
+      "layer2_state": {
+        "recurrent": {
+          "values": 786432,
+          "different": 76303,
+          "relative_l2": 1.6891986196295093e-08,
+          "max_abs": 1.4901161193847656e-08
+        },
+        "convolution": {
+          "values": 30720,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      },
+      "gdn_stage": {
+        "x": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "qkv": {
+          "values": 10240,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "h": {
+          "values": 10240,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "gate": {
+          "values": 48,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "beta": {
+          "values": 48,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "z": {
+          "values": 6144,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "y": {
+          "values": 6144,
+          "different": 439,
+          "relative_l2": 3.0072099160098155e-08,
+          "max_abs": 5.960464477539063e-08
+        },
+        "gdn_out": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "ffn_x": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "ffn_y": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      }
+    },
+    {
+      "position": 65542,
+      "token": 6150,
+      "layer2_state": {
+        "recurrent": {
+          "values": 786432,
+          "different": 71974,
+          "relative_l2": 1.7632373854441543e-08,
+          "max_abs": 1.4901161193847656e-08
+        },
+        "convolution": {
+          "values": 30720,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      },
+      "gdn_stage": {
+        "x": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "qkv": {
+          "values": 10240,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "h": {
+          "values": 10240,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "gate": {
+          "values": 48,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "beta": {
+          "values": 48,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "z": {
+          "values": 6144,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "y": {
+          "values": 6144,
+          "different": 603,
+          "relative_l2": 2.688913617897708e-08,
+          "max_abs": 5.960464477539063e-08
+        },
+        "gdn_out": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "ffn_x": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "ffn_y": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      }
+    },
+    {
+      "position": 65543,
+      "token": 11,
+      "layer2_state": {
+        "recurrent": {
+          "values": 786432,
+          "different": 68072,
+          "relative_l2": 1.763702837965254e-08,
+          "max_abs": 1.4901161193847656e-08
+        },
+        "convolution": {
+          "values": 30720,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      },
+      "gdn_stage": {
+        "x": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "qkv": {
+          "values": 10240,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "h": {
+          "values": 10240,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "gate": {
+          "values": 48,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "beta": {
+          "values": 48,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "z": {
+          "values": 6144,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "y": {
+          "values": 6144,
+          "different": 500,
+          "relative_l2": 2.2852446579265764e-08,
+          "max_abs": 2.9802322387695312e-08
+        },
+        "gdn_out": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "ffn_x": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        },
+        "ffn_y": {
+          "values": 2560,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      }
+    }
+  ],
+  "independent_gdn_replay": {
+    "fixed": {
+      "method": "independent FP64 gated-delta replay from prior captured device recurrent state",
+      "rows": [
+        {
+          "position": 65537,
+          "raw_o_relative_l2": 7.741184601936345e-08,
+          "replayed_recurrent_state_relative_l2": 4.0964799247483395e-08
+        },
+        {
+          "position": 65538,
+          "raw_o_relative_l2": 7.451256813176162e-08,
+          "replayed_recurrent_state_relative_l2": 4.7012763179604654e-08
+        },
+        {
+          "position": 65539,
+          "raw_o_relative_l2": 7.33406134367443e-08,
+          "replayed_recurrent_state_relative_l2": 4.237277348665217e-08
+        },
+        {
+          "position": 65540,
+          "raw_o_relative_l2": 6.965853477789595e-08,
+          "replayed_recurrent_state_relative_l2": 4.563894839213508e-08
+        },
+        {
+          "position": 65541,
+          "raw_o_relative_l2": 7.789092247780004e-08,
+          "replayed_recurrent_state_relative_l2": 4.4047877631970444e-08
+        },
+        {
+          "position": 65542,
+          "raw_o_relative_l2": 7.927700107667196e-08,
+          "replayed_recurrent_state_relative_l2": 5.056409165879899e-08
+        },
+        {
+          "position": 65543,
+          "raw_o_relative_l2": 7.635284772826057e-08,
+          "replayed_recurrent_state_relative_l2": 4.586040192097049e-08
+        }
+      ],
+      "maximum_raw_o_relative_l2": 7.927700107667196e-08,
+      "maximum_replayed_state_relative_l2": 5.056409165879899e-08
+    },
+    "adaptive": {
+      "method": "independent FP64 gated-delta replay from prior captured device recurrent state",
+      "rows": [
+        {
+          "position": 65537,
+          "raw_o_relative_l2": 7.741184601936345e-08,
+          "replayed_recurrent_state_relative_l2": 4.0964799247483395e-08
+        },
+        {
+          "position": 65538,
+          "raw_o_relative_l2": 7.451256813176162e-08,
+          "replayed_recurrent_state_relative_l2": 4.7012763179604654e-08
+        },
+        {
+          "position": 65539,
+          "raw_o_relative_l2": 7.33406134367443e-08,
+          "replayed_recurrent_state_relative_l2": 4.237277348665217e-08
+        },
+        {
+          "position": 65540,
+          "raw_o_relative_l2": 6.783218504532827e-08,
+          "replayed_recurrent_state_relative_l2": 4.4327294557869404e-08
+        },
+        {
+          "position": 65541,
+          "raw_o_relative_l2": 7.751550774465337e-08,
+          "replayed_recurrent_state_relative_l2": 4.395310320495985e-08
+        },
+        {
+          "position": 65542,
+          "raw_o_relative_l2": 7.993744967995779e-08,
+          "replayed_recurrent_state_relative_l2": 5.0623668271142655e-08
+        },
+        {
+          "position": 65543,
+          "raw_o_relative_l2": 7.69921285275157e-08,
+          "replayed_recurrent_state_relative_l2": 4.5961654458997175e-08
+        }
+      ],
+      "maximum_raw_o_relative_l2": 7.993744967995779e-08,
+      "maximum_replayed_state_relative_l2": 5.0623668271142655e-08
+    }
+  },
+  "same_prestate_gdn_counterfactual_at_position_65540": {
+    "h_bitwise_equal": true,
+    "different_gdn_inputs": [
+      "gate",
+      "beta"
+    ],
+    "cases": [
+      {
+        "case": "fixed gate/beta",
+        "recurrent_state_delta_vs_fixed_case": {
+          "values": 786432,
+          "different": 0,
+          "relative_l2": 0.0,
+          "max_abs": 0.0
+        }
+      },
+      {
+        "case": "adaptive gate/beta",
+        "recurrent_state_delta_vs_fixed_case": {
+          "values": 786432,
+          "different": 327296,
+          "relative_l2": 1.2441496833886908e-08,
+          "max_abs": 6.042395639394016e-09
+        }
+      },
+      {
+        "case": "adaptive gate + fixed beta",
+        "recurrent_state_delta_vs_fixed_case": {
+          "values": 786432,
+          "different": 163456,
+          "relative_l2": 7.760042950579477e-09,
+          "max_abs": 6.042395639394016e-09
+        }
+      },
+      {
+        "case": "fixed gate + adaptive beta",
+        "recurrent_state_delta_vs_fixed_case": {
+          "values": 786432,
+          "different": 180224,
+          "relative_l2": 9.791846125607078e-09,
+          "max_abs": 4.121198535211867e-09
+        }
+      }
+    ],
+    "observed_device_recurrent_state_delta": {
+      "values": 786432,
+      "different": 97439,
+      "relative_l2": 1.6519085447938797e-08,
+      "max_abs": 1.4901161193847656e-08
+    }
+  },
+  "resources": {
+    "minimum_available_gib_both_arms": 8.475,
+    "maximum_sampled_swap_gib": 2.074,
+    "maximum_sampled_cgroup_oom_kill_counter": 0
+  },
+  "limits": [
+    "single diagnostic fixed/adaptive pair; no independent semantic quality oracle",
+    "instrumented data, no performance claim",
+    "owner change aligns with the layer-2 input and recurrence change, but not a live forced-owner intervention",
+    "does not prove sole cause of later/whole-model state divergence"
+  ]
+}

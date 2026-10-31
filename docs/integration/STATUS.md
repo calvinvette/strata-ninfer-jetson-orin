@@ -7609,3 +7609,19 @@ not prove that it causes the later prefix-8 state drift. All six traced runs
 passed with identical output-token hashes, at least 8.44 GiB available and zero
 sampled OOM kills. This closes the bounded layers-0–2 owner search only. See the
 [cross-layer report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer0-2-owner-window-65536-65542.md).
+
+
+A fresh fixed/adaptive 65K/32 pair captured layer-1 MoE parts, layer-2 GDN
+stages and per-token layer-2 commit state at positions 65,536–65,543. The only
+changed layer-1 expert row at position 65,540 was expert 3, whose GPU/CPU owner
+change was already localized. At layer 2, the prior recurrent state matched;
+`x` differed slightly, but `qkv` and `h` were bit-identical. Gate/beta differed
+at 10/48 and 11/48 values, and the recurrent state first differed after this
+update (relative L2 `1.65e-8`); convolution history remained exact. An
+independent FP64 replay reproduced raw recurrence outputs within `8.0e-8`
+relative L2. A same-prestate, same-`h` counterfactual crossing gate/beta
+produced a recurrent delta, showing these inputs account for the local update
+effect. This is not a live forced-owner intervention or proof of sole cause
+for later state divergence. Both runs emitted identical output IDs, passed the
+six-GiB guard (minimum available 8.48 GiB), and had zero sampled OOM kills. See
+the [counterfactual report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-expert3-layer2-gdn-counterfactual-65540.md).

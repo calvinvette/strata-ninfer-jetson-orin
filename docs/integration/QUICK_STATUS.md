@@ -967,10 +967,12 @@ localizes state divergence but not its cause. E6/E7 remain open; see the
 A comparison of the layer-0/1/2 traces across the first seven generated
 positions found one owner change: layer-1 expert 3 changes GPU→CPU at position
 65,540 after adaptive swap `1:320>3`; layer-2 routes and owners match, with its
-first input delta at the same position. The separate service-row oracle matches
-both native owner outputs exactly. This is consistent with the later prefix-8
-GDN difference, but the owner effect has not been propagated as a state
-counterfactual. E6/E7 attribution remains open. [Cross-layer report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer0-2-owner-window-65536-65542.md).
+first input delta at the same position. A fresh paired capture followed this
+through layer-2 GDN: `x` shifted slightly; `qkv` and `h` remained exact; gate
+and beta changed; and the layer-2 recurrent state first differed after that
+token. The independent FP64 recurrence and same-prestate gate/beta
+counterfactual confirm the local update effect, but not a live forced-owner or
+whole-model cause. [Counterfactual report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-expert3-layer2-gdn-counterfactual-65540.md).
 
 The layer-13 state sequence now shows identical state through the update at
 position 65,538; the first sampled divergence is the post-state after token
