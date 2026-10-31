@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "model": "Qwen3.8-Flash-Next Q2_0",
+  "layer": 5,
+  "position": 65539,
+  "token_id": 1928,
+  "expert": 220,
+  "adaptive_swap": "5:220>8 applied at position 65539 before dispatch",
+  "activation_sha256": "94883dab11111b05558838573a4212ec0e26c25539172c96cc31e77492b27d03",
+  "activation_fixed_adaptive_bitwise_equal": true,
+  "input_and_routes_match": true,
+  "same_output_tokens": true,
+  "arms": [
+    {
+      "arm": "fixed",
+      "route_kind_expert220": -1,
+      "route_ids": [
+        220,
+        191,
+        387,
+        85,
+        211,
+        293,
+        79,
+        134,
+        491,
+        218
+      ],
+      "output_token_sha256": "2d5f3da8f9890f8c9262231bada2cfab088196528565a1c08ab685d86074c650"
+    },
+    {
+      "arm": "adaptive",
+      "route_kind_expert220": 0,
+      "route_ids": [
+        220,
+        191,
+        387,
+        85,
+        211,
+        293,
+        79,
+        134,
+        491,
+        218
+      ],
+      "output_token_sha256": "2d5f3da8f9890f8c9262231bada2cfab088196528565a1c08ab685d86074c650"
+    }
+  ],
+  "owner_semantics": {
+    "route_kind": -1,
+    "meaning": "CPU",
+    "gpu_route_kind": 0
+  },
+  "service_row_oracles": {
+    "fixed_vs_native_cpu_bitwise_equal": true,
+    "adaptive_vs_native_gpu_bitwise_equal": true,
+    "native_cpu_vs_gpu": {
+      "count": 2560,
+      "different": 1868,
+      "relative_l2": 1.1408681061902312e-07,
+      "max_abs": 1.4901161193847656e-08
+    },
+    "independent_q2_q8_1_fp64_oracle_vs_native_cpu": {
+      "count": 2560,
+      "different": 2557,
+      "relative_l2": 9.737843193668404e-08,
+      "max_abs": 1.0062649380415678e-08
+    },
+    "independent_q2_q8_1_fp64_oracle_vs_native_gpu": {
+      "count": 2560,
+      "different": 2556,
+      "relative_l2": 6.142000071019667e-08,
+      "max_abs": 9.604264050722122e-09
+    }
+  },
+  "native_expert_parity_stdout": "using captured service activation: /tmp/e6-layer5-expert220-activation.f32 (1 rows, 2560 float32 values)\n          width invariance (1 vs 3 tokens): gate/up 0, down 0 rows differ\n          gpu decode-once vs per-entry kernels: bitwise equal\n          GPU dequant vs ggml to_float: rel 0.00e+00, 0 of 4915200 values differ in any bit; fp16 of it: 0 differ; embedding rows: 0 of 640 differ\nlayer 5 expert 220 q2_0    /q2_0    blob  1382400  cpu rel 9.80e-03  gpu rel 9.80e-03  cpu-gpu 1.02e-07 (5604/7680 words differ)  ok\nnative_expert_parity: 0 failures",
+  "oracle": {
+    "kind": "independent scalar Q2_0 decoder and Q8_1 activation quantization, FP64 accumulation/SwiGLU",
+    "supervisor_status": "pass"
+  },
+  "scope": "One sampled token dispatch; confirms owner-specific service rows and checks numeric results, not sole cause of all later persistent-state drift."
+}

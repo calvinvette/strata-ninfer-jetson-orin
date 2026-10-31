@@ -7525,3 +7525,13 @@ first diverge at layer 17. Both requests return identical tokens, remain above
 the memory floor, and have zero sampled OOM kills. This is a local attribution
 candidate, not yet a verified owner-oracle result. See the
 [all-layer comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/all-layer-position65539-comparison.json).
+
+The layer-5 expert-220 follow-up confirms its owner changes CPU→GPU (`-1` to
+`0`) at position 65,539 after adaptive swap `5:220>8`. Input bytes, routes and
+route weight match; the fixed service row matches the native CPU replay
+bit-for-bit and the adaptive row matches the GPU replay bit-for-bit. The CPU/GPU
+gap is relative L2 `1.14e-7`; an independent scalar Q2_0/Q8_1 FP64 oracle is
+within `9.74e-8` of CPU and `6.14e-8` of GPU. This attributes the first sampled
+layer-5 output delta locally to expert ownership. Other later owner transitions
+may also contribute to recurrent drift. E6/E7 remain open. See the
+[owner oracle report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer5-expert220-owner-oracle-position65539.json).

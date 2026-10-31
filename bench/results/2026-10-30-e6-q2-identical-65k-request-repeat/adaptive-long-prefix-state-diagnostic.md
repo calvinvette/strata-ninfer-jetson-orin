@@ -533,3 +533,23 @@ that later bundle delta is not an independent first cause. The identical token
 hash persisted through both runs. Min available memory was 8.55 GiB fixed and
 8.44 GiB adaptive, with zero sampled OOM kills. See
 [`all-layer-position65539-comparison.json`](all-layer-position65539-comparison.json).
+
+### Direct owner and independent oracle check for layer-5 expert 220
+
+The focused owner capture confirms expert 220 is CPU-owned (`route_kind=-1`)
+in the fixed arm and GPU-owned (`route_kind=0`) in the adaptive arm at position
+65,539, exactly after round-4 swap `5:220>8`. Both captures have identical
+activation bytes, route IDs and route weight for this expert. The service row
+from the fixed all-layer bundle matches `native_expert_parity`'s CPU row
+bit-for-bit; the adaptive service row matches its GPU row bit-for-bit.
+
+The native CPU/GPU rows differ by relative L2 `1.14e-7` (1,868/2,560 values,
+maximum absolute `1.49e-8`). An independent scalar Q2_0 decoder with Q8_1
+activation quantization and FP64 accumulation differs from the native CPU and
+GPU outputs by relative L2 `9.74e-8` and `6.14e-8`, respectively. The service
+rows are therefore consistent with the independent Q2_0/Q8_1 arithmetic, and
+the local layer-5 combined-output delta is attributable to the owner change at
+this dispatch. This verifies the earliest changed expert row sampled at this
+position; it does not prove that this is the sole owner transition contributing
+to all subsequent state drift. See
+[`layer5-expert220-owner-oracle-position65539.json`](layer5-expert220-owner-oracle-position65539.json).

@@ -988,3 +988,10 @@ The all-layer trace at position 65,539 first differs at layer 5: only expert
 by a `5.77e-8` combined-output delta. The adaptive schedule promotes expert 220
 there before dispatch; direct owner/oracle confirmation is next. The delta
 appears in layer-6 input and routes remain equal until layer 17. [Trace](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/all-layer-position65539-comparison.json).
+
+Direct owner capture and independent Q2_0/Q8_1 oracle confirm layer-5 expert
+220 changes CPU→GPU at the first sampled output delta; identical-input service
+rows match their native owner replays bit-for-bit. CPU/GPU row difference is
+`1.14e-7` relative L2, and both agree with the independent FP64 oracle within
+`9.74e-8` / `6.14e-8`. This locally verifies the first changed expert row;
+later adaptive swaps may still contribute. [Report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer5-expert220-owner-oracle-position65539.json).
