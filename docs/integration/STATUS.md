@@ -7544,3 +7544,11 @@ shifts by `1.49e-8` and the shared output by `8.69e-8`, so the combined layer-7
 delta includes those additional terms. This is a later contributor after the
 layer-5 first delta, not its source. See the
 [layer-7 oracle report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer7-expert225-owner-oracle-position65539.json).
+
+An independent Q8_1 quantization of the captured layer-13 `x` vectors at
+position 65,539 found identical integer codes in all 80 activation blocks, but
+one FP16 scale differs (block 57: `0.0141448975` fixed-owner,
+`0.0141372681` adaptive). This is a plausible contribution to the `qkv`
+difference at that position; it does not replay the projection or establish
+full causality. The comparison is recorded in the
+[Q8_1 activation report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer13-q8_1-activation-position65539.json).
