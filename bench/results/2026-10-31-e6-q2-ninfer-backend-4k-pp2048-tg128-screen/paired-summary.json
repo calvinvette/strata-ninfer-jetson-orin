@@ -1,0 +1,242 @@
+{
+  "schema": 1,
+  "experiment": "Q2_0 strict NInfer vs Strata backend, 4K cache, pp2048+tg128 natural-stop retrieval/checksum screen",
+  "date": "2026-10-31",
+  "device": "Jetson AGX Orin Developer Kit, aarch64, SM87, CUDA 12.6",
+  "source_commit": "e781e411c93252be2351feb35468ce06ff6a16a4",
+  "source_file_sha256": "b49d75d02876d1eaa59d74d38e2867f5ecefa509909683adbcdfc6f3c18a02bb",
+  "binary": "build/integration/e0-cuda-build/strata",
+  "binary_sha256": "fd67288c399d895be036dab344e30caab3d081540bfc552f22dac6a5fc33644a",
+  "engine_version": "0.1.41",
+  "model": {
+    "name": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0",
+    "shard_1": {
+      "path": "~/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+      "bytes": 37623740192,
+      "sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720"
+    },
+    "shard_2": {
+      "path": "~/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+      "bytes": 28800138432,
+      "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+    },
+    "ple_pack": "~/models/strata-orin-validation/q2-ple-pack",
+    "expert_profile": "~/models/strata-orin-validation/q2-expert-profile.bin"
+  },
+  "workload": {
+    "task": "held-out exact retrieval/arithmetic: ordered EARLY/MIDDLE/LATE vault codes and numeric suffix sum",
+    "prompt_tokens": 2048,
+    "generation_cap": 128,
+    "actual_output_tokens": 47,
+    "natural_stop": true,
+    "expected_exact_text": "EARLY=AMBER-QUARTZ-618, MIDDLE=SILVER-MEADOW-243, LATE=INDIGO-LANTERN-907, SUM=1768",
+    "prompt_cache": false,
+    "warmup_per_process": 1,
+    "measured_per_process": 1
+  },
+  "profile": {
+    "expert_cache_slots": 4000,
+    "configured_context": 8192,
+    "prefill_chunk": 128,
+    "mtp_window": 2,
+    "pool_workers": 8,
+    "resident_budget_gib": 6,
+    "workspace_reserve_mib": 3072,
+    "host_reserve_gib": 9,
+    "pcie_frac": 0.0,
+    "adaptive_swaps": "default enabled",
+    "temperature": 0,
+    "exact_n_opt_in": false,
+    "cta256_opt_in": false
+  },
+  "backend_arms": {
+    "control": {
+      "expert_backend": "strata"
+    },
+    "candidate": {
+      "expert_backend": "ninfer",
+      "strict": true
+    }
+  },
+  "pair_order": "counterbalanced order-mixed independent processes: Strata\u2192NInfer, NInfer\u2192Strata, Strata\u2192NInfer",
+  "pairs": [
+    {
+      "pair": 0,
+      "order": [
+        "strata",
+        "ninfer"
+      ],
+      "arms": {
+        "strata": {
+          "status": "pass",
+          "min_available_bytes": 11071332352,
+          "completion_tokens": 47,
+          "exact_answer_passed": true,
+          "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+          "prompt_tps": 36.1,
+          "decode_tps": 8.1,
+          "ttft_s": 57.21465511713177,
+          "client_total_s": 62.562478815205395,
+          "swap_peak_bytes": 3036487680
+        },
+        "ninfer": {
+          "status": "pass",
+          "min_available_bytes": 11016765440,
+          "completion_tokens": 47,
+          "exact_answer_passed": true,
+          "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+          "prompt_tps": 42.1,
+          "decode_tps": 7.9,
+          "ttft_s": 49.21200684318319,
+          "client_total_s": 54.575645237229764,
+          "swap_peak_bytes": 6847918080
+        }
+      }
+    },
+    {
+      "pair": 1,
+      "order": [
+        "ninfer",
+        "strata"
+      ],
+      "arms": {
+        "strata": {
+          "status": "pass",
+          "min_available_bytes": 11076816896,
+          "completion_tokens": 47,
+          "exact_answer_passed": true,
+          "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+          "prompt_tps": 41.5,
+          "decode_tps": 8.7,
+          "ttft_s": 49.86308599309996,
+          "client_total_s": 54.809155012946576,
+          "swap_peak_bytes": 2949980160
+        },
+        "ninfer": {
+          "status": "pass",
+          "min_available_bytes": 10919370752,
+          "completion_tokens": 47,
+          "exact_answer_passed": true,
+          "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+          "prompt_tps": 41.4,
+          "decode_tps": 8.8,
+          "ttft_s": 50.0342546608299,
+          "client_total_s": 54.889933791942894,
+          "swap_peak_bytes": 2954915840
+        }
+      }
+    },
+    {
+      "pair": 2,
+      "order": [
+        "strata",
+        "ninfer"
+      ],
+      "arms": {
+        "strata": {
+          "status": "pass",
+          "min_available_bytes": 11087417344,
+          "completion_tokens": 47,
+          "exact_answer_passed": true,
+          "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+          "prompt_tps": 42.0,
+          "decode_tps": 8.9,
+          "ttft_s": 49.272518150974065,
+          "client_total_s": 54.138873126357794,
+          "swap_peak_bytes": 2870378496
+        },
+        "ninfer": {
+          "status": "pass",
+          "min_available_bytes": 11096850432,
+          "completion_tokens": 47,
+          "exact_answer_passed": true,
+          "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+          "prompt_tps": 42.9,
+          "decode_tps": 8.9,
+          "ttft_s": 48.19514586031437,
+          "client_total_s": 53.08854395290837,
+          "swap_peak_bytes": 2853187584
+        }
+      }
+    }
+  ],
+  "metrics": {
+    "prompt_tps": {
+      "direction": "higher_is_better",
+      "strata_median": 41.5,
+      "ninfer_median": 42.1,
+      "paired_effects_percent": [
+        16.620498614958446,
+        -0.24096385542169418,
+        2.1428571428571352
+      ],
+      "median_paired_effect_percent": 2.1428571428571352,
+      "paired_bootstrap_95_interval_percent": [
+        -0.24096385542169418,
+        16.620498614958446
+      ]
+    },
+    "decode_tps": {
+      "direction": "higher_is_better",
+      "strata_median": 8.7,
+      "ninfer_median": 8.8,
+      "paired_effects_percent": [
+        -2.4691358024691246,
+        1.1494252873563315,
+        0.0
+      ],
+      "median_paired_effect_percent": 0.0,
+      "paired_bootstrap_95_interval_percent": [
+        -2.4691358024691246,
+        1.1494252873563315
+      ]
+    },
+    "ttft_s": {
+      "direction": "lower_is_better",
+      "strata_median": 49.86308599309996,
+      "ninfer_median": 49.21200684318319,
+      "paired_effects_percent": [
+        16.261576772208187,
+        -0.3421029630405359,
+        2.2354373483634227
+      ],
+      "median_paired_effect_percent": 2.2354373483634227,
+      "paired_bootstrap_95_interval_percent": [
+        -0.3421029630405359,
+        16.261576772208187
+      ]
+    },
+    "client_total_s": {
+      "direction": "lower_is_better",
+      "strata_median": 54.809155012946576,
+      "ninfer_median": 54.575645237229764,
+      "paired_effects_percent": [
+        14.634428128624787,
+        -0.14716501444965724,
+        1.9784478820536355
+      ],
+      "median_paired_effect_percent": 1.9784478820536355,
+      "paired_bootstrap_95_interval_percent": [
+        -0.14716501444965724,
+        14.634428128624787
+      ]
+    }
+  },
+  "resources": {
+    "minimum_available_bytes": 10919370752,
+    "maximum_sampled_swap_bytes": 6847918080,
+    "sampled_oom_kills": 0,
+    "cpu_frequency_mhz_range": [
+      729.6,
+      2201.6
+    ],
+    "gpu_frequency_mhz_range": [
+      306,
+      1300.5
+    ],
+    "emc_readback": "permission denied",
+    "clocks": "dynamic; no clock controls",
+    "energy": "not measured"
+  },
+  "decision": "All six measured responses matched the exact expected answer and each other. Decode TPS paired median effect was 0.00% (95% three-pair interval \u22122.47% to +1.15%); no primary decode gain or 5% effect was observed. Do not run a seven-pair service confirmation for this cell."
+}

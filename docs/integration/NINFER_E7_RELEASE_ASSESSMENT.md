@@ -22,6 +22,16 @@ release profile is **not achieved**.
 
 ## Evidence and limits
 
+### 2026-10-31 2K-prompt backend screen
+
+A three-pair pp2048+tg128-cap retrieval/arithmetic comparison at fixed 4K
+cache measured 0.00% paired median NInfer decode-TPS advantage (95% screening
+interval −2.47% to +1.15%). All six requests naturally stopped at 47 tokens
+and matched the exact expected codes and sum. Prompt, TTFT and client medians
+favored NInfer by about 2%, but their three-pair intervals were wide and
+included zero. No metric met the 5% gate; this cell does not warrant service
+confirmation. See the [report](../../bench/results/2026-10-31-e6-q2-ninfer-backend-4k-pp2048-tg128-screen/README.md).
+
 ### 2026-10-31 4K-cache 128-token backend screen
 
 A three-pair pp512+tg128 NIMBUS comparison held the Q2_0 4K cache and service

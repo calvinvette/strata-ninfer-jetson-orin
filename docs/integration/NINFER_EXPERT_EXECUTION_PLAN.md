@@ -2597,3 +2597,11 @@ against strict NInfer found median paired NInfer effects of −1.30% prompt TPS,
 response hash. No metric met the 5% screen; do not run a seven-pair
 confirmation for this cell. This does not support a NInfer-specific transfer
 of the cache-policy result. See the [backend report](../../bench/results/2026-10-31-e6-q2-ninfer-backend-4k-tg128-screen/README.md).
+
+**E6 4K-cache pp2048+tg128-cap backend screen (2026-10-31):** a
+three-pair natural-stop retrieval/arithmetic comparison found 0.00% median
+paired NInfer decode-TPS advantage (95% screening interval −2.47% to +1.15%).
+All six outputs matched the exact codes and sum, stopping at 47 tokens.
+Prompt, TTFT and client medians favored NInfer by about 2%, but uncertainty
+was wide and each interval included zero. No metric met the 5% effect gate;
+do not run seven-pair confirmation for this cell. See the [backend report](../../bench/results/2026-10-31-e6-q2-ninfer-backend-4k-pp2048-tg128-screen/README.md).
