@@ -7383,6 +7383,19 @@ GDN/QSA plus accepted-prefix trace hit the 60-second no-progress watchdog
 after the 65K boundary and produced no accepted-prefix result. See the
 [paired diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
 
+A boundary-only matched run then captured complete GDN dumps at the 8K replay
+boundary. The fixed/adaptive files share the same shape (36 allocations,
+817,152 floats each) but differ in 33 allocations; the first differing byte
+is 512 bytes into allocation index 3 (zero-based), while allocations 0–2
+match. The 65K prompt-boundary state and both output-token hashes remain
+identical. QSA per-layer fingerprints match, although aggregate pooled/KV
+fields differ; this is fingerprint evidence only, not raw-byte QSA parity.
+Both direct-dump supervisors passed above the 6 GiB floor (9.30 GB fixed,
+9.22 GB adaptive minimum available) with zero sampled OOM kills. This localizes
+the replay GDN delta but does not identify a causal transfer or operator.
+Binary dumps remain in `/tmp` and are not committed. See the updated
+[diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
+
 **E7 current-source portability rebuild (2026-10-30):** full HIP and SYCL
 target trees rebuilt at source `4229c00e` on maestro1 with one-job builds. HIP
 `strata --help` passed and the host-only `shared_memory_budget_test` passed.

@@ -219,10 +219,46 @@ result and is not evidence of state divergence. It is retained as a failed
 instrumentation cell in `/tmp/e6-65k-fixed-per-layer-prefix-trace/` and
 `/tmp/e6-65k-fixed-per-layer-prefix-trace-supervisor/`.
 
+### Boundary layer summaries and direct GDN byte comparison
+
+The fixed-owner and adaptive 65K→8K sequences were repeated with boundary-only
+GDN and QSA layer summaries, without accepted-prefix hashing. Both passed
+supervision and reproduced the same long-request token hash
+`2d5f3da8f9890f8c9262231bada2cfab088196528565a1c08ab685d86074c650` and
+8K replay token hash `201a8bab084b2a57aa2f6a8ceb51b3609f4c5a297d952bf51dbf4cd321e16151`.
+The 65K prompt-boundary summary matched across arms. At the 8K replay boundary,
+the QSA per-layer summaries matched across arms, while the aggregate state
+fingerprints continued to differ in GDN, pooled state and KV. The per-allocation
+GDN hashes differed beginning at allocation index 3 (zero-based); all 36
+allocations were included in the capture.
+
+Because the aggregate and layer summaries needed a direct cross-check, a
+second matched pair wrote the complete GDN state at the replay boundary. Both
+binary dumps have header `(cells=8192, layers=36, floats_per_layer=817152)`
+and are 117,669,920 bytes including the 32-byte header. Their SHA256 values
+are fixed-owner `8183e0c1bb3c0f95e97b0a53288ced28f38477d5e4469978a0e5266704aebd6e`
+and adaptive `5ce9078c5101222ce0853f879d0c26a4044290a5d5edaae6fb006eb94c3a0c73`.
+The first payload difference is 512 bytes into GDN allocation 3; allocations
+0–2 match byte-for-byte and 33 of 36 allocations differ. Across the 113 MiB
+payload, 56,754,088 byte positions differ. This confirms replay GDN divergence
+and localizes its first observed allocation, but does not identify the model
+operator, expert transfer, or arithmetic event that produced it. QSA per-layer
+hashes are fingerprints rather than a byte-level proof; the aggregate QSA
+fingerprint differences remain unresolved by this capture.
+
+The fixed-owner direct-dump run passed with 9.30 GB minimum available physical
+RAM; the adaptive run passed with 9.22 GB. Both remained above the 6 GiB floor
+and recorded zero sampled cgroup OOM kills. Their raw GDN dumps, logs and
+supervisor telemetry remain in `/tmp/e6-65k-fixed-gdn-dump/`,
+`/tmp/e6-65k-fixed-gdn-dump-supervisor/`, `/tmp/e6-65k-adaptive-gdn-dump/`,
+and `/tmp/e6-65k-adaptive-gdn-dump-supervisor/` on Orin. These synchronized
+state diagnostics are not performance measurements.
+
 ## Next diagnostic
 
-Compare the same accepted prefixes against a matched fixed-owner 65K request,
-and capture per-layer state at the replay boundary to locate the first changed
-component/layer. The selected layer-1 replay row is observable and its
-route/owner record matches the short control, but the controlled toggle still
-does not connect a specific expert transfer to the state delta.
+Map GDN allocation index 3 to its model layer and inspect the adaptive update
+and active-expert path around the first sampled accepted-prefix divergence
+(prefixes 1–8). Keep the causal claim open until the state change is tied to a
+specific owner transition or operator with an independent oracle. Do not treat
+matching QSA fingerprints as raw-byte parity; capture QSA bytes if their
+aggregate mismatch becomes relevant to the causal trace.

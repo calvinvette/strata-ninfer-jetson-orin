@@ -2366,9 +2366,14 @@ by prefix 32. The fixed-owner replay exactly matched standalone fixed-profile
 state, unlike the adaptive replay. This narrows the onset but does not identify
 the responsible transfer or arithmetic. State hashing cut decode to 0.3
 tok/s, so those rates are instrumentation artifacts. A combined per-layer
-GDN/QSA trace hit the no-progress watchdog after the long boundary; use a
-lower-cost layer-local capture method to locate the first changed component.
-Instrumented rates are diagnostic only. See the
+GDN/QSA plus accepted-prefix trace hit the no-progress watchdog after the long
+boundary. A lower-cost boundary-only capture and direct GDN dump now localize
+the replay divergence: the fixed/adaptive 8K replay dumps first differ at
+GDN allocation index 3, with 33 of 36 allocations changed. Their 65K prompt
+boundaries and output-token hashes match. QSA per-layer fingerprints match,
+but the aggregate QSA state fields differ; byte-level QSA parity is not
+established. This localizes state movement, not its cause. E6/E7 remain open;
+instrumented rates are diagnostic only. See the
 [Report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
 
 **Current-source portability rebuild (2026-10-30):** full HIP and SYCL target

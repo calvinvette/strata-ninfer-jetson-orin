@@ -3344,3 +3344,15 @@ and capture the exact update schedule. This associates a state change with a
 policy interval but does not prove which transfer or owner arithmetic caused
 it. Keep the trace low overhead: combined per-layer GDN/QSA hashing with
 accepted-prefix tracing tripped Strata's no-progress watchdog in this cell.
+
+A follow-up boundary-only run used full GDN byte dumps to avoid relying solely
+on fingerprints. After the same 65K request and 8K replay, fixed-owner and
+adaptive dumps first differed at GDN allocation index 3; allocations 0–2 were
+byte-identical and 33 of 36 allocations differed. Keep raw dumps outside Git,
+record shape and hashes, and compare bytes independently of the engine's
+fingerprints. QSA per-layer hashes matched even though aggregate QSA fields
+differed, so treat those summaries as fingerprints until a byte-level check
+resolves the discrepancy. This localizes one state component but still does
+not attribute it to a transfer or operator. For Splash, include direct state
+captures at the first matched accepted-prefix divergence when feasible, and
+do not infer causality from a cache-owner event alone.
