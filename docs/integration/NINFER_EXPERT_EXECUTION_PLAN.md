@@ -2387,6 +2387,17 @@ hashes reproduced the prior pair. The next diagnostic moves one layer earlier
 to capture layer-1 MoE inputs and expert outputs around that position. This is
 localization evidence only, not a causal attribution or performance result.
 
+That matched layer-1 capture found identical inputs, routes and weights but an
+owner change for expert 3 at position 65,540: GPU in the fixed arm and CPU in
+the adaptive arm. The service expert rows matched the independent native GPU
+and CPU oracle outputs bit-for-bit, respectively. The expert-row relative-L2
+delta was `1.059e-7`; the combined MoE delta was `4.345e-8`. This is a
+verified local effect and aligns with the downstream layer-2 activation delta
+and prefix-8 GDN divergence, but it does not establish that this was the only
+owner change contributing to persistent-state divergence. Next check other
+active owner changes in layers through model layer 2 during commits 2–8. E6/E7
+remain open; no performance claim follows from this instrumented capture.
+
 **Current-source portability rebuild (2026-10-30):** full HIP and SYCL target
 trees rebuilt at source commit `d321286f` on maestro1 with one build job. HIP
 `strata --help` and the host-only shared-memory budget CTest passed. SYCL

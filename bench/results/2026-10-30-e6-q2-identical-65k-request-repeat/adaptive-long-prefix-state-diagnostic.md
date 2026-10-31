@@ -305,12 +305,44 @@ fixed-owner and 9.16 GB adaptive; both runs passed with zero sampled OOM kills.
 Route/activation files and supervisor logs remain in the corresponding
 `/tmp/e6-65k-{fixed,adaptive}-layer2-route*` paths on Orin.
 
+### Layer-1 expert ownership and service-output oracle
+
+The matched layer-1 captures at the same seven positions found identical
+inputs and expert IDs throughout. At position 65,540, expert 3 alone changed
+owner among the ten routed experts: fixed-owner assigned it to GPU (`route_kind
+= 0`), while adaptation assigned it to CPU (`route_kind = -1`). The other
+nine owner assignments matched. The complete service MoE bundles at that
+position confirm byte-identical input, routes, weights and shared output. The
+expert-3 service output changed in 1,840/2,560 values (maximum absolute
+`1.49e-8`, relative L2 `1.059e-7`); the combined MoE output changed in
+737/2,560 values (maximum `3.73e-9`, relative L2 `4.345e-8`).
+
+Using the exact same captured 2,560-value activation, `native_expert_parity`
+reported a CPU/GPU output difference at relative L2 `9.51e-8`. More directly,
+the fixed-owner service expert-3 row matched the independent native GPU row
+bit-for-bit, and the adaptive service row matched the native CPU row
+bit-for-bit. The shared output was identical. This identifies the local
+service expert-row change with its CPU/GPU ownership transition for this
+dispatch. At that same token position, the layer-2 MoE input had the small
+`5.12e-8` relative-L2 delta recorded above; the prefix-8 raw GDN capture first
+differed in allocation 2 (model layer 2). This links one changed active expert
+to an observed downstream activation delta in the sampled commit interval.
+It does not prove that this is the only adaptive owner change or the sole
+cause of every differing recurrent-state byte.
+
+Both complete-bundle runs passed supervision and reproduced the same 32-token
+output hash. Minimum available RAM was 9.21 GB fixed-owner and 9.10 GB
+adaptive, with zero sampled OOM kills. Their raw `STMOEBN1` bundles remain in
+`/tmp/e6-65k-{fixed,adaptive}-layer1-bundle/`; the independent activation and
+parity outputs remain in `/tmp/e6-layer1-position65540-*` and
+`/tmp/e6-layer1-expert3-parity-output/`. These are correctness diagnostics,
+not performance measurements.
+
 ## Next diagnostic
 
-Inspect model layer 1's routed MoE inputs and per-expert outputs over the same
-positions, especially the source of the layer-2 input delta at position
-65,540. Use a deterministic independent oracle to separate owner-transfer
-effects from small activation or arithmetic drift. Keep causality open until
-the state change is tied to a specific event. Matching QSA fingerprints are
-not raw-byte parity; capture QSA bytes if their aggregate mismatch becomes
-relevant to that causal trace.
+Check whether other active-owner changes occur in model layers before and
+through layer 2 during accepted commits 2–8, and compare their service rows
+with fixed-input CPU/GPU oracles. Keep the conclusion scoped to the verified
+expert-3 dispatch until those transitions are ruled in or out. Matching QSA
+fingerprints are not raw-byte parity; capture QSA bytes if their aggregate
+mismatch becomes relevant to the causal trace.
