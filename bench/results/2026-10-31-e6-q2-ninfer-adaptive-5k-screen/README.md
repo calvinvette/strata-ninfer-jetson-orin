@@ -114,9 +114,10 @@ every checkpoint by request ordinal. The engine reported 684 adaptive expert
 exchanges after warmup and 1,142 after the measured request. This localizes the
 first **recorded** within-process difference to the final prefill segment,
 after the adaptive cache had changed. At the time this capture was made, it did
-not identify the exact slot or prove that migration caused the state change;
-the later owner-map diagnostic below resolves the first limitation, not the
-causal question. See
+not identify the exact owner set. The follow-up below captures it and uses a
+fixed-profile intervention to test whether the GPU resident set changes the
+state. The active expert and operation that produce the first changed value
+remain unknown. See
 [`boundary-capture.json`](boundary-capture.json); state-hash timings are not
 performance measurements.
 
@@ -150,10 +151,52 @@ then replaced 952 more between warmup and the measured request (1,904 IDs in
 the latter symmetric difference). The log's `exchanged with the VRAM tier`
 counter is narrower: `FileExpertSource::commit_exchanges()` increments it for
 committed RAM-complement ownership rotations. It is not a count of all changes
-in the GPU resident map and must not be used as that proxy. The captured map
-does not explain the prefill-state divergence or establish it as a cause.
+in the GPU resident map and must not be used as that proxy. The fixed-profile
+intervention below shows that changing the GPU resident set changes the first
+verifier-window state, with the RAM complement held constant.
 
 The NInfer two-request diagnostic passed under the 6 GiB admission floor; its
 minimum sampled available host RAM was 9.04 GiB. This was a state/map capture,
 not a performance measurement. The profile binaries and raw residency dumps
 remain under `/tmp/e6-ninfer-adapt-5k/maps/` and are not committed.
+
+## Fixed resident-map state intervention
+
+Two custom profiles were constructed from the original Q2_0 ranking and the
+post-warmup learned ranking. The first 5,000 entries select different GPU
+resident sets (2,091 shared, 2,909 replacements in either direction). Both
+profiles then rank the same ordered 4,660 experts first among nonresident
+experts, so each process loads the same 6 GiB RAM complement. The rest of the
+profile ordering is shared. Startup residency dumps matched the intended maps
+exactly. Both arms used strict NInfer, `--adapt-every 0 --adapt-swaps 0`, the
+same 512-token NIMBUS prompt and 128-token generation limit.
+
+| Fixed GPU map | Prompt-boundary state after verifier position 511 | Response SHA-256 | Minimum available RAM |
+| --- | --- | --- | ---: |
+| Original Q2_0 profile | `gdn=39b33e3c…`, `pooled=97cffa72…`, `kv=e0b2ec10…` | `23734ee3eafb9aa7d11114e9ae88b799b5fca9549c53cb24ea5425c8555c2676` | 9.15 GiB |
+| Post-warmup resident set | `gdn=78bb6024…`, `pooled=4760977e…`, `kv=f5672351…` | `576272a200f58b5b0a72f489ac1a2019098ec2939ac1480a2531f90a8e337cd2` | 9.06 GiB |
+
+The reset fingerprint and sampled state at positions 128, 256 and 384 matched.
+The complete 36-row GDN prefill dump was also bit-identical: 29,417,472 FP32
+values, 117,669,912 bytes, SHA-256
+`12418d57d658521430e1a9c45847c77cfb144cf5e8a5e5347ae815d6378c4ac4`. The
+full GDN component remains identical at the end-of-prefill capture. The next
+aggregate state capture, after the verifier handles prompt position 511,
+differs. The sampled reset and checkpoints through position 384 match, but QSA
+state at the end of prefill was not captured separately. The exact onset in the
+final prefill chunk versus the first verifier window therefore remains open.
+The two arms differ in GPU resident IDs while holding the ordered RAM
+complement and common remainder ranking fixed. This bounded intervention shows
+the fixed GPU owner set is sufficient to change the captured boundary state
+and response for this prompt. It does not identify the specific expert, layer
+or kernel responsible.
+
+Both responses passed the expected `NIMBUS-7319` prefix check and generated 128
+tokens, but their full hashes differ. No semantic answer grading was done, so
+this is not evidence that either map has acceptable quality. The single runs
+are state diagnostics, not performance comparisons; their TPS is excluded.
+Energy was not measured. See
+[`resident-map-state-control.json`](resident-map-state-control.json). The first
+attempt at a fixed-map run omitted explicit zero values for the adaptive
+options; because the engine defaults to adaptive swaps, those runs are
+excluded. The reported arms explicitly set both options to zero.

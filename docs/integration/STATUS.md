@@ -7757,3 +7757,15 @@ ownership rotations, not all GPU map replacements. Both response hashes
 matched by request ordinal; NInfer's diagnostic minimum available RAM was
 9.04 GiB. Exact map parity does not explain the prompt-boundary recurrent-state
 change or prove adaptive migration caused it. See the [map capture report](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/README.md).
+
+**E6 matched-complement resident-map intervention (2026-10-31):** two strict
+NInfer runs used different fixed 5,000-entry GPU maps while holding the exact
+ordered 4,660-entry, 6 GiB RAM complement and remaining profile order constant;
+adaptive swaps were explicitly disabled. Reset and sampled states through
+position 384 matched, and all 36 captured GDN prefill rows were bit-identical.
+After verifier position 511, GDN/pooled/KV fingerprints and full response hashes
+differed. Both answers passed only the expected-prefix check; semantic quality
+was not graded and the single runs provide no performance evidence. Minimum
+available host RAM was 9.06 GiB. The resident map is sufficient to alter the
+captured state for this prompt, but the exact onset, expert, layer and kernel
+remain unknown. E6 remains open. See the [intervention report](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/README.md).

@@ -1,0 +1,232 @@
+{
+  "date": "2026-10-31",
+  "scope": "One strict-NInfer request per independent process, with adaptation explicitly disabled. The two custom profiles change the 5,000-entry GPU owner set while keeping the ordered 4,660-expert 6 GiB RAM complement identical.",
+  "model": "Qwen3.8-Flash-Next-GSQ-RCO Q2_0, original two GGUF shards and q2 PLE pack under /home/calvin/models/strata-orin-validation/",
+  "binary_sha256": "fd67288c399d895be036dab344e30caab3d081540bfc552f22dac6a5fc33644a",
+  "model_profile_sources": {
+    "original_q2_profile_sha256": "b3e62120218cd96d175a0547530158869177dd2164b22b40f32bea7d7e85fb8c",
+    "learned_post_warmup_profile_sha256": "29588fb2714f7ee4e7c4e23522c3b398c177b37def922ab32ffe45fad90ea010"
+  },
+  "matched_profile_construction": {
+    "cache_slots": 5000,
+    "resident_overlap": 2091,
+    "residents_replaced_each_direction": 2909,
+    "resident_map_symmetric_difference": 5818,
+    "ram_budget_bytes": 6442450944,
+    "ram_complement_entries": 4660,
+    "ordered_ram_complement_sha256": "3d7519b9d41ef7bd6462b0cc800408fc4d708d922a5d0968f3dcbaf75f5954f5",
+    "shared_remaining_profile_order_count": 12007,
+    "shared_remaining_profile_order_sha256": "57452dd854bdf550f6cf8867b62b9e42da6a58388001e1d15294f755e3ebc8da",
+    "profile_sha256": {
+      "original-map": "781fbe88884fbd263736bd4812c9abddfa59c707e2b2c1acad6cd40f6182cd64",
+      "learned-map": "76a1644f56d985fdd54a5816aadd39ce9356190dbaa828a293fab8462f507087"
+    }
+  },
+  "measurement_scope": {
+    "backend": "strict NInfer Q2_0 CUDA on Orin",
+    "adapt_every": 0,
+    "adapt_swaps": 0,
+    "prompt_tokens": 512,
+    "generated_tokens": 128,
+    "temperature": 0,
+    "energy": "not measured",
+    "performance": "excluded; one request per map and output hashes differ",
+    "headroom_floor_bytes": 6442450944
+  },
+  "runs": {
+    "original-map": {
+      "custom_profile_sha256": "781fbe88884fbd263736bd4812c9abddfa59c707e2b2c1acad6cd40f6182cd64",
+      "startup_residency_mismatch_count": 0,
+      "resident_count": 5000,
+      "ram_complement_count_logged": 4660,
+      "adaptive_swaps_off": true,
+      "ram_exchange_count": 0,
+      "request": {
+        "ordinal": 0,
+        "answer_prefix_passed": true,
+        "response_sha256": "23734ee3eafb9aa7d11114e9ae88b799b5fca9549c53cb24ea5425c8555c2676",
+        "usage": {
+          "prompt_tokens": 512,
+          "completion_tokens": 128,
+          "total_tokens": 640,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 512,
+          "prompt_ms": 36425.2,
+          "prompt_per_token_ms": 71.143,
+          "prompt_per_second": 14.1,
+          "predicted_n": 128,
+          "predicted_ms": 26669.0,
+          "predicted_per_token_ms": 208.352,
+          "predicted_per_second": 4.8,
+          "draft_n": 0,
+          "draft_n_accepted": 0
+        }
+      },
+      "prompt_boundary_position_511": {
+        "gdn": "39b33e3ca254df85",
+        "ple": "481bc4db512e953a",
+        "tail": "eadb9c684037310b",
+        "pooled": "97cffa72669eed68",
+        "kv": "e0b2ec102a6528d9",
+        "mtp": "14650fb0739d0383",
+        "stale": "14650fb0739d0383",
+        "dead": "76214e6986cead1e",
+        "pooled_full": "94bcbc74d1cab58d"
+      },
+      "request_reset_and_prefill_checkpoints_0_128_256_384": {
+        "0": [
+          "2d2b4c71fb470383",
+          "0b6b00a4dd808383",
+          "edd71f53c31aee9b",
+          "5c42fcd39eb3da43",
+          "829849b80c8474db",
+          "-1,-1"
+        ],
+        "128": [
+          "e4658996a30dfaa1",
+          "56b952fec48b77a8",
+          "cfb16919e760e6c6",
+          "2446f30268111138",
+          "689d1a933fbe4ad2",
+          "15,20"
+        ],
+        "256": [
+          "cbe1e3faedc12c28",
+          "383c7fdcbc56d293",
+          "bc6bca4536312a55",
+          "2446f30268111138",
+          "dec2714b281b6567",
+          "13618,13618"
+        ],
+        "384": [
+          "b5aaee4c8b9f73fb",
+          "d45f3345f76662bc",
+          "002a43012de7a9e8",
+          "2446f30268111138",
+          "5af5c968ba51d777",
+          "13618,13618"
+        ]
+      },
+      "prefill_gdn_dump": {
+        "path": "gdn-prefill-0.bin",
+        "sha256": "12418d57d658521430e1a9c45847c77cfb144cf5e8a5e5347ae815d6378c4ac4",
+        "layers": 36,
+        "floats_per_layer": 817152,
+        "bytes": 117669912
+      },
+      "minimum_available_bytes": 9828917248,
+      "supervisor_status": "pass"
+    },
+    "learned-map": {
+      "custom_profile_sha256": "76a1644f56d985fdd54a5816aadd39ce9356190dbaa828a293fab8462f507087",
+      "startup_residency_mismatch_count": 0,
+      "resident_count": 5000,
+      "ram_complement_count_logged": 4660,
+      "adaptive_swaps_off": true,
+      "ram_exchange_count": 0,
+      "request": {
+        "ordinal": 0,
+        "answer_prefix_passed": true,
+        "response_sha256": "576272a200f58b5b0a72f489ac1a2019098ec2939ac1480a2531f90a8e337cd2",
+        "usage": {
+          "prompt_tokens": 512,
+          "completion_tokens": 128,
+          "total_tokens": 640,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 512,
+          "prompt_ms": 28828.0,
+          "prompt_per_token_ms": 56.305,
+          "prompt_per_second": 17.8,
+          "predicted_n": 128,
+          "predicted_ms": 36314.7,
+          "predicted_per_token_ms": 283.709,
+          "predicted_per_second": 3.5,
+          "draft_n": 0,
+          "draft_n_accepted": 0
+        }
+      },
+      "prompt_boundary_position_511": {
+        "gdn": "78bb6024a25424f4",
+        "ple": "481bc4db512e953a",
+        "tail": "eadb9c684037310b",
+        "pooled": "4760977ee0c565d5",
+        "kv": "f5672351c2d59e20",
+        "mtp": "14650fb0739d0383",
+        "stale": "14650fb0739d0383",
+        "dead": "76214e6986cead1e",
+        "pooled_full": "1b47b53ffb91e2b8"
+      },
+      "request_reset_and_prefill_checkpoints_0_128_256_384": {
+        "0": [
+          "2d2b4c71fb470383",
+          "0b6b00a4dd808383",
+          "edd71f53c31aee9b",
+          "5c42fcd39eb3da43",
+          "829849b80c8474db",
+          "-1,-1"
+        ],
+        "128": [
+          "e4658996a30dfaa1",
+          "56b952fec48b77a8",
+          "cfb16919e760e6c6",
+          "2446f30268111138",
+          "689d1a933fbe4ad2",
+          "15,20"
+        ],
+        "256": [
+          "cbe1e3faedc12c28",
+          "383c7fdcbc56d293",
+          "bc6bca4536312a55",
+          "2446f30268111138",
+          "dec2714b281b6567",
+          "13618,13618"
+        ],
+        "384": [
+          "b5aaee4c8b9f73fb",
+          "d45f3345f76662bc",
+          "002a43012de7a9e8",
+          "2446f30268111138",
+          "5af5c968ba51d777",
+          "13618,13618"
+        ]
+      },
+      "prefill_gdn_dump": {
+        "path": "gdn-prefill-0.bin",
+        "sha256": "12418d57d658521430e1a9c45847c77cfb144cf5e8a5e5347ae815d6378c4ac4",
+        "layers": 36,
+        "floats_per_layer": 817152,
+        "bytes": 117669912
+      },
+      "minimum_available_bytes": 9728528384,
+      "supervisor_status": "pass"
+    }
+  },
+  "comparison": {
+    "response_hashes_match": false,
+    "both_expected_answer_prefix_passed": true,
+    "prefill_gdn_dump_sha256_equal": true,
+    "prefill_gdn_all_36_rows_bit_identical": true,
+    "prefill_gdn_float_values_bit_identical": 29417472,
+    "prompt_boundary_hashes_equal": false,
+    "reset_and_128_256_384_checkpoints_equal": true,
+    "minimum_available_ram_bytes": 9728528384,
+    "interpretation": "With the same RAM complement and no adaptation, changing the fixed GPU resident map preserves the captured prefill GDN state and reset/128/256/384 fingerprints, but changes the first-verifier-window prompt-boundary GDN/pooled/KV state and the full response hash. This is bounded evidence that the GPU resident owner set changes computation at or after the final prompt token; the exact expert/kernel that first causes the change is not yet isolated. Both responses passed only the expected-prefix check, so output quality equivalence is not established."
+  },
+  "raw_artifacts": "Profile binaries, full 117,669,912-byte GDN dumps, server logs and telemetry remain in /tmp/e6-ninfer-adapt-5k/maps/matched-complement-profiles/ and are not committed.",
+  "excluded_attempts": [
+    {
+      "issue": "An early fixed-map attempt omitted explicit --adapt-every 0 and --adapt-swaps 0; engine defaults left adaptive swaps enabled.",
+      "disposition": "Excluded from the reported intervention; both accepted arms explicitly disabled adaptation."
+    }
+  ]
+}

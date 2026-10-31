@@ -2675,3 +2675,16 @@ KV, MTP, stale, dead, pooled-full and previous-embedding fingerprints across
 the warmup and measured requests in both backends. All four responses matched
 exactly. This is bounded final-state evidence only; accepted-prefix and
 byte-level parity remain unproven. See the [state record](../../bench/results/2026-10-31-e6-q2-ninfer-fixed-route-5k-screen/state-parity.json).
+
+**E6 matched-complement resident-map intervention (2026-10-31):** two strict
+NInfer Q2_0 runs changed the fixed 5,000-entry GPU owner set while holding the
+exact ordered 4,660-entry, 6 GiB RAM complement and remaining profile order
+constant; both explicitly disabled adaptation. Reset and sampled checkpoints
+through position 384 matched, and the 36-row GDN prefill dump was bit-identical.
+The first subsequent aggregate capture, after verifier position 511, differed
+in GDN/pooled/KV state and response hash. Both responses passed a prefix check
+only; semantic equivalence was not graded. This bounds the resident map as
+sufficient to change captured state on this prompt, but does not isolate the
+onset within the last prefill chunk versus verifier window, or identify the
+expert/layer/kernel. Minimum available host RAM was 9.06 GiB. This is not a
+performance result; E6 remains open. See the [intervention report](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/README.md).
