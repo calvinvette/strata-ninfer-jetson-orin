@@ -3356,3 +3356,24 @@ resolves the discrepancy. This localizes one state component but still does
 not attribute it to a transfer or operator. For Splash, include direct state
 captures at the first matched accepted-prefix divergence when feasible, and
 do not infer causality from a cache-owner event alone.
+
+## Q2_0 request profiling and kernel-share limits (2026-10-31)
+
+A same-source Nsight Systems graph-node trace confirmed that the strict NInfer
+backend launched its grouped Q2_0 D3/D4 kernels and Q8_1 SwiGLU quantizer for a
+real 512-token request. Across one warmup and one 32-token measured request,
+these kernels summed to 287 ms, about 0.95% of all summed CUDA kernel-event
+durations. Wait-flag and dequantization kernels accounted for substantially
+more activity. CUDA event durations can overlap, so use this ratio only as a
+share of the summed event durations, not as a wall-time fraction. The trace
+also showed that Strata's type-42 matmul rows are not separable into dense and
+expert work without narrower ranges or kernel labels. Keep graph-node traces
+diagnostic because their overhead is high; never use them as TPS evidence.
+
+For a future Strata/Splash backend, measure the optimized operation's share of
+the whole request before spending time on its isolated microbenchmark. When
+work is captured in command graphs, verify whether the profiler reports graph
+nodes or whole-graph events; the latter can hide the very kernel needed for
+attribution. Pair the detailed trace with an unprofiled request, record the
+active route/owner shape, and label overlapping-duration sums explicitly.
+See the [Q2_0 kernel inventory](../../bench/results/2026-10-31-e6-q2-ninfer-kernel-share-diagnostic/README.md).

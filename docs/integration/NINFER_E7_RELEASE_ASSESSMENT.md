@@ -22,6 +22,20 @@ release profile is **not achieved**.
 
 ## Evidence and limits
 
+### 2026-10-31 Q2_0 graph-node kernel inventory
+
+Nsight Systems graph-node collection exposed the strict NInfer Q2_0 expert
+kernels for a pp512+tg32 request. Across one warmup and one measured request,
+D3, D4 and SwiGLU quantization summed to 287 ms, about 0.95% of total summed
+CUDA kernel-event durations. Wait-flag, dequantization and other kernels made
+up much of the remaining event time. Kernel-event durations can overlap, and
+the trace is diagnostic only; this percentage is not a request wall-time
+budget. The Strata type-42 matmul work remains mixed and cannot be cleanly
+divided into dense and expert operations here. The profile supports limited
+request-level headroom from the grouped expert kernels alone, not a release
+performance claim. See the
+[kernel diagnostic](../../bench/results/2026-10-31-e6-q2-ninfer-kernel-share-diagnostic/README.md).
+
 ### 2026-10-31 2K-prompt backend screen
 
 A three-pair pp2048+tg128-cap retrieval/arithmetic comparison at fixed 4K

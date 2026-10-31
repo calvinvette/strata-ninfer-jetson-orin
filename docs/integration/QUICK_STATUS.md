@@ -2,6 +2,8 @@
 
 Updated: 2026-10-31
 
+An opt-in Nsight graph-node diagnostic showed NInfer D3/D4 plus SwiGLU kernels account for 0.95% of summed GPU kernel durations in the captured pp512 request; the rest includes substantial wait-flag, dequantization and other model work. Kernel durations overlap, so this is not a wall-time fraction. [Report](../../bench/results/2026-10-31-e6-q2-ninfer-kernel-share-diagnostic/README.md).
+
 A three-pair 2K-prompt/128-cap comparison at a fixed 4K cache also found no NInfer decode gain: paired median 0.00% (95% screening interval −2.47% to +1.15%). Exact retrieval and arithmetic outputs matched. [Report](../../bench/results/2026-10-31-e6-q2-ninfer-backend-4k-pp2048-tg128-screen/README.md).
 
 A same-profile 4K-cache pp512+tg128 backend screen found no NInfer request-level gain on NIMBUS: paired medians were −1.3% prompt TPS and −1.3% decode TPS, with TTFT/client time also about 1.2% slower. All six exact-answer responses matched byte-for-byte; no metric met the 5% screen. [Report](../../bench/results/2026-10-31-e6-q2-ninfer-backend-4k-tg128-screen/README.md).

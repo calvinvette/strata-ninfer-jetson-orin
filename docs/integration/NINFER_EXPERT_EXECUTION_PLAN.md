@@ -230,13 +230,20 @@ The Q2_0 matched-residency three-pair screen and one same-day decode-phase pair
 are recorded in the [E2 paired screen](../../bench/results/2026-10-25-phase-e2-q2-ninfer-resident-smoke/paired-screen/README.md)
 and [Q2_0 phase timing](../../bench/results/2026-10-25-phase-e0-expert-runtime-audit/q2-decode-breakdown/README.md).
 They identify CPU expert work, job/plan setup and GPU-reach wait separately;
-the grouped NInfer operator screen is slower than Strata. Dense and resident
-expert kernel families are not separated in a Q2_0 service Nsight trace yet.
-This is enough to reject the current schedule and select it for optimization,
-not to claim a speedup ceiling or a performance result. The original pinned
-product binary's resident map remains unavailable. That limitation is explicit;
-it does not invalidate the same-source matched-map experiment. E0 does not
-expand into unrelated concurrency diagnosis.
+the initial grouped NInfer operator screen was slower than Strata. A new
+current-source Nsight graph-node trace confirms that strict NInfer launches
+grouped Q2_0 D3/D4 and SwiGLU kernels in the real request. These sum to 287 ms
+across a warmup and one 32-token measured request (0.95% of summed CUDA
+kernel-event durations). Large wait-flag and dequantization work remains.
+This ratio is not a wall-time fraction because kernel events can overlap. The
+Strata type-42 matmul work remains inseparable into dense and resident-expert
+parts in this trace, so E0 now has a bounded NInfer-family inventory rather
+than a complete before/after kernel budget. This helps explain why a grouped
+operator win may have little service effect; it neither sets a speedup ceiling
+nor changes the no-release result. The original pinned product binary's
+resident map remains unavailable. That limitation is explicit; it does not
+invalidate the same-source matched-map experiment. E0 does not expand into
+unrelated concurrency diagnosis. See the [node-trace diagnostic](../../bench/results/2026-10-31-e6-q2-ninfer-kernel-share-diagnostic/README.md).
 
 ### E1 — Specify and prove the selected expert contract — complete 2026-10-25
 
@@ -2605,3 +2612,11 @@ All six outputs matched the exact codes and sum, stopping at 47 tokens.
 Prompt, TTFT and client medians favored NInfer by about 2%, but uncertainty
 was wide and each interval included zero. No metric met the 5% effect gate;
 do not run seven-pair confirmation for this cell. See the [backend report](../../bench/results/2026-10-31-e6-q2-ninfer-backend-4k-pp2048-tg128-screen/README.md).
+
+**E0/E6 Nsight graph-node inventory (2026-10-31):** a paired diagnostic
+captured the strict NInfer Q2_0 kernels on the NIMBUS request. D3/D4 plus
+SwiGLU summed to 287 ms over one warmup and one measured pp512+tg32 request,
+0.95% of summed CUDA kernel-event durations. Wait-flag and dequantization work
+remain substantial. These durations overlap and are not request wall-time
+fractions; the Strata type-42 work is not separated by dense/expert role. See
+the [kernel report](../../bench/results/2026-10-31-e6-q2-ninfer-kernel-share-diagnostic/README.md).

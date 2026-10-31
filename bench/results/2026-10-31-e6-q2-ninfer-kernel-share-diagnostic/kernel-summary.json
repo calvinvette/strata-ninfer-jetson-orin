@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "experiment": "Nsight Systems CUDA graph-node kernel inventory, Q2_0 4K cache, one NIMBUS pp512+tg32 warmup and measured request per backend",
+  "date": "2026-10-31",
+  "device": "Jetson AGX Orin Developer Kit, aarch64, SM87, CUDA 12.6",
+  "profiler": {
+    "name": "NVIDIA Nsight Systems",
+    "version": "2024.5.4.34-245434855735v0",
+    "trace": "cuda,nvtx,osrt",
+    "cuda_graph_trace": "node",
+    "cpu_sampling": "disabled",
+    "interpretation": "diagnostic only; profiler node tracing adds substantial overhead; each process trace includes one warmup and one measured API request"
+  },
+  "source_commit": "e781e411c93252be2351feb35468ce06ff6a16a4",
+  "source_file_sha256": "b49d75d02876d1eaa59d74d38e2867f5ecefa509909683adbcdfc6f3c18a02bb",
+  "binary_sha256": "fd67288c399d895be036dab344e30caab3d081540bfc552f22dac6a5fc33644a",
+  "model": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0, same two shards and PLE pack as linked backend screens; 4,000 cache slots, 8K context, prefill chunk128, MTP2, eight workers, staging and prompt cache off",
+  "workload": {
+    "task": "NIMBUS-7319 held-out retrieval",
+    "prompt_tokens": 512,
+    "warmup_generation_cap": 32,
+    "measured_generation_cap": 32,
+    "exact_answer_prefix_passed": true,
+    "request_status": "all four warmup/measured requests passed"
+  },
+  "arms": {
+    "strata": {
+      "backend": "Strata",
+      "requests": 2,
+      "sum_cuda_kernel_duration_ms": 32039.247488,
+      "key_kernel_sums_ms": {
+        "wait_flag_ge_kernel": 8780.609011,
+        "dequant_kernel_type11": 3649.250144,
+        "dequant_kernel_type23": 2517.821376,
+        "dequant_kernel_type12": 1210.885376,
+        "mul_mat_q_ggml_type42": 6449.740608,
+        "gr_up_multi_n1": 366.856417,
+        "gr_down_staged_n1": 269.053952,
+        "moe_combine4": 65.524416
+      },
+      "minimum_available_bytes": 10337542144
+    },
+    "ninfer": {
+      "backend": "strict NInfer",
+      "requests": 2,
+      "sum_cuda_kernel_duration_ms": 30250.435746,
+      "key_kernel_sums_ms": {
+        "wait_flag_ge_kernel": 8156.370634,
+        "dequant_kernel_type11": 3430.541984,
+        "dequant_kernel_type23": 2379.23856,
+        "dequant_kernel_type12": 1141.596352,
+        "mul_mat_q_ggml_type42": 6117.391904,
+        "ninfer_d3_q2_0_grouped": 132.124216,
+        "ninfer_d4_q2_0_grouped": 132.146524,
+        "ninfer_swiglu_quantize_q8_1_many": 22.853637,
+        "gr_up_multi_n1": 344.071584,
+        "gr_down_staged_n1": 266.51344,
+        "moe_combine4": 60.438272
+      },
+      "minimum_available_bytes": 10485235712
+    }
+  },
+  "derived": {
+    "ninfer_d3_d4_and_swiglu_kernel_duration_ms": 287.124377,
+    "ninfer_identified_kernels_share_of_all_ninfer_summed_kernel_duration_percent": 0.949157,
+    "ninfer_d3_count": 6144,
+    "ninfer_d4_count": 6144,
+    "swiglu_count": 6144,
+    "scope_caveat": "Kernel durations are summed CUDA activity across warmup plus one measured request and can overlap. Their ratio is not a percentage of request wall time. The Q2 type-42 matmul rows in the Strata trace are not separable into dense and resident-expert contributions from this profile."
+  },
+  "raw_profiles_outside_git": [
+    "/tmp/e6-nsys-node-4k-tg128/strata-nsys-node.nsys-rep",
+    "/tmp/e6-nsys-node-4k-tg128/ninfer-nsys-node.nsys-rep"
+  ],
+  "conclusion": "The NInfer Q2_0 resident grouped D3/D4 plus activation kernels form a small share of summed GPU kernel activity for this short request; large wait-flag and dequantization work remains. This supports limited end-to-end headroom from isolated expert-kernel optimization, but is not a causal wall-time budget or general workload attribution."
+}
