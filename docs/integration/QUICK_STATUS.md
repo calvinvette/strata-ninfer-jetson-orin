@@ -2,7 +2,7 @@
 
 Updated: 2026-10-31
 
-An opt-in Nsight graph-node diagnostic showed NInfer D3/D4 plus SwiGLU kernels account for 0.95% of summed GPU kernel durations in the captured pp512 request; the rest includes substantial wait-flag, dequantization and other model work. Kernel durations overlap, so this is not a wall-time fraction. [Report](../../bench/results/2026-10-31-e6-q2-ninfer-kernel-share-diagnostic/README.md).
+An opt-in Nsight graph-node diagnostic showed NInfer D3/D4 plus SwiGLU kernels account for 0.95% of the GPU-active interval union in the captured pp512 request pair; event overlap was only 0.35%. This is not a request wall-time fraction or a general speedup ceiling. Wait-flag, dequantization and other work remains. [Report](../../bench/results/2026-10-31-e6-q2-ninfer-kernel-share-diagnostic/README.md).
 
 A three-pair 2K-prompt/128-cap comparison at a fixed 4K cache also found no NInfer decode gain: paired median 0.00% (95% screening interval −2.47% to +1.15%). Exact retrieval and arithmetic outputs matched. [Report](../../bench/results/2026-10-31-e6-q2-ninfer-backend-4k-pp2048-tg128-screen/README.md).
 

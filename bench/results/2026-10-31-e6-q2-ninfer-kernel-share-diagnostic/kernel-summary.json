@@ -63,14 +63,20 @@
   "derived": {
     "ninfer_d3_d4_and_swiglu_kernel_duration_ms": 287.124377,
     "ninfer_identified_kernels_share_of_all_ninfer_summed_kernel_duration_percent": 0.949157,
+    "strata_kernel_interval_union_ms": 31935.960797,
+    "strata_kernel_event_overlap_ms": 103.286691,
+    "ninfer_kernel_interval_union_ms": 30145.330111,
+    "ninfer_kernel_event_overlap_ms": 105.105635,
+    "ninfer_identified_kernels_interval_union_ms": 287.124377,
+    "ninfer_identified_kernels_share_of_ninfer_kernel_interval_union_percent": 0.952467,
     "ninfer_d3_count": 6144,
     "ninfer_d4_count": 6144,
     "swiglu_count": 6144,
-    "scope_caveat": "Kernel durations are summed CUDA activity across warmup plus one measured request and can overlap. Their ratio is not a percentage of request wall time. The Q2 type-42 matmul rows in the Strata trace are not separable into dense and resident-expert contributions from this profile."
+    "scope_caveat": "CUDA kernel intervals were reduced to their time union; 0.35% overlap correction changes the NInfer identified-kernel share from 0.949% of summed durations to 0.952% of GPU-active interval union. This is not a percentage of request wall time or an end-to-end speedup ceiling. The Q2 type-42 matmul rows in the Strata trace are not separable into dense and resident-expert contributions from this profile."
   },
   "raw_profiles_outside_git": [
     "/tmp/e6-nsys-node-4k-tg128/strata-nsys-node.nsys-rep",
     "/tmp/e6-nsys-node-4k-tg128/ninfer-nsys-node.nsys-rep"
   ],
-  "conclusion": "The NInfer Q2_0 resident grouped D3/D4 plus activation kernels form a small share of summed GPU kernel activity for this short request; large wait-flag and dequantization work remains. This supports limited end-to-end headroom from isolated expert-kernel optimization, but is not a causal wall-time budget or general workload attribution."
+  "conclusion": "The NInfer Q2_0 resident grouped D3/D4 plus activation kernels form 0.95% of the GPU-active interval union across one warmup and one measured short request; large wait-flag and dequantization work remains. This bounds recoverable GPU-active time for these identified kernels in this trace, but is not a request wall-time ceiling or general workload attribution."
 }

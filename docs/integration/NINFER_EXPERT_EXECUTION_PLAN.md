@@ -234,8 +234,11 @@ the initial grouped NInfer operator screen was slower than Strata. A new
 current-source Nsight graph-node trace confirms that strict NInfer launches
 grouped Q2_0 D3/D4 and SwiGLU kernels in the real request. These sum to 287 ms
 across a warmup and one 32-token measured request (0.95% of summed CUDA
-kernel-event durations). Large wait-flag and dequantization work remains.
-This ratio is not a wall-time fraction because kernel events can overlap. The
+kernel-event durations). A reduction of the same Nsight SQLite exports finds
+only 105 ms of kernel overlap across 30.250 s of summed NInfer kernel duration;
+the NInfer group occupies 0.95% of the GPU-active interval union as well.
+Large wait-flag and dequantization work remains. This is a GPU-active-time
+share, not request wall time or an end-to-end speedup ceiling. The
 Strata type-42 matmul work remains inseparable into dense and resident-expert
 parts in this trace, so E0 now has a bounded NInfer-family inventory rather
 than a complete before/after kernel budget. This helps explain why a grouped
