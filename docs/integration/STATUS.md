@@ -7318,6 +7318,26 @@ capacity screen, not 128K ingestion or performance qualification. See the
 
 **E6 2K- and 8K-capacity no-trace API screens (2026-10-31):** three randomized process pairs per cell at pp512+tg64 passed with matching warmup and measured output. At 2K, NInfer changed prompt TPS +1.31%, decode TPS -0.04%, first-visible TTFT -1.22%, and client time -0.83%; at 8K the changes were -0.48%, -0.78%, +0.42%, and +0.94%. No median reached the 5% useful-effect screen; intervals and three-pair uncertainty mean these remain screening findings. Minimum available RAM was 11.66 GiB (2K) and 11.53 GiB (8K), with zero sampled cgroup OOM kills; peak swap was 2.10 and 1.57 GiB. CPU frequencies varied from 729 to 2,201 MHz; GPU frequency and EMC readback were unavailable, and energy was not measured. These are short-prompt capacity screens, not large-context ingestion. See the [2K](../../bench/results/2026-10-31-e6-q2-2k-capacity-api-screen/README.md) and [8K](../../bench/results/2026-10-31-e6-q2-8k-capacity-api-screen/README.md) reports.
 
+**E6 one-position live owner intervention (2026-10-31):** the opt-in
+`STRATA_EXPERIMENT_FORCE_CPU_EXPERT=1:3:65540` hook forced layer-1 expert 3
+through the CPU path for one single-token dispatch. The minimally instrumented
+65K prompt + 32-token request passed and matched the adaptive arm's token IDs;
+layer-1 MoE, layer-2 GDN diagnostic/output and committed layer-2 state captures
+were byte-identical. The accepted-prefix full-state run also passed, with a
+minimum 9,190,219,776 bytes available (8.56 GiB) and no OOM. Its all-layer GDN
+dump had exact layers 0–2, float-roundoff deltas at layers 3–4, then deeper
+drift. Global relative L2 was 0.010784 versus adaptive and 0.008204 versus
+fixed-owner. A fixed-owner/adaptive full-state repeat already differed by
+0.010855, so this full-state delta is within the observed same-setup repeat
+variation. The targeted intervention therefore establishes a local
+layer-1-to-layer-2 counterfactual in the minimally instrumented capture, but
+does not establish a whole-model effect. A/B rates in these instrumented runs
+are excluded from performance evidence; energy was not measured. The diagnostic
+hook is opt-in and defaults off. CUDA built and ran on Orin; maestro1 rebuilt
+HIP and SYCL with one job, HIP help passed, and SYCL startup was unavailable
+because the host has no SYCL device. E6/E7 remain open. [Report and comparison
+data](../../bench/results/2026-10-31-e6-q2-owner-intervention/README.md).
+
 **E6 exact 256K retrieval/state check (2026-10-29):** one fresh-process
 Strata/strict-NInfer pair passed a held-out 256,000-token retrieval/arithmetic
 task at 262,144 configured context with PCIe staging disabled. Both returned

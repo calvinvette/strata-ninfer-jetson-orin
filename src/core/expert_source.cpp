@@ -3113,6 +3113,38 @@ constexpr int64_t kMaxWindowEntries = 128;
 constexpr int64_t kMaxCaptureRows = 4096;
 static_assert(strata::kernels::cpu::MAXT * 10 <= kMaxWindowEntries, "a verify window's entries overflow the tables");
 
+struct ForceCpuExpertDispatch {
+    bool enabled = false;
+    int64_t layer = -1;
+    int32_t expert = -1;
+    int64_t position = -1;
+    bool invalid = false;
+};
+
+// Diagnostic-only owner intervention for one single-token verifier dispatch.
+// Format: STRATA_EXPERIMENT_FORCE_CPU_EXPERT=layer:expert:position
+const ForceCpuExpertDispatch& force_cpu_expert_dispatch() {
+    static const ForceCpuExpertDispatch config = [] {
+        ForceCpuExpertDispatch result;
+        const char* text = std::getenv("STRATA_EXPERIMENT_FORCE_CPU_EXPERT");
+        if (text == nullptr || *text == '\0') return result;
+        char trailing = '\0';
+        long long layer = -1, expert = -1, position = -1;
+        if (std::sscanf(text, "%lld:%lld:%lld%c", &layer, &expert, &position, &trailing) != 3 ||
+            layer < 0 || layer >= 48 || expert < 0 ||
+            expert > (long long) std::numeric_limits<int32_t>::max() || position < 0) {
+            result.invalid = true;
+            return result;
+        }
+        result.enabled = true;
+        result.layer = (int64_t) layer;
+        result.expert = (int32_t) expert;
+        result.position = (int64_t) position;
+        return result;
+    }();
+    return config;
+}
+
 // Opt-in diagnostic for reproducing expert CPU/GPU differences on an actual verifier activation.
 // Each JSONL row contains one verifier-row activation, its absolute input token key, and every routed expert and its
 // final owner: -1 CPU, 0 primary VRAM/foresight, 1 PCIe, 2 peer/helper GPU. No token text is recorded.
@@ -3318,6 +3350,13 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
                                 int64_t position0) {
     using namespace strata::kernels::cpu;
     if (d.failed) return;
+    const ForceCpuExpertDispatch& force_cpu = force_cpu_expert_dispatch();
+    if (force_cpu.invalid) {
+        d.failed = true;
+        d.fail = "STRATA_EXPERIMENT_FORCE_CPU_EXPERT must be layer:expert:position";
+        d.fail_layer = d.layers;
+        return;
+    }
     if (n_tok < 1 || n_tok > MAXT) {
         d.failed = true;
         d.fail = "a verify window has more tokens than the multi-token expert kernel takes";
@@ -3330,6 +3369,21 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
         d.fail = "a verify window routes more entries than the expert pool's window tables hold";
         d.fail_layer = d.layers;
         return;
+    }
+    if (force_cpu.enabled && d.layers == force_cpu.layer && n_tok != 1) {
+        for (int64_t t = 0; t < n_tok; ++t) {
+            const int64_t position = row_positions != nullptr ? row_positions[t] : position0 + t;
+            if (position != force_cpu.position) continue;
+            for (int64_t j = 0; j < k; ++j) {
+                if (ids[t * k + j] == force_cpu.expert) {
+                    d.failed = true;
+                    d.fail = "STRATA_EXPERIMENT_FORCE_CPU_EXPERT requires a one-token dispatch";
+                    d.fail_layer = d.layers;
+                    d.fail_expert = force_cpu.expert;
+                    return;
+                }
+            }
+        }
     }
     if ((int64_t) d.act_multi.size() < n_tok) d.act_multi.resize((size_t) MAXT);
     const ExpertLayout& lay = expert_layout();
@@ -3434,6 +3488,22 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
                     }
                     ++miss_rank;
                 }
+            }
+            const int64_t row_position = row_positions != nullptr
+                ? row_positions[i0 / k] : position0 + i0 / k;
+            if (force_cpu.enabled && d.layers == force_cpu.layer && e == force_cpu.expert &&
+                row_position == force_cpu.position && n_tok == 1 && kd == 0) {
+                // This opt-in counterfactual changes only one routed row's compute owner.
+                // The weight source remains caller-owned; normal CPU expert dispatch below reads it.
+                kd = -1;
+                ptr = 0;
+                static std::atomic<bool> logged{false};
+                bool expected = false;
+                if (logged.compare_exchange_strong(expected, true, std::memory_order_relaxed))
+                    std::fprintf(stderr,
+                                 "strata: EXPERIMENT forced CPU owner for layer %lld expert %d position %lld\n",
+                                 (long long) force_cpu.layer, force_cpu.expert,
+                                 (long long) force_cpu.position);
             }
             for (int64_t i = i0; i < n; ++i)
                 if (first_of[i] == i0) kind[i] = kd;
