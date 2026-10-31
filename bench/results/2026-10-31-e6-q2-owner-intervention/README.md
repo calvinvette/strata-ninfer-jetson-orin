@@ -74,10 +74,12 @@ GDN difference first material at layer 16.
 
 ## Interpretation and next step
 
-This closes the single-position local owner-intervention question, not E6 or
-E7. The one-position intervention reproduces the adaptive local layer-1 and
-layer-2 captured state in the minimally instrumented run, while the whole-model
-checkpoint remains within the scale of same-setup repeat variation. Next
-investigate repeatability at deeper state checkpoints and use a less intrusive
-full-state capture or multiple matched controls before claiming a long-range
-causal effect. No speedup, quality, or generalization claim follows.
+This answers the single-position local owner-intervention question, not E6 or
+E7. The layer-1 intervention reproduces the adaptive local layer-1 and layer-2
+captured state in the minimally instrumented run. A second forced-CPU full-state
+run then differed from the first by relative L2 `0.01078`, approximately the
+same as the original forced/adaptive comparison; the layer-1 whole-model effect
+is therefore not established. The independently repeated layer-5, layer-7 and
+layer-13 interventions retain their reported bounded causal state findings.
+No speedup, quality, or generalization claim follows. See
+[layer1-full-state-repeat.md](layer1-full-state-repeat.md).

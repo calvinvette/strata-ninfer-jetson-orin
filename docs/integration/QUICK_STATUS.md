@@ -2,6 +2,12 @@
 
 Updated: 2026-10-31
 
+Layer-1 expert-3 forced-owner repeats now match locally through layer 2 but
+not across full GDN state: the second forced-CPU run differs from the first by
+relative L2 `0.01078`, similar to forced versus adaptive. Keep that result
+local-only. Repeated layer-5/7/13 owner interventions retain their bounded
+causal state findings; none is a performance claim. [Layer-1 repeat](../../bench/results/2026-10-31-e6-q2-owner-intervention/layer1-full-state-repeat.md).
+
 This is a short orientation to the integration. The [plan](PLAN.md) defines
 phase gates; the detailed [status](STATUS.md) is the evidence record, and the
 [measurement protocol](BENCHMARKS.md) defines how to interpret results. The

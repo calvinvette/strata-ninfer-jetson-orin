@@ -1,5 +1,13 @@
 # Integration status
 
+**E6 layer-1 intervention repeat (2026-10-31):** a second exact-position
+forced-CPU run at layer 1 expert 3 returned the same 32 token IDs and passed
+with 8.70 GiB minimum available RAM. Its full 36-layer GDN state differs from
+the first forced-CPU run by relative L2 `0.01078`, essentially the same as the
+forced/adaptive difference. Layers 0–2 remain exact and the earlier local
+layer-1/2 counterfactual stands; the whole-model layer-1 causal effect is not
+repeatable in these captures. [Report](../../bench/results/2026-10-31-e6-q2-owner-intervention/layer1-full-state-repeat.md).
+
 Updated: 2026-10-31. Phases 1 through 4 are complete for their documented tested
 Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 is
 complete for its bounded Orin qualification matrix under [its closeout]
