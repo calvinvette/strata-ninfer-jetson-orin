@@ -942,6 +942,7 @@ Layer-2 routes and owners matched across the first seven generated positions;
 one upstream input row showed a small delta before its MoE. The next probe is
 layer 1 around that position.
 That layer-1 probe found expert 3 changed GPU→CPU owner at the matching token;
-the service output rows matched independent CPU/GPU oracle results exactly.
+the round-4 adaptive swap promoted layer-1 expert 320 into expert 3's slot,
+and the service output rows matched independent CPU/GPU oracle results exactly.
 The tiny local MoE delta aligns with the layer-2 activation and prefix-8 GDN
 differences, while broader E6/E7 attribution remains open.

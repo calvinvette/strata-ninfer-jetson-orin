@@ -7420,7 +7420,9 @@ A layer-1 service bundle at position 65,540 localizes one active expert
 change: with identical input, routes, weights and shared output, expert 3 was
 GPU-owned in the fixed arm and CPU-owned in the adaptive arm. Its service row
 matched the independent native GPU and CPU oracle outputs bit-for-bit in the
-respective arms. The per-expert delta was relative L2 `1.059e-7`, and the
+respective arms. The adaptive round-4 log records swap `1:320>3`, applied at
+position 65,539 before the CPU-owned dispatch at 65,540. The per-expert delta
+was relative L2 `1.059e-7`, and the
 combined MoE delta was `4.345e-8`; output tokens remained identical. This
 dispatch aligns with the small layer-2 activation delta and layer-2 GDN state
 divergence at accepted prefix 8. It is a verified local owner effect, but does

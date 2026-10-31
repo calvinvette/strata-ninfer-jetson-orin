@@ -313,7 +313,12 @@ owner among the ten routed experts: fixed-owner assigned it to GPU (`route_kind
 = 0`), while adaptation assigned it to CPU (`route_kind = -1`). The other
 nine owner assignments matched. The complete service MoE bundles at that
 position confirm byte-identical input, routes, weights and shared output. The
-expert-3 service output changed in 1,840/2,560 values (maximum absolute
+round-4 adaptation log records the layer-1 swap `1:320>3`: expert 320 was
+loaded into expert 3's slot. The update was queued and applied at position
+65,539; at the next layer-1 dispatch, position 65,540, expert 3 was CPU-owned.
+This ties the observed owner change to that adaptive swap.
+
+The expert-3 service output changed in 1,840/2,560 values (maximum absolute
 `1.49e-8`, relative L2 `1.059e-7`); the combined MoE output changed in
 737/2,560 values (maximum `3.73e-9`, relative L2 `4.345e-8`).
 
