@@ -7514,3 +7514,14 @@ emitted the same tokens and had zero sampled OOM kills, with at least 8.38 GiB
 available. The remaining source is earlier in the network. An all-layer trace
 at this position is the next useful localization. See the
 [boundary comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer12-boundary-position65539-comparison.json).
+
+The all-layer MoE bundle at position 65,539 finds the first sampled output
+change at layer 5: inputs, routes and route weights match, while expert 220's
+row differs by relative L2 `1.14e-7`; shared output is exact and combined output
+differs by `5.77e-8`. The adaptive round-4 schedule promotes `5:220>8` before
+this dispatch. The next step is direct owner capture plus CPU/GPU oracle on the
+same input. This layer-5 delta appears in layer-6 input (`7.54e-8`); routes
+first diverge at layer 17. Both requests return identical tokens, remain above
+the memory floor, and have zero sampled OOM kills. This is a local attribution
+candidate, not yet a verified owner-oracle result. See the
+[all-layer comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/all-layer-position65539-comparison.json).

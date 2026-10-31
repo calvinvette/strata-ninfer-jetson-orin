@@ -513,3 +513,23 @@ delta before its `qkv` projection expands it. All boundary fields are reported
 in [`layer12-boundary-position65539-comparison.json`](layer12-boundary-position65539-comparison.json).
 This one-layer boundary does not reveal where the layer-12 difference first
 arose; an all-layer position-65,539 trace is the next localization step.
+
+### All-layer MoE trace at position 65,539
+
+The 47-layer bundle at the first layer-13 state-divergence token finds an
+upstream first delta at model layer 5. Layers 0–4 have identical MoE inputs,
+routes, weights, expert rows, shared outputs and combined outputs. At layer 5,
+the input, ten route IDs and route weights are still exact, but expert 220's
+row differs in 1,868/2,560 values (relative L2 `1.14e-7`, max absolute
+`1.49e-8`); shared output remains exact and combined output differs by
+`5.77e-8`. The adaptive round-4 schedule includes `5:220>8`, applied at
+position 65,539 before this dispatch. This is a strong owner-transition match;
+the direct owner capture and fixed-input CPU/GPU oracle are the next checks.
+
+The layer-5 output delta appears in layer-6 input (relative L2 `7.54e-8`) and
+then propagates. Routes first differ at layer 17. At layer 7, expert 225 also
+changes row and the shared path changes, but layer-7 input has already drifted;
+that later bundle delta is not an independent first cause. The identical token
+hash persisted through both runs. Min available memory was 8.55 GiB fixed and
+8.44 GiB adaptive, with zero sampled OOM kills. See
+[`all-layer-position65539-comparison.json`](all-layer-position65539-comparison.json).

@@ -982,3 +982,9 @@ layer-12 residual relative L2 `1.11e-7`, MoE `2.13e-7`, next-layer activation
 `1.53e-7`; layer-13 GDN `x` is `1.80e-7`. Both arms returned identical tokens
 and stayed above the memory floor. Next localize across earlier layers.
 [Boundary comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer12-boundary-position65539-comparison.json).
+
+The all-layer trace at position 65,539 first differs at layer 5: only expert
+220's row changes with matching input/routes (relative L2 `1.14e-7`), followed
+by a `5.77e-8` combined-output delta. The adaptive schedule promotes expert 220
+there before dispatch; direct owner/oracle confirmation is next. The delta
+appears in layer-6 input and routes remain equal until layer 17. [Trace](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/all-layer-position65539-comparison.json).
