@@ -2568,3 +2568,13 @@ effectively tied. The screen does not meet the 5% effect/uncertainty gate, so
 no seven-pair confirmation is indicated for this cell. All six requests
 produced the same 64-token response hash. See the
 [API screen report](../../bench/results/2026-10-31-e6-q2-ninfer-backend-4k-api-screen/README.md).
+
+
+**E6 cache/backend interaction screen (2026-10-31):** a counterbalanced
+three-pair 3K/4K cache ablation on the Strata backend reproduced decode-rate
+gains (+16.92% NIMBUS and +20.83% ORBIT median), with GPU-cache hit rates up
+11–13 percentage points. Prompt throughput and TTFT regressed about 8–10%;
+client-total latency was tied. This shows the decode effect is not specific to
+NInfer, though the small sample does not quantify interaction. The profile
+fails the combined regression gate, so do not confirm it. See the
+[Strata cache ablation](../../bench/results/2026-10-31-e6-q2-strata-cache-capacity-ablation/README.md).

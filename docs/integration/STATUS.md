@@ -2,6 +2,8 @@
 
 # Integration status
 
+**E6 Strata-backend cache-capacity ablation (2026-10-31):** with Strata held fixed, 3K→4K expert-cache slots increased median decode TPS by 16.92% on NIMBUS (three-pair 95% interval −2.86% to +22.86%) and 20.83% on ORBIT (+19.72% to +42.37%). Cache-hit rates rose 11.2 and 12.8 points. Prompt TPS and TTFT regressed about 8–10%, while client-total latency was effectively tied. This indicates cache capacity with adaptive swaps can explain decode gains without NInfer, and the tested 4K policy fails the combined regression gate. No seven-pair confirmation is justified. [Ablation report](../../bench/results/2026-10-31-e6-q2-strata-cache-capacity-ablation/README.md).
+
 **E6 4K-cache backend API screen (2026-10-31):** three paired pp512+tg64, 8K-context requests compared strict NInfer with Strata at the same 4,000-slot cache. Median decode TPS advantage was +3.33%, but the 95% paired interval included zero (0.00% to +14.46%); prompt TPS and TTFT were tied. No seven-pair confirmation is indicated. All six capped outputs shared the same hash. See the [screen report](../../bench/results/2026-10-31-e6-q2-ninfer-backend-4k-api-screen/README.md).
 
 **E6 layer-1 intervention repeat (2026-10-31):** a second exact-position

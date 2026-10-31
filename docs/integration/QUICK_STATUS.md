@@ -2,6 +2,12 @@
 
 Updated: 2026-10-31
 
+A Strata-only 3K/4K cache ablation reproduced higher decode TPS at 4K
+(+16.9% NIMBUS, +20.8% ORBIT medians) with 11–13 point higher cache-hit
+rates, but prompt TPS and TTFT regressed 8–10% and client total was tied.
+Thus the decode gain is not unique to NInfer and this 4K profile fails the
+combined latency gate. [Ablation](../../bench/results/2026-10-31-e6-q2-strata-cache-capacity-ablation/README.md).
+
 A same-day 4K-cache, 8K-context NInfer-versus-Strata API screen measured
 +3.33% median decode TPS at pp512+tg64, but its three-pair interval included
 zero. Prompt TPS and TTFT were effectively tied, so no confirmation was run.

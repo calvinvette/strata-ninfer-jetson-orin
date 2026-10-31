@@ -1,0 +1,375 @@
+{
+  "experiment": "Strata backend cache-capacity ablation, 3K vs 4K configured expert slots",
+  "date": "2026-10-31",
+  "device": "Jetson AGX Orin Developer Kit, CUDA 12.6, SM87",
+  "source_checkout": "HEAD dd88f3ef with opt-in NInfer CTA256 experiment source present (not enabled); Strata backend served all runs",
+  "binary_sha256": "a870afb388809691edd0ac844dd5b104b6a50fdbbd92baf555cbca13969516dd",
+  "model": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0, same two shards, PLE pack, tokenizer and expert profile as 2026-10-31 NInfer cache confirmation",
+  "protocol": {
+    "pairs": 3,
+    "order": [
+      "3K\u21924K",
+      "4K\u21923K",
+      "3K\u21924K"
+    ],
+    "backend": "Strata held fixed; adaptive swaps remain enabled",
+    "only_changed_factor": "expert-cache capacity, 3,000 vs 4,000 slots",
+    "context_tokens": 8192,
+    "workloads": "two heldout tokenizer-verified pp512 retrieval/checksum prompts; tg64 cap",
+    "warmups": "both prompts warmed once per process; measured once per prompt",
+    "temperature": 0,
+    "trace": "off",
+    "energy": "not attributed",
+    "clock_control": "none; read-only sampling"
+  },
+  "pairs": [
+    {
+      "pair": 0,
+      "order": "3K\u21924K",
+      "arms": {
+        "3k": {
+          "status": "pass",
+          "minimum_available_bytes": 12405202944,
+          "requests": [
+            {
+              "cell": "e6-heldout-retrieval-1-pp512-tg64",
+              "expected_prefix": "NIMBUS-7319",
+              "answer_prefix_passed": true,
+              "prompt_tokens": 512,
+              "output_tokens": 64,
+              "prompt_tps": 21.4,
+              "decode_tps": 6.5,
+              "ttft_s": 24.164754350669682,
+              "client_total_s": 33.76596708409488,
+              "response_sha256": "6215e436a770f298de1f738851f7c16c63eb02f1b15fd6281b831ee4e6a8f89d",
+              "gpu_cache_hit_rate": 0.614
+            },
+            {
+              "cell": "e6-heldout-retrieval-2-pp512-tg64",
+              "expected_prefix": "ORBIT-4826",
+              "answer_prefix_passed": true,
+              "prompt_tokens": 512,
+              "output_tokens": 64,
+              "prompt_tps": 24.1,
+              "decode_tps": 5.9,
+              "ttft_s": 21.528140875976533,
+              "client_total_s": 32.046719923149794,
+              "response_sha256": "57a97d72bfaf479c632c86cc353fbf29f5073274b2d58cc293939d3c4b3139cc",
+              "gpu_cache_hit_rate": 0.614
+            }
+          ]
+        },
+        "4k": {
+          "status": "pass",
+          "minimum_available_bytes": 10798739456,
+          "requests": [
+            {
+              "cell": "e6-heldout-retrieval-1-pp512-tg64",
+              "expected_prefix": "NIMBUS-7319",
+              "answer_prefix_passed": true,
+              "prompt_tokens": 512,
+              "output_tokens": 64,
+              "prompt_tps": 21.6,
+              "decode_tps": 7.6,
+              "ttft_s": 23.93596464395523,
+              "client_total_s": 32.14331287611276,
+              "response_sha256": "6215e436a770f298de1f738851f7c16c63eb02f1b15fd6281b831ee4e6a8f89d",
+              "gpu_cache_hit_rate": 0.726
+            },
+            {
+              "cell": "e6-heldout-retrieval-2-pp512-tg64",
+              "expected_prefix": "ORBIT-4826",
+              "answer_prefix_passed": true,
+              "prompt_tokens": 512,
+              "output_tokens": 64,
+              "prompt_tps": 21.8,
+              "decode_tps": 8.4,
+              "ttft_s": 23.64888442121446,
+              "client_total_s": 31.140371304936707,
+              "response_sha256": "57a97d72bfaf479c632c86cc353fbf29f5073274b2d58cc293939d3c4b3139cc",
+              "gpu_cache_hit_rate": 0.742
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pair": 1,
+      "order": "4K\u21923K",
+      "arms": {
+        "3k": {
+          "status": "pass",
+          "minimum_available_bytes": 12406255616,
+          "requests": [
+            {
+              "cell": "e6-heldout-retrieval-1-pp512-tg64",
+              "expected_prefix": "NIMBUS-7319",
+              "answer_prefix_passed": true,
+              "prompt_tokens": 512,
+              "output_tokens": 64,
+              "prompt_tps": 24.8,
+              "decode_tps": 7.0,
+              "ttft_s": 20.808270201086998,
+              "client_total_s": 29.769681735895574,
+              "response_sha256": "6215e436a770f298de1f738851f7c16c63eb02f1b15fd6281b831ee4e6a8f89d",
+              "gpu_cache_hit_rate": 0.614
+            },
+            {
+              "cell": "e6-heldout-retrieval-2-pp512-tg64",
+              "expected_prefix": "ORBIT-4826",
+              "answer_prefix_passed": true,
+              "prompt_tokens": 512,
+              "output_tokens": 64,
+              "prompt_tps": 26.2,
+              "decode_tps": 7.2,
+              "ttft_s": 19.78896147198975,
+              "client_total_s": 28.560574843082577,
+              "response_sha256": "57a97d72bfaf479c632c86cc353fbf29f5073274b2d58cc293939d3c4b3139cc",
+              "gpu_cache_hit_rate": 0.614
+            }
+          ]
+        },
+        "4k": {
+          "status": "pass",
+          "minimum_available_bytes": 11029635072,
+          "requests": [
+            {
+              "cell": "e6-heldout-retrieval-1-pp512-tg64",
+              "expected_prefix": "NIMBUS-7319",
+              "answer_prefix_passed": true,
+              "prompt_tokens": 512,
+              "output_tokens": 64,
+              "prompt_tps": 21.8,
+              "decode_tps": 6.8,
+              "ttft_s": 23.66670105839148,
+              "client_total_s": 32.94533245684579,
+              "response_sha256": "6215e436a770f298de1f738851f7c16c63eb02f1b15fd6281b831ee4e6a8f89d",
+              "gpu_cache_hit_rate": 0.726
+            },
+            {
+              "cell": "e6-heldout-retrieval-2-pp512-tg64",
+              "expected_prefix": "ORBIT-4826",
+              "answer_prefix_passed": true,
+              "prompt_tokens": 512,
+              "output_tokens": 64,
+              "prompt_tps": 21.9,
+              "decode_tps": 8.7,
+              "ttft_s": 23.501770013011992,
+              "client_total_s": 30.736237620934844,
+              "response_sha256": "57a97d72bfaf479c632c86cc353fbf29f5073274b2d58cc293939d3c4b3139cc",
+              "gpu_cache_hit_rate": 0.742
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pair": 2,
+      "order": "3K\u21924K",
+      "arms": {
+        "3k": {
+          "status": "pass",
+          "minimum_available_bytes": 12406931456,
+          "requests": [
+            {
+              "cell": "e6-heldout-retrieval-1-pp512-tg64",
+              "expected_prefix": "NIMBUS-7319",
+              "answer_prefix_passed": true,
+              "prompt_tokens": 512,
+              "output_tokens": 64,
+              "prompt_tps": 24.7,
+              "decode_tps": 7.0,
+              "ttft_s": 20.9550962978974,
+              "client_total_s": 29.986914314795285,
+              "response_sha256": "6215e436a770f298de1f738851f7c16c63eb02f1b15fd6281b831ee4e6a8f89d",
+              "gpu_cache_hit_rate": 0.614
+            },
+            {
+              "cell": "e6-heldout-retrieval-2-pp512-tg64",
+              "expected_prefix": "ORBIT-4826",
+              "answer_prefix_passed": true,
+              "prompt_tokens": 512,
+              "output_tokens": 64,
+              "prompt_tps": 26.2,
+              "decode_tps": 7.1,
+              "ttft_s": 19.711356699932367,
+              "client_total_s": 28.55215474124998,
+              "response_sha256": "57a97d72bfaf479c632c86cc353fbf29f5073274b2d58cc293939d3c4b3139cc",
+              "gpu_cache_hit_rate": 0.614
+            }
+          ]
+        },
+        "4k": {
+          "status": "pass",
+          "minimum_available_bytes": 11040337920,
+          "requests": [
+            {
+              "cell": "e6-heldout-retrieval-1-pp512-tg64",
+              "expected_prefix": "NIMBUS-7319",
+              "answer_prefix_passed": true,
+              "prompt_tokens": 512,
+              "output_tokens": 64,
+              "prompt_tps": 22.6,
+              "decode_tps": 8.6,
+              "ttft_s": 22.869810205884278,
+              "client_total_s": 30.135443865321577,
+              "response_sha256": "6215e436a770f298de1f738851f7c16c63eb02f1b15fd6281b831ee4e6a8f89d",
+              "gpu_cache_hit_rate": 0.726
+            },
+            {
+              "cell": "e6-heldout-retrieval-2-pp512-tg64",
+              "expected_prefix": "ORBIT-4826",
+              "answer_prefix_passed": true,
+              "prompt_tokens": 512,
+              "output_tokens": 64,
+              "prompt_tps": 24.7,
+              "decode_tps": 8.5,
+              "ttft_s": 20.903173733036965,
+              "client_total_s": 28.303304225206375,
+              "response_sha256": "57a97d72bfaf479c632c86cc353fbf29f5073274b2d58cc293939d3c4b3139cc",
+              "gpu_cache_hit_rate": 0.742
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "metrics": {
+    "e6-heldout-retrieval-1-pp512-tg64:prompt_tps": {
+      "3k_median": 24.7,
+      "4k_median": 21.8,
+      "paired_4k_advantage_pct_by_block": [
+        0.9345794392523477,
+        -12.096774193548388,
+        -8.502024291497968
+      ],
+      "median_paired_4k_advantage_pct": -8.502024291497968,
+      "bootstrap_95_percentile_interval_pct": [
+        -12.096774193548388,
+        0.9345794392523477
+      ],
+      "positive_means": "higher TPS"
+    },
+    "e6-heldout-retrieval-1-pp512-tg64:decode_tps": {
+      "3k_median": 7.0,
+      "4k_median": 7.6,
+      "paired_4k_advantage_pct_by_block": [
+        16.923076923076906,
+        -2.857142857142858,
+        22.857142857142843
+      ],
+      "median_paired_4k_advantage_pct": 16.923076923076906,
+      "bootstrap_95_percentile_interval_pct": [
+        -2.857142857142858,
+        22.857142857142843
+      ],
+      "positive_means": "higher TPS"
+    },
+    "e6-heldout-retrieval-1-pp512-tg64:ttft_s": {
+      "3k_median": 20.9550962978974,
+      "4k_median": 23.66670105839148,
+      "paired_4k_advantage_pct_by_block": [
+        0.9558407614552955,
+        -12.077859310649352,
+        -8.372233484885827
+      ],
+      "median_paired_4k_advantage_pct": -8.372233484885827,
+      "bootstrap_95_percentile_interval_pct": [
+        -12.077859310649352,
+        0.9558407614552955
+      ],
+      "positive_means": "lower latency"
+    },
+    "e6-heldout-retrieval-1-pp512-tg64:client_total_s": {
+      "3k_median": 29.986914314795285,
+      "4k_median": 32.14331287611276,
+      "paired_4k_advantage_pct_by_block": [
+        5.048185960906326,
+        -9.639152147303164,
+        -0.49287327968383643
+      ],
+      "median_paired_4k_advantage_pct": -0.49287327968383643,
+      "bootstrap_95_percentile_interval_pct": [
+        -9.639152147303164,
+        5.048185960906326
+      ],
+      "positive_means": "lower latency"
+    },
+    "e6-heldout-retrieval-2-pp512-tg64:prompt_tps": {
+      "3k_median": 26.2,
+      "4k_median": 21.9,
+      "paired_4k_advantage_pct_by_block": [
+        -9.54356846473029,
+        -16.412213740458014,
+        -5.72519083969466
+      ],
+      "median_paired_4k_advantage_pct": -9.54356846473029,
+      "bootstrap_95_percentile_interval_pct": [
+        -16.412213740458014,
+        -5.72519083969466
+      ],
+      "positive_means": "higher TPS"
+    },
+    "e6-heldout-retrieval-2-pp512-tg64:decode_tps": {
+      "3k_median": 7.1,
+      "4k_median": 8.5,
+      "paired_4k_advantage_pct_by_block": [
+        42.3728813559322,
+        20.833333333333325,
+        19.718309859154925
+      ],
+      "median_paired_4k_advantage_pct": 20.833333333333325,
+      "bootstrap_95_percentile_interval_pct": [
+        19.718309859154925,
+        42.3728813559322
+      ],
+      "positive_means": "higher TPS"
+    },
+    "e6-heldout-retrieval-2-pp512-tg64:ttft_s": {
+      "3k_median": 19.78896147198975,
+      "4k_median": 23.501770013011992,
+      "paired_4k_advantage_pct_by_block": [
+        -8.967626157179298,
+        -15.797995380631358,
+        -5.701608034864869
+      ],
+      "median_paired_4k_advantage_pct": -8.967626157179298,
+      "bootstrap_95_percentile_interval_pct": [
+        -15.797995380631358,
+        -5.701608034864869
+      ],
+      "positive_means": "lower latency"
+    },
+    "e6-heldout-retrieval-2-pp512-tg64:client_total_s": {
+      "3k_median": 28.560574843082577,
+      "4k_median": 30.736237620934844,
+      "paired_4k_advantage_pct_by_block": [
+        2.910526047804063,
+        -7.078494136739744,
+        0.8792277893193257
+      ],
+      "median_paired_4k_advantage_pct": 0.8792277893193257,
+      "bootstrap_95_percentile_interval_pct": [
+        -7.078494136739744,
+        2.910526047804063
+      ],
+      "positive_means": "lower latency"
+    }
+  },
+  "resources": {
+    "minimum_sampled_available_ram_gib": 10.057109832763672,
+    "maximum_sampled_swap_gib": 2.7036056518554688,
+    "oom_kills": 0,
+    "cpu_mhz": [
+      729.6,
+      2201.6
+    ],
+    "gpu_mhz": [
+      306,
+      1300.5
+    ],
+    "emc": "readback denied",
+    "clocks": "dynamic"
+  },
+  "interpretation": "At fixed Strata backend, 4K also raises decode throughput on the two heldout tasks, particularly ORBIT, while prompt throughput is slower and client total is effectively tied. This indicates a cache-capacity/adaptive-swap effect can occur without NInfer, but the small three-pair sample and workload-specific tradeoffs do not establish a general policy or NInfer interaction."
+}
