@@ -5,7 +5,7 @@
   "generated_position": 65539,
   "weight_contract": "blk.13.attn_qkv.weight is Q3_K; Strata native_mmvq consumes Q8_1 activations",
   "capture": "STGDIAG4 layer13.gdn; x begins at byte 100",
-  "method": "Independent tools/integration/q2_0_expert_oracle.py quantize_q8_1 over captured x values; runtime contract checked in include/strata/kernels/native_mmvq.hpp and src/core/verify.cpp",
+  "method": "Independent tools/integration/q2_0_expert_oracle.py quantize_q8_1 over captured x values, cross-checked against raw buffers produced by native_quantize_q8_1; runtime contract checked in include/strata/kernels/native_mmvq.hpp and src/core/verify.cpp",
   "activation_width": 2560,
   "q8_1_blocks": 80,
   "integer_codes_changed": 0,
@@ -13,6 +13,11 @@
   "blocks_with_fp16_scale_changes": [57],
   "fixed_fp16_scale_block_57": 0.0141448974609375,
   "adaptive_fp16_scale_block_57": 0.01413726806640625,
+  "native_cuda_buffer_comparison": {
+    "integer_code_blocks_changed": 0,
+    "stored_sum_blocks_changed": 0,
+    "stored_d_blocks_changed": [57]
+  },
   "same_quantized_activation": false,
   "interpretation": "Native verifier quantizes this GDN input with native_quantize_q8_1 before native_mmvq; Q8_1 is therefore the runtime activation format for this projection. Integer codes match, but one stored FP16 scale differs. This is a plausible contributor to qkv drift, not a projection replay or full causal proof."
 }
