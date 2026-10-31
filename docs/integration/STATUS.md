@@ -7745,3 +7745,15 @@ effect. This is not a live forced-owner intervention or proof of sole cause
 for later state divergence. Both runs emitted identical output IDs, passed the
 six-GiB guard (minimum available 8.48 GiB), and had zero sampled OOM kills. See
 the [counterfactual report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-expert3-layer2-gdn-counterfactual-65540.md).
+
+**E6 adaptive 5K residency-map capture (2026-10-31):** the saved profiles are
+now validated against independent startup owner maps. Strata and NInfer saved
+byte-identical full profiles after both warmup (`29588fb2…ea010`) and the
+measured request (`71cf28d3…c83ef`); the corresponding 5,000-entry resident
+maps have zero cross-backend symmetric difference. Each backend replaced
+2,909 initial resident IDs by warmup and 952 more by the measured checkpoint.
+The `exchanged with the VRAM tier` log value counts committed RAM-complement
+ownership rotations, not all GPU map replacements. Both response hashes
+matched by request ordinal; NInfer's diagnostic minimum available RAM was
+9.04 GiB. Exact map parity does not explain the prompt-boundary recurrent-state
+change or prove adaptive migration caused it. See the [map capture report](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/README.md).

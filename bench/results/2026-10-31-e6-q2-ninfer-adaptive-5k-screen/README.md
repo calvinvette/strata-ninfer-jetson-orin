@@ -113,8 +113,10 @@ tail and other recorded fields matched. Strata and NInfer still matched at
 every checkpoint by request ordinal. The engine reported 684 adaptive expert
 exchanges after warmup and 1,142 after the measured request. This localizes the
 first **recorded** within-process difference to the final prefill segment,
-after the adaptive cache had changed. It does not identify the exact slot or
-prove that migration caused the state change. See
+after the adaptive cache had changed. At the time this capture was made, it did
+not identify the exact slot or prove that migration caused the state change;
+the later owner-map diagnostic below resolves the first limitation, not the
+causal question. See
 [`boundary-capture.json`](boundary-capture.json); state-hash timings are not
 performance measurements.
 
@@ -124,3 +126,34 @@ sampled chunk. Layer 15 was rejected because it is QSA, not GDN. These selected
 layers do not explain the changed aggregate GDN hash; the other GDN layers and
 aggregate components remain to be checked. Raw layer snapshots stay under
 `/tmp/e6-ninfer-adapt-5k/` and their hashes are recorded in the boundary JSON.
+
+## Adaptive residency map capture
+
+A follow-up captured `STRATA_RESIDENCY_DUMP` at startup and saved the learned
+profile at process exit for one-request and two-request runs. The startup dump
+matched the original Q2_0 profile's first 5,000 experts exactly in both
+backends. Reloading Strata's saved post-warmup profile reproduced its first
+5,000 IDs in the independently dumped startup map with zero symmetric
+difference. This validates use of the saved profile's first 5,000 entries as
+the resident owner set for these runs.
+
+| Checkpoint | Strata profile SHA-256 | NInfer profile SHA-256 | Resident-map comparison |
+| --- | --- | --- | --- |
+| After warmup request | `29588fb2714f7ee4e7c4e23522c3b398c177b37def922ab32ffe45fad90ea010` | `29588fb2714f7ee4e7c4e23522c3b398c177b37def922ab32ffe45fad90ea010` | Entire profile identical; 0 resident-ID symmetric difference |
+| After measured request | `71cf28d385d6ccf22c122830d22e62451811ffaf30296414ec8207c1939c83ef` | `71cf28d385d6ccf22c122830d22e62451811ffaf30296414ec8207c1939c83ef` | Entire profile identical; 0 resident-ID symmetric difference |
+
+The warmup and measured response hashes also match across backends and match
+the earlier captures (`576272a200f58b5b0a72f489ac1a2019098ec2939ac1480a2531f90a8e337cd2`
+and `1719e86b58f64cf00c23749b67feacac453c76684a351ca0480d026111124e77`).
+Each backend replaced 2,909 of its initial resident IDs by the end of warmup,
+then replaced 952 more between warmup and the measured request (1,904 IDs in
+the latter symmetric difference). The log's `exchanged with the VRAM tier`
+counter is narrower: `FileExpertSource::commit_exchanges()` increments it for
+committed RAM-complement ownership rotations. It is not a count of all changes
+in the GPU resident map and must not be used as that proxy. The captured map
+does not explain the prefill-state divergence or establish it as a cause.
+
+The NInfer two-request diagnostic passed under the 6 GiB admission floor; its
+minimum sampled available host RAM was 9.04 GiB. This was a state/map capture,
+not a performance measurement. The profile binaries and raw residency dumps
+remain under `/tmp/e6-ninfer-adapt-5k/maps/` and are not committed.
