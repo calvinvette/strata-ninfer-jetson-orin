@@ -1,3 +1,5 @@
+**E6 Q2_0 CTA schedule screen (2026-10-31):** an opt-in 256-thread CTA mapping passed independent D3/D4 oracle and grouped-output checks, including exact grouped intermediates and output hashes. Across six paired operator blocks it was slower than the 128-thread default by 2.46% for one token, 2.92% for grouped 64 and 2.50% for grouped 128; paired bootstrap intervals excluded zero but the small, imperfectly balanced screen is not confirmation. The grouped NInfer/Strata descriptive ratio also worsened from about 1.14–1.15x to 1.17–1.18x. Keep the default unchanged and do not advance this candidate to service testing. The opt-in path remains available only for reproducible schedule experiments. Minimum available RAM was 24.33 GiB; clocks were dynamic and energy was not measured. E6/E7 remain open. See the [operator report](../../bench/results/2026-10-31-e6-ninfer-q2-cta256-screen/README.md).
+
 # Integration status
 
 **E6 layer-1 intervention repeat (2026-10-31):** a second exact-position

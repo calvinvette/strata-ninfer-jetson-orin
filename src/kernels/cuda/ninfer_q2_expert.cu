@@ -17,6 +17,7 @@
 
 #include <cstdint>
 #include <atomic>
+#include <cstdlib>
 #include <stdexcept>
 
 namespace strata::kernels {
@@ -229,13 +230,15 @@ __global__ void d4_q2_0(const uint8_t* down, const float* hidden, float* output)
     if (lane == 0) output[row] = value;
 }
 
-__global__ void d3_q2_0_grouped(const unsigned long long* grp_ptr, const int32_t* grp_start,
+template<int RowsPerCta>
+__global__ __launch_bounds__(RowsPerCta * 16) void d3_q2_0_grouped(
+                                const unsigned long long* grp_ptr, const int32_t* grp_start,
                                 const int32_t* n_groups, const int32_t* ent_tok,
                                 const Q8_1Block* xq, NativeExpertLayout L,
                                 float* gate, float* up, int64_t grid_groups) {
     const int lane = threadIdx.x & 15;
     const int warp = threadIdx.x >> 5;
-    const int row = static_cast<int>(blockIdx.x) * 8 + warp * 2 + ((threadIdx.x & 31) >> 4);
+    const int row = static_cast<int>(blockIdx.x) * RowsPerCta + warp * 2 + ((threadIdx.x & 31) >> 4);
     if (row >= 2 * L.n_ff) return;
     const bool is_up = row >= L.n_ff;
     const int r = is_up ? row - static_cast<int>(L.n_ff) : row;
@@ -267,13 +270,14 @@ __global__ void d3_q2_0_grouped(const unsigned long long* grp_ptr, const int32_t
     }
 }
 
-__global__ void d4_q2_0_grouped(const unsigned long long* grp_ptr, const int32_t* grp_start,
+template<int RowsPerCta>
+__global__ __launch_bounds__(RowsPerCta * 16) void d4_q2_0_grouped(
+                                const unsigned long long* grp_ptr, const int32_t* grp_start,
                                 const int32_t* n_groups, const int32_t* ent_dst,
                                 const Q8_1Block* hq, NativeExpertLayout L, float* output,
                                 int64_t grid_groups) {
     const int lane = threadIdx.x & 15;
-    const int warp = threadIdx.x >> 5;
-    const int row = static_cast<int>(blockIdx.x) * 8 + warp * 2 + ((threadIdx.x & 31) >> 4);
+    const int row = static_cast<int>(blockIdx.x) * RowsPerCta + (threadIdx.x >> 4);
     if (row >= L.n_embd) return;
     const size_t offset = L.down_off + static_cast<size_t>(row) * L.d_row;
     const int group_count = *n_groups;
@@ -344,15 +348,35 @@ void ninfer_q2_0_expert_grouped(const NativeExpertLayout& L, const unsigned long
     auto* up = reinterpret_cast<float*>(scratch + fa);
     auto* hidden_q8_1 = scratch + 3 * fa;
     const auto s = static_cast<cudaStream_t>(stream);
-    d3_q2_0_grouped<<<dim3((2 * kIntermediate + 7) / 8, static_cast<unsigned>(gy)),
-                       128, 0, s>>>(grp_ptr, grp_start, n_groups, ent_tok,
-                                     static_cast<const Q8_1Block*>(x_q8_1), L, gate, up, gy);
+    // The opt-in 256-thread mapping assigns the same 16-lane row groups as
+    // Strata's Q2_0 subwarp kernels. It halves CTA count without changing the
+    // per-row reduction or weight/activation arithmetic. Keep the 128-thread
+    // baseline as default until end-to-end measurements qualify the variant.
+    static const bool cta256 = [] {
+        const char* value = std::getenv("STRATA_NINFER_Q2_CTA256");
+        return value != nullptr && value[0] == '1';
+    }();
+    if (cta256) {
+        d3_q2_0_grouped<16><<<dim3((2 * kIntermediate + 15) / 16, static_cast<unsigned>(gy)),
+                               256, 0, s>>>(grp_ptr, grp_start, n_groups, ent_tok,
+                                             static_cast<const Q8_1Block*>(x_q8_1), L, gate, up, gy);
+    } else {
+        d3_q2_0_grouped<8><<<dim3((2 * kIntermediate + 7) / 8, static_cast<unsigned>(gy)),
+                              128, 0, s>>>(grp_ptr, grp_start, n_groups, ent_tok,
+                                            static_cast<const Q8_1Block*>(x_q8_1), L, gate, up, gy);
+    }
     const int64_t hidden_values = cap_entries * kIntermediate;
     ninfer_swiglu_quantize_q8_1_many<<<static_cast<unsigned>((hidden_values + 255) / 256), 256, 0, s>>>(
         gate, up, reinterpret_cast<Q8_1Block*>(hidden_q8_1), hidden_values);
-    d4_q2_0_grouped<<<dim3((kHidden + 7) / 8, static_cast<unsigned>(gy)),
-                       128, 0, s>>>(grp_ptr, grp_start, n_groups, ent_dst,
-                                     reinterpret_cast<const Q8_1Block*>(hidden_q8_1), L, output, gy);
+    if (cta256) {
+        d4_q2_0_grouped<16><<<dim3((kHidden + 15) / 16, static_cast<unsigned>(gy)),
+                               256, 0, s>>>(grp_ptr, grp_start, n_groups, ent_dst,
+                                             reinterpret_cast<const Q8_1Block*>(hidden_q8_1), L, output, gy);
+    } else {
+        d4_q2_0_grouped<8><<<dim3((kHidden + 7) / 8, static_cast<unsigned>(gy)),
+                              128, 0, s>>>(grp_ptr, grp_start, n_groups, ent_dst,
+                                            reinterpret_cast<const Q8_1Block*>(hidden_q8_1), L, output, gy);
+    }
     const cudaError_t error = cudaGetLastError();
     if (error != cudaSuccess) throw std::runtime_error(cudaGetErrorString(error));
 }

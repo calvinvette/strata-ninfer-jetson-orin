@@ -2547,3 +2547,14 @@ workload domain, not a fixed-residency effect, general profile, or release
 qualification. The separate 4K NInfer-versus-Strata screen remains below 5%.
 A follow-up pp2048+tg48 cache-capacity screen passed all six retrieval/checksum requests but found 4K decode TPS 3.79% slower than 3K (three-pair interval −4.28% to −3.15%), so the earlier gain is workload-specific at present. Adaptive swaps were active and no fixed-map effect is isolated. A pp512+tg128 seven-pair natural-stop confirmation found +10.10% decode TPS on NIMBUS (95% paired interval +9.91% to +10.53%) and +12.45% on ORBIT (+4.83% to +15.97%). All answers were exact at response start; measured decode GPU-cache hit rates rose about 10 percentage points in both tasks. ORBIT naturally stopped at 117 tokens on 3K and reached the 128-token cap on 4K; this is an output-length/termination difference, not full-text quality equivalence. The earlier fixed-length pilot is superseded. The NIMBUS result has equal work length and under-5% median regressions in prompt TPS and TTFT. Adaptive swaps remain active; no fixed-residency effect is isolated. See the [seven-pair confirmation](../../bench/results/2026-10-31-e6-q2-cache-size-tg128-confirm/README.md) and [pilot](../../bench/results/2026-10-31-e6-q2-cache-size-tg128/README.md). E6/E7 remain open. See the [longer-prompt screen](../../bench/results/2026-10-31-e6-q2-cache-capacity-pp2048/README.md), [confirmation](../../bench/results/2026-10-31-e6-q2-cache-size-confirm/README.md)
 and [initial screen](../../bench/results/2026-10-31-e6-q2-cache-size-screen/README.md).
+
+
+**E6 operator schedule follow-up (2026-10-31):** a row-grouped 256-thread CTA
+variant was screened against the 128-thread Q2_0 default at one-token and
+64/128-token grouped shapes. Six paired process blocks, including a
+counterbalanced follow-up after the initial all-candidate-first screen, found
+2.46%, 2.92% and 2.50% greater candidate latency. Exact intermediate/output
+checks passed, but the schedule misses the 5% benefit gate. Keep 128 threads as
+default; do not spend an end-to-end confirmation on this candidate. The opt-in
+variant remains experimental and is not qualified. See the
+[screen report](../../bench/results/2026-10-31-e6-ninfer-q2-cta256-screen/README.md).

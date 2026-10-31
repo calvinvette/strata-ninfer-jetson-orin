@@ -30,6 +30,8 @@ relative L2 `0.01078`, similar to forced versus adaptive. Keep that result
 local-only. Repeated layer-5/7/13 owner interventions retain their bounded
 causal state findings; none is a performance claim. [Layer-1 repeat](../../bench/results/2026-10-31-e6-q2-owner-intervention/layer1-full-state-repeat.md).
 
+A Q2_0 NInfer grouped-kernel experiment tested 256-thread CTAs against the 128-thread default. It was numerically correct but 2.5–2.9% slower across measured operator sizes, so the default stays 128 threads and this variant is not qualified. [Operator report](../../bench/results/2026-10-31-e6-ninfer-q2-cta256-screen/README.md).
+
 This is a short orientation to the integration. The [plan](PLAN.md) defines
 phase gates; the detailed [status](STATUS.md) is the evidence record, and the
 [measurement protocol](BENCHMARKS.md) defines how to interpret results. The

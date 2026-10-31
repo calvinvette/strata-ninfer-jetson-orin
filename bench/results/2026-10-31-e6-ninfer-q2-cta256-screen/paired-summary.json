@@ -1,0 +1,392 @@
+{
+  "experiment": "Six-pair operator screen: default 128-thread vs opt-in 256-thread CTA mapping for NInfer Q2_0 grouped D3/D4",
+  "date": "2026-10-31",
+  "device": "Jetson AGX Orin Developer Kit; CUDA 12.6; SM87",
+  "protocol": {
+    "pairs": 6,
+    "initial_screen_order_note": "Initial three pairs were all candidate-first due to deterministic random seed; treat as order-confounded screen.",
+    "followup_order": [
+      "candidate\u2192baseline",
+      "baseline\u2192candidate",
+      "candidate\u2192baseline"
+    ],
+    "only_change": "STRATA_NINFER_Q2_CTA256 unset vs 1",
+    "target": "layer 3, expert 94 captured Q2_0 activation; operator harness one-token and grouped 64/128 token cases",
+    "energy": "not attributed",
+    "clocks": "read-only dynamic sampling"
+  },
+  "pairs": [
+    {
+      "pair": 0,
+      "order": "candidate\u2192baseline",
+      "arms": {
+        "candidate": {
+          "one_token": {
+            "strata_median_us": 24.713,
+            "ninfer_median_us": 24.627,
+            "ratio": 0.997
+          },
+          "grouped64": {
+            "strata_median_us": 3945.4,
+            "ninfer_median_us": 4617.096,
+            "ratio": 1.17
+          },
+          "grouped128": {
+            "strata_median_us": 7966.045,
+            "ninfer_median_us": 9388.065,
+            "ratio": 1.178
+          },
+          "returncode": 0,
+          "minimum_available_bytes": 26127687680,
+          "elapsed_s": 11.665157152805477,
+          "output_sha256": "adcf17a835454a6cfbb24c1a2acd9e088d5d962fc060b607a548da94ff424f40",
+          "functional_checks_passed": true
+        },
+        "baseline": {
+          "one_token": {
+            "strata_median_us": 24.617,
+            "ninfer_median_us": 23.975,
+            "ratio": 0.974
+          },
+          "grouped64": {
+            "strata_median_us": 3948.063,
+            "ninfer_median_us": 4521.631,
+            "ratio": 1.145
+          },
+          "grouped128": {
+            "strata_median_us": 7960.245,
+            "ninfer_median_us": 9149.958,
+            "ratio": 1.149
+          },
+          "returncode": 0,
+          "minimum_available_bytes": 26137067520,
+          "elapsed_s": 11.70103747677058,
+          "output_sha256": "adcf17a835454a6cfbb24c1a2acd9e088d5d962fc060b607a548da94ff424f40",
+          "functional_checks_passed": true
+        }
+      }
+    },
+    {
+      "pair": 1,
+      "order": "candidate\u2192baseline",
+      "arms": {
+        "candidate": {
+          "one_token": {
+            "strata_median_us": 24.723,
+            "ninfer_median_us": 24.645,
+            "ratio": 0.997
+          },
+          "grouped64": {
+            "strata_median_us": 3950.43,
+            "ninfer_median_us": 4621.726,
+            "ratio": 1.17
+          },
+          "grouped128": {
+            "strata_median_us": 7952.971,
+            "ninfer_median_us": 9377.966,
+            "ratio": 1.179
+          },
+          "returncode": 0,
+          "minimum_available_bytes": 26137513984,
+          "elapsed_s": 11.687922065146267,
+          "output_sha256": "adcf17a835454a6cfbb24c1a2acd9e088d5d962fc060b607a548da94ff424f40",
+          "functional_checks_passed": true
+        },
+        "baseline": {
+          "one_token": {
+            "strata_median_us": 24.849,
+            "ninfer_median_us": 24.19,
+            "ratio": 0.973
+          },
+          "grouped64": {
+            "strata_median_us": 3951.589,
+            "ninfer_median_us": 4487.725,
+            "ratio": 1.137
+          },
+          "grouped128": {
+            "strata_median_us": 7959.893,
+            "ninfer_median_us": 9146.298,
+            "ratio": 1.15
+          },
+          "returncode": 0,
+          "minimum_available_bytes": 26138484736,
+          "elapsed_s": 11.675097581930459,
+          "output_sha256": "adcf17a835454a6cfbb24c1a2acd9e088d5d962fc060b607a548da94ff424f40",
+          "functional_checks_passed": true
+        }
+      }
+    },
+    {
+      "pair": 2,
+      "order": "candidate\u2192baseline",
+      "arms": {
+        "candidate": {
+          "one_token": {
+            "strata_median_us": 24.726,
+            "ninfer_median_us": 24.635,
+            "ratio": 0.996
+          },
+          "grouped64": {
+            "strata_median_us": 3945.363,
+            "ninfer_median_us": 4623.947,
+            "ratio": 1.172
+          },
+          "grouped128": {
+            "strata_median_us": 7955.477,
+            "ninfer_median_us": 9377.583,
+            "ratio": 1.179
+          },
+          "returncode": 0,
+          "minimum_available_bytes": 26151854080,
+          "elapsed_s": 11.44858428183943,
+          "output_sha256": "adcf17a835454a6cfbb24c1a2acd9e088d5d962fc060b607a548da94ff424f40",
+          "functional_checks_passed": true
+        },
+        "baseline": {
+          "one_token": {
+            "strata_median_us": 24.637,
+            "ninfer_median_us": 24.101,
+            "ratio": 0.978
+          },
+          "grouped64": {
+            "strata_median_us": 3945.883,
+            "ninfer_median_us": 4546.751,
+            "ratio": 1.152
+          },
+          "grouped128": {
+            "strata_median_us": 7972.686,
+            "ninfer_median_us": 9162.502,
+            "ratio": 1.15
+          },
+          "returncode": 0,
+          "minimum_available_bytes": 26140798976,
+          "elapsed_s": 11.394594243727624,
+          "output_sha256": "adcf17a835454a6cfbb24c1a2acd9e088d5d962fc060b607a548da94ff424f40",
+          "functional_checks_passed": true
+        }
+      }
+    },
+    {
+      "pair": 3,
+      "order": "candidate\u2192baseline",
+      "arms": {
+        "candidate": {
+          "one_token": {
+            "strata_median_us": 24.543,
+            "ninfer_median_us": 24.586,
+            "ratio": 1.002
+          },
+          "grouped64": {
+            "strata_median_us": 3952.665,
+            "ninfer_median_us": 4687.69,
+            "ratio": 1.186
+          },
+          "grouped128": {
+            "strata_median_us": 7961.663,
+            "ninfer_median_us": 9382.72,
+            "ratio": 1.179
+          },
+          "returncode": 0,
+          "minimum_available_bytes": 26134065152,
+          "elapsed_s": 11.687248026020825,
+          "output_sha256": "adcf17a835454a6cfbb24c1a2acd9e088d5d962fc060b607a548da94ff424f40",
+          "functional_checks_passed": true
+        },
+        "baseline": {
+          "one_token": {
+            "strata_median_us": 24.853,
+            "ninfer_median_us": 24.18,
+            "ratio": 0.973
+          },
+          "grouped64": {
+            "strata_median_us": 3945.874,
+            "ninfer_median_us": 4511.286,
+            "ratio": 1.143
+          },
+          "grouped128": {
+            "strata_median_us": 7961.063,
+            "ninfer_median_us": 9152.089,
+            "ratio": 1.149
+          },
+          "returncode": 0,
+          "minimum_available_bytes": 26144493568,
+          "elapsed_s": 11.6201760196127,
+          "output_sha256": "adcf17a835454a6cfbb24c1a2acd9e088d5d962fc060b607a548da94ff424f40",
+          "functional_checks_passed": true
+        }
+      }
+    },
+    {
+      "pair": 4,
+      "order": "baseline\u2192candidate",
+      "arms": {
+        "baseline": {
+          "one_token": {
+            "strata_median_us": 24.634,
+            "ninfer_median_us": 24.011,
+            "ratio": 0.975
+          },
+          "grouped64": {
+            "strata_median_us": 3952.955,
+            "ninfer_median_us": 4512.36,
+            "ratio": 1.141
+          },
+          "grouped128": {
+            "strata_median_us": 7957.544,
+            "ninfer_median_us": 9149.007,
+            "ratio": 1.15
+          },
+          "returncode": 0,
+          "minimum_available_bytes": 26143539200,
+          "elapsed_s": 11.432486258912832,
+          "output_sha256": "adcf17a835454a6cfbb24c1a2acd9e088d5d962fc060b607a548da94ff424f40",
+          "functional_checks_passed": true
+        },
+        "candidate": {
+          "one_token": {
+            "strata_median_us": 24.65,
+            "ninfer_median_us": 24.659,
+            "ratio": 1.0
+          },
+          "grouped64": {
+            "strata_median_us": 3946.999,
+            "ninfer_median_us": 4641.073,
+            "ratio": 1.176
+          },
+          "grouped128": {
+            "strata_median_us": 7956.115,
+            "ninfer_median_us": 9376.274,
+            "ratio": 1.178
+          },
+          "returncode": 0,
+          "minimum_available_bytes": 26147729408,
+          "elapsed_s": 11.392966580111533,
+          "output_sha256": "adcf17a835454a6cfbb24c1a2acd9e088d5d962fc060b607a548da94ff424f40",
+          "functional_checks_passed": true
+        }
+      }
+    },
+    {
+      "pair": 5,
+      "order": "candidate\u2192baseline",
+      "arms": {
+        "candidate": {
+          "one_token": {
+            "strata_median_us": 24.887,
+            "ninfer_median_us": 24.84,
+            "ratio": 0.998
+          },
+          "grouped64": {
+            "strata_median_us": 3945.363,
+            "ninfer_median_us": 4666.324,
+            "ratio": 1.183
+          },
+          "grouped128": {
+            "strata_median_us": 7954.803,
+            "ninfer_median_us": 9375.751,
+            "ratio": 1.179
+          },
+          "returncode": 0,
+          "minimum_available_bytes": 26150936576,
+          "elapsed_s": 11.699798874091357,
+          "output_sha256": "adcf17a835454a6cfbb24c1a2acd9e088d5d962fc060b607a548da94ff424f40",
+          "functional_checks_passed": true
+        },
+        "baseline": {
+          "one_token": {
+            "strata_median_us": 24.626,
+            "ninfer_median_us": 23.928,
+            "ratio": 0.972
+          },
+          "grouped64": {
+            "strata_median_us": 3947.17,
+            "ninfer_median_us": 4520.711,
+            "ratio": 1.145
+          },
+          "grouped128": {
+            "strata_median_us": 7954.963,
+            "ninfer_median_us": 9153.473,
+            "ratio": 1.151
+          },
+          "returncode": 0,
+          "minimum_available_bytes": 26153201664,
+          "elapsed_s": 11.678027129732072,
+          "output_sha256": "adcf17a835454a6cfbb24c1a2acd9e088d5d962fc060b607a548da94ff424f40",
+          "functional_checks_passed": true
+        }
+      }
+    }
+  ],
+  "metrics": {
+    "one_token": {
+      "candidate_latency_change_pct_by_pair": [
+        2.719499478623555,
+        1.8809425382389389,
+        2.215675698103814,
+        1.6790736145574803,
+        2.6987630669276674,
+        3.8114343029087117
+      ],
+      "median_candidate_latency_change_pct": 2.4572193825157407,
+      "bootstrap_95_percentile_interval_pct": [
+        1.7800080763982096,
+        3.2654668907661333
+      ],
+      "baseline_median_us": 24.055999999999997,
+      "candidate_median_us": 24.64,
+      "lower_is_better": true
+    },
+    "grouped64": {
+      "candidate_latency_change_pct_by_pair": [
+        2.111295680695724,
+        2.9859449944013683,
+        1.6978277455704127,
+        3.9102819018789647,
+        2.8524541481619536,
+        3.2210198793950706
+      ],
+      "median_candidate_latency_change_pct": 2.919199571281661,
+      "bootstrap_95_percentile_interval_pct": [
+        1.9045617131330683,
+        3.5656508906370177
+      ],
+      "baseline_median_us": 4516.5355,
+      "candidate_median_us": 4632.51,
+      "lower_is_better": true
+    },
+    "grouped128": {
+      "candidate_latency_change_pct_by_pair": [
+        2.602274239947322,
+        2.5329155030811235,
+        2.347404671780695,
+        2.519982049999725,
+        2.484061931529835,
+        2.428346049636021
+      ],
+      "median_candidate_latency_change_pct": 2.50202199076478,
+      "bootstrap_95_percentile_interval_pct": [
+        2.387875360708358,
+        2.5675948715142227
+      ],
+      "baseline_median_us": 9151.0235,
+      "candidate_median_us": 9377.7745,
+      "lower_is_better": true
+    }
+  },
+  "decision": "Both screens pass sampled numerical and output checks. The combined six-pair estimate shows the 256-thread candidate slower on grouped operator shapes; maintain 128-thread default and do not promote the opt-in path. Small n, dynamic clocks and order imbalance limit inference; no end-to-end confirmation was run.",
+  "resources": {
+    "minimum_sampled_available_ram_gib": 24.33330535888672,
+    "maximum_elapsed_s": 11.70103747677058,
+    "oom_or_oom_kill": 0,
+    "cpu_frequency_range_mhz": [
+      729.6,
+      2201.6
+    ],
+    "gpu_frequency_range_mhz": [
+      306.0,
+      1300.5
+    ],
+    "emc": "readback denied",
+    "energy": "not measured"
+  }
+}
