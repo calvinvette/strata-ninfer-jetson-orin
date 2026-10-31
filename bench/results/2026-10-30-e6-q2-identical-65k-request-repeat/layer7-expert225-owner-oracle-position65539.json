@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "model": "Qwen3.8-Flash-Next Q2_0",
+  "position": 65539,
+  "token_id": 1928,
+  "layer": 7,
+  "expert": 225,
+  "adaptive_swap": "7:225>1 in round 4 applied at position 65539",
+  "routes_equal": true,
+  "fixed_route_ids": [
+    307,
+    225,
+    401,
+    461,
+    2,
+    214,
+    501,
+    213,
+    456,
+    359
+  ],
+  "fixed_weight": 0.15016841888427734,
+  "adaptive_weight": 0.15016843378543854,
+  "expert_route_weight_delta": 1.4901161193847656e-08,
+  "input_fixed_vs_adaptive": {
+    "count": 2560,
+    "different": 1922,
+    "relative_l2": 1.2937811247305246e-07,
+    "max_abs": 4.544854164123535e-07
+  },
+  "fixed_service_matches_cpu_bitwise": true,
+  "adaptive_service_matches_gpu_bitwise": true,
+  "native_cpu_gpu_same_fixed_input": {
+    "count": 2560,
+    "different": 1805,
+    "relative_l2": 1.0542775710984453e-07,
+    "max_abs": 1.4901161193847656e-08
+  },
+  "native_cpu_gpu_same_adaptive_input": {
+    "count": 2560,
+    "different": 1805,
+    "relative_l2": 1.0542775710984453e-07,
+    "max_abs": 1.4901161193847656e-08
+  },
+  "native_cpu_input_change": {
+    "count": 2560,
+    "different": 0,
+    "relative_l2": 0.0,
+    "max_abs": 0.0
+  },
+  "native_gpu_input_change": {
+    "count": 2560,
+    "different": 0,
+    "relative_l2": 0.0,
+    "max_abs": 0.0
+  },
+  "service_row_change": {
+    "count": 2560,
+    "different": 1805,
+    "relative_l2": 1.0542775710984453e-07,
+    "max_abs": 1.4901161193847656e-08
+  },
+  "shared_output_change": {
+    "count": 2560,
+    "different": 2278,
+    "relative_l2": 8.692918254853284e-08,
+    "max_abs": 3.725290298461914e-09
+  },
+  "combined_output_change": {
+    "count": 2560,
+    "different": 2120,
+    "relative_l2": 1.430621389491486e-07,
+    "max_abs": 7.450580596923828e-09
+  },
+  "output_token_sha256": "2d5f3da8f9890f8c9262231bada2cfab088196528565a1c08ab685d86074c650",
+  "native_parity": {
+    "fixed": "pass",
+    "adaptive": "pass",
+    "arithmetic": "Q2_0 native CPU/GPU expert execution and float reference; GPU dequant matched ggml to_float bitwise"
+  },
+  "scope": "Later changed row after the layer-5 input drift. Service rows match the execution owner; small activation change leaves the quantized native expert row exact in this captured pair. Does not quantify contribution to end-to-end state drift."
+}

@@ -7535,3 +7535,12 @@ within `9.74e-8` of CPU and `6.14e-8` of GPU. This attributes the first sampled
 layer-5 output delta locally to expert ownership. Other later owner transitions
 may also contribute to recurrent drift. E6/E7 remain open. See the
 [owner oracle report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer5-expert220-owner-oracle-position65539.json).
+
+A second round-4 owner transition at layer 7/expert 225 was checked on both
+captured activations. The per-owner native expert row is unchanged by the
+activation shift in this sample; fixed service matches CPU and adaptive service
+matches GPU bit-for-bit, with owner gap `1.05e-7` relative L2. Its route weight
+shifts by `1.49e-8` and the shared output by `8.69e-8`, so the combined layer-7
+delta includes those additional terms. This is a later contributor after the
+layer-5 first delta, not its source. See the
+[layer-7 oracle report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer7-expert225-owner-oracle-position65539.json).

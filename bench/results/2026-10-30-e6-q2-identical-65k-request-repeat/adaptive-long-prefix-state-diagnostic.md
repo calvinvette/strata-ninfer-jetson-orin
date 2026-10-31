@@ -553,3 +553,17 @@ this dispatch. This verifies the earliest changed expert row sampled at this
 position; it does not prove that this is the sole owner transition contributing
 to all subsequent state drift. See
 [`layer5-expert220-owner-oracle-position65539.json`](layer5-expert220-owner-oracle-position65539.json).
+
+### Layer-7 expert 225 after the layer-5 activation delta
+
+The later round-4 promotion `7:225>1` also changes the layer-7 expert row.
+Layer-7 inputs already differ by relative L2 `1.29e-7`, and this expert's route
+weight changes by `1.49e-8`. Replaying each captured input through the native
+CPU and GPU expert paths shows the input change alone produces bit-identical
+expert-225 rows on each owner. The fixed service row matches CPU and the
+adaptive row matches GPU bit-for-bit; the owner-specific row gap is relative
+L2 `1.05e-7`, same as the observed service-row delta. However the shared output
+also changes (`8.69e-8`), so the combined layer-7 MoE delta (`1.43e-7`) includes
+both routed-owner and shared/weight effects. This is a later contributor after
+the layer-5 onset, not the first cause. See
+[`layer7-expert225-owner-oracle-position65539.json`](layer7-expert225-owner-oracle-position65539.json).

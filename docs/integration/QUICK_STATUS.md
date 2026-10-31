@@ -995,3 +995,9 @@ rows match their native owner replays bit-for-bit. CPU/GPU row difference is
 `1.14e-7` relative L2, and both agree with the independent FP64 oracle within
 `9.74e-8` / `6.14e-8`. This locally verifies the first changed expert row;
 later adaptive swaps may still contribute. [Report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer5-expert220-owner-oracle-position65539.json).
+
+Layer-7 expert 225 is a later contributor: its input shifts, but CPU and GPU
+replays each produce the same expert row on both captured inputs; service rows
+match their respective owners bit-for-bit, differing by `1.05e-7`. Route
+weight and shared output also move, so the combined MoE delta has more than one
+component. [Oracle](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer7-expert225-owner-oracle-position65539.json).
