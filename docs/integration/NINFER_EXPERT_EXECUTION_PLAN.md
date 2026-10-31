@@ -2396,10 +2396,15 @@ records swap `1:320>3`, applied at position 65,539 before the CPU-owned
 dispatch. The expert-row relative-L2 delta was `1.059e-7`; the combined MoE
 delta was `4.345e-8`. This is a
 verified local effect and aligns with the downstream layer-2 activation delta
-and prefix-8 GDN divergence, but it does not establish that this was the only
-owner change contributing to persistent-state divergence. Next check other
-active owner changes in layers through model layer 2 during commits 2–8. E6/E7
-remain open; no performance claim follows from this instrumented capture.
+and prefix-8 GDN divergence. A cross-layer comparison of three separate
+fixed/adaptive route captures then checked model layers 0–2 over positions
+65,536–65,542: the only owner-kind change was layer-1 expert 3 at position
+65,540; layer-2 routes and owners matched, with its first input delta at that
+same dispatch. This closes that bounded owner-transition search, not the causal
+link to persistent-state drift. Next test a targeted fixed-owner counterfactual
+through the affected downstream state path; the current evidence doesn't
+support an end-to-end causal claim. E6/E7 remain open; no performance claim
+follows from this instrumented capture. See the [cross-layer comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer0-2-owner-window-65536-65542.md).
 
 A matched layer-0 capture over positions 65,536–65,542 supplies a negative
 control: routes, owner kinds, and all MoE input values matched at all seven

@@ -1,0 +1,221 @@
+{
+  "schema": 1,
+  "date": "2026-10-30 captured; analyzed 2026-10-31",
+  "device": "Jetson AGX Orin",
+  "model": "Qwen3.8-Flash-Next GSQ-RCO Q2_0",
+  "prompt_tokens": 65536,
+  "generation_tokens": 32,
+  "context_tokens": 131072,
+  "profile": "original q2-expert-profile.bin; 3,000 slots; 6 GiB resident budget; 8 workers; prefill 128; PCIe staging off; prompt cache off; MTP2",
+  "comparison": "fixed profile with adaptation disabled versus adaptive profile; same strict-NInfer backend",
+  "common_output_token_sha256": "2d5f3da8f9890f8c9262231bada2cfab088196528565a1c08ab685d86074c650",
+  "capture_scope": "Three separate matched fixed/adaptive capture pairs, one selected model layer (0, 1, or 2) per pair. Each captured seven first generated dispatches, positions 65536\u201365542. These are repeated task runs, not simultaneous layer captures in one process.",
+  "raw_capture_location": "Local-only /tmp/e6-65k-{fixed,adaptive}-layer{0,1,2}-route/layer*-routes.jsonl",
+  "resource_minimum_available_gib": 8.444,
+  "sampled_cgroup_oom_kills": 0,
+  "layers": [
+    {
+      "model_layer": 0,
+      "positions": [
+        {
+          "position": 65536,
+          "token_id": 32,
+          "routes_equal": true,
+          "inputs_bitwise_equal": true,
+          "input_relative_l2": 0.0,
+          "owner_changes": []
+        },
+        {
+          "position": 65537,
+          "token_id": 6165,
+          "routes_equal": true,
+          "inputs_bitwise_equal": true,
+          "input_relative_l2": 0.0,
+          "owner_changes": []
+        },
+        {
+          "position": 65538,
+          "token_id": 11036,
+          "routes_equal": true,
+          "inputs_bitwise_equal": true,
+          "input_relative_l2": 0.0,
+          "owner_changes": []
+        },
+        {
+          "position": 65539,
+          "token_id": 1928,
+          "routes_equal": true,
+          "inputs_bitwise_equal": true,
+          "input_relative_l2": 0.0,
+          "owner_changes": []
+        },
+        {
+          "position": 65540,
+          "token_id": 1472,
+          "routes_equal": true,
+          "inputs_bitwise_equal": true,
+          "input_relative_l2": 0.0,
+          "owner_changes": []
+        },
+        {
+          "position": 65541,
+          "token_id": 264,
+          "routes_equal": true,
+          "inputs_bitwise_equal": true,
+          "input_relative_l2": 0.0,
+          "owner_changes": []
+        },
+        {
+          "position": 65542,
+          "token_id": 6150,
+          "routes_equal": true,
+          "inputs_bitwise_equal": true,
+          "input_relative_l2": 0.0,
+          "owner_changes": []
+        }
+      ],
+      "capture_files_sha256": {
+        "fixed": "4c09f901c27b5eafa50c15ffbac09502e163761d0967daf7b72734df0bfd0ead",
+        "adaptive": "4c09f901c27b5eafa50c15ffbac09502e163761d0967daf7b72734df0bfd0ead"
+      }
+    },
+    {
+      "model_layer": 1,
+      "positions": [
+        {
+          "position": 65536,
+          "token_id": 32,
+          "routes_equal": true,
+          "inputs_bitwise_equal": true,
+          "input_relative_l2": 0.0,
+          "owner_changes": []
+        },
+        {
+          "position": 65537,
+          "token_id": 6165,
+          "routes_equal": true,
+          "inputs_bitwise_equal": true,
+          "input_relative_l2": 0.0,
+          "owner_changes": []
+        },
+        {
+          "position": 65538,
+          "token_id": 11036,
+          "routes_equal": true,
+          "inputs_bitwise_equal": true,
+          "input_relative_l2": 0.0,
+          "owner_changes": []
+        },
+        {
+          "position": 65539,
+          "token_id": 1928,
+          "routes_equal": true,
+          "inputs_bitwise_equal": true,
+          "input_relative_l2": 0.0,
+          "owner_changes": []
+        },
+        {
+          "position": 65540,
+          "token_id": 1472,
+          "routes_equal": true,
+          "inputs_bitwise_equal": true,
+          "input_relative_l2": 0.0,
+          "owner_changes": [
+            {
+              "expert": 3,
+              "fixed_owner_kind": 0,
+              "adaptive_owner_kind": -1,
+              "route_index": 1
+            }
+          ]
+        },
+        {
+          "position": 65541,
+          "token_id": 264,
+          "routes_equal": true,
+          "inputs_bitwise_equal": true,
+          "input_relative_l2": 0.0,
+          "owner_changes": []
+        },
+        {
+          "position": 65542,
+          "token_id": 6150,
+          "routes_equal": true,
+          "inputs_bitwise_equal": true,
+          "input_relative_l2": 0.0,
+          "owner_changes": []
+        }
+      ],
+      "capture_files_sha256": {
+        "fixed": "f592a386345d2701bfd23dcb55b8966688ad07b7e75660fcb77ae365b8cffe94",
+        "adaptive": "dcc653e26c2f60202c53d695e9b6f3978b0162b350b7d8779e6e22da00e7e88d"
+      }
+    },
+    {
+      "model_layer": 2,
+      "positions": [
+        {
+          "position": 65536,
+          "token_id": 32,
+          "routes_equal": true,
+          "inputs_bitwise_equal": true,
+          "input_relative_l2": 0.0,
+          "owner_changes": []
+        },
+        {
+          "position": 65537,
+          "token_id": 6165,
+          "routes_equal": true,
+          "inputs_bitwise_equal": true,
+          "input_relative_l2": 0.0,
+          "owner_changes": []
+        },
+        {
+          "position": 65538,
+          "token_id": 11036,
+          "routes_equal": true,
+          "inputs_bitwise_equal": true,
+          "input_relative_l2": 0.0,
+          "owner_changes": []
+        },
+        {
+          "position": 65539,
+          "token_id": 1928,
+          "routes_equal": true,
+          "inputs_bitwise_equal": true,
+          "input_relative_l2": 0.0,
+          "owner_changes": []
+        },
+        {
+          "position": 65540,
+          "token_id": 1472,
+          "routes_equal": true,
+          "inputs_bitwise_equal": false,
+          "input_relative_l2": 5.1198584381920996e-08,
+          "owner_changes": []
+        },
+        {
+          "position": 65541,
+          "token_id": 264,
+          "routes_equal": true,
+          "inputs_bitwise_equal": true,
+          "input_relative_l2": 0.0,
+          "owner_changes": []
+        },
+        {
+          "position": 65542,
+          "token_id": 6150,
+          "routes_equal": true,
+          "inputs_bitwise_equal": true,
+          "input_relative_l2": 0.0,
+          "owner_changes": []
+        }
+      ],
+      "capture_files_sha256": {
+        "fixed": "c20ab4981387a619072d799cdd8e919ea64d1b2e5ce9eec274c5208d3b217b60",
+        "adaptive": "3265ddeddf595b8459298d9f534df232634ea611f36546f5b1a4e426f2b9a22a"
+      }
+    }
+  ],
+  "peak_sampled_system_swap_gib": 1.866
+}

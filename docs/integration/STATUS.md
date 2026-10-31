@@ -7597,3 +7597,15 @@ original `9.77e-6` to `3.37e-8`. This attributes nearly all of the sampled
 layer-13 state delta to the Q8_1 scale change, with a small remaining
 gate/beta contribution. See the
 [full GDN counterfactual](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer13-gdn-scale-counterfactual-position65539.json).
+
+
+A comparison of the existing fixed/adaptive route traces for model layers 0–2
+across positions 65,536–65,542 found one owner-kind change: layer-1 expert 3
+was GPU-owned in fixed and CPU-owned in adaptive at position 65,540, after swap
+`1:320>3`. Inputs/routes matched at layer 1; layer 2 had matching routes and
+owners but its first activation delta at that dispatch (`5.12e-8` relative L2).
+The separate CPU/GPU service-row oracle confirms the local row effect, but does
+not prove that it causes the later prefix-8 state drift. All six traced runs
+passed with identical output-token hashes, at least 8.44 GiB available and zero
+sampled OOM kills. This closes the bounded layers-0–2 owner search only. See the
+[cross-layer report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer0-2-owner-window-65536-65542.md).

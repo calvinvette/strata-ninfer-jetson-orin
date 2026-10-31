@@ -964,14 +964,13 @@ residency is enabled. The first raw difference is in zero-based model layer 2;
 the distinct 8K replay-boundary dump first differs in GDN allocation 3. This
 localizes state divergence but not its cause. E6/E7 remain open; see the
 [paired diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
-Layer-2 routes and owners matched across the first seven generated positions;
-one upstream input row showed a small delta before its MoE. The next probe is
-layer 1 around that position.
-That layer-1 probe found expert 3 changed GPU→CPU owner at the matching token;
-the round-4 adaptive swap promoted layer-1 expert 320 into expert 3's slot,
-and the service output rows matched independent CPU/GPU oracle results exactly.
-The tiny local MoE delta aligns with the layer-2 activation and prefix-8 GDN
-differences, while broader E6/E7 attribution remains open.
+A comparison of the layer-0/1/2 traces across the first seven generated
+positions found one owner change: layer-1 expert 3 changes GPU→CPU at position
+65,540 after adaptive swap `1:320>3`; layer-2 routes and owners match, with its
+first input delta at the same position. The separate service-row oracle matches
+both native owner outputs exactly. This is consistent with the later prefix-8
+GDN difference, but the owner effect has not been propagated as a state
+counterfactual. E6/E7 attribution remains open. [Cross-layer report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer0-2-owner-window-65536-65542.md).
 
 The layer-13 state sequence now shows identical state through the update at
 position 65,538; the first sampled divergence is the post-state after token
