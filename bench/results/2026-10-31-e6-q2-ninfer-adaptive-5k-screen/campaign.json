@@ -1,0 +1,62 @@
+{
+  "experiment": "E6 adaptive 5000-slot Q2_0 backend screen",
+  "date": "2026-10-31",
+  "hypothesis": "larger adaptive residency increases routed GPU work and may expose an NInfer-specific decode benefit",
+  "primary_metric": "decode TPS; screening success requires >=5% median paired NInfer advantage; no seven-pair confirmation unless the paired interval excludes zero and other primary regressions <=5%",
+  "model": {
+    "name": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0",
+    "shard_1_sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720",
+    "shard_2_sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113",
+    "ple_pack": "~/models/strata-orin-validation/q2-ple-pack",
+    "expert_profile_sha256": "b3e62120218cd96d175a0547530158869177dd2164b22b40f32bea7d7e85fb8c"
+  },
+  "workload": "NIMBUS-7319, 512 prompt tokens, 128 generation tokens, one warmup and one measured request per process",
+  "factors_held": "same artifacts/profile/context/prefill/MTP/workers/resident and workspace budget; only backend toggled; cache fixed at 5000 slots; adaptive policy explicit every 4 windows, up to 96 exchanges",
+  "trace": "disabled for timings",
+  "pair_seed": 20261031,
+  "pair_orders": [
+    [
+      "baseline",
+      "candidate"
+    ],
+    [
+      "candidate",
+      "baseline"
+    ],
+    [
+      "baseline",
+      "candidate"
+    ]
+  ],
+  "source_code_commit": "e781e411c93252be2351feb35468ce06ff6a16a4",
+  "binary_sha256": "fd67288c399d895be036dab344e30caab3d081540bfc552f22dac6a5fc33644a",
+  "launch_profile": {
+    "expert_cache_slots": 5000,
+    "configured_context": 8192,
+    "prefill_chunk": 128,
+    "speculation_window": 2,
+    "draft_generation": "disabled; zero draft tokens observed",
+    "pool_workers": 8,
+    "adaptive_swaps_every_windows": 4,
+    "adaptive_swaps_max_per_round": 96,
+    "prompt_cache": 0,
+    "pcie_frac": 0.0,
+    "resident_budget_gib": 6,
+    "workspace_reserve_mib": 3072,
+    "host_reserve_gib": 9,
+    "temperature": 0,
+    "trace_in_timing_runs": false,
+    "backend_args": {
+      "baseline": [
+        "--expert-backend",
+        "strata"
+      ],
+      "candidate": [
+        "--expert-backend",
+        "ninfer",
+        "--expert-backend-strict"
+      ]
+    }
+  },
+  "model_paths_under_models": "~/models/strata-orin-validation/"
+}

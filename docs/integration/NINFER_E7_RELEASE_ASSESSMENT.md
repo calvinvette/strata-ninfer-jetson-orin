@@ -61,6 +61,18 @@ there is no basis for service confirmation. This does not attribute the
 separate 3K-to-4K cache-policy gain to NInfer. See the
 [paired report](../../bench/results/2026-10-31-e6-q2-ninfer-backend-4k-tg128-screen/README.md).
 
+### 2026-10-31 adaptive 5K-residency backend screen
+
+A three-pair pp512+tg128 NIMBUS screen compared Strata and strict NInfer with
+the same adaptive 5,000-slot Q2_0 cache policy. After warmup, both arms logged
+76.0% GPU-cache hits and 1,142 exchanges; all six responses had the exact
+retrieval prefix, length and same response hash. Median paired NInfer effects
+were 0.00% prompt TPS, −1.08% decode TPS, −0.23% TTFT and −0.30% client time.
+The decode interval was −5.21% to 0.00%; no metric met the 5% effect gate.
+The dynamic slot map was not hashed, so this is a matched-policy backend screen
+and not a route-replay operator ablation. No confirmation or release profile
+is indicated. See the [screen report](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/README.md).
+
 ### 2026-10-31 exact-entry operator and request follow-up
 
 An opt-in compile-time specialization improved grouped NInfer Q2_0 operator

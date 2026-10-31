@@ -3363,12 +3363,23 @@ A same-source Nsight Systems graph-node trace confirmed that the strict NInfer
 backend launched its grouped Q2_0 D3/D4 kernels and Q8_1 SwiGLU quantizer for a
 real 512-token request. Across one warmup and one 32-token measured request,
 these kernels summed to 287 ms, about 0.95% of all summed CUDA kernel-event
-durations. Wait-flag and dequantization kernels accounted for substantially
-more activity. CUDA event durations can overlap, so use this ratio only as a
-share of the summed event durations, not as a wall-time fraction. The trace
-also showed that Strata's type-42 matmul rows are not separable into dense and
-expert work without narrower ranges or kernel labels. Keep graph-node traces
-diagnostic because their overhead is high; never use them as TPS evidence.
+durations. An interval-union calculation found 30.145 seconds of active GPU
+time across 30.250 seconds of summed events, with only 105 ms of overlap; the
+identified kernels were also about 0.95% of that union. This is still not a
+request wall-time fraction. Wait-flag and dequantization kernels accounted for
+substantially more activity. The trace also showed that Strata's type-42
+matmul rows are not separable into dense and expert work without narrower
+ranges or kernel labels. Keep graph-node traces diagnostic because their
+overhead is high; never use them as TPS evidence.
+
+A later adaptive 5K-residency screen raised decode GPU-cache hits to 76% in
+both backends, yet strict NInfer was 1.08% slower at median decode TPS across
+three pairs; uncertainty included no effect and outputs matched. That screen
+did not hash dynamic slot maps, so it does not isolate operator-only timing,
+but it shows that higher residency alone did not reveal an end-to-end NInfer
+gain. For a future Strata/Splash integration, validate the actual request-level
+share and test the accelerated engine on the same resident routes before
+expanding isolated kernel work. See the [adaptive cache report](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/README.md).
 
 For a future Strata/Splash backend, measure the optimized operation's share of
 the whole request before spending time on its isolated microbenchmark. When

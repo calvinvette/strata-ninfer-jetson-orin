@@ -7,10 +7,11 @@ deliverable was an integration plan and an auditable source/evidence import.
 The runtime now has an experimental, opt-in CUDA path for resident Q2_0
 Flash-Next experts; Strata continues to own residency, memory, routing and
 state. E0–E5 have bounded implementation and test evidence. E6's context
-screen is complete, but its performance gate failed, and the E7 assessment
-proposes no NInfer release profile. Current-source HIP and SYCL builds and help
-checks passed on x86_64 maestro1; accelerator execution remains untested. NInfer
-remains opt-in and the default path remains Strata. The latest staged-miss
+screen is complete, but its performance gate failed. A three-pair 5K adaptive
+cache screen also found no NInfer gain after warmup reached a 76% GPU expert-hit
+rate. The E7 assessment proposes no NInfer release profile. Current-source HIP
+and SYCL builds and help checks passed on x86_64 maestro1; accelerator execution
+remains untested. NInfer remains opt-in and the default path remains Strata. The latest staged-miss
 workload screen has output-hash mismatches in its 557- and 1,069-token cells,
 so its performance signal is not quality-qualified. See the [staged screen](../../bench/results/2026-10-26-phase-e6-q2-staged-workload-screen/README.md), [release
 assessment](NINFER_E7_RELEASE_ASSESSMENT.md) and [current
