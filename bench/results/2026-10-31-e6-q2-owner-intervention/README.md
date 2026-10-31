@@ -66,6 +66,12 @@ A third intervention at layer 13 expert 474 is documented in
 two forced-CPU checkpoints match each other, and the matched adaptive control
 repeats exactly; their comparison first differs materially at GDN layer 18.
 
+A fourth intervention at layer 7 expert 225 is documented in
+[layer7-expert225-intervention.md](layer7-expert225-intervention.md). Two
+forced-CPU checkpoints match each other; the adaptive state control repeats
+exactly. The owner change has a small local row delta and a reproducible later
+GDN difference first material at layer 16.
+
 ## Interpretation and next step
 
 This closes the single-position local owner-intervention question, not E6 or

@@ -7343,7 +7343,13 @@ the adaptive full-state control repeated exactly. Its first material GDN
 difference occurs at layer 18 (global relative L2 `0.008878`). This attributes
 a second bounded state effect for the sampled request. Neither result establishes
 a quality impact, performance benefit, or general explanation for other drift.
-Instrumented rates are excluded; energy was not measured.
+A third intervention forced layer-7 expert 225 to CPU at position 65,539. With
+exact matched input/routes and two identical forced checkpoints, the expert row
+delta was `2.93e-8` relative L2 while full GDN state first differed materially
+at layer 16; global GDN relative L2 was `0.008355`. The matched adaptive state
+control repeated exactly. This is another bounded causal state effect, despite
+the small local arithmetic delta. Instrumented rates are excluded; energy was
+not measured.
 The hook defaults off. CUDA built and ran on Orin; maestro1 rebuilt HIP and
 SYCL with one job, HIP help passed, and SYCL startup was unavailable because
 the host has no SYCL device. E6/E7 remain open. [Reports and comparison

@@ -2407,19 +2407,21 @@ recurrent-state delta after the owner switch: `x` differs slightly, `qkv` and
 `h` remain bit-identical, and gate/beta differ. Holding pre-state and `h` fixed
 while crossing gate/beta reproduces a local recurrent-state delta, attributing
 that update's effect to those inputs. This remains a captured-input
-counterfactual, not a whole-request cause. Three one-position live interventions
+counterfactual, not a whole-request cause. Four one-position live interventions
 now reverse sampled adaptive GPU promotions to CPU. At layer 1 expert 3,
 position 65,540, the minimally instrumented capture matches the adaptive
 layer-1 MoE and layer-2 GDN captures byte-for-byte. At layer 5 expert 220,
 position 65,539, the intervention matches the fixed arm's expert row and
 combined layer output exactly while preserving the adaptive profile otherwise.
 At layer 13 expert 474, position 65,540, the matched-input intervention also
-produces a later GDN state delta. For layers 5 and 13, two forced-CPU checkpoints
-and two adaptive controls match byte-for-byte within each arm. The cross-arm GDN
-difference first becomes material at layer 15 for the layer-5 switch and layer
-18 for the layer-13 switch. These are bounded causal state effects for this
-request. The layer-1 full-state result lacks a repeated forced-arm checkpoint.
-No quality or performance claim follows. Keep E6/E7 open. See
+produces a later GDN state delta. At layer 7 expert 225, position 65,539, the
+local row delta is smaller but a downstream state change is reproduced. For
+layers 5, 7 and 13, two forced-CPU checkpoints and adaptive controls match
+byte-for-byte within each arm. The cross-arm GDN difference first becomes
+material at layers 15, 16 and 18 respectively. These are bounded causal state
+effects for this request. The layer-1 full-state result lacks a repeated
+forced-arm checkpoint. No quality or performance claim follows. Keep E6/E7
+open. See
 the [owner intervention report](../../bench/results/2026-10-31-e6-q2-owner-intervention/README.md), [downstream counterfactual report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-expert3-layer2-gdn-counterfactual-65540.md), and [bounded owner scan](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer0-2-owner-window-65536-65542.md).
 
 A matched layer-0 capture over positions 65,536–65,542 supplies a negative
@@ -2504,16 +2506,18 @@ it does not test a 128K prompt or complete E6. See the
 and updated [combined chart](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md#combined-no-trace-api-paired-effect-chart).
 
 **E6 exact-position owner interventions (2026-10-31):** the opt-in hook forced
-layer-1 expert 3 to CPU at position 65,540, layer-5 expert 220 at 65,539, and
-layer-13 expert 474 at 65,540. All 65K +32 requests passed with identical
+layer-1 expert 3 to CPU at position 65,540, layer-5 expert 220 at 65,539,
+layer-7 expert 225 at 65,539, and layer-13 expert 474 at 65,540. All 65K +32 requests passed with identical
 output tokens and at least 8.40 GiB available RAM. The layer-1 intervention
 matched adaptive layer-1/2 captures byte-for-byte. For layer 5, inputs/routes
 were exact and forced CPU output matched the fixed arm; repeated forced and
 adaptive full-state checkpoints matched within arms, with the first material
 GDN difference at layer 15. The layer-13 switch also had identical inputs,
 routes and weights, repeated forced checkpoints and an exact adaptive GDN
-control; its first material GDN difference is at layer 18. These are bounded
-causal state effects, not quality or speed findings or a general explanation
-of long-context drift. Layer-1's full-state result remains unreplicated. CUDA built and ran on Orin; HIP and SYCL compiled on maestro1, with HIP
+control; its first material GDN difference is at layer 18. Layer 7's smaller
+local row delta also produces a repeated GDN change first material at layer 16.
+These are bounded causal state effects, not quality or speed findings or a
+general explanation of long-context drift. Layer-1's full-state result remains
+unreplicated. CUDA built and ran on Orin; HIP and SYCL compiled on maestro1, with HIP
 help passing and SYCL device startup unavailable. E6/E7 remain open. See the
 [intervention reports](../../bench/results/2026-10-31-e6-q2-owner-intervention/README.md).
