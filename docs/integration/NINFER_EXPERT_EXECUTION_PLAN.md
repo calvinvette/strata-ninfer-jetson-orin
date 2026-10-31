@@ -2777,7 +2777,11 @@ paired bootstrap 95% interval +47.2% to +58.0%), prompt throughput +30.0%,
 and cache hits from 21.5% to 48.2%; first-visible latency fell 23.1% and client
 time 24.0%. Minimum available memory remained 9.16 GiB with no sampled OOM
 kills. This confirms map-driven performance for one 4K synthetic retrieval
-task, not broad semantic quality or an NInfer backend advantage. Next compare
-Strata and strict NInfer with the learned map fixed at the same 4K prompt; then
-extend to held-out task families and larger contexts under the E6 matrix. E6
-and E7 remain open. See the [4K campaign report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
+task, not broad semantic quality or an NInfer backend advantage. The subsequent
+same-map Strata-versus-strict-NInfer 4K screen measured 0.0% paired decode
+change (95% interval −3.8% to +1.3%) at the same 48.2% hit rate. The median
+missed the 5% gate; one NInfer prefill outlier produced wide prompt and latency
+intervals, so this does not prove equivalence. It shows no useful backend
+advantage in this small sample. Next extend held-out task families, context
+sizes and semantic/state checks under E6. E6 and E7 remain open. See the [4K
+campaign report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).

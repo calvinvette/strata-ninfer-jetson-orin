@@ -14,13 +14,13 @@ throughput increased 127.9% under NInfer (4.53 to 10.50 tok/s; paired bootstrap
 resident-map selection and cache hits as the source of the large observed gain;
 it does **not** show a comparable NInfer-kernel gain.
 
-With the exact resident map held fixed, the three-pair NInfer-versus-Strata
-screen showed +0.7% decode TPS on the original map (4.44 vs 4.48 tok/s; interval
-−1.2% to +8.0%) and −2.2% on the learned map (10.41 vs 10.31 tok/s; −4.9% to
-+2.9%). Neither median met the 5% useful-effect gate, so these cells were not
-confirmed. The small samples leave uncertainty, particularly on the original
-map, but give no evidence of a useful end-to-end NInfer advantage in this
-workload.
+With the exact resident map held fixed, same-map NInfer-versus-Strata screens
+showed decode changes of +0.7% on the original 512-token map, −2.2% on the
+learned 512-token map, +4.2% at 2K and 0.0% at 4K. None met the 5% useful-effect
+gate, so these cells were not confirmed. The three-pair intervals are coarse;
+the 4K screen also had one NInfer prefill outlier. These screens give no
+evidence of a useful end-to-end NInfer advantage at these tested settings, but
+do not establish equivalence.
 
 ## Paired map results
 
@@ -133,6 +133,28 @@ prompt; it does not establish broad semantic quality or a general NInfer-kernel
 advantage. Pair-level data and hashes are in `evidence.json`; raw captures are
 under `/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task4096-confirmation/`.
 
+### Same-map backend screen at 4K
+
+A three-pair screen then compared Strata and strict NInfer on the same learned
+5K map, with adaptation off. All six measured requests returned the identical
+47-token expected answer and both backends had the same 48.2% expert-hit rate.
+
+| Metric | Strata median | NInfer median | NInfer paired change (95% interval) |
+| --- | ---: | ---: | ---: |
+| Decode throughput | 8.0 tok/s | 7.8 tok/s | 0.0% (−3.8%, +1.3%) |
+| Prompt throughput | 60.7 tok/s | 58.4 tok/s | −3.8% (−30.1%, +1.4%) |
+| First visible token | 67.66 s | 70.28 s | +3.9% (−1.3%, +42.9%) |
+| Client request time | 73.34 s | 76.19 s | +3.9% (−1.4%, +39.6%) |
+
+The decode median did not meet the 5% gate, so no confirmation was run. One
+NInfer pair had substantially slower prefill (41.2 tok/s versus 58.9 tok/s for
+its Strata control), producing the wide three-pair prompt and latency
+intervals. Minimum available RAM was 9.19 GiB; sampled OOM-kill counts were
+zero and clocks remained dynamic. This screen gives no evidence of a useful
+NInfer backend gain at 4K, but its small sample does not establish equivalence.
+Pair-level data is in `evidence.json`; raw captures are under
+`/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task4096-backend-screen/`.
+
 ## Controls and identity
 
 - Model: Qwen3.8-Flash-Next GSQ-RCO Q2_0, two GGUF shards. SHA-256 values:
@@ -191,10 +213,9 @@ The primary finding is that a fixed 5K residency map with more useful experts
 in GPU memory more than doubled decode speed on the two 512-token exact-lookup
 prompts under NInfer. It improved decode 52.0% at 2K and 54.0% at 4K under
 NInfer; the 512-token ORBIT map effect was also confirmed under Strata.
-The same-map screens at 512 tokens and 2K did not show a 5% NInfer end-to-end
-gain. Continue the
-planned context/workload matrix and broader quality/state gates before changing
-release defaults or claiming NInfer acceleration.
+The same-map screens at 512 tokens, 2K and 4K did not show a 5% NInfer end-to-end
+gain. Continue the planned context/workload matrix and broader quality/state
+gates before changing release defaults or claiming NInfer acceleration.
 
 Pair-level values, response hashes and memory/clock summaries are in
 [`evidence.json`](evidence.json). Raw process captures remain under

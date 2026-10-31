@@ -7853,6 +7853,10 @@ readback was denied and energy was not measured. This extends the synthetic
 retrieval residency-map result to one actual 4K prompt; it does not establish
 broad semantic quality or an NInfer-kernel advantage. The report and pair-level
 data are in the [fixed-map report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
-The next discriminating measurement is a same-map Strata-versus-strict-NInfer
-4K screen, followed by additional held-out prompt families and larger context
-sizes if the screen warrants them. E6/E7 remain open.
+The same-map Strata-versus-strict-NInfer 4K screen measured 0.0% paired decode
+change (95% interval −3.8% to +1.3%) at the same 48.2% hit rate. It did not
+meet the 5% gate, so no confirmation was run; one NInfer prefill outlier makes
+latency and prompt-throughput intervals wide. This gives no evidence of a
+useful NInfer backend gain at 4K, without establishing equivalence. Extend the
+workload/context matrix and semantic quality/state gates next. E6/E7 remain
+open; see the [fixed-map report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
