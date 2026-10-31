@@ -7832,5 +7832,10 @@ Minimum available RAM was 9.15 GiB, cgroup OOM-kill counters remained zero,
 and clocks were not changed. One original-map NIMBUS warmup took 127.6 s; its
 measured 2K request was within the campaign range, so the pair was retained.
 This extends the residency-map result to one actual 2K prompt under strict
-NInfer; same-map Strata 2K performance and broader semantic quality remain
-untested. See the [fixed-map report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
+NInfer. A separate three-pair same-map Strata-versus-NInfer 2K screen measured
+NInfer decode +4.2% (95% interval −3.9% to +5.0%), prompt throughput +1.7%,
+TTFT −1.6%, and client time −1.9%; both backends had the same 47.7% hit rate
+and exact answers. The decode median missed the 5% gate, so it was not
+confirmed; the interval remains coarse. This gives no demonstrated NInfer
+kernel gain at 2K. Broader semantic quality remains untested. See the
+[fixed-map report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).

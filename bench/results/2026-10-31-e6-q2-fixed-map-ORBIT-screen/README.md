@@ -64,6 +64,23 @@ These are three-pair screens. The decode medians are below the 5% threshold;
 there was no confirmation campaign. The intervals are coarse and do not prove
 that backend effects are exactly zero.
 
+With the learned map fixed, a separate three-pair 2K screen directly compared
+Strata and strict NInfer on the same 2,048-token retrieval/arithmetic request.
+All answers matched the exact four-field string, and both backends had 47.7%
+expert-cache hits.
+
+| Metric | Strata median | NInfer median | NInfer paired change (95% interval) |
+| --- | ---: | ---: | ---: |
+| Decode throughput | 7.66 tok/s | 7.69 tok/s | +4.2% (−3.9%, +5.0%) |
+| Prompt throughput | 41.97 tok/s | 42.67 tok/s | +1.7% (−10.9%, +14.3%) |
+| First visible token | 49.00 s | 48.20 s | −1.6% (−12.3%, +12.2%) |
+| Client request time | 55.18 s | 54.12 s | −1.9% (−11.6%, +11.2%) |
+
+The decode median remained below the 5% useful-effect threshold, so this
+screen was not confirmed. Minimum request-window available RAM was 9.17 GiB,
+with zero sampled cgroup OOM kills. This gives no evidence of a useful NInfer
+kernel advantage at 2K either, although the three-pair interval remains coarse.
+
 ## 2K prompt replication
 
 A separate 2,048-token retrieval/arithmetic fixture placed markers at 10%, 50%
@@ -146,7 +163,8 @@ The primary finding is that a fixed 5K residency map with more useful experts
 in GPU memory more than doubled decode speed on the two 512-token exact-lookup
 prompts and improved decode 52.0% on the 2K retrieval prompt, under NInfer; the
 512-token ORBIT map effect was also confirmed under Strata.
-The same-map screens did not show a 5% NInfer end-to-end gain. Continue the
+The same-map screens at 512 tokens and 2K did not show a 5% NInfer end-to-end
+gain. Continue the
 planned context/workload matrix and broader quality/state gates before changing
 release defaults or claiming NInfer acceleration.
 

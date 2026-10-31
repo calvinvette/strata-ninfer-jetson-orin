@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **E0–E5 are complete for their documented bounded Q2_0 prototype scopes. E6 remains open and E7 has no release profile. On 2026-10-31, changing the 5K GPU-resident map improved strict-NInfer decode +127.9% on held-out ORBIT (also +130.1% under Strata), +113.5% on a second 512-token alpine-seed task, and +52.0% on a 2,048-token retrieval/arithmetic prompt. Cache hits rose from about 21–22% to 74% on the short tasks and from 21.1% to 47.7% at 2K. Same-map three-pair backend screens measured NInfer decode at +0.7% and −2.2% on the original and learned maps at 512 tokens, below the 5% useful-effect gate. The large gains track residency/cache-hit selection; they do not demonstrate an NInfer-kernel gain. Broader quality, context and end-to-end product gates remain. maestro1 HIP/SYCL evidence remains x86 build-only; no device execution is claimed. Updated 2026-10-31.**
+Status: **E0–E5 are complete for their documented bounded Q2_0 prototype scopes. E6 remains open and E7 has no release profile. On 2026-10-31, changing the 5K GPU-resident map improved strict-NInfer decode +127.9% on held-out ORBIT (also +130.1% under Strata), +113.5% on a second 512-token alpine-seed task, and +52.0% on a 2,048-token retrieval/arithmetic prompt. Cache hits rose from about 21–22% to 74% on the short tasks and from 21.1% to 47.7% at 2K. Same-map three-pair backend screens measured NInfer decode at +0.7% and −2.2% on the original and learned maps at 512 tokens and +4.2% on the learned map at 2K; none met the 5% useful-effect median gate. The large gains track residency/cache-hit selection; they do not demonstrate an NInfer-kernel gain. Broader quality, context and end-to-end product gates remain. maestro1 HIP/SYCL evidence remains x86 build-only; no device execution is claimed. Updated 2026-10-31.**
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -2759,7 +2759,12 @@ time fell 25.6%. GPU expert hits rose 21.1% to 47.7%. Minimum available RAM was
 9.15 GiB, with zero sampled cgroup OOM kills and no clock changes. One original
 map warmup had a slow 127.6-second client time; its subsequent measured 2K
 request fell in the campaign range and the pair is retained. This is a map
-effect under strict NInfer; same-map Strata comparison at 2K remains untested.
-The result supports workload/context generalization of the residency effect
-but does not qualify broad quality or context behavior. See the [fixed-map
+effect under strict NInfer. The same-map 2K Strata-versus-strict-NInfer screen
+had +4.2% decode (paired 95% interval −3.9% to +5.0%), +1.7% prompt
+throughput, −1.6% TTFT and −1.9% client time, with exact answer matches and the
+same 47.7% hit rate. It did not meet the 5% median threshold and was not
+confirmed. This gives no evidence of a useful NInfer-kernel gain at 2K, though
+the three-pair interval remains coarse. The result supports workload/context
+generalization of the residency effect but does not qualify broad quality or
+context behavior. See the [fixed-map
 report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
