@@ -2633,3 +2633,13 @@ TPS was tied and TTFT/client medians slightly favored Strata. No metric met the
 5% NInfer effect gate, so no confirmation is indicated. Since the dynamic slot
 map was not hashed, this is a backend screen under matched policy rather than
 a strict route-replay ablation. See the [adaptive 5K report](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/README.md).
+
+**E6 fixed route-ranked 5K-residency screen (2026-10-31):** a trace-ranked
+profile gave both backends the same fixed 5,000 resident slots, covering 85.23%
+of the exact NIMBUS route trace; adaptation was disabled. Across three pairs,
+NInfer median paired decode TPS was +1.19% (95% screen interval −0.25% to
++2.50%), while prompt TPS was +0.01%, TTFT +0.03%, and client time +0.29%.
+All six outputs matched. No metric met the 5% gate, so no confirmation is
+indicated. Because the profile was built from this workload's own routes, this
+is an oracle-residency diagnostic and not a held-out or deployable profile.
+See the [fixed-map report](../../bench/results/2026-10-31-e6-q2-ninfer-fixed-route-5k-screen/README.md).

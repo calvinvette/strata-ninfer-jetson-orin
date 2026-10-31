@@ -1,0 +1,61 @@
+{
+  "experiment": "Q2_0 fixed route-ranked 5000-slot Strata versus strict NInfer screen",
+  "date": "2026-10-31",
+  "device": "Jetson AGX Orin orin1, aarch64, SM87, CUDA 12.6",
+  "hypothesis": "With a fixed identical resident map covering more than 85% of this workload's routed experts, NInfer's active-resident path may show an API decode benefit without adaptive-map variation.",
+  "primary_metric": "decode tokens/s; three-pair screen only; >=5% median effect and interval excluding zero required before confirmation",
+  "model": {
+    "name": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0",
+    "shard_1_sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720",
+    "shard_2_sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113",
+    "ple_pack": "~/models/strata-orin-validation/q2-ple-pack",
+    "all_model_and_runtime_artifacts_remain_under": "~/models/"
+  },
+  "route_profile": {
+    "profile_path": "~/models/strata-orin-validation/q2-nimbus-route-profile.bin",
+    "profile_sha256": "0909eb556cc01d022fd6609a8bda3009c1cbbd142e32d19ba42166f80f8ea518",
+    "routing_trace_path": "~/models/strata-orin-validation/q2-nimbus-route-5k-routing.bin",
+    "routing_trace_sha256": "0b8bf138da9fb8ab355464231ce37066f3f172789e75d1429ad4101ad8f62a1f",
+    "profile_build_command": "python3 tools/make_profile.py q2-nimbus-route-5k-routing.bin --no-base --out q2-nimbus-route-profile.bin",
+    "route_trace_experts": 122880,
+    "unique_layer_expert_pairs": 10065,
+    "configured_resident_slots": 5000,
+    "trace_routing_hit_rate_pct": 85.2262,
+    "trace_origin": "two requests (one warmup and one measured) with the exact held-out workload and adaptation disabled; route dump was not timed",
+    "interpretation": "workload-oracle resident profile; not deployable or held-out profile evidence"
+  },
+  "workload": "NIMBUS-7319 retrieval, 512 prompt tokens, 128 generated tokens; one warmup and one measured request per fresh process",
+  "controls": "same binary, model, PLE pack, route-ranked profile, resident slot count, context, prefill, workers, memory reserves and request; adaptive swaps disabled in both arms; only backend selection differs",
+  "runtime": {
+    "source_implementation_commit": "e781e411c93252be2351feb35468ce06ff6a16a4",
+    "binary_sha256": "fd67288c399d895be036dab344e30caab3d081540bfc552f22dac6a5fc33644a",
+    "profile_slots": 5000,
+    "context_tokens": 8192,
+    "prefill_chunk": 128,
+    "speculation_window": 2,
+    "draft_tokens_observed": 0,
+    "pool_workers": 8,
+    "prompt_cache": 0,
+    "pcie_fraction": 0.0,
+    "resident_budget_gib": 6,
+    "workspace_reserve_mib": 3072,
+    "host_reserve_gib": 9,
+    "adapt_every": 0,
+    "adapt_swaps": 0,
+    "temperature": 0,
+    "backend_args": {
+      "baseline": ["--expert-backend", "strata"],
+      "candidate": ["--expert-backend", "ninfer", "--expert-backend-strict"]
+    }
+  },
+  "randomized_pair_order": {
+    "seed": 20261031,
+    "blocks": [
+      ["baseline", "candidate"],
+      ["candidate", "baseline"],
+      ["baseline", "candidate"]
+    ]
+  },
+  "telemetry": "one-second available-memory and swap sampling, cgroup OOM counter, read-only dynamic CPU/GPU frequency observations; EMC denied; no energy measurement; no clock control",
+  "trace_artifacts": "raw requests and process telemetry under /tmp/e6-ninfer-fixed-5k; route IDs only retained in ~/models; prompt/completion text excluded from repository"
+}

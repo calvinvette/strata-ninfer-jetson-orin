@@ -3381,6 +3381,17 @@ gain. For a future Strata/Splash integration, validate the actual request-level
 share and test the accelerated engine on the same resident routes before
 expanding isolated kernel work. See the [adaptive cache report](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/README.md).
 
+A follow-up fixed-map screen ranked 5,000 resident slots from an untimed route
+trace of the same NIMBUS workload, covering 85.23% of its route selections.
+With adaptation disabled and the same profile supplied to both engines,
+NInfer decode TPS was +1.19% at the paired median (95% screen interval
+−0.25% to +2.50%); outputs and measured 84.9% cache-hit rates matched. This
+removes dynamic slot-map changes as an explanation for the lack of a useful
+gain in this diagnostic, but the workload-derived profile is an oracle and
+cannot support a deployment claim. For a future Strata/Splash integration,
+pair identical residency maps before attributing end-to-end effects to an
+operator backend. See the [fixed-map screen](../../bench/results/2026-10-31-e6-q2-ninfer-fixed-route-5k-screen/README.md).
+
 For a future Strata/Splash backend, measure the optimized operation's share of
 the whole request before spending time on its isolated microbenchmark. When
 work is captured in command graphs, verify whether the profiler reports graph

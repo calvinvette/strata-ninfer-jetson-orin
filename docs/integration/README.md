@@ -9,7 +9,9 @@ Flash-Next experts; Strata continues to own residency, memory, routing and
 state. E0–E5 have bounded implementation and test evidence. E6's context
 screen is complete, but its performance gate failed. A three-pair 5K adaptive
 cache screen also found no NInfer gain after warmup reached a 76% GPU expert-hit
-rate. The E7 assessment proposes no NInfer release profile. Current-source HIP
+rate. A fixed route-ranked map at 85.23% trace coverage also showed only +1.19%
+median NInfer decode TPS with uncertainty spanning zero and a same-workload
+oracle profile. The E7 assessment proposes no NInfer release profile. Current-source HIP
 and SYCL builds and help checks passed on x86_64 maestro1; accelerator execution
 remains untested. NInfer remains opt-in and the default path remains Strata. The latest staged-miss
 workload screen has output-hash mismatches in its 557- and 1,069-token cells,

@@ -73,6 +73,18 @@ The dynamic slot map was not hashed, so this is a matched-policy backend screen
 and not a route-replay operator ablation. No confirmation or release profile
 is indicated. See the [screen report](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/README.md).
 
+### 2026-10-31 fixed route-ranked 5K-residency screen
+
+A three-pair comparison disabled adaptation and used one identical 5,000-slot
+Q2_0 profile for Strata and strict NInfer. The profile was ranked from this
+workload's route trace and covered 85.23% of recorded route selections; API
+counters reported 84.9% GPU-cache hits in both arms. Median paired NInfer
+effects were +0.01% prompt TPS, +1.19% decode TPS, +0.03% TTFT and +0.29%
+client time. The decode interval was −0.25% to +2.50%; all six outputs matched.
+This narrows the adaptive-map caveat but is an oracle-residency diagnostic, not
+a deployable or held-out profile. No metric met the 5% gate, so no confirmation
+or release profile is indicated. See the [fixed-map report](../../bench/results/2026-10-31-e6-q2-ninfer-fixed-route-5k-screen/README.md).
+
 ### 2026-10-31 exact-entry operator and request follow-up
 
 An opt-in compile-time specialization improved grouped NInfer Q2_0 operator

@@ -6,6 +6,8 @@ An opt-in Nsight graph-node diagnostic showed NInfer D3/D4 plus SwiGLU kernels a
 
 A new three-pair 5K adaptive-cache NIMBUS screen reached 76.0% GPU expert hits after warmup in both backends, yet NInfer decode TPS was 1.08% lower at the paired median; all measured outputs matched. No 5% gain or follow-up confirmation. [Report](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/README.md).
 
+A fixed-map follow-up ranked 5K resident experts from the workload's own route trace (85.23% trace coverage) and disabled adaptation. NInfer decode TPS was +1.19% at the paired median (95% screen interval −0.25% to +2.50%); all outputs and the 84.9% hit rates matched. This oracle profile still shows no 5% effect and is not deployable. [Report](../../bench/results/2026-10-31-e6-q2-ninfer-fixed-route-5k-screen/README.md).
+
 A three-pair 2K-prompt/128-cap comparison at a fixed 4K cache also found no NInfer decode gain: paired median 0.00% (95% screening interval −2.47% to +1.15%). Exact retrieval and arithmetic outputs matched. [Report](../../bench/results/2026-10-31-e6-q2-ninfer-backend-4k-pp2048-tg128-screen/README.md).
 
 A same-profile 4K-cache pp512+tg128 backend screen found no NInfer request-level gain on NIMBUS: paired medians were −1.3% prompt TPS and −1.3% decode TPS, with TTFT/client time also about 1.2% slower. All six exact-answer responses matched byte-for-byte; no metric met the 5% screen. [Report](../../bench/results/2026-10-31-e6-q2-ninfer-backend-4k-tg128-screen/README.md).
