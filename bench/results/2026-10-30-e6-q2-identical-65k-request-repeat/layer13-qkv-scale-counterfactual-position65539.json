@@ -1,0 +1,30 @@
+{
+  "experiment": "E6 layer-13 Q3_K/Q8_1 projection replay and scale counterfactual",
+  "model": "Qwen3.8-Flash-Next Q2_0",
+  "position": 65539,
+  "weight": {
+    "tensor": "blk.13.attn_qkv.weight",
+    "format": "Q3_K",
+    "shape_gguf_order": [2560, 10240],
+    "source": "local Q2_0 model shard; tensor bytes were not copied into the repository"
+  },
+  "runtime_contract": "native_quantize_q8_1 followed by native_q3_k_mmvq",
+  "replay": {
+    "fixed_captured_vs_replay": {"changed_values": 0, "relative_l2": 0.0, "max_absolute": 0.0},
+    "adaptive_captured_vs_replay": {"changed_values": 0, "relative_l2": 0.0, "max_absolute": 0.0}
+  },
+  "quantized_inputs": {
+    "q8_1_integer_codes_match": true,
+    "different_fp16_scale_blocks": [57]
+  },
+  "counterfactual": {
+    "change": "Replace only adaptive Q8_1 block 57's stored FP16 d with fixed-owner block 57's d, leaving adaptive integer codes and all other blocks unchanged",
+    "adaptive_counterfactual_vs_fixed_captured": {"changed_values": 0, "relative_l2": 0.0, "max_absolute": 0.0},
+    "adaptive_counterfactual_vs_adaptive_captured": {
+      "changed_values": 10236,
+      "relative_l2": 0.00004260689355818268,
+      "max_absolute": 0.00034812092781066895
+    }
+  },
+  "interpretation": "For this captured pair and position, the layer-13 qkv projection delta is fully reproduced by the native CUDA path and eliminated by changing only Q8_1 block 57's scale. This establishes the local projection cause, not the origin of the upstream x delta or the full cause of later recurrent-state divergence."
+}

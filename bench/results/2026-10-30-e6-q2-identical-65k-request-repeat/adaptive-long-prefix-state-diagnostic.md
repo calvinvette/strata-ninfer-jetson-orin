@@ -499,6 +499,19 @@ single-arm replay of both captured `x` rows is needed before assigning cause.
 The compact comparison is in
 [`gdn-layer13-position65539-comparison.json`](gdn-layer13-position65539-comparison.json).
 
+#### Native projection replay and scale counterfactual
+
+The captured layer-13 `x` rows were replayed through native CUDA
+`native_quantize_q8_1` and `native_q3_k_mmvq` with the actual Q3_K
+`blk.13.attn_qkv.weight` bytes. Both replay outputs match their corresponding
+captured `qkv` vectors bit-for-bit. The Q8_1 integer codes match across arms;
+only block 57's stored FP16 scale differs. Replacing just the adaptive block
+57 scale with the fixed-owner value makes the adaptive replay bit-identical to
+the fixed capture. This isolates the sampled layer-13 `qkv` difference to that
+one activation scale. The result does not locate the earlier source of the
+`x` delta and does not by itself explain the full recurrent-state difference.
+See [`layer13-qkv-scale-counterfactual-position65539.json`](layer13-qkv-scale-counterfactual-position65539.json).
+
 ### Layer-12 boundary feeding the layer-13 GDN update
 
 A paired boundary capture at position 65,539 confirms the layer-13 input delta

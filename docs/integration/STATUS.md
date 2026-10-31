@@ -7553,3 +7553,13 @@ blocks, but one FP16 scale differs (block 57: `0.0141448975` fixed-owner,
 `0.0141372681` adaptive). This is a plausible contributor to `qkv` drift; it
 does not replay the projection or establish full causality. See the
 [Q8_1 activation report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer13-q8_1-activation-position65539.json).
+
+The native CUDA projection was then replayed with the actual layer-13 weights
+and both captured `x` rows. Each replay matched its captured `qkv` bit-for-bit.
+Replacing only adaptive Q8_1 block 57's FP16 `d` with the fixed-owner value
+made all 10,240 adaptive replay outputs bit-identical to the fixed capture.
+This confirms the single block-scale change fully explains the local `qkv`
+delta for this pair and position. It does not explain where the upstream `x`
+delta originated or establish the full cause of later recurrent-state
+divergence. See the
+[projection replay report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer13-qkv-scale-counterfactual-position65539.json).
