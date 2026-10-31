@@ -115,7 +115,7 @@ E4 explicitly leaves the mixed-codec
 Coder IQ1_M and ISTA-DASLab IQ3_S models unsupported by
 the NInfer selector; E5 is complete for the bounded single-live static Q2_0
 profile, with cross-backend state migration, adaptive residency and broader
-quality coverage explicitly excluded. E6's 1K–256K context screen is complete.
+quality coverage explicitly excluded. E6's 1K–256K context screen is complete. Added 2K and 8K configured-capacity pp512+tg64 screens also show no median effect at or above 5%; E6 overall remains open pending broader confirmation and quality gates.
 After a grouped SwiGLU precision correction, one short-request 6-GiB staged
 Q2_0 cell passed seven-pair TTFT confirmation, but broader workload/context
 coverage and E6's full performance exit remain open. A follow-up 8K

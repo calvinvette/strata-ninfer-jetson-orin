@@ -89,6 +89,8 @@ pp2048+tg128 (median tied decode TPS, -2.34% client time); the latter had one
 unrepeated decode outlier. Both matched content within pairs but lacked an
 independent task-quality oracle. A separate 2K held-out retrieval check passed
 exact answer, token, persistent-state, and residency gates for both backends.
+Two additional three-pair capacity screens at 2K and 8K with pp512+tg64 also passed. Median NInfer effects were +1.31% prompt TPS, -0.04% decode, -1.22% first-visible TTFT, and -0.83% client time at 2K; at 8K they were -0.48%, -0.78%, +0.42%, and +0.94%. None reached the 5% useful-effect screen. All six requests in each cell matched output within pairs. [Reports and paired data](../../bench/results/2026-10-31-e6-q2-2k-capacity-api-screen/README.md).
+
 An added three-pair no-trace screen at 256K configured capacity with pp512+tg64
 also found near-zero effects: -0.23% prompt TPS, -0.68% decode TPS, +0.27%
 first-visible TTFT, and +0.33% client time; every interval crossed zero and

@@ -7289,7 +7289,7 @@ OOM kills. This is one synthetic task and not broad quality qualification.
 Instrumented prompt/decode rates were 35.30/34.97 and 5.341/5.325 tokens/s;
 these are diagnostic only, not performance measurements. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/quality-retrieval-2k-README.md).
 
-The seven no-trace API workload screens now have a combined paired-effect figure
+The nine no-trace API workload screens now have a combined paired-effect figure
 with each block and its three-block bootstrap interval, plus sanitized JSON/CSV
 source data. The chart displays the small or unstable effects and makes no
 product-performance claim. [Figure and source data](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md#combined-no-trace-api-paired-effect-chart).
@@ -7315,6 +7315,8 @@ requests was 8.40 GiB, OOM kills were zero, and peak sampled swap was 4.78 GiB.
 Clocks remained dynamic and energy was not measured. This is a short-workload
 capacity screen, not 128K ingestion or performance qualification. See the
 [report and paired data](../../bench/results/2026-10-31-e6-q2-128k-capacity-api-screen/README.md).
+
+**E6 2K- and 8K-capacity no-trace API screens (2026-10-31):** three randomized process pairs per cell at pp512+tg64 passed with matching warmup and measured output. At 2K, NInfer changed prompt TPS +1.31%, decode TPS -0.04%, first-visible TTFT -1.22%, and client time -0.83%; at 8K the changes were -0.48%, -0.78%, +0.42%, and +0.94%. No median reached the 5% useful-effect screen; intervals and three-pair uncertainty mean these remain screening findings. Minimum available RAM was 11.66 GiB (2K) and 11.53 GiB (8K), with zero sampled cgroup OOM kills; peak swap was 2.10 and 1.57 GiB. CPU frequencies varied from 729 to 2,201 MHz; GPU frequency and EMC readback were unavailable, and energy was not measured. These are short-prompt capacity screens, not large-context ingestion. See the [2K](../../bench/results/2026-10-31-e6-q2-2k-capacity-api-screen/README.md) and [8K](../../bench/results/2026-10-31-e6-q2-8k-capacity-api-screen/README.md) reports.
 
 **E6 exact 256K retrieval/state check (2026-10-29):** one fresh-process
 Strata/strict-NInfer pair passed a held-out 256,000-token retrieval/arithmetic

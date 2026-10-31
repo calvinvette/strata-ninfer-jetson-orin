@@ -1,0 +1,306 @@
+{
+  "schema": 1,
+  "date": "2026-10-31",
+  "model": "Qwen3.8-Flash-Next GSQ-RCO Q2_0",
+  "configured_context_tokens": 2048,
+  "workload": "pp512+tg64",
+  "comparison": "strict NInfer / Strata expert backend; PCIe staging disabled in both",
+  "capture": "no trace; three randomized same-day independent-process pairs, one matching warmup and one measured request per process",
+  "summary": {
+    "cell": "e6-pp512-tg64-no-staging",
+    "paired_blocks": 3,
+    "api_content_matching_blocks": 3,
+    "prompt_tps": {
+      "baseline_median": 30.199362982187093,
+      "candidate_median": 30.487441793995405,
+      "median_within_block_candidate_over_baseline": 1.0131226694712687,
+      "paired_bootstrap_95_interval": [
+        1.0039062034798558,
+        1.0160994377034624
+      ]
+    },
+    "decode_tps": {
+      "baseline_median": 8.702273468943762,
+      "candidate_median": 8.90224225226729,
+      "median_within_block_candidate_over_baseline": 0.9995662758485604,
+      "paired_bootstrap_95_interval": [
+        0.986554644333552,
+        1.022978912813665
+      ]
+    },
+    "client_ttft_s": {
+      "baseline_median": 17.107646744698286,
+      "candidate_median": 16.945781407877803,
+      "median_within_block_candidate_over_baseline": 0.9878231037878935,
+      "paired_bootstrap_95_interval": [
+        0.9846521825417925,
+        0.9949597332365946
+      ]
+    },
+    "client_total_s": {
+      "baseline_median": 24.21830865414813,
+      "candidate_median": 23.98903633793816,
+      "median_within_block_candidate_over_baseline": 0.9917017810524059,
+      "paired_bootstrap_95_interval": [
+        0.9905330995865931,
+        0.9937280739435628
+      ]
+    }
+  },
+  "raw_paired_blocks": [
+    {
+      "block": 0,
+      "baseline": {
+        "prompt_tps": 30.36881502307318,
+        "decode_tps": 8.702273468943762,
+        "client_total_s": 24.21830865414813,
+        "client_ttft_s": 17.031625343021005,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.727,
+        "logical_file_mb": 7972.3,
+        "prompt_tokens": 512,
+        "completion_tokens": 64,
+        "expert_slots": 3000,
+        "expert_cache_mib": 3955,
+        "mtp_max": 0,
+        "native_spec_capacity": 2,
+        "lookup": 0,
+        "kv": "fp16",
+        "gpu_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "emc_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "minimum_available_bytes": 12525195264,
+        "maximum_swap_used_bytes": 2257702912,
+        "rail_energy": {
+          "status": "estimated",
+          "joules_by_named_rail": {
+            "VDD_GPU_SOC": 251.55027536680498,
+            "VDD_CPU_CV": 116.97916409018801,
+            "VIN_SYS_5V0": 161.17241962061922
+          },
+          "scope": "each named rail separately; no whole-board or summed-rail claim; includes prefill and decode",
+          "method": "linear integration of instantaneous mW; timestamps have one-second granularity"
+        }
+      },
+      "candidate": {
+        "prompt_tps": 30.487441793995405,
+        "decode_tps": 8.90224225226729,
+        "client_total_s": 23.98903633793816,
+        "client_ttft_s": 16.945781407877803,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.727,
+        "logical_file_mb": 7972.3,
+        "prompt_tokens": 512,
+        "completion_tokens": 64,
+        "expert_slots": 3000,
+        "expert_cache_mib": 3955,
+        "mtp_max": 0,
+        "native_spec_capacity": 2,
+        "lookup": 0,
+        "kv": "fp16",
+        "gpu_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "emc_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "minimum_available_bytes": 12562223104,
+        "maximum_swap_used_bytes": 1939116032,
+        "rail_energy": {
+          "status": "estimated",
+          "joules_by_named_rail": {
+            "VDD_GPU_SOC": 248.50409228066198,
+            "VDD_CPU_CV": 112.39453580920991,
+            "VIN_SYS_5V0": 160.21901820740393
+          },
+          "scope": "each named rail separately; no whole-board or summed-rail claim; includes prefill and decode",
+          "method": "linear integration of instantaneous mW; timestamps have one-second granularity"
+        }
+      },
+      "api_content_matches": true
+    },
+    {
+      "block": 1,
+      "candidate": {
+        "prompt_tps": 30.304823912400117,
+        "decode_tps": 8.562216543807779,
+        "client_total_s": 24.395341399125755,
+        "client_ttft_s": 17.06368365790695,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.727,
+        "logical_file_mb": 7972.3,
+        "prompt_tokens": 512,
+        "completion_tokens": 64,
+        "expert_slots": 3000,
+        "expert_cache_mib": 3955,
+        "mtp_max": 0,
+        "native_spec_capacity": 2,
+        "lookup": 0,
+        "kv": "fp16",
+        "gpu_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "emc_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "minimum_available_bytes": 12555358208,
+        "maximum_swap_used_bytes": 1724952576,
+        "rail_energy": {
+          "status": "estimated",
+          "joules_by_named_rail": {
+            "VDD_GPU_SOC": 247.8132143450378,
+            "VDD_CPU_CV": 110.52943425122346,
+            "VIN_SYS_5V0": 162.3044020025391
+          },
+          "scope": "each named rail separately; no whole-board or summed-rail claim; includes prefill and decode",
+          "method": "linear integration of instantaneous mW; timestamps have one-second granularity"
+        }
+      },
+      "baseline": {
+        "prompt_tps": 29.824663598765074,
+        "decode_tps": 8.678907542513086,
+        "client_total_s": 24.549312874209136,
+        "client_ttft_s": 17.32965605566278,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.727,
+        "logical_file_mb": 7972.3,
+        "prompt_tokens": 512,
+        "completion_tokens": 64,
+        "expert_slots": 3000,
+        "expert_cache_mib": 3955,
+        "mtp_max": 0,
+        "native_spec_capacity": 2,
+        "lookup": 0,
+        "kv": "fp16",
+        "gpu_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "emc_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "minimum_available_bytes": 12591333376,
+        "maximum_swap_used_bytes": 1717604352,
+        "rail_energy": {
+          "status": "estimated",
+          "joules_by_named_rail": {
+            "VDD_GPU_SOC": 249.39769653775096,
+            "VDD_CPU_CV": 115.41140255048298,
+            "VIN_SYS_5V0": 163.28964509150794
+          },
+          "scope": "each named rail separately; no whole-board or summed-rail claim; includes prefill and decode",
+          "method": "linear integration of instantaneous mW; timestamps have one-second granularity"
+        }
+      },
+      "api_content_matches": true
+    },
+    {
+      "block": 2,
+      "baseline": {
+        "prompt_tps": 30.199362982187093,
+        "decode_tps": 8.958190445530002,
+        "client_total_s": 24.104384166188538,
+        "client_ttft_s": 17.107646744698286,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.727,
+        "logical_file_mb": 7972.3,
+        "prompt_tokens": 512,
+        "completion_tokens": 64,
+        "expert_slots": 3000,
+        "expert_cache_mib": 3955,
+        "mtp_max": 0,
+        "native_spec_capacity": 2,
+        "lookup": 0,
+        "kv": "fp16",
+        "gpu_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "emc_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "minimum_available_bytes": 12567687168,
+        "maximum_swap_used_bytes": 1700163584,
+        "rail_energy": {
+          "status": "estimated",
+          "joules_by_named_rail": {
+            "VDD_GPU_SOC": 245.29688280456196,
+            "VDD_CPU_CV": 112.16828356610978,
+            "VIN_SYS_5V0": 160.95842905063236
+          },
+          "scope": "each named rail separately; no whole-board or summed-rail claim; includes prefill and decode",
+          "method": "linear integration of instantaneous mW; timestamps have one-second granularity"
+        }
+      },
+      "candidate": {
+        "prompt_tps": 30.5956592408452,
+        "decode_tps": 8.95430506198058,
+        "client_total_s": 23.904360708780587,
+        "client_ttft_s": 16.899328705854714,
+        "drafted": 0,
+        "accepted": 0,
+        "cache_hit_rate": 0.727,
+        "logical_file_mb": 7972.3,
+        "prompt_tokens": 512,
+        "completion_tokens": 64,
+        "expert_slots": 3000,
+        "expert_cache_mib": 3955,
+        "mtp_max": 0,
+        "native_spec_capacity": 2,
+        "lookup": 0,
+        "kv": "fp16",
+        "gpu_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "emc_observed_hz": {
+          "samples": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        "minimum_available_bytes": 12575256576,
+        "maximum_swap_used_bytes": 1693032448,
+        "rail_energy": {
+          "status": "estimated",
+          "joules_by_named_rail": {
+            "VDD_GPU_SOC": 248.38618363335448,
+            "VDD_CPU_CV": 111.08252289994877,
+            "VIN_SYS_5V0": 160.37880572602353
+          },
+          "scope": "each named rail separately; no whole-board or summed-rail claim; includes prefill and decode",
+          "method": "linear integration of instantaneous mW; timestamps have one-second granularity"
+        }
+      },
+      "api_content_matches": true
+    }
+  ],
+  "source_revision": "12d82c92de7e5e1dee173c33a90ea9e9da3e7445",
+  "binary_sha256": "0b8eadf1f3894efe449d9b96082f7e83cd9aa2bf616f6161625b95f7001ccf37"
+}

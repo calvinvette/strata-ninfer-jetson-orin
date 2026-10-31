@@ -3,7 +3,7 @@
   "date": "2026-10-29, extended 2026-10-31",
   "model": "Qwen3.8-Flash-Next GSQ-RCO Q2_0",
   "comparison": "strict NInfer / Strata expert backend; PCIe staging disabled in both",
-  "capture": "no trace; one same-workload warmup and one measured API request per fresh process; added 512+64 at 262,144 configured context on 2026-10-31; added matched pp512+tg64 screens at 131,072 and 262,144 configured context",
+  "capture": "no trace; one same-workload warmup and one measured API request per fresh process; added 512+64 at 262,144 configured context on 2026-10-31; added matched pp512+tg64 screens at 131,072 and 262,144 configured context; added matched pp512+tg64 screens at 2K and 8K configured context on 2026-10-31",
   "uncertainty": "bootstrap median of whole paired process blocks; 5000 resamples; three pairs per cell; screening only",
   "cells": [
     {
@@ -121,6 +121,115 @@
       ]
     },
     {
+      "name": "pp512+tg64, 2K cap",
+      "context_tokens": 2048,
+      "paired_blocks": 3,
+      "content_matched_blocks": 3,
+      "warmup_matched_blocks": 3,
+      "metrics": {
+        "prompt_tps": {
+          "kind": "tps",
+          "median_paired_change_pct": 1.3122669471268722,
+          "bootstrap_95_interval_pct": [
+            0.3906203479855819,
+            1.609943770346245
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "baseline \u2192 candidate",
+              "value": 0.3906203479855819
+            },
+            {
+              "block": 1,
+              "order": "candidate \u2192 baseline",
+              "value": 1.609943770346245
+            },
+            {
+              "block": 2,
+              "order": "baseline \u2192 candidate",
+              "value": 1.3122669471268722
+            }
+          ]
+        },
+        "decode_tps": {
+          "kind": "tps",
+          "median_paired_change_pct": -0.04337241514396073,
+          "bootstrap_95_interval_pct": [
+            -1.3445355666448,
+            2.2978912813665042
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "baseline \u2192 candidate",
+              "value": 2.2978912813665042
+            },
+            {
+              "block": 1,
+              "order": "candidate \u2192 baseline",
+              "value": -1.3445355666448
+            },
+            {
+              "block": 2,
+              "order": "baseline \u2192 candidate",
+              "value": -0.04337241514396073
+            }
+          ]
+        },
+        "first_visible_ttft_s": {
+          "kind": "latency",
+          "median_paired_change_pct": -1.2176896212106492,
+          "bootstrap_95_interval_pct": [
+            -1.5347817458207458,
+            -0.504026676340541
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "baseline \u2192 candidate",
+              "value": -0.504026676340541
+            },
+            {
+              "block": 1,
+              "order": "candidate \u2192 baseline",
+              "value": -1.5347817458207458
+            },
+            {
+              "block": 2,
+              "order": "baseline \u2192 candidate",
+              "value": -1.2176896212106492
+            }
+          ]
+        },
+        "client_total_s": {
+          "kind": "latency",
+          "median_paired_change_pct": -0.8298218947594083,
+          "bootstrap_95_interval_pct": [
+            -0.946690041340692,
+            -0.6271926056437227
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "baseline \u2192 candidate",
+              "value": -0.946690041340692
+            },
+            {
+              "block": 1,
+              "order": "candidate \u2192 baseline",
+              "value": -0.6271926056437227
+            },
+            {
+              "block": 2,
+              "order": "baseline \u2192 candidate",
+              "value": -0.8298218947594083
+            }
+          ]
+        }
+      }
+    },
+    {
       "name": "pp2048+tg128",
       "context_tokens": 4096,
       "paired_blocks": 3,
@@ -233,6 +342,115 @@
         11.632526397705078,
         11.599658966064453
       ]
+    },
+    {
+      "name": "pp512+tg64, 8K cap",
+      "context_tokens": 8192,
+      "paired_blocks": 3,
+      "content_matched_blocks": 3,
+      "warmup_matched_blocks": 3,
+      "metrics": {
+        "prompt_tps": {
+          "kind": "tps",
+          "median_paired_change_pct": -0.4774235794862691,
+          "bootstrap_95_interval_pct": [
+            -1.2495119094103613,
+            2.268583915872835
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "candidate \u2192 baseline",
+              "value": -0.4774235794862691
+            },
+            {
+              "block": 1,
+              "order": "candidate \u2192 baseline",
+              "value": -1.2495119094103613
+            },
+            {
+              "block": 2,
+              "order": "candidate \u2192 baseline",
+              "value": 2.268583915872835
+            }
+          ]
+        },
+        "decode_tps": {
+          "kind": "tps",
+          "median_paired_change_pct": -0.7847348422270084,
+          "bootstrap_95_interval_pct": [
+            -4.934930552791805,
+            -0.21827129137234058
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "candidate \u2192 baseline",
+              "value": -4.934930552791805
+            },
+            {
+              "block": 1,
+              "order": "candidate \u2192 baseline",
+              "value": -0.21827129137234058
+            },
+            {
+              "block": 2,
+              "order": "candidate \u2192 baseline",
+              "value": -0.7847348422270084
+            }
+          ]
+        },
+        "first_visible_ttft_s": {
+          "kind": "latency",
+          "median_paired_change_pct": 0.41998013281177027,
+          "bootstrap_95_interval_pct": [
+            -2.139558623417348,
+            1.255806428068218
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "candidate \u2192 baseline",
+              "value": 0.41998013281177027
+            },
+            {
+              "block": 1,
+              "order": "candidate \u2192 baseline",
+              "value": 1.255806428068218
+            },
+            {
+              "block": 2,
+              "order": "candidate \u2192 baseline",
+              "value": -2.139558623417348
+            }
+          ]
+        },
+        "client_total_s": {
+          "kind": "latency",
+          "median_paired_change_pct": 0.9394477647439947,
+          "bootstrap_95_interval_pct": [
+            -1.3196214555370345,
+            1.8885403572770798
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "candidate \u2192 baseline",
+              "value": 1.8885403572770798
+            },
+            {
+              "block": 1,
+              "order": "candidate \u2192 baseline",
+              "value": 0.9394477647439947
+            },
+            {
+              "block": 2,
+              "order": "candidate \u2192 baseline",
+              "value": -1.3196214555370345
+            }
+          ]
+        }
+      }
     },
     {
       "name": "pp16384+tg128",
