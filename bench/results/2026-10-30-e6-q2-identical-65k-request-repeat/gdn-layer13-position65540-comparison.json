@@ -1,0 +1,129 @@
+{
+  "schema": 1,
+  "experiment": "65,536-token prompt + 32 generated tokens; separate fixed-owner and adaptive runs",
+  "model": "Qwen3.8-Flash-Next Q2_0",
+  "layer": 13,
+  "position": 65540,
+  "token_id": 1472,
+  "output_token_sha256": {
+    "fixed": "2d5f3da8f9890f8c9262231bada2cfab088196528565a1c08ab685d86074c650",
+    "adaptive": "2d5f3da8f9890f8c9262231bada2cfab088196528565a1c08ab685d86074c650"
+  },
+  "supervision": {
+    "fixed": {
+      "status": "pass",
+      "elapsed_s": 823.07880204916,
+      "minimum_available_gib": 8.55230712890625,
+      "floor_gib": 6.0,
+      "oom_kills": 0
+    },
+    "adaptive": {
+      "status": "pass",
+      "elapsed_s": 820.7303078919649,
+      "minimum_available_gib": 8.256248474121094,
+      "floor_gib": 6.0,
+      "oom_kills": 0
+    }
+  },
+  "gdn_geometry": {
+    "n_embd": 2560,
+    "conv_channels": 10240,
+    "v_heads": 48,
+    "value_dim": 6144
+  },
+  "stage_comparison": {
+    "x": {
+      "count": 2560,
+      "different": 2102,
+      "relative_l2": 1.559379197855609e-07,
+      "max_abs": 7.152557373046875e-07
+    },
+    "qkv": {
+      "count": 10240,
+      "different": 0,
+      "relative_l2": 0.0,
+      "max_abs": 0.0
+    },
+    "h": {
+      "count": 10240,
+      "different": 10203,
+      "relative_l2": 2.5177863701106305e-05,
+      "max_abs": 1.7321668565273285e-05
+    },
+    "gate": {
+      "count": 48,
+      "different": 14,
+      "relative_l2": 1.037678050978162e-07,
+      "max_abs": 2.384185791015625e-07
+    },
+    "beta": {
+      "count": 48,
+      "different": 19,
+      "relative_l2": 6.198088621268559e-08,
+      "max_abs": 1.1920928955078125e-07
+    },
+    "z": {
+      "count": 6144,
+      "different": 0,
+      "relative_l2": 0.0,
+      "max_abs": 0.0
+    },
+    "y": {
+      "count": 6144,
+      "different": 6108,
+      "relative_l2": 1.4526382135816017e-05,
+      "max_abs": 9.268522262573242e-06
+    },
+    "gdn_out": {
+      "count": 2560,
+      "different": 2560,
+      "relative_l2": 0.0010478782322083078,
+      "max_abs": 0.0003305971622467041
+    },
+    "ffn_x": {
+      "count": 2560,
+      "different": 2560,
+      "relative_l2": 0.00034499246286415463,
+      "max_abs": 0.0007888674736022949
+    },
+    "ffn_y": {
+      "count": 2560,
+      "different": 2560,
+      "relative_l2": 0.0054734782577225685,
+      "max_abs": 0.0001450384734198451
+    }
+  },
+  "raw_gdn_o": {
+    "count": 6144,
+    "different": 6120,
+    "relative_l2": 6.299999629968387e-06,
+    "max_abs": 9.848736226558685e-07
+  },
+  "committed_state_after_position": {
+    "header": {
+      "recurrent_floats": 786432,
+      "state_floats": 817152,
+      "token": 1472,
+      "position": 65540
+    },
+    "all": {
+      "count": 817152,
+      "different": 795106,
+      "relative_l2": 2.354072588869818e-05,
+      "max_abs": 0.00034812092781066895
+    },
+    "recurrent": {
+      "count": 786432,
+      "different": 784870,
+      "relative_l2": 1.2837041328826215e-05,
+      "max_abs": 3.606081008911133e-06
+    },
+    "convolution": {
+      "count": 30720,
+      "different": 10236,
+      "relative_l2": 2.354506731090721e-05,
+      "max_abs": 0.00034812092781066895
+    }
+  },
+  "scope": "instrumented diagnostic only; raw dumps remain in /tmp and rates are not performance evidence"
+}

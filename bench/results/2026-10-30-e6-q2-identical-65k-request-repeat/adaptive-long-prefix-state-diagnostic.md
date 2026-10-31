@@ -417,6 +417,27 @@ are summarized in
 [`active-owner-oracle-position65540.json`](active-owner-oracle-position65540.json).
 Oracle output dumps and activations remain in `/tmp/e6-layer{3,6,11,13}-*` on
 Orin. This is a numeric diagnostic, not performance or semantic-quality
-evidence. The next useful check is to capture the layer-13 Q8_1 activation
-blocks, determine where the small upstream deltas change its quantized input,
-and trace the resulting GDN state through accepted prefix 8.
+evidence.
+
+### Layer-13 GDN stages and committed state
+
+A matched GDN capture at the same position shows the layer-13 input `x`
+differing by only `1.56e-7` relative L2 while the projected `qkv` is
+bit-identical. The recurrent `h` output already differs by `2.52e-5`; `y`
+differs by `1.45e-5`, and the normalized `gdn_out` by `1.05e-3`. The resulting
+MoE input is the `3.45e-4` delta from the all-layer bundle. The state committed
+after position 65,540 differs in 795,106/817,152 values (relative L2
+`2.35e-5`); its 786,432-value recurrent matrix differs by `1.28e-5`, and the
+30,720-value convolution history by `2.35e-5`. Both runs still emit the same
+32 tokens. This places the larger change inside the recurrent GDN computation
+despite identical projected `qkv`; it does not say whether the GDN state was
+already different before this token or how that difference arose.
+
+The full stage and committed-state metrics are in
+[`gdn-layer13-position65540-comparison.json`](gdn-layer13-position65540-comparison.json).
+Raw dumps remain in `/tmp/e6-65k-{fixed,adaptive}-layer13-gdn/` on Orin. Next
+capture pre/post recurrent state at layer 13 over the first generated positions
+to determine whether the state delta is present before the sampled recurrent
+update. Then trace its first appearance through the earlier GDN layers and
+accepted prefixes. These remain correctness diagnostics; captured rates are
+not performance evidence.

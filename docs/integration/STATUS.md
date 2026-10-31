@@ -79,6 +79,15 @@ and its causal relation to the prefix-8 state mismatch remain open. See the
 [all-layer comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/all-layer-position65540-comparison.json)
 and [owner/oracle comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/active-owner-oracle-position65540.json).
 
+A layer-13 GDN-stage capture finds `x` differs by `1.56e-7` relative L2 and
+projected `qkv` matches bit-for-bit, but recurrent output `h` differs by
+`2.52e-5`. The delta grows to `1.05e-3` at normalized GDN output; the
+layer-13 MoE input is off by `3.45e-4`. Committed state after position 65,540
+differs in 795,106/817,152 values (relative L2 `2.35e-5`). This focuses the
+next experiment on whether layer-13 recurrent state is already different
+before the sampled token. See the
+[stage comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/gdn-layer13-position65540-comparison.json).
+
 **E6 fixed-GPU backend pilot (2026-10-30):** a no-trace 65K/32 pair toggled
 only the resident backend under the same fixed GPU profile. Both arms emitted
 identical token IDs and recorded 12.2% GPU-cache hits. NInfer measured 86.6/3.9

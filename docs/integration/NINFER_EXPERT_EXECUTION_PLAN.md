@@ -2426,6 +2426,17 @@ dominates the large layer-13 change. The earlier source of that drift and its
 causal role in prefix-8 state divergence are not yet isolated. See the
 [owner/oracle comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/active-owner-oracle-position65540.json).
 
+A direct layer-13 GDN-stage capture further localizes that change: input `x`
+differs by `1.56e-7`, projected `qkv` is bit-identical, then recurrent output
+`h` differs by `2.52e-5`. The difference grows to `1.05e-3` at normalized
+`gdn_out`; the layer-13 MoE input differs by `3.45e-4`. The committed layer-13
+state after position 65,540 differs in 795,106/817,152 values (relative L2
+`2.35e-5`). This points to the recurrent state path even though the current
+token's projected `qkv` matches. The pre-state at that exact dispatch has not
+yet been compared. Next capture layer-13 pre/post state across the first few
+generated positions, then trace its first divergence back through earlier GDN
+layers and accepted prefixes. See the [stage comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/gdn-layer13-position65540-comparison.json).
+
 **Current-source portability rebuild (2026-10-30):** full HIP and SYCL target
 trees rebuilt at source commit `d321286f` on maestro1 with one build job. HIP
 `strata --help` and the host-only shared-memory budget CTest passed. SYCL
