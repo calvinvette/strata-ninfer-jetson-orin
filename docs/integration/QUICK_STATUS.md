@@ -17,8 +17,8 @@ adaptive swaps were active in both experiments. [Longer-prompt screen](../../ben
 
 A seven-pair natural-stop confirmation at pp512+tg128 found +10.10% decode
 TPS on NIMBUS (95% interval +9.91% to +10.53%) and +12.45% on ORBIT
-(+4.83% to +15.97%). All 28 answers were exact at response start. ORBIT
-naturally stopped at 117 tokens on 3K but hit the 128-token cap on 4K, so this
+(+4.83% to +15.97%). All 28 answers were exact at response start; measured GPU-cache hit rates
+rose about 10 percentage points on both tasks. ORBIT naturally stopped at 117 tokens on 3K but hit the 128-token cap on 4K, so this
 shows output-length/termination variation and not full-text equivalence. The
 NIMBUS result has equal output lengths and prompt/TTFT median regressions under
 5%. Adaptive swaps are active; this remains a scoped cache-policy result.

@@ -38,6 +38,12 @@ unchanged. NIMBUS client time had equal output lengths. ORBIT client-total time
 is not a clean equal-work comparison because output lengths differ.
 
 All 28 measured responses started with the exact requested retrieval value.
+Per-request engine counters show decode GPU-cache hit-rate medians rising from
+59.8% to 69.5% on NIMBUS (+9.7 percentage points) and 58.7% to 69.2% on ORBIT
+(+10.5 points). The added GPU hits are consistent with the decode-rate gains,
+but adaptive swaps were active, so this is not a fixed-residency mediation
+experiment and does not isolate NInfer kernel speed.
+
 NIMBUS generated 128 tokens on both arms in every pair. ORBIT generated 117
 naturally stopped tokens on 3K and 128 tokens on 4K in every pair. The ORBIT
 3K answer completed its explanation; 4K reached the generation cap during its

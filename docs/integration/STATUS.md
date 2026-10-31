@@ -49,8 +49,9 @@ multi-prompt confirmation, not a general profile. [Report](../../bench/results/2
 qualification. All 28 measured answers began with the expected value. On
 NIMBUS, both arms produced 128 tokens; 4K decode TPS improved 10.10% (95%
 paired interval +9.91% to +10.53%), while prompt TPS and TTFT were slower by
-3.63% and 3.85% on median. On ORBIT, 3K naturally stopped at 117 tokens in all
-seven pairs while 4K reached its 128-token cap; decode TPS improved 12.45%
+3.63% and 3.85% on median. Decode GPU-cache hit medians rose 59.8%→69.5% on
+NIMBUS and 58.7%→69.2% on ORBIT. On ORBIT, 3K naturally stopped at 117 tokens
+in all seven pairs while 4K reached its 128-token cap; decode TPS improved 12.45%
 (+4.83% to +15.97%). That output-length/termination difference means full-text
 quality is not equivalent and ORBIT client-total time is length-confounded.
 Minimum available RAM was 10.23 GiB; peak swap 2.68 GiB; OOM counters were
