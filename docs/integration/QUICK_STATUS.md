@@ -15,10 +15,14 @@ but 4K decode TPS was 3.79% slower (three-pair interval −4.28% to −3.15%).
 The earlier +18%/+25% decode result therefore applies only to pp512+tg64 so far;
 adaptive swaps were active in both experiments. [Longer-prompt screen](../../bench/results/2026-10-31-e6-q2-cache-capacity-pp2048/README.md).
 
-A pp512+tg128 3K/4K screen on the NIMBUS task found +9.40% median decode TPS
-(three-pair interval +3.55% to +10.63%). The second task stopped at 117/128 on
-3K and was excluded, leaving only one eligible task; this needs multi-prompt
-confirmation. [Screen](../../bench/results/2026-10-31-e6-q2-cache-size-tg128/README.md).
+A seven-pair natural-stop confirmation at pp512+tg128 found +10.10% decode
+TPS on NIMBUS (95% interval +9.91% to +10.53%) and +12.45% on ORBIT
+(+4.83% to +15.97%). All 28 answers were exact at response start. ORBIT
+naturally stopped at 117 tokens on 3K but hit the 128-token cap on 4K, so this
+shows output-length/termination variation and not full-text equivalence. The
+NIMBUS result has equal output lengths and prompt/TTFT median regressions under
+5%. Adaptive swaps are active; this remains a scoped cache-policy result.
+[Confirmation](../../bench/results/2026-10-31-e6-q2-cache-size-tg128-confirm/README.md).
 
 Layer-1 expert-3 forced-owner repeats now match locally through layer 2 but
 not across full GDN state: the second forced-CPU run differs from the first by

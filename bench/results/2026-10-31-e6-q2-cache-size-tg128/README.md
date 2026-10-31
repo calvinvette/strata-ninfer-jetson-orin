@@ -29,14 +29,9 @@ identical.
 
 ## Failed cell and resources
 
-The `ORBIT-4826` task is retained as a failed cell. On 3K, it naturally stopped
-at 117 of 128 requested tokens in both its warmup and measured requests; the
-matched 4K task reached 128. The harness marked those 3K cells incomplete, so
-this task is excluded from paired effects. The pair-0 baseline process therefore
-has a separate failed task even though its NIMBUS measured task passed. A new
-multi-prompt confirmation should replace ORBIT with a task that reliably
-completes 128 tokens, or qualify natural-stop behavior using an output-length
-metric designed for it.
+The preliminary fixed-length pilot treated the `ORBIT-4826` 3K response as incomplete after its natural stop at 117 of 128 requested tokens; 4K reached 128. This task was excluded from that pilot estimate. The seven-pair [natural-stop confirmation](../2026-10-31-e6-q2-cache-size-tg128-confirm/README.md) retains both arms and reports actual token counts and per-token rates. The pair-0 baseline process therefore
+has a separate failed task even though its NIMBUS measured task passed. The natural-stop confirmation supersedes that fixed-length pilot: both tasks
+were retained after validating actual generated lengths and exact answer starts.
 
 Across eligible process runs, minimum sampled available RAM was 10.28 GiB,
 maximum sampled swap was 2.67 GiB and sampled OOM kills were zero. The six-GiB
