@@ -7545,11 +7545,11 @@ delta includes those additional terms. This is a later contributor after the
 layer-5 first delta, not its source. See the
 [layer-7 oracle report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer7-expert225-owner-oracle-position65539.json).
 
-The layer-13 `attn_qkv.weight` is Q3_K, whose Strata MMVQ contract uses Q8_K
-activations. An initial Q8_1 check was therefore inapplicable and was replaced
-with a host transcription of the runtime Q8_K quantizer. At position 65,539,
-all 2,560 integer codes and block sums match, while four of ten FP32 block
-scales differ slightly. This is consistent with scale-level activation
-differences contributing to `qkv` drift; it does not replay the Q3_K projection
-or establish full causality. See the
-[Q8_K activation report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer13-q8_k-activation-position65539.json).
+The layer-13 `attn_qkv.weight` is Q3_K, but this runtime's `native_mmvq`
+contract consumes Q8_1 activations: `verify.cpp` quantizes `x` with
+`native_quantize_q8_1` before the projection. Comparing the captured inputs
+through the independent Q8_1 quantizer found identical integer codes in all 80
+blocks, but one FP16 scale differs (block 57: `0.0141448975` fixed-owner,
+`0.0141372681` adaptive). This is a plausible contributor to `qkv` drift; it
+does not replay the projection or establish full causality. See the
+[Q8_1 activation report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer13-q8_1-activation-position65539.json).
