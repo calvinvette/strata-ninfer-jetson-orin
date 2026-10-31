@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **E0–E5 are complete for their documented bounded Q2_0 prototype scopes. E6 remains open: same-day resident-backend screens have not met the preregistered 5% end-to-end threshold, and E7 proposes no release profile. A new adaptive 5K Q2_0 screen reached 76.0% decode GPU-cache hits after warmup in both backends; NInfer decode TPS was 1.08% lower at the paired median (three-pair interval −5.21% to 0.00%), with matching outputs. This does not justify confirmation. New 2026-10-31 diagnostics place the first sampled adaptive owner delta at model layer 5, position 65,539: expert 220 moves CPU→GPU after `5:220>8` with identical input/routes; the fixed service row matches the native CPU path, adaptive matches native GPU bit-for-bit, and an independent scalar Q2_0/Q8_1 oracle is within 9.74e-8 / 6.14e-8 relative L2. A later layer-7 expert-225 promotion is also locally confirmed. At layer 13 the incoming recurrent state matches through position 65,539, then the update creates a 2.32e-5 state delta; `x` differs by 1.80e-7 and projected `qkv` by 4.26e-5. Although its weight is Q3_K, this runtime's `native_mmvq` input contract is Q8_1: integer codes match, but one block's FP16 scale differs. Native CUDA replay matches both captured projections bit-for-bit, and pinning only that scale makes the outputs bit-identical, establishing the local `qkv` cause for this pair. Replaying the full GDN update and pinning that scale reduces recurrent-state relative L2 from `9.77e-6` to `3.37e-8` while retaining adaptive gate/beta inputs, attributing nearly all of the sampled state delta to the scale change. Repeated exact-position CPU-owner interventions at layers 5, 7 and 13 now produce reproducible GDN-state differences first material at layers 15, 16 and 18, respectively, while output token IDs remain identical. The layer-1 intervention matches local layer-1/2 captures, but a second forced-CPU run differs from the first by global GDN relative L2 `0.01078`, nearly the earlier forced/adaptive difference; no repeatable whole-model layer-1 effect is established. These are bounded causal state findings, not quality or performance improvements, and do not explain every persistent-state difference. The fixed/adaptive runs retained identical output tokens and the six-GiB memory floor. A separate adaptive 5K map capture found byte-identical full Strata/NInfer profiles after warmup and after the measured request, with identical resident IDs and outputs; its 952 resident replacements at the measured checkpoint are distinct from the narrower RAM-complement rotation counter. This is state evidence, not a performance qualification. E6/E7 remain open for broader quality, causal-boundary and end-to-end performance gates. maestro1 HIP/SYCL evidence remains x86 build-only; no device execution is claimed. Updated 2026-10-31.**
+Status: **E0–E5 are complete for their documented bounded Q2_0 prototype scopes. E6 remains open and E7 has no release profile. A 2026-10-31 held-out ORBIT fixed-map confirmation found +127.9% decode TPS under strict NInfer and +130.1% under Strata when the 5K GPU-resident map changed, with GPU hit rate rising from 21.4% to 74.1% and exact paired outputs. Three-pair same-map backend screens measured NInfer decode at +0.7% on the original map and −2.2% on the learned map; neither reached the 5% useful-effect gate. The large improvement is attributable to resident-map/cache-hit selection, not a demonstrated NInfer-kernel gain. This is one 512+64 task and does not close broader quality, context or end-to-end product gates. maestro1 HIP/SYCL evidence remains x86 build-only; no device execution is claimed. Updated 2026-10-31.**
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -2712,3 +2712,26 @@ unchanged in each intervention. Five runs generated one verifier token and one
 used 128 tokens. Two preliminary sweeps without a forwarded override are
 excluded. This confirms local owner-dependent arithmetic, not a preferred
 owner, quality or performance result.
+
+**E6 held-out fixed-map confirmation (2026-10-31):** under one Q2_0 5K
+resident-map intervention, the ordered 4,660-entry 6-GiB RAM complement and
+all other request settings were held fixed, with adaptive swaps disabled. On
+three randomized screen pairs followed by seven confirmation pairs, learned-map
+GPU cache hits rose from 21.4% to 74.1%. Decode improved +127.9% under strict
+NInfer and +130.1% under Strata in confirmation; prompt throughput, first-token
+latency and client request time also improved, with exact paired response
+matches. Thus this large end-to-end change is attributable to the selected
+resident experts/cache hits and is shared by both backends.
+
+Separate three-pair same-map backend screens compared Strata with strict
+NInfer at each resident map. Decode changed +0.7% on the original map and
+−2.2% on the learned map; neither median met the 5% useful-effect gate, so no
+confirmation was run. The intervals remain coarse and do not prove zero
+backend effect. Minimum available RAM was 9.15 GiB, all sampled cgroup OOM-kill
+counters were zero, CPU/GPU frequencies were observed without clock changes,
+EMC readback was denied, and energy was not measured. This is one held-out
+512+64 retrieval task, not general quality or context qualification. The result
+clarifies the prior lack of visible NInfer gains: this tested large gain came
+from residency, while no useful same-map NInfer kernel gain was demonstrated.
+E6 broader workload/context and quality gates and E7 release assessment remain
+open. See the [fixed-map ORBIT report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).

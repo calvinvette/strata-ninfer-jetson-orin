@@ -7793,3 +7793,19 @@ and the other expert rows were unchanged. Five checks used one verifier token,
 one used the 128-token run. Preliminary runs without a forwarded override were
 excluded. This confirms local arithmetic effects only; E6 remains open. See the
 [localization record](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/resident-map-compute-localization.json).
+
+
+**E6 fixed-map and same-map backend confirmation (2026-10-31):** on the held-out
+ORBIT 512+64 request, a learned fixed 5K GPU map improved decode by +127.9%
+under strict NInfer and +130.1% under Strata in separate seven-pair
+confirmations. GPU hit rate rose from 21.4% to 74.1%; paired outputs matched
+exactly. With the map held fixed, three-pair NInfer-versus-Strata decode screens
+measured +0.7% on the original map and −2.2% on the learned map, both below the
+5% useful-effect median threshold, so neither proceeded to confirmation. This
+points to expert residency/cache hits as the measured source of the large gain,
+not a demonstrated NInfer kernel advantage. All 26 paired blocks passed; minimum
+available RAM was 9.15 GiB, sampled cgroup OOM kills were zero, CPU/GPU clocks
+were observed without changing them, EMC readback was denied, and energy was not
+measured. The finding is limited to one held-out 512-token prompt and 64-token
+completion. Broader E6 quality/context coverage and E7 release assessment
+remain open. See the [paired report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
