@@ -1,0 +1,158 @@
+{
+  "scope": "one correctness-only fresh-process pair; both backends use adaptive 5K profile; reset, prefill checkpoints and final-state hashing enabled; timing excluded",
+  "source_binary_sha256": "fd67288c399d895be036dab344e30caab3d081540bfc552f22dac6a5fc33644a",
+  "model_profile_sha256": "b3e62120218cd96d175a0547530158869177dd2164b22b40f32bea7d7e85fb8c",
+  "instrumentation": {
+    "STRATA_REQUEST_RESET_STATE_HASH": "1",
+    "STRATA_PROMPT_BOUNDARY_STATE_HASH": "1",
+    "STRATA_PREFILL_STATE_HASH_AT": "128,256,384,512",
+    "STRATA_STATE_HASH": "1",
+    "actual_prompt_boundary_position": 511,
+    "note": "The explicit prefill checkpoints appeared at 128, 256 and 384; the engine's prompt-boundary fingerprint reported position 511. No checkpoint was emitted at requested position 512."
+  },
+  "workload_per_process": ["warmup NIMBUS-7319, 512 prompt + 128 output", "measured NIMBUS-7319, 512 prompt + 128 output"],
+  "adaptive_exchanges_cumulative": {
+    "after_warmup": 684,
+    "after_measured_request": 1142,
+    "same_counts_both_backends": true
+  },
+  "checkpoint_hashes_by_request_ordinal": [
+    {
+      "ordinal": "warmup",
+      "post_reset_position_0": {
+        "gdn": "2d2b4c71fb470383",
+        "ple": "0b6b00a4dd808383",
+        "tail": "edd71f53c31aee9b",
+        "dead": "5c42fcd39eb3da43",
+        "pooled_full": "829849b80c8474db",
+        "ple_prev": "-1,-1"
+      },
+      "prefill_position_128": {
+        "gdn": "e4658996a30dfaa1",
+        "ple": "56b952fec48b77a8",
+        "tail": "cfb16919e760e6c6",
+        "dead": "2446f30268111138",
+        "pooled_full": "689d1a933fbe4ad2",
+        "ple_prev": "15,20"
+      },
+      "prefill_position_256": {
+        "gdn": "cbe1e3faedc12c28",
+        "ple": "383c7fdcbc56d293",
+        "tail": "bc6bca4536312a55",
+        "dead": "2446f30268111138",
+        "pooled_full": "dec2714b281b6567",
+        "ple_prev": "13618,13618"
+      },
+      "prefill_position_384": {
+        "gdn": "b5aaee4c8b9f73fb",
+        "ple": "d45f3345f76662bc",
+        "tail": "002a43012de7a9e8",
+        "dead": "2446f30268111138",
+        "pooled_full": "5af5c968ba51d777",
+        "ple_prev": "13618,13618"
+      },
+      "prompt_boundary_position_511": {
+        "L": 512,
+        "gdn": "39b33e3ca254df85",
+        "ple": "481bc4db512e953a",
+        "tail": "eadb9c684037310b",
+        "pooled": "97cffa72669eed68",
+        "kv": "e0b2ec102a6528d9",
+        "mtp": "14650fb0739d0383",
+        "stale": "14650fb0739d0383",
+        "dead": "76214e6986cead1e",
+        "pooled_full": "94bcbc74d1cab58d",
+        "ple_prev": "271,248069"
+      },
+      "final_state": {
+        "L": 639,
+        "gdn": "8594f48087c5eb15",
+        "ple": "2d04626b5d78870b",
+        "tail": "b4811869a72fcd1f",
+        "pooled": "f581c0274f87f5f2",
+        "kv": "0d1dfafbd41a6f23",
+        "mtp": "14650fb0739d0383",
+        "stale": "011a3fe290018383",
+        "dead": "76214e6986cead1e",
+        "pooled_full": "93bbc4f2db57dd83",
+        "ple_prev": "51202,1"
+      }
+    },
+    {
+      "ordinal": "measured",
+      "post_reset_position_0": {
+        "gdn": "2d2b4c71fb470383",
+        "ple": "0b6b00a4dd808383",
+        "tail": "edd71f53c31aee9b",
+        "dead": "5c42fcd39eb3da43",
+        "pooled_full": "829849b80c8474db",
+        "ple_prev": "-1,-1"
+      },
+      "prefill_position_128": {
+        "gdn": "e4658996a30dfaa1",
+        "ple": "56b952fec48b77a8",
+        "tail": "cfb16919e760e6c6",
+        "dead": "2446f30268111138",
+        "pooled_full": "689d1a933fbe4ad2",
+        "ple_prev": "15,20"
+      },
+      "prefill_position_256": {
+        "gdn": "cbe1e3faedc12c28",
+        "ple": "383c7fdcbc56d293",
+        "tail": "bc6bca4536312a55",
+        "dead": "2446f30268111138",
+        "pooled_full": "dec2714b281b6567",
+        "ple_prev": "13618,13618"
+      },
+      "prefill_position_384": {
+        "gdn": "b5aaee4c8b9f73fb",
+        "ple": "d45f3345f76662bc",
+        "tail": "002a43012de7a9e8",
+        "dead": "2446f30268111138",
+        "pooled_full": "5af5c968ba51d777",
+        "ple_prev": "13618,13618"
+      },
+      "prompt_boundary_position_511": {
+        "L": 512,
+        "gdn": "78bb6024a25424f4",
+        "ple": "481bc4db512e953a",
+        "tail": "eadb9c684037310b",
+        "pooled": "4760977ee0c565d5",
+        "kv": "f5672351c2d59e20",
+        "mtp": "14650fb0739d0383",
+        "stale": "14650fb0739d0383",
+        "dead": "76214e6986cead1e",
+        "pooled_full": "1b47b53ffb91e2b8",
+        "ple_prev": "271,248069"
+      },
+      "final_state": {
+        "L": 639,
+        "gdn": "5a48681b98893cc8",
+        "ple": "0cdbb471f8ac3c59",
+        "tail": "862a0962b97ae942",
+        "pooled": "2e1c5cedca9ab9e5",
+        "kv": "31469a4f24bcc94b",
+        "mtp": "14650fb0739d0383",
+        "stale": "011a3fe290018383",
+        "dead": "76214e6986cead1e",
+        "pooled_full": "4c2fb0d92bf5d5b4",
+        "ple_prev": "56127,52870"
+      }
+    }
+  ],
+  "comparison": {
+    "cross_backend_match_at_each_request_ordinal_and_checkpoint": true,
+    "within_process_reset_states_match": true,
+    "within_process_prefill_positions_128_256_384_match": true,
+    "within_process_prompt_boundary_511_matches": false,
+    "first_recorded_within_process_divergence": "prompt boundary position 511, after matching reset and prefill checkpoints through position 384",
+    "response_hashes_match_across_backends_by_ordinal": true,
+    "response_hashes_differ_by_request_ordinal": true
+  },
+  "interpretation": "The same request reset and first three prefill checkpoints agree. After the warmup has changed adaptive residency (684 cumulative expert exchanges), the measured prompt diverges from its warmup counterpart by the final prefill boundary. Strata and NInfer still match each other at every recorded point. This associates the within-process change with the adaptive-residency request history, but does not prove a particular slot change or arithmetic cause.",
+  "minimum_available_host_memory_gib": {
+    "strata": 9.014,
+    "ninfer": 9.044
+  },
+  "limit": "one workload, one process pair, sampled checkpoints only; full state bytes and exact resident-map hashes were not captured"
+}

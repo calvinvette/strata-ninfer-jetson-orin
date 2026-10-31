@@ -99,3 +99,21 @@ shared request-order change. It does not establish repeatability across
 requests or identify the source of the change. Minimum available host memory
 was 8.95 GiB for Strata and 9.02 GiB for NInfer. Hashing timings are excluded.
 See [`state-parity.json`](state-parity.json).
+
+## Corrected reset and prefill-boundary capture
+
+The first attempt at this capture omitted reset and prompt-boundary hashes
+because the API harness did not set those environment switches from its CLI
+flags. That attempt is excluded from reset-state conclusions. The harness now
+sets the opt-in variables and its focused tests pass. In a corrected pair, the
+post-reset state and sampled prefill checkpoints at positions 128, 256 and 384
+matched between the warmup and measured requests. At the prompt boundary
+(position 511), GDN, pooled, KV and pooled-full fingerprints differed; PLE,
+tail and other recorded fields matched. Strata and NInfer still matched at
+every checkpoint by request ordinal. The engine reported 684 adaptive expert
+exchanges after warmup and 1,142 after the measured request. This localizes the
+first **recorded** within-process difference to the final prefill segment,
+after the adaptive cache had changed. It does not identify the exact slot or
+prove that migration caused the state change. See
+[`boundary-capture.json`](boundary-capture.json); state-hash timings are not
+performance measurements.

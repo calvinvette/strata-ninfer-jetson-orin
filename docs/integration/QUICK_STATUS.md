@@ -8,6 +8,8 @@ A new three-pair 5K adaptive-cache NIMBUS screen reached 76.0% GPU expert hits a
 
 A correctness-only adaptive-state pair matched Strata and NInfer final fingerprints at both request ordinals. But identical warmup and measured prompts produced different state hashes and text by ordinal in both backends, so shared request-history variation remains open. [State record](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/state-parity.json).
 
+Corrected reset/prefill checkpoints match through position 384; first sampled repeated-request divergence appears at prompt boundary 511, after 684 adaptive exchanges. Both backends still match at each ordinal. Exact slot-level cause remains unproven. [Boundary capture](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/boundary-capture.json).
+
 A fixed-map follow-up ranked 5K resident experts from the workload's own route trace (85.23% trace coverage) and disabled adaptation. NInfer decode TPS was +1.19% at the paired median (95% screen interval −0.25% to +2.50%); all outputs and the 84.9% hit rates matched. This oracle profile still shows no 5% effect and is not deployable. [Report](../../bench/results/2026-10-31-e6-q2-ninfer-fixed-route-5k-screen/README.md).
 
 A separate one-pair, hash-instrumented check with that fixed map matched all final persistent-state fingerprints across both backends and both same-process requests. Bounded final-state evidence only; no accepted-prefix or byte-level claim. [State record](../../bench/results/2026-10-31-e6-q2-ninfer-fixed-route-5k-screen/state-parity.json).

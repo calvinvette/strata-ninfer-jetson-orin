@@ -3400,6 +3400,14 @@ matched request ordinal and also repeat identical requests within each backend;
 cross-backend parity alone can hide a shared request-history effect. See the
 [adaptive state record](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/state-parity.json).
 
+The corrected adaptive capture found matching reset and prefill fingerprints
+through token position 384, then a shared Strata/NInfer split at the position
+511 prompt boundary after the warmup had exchanged experts. For Splash, capture
+post-reset state, each prefill chunk boundary and the exact resident-map hash;
+final response state alone cannot locate a request-history split. The API
+capture harness must be checked to ensure its CLI flags actually set the
+runtime environment variables. See the [boundary record](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/boundary-capture.json).
+
 For a future Strata/Splash backend, measure the optimized operation's share of
 the whole request before spending time on its isolated microbenchmark. When
 work is captured in command graphs, verify whether the profiler reports graph

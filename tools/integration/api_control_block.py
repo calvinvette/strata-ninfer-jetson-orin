@@ -44,6 +44,16 @@ def configure_trace_environment(config_env, inherited_env, no_trace, accepted_pr
             inherited_env.pop(key, None)
     else:
         config_env['STRATA_TRACE'] = '1'
+    # The capture switches are opt-in outputs. Retaining a preconfigured value
+    # when --no-trace is active is not enough: the corresponding CLI switch
+    # must enable it even when neither environment already contains the key.
+    for enabled, key in (
+        (accepted_prefix_trace, 'STRATA_ACCEPTED_PREFIX_TRACE'),
+        (prompt_boundary_state_hash, 'STRATA_PROMPT_BOUNDARY_STATE_HASH'),
+        (request_reset_state_hash, 'STRATA_REQUEST_RESET_STATE_HASH'),
+    ):
+        if enabled:
+            config_env[key] = '1'
     inherited_env.update({str(key): str(value) for key, value in config_env.items()})
     return config_env, inherited_env
 

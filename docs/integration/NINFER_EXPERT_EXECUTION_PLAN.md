@@ -2643,6 +2643,17 @@ This is a shared request-order change, not cross-backend divergence; its cause
 and repeatability remain unresolved. The traced run supplies no performance
 evidence. See the [state record](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/state-parity.json).
 
+**E6 adaptive 5K reset/prefill boundary follow-up (2026-10-31):** after fixing
+the API harness to actually enable its opt-in reset and prompt-boundary hash
+flags, one paired capture found matching reset and prefill state through
+position 384 across repeated requests. At prompt position 511, GDN, pooled, KV
+and pooled-full hashes differed between warmup and measured requests; Strata
+and NInfer still matched at each request ordinal. The adaptive tier had
+exchanged 684 experts after warmup and 1,142 by request completion. This
+localizes the first sampled within-process change to the final prefill segment
+after residency changed, without proving an exact slot-level cause. The
+instrumented run is not performance evidence. See the [boundary report](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/boundary-capture.json).
+
 **E6 fixed route-ranked 5K-residency screen (2026-10-31):** a trace-ranked
 profile gave both backends the same fixed 5,000 resident slots, covering 85.23%
 of the exact NIMBUS route trace; adaptation was disabled. Across three pairs,

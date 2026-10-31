@@ -103,6 +103,20 @@ class ApiControlBlockTests(unittest.TestCase):
         self.assertEqual(result_config['STRATA_REQUEST_RESET_STATE_HASH'], '1')
         self.assertEqual(result_env['STRATA_REQUEST_RESET_STATE_HASH'], '1')
 
+    def test_requested_state_capture_flags_are_enabled_without_existing_env(self):
+        result_config, result_env = configure_trace_environment(
+            {}, {'PATH': '/bin'}, True,
+            accepted_prefix_trace=True,
+            prompt_boundary_state_hash=True,
+            request_reset_state_hash=True)
+        self.assertNotIn('STRATA_TRACE', result_config)
+        self.assertNotIn('STRATA_TRACE', result_env)
+        for key in ('STRATA_ACCEPTED_PREFIX_TRACE',
+                    'STRATA_PROMPT_BOUNDARY_STATE_HASH',
+                    'STRATA_REQUEST_RESET_STATE_HASH'):
+            self.assertEqual(result_config[key], '1')
+            self.assertEqual(result_env[key], '1')
+
     def test_no_trace_can_retain_explicit_prefill_state_positions(self):
         config = {'STRATA_TRACE': '1', 'STRATA_PREFILL_STATE_HASH_AT': '8192,16384'}
         inherited = {'STRATA_TRACE': '1', 'STRATA_PREFILL_STATE_HASH_AT': '8192,16384', 'PATH': '/bin'}
