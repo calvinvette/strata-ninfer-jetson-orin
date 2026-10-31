@@ -254,11 +254,43 @@ supervisor telemetry remain in `/tmp/e6-65k-fixed-gdn-dump/`,
 and `/tmp/e6-65k-adaptive-gdn-dump-supervisor/` on Orin. These synchronized
 state diagnostics are not performance measurements.
 
+### Direct GDN capture at accepted prefix 8
+
+To compare raw GDN bytes at the first sampled divergence rather than only at
+the later 8K replay boundary, the matched 65K requests were repeated with a
+full GDN dump triggered at `cells=65543` (accepted prefix 8). Both runs passed
+supervision, returned the same 32 tokens (SHA256
+`2d5f3da8f9890f8c9262231bada2cfab088196528565a1c08ab685d86074c650`), and had
+identical 65K prompt-boundary fingerprints. The dumps have the same header
+`(cells=65543, layers=36, floats_per_layer=817152)` and 117,669,920-byte size.
+Their fixed-owner and adaptive SHA256 values are respectively
+`2c45c07ef046a4ae6cfd7693e280a80ff866cddca4ca186fa370da05e29db3d9` and
+`2fdbc4708352215787fb71d4710fc32d07cb3c5539519a727da46378be619101`.
+
+The first payload difference is byte 6,538,252, which is 1,036 bytes into
+zero-based GDN allocation 2. Allocations 0–1 match; allocations 2–35 differ
+(34 of 36 allocations), with 67,929,282 differing payload byte positions.
+The session maps GDN allocations in model-layer order while omitting QSA
+layers 3, 7, …; allocation 2 therefore belongs to zero-based model layer 2.
+This is the earliest directly byte-localized divergence at the sampled prefix.
+It complements, rather than replaces, the separate 8K replay-boundary result,
+where the first differing allocation was index 3. These are distinct sequence
+positions and do not identify a specific update, owner transition, expert, or
+arithmetic operation as the cause.
+
+The fixed-owner run passed with minimum available RAM of 9.28 GB; the adaptive
+run passed with 9.11 GB. Both stayed above the six-GiB floor and recorded zero
+sampled OOM kills. Raw files and supervisor data remain in `/tmp/e6-65k-fixed-prefix8-gdn-dump/`,
+`/tmp/e6-65k-fixed-prefix8-gdn-dump-supervisor/`,
+`/tmp/e6-65k-adaptive-prefix8-gdn-dump/`, and
+`/tmp/e6-65k-adaptive-prefix8-gdn-dump-supervisor/` on Orin. These are
+instrumented state diagnostics, not performance measurements.
+
 ## Next diagnostic
 
-Map GDN allocation index 3 to its model layer and inspect the adaptive update
-and active-expert path around the first sampled accepted-prefix divergence
-(prefixes 1–8). Keep the causal claim open until the state change is tied to a
-specific owner transition or operator with an independent oracle. Do not treat
-matching QSA fingerprints as raw-byte parity; capture QSA bytes if their
-aggregate mismatch becomes relevant to the causal trace.
+Inspect the active-expert route, residency, and arithmetic path for model
+layer 2 around accepted commits 2–8, using an independent oracle to distinguish
+an owner-transfer effect from numerical or ordering variation. Keep causality
+open until the state change is tied to a specific event. Matching QSA
+fingerprints are not raw-byte parity; capture QSA bytes if their aggregate
+mismatch becomes relevant to that causal trace.

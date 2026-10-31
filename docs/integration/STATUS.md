@@ -7396,6 +7396,17 @@ the replay GDN delta but does not identify a causal transfer or operator.
 Binary dumps remain in `/tmp` and are not committed. See the updated
 [diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
 
+A subsequent matched capture dumped raw GDN state at accepted prefix 8 of the
+65K request, the first sampled adaptive/fixed state divergence. Prompt-boundary
+fingerprints and all 32 output tokens still matched. Raw GDN first differed
+1,036 bytes into allocation 2, which maps to zero-based model layer 2 after
+omitting QSA layers; 34/36 allocations differed. The separate 8K replay dump
+first differed at allocation 3, so the two observations apply to distinct
+sequence positions. Minimum available RAM was 9.28 GB fixed-owner and 9.11 GB
+adaptive, with no sampled OOM kills. This narrows where state first differs,
+not why; E6/E7 remain open. Raw dumps remain outside Git. See the
+[updated diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
+
 **E7 current-source portability rebuild (2026-10-30):** full HIP and SYCL
 target trees rebuilt at source `4229c00e` on maestro1 with one-job builds. HIP
 `strata --help` passed and the host-only `shared_memory_budget_test` passed.

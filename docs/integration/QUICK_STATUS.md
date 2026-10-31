@@ -931,3 +931,10 @@ checks passed; multi-live batch decode and adaptive expert migration remain
 excluded because their persistent-state gates fail. [Closeout](PHASE5_CLOSEOUT.md).
 
 Phase 6 is closed for measured Orin factor domains: held-out cache/context, prefill/cache, worker/transfer, MTP/KV/workload, and graph/speculation cells have oracle checks and block-level uncertainty. No single Pareto profile is promoted; energy rails include board background. [Closeout](PHASE6_CLOSEOUT.md).
+
+Current E6 diagnostic: identical 65K prompt boundaries and generated tokens
+produce different persistent GDN bytes by accepted prefix 8 when adaptive
+residency is enabled. The first raw difference is in zero-based model layer 2;
+the distinct 8K replay-boundary dump first differs in GDN allocation 3. This
+localizes state divergence but not its cause. E6/E7 remain open; see the
+[paired diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
