@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **E0–E5 bounded prototype evidence complete. E6 has three same-process 65K repeats that isolate an adaptive-residency-associated state divergence while preserving the 32 output tokens. At position 65,540, the round-4 update moves layer-1 expert 3 from GPU to CPU; its service row matches the independent owner oracle. The same update promotes active experts 229, 285 and 234 in layers 3, 6 and 11, and experts 474, 385 and 250 in layer 13. Their fixed/adaptive service rows match CPU/GPU oracle outputs. Same-input CPU/GPU differences are about 1.1e-7 relative L2. By layer 13 the inputs differ by 3.45e-4 and changing that input changes the three expert outputs by 5.99–6.68e-3 on either backend. The larger layer-13 output delta therefore follows accumulated input drift, not the local CPU/GPU rounding gap; the earlier source and its relation to prefix-8 state remain under investigation. The three-pair no-trace fixed-GPU resident-backend screen remains below the preregistered 5% threshold. E6/E7 stay open for broader quality/repeatability, causal diagnosis and end-to-end performance qualification. maestro1 current-source HIP and SYCL x86 builds pass; SYCL runtime remains unavailable without a device. Updated 2026-10-31.**
+Status: **E0–E5 are complete for their documented bounded Q2_0 prototype scopes. E6 remains open: the resident NInfer screen has not met its preregistered 5% end-to-end threshold, and E7 does not propose a release profile. New 2026-10-31 diagnostics place the first sampled adaptive owner delta at model layer 5, position 65,539: expert 220 moves CPU→GPU after `5:220>8` with identical input/routes; the fixed service row matches the native CPU path, adaptive matches native GPU bit-for-bit, and an independent scalar Q2_0/Q8_1 oracle is within 9.74e-8 / 6.14e-8 relative L2. A later layer-7 expert-225 promotion is also locally confirmed. At layer 13 the incoming recurrent state matches through position 65,539, then the update creates a 2.32e-5 state delta; `x` differs by 1.80e-7 and projected `qkv` by 4.26e-5. This establishes an owner-transition-to-state-drift path for the sampled tokens, with shared/route-weight and later owner effects also present; it does not prove that one promotion is the sole cause of all persistent-state differences or improve performance. The fixed/adaptive runs retained identical output tokens and the six-GiB memory floor. E6/E7 remain open for broader quality, causal-boundary and end-to-end performance gates. maestro1 HIP/SYCL evidence remains x86 build-only; no device execution is claimed. Updated 2026-10-31.**
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -2443,3 +2443,18 @@ trees rebuilt at source commit `d321286f` on maestro1 with one build job. HIP
 compiled and linked after loading oneMKL; CLI startup aborts because maestro1
 has no SYCL device. This is x86_64 build evidence only. See the
 [build record](../../bench/results/2026-10-30-e7-maestro-current-source-builds/README.md#2026-10-30-follow-up-request-tagged-route-trace-change).
+
+
+Execution note (2026-10-31): the position-65,539 all-layer trace found exact
+MoE inputs/routes through layer 4, then a layer-5 expert-220 row delta under
+round-4 promotion `5:220>8`. Direct owner capture and native CPU/GPU replays
+confirmed the service rows exactly; an independent Q2_0/Q8_1 FP64 oracle
+corroborated the arithmetic. Layer-7 expert 225 showed a second owner contribution
+plus shared-output and route-weight deltas. A pre/post GDN sequence found layer-13
+state exact through the update at 65,538 and before the update at 65,539, then
+first differing after token 1,928 at position 65,539. Layer-13 GDN stages at that
+position show tiny `x` drift followed by larger `qkv` drift and recurrent output
+drift. All runs preserved the six-GiB guard and identical token IDs. This is
+correctness localization, not a speed result or sole-cause proof. Details are in
+the [65K diagnostic report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md)
+and its linked JSON comparisons.
