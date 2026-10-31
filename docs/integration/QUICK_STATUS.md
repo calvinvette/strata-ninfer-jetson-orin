@@ -1,6 +1,6 @@
 # Quick status
 
-Updated: 2026-10-30
+Updated: 2026-10-31
 
 This is a short orientation to the integration. The [plan](PLAN.md) defines
 phase gates; the detailed [status](STATUS.md) is the evidence record, and the
@@ -41,8 +41,11 @@ layer-1 expert-3 GPU→CPU eviction causes a tiny service-output delta; layer 2
 receives a small activation delta. An all-47-layer bundle at position 65,540
 then found larger drift by layer 13 (combined-output relative L2 `5.47e-3`),
 with route IDs matching through layer 16 and first differing at layer 17. Same
-output tokens do not establish accepted-state parity. Layer-13 owner attribution
-is the next diagnostic. E6/E7 remain open. [Comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/all-layer-position65540-comparison.json).
+output tokens do not establish accepted-state parity. Layer-13 experts 474,
+385 and 250 moved CPU→GPU, and the independent oracle confirms the same-input
+CPU/GPU gap is only about `1.1e-7`; their larger output delta follows the
+changed activation. E6/E7 remain open. [All-layer comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/all-layer-position65540-comparison.json)
+and [owner/oracle comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/active-owner-oracle-position65540.json).
 
 The fixed-GPU resident-backend screen now has three no-trace pairs: median
 NInfer changes were -0.46% prefill and 0.00% decode, below the 5% screen. One

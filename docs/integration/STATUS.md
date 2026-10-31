@@ -1,6 +1,6 @@
 # Integration status
 
-Updated: 2026-10-30. Phases 1 through 4 are complete for their documented tested
+Updated: 2026-10-31. Phases 1 through 4 are complete for their documented tested
 Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 is
 complete for its bounded Orin qualification matrix under [its closeout]
 (PHASE7_CLOSEOUT.md), and Phase 8 is complete for the bounded Q2_0 release
@@ -68,9 +68,16 @@ first differs at layer 2. Small differences accumulate through layer 12, then
 layer 13 has input relative L2 `3.45e-4`, expert-parts `6.92e-3`, and combined
 output `5.47e-3`. Route IDs remain equal through layer 16 and first differ at
 layer 17. Both arms still emit the same 32 output tokens, but that is not
-accepted-state parity. The bundle does not separate the layer-13 input drift
-from execution-owner effects. Next capture layer-13 owners and oracle-check its
-service rows. [Comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/all-layer-position65540-comparison.json).
+accepted-state parity. A direct layer-13 owner capture found experts 474, 385
+and 250 moved CPU→GPU. Native CPU/GPU oracles match their corresponding service
+rows bit-for-bit; the same-input owner gap is about `1.1e-7` relative L2. The
+fixed/adaptive layer-13 input difference changes those expert rows by
+`5.99–6.68e-3` on either backend, indicating upstream input drift dominates
+that local output change. Similar CPU→GPU oracle matches were found for active
+experts 229, 285 and 234 in layers 3, 6 and 11. The specific upstream source
+and its causal relation to the prefix-8 state mismatch remain open. See the
+[all-layer comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/all-layer-position65540-comparison.json)
+and [owner/oracle comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/active-owner-oracle-position65540.json).
 
 **E6 fixed-GPU backend pilot (2026-10-30):** a no-trace 65K/32 pair toggled
 only the resident backend under the same fixed GPU profile. Both arms emitted

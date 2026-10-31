@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **E0–E5 bounded prototype evidence complete; E6 same-process 65K repeats localized one request-dependent expert-320 output change to CPU-miss versus resident-GPU ownership. Exact-input CPU/GPU replay matched each service row. Fixed-CPU and fixed-GPU owner repeats each matched prompt-boundary/final state, the full layer-1 MoE bundle and five sampled accepted-prefix records across repeated requests; cross-owner state and sampled output trajectories differ. A three-pair no-trace fixed-GPU backend screen preserved exact token parity and 12.2% cache hits. Median NInfer changes were -0.46% prefill and 0.00% decode; one Strata decode arm was an unexplained 0.9 tok/s outlier. Neither metric met the preregistered 5% screen, so no seven-pair confirmation is indicated for this fixed-owner path. A matched 65K→8K request-history control implicates adaptive residency in the changed replay state, but the specific transfer is not captured. E6/E7 remain open pending broader quality/repeatability and end-to-end performance qualification. maestro1 root remains nearly full, but `/mnt/sda2` has scratch space; current-source HIP and SYCL x86 builds now pass (SYCL CLI/runtime unavailable without a device). Updated 2026-10-30.**
+Status: **E0–E5 bounded prototype evidence complete. E6 has three same-process 65K repeats that isolate an adaptive-residency-associated state divergence while preserving the 32 output tokens. At position 65,540, the round-4 update moves layer-1 expert 3 from GPU to CPU; its service row matches the independent owner oracle. The same update promotes active experts 229, 285 and 234 in layers 3, 6 and 11, and experts 474, 385 and 250 in layer 13. Their fixed/adaptive service rows match CPU/GPU oracle outputs. Same-input CPU/GPU differences are about 1.1e-7 relative L2. By layer 13 the inputs differ by 3.45e-4 and changing that input changes the three expert outputs by 5.99–6.68e-3 on either backend. The larger layer-13 output delta therefore follows accumulated input drift, not the local CPU/GPU rounding gap; the earlier source and its relation to prefix-8 state remain under investigation. The three-pair no-trace fixed-GPU resident-backend screen remains below the preregistered 5% threshold. E6/E7 stay open for broader quality/repeatability, causal diagnosis and end-to-end performance qualification. maestro1 current-source HIP and SYCL x86 builds pass; SYCL runtime remains unavailable without a device. Updated 2026-10-31.**
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -2415,6 +2415,16 @@ the already-different input from execution-owner effects. This excludes a
 layer-0 difference only at the sampled dispatches, not other positions. See the
 [all-layer comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/all-layer-position65540-comparison.json)
 and [adaptive-state diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
+
+Fixed-input native expert oracles now show that the adaptive round-4 promotions
+at layers 3/6/11/13 switch the sampled service rows from CPU to GPU results
+bit-for-bit. The same-input CPU/GPU numeric gap is only about `1.1e-7` relative
+L2. At layer 13, changing the captured input shifts each promoted expert row by
+`5.99–6.68e-3` on either backend, matching the observed service-row delta. This
+shows that upstream input drift, rather than local CPU/GPU arithmetic alone,
+dominates the large layer-13 change. The earlier source of that drift and its
+causal role in prefix-8 state divergence are not yet isolated. See the
+[owner/oracle comparison](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/active-owner-oracle-position65540.json).
 
 **Current-source portability rebuild (2026-10-30):** full HIP and SYCL target
 trees rebuilt at source commit `d321286f` on maestro1 with one build job. HIP

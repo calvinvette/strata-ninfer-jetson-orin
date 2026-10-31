@@ -381,8 +381,42 @@ has propagated, but does not yet attribute it to ownership, input
 quantization, or a kernel. Same-token output does not establish accepted-state
 parity.
 
-Next capture layer-13 owner kinds and compare its per-expert service rows with
-fixed-input CPU/GPU oracles. The adaptive round-4 schedule includes swaps in
-layer 13, while the layer-13 input already differs; the all-layer bundle alone
-cannot separate those effects. Keep the result limited to this prompt, build,
-profile and sampled dispatch.
+At this point the all-layer bundle identifies where the larger row delta
+appears, but cannot separate changed input from changed execution owner. The
+following owner and oracle capture makes that distinction for the sampled
+experts; the result remains limited to this prompt, build, profile and
+dispatch.
+
+### Active-owner service-row oracle comparison
+
+The round-4 adaptive schedule also promotes active experts at layers 3, 6 and
+11 (`3:229>8`, `6:285>0`, `11:234>3`), in addition to layer-13 experts 474,
+385 and 250. At position 65,540, the fixed and adaptive route IDs match for
+all these experts. For layers 3, 6 and 11, each fixed service row matches the
+independent CPU oracle bit-for-bit and each adaptive service row matches the
+GPU oracle bit-for-bit. The fixed-input CPU/GPU oracle difference is only
+`1.12–1.14e-7` relative L2 for these rows. Their fixed/adaptive float inputs
+differ slightly, but the same-owner oracle outputs remain byte-identical
+across those inputs; the observed row change is therefore the small CPU/GPU
+execution delta at these sampled dispatches.
+
+At layer 13 the owner capture directly shows experts 474, 385 and 250 moving
+CPU→GPU: fixed kinds are `-1`, adaptive kinds are `0`. Their service rows also
+match the corresponding CPU and GPU oracle outputs bit-for-bit. On the exact
+same input, CPU/GPU oracle differences remain about `1.1e-7` relative L2. But
+the fixed/adaptive layer-13 input differs by `3.45e-4`; applying either CPU or
+GPU oracle to the two different inputs changes each row by `5.99–6.68e-3`
+relative L2, essentially the same as the actual service-row change. This
+separates the large layer-13 row delta from the tiny same-input CPU/GPU numeric
+delta: the changed layer-13 input is the dominant factor in these rows. The
+trace does not yet identify which earlier small transition(s) cause that
+input drift or prove a sole cause of the prefix-8 recurrent-state mismatch.
+
+The direct owner capture, matched service rows and independent oracle metrics
+are summarized in
+[`active-owner-oracle-position65540.json`](active-owner-oracle-position65540.json).
+Oracle output dumps and activations remain in `/tmp/e6-layer{3,6,11,13}-*` on
+Orin. This is a numeric diagnostic, not performance or semantic-quality
+evidence. The next useful check is to capture the layer-13 Q8_1 activation
+blocks, determine where the small upstream deltas change its quantized input,
+and trace the resulting GDN state through accepted prefix 8.
