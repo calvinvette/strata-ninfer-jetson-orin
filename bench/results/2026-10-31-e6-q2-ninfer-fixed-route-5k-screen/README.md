@@ -57,3 +57,16 @@ maximum sampled swap use was 1.71 GiB and sampled OOM-kill counters were zero.
 CPU clocks ranged from 729.6 to 2,201.6 MHz and GPU clocks from 306 to
 1,300.5 MHz. EMC was not readable, energy was not measured, and clocks were
 left dynamic.
+
+## Correctness-only persistent-state check
+
+After the timing screen, one additional fresh-process pair repeated the same
+warmup and measured request with final persistent-state hashing enabled. All
+four responses had the same exact prefix, 128-token length and response hash.
+The final GDN, PLE, tail, pooled, KV, MTP, stale, dead, pooled-full and
+previous-embedding fingerprints matched across both requests and both
+backends. Minimum available memory was 9.08 GiB for Strata and 9.11 GiB for
+NInfer. This is one bounded final-state check; it is not accepted-prefix
+parity, full byte-level state equivalence or general quality evidence. The
+hashing run is separate from performance data. See
+[`state-parity.json`](state-parity.json).

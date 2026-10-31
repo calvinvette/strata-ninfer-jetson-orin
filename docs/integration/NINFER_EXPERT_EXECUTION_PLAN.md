@@ -2643,3 +2643,10 @@ All six outputs matched. No metric met the 5% gate, so no confirmation is
 indicated. Because the profile was built from this workload's own routes, this
 is an oracle-residency diagnostic and not a held-out or deployable profile.
 See the [fixed-map report](../../bench/results/2026-10-31-e6-q2-ninfer-fixed-route-5k-screen/README.md).
+
+**E6 fixed-map final-state check (2026-10-31):** one separate state-hash pair
+with the route-ranked profile produced identical final GDN, PLE, tail, pooled,
+KV, MTP, stale, dead, pooled-full and previous-embedding fingerprints across
+the warmup and measured requests in both backends. All four responses matched
+exactly. This is bounded final-state evidence only; accepted-prefix and
+byte-level parity remain unproven. See the [state record](../../bench/results/2026-10-31-e6-q2-ninfer-fixed-route-5k-screen/state-parity.json).

@@ -1,0 +1,33 @@
+{
+  "scope": "one correctness-only fresh-process Strata/NInfer pair with final persistent-state hashing enabled; no performance inference",
+  "profile_sha256": "0909eb556cc01d022fd6609a8bda3009c1cbbd142e32d19ba42166f80f8ea518",
+  "adaptive_swaps": false,
+  "request_sequence_per_process": ["warmup NIMBUS retrieval, 512 prompt + 128 output", "measured NIMBUS retrieval, 512 prompt + 128 output"],
+  "all_four_requests_passed": true,
+  "all_four_response_sha256": "1719e86b58f64cf00c23749b67feacac453c76684a351ca0480d026111124e77",
+  "all_four_exact_prefixes_passed": true,
+  "persistent_state_scope": "final request state fingerprint after each response; not accepted-prefix state or full byte-level comparison",
+  "state_hashes_per_request": {
+    "L": 639,
+    "gdn": "221b694384543f56",
+    "ple": "a7474526a004fa83",
+    "tail": "def21db7fda64ebe",
+    "pooled": "535e95adb90b2248",
+    "kv": "83dc03a7dca9c29c",
+    "mtp": "14650fb0739d0383",
+    "stale": "011a3fe290018383",
+    "dead": "76214e6986cead1e",
+    "pooled_full": "2dcac34b17f89565",
+    "ple_prev": "56127,52870"
+  },
+  "comparison": {
+    "within_strata_warmup_measured_match": true,
+    "within_ninfer_warmup_measured_match": true,
+    "cross_backend_match": true
+  },
+  "minimum_available_host_memory_gib": {
+    "strata": 9.079,
+    "ninfer": 9.110
+  },
+  "limit": "single workload, one process pair, same-workload route-ranked cache; supports only this fixed-profile request sequence"
+}
