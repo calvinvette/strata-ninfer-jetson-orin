@@ -1,0 +1,18 @@
+{
+  "experiment": "E6 layer-13 Q8_K activation comparison",
+  "model": "Qwen3.8-Flash-Next Q2_0",
+  "prompt_tokens": 65536,
+  "generated_position": 65539,
+  "weight_contract": "blk.13.attn_qkv.weight is Q3_K; Strata MMVQ consumes Q8_K activations",
+  "capture": "STGDIAG4 layer13.gdn; x begins at byte 100",
+  "method": "Independent host transcription of quantize_q8_K in src/kernels/cuda/quantize_act.cu, including FP32 products and nearest_int",
+  "activation_width": 2560,
+  "q8_k_blocks": 10,
+  "integer_codes_changed": 0,
+  "blocks_with_integer_code_changes": [],
+  "blocks_with_fp32_scale_changes": [0, 3, 4, 8],
+  "fixed_fp32_scales": [-0.019314831122756004, 0.01831808313727379, 0.015451334416866302, 0.020340250805020332, -0.016195621341466904, -0.014629663899540901, 0.01764427125453949, 0.019463330507278442, -0.013183283619582653, -0.015202340669929981],
+  "adaptive_fp32_scales": [-0.019314829260110855, 0.01831808313727379, 0.015451334416866302, 0.020340248942375183, -0.016195619478821754, -0.014629663899540901, 0.01764427125453949, 0.019463330507278442, -0.013183287344872952, -0.015202340669929981],
+  "blocks_with_changed_bsums": [],
+  "interpretation": "Q8_K integer activation codes and bsums match; four of ten FP32 scales differ slightly. This is consistent with scale-level activation differences contributing to qkv drift, but the offline quantization comparison does not replay the Q3_K projection or establish full causality. The earlier Q8_1 check was inapplicable to this Q3_K projection."
+}
