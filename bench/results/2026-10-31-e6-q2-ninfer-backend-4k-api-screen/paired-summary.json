@@ -1,0 +1,189 @@
+{
+  "experiment": "NInfer strict Q2_0 backend vs Strata backend, 4,000-slot cache, pp512+tg64, configured 8K context",
+  "date": "2026-10-31",
+  "device": "Jetson AGX Orin Developer Kit, CUDA 12.6, SM87",
+  "source_commit": "dd88f3ef",
+  "binary_sha256_at_run_time": "not recorded; current binary was rebuilt after this campaign and must not be used as its identity",
+  "model": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0, two GGUF shards under ~/models/strata-orin-validation/Q2_0/; q2-ple-pack and q2-expert-profile.bin from the same directory",
+  "config": "Both arms used the same model/pack/profile, 4,000 expert slots, prefill 128, MTP spec 2, max context 8,192, mmap experts, prompt cache off, 3 GiB workspace reserve, no PCIe staging, 8 pool workers, resident budget 6 GiB, and 9 GiB host reserve. Only expert backend changed; candidate used strict NInfer.",
+  "protocol": {
+    "pairs": 3,
+    "order": "baseline\u2192candidate, candidate\u2192baseline, baseline\u2192candidate",
+    "scope": "one warmup and one measured independent-process API request per arm and pair; no trace",
+    "workload": "tokenizer-verified synthetic 512-token repeated-red prompt with a 64-token generation cap",
+    "temperature": 0,
+    "energy": "not attributed",
+    "clocks": "read-only dynamic sampling"
+  },
+  "pairs": [
+    {
+      "pair": 0,
+      "order": "baseline\u2192candidate",
+      "arms": {
+        "baseline": {
+          "prompt_tps": 30.5,
+          "decode_tps": 8.3,
+          "ttft_s": 17.033445991110057,
+          "client_total_s": 24.53297699894756,
+          "prompt_tokens": 512,
+          "output_tokens": 64,
+          "text_sha256": "4a7ec1ebd61dc2be1dee07887644a5891e034bd488088155171f3fcb6eb69e85",
+          "supervisor_status": "pass",
+          "min_available_bytes": 9911844864
+        },
+        "candidate": {
+          "prompt_tps": 31.1,
+          "decode_tps": 9.5,
+          "ttft_s": 16.61713865119964,
+          "client_total_s": 23.22625163802877,
+          "prompt_tokens": 512,
+          "output_tokens": 64,
+          "text_sha256": "4a7ec1ebd61dc2be1dee07887644a5891e034bd488088155171f3fcb6eb69e85",
+          "supervisor_status": "pass",
+          "min_available_bytes": 10950324224
+        }
+      }
+    },
+    {
+      "pair": 1,
+      "order": "candidate\u2192baseline",
+      "arms": {
+        "baseline": {
+          "prompt_tps": 31.6,
+          "decode_tps": 9.3,
+          "ttft_s": 16.385175608098507,
+          "client_total_s": 23.149016994051635,
+          "prompt_tokens": 512,
+          "output_tokens": 64,
+          "text_sha256": "4a7ec1ebd61dc2be1dee07887644a5891e034bd488088155171f3fcb6eb69e85",
+          "supervisor_status": "pass",
+          "min_available_bytes": 11011178496
+        },
+        "candidate": {
+          "prompt_tps": 31.5,
+          "decode_tps": 9.3,
+          "ttft_s": 16.43331166729331,
+          "client_total_s": 23.139253241941333,
+          "prompt_tokens": 512,
+          "output_tokens": 64,
+          "text_sha256": "4a7ec1ebd61dc2be1dee07887644a5891e034bd488088155171f3fcb6eb69e85",
+          "supervisor_status": "pass",
+          "min_available_bytes": 10993192960
+        }
+      }
+    },
+    {
+      "pair": 2,
+      "order": "baseline\u2192candidate",
+      "arms": {
+        "baseline": {
+          "prompt_tps": 31.3,
+          "decode_tps": 9.0,
+          "ttft_s": 16.55574526125565,
+          "client_total_s": 23.499172560870647,
+          "prompt_tokens": 512,
+          "output_tokens": 64,
+          "text_sha256": "4a7ec1ebd61dc2be1dee07887644a5891e034bd488088155171f3fcb6eb69e85",
+          "supervisor_status": "pass",
+          "min_available_bytes": 11004837888
+        },
+        "candidate": {
+          "prompt_tps": 29.8,
+          "decode_tps": 9.3,
+          "ttft_s": 17.363719895947725,
+          "client_total_s": 24.076826917938888,
+          "prompt_tokens": 512,
+          "output_tokens": 64,
+          "text_sha256": "4a7ec1ebd61dc2be1dee07887644a5891e034bd488088155171f3fcb6eb69e85",
+          "supervisor_status": "pass",
+          "min_available_bytes": 11004813312
+        }
+      }
+    }
+  ],
+  "metrics": {
+    "prompt_tps": {
+      "baseline_median": 31.3,
+      "candidate_median": 31.1,
+      "paired_candidate_advantage_pct": [
+        1.967213114754096,
+        -0.31645569620253333,
+        -4.792332268370602
+      ],
+      "median_paired_advantage_pct": -0.31645569620253333,
+      "bootstrap_95_percentile_interval_pct": [
+        -4.792332268370602,
+        1.967213114754096
+      ],
+      "positive_means": "higher TPS"
+    },
+    "decode_tps": {
+      "baseline_median": 9.0,
+      "candidate_median": 9.3,
+      "paired_candidate_advantage_pct": [
+        14.457831325301186,
+        0.0,
+        3.3333333333333437
+      ],
+      "median_paired_advantage_pct": 3.3333333333333437,
+      "bootstrap_95_percentile_interval_pct": [
+        0.0,
+        14.457831325301186
+      ],
+      "positive_means": "higher TPS"
+    },
+    "ttft_s": {
+      "baseline_median": 16.55574526125565,
+      "candidate_median": 16.61713865119964,
+      "paired_candidate_advantage_pct": [
+        2.5052889588808025,
+        -0.2929175821000607,
+        -4.653234672834328
+      ],
+      "median_paired_advantage_pct": -0.2929175821000607,
+      "bootstrap_95_percentile_interval_pct": [
+        -4.653234672834328,
+        2.5052889588808025
+      ],
+      "positive_means": "lower latency"
+    },
+    "client_total_s": {
+      "baseline_median": 23.499172560870647,
+      "candidate_median": 23.22625163802877,
+      "paired_candidate_advantage_pct": [
+        5.626070798179361,
+        0.04219562320448844,
+        -2.399212981997423
+      ],
+      "median_paired_advantage_pct": 0.04219562320448844,
+      "bootstrap_95_percentile_interval_pct": [
+        -2.399212981997423,
+        5.626070798179361
+      ],
+      "positive_means": "lower latency"
+    }
+  },
+  "correctness": {
+    "all_six_processes_passed": true,
+    "measured_output_tokens": 64,
+    "same_measured_response_sha256_all_arms": "4a7ec1ebd61dc2be1dee07887644a5891e034bd488088155171f3fcb6eb69e85",
+    "natural_stop": "No; generation cap reached. Text identity is only this deterministic capped workload, not broad quality.",
+    "same_profile_identity": "Configuration and cache policy were identical across arms."
+  },
+  "resources": {
+    "minimum_available_ram_gib": 9.231124877929688,
+    "maximum_swap_gib": 1.9445343017578125,
+    "oom_kills": 0,
+    "cpu_mhz": [
+      729.6,
+      2201.6
+    ],
+    "gpu_mhz": [
+      306,
+      1300.5
+    ],
+    "emc": "readback denied",
+    "clocks": "dynamic"
+  },
+  "decision": "Three-pair screen did not demonstrate a 5% NInfer end-to-end benefit; all paired 95% percentile intervals include zero. Do not run seven-pair confirmation on this cell absent a new hypothesis."
+}

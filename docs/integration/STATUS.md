@@ -2,6 +2,8 @@
 
 # Integration status
 
+**E6 4K-cache backend API screen (2026-10-31):** three paired pp512+tg64, 8K-context requests compared strict NInfer with Strata at the same 4,000-slot cache. Median decode TPS advantage was +3.33%, but the 95% paired interval included zero (0.00% to +14.46%); prompt TPS and TTFT were tied. No seven-pair confirmation is indicated. All six capped outputs shared the same hash. See the [screen report](../../bench/results/2026-10-31-e6-q2-ninfer-backend-4k-api-screen/README.md).
+
 **E6 layer-1 intervention repeat (2026-10-31):** a second exact-position
 forced-CPU run at layer 1 expert 3 returned the same 32 token IDs and passed
 with 8.70 GiB minimum available RAM. Its full 36-layer GDN state differs from

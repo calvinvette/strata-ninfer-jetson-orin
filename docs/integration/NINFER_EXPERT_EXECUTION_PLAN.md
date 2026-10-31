@@ -2558,3 +2558,13 @@ checks passed, but the schedule misses the 5% benefit gate. Keep 128 threads as
 default; do not spend an end-to-end confirmation on this candidate. The opt-in
 variant remains experimental and is not qualified. See the
 [screen report](../../bench/results/2026-10-31-e6-ninfer-q2-cta256-screen/README.md).
+
+
+**E6 backend API comparison recovered (2026-10-31):** the same-day 4K-cache
+Q2_0 pp512+tg64 screen compared strict NInfer against Strata in three paired
+independent-process blocks. Decode TPS favored NInfer by 3.33% at the median,
+but its 95% paired interval was 0.00% to +14.46%; prompt TPS and TTFT were
+effectively tied. The screen does not meet the 5% effect/uncertainty gate, so
+no seven-pair confirmation is indicated for this cell. All six requests
+produced the same 64-token response hash. See the
+[API screen report](../../bench/results/2026-10-31-e6-q2-ninfer-backend-4k-api-screen/README.md).

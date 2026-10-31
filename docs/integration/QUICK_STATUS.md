@@ -2,6 +2,11 @@
 
 Updated: 2026-10-31
 
+A same-day 4K-cache, 8K-context NInfer-versus-Strata API screen measured
++3.33% median decode TPS at pp512+tg64, but its three-pair interval included
+zero. Prompt TPS and TTFT were effectively tied, so no confirmation was run.
+[Screen report](../../bench/results/2026-10-31-e6-q2-ninfer-backend-4k-api-screen/README.md).
+
 A seven-pair held-out comparison found that 4K configured cache capacity with
 default adaptive swaps improved decode TPS over 3K by 17.97% and 25.20% on two
 Q2_0 retrieval tasks at 8K context (paired intervals +11.01% to +22.88% and
@@ -31,6 +36,8 @@ local-only. Repeated layer-5/7/13 owner interventions retain their bounded
 causal state findings; none is a performance claim. [Layer-1 repeat](../../bench/results/2026-10-31-e6-q2-owner-intervention/layer1-full-state-repeat.md).
 
 A Q2_0 NInfer grouped-kernel experiment tested 256-thread CTAs against the 128-thread default. It was numerically correct but 2.5–2.9% slower across measured operator sizes, so the default stays 128 threads and this variant is not qualified. [Operator report](../../bench/results/2026-10-31-e6-ninfer-q2-cta256-screen/README.md).
+
+A same-day 4K-cache NInfer-versus-Strata pp512+tg64 screen found +3.33% median decode TPS, but the three-pair interval includes zero; prompt rate and TTFT were tied. No confirmation is warranted. [Screen](../../bench/results/2026-10-31-e6-q2-ninfer-backend-4k-api-screen/README.md).
 
 This is a short orientation to the integration. The [plan](PLAN.md) defines
 phase gates; the detailed [status](STATUS.md) is the evidence record, and the
