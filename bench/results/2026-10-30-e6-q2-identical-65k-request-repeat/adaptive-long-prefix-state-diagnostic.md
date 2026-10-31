@@ -512,6 +512,17 @@ one activation scale. The result does not locate the earlier source of the
 `x` delta and does not by itself explain the full recurrent-state difference.
 See [`layer13-qkv-scale-counterfactual-position65539.json`](layer13-qkv-scale-counterfactual-position65539.json).
 
+The same captured inputs also replay the full convolution and recurrent update:
+both arms' convolution histories, normalized `h` vectors and recurrent states
+match their captures bit-for-bit. Feeding the adaptive run's scale-pinned
+`qkv` through the convolution yields fixed-owner convolution history and `h`
+bit-for-bit. Keeping adaptive gate/beta inputs for the recurrence then leaves a
+relative L2 of `3.37e-8` to the fixed recurrent state, compared with the
+original cross-arm `9.77e-6`. This shows that the scale change drives nearly
+all of the sampled recurrent-state delta, with a small residual from other
+adaptive inputs. See
+[`layer13-gdn-scale-counterfactual-position65539.json`](layer13-gdn-scale-counterfactual-position65539.json).
+
 ### Layer-12 boundary feeding the layer-13 GDN update
 
 A paired boundary capture at position 65,539 confirms the layer-13 input delta

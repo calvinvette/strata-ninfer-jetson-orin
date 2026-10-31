@@ -1,0 +1,32 @@
+{
+  "experiment": "E6 layer-13 full GDN scale counterfactual",
+  "model": "Qwen3.8-Flash-Next Q2_0",
+  "position": 65539,
+  "runtime_replay": "gdn_conv_l2_multi followed by gdn_step_norm_multi using captured inputs and local GGUF weights",
+  "kernel_build_sha256": "1a533ffcb2ae24789d395eaf8041e1949ad9f460bbfbbcb2e00a6b0250553a73",
+  "baseline_replay": {
+    "fixed_recurrent_state_vs_capture": {"changed_values": 0, "relative_l2": 0.0},
+    "fixed_convolution_history_vs_capture": {"changed_values": 0, "relative_l2": 0.0},
+    "fixed_normalized_h_vs_capture": {"changed_values": 0, "relative_l2": 0.0},
+    "adaptive_recurrent_state_vs_capture": {"changed_values": 0, "relative_l2": 0.0},
+    "adaptive_convolution_history_vs_capture": {"changed_values": 0, "relative_l2": 0.0},
+    "adaptive_normalized_h_vs_capture": {"changed_values": 0, "relative_l2": 0.0}
+  },
+  "counterfactual": {
+    "change": "Use the adaptive Q8_1 block-57 scale-pinned qkv projection; preserve the common incoming state and adaptive gate/beta/z inputs",
+    "convolution_history_vs_fixed_capture": {"changed_values": 0, "relative_l2": 0.0},
+    "normalized_h_vs_fixed_capture": {"changed_values": 0, "relative_l2": 0.0},
+    "recurrent_state_vs_fixed_capture": {
+      "changed_values": 201228,
+      "relative_l2": 3.3737673872586726e-08,
+      "max_absolute": 2.9802322387695312e-08
+    },
+    "recurrent_state_vs_adaptive_capture": {
+      "changed_values": 776597,
+      "relative_l2": 9.764823117347937e-06,
+      "max_absolute": 5.0961971282958984e-06
+    },
+    "original_fixed_vs_adaptive_recurrent_state_relative_l2": 9.765345223887697e-06
+  },
+  "interpretation": "The scale-pinned qkv removes the captured convolution-history and normalized-h differences exactly. With adaptive gate, beta and z retained, the recurrent state becomes very close to fixed (3.37e-8 relative L2 versus the original 9.77e-6 cross-arm delta); remaining drift is consistent with the other adaptive inputs. This is a counterfactual for this pair and position, not a broad quality or performance result."
+}

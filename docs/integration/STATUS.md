@@ -7563,3 +7563,13 @@ delta for this pair and position. It does not explain where the upstream `x`
 delta originated or establish the full cause of later recurrent-state
 divergence. See the
 [projection replay report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer13-qkv-scale-counterfactual-position65539.json).
+
+Replaying the full captured GDN update also matches both arms' recurrent state,
+convolution history and normalized `h` bit-for-bit. Feeding the scale-pinned
+adaptive projection through the convolution and recurrence makes its
+convolution history and normalized `h` identical to fixed. With adaptive
+gate/beta retained, recurrent-state relative L2 to fixed falls from the
+original `9.77e-6` to `3.37e-8`. This attributes nearly all of the sampled
+layer-13 state delta to the Q8_1 scale change, with a small remaining
+gate/beta contribution. See the
+[full GDN counterfactual](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer13-gdn-scale-counterfactual-position65539.json).
