@@ -536,5 +536,28 @@
       }
     ],
     "interpretation": "For this single layer-1 activation, every sampled GPU-resident NInfer result is closer to the independent FP64 Q2_0 x Q8_1 runtime-contract oracle than the corresponding file/CPU result. All errors remain below 1.1e-7 relative L2. This local numerical ordering does not establish general superiority, answer quality, or performance."
+  },
+  "single_expert_owner_intervention": {
+    "map": "learned-map",
+    "forced_cpu_expert": "layer 1, expert 320, verifier position 511",
+    "log_confirmation": "EXPERIMENT forced CPU owner for layer 1 expert 320 position 511",
+    "captured_input_route_ids_and_weights_match_original_map": true,
+    "expert_part_comparison": {
+      "forced_cpu_vs_original_cpu": {
+        "different": 0,
+        "count": 2560,
+        "relative_l2": 0.0,
+        "max_abs": 0.0
+      },
+      "forced_cpu_vs_learned_gpu": {
+        "different": 1807,
+        "count": 2560,
+        "relative_l2": 1.0125531343344678e-07,
+        "max_abs": 7.450580596923828e-09
+      }
+    },
+    "full_response_sha256": "576272a200f58b5b0a72f489ac1a2019098ec2939ac1480a2531f90a8e337cd2",
+    "expected_prefix_passed": true,
+    "interpretation": "Forcing expert 320 to CPU on the learned map reproduces its naturally CPU-owned original-map expert row bit-for-bit at the same input and route. The complete layer output still differs because the other active owner-changed expert rows remain on their learned-map owners."
   }
 }
