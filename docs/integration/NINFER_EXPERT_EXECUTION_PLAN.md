@@ -2329,8 +2329,9 @@ the instrumented run are diagnostic only. See the [functional report](../../benc
 
 The 1K `pp512+tg64`, 4K `pp2048+tg128`, 16K, 32K and 64K no-trace API screens
 are included in a combined paired-effect figure with all three blocks and
-bootstrap intervals. The chart does not satisfy E6's full context/workload
-exit. See the
+bootstrap intervals. Later 128K and 256K configured-capacity screens use a
+512-token prompt and are also shown; they do not test near-limit ingestion.
+The chart does not satisfy E6's full context/workload exit. See the
 [figure and sanitized source data](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md#combined-no-trace-api-paired-effect-chart).
 
 **Adaptive request-history diagnostic (2026-10-30):** after one 65,536-token
@@ -2468,4 +2469,15 @@ Minimum available RAM was 7.07 GiB, sampled OOM kills were zero, and peak swap
 was 2.70 GiB. Dynamic clocks and unmeasured energy limit the screen. This adds
 configured-capacity coverage only; it is neither a 256K prompt nor performance
 qualification. See the [screen report](../../bench/results/2026-10-31-e6-q2-256k-capacity-api-screen/README.md)
+and updated [combined chart](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md#combined-no-trace-api-paired-effect-chart).
+
+**E6 128K-capacity short-workload screen (2026-10-31):** a matching three-pair
+pp512+tg64 API screen at `--max-context 131072` passed all cells with matched
+warmups and measured output. Median NInfer effects were +0.29% prompt TPS,
+-2.92% decode TPS, -0.27% first-visible TTFT and +0.56% client time; every
+paired interval crossed zero. Available memory stayed above 8.40 GiB, OOM
+kills were zero and peak sampled swap was 4.78 GiB. Energy was not measured
+and clocks remained dynamic. The test extends configured-capacity screening;
+it does not test a 128K prompt or complete E6. See the
+[screen report](../../bench/results/2026-10-31-e6-q2-128k-capacity-api-screen/README.md)
 and updated [combined chart](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md#combined-no-trace-api-paired-effect-chart).

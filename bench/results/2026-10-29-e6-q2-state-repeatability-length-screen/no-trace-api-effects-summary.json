@@ -1,9 +1,9 @@
 {
   "schema": 1,
-  "date": "2026-10-31 (extended with 256K capacity screen)",
+  "date": "2026-10-29, extended 2026-10-31",
   "model": "Qwen3.8-Flash-Next GSQ-RCO Q2_0",
   "comparison": "strict NInfer / Strata expert backend; PCIe staging disabled in both",
-  "capture": "no trace; one same-workload warmup and one measured API request per fresh process; added 512+64 at 262,144 configured context on 2026-10-31",
+  "capture": "no trace; one same-workload warmup and one measured API request per fresh process; added 512+64 at 262,144 configured context on 2026-10-31; added matched pp512+tg64 screens at 131,072 and 262,144 configured context",
   "uncertainty": "bootstrap median of whole paired process blocks; 5000 resamples; three pairs per cell; screening only",
   "cells": [
     {
@@ -872,6 +872,115 @@
           "block_2_ninfer": 325
         },
         "note": "API text was compared; engine token IDs and accepted-prefix state were not captured"
+      }
+    },
+    {
+      "name": "pp512+tg64, 128K cap",
+      "context_tokens": 131072,
+      "paired_blocks": 3,
+      "content_matched_blocks": 3,
+      "warmup_matched_blocks": 3,
+      "metrics": {
+        "prompt_tps": {
+          "kind": "tps",
+          "median_paired_change_pct": 0.29387798720292846,
+          "bootstrap_95_interval_pct": [
+            -5.277670612601271,
+            7.615037085786458
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "NInfer \u2192 Strata",
+              "value": -5.277670612601271
+            },
+            {
+              "block": 1,
+              "order": "Strata \u2192 NInfer",
+              "value": 0.29387798720292846
+            },
+            {
+              "block": 2,
+              "order": "Strata \u2192 NInfer",
+              "value": 7.615037085786458
+            }
+          ]
+        },
+        "decode_tps": {
+          "kind": "tps",
+          "median_paired_change_pct": -2.9237329673561407,
+          "bootstrap_95_interval_pct": [
+            -3.3805179038536304,
+            6.988867059593984
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "NInfer \u2192 Strata",
+              "value": -3.3805179038536304
+            },
+            {
+              "block": 1,
+              "order": "Strata \u2192 NInfer",
+              "value": -2.9237329673561407
+            },
+            {
+              "block": 2,
+              "order": "Strata \u2192 NInfer",
+              "value": 6.988867059593984
+            }
+          ]
+        },
+        "first_visible_ttft_s": {
+          "kind": "latency",
+          "median_paired_change_pct": -0.26787522092522886,
+          "bootstrap_95_interval_pct": [
+            -7.022858151618672,
+            5.572658895570104
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "NInfer \u2192 Strata",
+              "value": 5.572658895570104
+            },
+            {
+              "block": 1,
+              "order": "Strata \u2192 NInfer",
+              "value": -0.26787522092522886
+            },
+            {
+              "block": 2,
+              "order": "Strata \u2192 NInfer",
+              "value": -7.022858151618672
+            }
+          ]
+        },
+        "client_total_s": {
+          "kind": "latency",
+          "median_paired_change_pct": 0.5643081104275804,
+          "bootstrap_95_interval_pct": [
+            -6.927876985668668,
+            5.048064416192188
+          ],
+          "paired_changes_pct": [
+            {
+              "block": 0,
+              "order": "NInfer \u2192 Strata",
+              "value": 5.048064416192188
+            },
+            {
+              "block": 1,
+              "order": "Strata \u2192 NInfer",
+              "value": 0.5643081104275804
+            },
+            {
+              "block": 2,
+              "order": "Strata \u2192 NInfer",
+              "value": -6.927876985668668
+            }
+          ]
+        }
       }
     },
     {

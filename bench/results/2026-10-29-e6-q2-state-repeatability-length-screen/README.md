@@ -429,11 +429,12 @@ dynamic. Raw captures remain local-only.
 
 **Combined no-trace API paired-effect chart:** the 1K, 4K, 16K, 32K and 64K
 three-block screens are shown together with paired bootstrap intervals, along
-with a 512+64 workload at 256K configured capacity. Values are candidate
+with 512+64 workloads at 128K and 256K configured capacity. Values are candidate
 NInfer relative to Strata; positive TPS is faster, while positive latency is
 slower. The plot preserves every pair and does not interpolate. The 256K-cap
-screen is a short workload and does not represent near-limit ingestion; see
-the [capacity report](../2026-10-31-e6-q2-256k-capacity-api-screen/README.md).
+both capacity screens use short workloads and do not represent near-limit
+ingestion; see the [128K report](../2026-10-31-e6-q2-128k-capacity-api-screen/README.md)
+and [256K report](../2026-10-31-e6-q2-256k-capacity-api-screen/README.md).
 The [16K](no-trace-api-pp16384-cap32768-README.md),
 [32K](no-trace-api-pp32768-cap65536-README.md) and
 [64K](no-trace-api-pp65536-cap131072-README.md) reports document paired results

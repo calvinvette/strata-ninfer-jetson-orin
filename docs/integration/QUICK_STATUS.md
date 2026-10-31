@@ -93,7 +93,10 @@ An added three-pair no-trace screen at 256K configured capacity with pp512+tg64
 also found near-zero effects: -0.23% prompt TPS, -0.68% decode TPS, +0.27%
 first-visible TTFT, and +0.33% client time; every interval crossed zero and
 all six requests remained above the six-GiB floor. The combined figure now
-includes this cell; it is not near-limit ingestion or a quality oracle.
+includes this cell. A matching 128K-capacity screen found +0.29% prompt TPS,
+-2.92% decode TPS, -0.27% TTFT and +0.56% client time, again with every
+interval crossing zero and no memory-floor breach. Both use short prompts;
+neither is near-limit ingestion or a quality oracle.
 The follow-up 256K exact retrieval check also passed: one 256,000-token
 Strata/strict-NInfer pair matched the exact answer, all 47 tokens, nine final
 state fingerprints and residency. NInfer's single-pair rates were only +0.10%

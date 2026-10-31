@@ -7289,7 +7289,7 @@ OOM kills. This is one synthetic task and not broad quality qualification.
 Instrumented prompt/decode rates were 35.30/34.97 and 5.341/5.325 tokens/s;
 these are diagnostic only, not performance measurements. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/quality-retrieval-2k-README.md).
 
-The five no-trace API workload screens now have a combined paired-effect figure
+The seven no-trace API workload screens now have a combined paired-effect figure
 with each block and its three-block bootstrap interval, plus sanitized JSON/CSV
 source data. The chart displays the small or unstable effects and makes no
 product-performance claim. [Figure and source data](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md#combined-no-trace-api-paired-effect-chart).
@@ -7305,6 +7305,16 @@ sampled cgroup OOM-kill counts were zero, although peak sampled swap was
 729.6 to 2,201.6 MHz; energy was not measured and EMC readback was unavailable.
 This extends the short-workload configured-capacity screen, not near-limit
 ingestion or quality qualification. See the [report and paired data](../../bench/results/2026-10-31-e6-q2-256k-capacity-api-screen/README.md).
+
+**E6 128K-capacity no-trace API screen (2026-10-31):** the same pp512+tg64
+cell ran as three randomized fresh-process pairs at `--max-context 131072`.
+All warmup and measured text matched across arms. Median NInfer effects were
++0.29% prompt TPS, -2.92% decode TPS, -0.27% first-visible TTFT and +0.56%
+client time; all paired intervals crossed zero. Minimum available RAM during
+requests was 8.40 GiB, OOM kills were zero, and peak sampled swap was 4.78 GiB.
+Clocks remained dynamic and energy was not measured. This is a short-workload
+capacity screen, not 128K ingestion or performance qualification. See the
+[report and paired data](../../bench/results/2026-10-31-e6-q2-128k-capacity-api-screen/README.md).
 
 **E6 exact 256K retrieval/state check (2026-10-29):** one fresh-process
 Strata/strict-NInfer pair passed a held-out 256,000-token retrieval/arithmetic
