@@ -7769,3 +7769,14 @@ was not graded and the single runs provide no performance evidence. Minimum
 available host RAM was 9.06 GiB. The resident map is sufficient to alter the
 captured state for this prompt, but the exact onset, expert, layer and kernel
 remain unknown. E6 remains open. See the [intervention report](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/README.md).
+
+**E6 verifier-stage compute localization (2026-10-31):** an opt-in bundle of
+all 36 non-QSA layers found the first captured map-dependent difference at
+layer 1, token position 511. Routes, route weights, inputs and shared output
+matched exactly; only the six routed expert rows whose GPU ownership changed
+between maps differed, at `8.38e-8` relative L2 across all expert-part values.
+The combined layer output differed at `8.09e-8` relative L2. Layer 0 was
+bit-identical. By QSA layer 47, differences had grown substantially. This
+localizes a small owner-dependent numerical effect, not a quality or
+performance improvement. One prompt, no semantic grading; E6 remains open. See
+the [compute localization record](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/resident-map-compute-localization.json).

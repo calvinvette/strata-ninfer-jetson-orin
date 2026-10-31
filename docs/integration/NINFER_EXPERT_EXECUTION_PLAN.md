@@ -2688,3 +2688,15 @@ sufficient to change captured state on this prompt, but does not isolate the
 onset within the last prefill chunk versus verifier window, or identify the
 expert/layer/kernel. Minimum available host RAM was 9.06 GiB. This is not a
 performance result; E6 remains open. See the [intervention report](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/README.md).
+
+**E6 verifier-stage compute localization (2026-10-31):** a 36-layer
+non-QSA bundle at verifier position 511 found layer 0 bit-identical and the
+first recorded map-dependent compute difference at layer 1. That layer's
+routes, route weights, input and shared output matched exactly. Six active
+expert rows whose GPU residency differed between maps changed at `8.38e-8`
+relative L2, and the combined output changed at `8.09e-8`. The difference grew
+by QSA layer 47. This is a bounded owner-dependent numerical result, not
+evidence that either map improves answer quality or speed. The verifier-stage
+capture completed; prompt-stage QSA instrumentation at position 510 crashed
+both runs and is excluded. E6 remains open. See the [compute localization
+record](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/resident-map-compute-localization.json).

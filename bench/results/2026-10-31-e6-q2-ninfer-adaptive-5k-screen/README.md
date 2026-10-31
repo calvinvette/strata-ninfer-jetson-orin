@@ -200,3 +200,32 @@ Energy was not measured. See
 attempt at a fixed-map run omitted explicit zero values for the adaptive
 options; because the engine defaults to adaptive swaps, those runs are
 excluded. The reported arms explicitly set both options to zero.
+
+## Verifier-stage compute localization
+
+Follow-up captures used the same fixed profiles and prompt at verifier
+position 511. The MoE bundle covered all 36 non-QSA layers. Layer 0 is
+bit-identical. At layer 1, route IDs, route weights, MoE input and shared output
+are also bit-identical, while 11,121 of 25,600 expert-part values differ
+(relative L2 `8.38e-8`, max absolute `1.12e-8`); the combined output differs at
+1,522 of 2,560 values (relative L2 `8.09e-8`, max absolute `3.73e-9`). The six
+active expert rows that differ—32, 97, 320, 400, 70 and 74—are exactly the
+layer-1 routed experts whose GPU residency changes between these profiles.
+The other four routed experts keep their owner class and their captured rows
+are bit-identical. This localizes the first recorded map-dependent compute
+delta to owner-dependent expert execution at layer 1 for this token. The
+relative differences are small; this does not establish which result is more
+accurate.
+
+At QSA layer 3, the earliest QSA layer, input differences are around `1e-7`
+relative L2 and the selected attention indices match. By QSA layer 47, all
+captured fields differ (QSA input relative L2 `3.02e-2`), though selected
+indices still match. Thus the small layer-1 difference grows through later
+computation in this example. This remains one prompt and one request per map;
+the answer hashes differ, both pass only the expected-prefix check, and no
+semantic quality or performance comparison was performed. The prompt-stage
+QSA capture at layer 47, position 510 crashed the instrumented engine with
+signal 11 in both arms and is excluded; verifier-stage captures completed.
+Compact metrics are in
+[`resident-map-compute-localization.json`](resident-map-compute-localization.json);
+raw captures remain outside Git under `/tmp/e6-ninfer-adapt-5k/`.
