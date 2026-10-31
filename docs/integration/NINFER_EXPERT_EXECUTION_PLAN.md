@@ -2413,9 +2413,12 @@ position 65,540, the minimally instrumented capture matches the adaptive
 layer-1 MoE and layer-2 GDN captures byte-for-byte. At layer 5 expert 220,
 position 65,539, the intervention matches the fixed arm's expert row and
 combined layer output exactly while preserving the adaptive profile otherwise.
-Whole-model accepted-prefix captures show small or delayed deeper GDN deltas,
-but lack matched full-state repeats for each intervention; they do not establish
-a whole-model causal effect. Keep E6/E7 open; no performance claim follows. See
+Whole-model accepted-prefix captures show small or delayed deeper GDN deltas.
+Two layer-5 forced-CPU runs produced byte-identical MoE bundles and complete
+GDN checkpoints, but there is no matched adaptive full-state repeat under this
+capture setup; the layer-1 forced intervention also lacks a repeated forced-arm
+checkpoint. This leaves whole-model attribution open. Keep E6/E7 open; no
+performance claim follows. See
 the [owner intervention report](../../bench/results/2026-10-31-e6-q2-owner-intervention/README.md), [downstream counterfactual report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-expert3-layer2-gdn-counterfactual-65540.md), and [bounded owner scan](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer0-2-owner-window-65536-65542.md).
 
 A matched layer-0 capture over positions 65,536–65,542 supplies a negative
@@ -2505,9 +2508,9 @@ position 65,539. Both 65K +32 requests passed with the same token IDs as their
 references and at least 8.47 GiB available RAM. The layer-1 intervention
 matched the adaptive layer-1 MoE and layer-2 GDN captures byte-for-byte. At
 layer 5, inputs/routes were exact and the forced CPU row and combined layer
-output matched the fixed arm byte-for-byte. Full-state GDN differences were
-small or delayed relative to adaptive, but each intervention lacks matched
-full-state repeats, so no whole-model causal, quality or performance conclusion
-follows. CUDA built and ran on Orin; HIP and SYCL compiled on maestro1, with HIP
+output matched the fixed arm byte-for-byte. Two layer-5 forced-CPU runs had
+byte-identical full GDN checkpoints, but an adaptive full-state repeat under
+the same capture setup is missing. No whole-model causal, quality or performance
+conclusion follows. CUDA built and ran on Orin; HIP and SYCL compiled on maestro1, with HIP
 help passing and SYCL device startup unavailable. E6/E7 remain open. See the
 [intervention reports](../../bench/results/2026-10-31-e6-q2-owner-intervention/README.md).

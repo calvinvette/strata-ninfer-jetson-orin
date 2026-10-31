@@ -1018,6 +1018,8 @@ Live one-position owner interventions now cover layer-1 expert 3 at position
 matches the fixed arm byte-for-byte with exact inputs/routes; its full-state GDN
 comparison first grows beyond `1e-8` at layer 15, without a matched repeat to
 attribute that drift. The former matched adaptive layer-1/2 captures exactly.
-Both requests passed above 8.4 GiB RAM, but neither establishes whole-model
-causality or speed. HIP and SYCL built on maestro1; only HIP could start without
-device limits. E6/E7 remain open. [Reports](../../bench/results/2026-10-31-e6-q2-owner-intervention/README.md).
+Both requests passed above 8.4 GiB RAM. The layer-5 forced arm repeated with a
+byte-identical full GDN checkpoint; a same-instrumentation adaptive full-state
+repeat is still needed before attributing deeper drift. Neither intervention
+establishes a speed benefit. HIP and SYCL built on maestro1; only HIP could
+start without device limits. E6/E7 remain open. [Reports](../../bench/results/2026-10-31-e6-q2-owner-intervention/README.md).
