@@ -24,10 +24,12 @@ PLE pack `a43d7d0b69525335f4b000d5197a1d3aefcd3c0014fc3e12b3455e0a5d827ba2`,
 PLE index `c758314d495a1261d06a806b1c415596dfabe62e0cbf44ce592dc84c53229ccd`,
 and expert profile `b3e62120218cd96d175a0547530158869177dd2164b22b40f32bea7d7e85fb8c`.
 
-The profile is a static rank list with no eviction. Hashes below cover the
-ranked `(layer, expert)` pairs used to construct each cache map; both backends
-reported the same slot count and profile at startup. The 4,000-slot profile
-prefix hash is `6edcb2fedb58c628fc954a3ac581816dfb3453e3474a158b33cf98cffa1f4e85`.
+The startup profile is a ranked list with no profile eviction, but adaptive
+swaps are enabled by default and exchange profile experts with the GPU cache.
+Thus the runtime map can change during a request. Hashes below cover the ranked
+`(layer, expert)` pairs used to construct the startup cache recipe; they do not
+identify runtime resident IDs. Both backends reported the same slot count and
+profile at startup. The 4,000-slot profile prefix hash is `6edcb2fedb58c628fc954a3ac581816dfb3453e3474a158b33cf98cffa1f4e85`.
 The 3,000-slot prefix hash is `ea9288dd40eedfaecd799054bab3192ee1b5b922b7f790869a53fdc3aa267a01`.
 These are profile-derived map identities, not an independently dumped runtime
 ID array.
@@ -55,8 +57,8 @@ size. The descriptive client-total 95th percentile was 24.43 s for Strata and 23
 
 ## 3,000 versus 4,000 slots with NInfer held fixed
 
-A separate randomized three-pair screen changed only the static cache size
-within strict NInfer. Pair order was 3K→4K, 4K→3K, 3K→4K. All six processes
+A separate randomized three-pair screen changed only the configured cache
+capacity within strict NInfer, with default adaptive swaps active. Pair order was 3K→4K, 4K→3K, 3K→4K. All six processes
 passed; all measured requests returned 64 tokens, and all warmup/measured text
 hashes were identical across configurations. The 3K arm reported 22,321/30,720
 cache hits (72.7%); the 4K arm reported 23,356/30,720 (76.0%). Cache allocation
@@ -72,21 +74,21 @@ rose from 3,955 MiB to 5,273 MiB.
 Decode TPS is the nominated primary for this decode/cache screen. All three
 paired decode effects exceed 5%, and the three-block paired bootstrap interval
 is above zero. Prompt TPS, TTFT and client total also improve; none regresses by
-more than 5%. This is sufficient to advance the cache-size comparison to a
-seven-pair held-out confirmation, not to qualify the 4K profile. The bootstrap
-interval is discrete with only three pairs and should be read as a screen.
-The responses are from a synthetic completion prompt and have no independent
-quality oracle. The next confirmation must use held-out retrieval prompts and
-check the expected answer as well as completion behavior.
+more than 5%. The three-pair screen advanced to a seven-pair held-out retrieval confirmation.
+The confirmation found +17.97% and +25.20% median decode TPS for 4K on two
+tasks, with paired intervals above +11.01% and +23.13%; all 28 answers passed.
+This supports 4K with adaptive swaps for the tested 8K/pp512+tg64 retrieval
+domain, not a fixed-residency cache-size effect or general profile qualification.
+See the [held-out confirmation](../2026-10-31-e6-q2-cache-size-confirm/README.md).
 
 Descriptive client-total p95 was 24.17 s for 3K and 23.11 s for 4K (n=3 independent process observations per configuration). Drafted and accepted speculative tokens were zero in every measured request. The full-precision observations, profile-prefix map hashes, and paired
 intervals are in [`cache-size-paired-summary.json`](cache-size-paired-summary.json).
 
 ## Resources and limits
 
-The minimum process-level available RAM across both campaigns was 9.23 GiB in
-the 4K backend screen and 10.15 GiB in the cache-size screen. The cache-size
-screen's peak sampled swap was 1.94 GiB; sampled cgroup OOM-kill counts were
+The minimum process-level available RAM across both initial campaigns was
+9.23 GiB in the 4K backend screen and 10.15 GiB in the 3K/4K screen. The latter
+screen peak sampled swap was 1.94 GiB; sampled cgroup OOM-kill counts were
 zero. The 4K backend screen's peak swap was 1.94 GiB, also with zero OOM kills.
 Clock reads were observation-only: CPU frequencies ranged 729.6–2,201.6 MHz,
 GPU frequencies 306–1,300.5 MHz; EMC readback was denied. Clocks remained
@@ -97,6 +99,6 @@ service or system settings were changed.
 ## Decision
 
 Keep NInfer opt-in. The 4,000-slot backend comparison is tied at the end-to-end
-screen threshold. The 3K-to-4K cache-size change shows a promising decode
-throughput screen result but needs held-out correctness and seven-pair
-confirmation. No release profile or general quality claim follows.
+screen threshold. The 3K-to-4K configured cache-capacity screen showed a promising decode
+result; seven-pair held-out confirmation passed on two retrieval tasks with
+4K plus adaptive swaps, scoped to 8K context and pp512+tg64. No release profile or general quality claim follows.

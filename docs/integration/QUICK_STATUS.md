@@ -2,10 +2,13 @@
 
 Updated: 2026-10-31
 
-A same-build NInfer cache-size screen found a promising 3K→4K decode result
-(+6.33%, three paired blocks; 72.7%→76.0% hit rate), with 10.15 GiB minimum
-available RAM. It has no independent quality oracle yet; the 4K profile is
-awaiting seven-pair held-out retrieval confirmation. [Results](../../bench/results/2026-10-31-e6-q2-cache-size-screen/README.md).
+A seven-pair held-out comparison found that 4K configured cache capacity with
+default adaptive swaps improved decode TPS over 3K by 17.97% and 25.20% on two
+Q2_0 retrieval tasks at 8K context (paired intervals +11.01% to +22.88% and
++23.13% to +28.28%). All 28 answers passed; minimum sampled available RAM was
+10.25 GiB, with zero OOM kills. This is scoped to pp512+tg64 and does not
+establish fixed residency or a general profile. NInfer-vs-Strata remains below
+the 5% screen threshold. [Confirmation](../../bench/results/2026-10-31-e6-q2-cache-size-confirm/README.md).
 
 Layer-1 expert-3 forced-owner repeats now match locally through layer 2 but
 not across full GDN state: the second forced-CPU run differs from the first by

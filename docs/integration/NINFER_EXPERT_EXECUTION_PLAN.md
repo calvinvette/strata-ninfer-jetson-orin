@@ -2535,17 +2535,15 @@ and leave E6 open. See the [repeat report](../../bench/results/2026-10-31-e6-q2-
 and [comparison JSON](../../bench/results/2026-10-31-e6-q2-owner-intervention/layer1-forced-repeat-gdn.json).
 
 
-**E6 static cache-size screen (2026-10-31):** a same-build, randomized
-three-pair 3,000-versus-4,000-slot strict-NInfer screen at 8K context and
-pp512+tg64 raised median decode TPS by `6.33%` (paired bootstrap interval
-`5.61%` to `6.91%`). Prompt TPS improved `4.10%`, first-visible TTFT `3.75%`,
-and client total `4.44%`; all paired effects favored 4K, and none regressed by
-more than 5%. The observed decode cache-hit rate rose from `72.7%` to `76.0%`.
-Minimum process-level RAM was `10.15 GiB`; OOM kills were zero. Warmup and
-measured output text matched across arms, but the synthetic workload has no
-independent quality oracle. Advance to seven-pair confirmation with held-out
-retrieval prompts before considering any profile qualification. Separately, a
-three-pair 4K backend screen found only `3.38%` median decode improvement for
-NInfer over Strata and no other 5% effect, so no backend confirmation is
-warranted there. See the [cache-size report](../../bench/results/2026-10-31-e6-q2-cache-size-screen/README.md)
-and its [paired summaries](../../bench/results/2026-10-31-e6-q2-cache-size-screen/cache-size-paired-summary.json).
+**E6 Q2_0 cache-policy confirmation (2026-10-31):** the three-pair 3K/4K
+screen was followed by seven randomized held-out pairs at 8K context, pp512+tg64.
+With NInfer held fixed and default adaptive swaps active, 4K delivered +17.97%
+median decode TPS on retrieval task 1 (95% paired interval +11.01% to +22.88%)
+and +25.20% on task 2 (+23.13% to +28.28%). All 28 measured outputs began
+with the expected answer and contained 64 tokens. Minimum process-sampled
+available RAM was 10.25 GiB; maximum sampled swap was 2.66 GiB; sampled OOM
+kills were zero. This is a candidate 4K-plus-adaptive-swaps policy for this
+workload domain, not a fixed-residency effect, general profile, or release
+qualification. The separate 4K NInfer-versus-Strata screen remains below 5%.
+E6/E7 remain open. See the [confirmation](../../bench/results/2026-10-31-e6-q2-cache-size-confirm/README.md)
+and [initial screen](../../bench/results/2026-10-31-e6-q2-cache-size-screen/README.md).
