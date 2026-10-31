@@ -7809,3 +7809,15 @@ were observed without changing them, EMC readback was denied, and energy was not
 measured. The finding is limited to one held-out 512-token prompt and 64-token
 completion. Broader E6 quality/context coverage and E7 release assessment
 remain open. See the [paired report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
+
+**E6 second held-out task replication (2026-10-31):** a tokenizer-verified
+512-token alpine seed-catalog lookup returned the exact `MAPLE-6159` answer in
+all three screen pairs and seven confirmation pairs. With the same fixed
+resident maps and strict NInfer, learned-map decode improved +113.5% in
+confirmation (4.80 to 10.25 tok/s; paired 95% interval +109.8% to +117.3%), GPU
+cache hits increased 22.1% to 73.8%, prompt throughput improved 18.0%, TTFT fell
+15.3%, and client time fell 27.9%. Full response explanations differed between
+maps, so this confirms exact-answer retrieval only. Minimum available RAM was
+9.18 GiB, sampled cgroup OOM kills remained zero, and no clock controls were
+changed. This is a second prompt in the same synthetic lookup family, not broad
+quality qualification. See the [fixed-map report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).

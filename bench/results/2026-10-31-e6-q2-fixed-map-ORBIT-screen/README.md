@@ -1,4 +1,4 @@
-# Q2_0 fixed-map and backend comparison on ORBIT
+# Q2_0 fixed-map and backend comparison on held-out tasks
 
 Date: 2026-10-31. Hardware: Jetson AGX Orin, CUDA backend. This experiment
 measured a held-out prompt, not a representative workload suite.
@@ -99,18 +99,29 @@ that backend effects are exactly zero.
 ## Limits and interpretation
 
 The learned profile was trained from prior Q2_0 routing observations, then
-measured on the separate ORBIT task with adaptation disabled. This is held-out
-for the task but remains one task, one model, one prompt size and one output
-size. Exact retrieval and exact paired text are a narrow functional check, not
-semantic grading or broad quality qualification. These results do not qualify
-other contexts, prompt lengths, models, memory budgets, or sustained service
-loads.
+measured on two separate exact-lookup prompts with adaptation disabled. The
+second prompt changed the catalog subject and answer to alpine seed samples
+and `MAPLE-6159`; it was verified as exactly 512 prompt tokens with Strata's
+tokenizer. Across three screen pairs and seven confirmation pairs, learned-map
+decode improved 114.5% in the screen and 113.5% in confirmation (4.80 to 10.25
+tok/s; paired bootstrap 95% interval +109.8% to +117.3%). Prompt throughput
+improved 18.0%, first visible token latency fell 15.3%, and client request time
+fell 27.9%. GPU hit rate increased from 22.1% to 73.8%. All 20 processes passed
+the exact `MAPLE-6159` prefix check. Full explanatory text differed between
+maps, so this does not claim text equivalence or semantic grading.
+
+Both prompts are synthetic exact lookups with the same general request shape.
+The evidence now covers two held-out prompts, one model, one prompt size and
+one output size. It is still not broad quality qualification. These results do
+not qualify other contexts, prompt lengths, models, memory budgets, or sustained
+service loads.
 
 The primary finding is that a fixed 5K residency map with more useful experts
-in GPU memory can nearly double decode speed in this setup, under either
-backend. The same-map screens did not show a 5% NInfer end-to-end gain. Continue
-the planned context/workload matrix and broader quality/state gates before
-changing release defaults or claiming NInfer acceleration.
+in GPU memory can more than double decode speed on these two exact-lookup
+prompts, under NInfer; the ORBIT map effect was also confirmed under Strata.
+The same-map screens did not show a 5% NInfer end-to-end gain. Continue the
+planned context/workload matrix and broader quality/state gates before changing
+release defaults or claiming NInfer acceleration.
 
 Pair-level values, response hashes and memory/clock summaries are in
 [`evidence.json`](evidence.json). Raw process captures remain under
