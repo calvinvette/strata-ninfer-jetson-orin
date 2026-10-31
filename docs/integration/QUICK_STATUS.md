@@ -1018,9 +1018,9 @@ Live one-position owner interventions now cover layer-1 expert 3 at position
 matches the fixed arm byte-for-byte with exact inputs/routes; its full-state GDN
 comparison first grows beyond `1e-8` at layer 15, without a matched repeat to
 attribute that drift. The former matched adaptive layer-1/2 captures exactly.
-Both requests passed above 8.4 GiB RAM. Two forced-CPU checkpoints and two
-adaptive full-state checkpoints match byte-for-byte within their arms. The
-layer-5 owner switch causes reproducible GDN drift first material at layer 15
-for this request, with identical output tokens. This establishes a bounded
-state effect, not a quality or speed benefit. HIP and SYCL built on maestro1;
-only HIP could start without device limits. E6/E7 remain open. [Reports](../../bench/results/2026-10-31-e6-q2-owner-intervention/README.md).
+Requests passed above 8.4 GiB RAM. Repeated layer-5 and layer-13 CPU interventions
+and adaptive controls match byte-for-byte within arms. Both owner switches
+produce reproducible later GDN drift (first material at layers 15 and 18), with
+identical output tokens. These are bounded state effects, not quality or speed
+benefits. HIP and SYCL built on maestro1; only HIP could start without device
+limits. E6/E7 remain open. [Reports](../../bench/results/2026-10-31-e6-q2-owner-intervention/README.md).

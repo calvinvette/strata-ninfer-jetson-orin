@@ -61,6 +61,11 @@ two adaptive controls match byte-for-byte within their respective arms. Their
 cross-arm comparison ties the layer-5 owner switch to a later GDN state change
 at layer 15 for that request.
 
+A third intervention at layer 13 expert 474 is documented in
+[layer13-expert474-intervention.md](layer13-expert474-intervention.md). Its
+two forced-CPU checkpoints match each other, and the matched adaptive control
+repeats exactly; their comparison first differs materially at GDN layer 18.
+
 ## Interpretation and next step
 
 This closes the single-position local owner-intervention question, not E6 or

@@ -7335,8 +7335,14 @@ byte-identical layer-5 MoE bundle and all-layer GDN checkpoint; available RAM
 was at least 8.48 GiB. A matched adaptive full-state run then reproduced the
 earlier adaptive GDN checkpoint byte-for-byte. Together, two exact repeats per
 arm attribute the first material difference at GDN layer 15 to this owner
-intervention for the sampled request/checkpoint. This does not establish a
-quality impact, performance benefit, or general explanation for other drift.
+intervention for the sampled request/checkpoint. A second intervention forced
+layer-13 expert 474 to CPU at position 65,540 with exact adaptive inputs,
+routes and weights. Its expert-parts and combined-output deltas versus adaptive
+GPU were `3.56e-8` and `6.44e-8`; two forced checkpoints matched each other and
+the adaptive full-state control repeated exactly. Its first material GDN
+difference occurs at layer 18 (global relative L2 `0.008878`). This attributes
+a second bounded state effect for the sampled request. Neither result establishes
+a quality impact, performance benefit, or general explanation for other drift.
 Instrumented rates are excluded; energy was not measured.
 The hook defaults off. CUDA built and ran on Orin; maestro1 rebuilt HIP and
 SYCL with one job, HIP help passed, and SYCL startup was unavailable because
