@@ -286,11 +286,31 @@ sampled OOM kills. Raw files and supervisor data remain in `/tmp/e6-65k-fixed-pr
 `/tmp/e6-65k-adaptive-prefix8-gdn-dump-supervisor/` on Orin. These are
 instrumented state diagnostics, not performance measurements.
 
+### Layer-2 MoE input and route comparison
+
+The same pair also captured layer-2 MoE inputs, routed expert IDs and final
+owner kinds at positions 65,536–65,542 (the seven generated-token dispatches
+after the first accepted token). All seven route-ID and owner-kind arrays
+matched between fixed and adaptive arms. There were 61 CPU-owned and nine
+GPU-owned expert rows across these seven dispatches in each arm. The captured
+layer-2 input activations matched exactly at six positions. At position
+65,540, 798 of 2,560 float values differed; maximum absolute difference was
+`2.4e-7`, relative L2 was `5.12e-8`. The route IDs and owners at that dispatch
+still matched. These activations enter layer 2's MoE, so this observation
+places a small input delta before that layer's MoE output; it does not identify
+where the upstream delta originated or explain the larger recurrent-state
+difference at prefix 8. The paired output-token hash and raw prefix-8 GDN
+hashes reproduce the prior capture exactly. Minimum available RAM was 9.28 GB
+fixed-owner and 9.16 GB adaptive; both runs passed with zero sampled OOM kills.
+Route/activation files and supervisor logs remain in the corresponding
+`/tmp/e6-65k-{fixed,adaptive}-layer2-route*` paths on Orin.
+
 ## Next diagnostic
 
-Inspect the active-expert route, residency, and arithmetic path for model
-layer 2 around accepted commits 2–8, using an independent oracle to distinguish
-an owner-transfer effect from numerical or ordering variation. Keep causality
-open until the state change is tied to a specific event. Matching QSA
-fingerprints are not raw-byte parity; capture QSA bytes if their aggregate
-mismatch becomes relevant to that causal trace.
+Inspect model layer 1's routed MoE inputs and per-expert outputs over the same
+positions, especially the source of the layer-2 input delta at position
+65,540. Use a deterministic independent oracle to separate owner-transfer
+effects from small activation or arithmetic drift. Keep causality open until
+the state change is tied to a specific event. Matching QSA fingerprints are
+not raw-byte parity; capture QSA bytes if their aggregate mismatch becomes
+relevant to that causal trace.

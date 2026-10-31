@@ -938,3 +938,6 @@ residency is enabled. The first raw difference is in zero-based model layer 2;
 the distinct 8K replay-boundary dump first differs in GDN allocation 3. This
 localizes state divergence but not its cause. E6/E7 remain open; see the
 [paired diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
+Layer-2 routes and owners matched across the first seven generated positions;
+one upstream input row showed a small delta before its MoE. The next probe is
+layer 1 around that position.

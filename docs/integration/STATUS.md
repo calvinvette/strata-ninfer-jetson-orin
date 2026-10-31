@@ -7407,6 +7407,15 @@ adaptive, with no sampled OOM kills. This narrows where state first differs,
 not why; E6/E7 remain open. Raw dumps remain outside Git. See the
 [updated diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
 
+A matched layer-2 MoE capture at positions 65,536–65,542 found identical route
+IDs and owner kinds in both arms. The layer-2 input activations matched at six
+positions; at 65,540, 798/2,560 values differed (maximum absolute `2.4e-7`,
+relative L2 `5.12e-8`) before that layer's MoE. The prefix-8 GDN and output
+hashes reproduced the prior pair. The next probe moves upstream to layer 1 and
+does not yet explain the recurrent-state delta. Minimum available RAM was
+9.28 GB fixed-owner and 9.16 GB adaptive, with zero sampled OOM kills. See the
+[diagnostic](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
+
 **E7 current-source portability rebuild (2026-10-30):** full HIP and SYCL
 target trees rebuilt at source `4229c00e` on maestro1 with one-job builds. HIP
 `strata --help` passed and the host-only `shared_memory_budget_test` passed.

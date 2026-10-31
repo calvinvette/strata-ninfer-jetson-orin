@@ -2379,6 +2379,14 @@ established. These captures localize state movement, not its cause. E6/E7
 remain open; instrumented rates are diagnostic only. See the
 [Report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/adaptive-long-prefix-state-diagnostic.md).
 
+A matched layer-2 MoE capture at positions 65,536–65,542 found identical route
+IDs and owner kinds in both arms. The layer-2 input activations matched at six
+positions; at 65,540, 798/2,560 values differed (maximum absolute `2.4e-7`,
+relative L2 `5.12e-8`) before that layer's MoE. The prefix-8 GDN and output
+hashes reproduced the prior pair. The next diagnostic moves one layer earlier
+to capture layer-1 MoE inputs and expert outputs around that position. This is
+localization evidence only, not a causal attribution or performance result.
+
 **Current-source portability rebuild (2026-10-30):** full HIP and SYCL target
 trees rebuilt at source commit `d321286f` on maestro1 with one build job. HIP
 `strata --help` and the host-only shared-memory budget CTest passed. SYCL
