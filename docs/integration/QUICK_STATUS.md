@@ -6,6 +6,8 @@ An opt-in Nsight graph-node diagnostic showed NInfer D3/D4 plus SwiGLU kernels a
 
 A new three-pair 5K adaptive-cache NIMBUS screen reached 76.0% GPU expert hits after warmup in both backends, yet NInfer decode TPS was 1.08% lower at the paired median; all measured outputs matched. No 5% gain or follow-up confirmation. [Report](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/README.md).
 
+A correctness-only adaptive-state pair matched Strata and NInfer final fingerprints at both request ordinals. But identical warmup and measured prompts produced different state hashes and text by ordinal in both backends, so shared request-history variation remains open. [State record](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/state-parity.json).
+
 A fixed-map follow-up ranked 5K resident experts from the workload's own route trace (85.23% trace coverage) and disabled adaptation. NInfer decode TPS was +1.19% at the paired median (95% screen interval −0.25% to +2.50%); all outputs and the 84.9% hit rates matched. This oracle profile still shows no 5% effect and is not deployable. [Report](../../bench/results/2026-10-31-e6-q2-ninfer-fixed-route-5k-screen/README.md).
 
 A separate one-pair, hash-instrumented check with that fixed map matched all final persistent-state fingerprints across both backends and both same-process requests. Bounded final-state evidence only; no accepted-prefix or byte-level claim. [State record](../../bench/results/2026-10-31-e6-q2-ninfer-fixed-route-5k-screen/state-parity.json).

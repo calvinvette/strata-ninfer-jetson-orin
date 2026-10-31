@@ -3392,6 +3392,14 @@ cannot support a deployment claim. For a future Strata/Splash integration,
 pair identical residency maps before attributing end-to-end effects to an
 operator backend. See the [fixed-map screen](../../bench/results/2026-10-31-e6-q2-ninfer-fixed-route-5k-screen/README.md).
 
+An adaptive-policy correctness pair then matched all final-state fingerprints
+between Strata and NInfer at each request ordinal. The same process's repeated
+identical prompt nevertheless changed response and recurrent-state hashes in
+both backends. For a future Strata/Splash port, compare backend state by
+matched request ordinal and also repeat identical requests within each backend;
+cross-backend parity alone can hide a shared request-history effect. See the
+[adaptive state record](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/state-parity.json).
+
 For a future Strata/Splash backend, measure the optimized operation's share of
 the whole request before spending time on its isolated microbenchmark. When
 work is captured in command graphs, verify whether the profiler reports graph

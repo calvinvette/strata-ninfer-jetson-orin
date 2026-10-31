@@ -1,0 +1,58 @@
+{
+  "scope": "one correctness-only fresh-process Strata/NInfer pair with final persistent-state hashing enabled; no performance inference",
+  "model_profile_sha256": "b3e62120218cd96d175a0547530158869177dd2164b22b40f32bea7d7e85fb8c",
+  "adaptive_policy": {
+    "every_windows": 4,
+    "max_swaps_per_round": 96,
+    "warmup_gpu_hit_rate": "52.4% (32180/61440)",
+    "measured_gpu_hit_rate": "76.0% (46694/61440)"
+  },
+  "request_sequence_per_process": ["warmup NIMBUS retrieval, 512 prompt + 128 output", "measured NIMBUS retrieval, 512 prompt + 128 output"],
+  "all_four_requests_passed": true,
+  "all_four_exact_prefixes_passed": true,
+  "response_sha256_by_request_ordinal": [
+    "576272a200f58b5b0a72f489ac1a2019098ec2939ac1480a2531f90a8e337cd2",
+    "1719e86b58f64cf00c23749b67feacac453c76684a351ca0480d026111124e77"
+  ],
+  "persistent_state_scope": "final request state fingerprint after each response; not accepted-prefix state or full byte-level comparison",
+  "state_hashes_by_request_ordinal": [
+    {
+      "L": 639,
+      "gdn": "8594f48087c5eb15",
+      "ple": "2d04626b5d78870b",
+      "tail": "b4811869a72fcd1f",
+      "pooled": "f581c0274f87f5f2",
+      "kv": "0d1dfafbd41a6f23",
+      "mtp": "14650fb0739d0383",
+      "stale": "011a3fe290018383",
+      "dead": "76214e6986cead1e",
+      "pooled_full": "93bbc4f2db57dd83",
+      "ple_prev": "51202,1"
+    },
+    {
+      "L": 639,
+      "gdn": "5a48681b98893cc8",
+      "ple": "0cdbb471f8ac3c59",
+      "tail": "862a0962b97ae942",
+      "pooled": "2e1c5cedca9ab9e5",
+      "kv": "31469a4f24bcc94b",
+      "mtp": "14650fb0739d0383",
+      "stale": "011a3fe290018383",
+      "dead": "76214e6986cead1e",
+      "pooled_full": "4c2fb0d92bf5d5b4",
+      "ple_prev": "56127,52870"
+    }
+  ],
+  "comparison": {
+    "strata_and_ninfer_match_at_warmup_ordinal": true,
+    "strata_and_ninfer_match_at_measured_ordinal": true,
+    "warmup_and_measured_state_match_within_process": false,
+    "warmup_and_measured_response_hash_match": false
+  },
+  "interpretation": "Final persistent states agree across backends at each request ordinal, while both backends show the same request-ordinal state and text change. This is a shared request-history observation, not proof of a cause or repeatable state across requests.",
+  "minimum_available_host_memory_gib": {
+    "strata": 8.951,
+    "ninfer": 9.023
+  },
+  "limit": "single workload, one process pair, same adaptive policy; supports only this bounded final-state comparison"
+}

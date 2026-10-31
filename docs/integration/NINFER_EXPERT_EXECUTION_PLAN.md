@@ -2634,6 +2634,15 @@ TPS was tied and TTFT/client medians slightly favored Strata. No metric met the
 map was not hashed, this is a backend screen under matched policy rather than
 a strict route-replay ablation. See the [adaptive 5K report](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/README.md).
 
+**E6 adaptive 5K final-state check (2026-10-31):** one separate hash-instrumented
+pair matched all ten final persistent-state fingerprints across Strata and
+NInfer at both the warmup and measured request ordinals. Within each backend,
+the repeated request ordinals had different response hashes and differed in
+GDN, PLE, tail, pooled, KV, pooled-full and previous-embedding fingerprints.
+This is a shared request-order change, not cross-backend divergence; its cause
+and repeatability remain unresolved. The traced run supplies no performance
+evidence. See the [state record](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/state-parity.json).
+
 **E6 fixed route-ranked 5K-residency screen (2026-10-31):** a trace-ranked
 profile gave both backends the same fixed 5,000 resident slots, covering 85.23%
 of the exact NIMBUS route trace; adaptation was disabled. Across three pairs,

@@ -85,3 +85,17 @@ general task quality, long-context parity or exact persistent-state equality.
 The 5K adaptive profile is not recommended as a default. E6 remains open for
 its wider quality and workload gates; E7 still proposes no NInfer release
 profile.
+
+## Correctness-only persistent-state check
+
+One additional Strata/NInfer pair repeated the warmup and measured request
+with final-state hashing enabled. The two backends matched each of the ten
+recorded persistent-state fields at both request ordinals, and their response
+hashes matched by ordinal. Within each backend, however, the warmup and
+measured final states differed in GDN, PLE, tail, pooled, KV, pooled-full and
+previous-embedding fields; the response hashes also differed by request
+ordinal. Thus this pair shows cross-backend state agreement alongside a
+shared request-order change. It does not establish repeatability across
+requests or identify the source of the change. Minimum available host memory
+was 8.95 GiB for Strata and 9.02 GiB for NInfer. Hashing timings are excluded.
+See [`state-parity.json`](state-parity.json).
