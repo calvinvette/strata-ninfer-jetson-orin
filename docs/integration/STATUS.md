@@ -7332,11 +7332,12 @@ adaptive GPU, expert-parts and combined-output relative L2 were `3.86e-8` and
 `5.77e-8`. The full GDN state differs from adaptive at `0.002588`, first above
 `1e-8` at layer 15. A second forced-CPU run repeated the same tokens and had a
 byte-identical layer-5 MoE bundle and all-layer GDN checkpoint; available RAM
-was at least 8.48 GiB. This establishes forced-arm repeatability, but a matched
-adaptive full-state repeat under the same capture setup is still missing, so
-whole-model attribution remains open. These results support local owner-effect
-attribution only, not a performance benefit. Instrumented rates are excluded;
-energy was not measured.
+was at least 8.48 GiB. A matched adaptive full-state run then reproduced the
+earlier adaptive GDN checkpoint byte-for-byte. Together, two exact repeats per
+arm attribute the first material difference at GDN layer 15 to this owner
+intervention for the sampled request/checkpoint. This does not establish a
+quality impact, performance benefit, or general explanation for other drift.
+Instrumented rates are excluded; energy was not measured.
 The hook defaults off. CUDA built and ran on Orin; maestro1 rebuilt HIP and
 SYCL with one job, HIP help passed, and SYCL startup was unavailable because
 the host has no SYCL device. E6/E7 remain open. [Reports and comparison

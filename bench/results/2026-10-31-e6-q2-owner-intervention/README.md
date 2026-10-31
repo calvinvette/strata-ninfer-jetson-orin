@@ -56,7 +56,10 @@ not copied into Git.
 
 A second intervention at the earlier sampled owner transition is documented
 in [layer5-expert220-intervention.md](layer5-expert220-intervention.md), with
-its own local MoE and full-state comparisons.
+its own local MoE and full-state comparisons. Two forced-CPU checkpoints and
+two adaptive controls match byte-for-byte within their respective arms. Their
+cross-arm comparison ties the layer-5 owner switch to a later GDN state change
+at layer 15 for that request.
 
 ## Interpretation and next step
 

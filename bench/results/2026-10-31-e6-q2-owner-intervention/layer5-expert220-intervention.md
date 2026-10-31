@@ -31,17 +31,21 @@ The full 36-layer GDN checkpoint after eight generated positions differs from
 the prior adaptive checkpoint at global relative L2 `0.002588` and from the
 fixed checkpoint at `0.010880`. Layers 0–14 remain below relative L2 `1e-8`
 versus adaptive; the first larger differences appear at layer 15 and grow in
-deeper layers. At the time of the first capture there was no repeated full-state
-control, so the deeper difference was not attributable.
+deeper layers.
 
 A second forced-CPU run repeated the same prompt, dispatch, instrumentation and
 generation. It returned the same token IDs, and both its captured layer-5 MoE
 bundle and complete 36-layer GDN checkpoint were byte-identical to the first
-forced-CPU run. Minimum available memory was 8.48 GiB on the repeat. This shows
-the forced arm is repeatable for this capture, but a matched adaptive full-state
-repeat under this same instrumentation is still needed to attribute the
-adaptive-versus-forced deep-state difference. See
-[`layer5-forced-cpu-repeatability.json`](layer5-forced-cpu-repeatability.json).
+forced-CPU run. Minimum available memory was 8.48 GiB on the repeat. A matched
+adaptive full-state run then reproduced the earlier adaptive checkpoint
+byte-for-byte, and the forced and adaptive output token hashes also matched.
+These exact repeat controls attribute this request's later GDN state change to
+the forced CPU-versus-adaptive GPU owner at layer 5 expert 220: the first
+material checkpoint difference appears at layer 15. This is a bounded causal
+result for this request and checkpoint. It does not establish a quality impact,
+performance gain, or explain other request/state drift. See
+[`layer5-forced-cpu-repeatability.json`](layer5-forced-cpu-repeatability.json)
+and [`layer5-adaptive-control-repeatability.json`](layer5-adaptive-control-repeatability.json).
 
 Machine-readable bundle comparisons are `layer5-forced-v-adaptive-moe.json`
 and `layer5-forced-v-fixed-moe.json`. Whole-model GDN comparisons are
