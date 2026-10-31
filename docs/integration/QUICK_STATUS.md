@@ -1013,11 +1013,11 @@ match their respective owners bit-for-bit, differing by `1.05e-7`. Route
 weight and shared output also move, so the combined MoE delta has more than one
 component. [Oracle](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer7-expert225-owner-oracle-position65539.json).
 
-The position-65,540 live owner intervention now forces layer-1 expert 3 to CPU
-for one token. In a minimally instrumented capture, layer-1 MoE and layer-2 GDN
-state matched the adaptive reference byte-for-byte. The full accepted-prefix
-GDN checkpoint matched exactly through layers 0–2; deeper differences were
-similar in size to fixed/adaptive repeat variation, so no whole-model causal
-effect is claimed. The opt-in hook passed a supervised Orin request with more
-than 8.5 GiB RAM available. HIP and SYCL also built on maestro1; only HIP could
-start without device limits. E6/E7 remain open. [Report](../../bench/results/2026-10-31-e6-q2-owner-intervention/README.md).
+Live one-position owner interventions now cover layer-1 expert 3 at position
+65,540 and layer-5 expert 220 at position 65,539. The latter forced CPU row
+matches the fixed arm byte-for-byte with exact inputs/routes; its full-state GDN
+comparison first grows beyond `1e-8` at layer 15, without a matched repeat to
+attribute that drift. The former matched adaptive layer-1/2 captures exactly.
+Both requests passed above 8.4 GiB RAM, but neither establishes whole-model
+causality or speed. HIP and SYCL built on maestro1; only HIP could start without
+device limits. E6/E7 remain open. [Reports](../../bench/results/2026-10-31-e6-q2-owner-intervention/README.md).

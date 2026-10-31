@@ -54,6 +54,10 @@ Machine-readable state comparisons are in `forced-v-adaptive-gdn.json`,
 supervisor logs remain in `/tmp/e6-owner3-causal-*` on the test hosts and were
 not copied into Git.
 
+A second intervention at the earlier sampled owner transition is documented
+in [layer5-expert220-intervention.md](layer5-expert220-intervention.md), with
+its own local MoE and full-state comparisons.
+
 ## Interpretation and next step
 
 This closes the single-position local owner-intervention question, not E6 or

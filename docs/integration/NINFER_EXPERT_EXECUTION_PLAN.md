@@ -2407,13 +2407,16 @@ recurrent-state delta after the owner switch: `x` differs slightly, `qkv` and
 `h` remain bit-identical, and gate/beta differ. Holding pre-state and `h` fixed
 while crossing gate/beta reproduces a local recurrent-state delta, attributing
 that update's effect to those inputs. This remains a captured-input
-counterfactual, not a whole-request cause. A one-position live intervention now
-forces layer-1 expert 3 to CPU at position 65,540: the minimally instrumented
-capture matches the adaptive layer-1 MoE and layer-2 GDN captures byte-for-byte.
-With whole-model accepted-prefix state dumping enabled, layers 0–2 remain exact
-but deeper GDN state differs at a scale similar to the fixed/adaptive repeat
-control. This does not establish a whole-model intervention effect. Keep E6/E7
-open; no performance claim follows. See the [owner intervention report](../../bench/results/2026-10-31-e6-q2-owner-intervention/README.md), [downstream counterfactual report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-expert3-layer2-gdn-counterfactual-65540.md), and [bounded owner scan](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer0-2-owner-window-65536-65542.md).
+counterfactual, not a whole-request cause. Two one-position live interventions
+now reverse sampled adaptive GPU promotions to CPU. At layer 1 expert 3,
+position 65,540, the minimally instrumented capture matches the adaptive
+layer-1 MoE and layer-2 GDN captures byte-for-byte. At layer 5 expert 220,
+position 65,539, the intervention matches the fixed arm's expert row and
+combined layer output exactly while preserving the adaptive profile otherwise.
+Whole-model accepted-prefix captures show small or delayed deeper GDN deltas,
+but lack matched full-state repeats for each intervention; they do not establish
+a whole-model causal effect. Keep E6/E7 open; no performance claim follows. See
+the [owner intervention report](../../bench/results/2026-10-31-e6-q2-owner-intervention/README.md), [downstream counterfactual report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-expert3-layer2-gdn-counterfactual-65540.md), and [bounded owner scan](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer0-2-owner-window-65536-65542.md).
 
 A matched layer-0 capture over positions 65,536–65,542 supplies a negative
 control: routes, owner kinds, and all MoE input values matched at all seven
@@ -2496,14 +2499,15 @@ it does not test a 128K prompt or complete E6. See the
 [screen report](../../bench/results/2026-10-31-e6-q2-128k-capacity-api-screen/README.md)
 and updated [combined chart](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md#combined-no-trace-api-paired-effect-chart).
 
-**E6 one-position owner intervention (2026-10-31):** an opt-in diagnostic hook
-forced layer-1 expert 3 to CPU at position 65,540. The 65K-token request passed
-with identical 32 generated token IDs and at least 8.56 GiB available RAM. The
-minimally instrumented layer-1 MoE and layer-2 GDN captures matched the adaptive
-reference byte-for-byte. In an accepted-prefix full-state capture, GDN layers
-0–2 matched exactly; deeper-state drift was comparable to the fixed/adaptive
-control (global relative L2 0.01078 versus 0.01085 for that control). Treat this
-as local counterfactual evidence only; no whole-model, quality or performance
-claim follows. CUDA built and ran on Orin; HIP and SYCL compiled on maestro1,
-with HIP help passing and SYCL device startup unavailable. E6/E7 remain open.
-See the [intervention report](../../bench/results/2026-10-31-e6-q2-owner-intervention/README.md).
+**E6 exact-position owner interventions (2026-10-31):** the opt-in hook forced
+layer-1 expert 3 to CPU at position 65,540 and layer-5 expert 220 to CPU at
+position 65,539. Both 65K +32 requests passed with the same token IDs as their
+references and at least 8.47 GiB available RAM. The layer-1 intervention
+matched the adaptive layer-1 MoE and layer-2 GDN captures byte-for-byte. At
+layer 5, inputs/routes were exact and the forced CPU row and combined layer
+output matched the fixed arm byte-for-byte. Full-state GDN differences were
+small or delayed relative to adaptive, but each intervention lacks matched
+full-state repeats, so no whole-model causal, quality or performance conclusion
+follows. CUDA built and ran on Orin; HIP and SYCL compiled on maestro1, with HIP
+help passing and SYCL device startup unavailable. E6/E7 remain open. See the
+[intervention reports](../../bench/results/2026-10-31-e6-q2-owner-intervention/README.md).
