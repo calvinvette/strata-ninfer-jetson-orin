@@ -27,14 +27,18 @@ release profile is **not achieved**.
 Nsight Systems graph-node collection exposed the strict NInfer Q2_0 expert
 kernels for a pp512+tg32 request. Across one warmup and one measured request,
 D3, D4 and SwiGLU quantization summed to 287 ms, about 0.95% of total summed
-CUDA kernel-event durations. Wait-flag, dequantization and other kernels made
-up much of the remaining event time. Kernel-event durations can overlap, and
-the trace is diagnostic only; this percentage is not a request wall-time
-budget. The Strata type-42 matmul work remains mixed and cannot be cleanly
+CUDA kernel-event durations. A follow-up union of the timestamp intervals
+found only 105 ms overlap across 30.250 s of summed NInfer kernel duration;
+the identified kernels occupy 0.95% of the 30.145-second GPU-active interval
+union. Wait-flag, dequantization and other kernels made up much of the
+remaining event time. This is a share of GPU-active time, not request wall
+time or an end-to-end speedup ceiling; CPU/GPU overlap and profiler overhead
+remain. The Strata type-42 matmul work remains mixed and cannot be cleanly
 divided into dense and expert operations here. The profile supports limited
-request-level headroom from the grouped expert kernels alone, not a release
-performance claim. See the
-[kernel diagnostic](../../bench/results/2026-10-31-e6-q2-ninfer-kernel-share-diagnostic/README.md).
+headroom from the grouped expert kernels alone for this workload, not a
+release performance claim. See the
+[kernel diagnostic](../../bench/results/2026-10-31-e6-q2-ninfer-kernel-share-diagnostic/README.md)
+and its [`kernel-union derivation`](../../bench/results/2026-10-31-e6-q2-ninfer-kernel-share-diagnostic/analyze_kernel_union.py).
 
 ### 2026-10-31 2K-prompt backend screen
 
