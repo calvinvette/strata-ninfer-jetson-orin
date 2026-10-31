@@ -2654,6 +2654,11 @@ localizes the first sampled within-process change to the final prefill segment
 after residency changed, without proving an exact slot-level cause. The
 instrumented run is not performance evidence. See the [boundary report](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/boundary-capture.json).
 
+The first per-layer GDN samples at layers 5, 13, 16 and 18 matched across
+repeated request ordinals at every prefill checkpoint, despite the differing
+aggregate GDN fingerprint. These selected layers do not exhaustively locate
+the changed state; the other GDN allocations remain unexamined in this pair.
+
 **E6 fixed route-ranked 5K-residency screen (2026-10-31):** a trace-ranked
 profile gave both backends the same fixed 5,000 resident slots, covering 85.23%
 of the exact NIMBUS route trace; adaptation was disabled. Across three pairs,

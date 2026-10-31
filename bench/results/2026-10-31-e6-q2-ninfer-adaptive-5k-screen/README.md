@@ -117,3 +117,10 @@ after the adaptive cache had changed. It does not identify the exact slot or
 prove that migration caused the state change. See
 [`boundary-capture.json`](boundary-capture.json); state-hash timings are not
 performance measurements.
+
+Follow-up per-layer prefill traces found that recurrent-state fingerprints at
+GDN layers 5, 13, 16 and 18 match across the two request ordinals at every
+sampled chunk. Layer 15 was rejected because it is QSA, not GDN. These selected
+layers do not explain the changed aggregate GDN hash; the other GDN layers and
+aggregate components remain to be checked. Raw layer snapshots stay under
+`/tmp/e6-ninfer-adapt-5k/` and their hashes are recorded in the boundary JSON.

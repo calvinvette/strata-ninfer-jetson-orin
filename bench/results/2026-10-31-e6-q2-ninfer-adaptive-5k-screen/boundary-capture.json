@@ -10,7 +10,10 @@
     "actual_prompt_boundary_position": 511,
     "note": "The explicit prefill checkpoints appeared at 128, 256 and 384; the engine's prompt-boundary fingerprint reported position 511. No checkpoint was emitted at requested position 512."
   },
-  "workload_per_process": ["warmup NIMBUS-7319, 512 prompt + 128 output", "measured NIMBUS-7319, 512 prompt + 128 output"],
+  "workload_per_process": [
+    "warmup NIMBUS-7319, 512 prompt + 128 output",
+    "measured NIMBUS-7319, 512 prompt + 128 output"
+  ],
   "adaptive_exchanges_cumulative": {
     "after_warmup": 684,
     "after_measured_request": 1142,
@@ -154,5 +157,59 @@
     "strata": 9.014,
     "ninfer": 9.044
   },
-  "limit": "one workload, one process pair, sampled checkpoints only; full state bytes and exact resident-map hashes were not captured"
+  "limit": "one workload, one process pair, sampled checkpoints only; full state bytes and exact resident-map hashes were not captured",
+  "selected_gdn_layer_prefill_traces": {
+    "scope": "one Strata process with two identical prompts under adaptive residency; hashes sampled after each prefill chunk; raw state arrays remain under /tmp/e6-ninfer-adapt-5k",
+    "request_ordinals": [
+      "warmup",
+      "measured"
+    ],
+    "layers": {
+      "5": {
+        "boundary_hashes": [
+          "98da782c0e7e166e",
+          "549268f273553911",
+          "0c44a0dd3eb12ccc",
+          "72491d1e0e978525"
+        ],
+        "repeated_request_hashes_match": true,
+        "raw_state_sha256": "149ba2f7f6e79934afb96e2199021721e1e3e02400b5460541979094890393a4"
+      },
+      "13": {
+        "boundary_hashes": [
+          "d5c3d69288a17971",
+          "d64700d592913df2",
+          "3f6258f423135184",
+          "31ba9e8dae235104"
+        ],
+        "repeated_request_hashes_match": true,
+        "raw_state_sha256": "2bf77c0e67623dfe3917dabd61ad0c2a892dcb78ba5d0916dbaa7892d1c7c59c"
+      },
+      "16": {
+        "boundary_hashes": [
+          "b502466453b04ad9",
+          "395e17b2606725d5",
+          "3fe12d5e9ab4855a",
+          "f71335985c9445fb"
+        ],
+        "repeated_request_hashes_match": true,
+        "raw_state_sha256": "72dd450655a9885969dbdf531f76be35bb7d4dcd9422bfca76767e2c9cea061e"
+      },
+      "18": {
+        "boundary_hashes": [
+          "edf3041ffc5b11f6",
+          "0ed458264f9a56a7",
+          "9ce17cd11405d3d3",
+          "8d0e2c908b07bffc"
+        ],
+        "repeated_request_hashes_match": true,
+        "raw_state_sha256": "9fa7a47f2198f3258255e11f9ec265f88cb6cf8f2c2cdfdb8bb42ba403407c4b"
+      }
+    },
+    "unsupported_target": {
+      "layer": 15,
+      "reason": "QSA/full-attention layer; prefill GDN state trace accepts GDN layers only; no state result captured"
+    },
+    "interpretation": "The sampled GDN states at layers 5, 13, 16 and 18 match between request ordinals at all four prefill boundaries, while aggregate GDN state differs at the prompt boundary. The divergence remains in other GDN layer states or other parts of the aggregate fingerprint; sampled layers are not an exhaustive localization."
+  }
 }

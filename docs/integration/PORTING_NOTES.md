@@ -3408,6 +3408,11 @@ final response state alone cannot locate a request-history split. The API
 capture harness must be checked to ensure its CLI flags actually set the
 runtime environment variables. See the [boundary record](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/boundary-capture.json).
 
+In this pair, sampled GDN states at layers 5, 13, 16 and 18 stayed identical
+across request ordinals even though the aggregate GDN fingerprint changed.
+For Splash, capture selected layer state and full aggregate state together;
+one stable recurrent layer does not rule out divergence elsewhere.
+
 For a future Strata/Splash backend, measure the optimized operation's share of
 the whole request before spending time on its isolated microbenchmark. When
 work is captured in command graphs, verify whether the profiler reports graph
