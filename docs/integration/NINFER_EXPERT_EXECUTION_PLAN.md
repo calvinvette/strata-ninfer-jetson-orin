@@ -2768,3 +2768,16 @@ the three-pair interval remains coarse. The result supports workload/context
 generalization of the residency effect but does not qualify broad quality or
 context behavior. See the [fixed-map
 report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
+
+**E6 actual 4K prompt map confirmation (2026-10-31):** the held-out
+4,096-token retrieval/arithmetic fixture returned its entire exact expected
+answer in all fourteen strict-NInfer confirmation cells (seven randomized
+pairs). The learned fixed map increased decode +54.0% (5.1 to 7.8 tok/s;
+paired bootstrap 95% interval +47.2% to +58.0%), prompt throughput +30.0%,
+and cache hits from 21.5% to 48.2%; first-visible latency fell 23.1% and client
+time 24.0%. Minimum available memory remained 9.16 GiB with no sampled OOM
+kills. This confirms map-driven performance for one 4K synthetic retrieval
+task, not broad semantic quality or an NInfer backend advantage. Next compare
+Strata and strict NInfer with the learned map fixed at the same 4K prompt; then
+extend to held-out task families and larger contexts under the E6 matrix. E6
+and E7 remain open. See the [4K campaign report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).

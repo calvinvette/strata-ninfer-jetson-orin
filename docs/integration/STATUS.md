@@ -7839,3 +7839,20 @@ and exact answers. The decode median missed the 5% gate, so it was not
 confirmed; the interval remains coarse. This gives no demonstrated NInfer
 kernel gain at 2K. Broader semantic quality remains untested. See the
 [fixed-map report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
+
+**E6 actual 4K prompt map confirmation (2026-10-31):** a tokenizer-verified
+4,096-token three-position retrieval/arithmetic fixture returned the full exact
+three-code and suffix-sum string in every measured arm (47 naturally stopped
+tokens). With strict NInfer and the same fixed maps and 6-GiB RAM complement,
+the learned map improved decode +54.0% in seven pairs (5.1 to 7.8 tok/s;
+paired bootstrap 95% interval +47.2% to +58.0%), prompt throughput +30.0%,
+first-visible latency −23.1%, and client time −24.0%. GPU hits rose 21.5% to
+48.2%. Minimum available RAM was 9.16 GiB, sampled cgroup OOM-kill counts
+remained zero, CPU/GPU clocks were observed without control changes, EMC
+readback was denied and energy was not measured. This extends the synthetic
+retrieval residency-map result to one actual 4K prompt; it does not establish
+broad semantic quality or an NInfer-kernel advantage. The report and pair-level
+data are in the [fixed-map report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
+The next discriminating measurement is a same-map Strata-versus-strict-NInfer
+4K screen, followed by additional held-out prompt families and larger context
+sizes if the screen warrants them. E6/E7 remain open.
