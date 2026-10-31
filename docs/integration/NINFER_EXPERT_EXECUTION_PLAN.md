@@ -2700,3 +2700,8 @@ evidence that either map improves answer quality or speed. The verifier-stage
 capture completed; prompt-stage QSA instrumentation at position 510 crashed
 both runs and is excluded. E6 remains open. See the [compute localization
 record](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/resident-map-compute-localization.json).
+The six changed expert rows were also compared with the independent FP64
+Q2_0 × Q8_1 oracle at the shared input. All six GPU-resident NInfer rows were
+closer (`5.86e-8`–`6.21e-8` relative L2) than their file/CPU-owned counterpart
+(`8.94e-8`–`1.01e-7`). This single activation is local arithmetic evidence;
+it does not establish general accuracy or answer quality.

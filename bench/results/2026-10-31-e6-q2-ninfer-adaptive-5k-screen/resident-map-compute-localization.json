@@ -420,5 +420,121 @@
     "Prompt-stage QSA capture at layer 47 position 510 caused engine exit by signal 11 for both map arms; these failed instrumented runs are excluded. Verifier-stage position 511 captures completed.",
     "One request per map; no semantic answer grading and no performance comparison."
   ],
-  "raw_artifacts": "Full MoE bundles, QSA captures, engine logs and failed prompt-stage captures remain under /tmp/e6-ninfer-adapt-5k/maps/matched-complement-profiles/ and are not committed."
+  "raw_artifacts": "Full MoE bundles, QSA captures, engine logs and failed prompt-stage captures remain under /tmp/e6-ninfer-adapt-5k/maps/matched-complement-profiles/ and are not committed.",
+  "independent_q2_0_q8_1_oracle": {
+    "script_sha256": "8a343ef57bcb549c9b95304e8d257168cf870d24efa1ad92ce31b55f1f71cc70",
+    "arithmetic": "Independent scalar Q2_0 x Q8_1 oracle, FP64 accumulation and SwiGLU",
+    "activation_sha256": "6019d76164181ea5cb53309f62b1935cd6ebf7f917f2a9187b5314a22e838969",
+    "expert_results": [
+      {
+        "expert": 32,
+        "oracle_output_sha256_f64le": "71cf7545f0447473655b23642382d50bfac4b605348b32e225df563f6bee22b3",
+        "owner": {
+          "original_gpu_resident": true,
+          "learned_gpu_resident": false
+        },
+        "runtime_to_oracle": {
+          "original": {
+            "relative_l2_vs_fp64_q8_1_oracle": 6.018046180139873e-08,
+            "max_abs_vs_fp64_q8_1_oracle": 5.6461431086063385e-09
+          },
+          "learned": {
+            "relative_l2_vs_fp64_q8_1_oracle": 9.053957498070247e-08,
+            "max_abs_vs_fp64_q8_1_oracle": 7.676135282963514e-09
+          }
+        }
+      },
+      {
+        "expert": 97,
+        "oracle_output_sha256_f64le": "809902ab45cea07343af43db3fe2d77204793b1318b34413ede0ddf9b4c81bb7",
+        "owner": {
+          "original_gpu_resident": true,
+          "learned_gpu_resident": false
+        },
+        "runtime_to_oracle": {
+          "original": {
+            "relative_l2_vs_fp64_q8_1_oracle": 6.04475781273115e-08,
+            "max_abs_vs_fp64_q8_1_oracle": 5.2532413974404335e-09
+          },
+          "learned": {
+            "relative_l2_vs_fp64_q8_1_oracle": 1.0147538570445562e-07,
+            "max_abs_vs_fp64_q8_1_oracle": 1.0815710993483663e-08
+          }
+        }
+      },
+      {
+        "expert": 320,
+        "oracle_output_sha256_f64le": "8abb3661eae0a2d7e1561ea41121cef1c72924ed48414824c6a933cd2c4f72fc",
+        "owner": {
+          "original_gpu_resident": false,
+          "learned_gpu_resident": true
+        },
+        "runtime_to_oracle": {
+          "original": {
+            "relative_l2_vs_fp64_q8_1_oracle": 8.212598482171655e-08,
+            "max_abs_vs_fp64_q8_1_oracle": 5.744368536397815e-09
+          },
+          "learned": {
+            "relative_l2_vs_fp64_q8_1_oracle": 6.079798098549875e-08,
+            "max_abs_vs_fp64_q8_1_oracle": 4.245521267876029e-09
+          }
+        }
+      },
+      {
+        "expert": 400,
+        "oracle_output_sha256_f64le": "3390e5e6a31a37a7d09d1112a7305a9a32fff00aeb96f4ab00f9abd45bbb8742",
+        "owner": {
+          "original_gpu_resident": false,
+          "learned_gpu_resident": true
+        },
+        "runtime_to_oracle": {
+          "original": {
+            "relative_l2_vs_fp64_q8_1_oracle": 9.184760191097353e-08,
+            "max_abs_vs_fp64_q8_1_oracle": 5.555193638429046e-09
+          },
+          "learned": {
+            "relative_l2_vs_fp64_q8_1_oracle": 5.963654330092209e-08,
+            "max_abs_vs_fp64_q8_1_oracle": 4.725734470412135e-09
+          }
+        }
+      },
+      {
+        "expert": 70,
+        "oracle_output_sha256_f64le": "c8c401b6eeb66e759ab0e409b0bcd2c4014b0e585161f0a9d3f789c5dba4d024",
+        "owner": {
+          "original_gpu_resident": true,
+          "learned_gpu_resident": false
+        },
+        "runtime_to_oracle": {
+          "original": {
+            "relative_l2_vs_fp64_q8_1_oracle": 6.210251279643533e-08,
+            "max_abs_vs_fp64_q8_1_oracle": 3.839886630885303e-09
+          },
+          "learned": {
+            "relative_l2_vs_fp64_q8_1_oracle": 9.592088124792029e-08,
+            "max_abs_vs_fp64_q8_1_oracle": 6.9776433520019054e-09
+          }
+        }
+      },
+      {
+        "expert": 74,
+        "oracle_output_sha256_f64le": "1075f3824d1b0db672ee5cc8bc8efac24cacb32c2dd323ebfa373b53bae43427",
+        "owner": {
+          "original_gpu_resident": true,
+          "learned_gpu_resident": false
+        },
+        "runtime_to_oracle": {
+          "original": {
+            "relative_l2_vs_fp64_q8_1_oracle": 5.86032284474328e-08,
+            "max_abs_vs_fp64_q8_1_oracle": 7.017661118879914e-09
+          },
+          "learned": {
+            "relative_l2_vs_fp64_q8_1_oracle": 8.94011519561695e-08,
+            "max_abs_vs_fp64_q8_1_oracle": 1.0040821507573128e-08
+          }
+        }
+      }
+    ],
+    "interpretation": "For this single layer-1 activation, every sampled GPU-resident NInfer result is closer to the independent FP64 Q2_0 x Q8_1 runtime-contract oracle than the corresponding file/CPU result. All errors remain below 1.1e-7 relative L2. This local numerical ordering does not establish general superiority, answer quality, or performance."
+  }
 }

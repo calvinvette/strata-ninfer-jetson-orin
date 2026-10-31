@@ -229,3 +229,11 @@ signal 11 in both arms and is excluded; verifier-stage captures completed.
 Compact metrics are in
 [`resident-map-compute-localization.json`](resident-map-compute-localization.json);
 raw captures remain outside Git under `/tmp/e6-ninfer-adapt-5k/`.
+
+The six changed expert rows were also checked against the independent scalar
+Q2_0 × Q8_1 oracle using the shared, bit-identical layer-1 input. In every row,
+the GPU-resident NInfer result was closer to the FP64 oracle than the
+file/CPU-owned result: GPU relative L2 was `5.86e-8`–`6.21e-8`, versus
+`8.94e-8`–`1.01e-7` for file/CPU execution. All values are small, and this
+single activation does not establish a general accuracy advantage. Per-expert
+errors and the oracle/script fingerprint are in the localization JSON.

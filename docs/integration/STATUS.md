@@ -7780,3 +7780,9 @@ bit-identical. By QSA layer 47, differences had grown substantially. This
 localizes a small owner-dependent numerical effect, not a quality or
 performance improvement. One prompt, no semantic grading; E6 remains open. See
 the [compute localization record](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/resident-map-compute-localization.json).
+
+An independent FP64 Q2_0 × Q8_1 oracle was applied to those six layer-1 expert
+rows using their shared captured input. The GPU-resident NInfer rows were
+closer for all six (`5.86e-8`–`6.21e-8` relative L2) than the file/CPU-owned
+rows (`8.94e-8`–`1.01e-7`). This is one activation and does not establish a
+general numerical advantage or answer-quality effect; E6 remains open.
