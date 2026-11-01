@@ -3096,7 +3096,8 @@ def jetson_nvcc(gpu):
     version than the driver builds an engine that cannot start, so it is refused.  STRATA_NVCC picks one (#601)."""
     api = gpu.get("driver_api", 0)
     ceiling = (api // 1000, api % 1000 // 10 + 1) if api else None      # driver 13020 (CUDA 13.2) -> below (13, 3)
-    if os.environ.get("STRATA_NVCC"):
+    pick = os.environ.get("STRATA_NVCC")
+    if pick and Path(pick).exists():                 # a stale override falls through to the bounded search below
         nvcc, ver = find_nvcc()
     else:
         nvcc, ver = find_nvcc(below=(13, 0))

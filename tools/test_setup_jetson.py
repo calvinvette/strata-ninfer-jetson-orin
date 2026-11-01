@@ -225,9 +225,15 @@ class JetPackToolkits(unittest.TestCase):
                 self.tools(driver_api, installed)
 
     def test_strata_nvcc_is_the_only_one_considered(self):
-        nvcc, seen, text = self.tools(13020, [(13, 4)], env={"STRATA_NVCC": "/opt/cuda-13.4/bin/nvcc"})
+        with tempfile.NamedTemporaryFile() as pick:
+            nvcc, seen, text = self.tools(13020, [(13, 4)], env={"STRATA_NVCC": pick.name})
         self.assertEqual((nvcc, seen), ("/usr/local/cuda-13.4/bin/nvcc", [None]))
         self.assertIn("minor version compatibility", text)
+
+    def test_a_stale_strata_nvcc_keeps_the_bounded_search(self):
+        # JetPack 6.2 with 12.6 and 13.2 installed: a STRATA_NVCC naming a missing file must not pick 13.2
+        nvcc, seen, _ = self.tools(12060, [(12, 6), (13, 2)], env={"STRATA_NVCC": "/missing/bin/nvcc"})
+        self.assertEqual((nvcc, seen), ("/usr/local/cuda-12.6/bin/nvcc", [(13, 0)]))
 
 
 class Installation(unittest.TestCase):
