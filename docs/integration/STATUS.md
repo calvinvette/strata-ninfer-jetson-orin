@@ -1,6 +1,6 @@
 # Integration status
 
-Updated: 2026-10-25. Phases 1 through 4 are complete for their documented tested
+Updated: 2026-11-01. Phases 1 through 4 are complete for their documented tested
 Orin scopes (Phase 3 Q2_0; Phase 4 opt-in kernel/CPU candidates). Phase 7 is
 complete for its bounded Orin qualification matrix under [its closeout]
 (PHASE7_CLOSEOUT.md), and Phase 8 is complete for the bounded Q2_0 release
@@ -17,6 +17,17 @@ The follow-on covers NInfer-derived resident computation, bounded staging of
 cache misses, model/codec coverage, state and quality gates, and matched
 performance controls. This update is planning only; no new runtime or benchmark
 was executed for it.
+
+JetPack 7 setup support, recorded 2026-11-01: `setup.py` now compiles the Orin
+engine with JetPack 7's CUDA 13.x toolkit when no 12.x toolkit is installed;
+JetPack 6.2 still selects the same 12.x nvcc, and Orin keeps the
+`engine-cuda12/` slot and `-DSTRATA_EXPERIMENTAL_SM60=ON`. On a 64 GB Orin with
+L4T R39.2.1 and CUDA 13.2, a clean build passed 122 of 124 registered CUDA
+functional tests; the two failures were missing default input files, and both
+passed once given the real Q2_0 files and the regenerated one-layer fixture.
+This is build and functional evidence with screening-level Q2_0 speed, not a
+CUDA 12.6 versus 13.2 comparison ([validation
+report](../../bench/results/2026-11-01-jetpack7-cuda13-orin-validation/README.md)).
 
 The current Coder two-live investigation refines that exclusion. At cache 3,000,
 the default path's prompt-1 state first changed at position 105/layer 24 and its
