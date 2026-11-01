@@ -2835,3 +2835,16 @@ Minimum available RAM was 7.27 GiB; sampled OOM kills were zero. One synthetic
 the [64K screen report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
 
 **E6 actual 64K prompt map confirmation (2026-11-01):** a separate seven-pair randomized confirmation completed at 131,072 configured context. All fourteen strict-NInfer requests used a 65,536-token prompt and returned the same exact 47-token retrieval/arithmetic answer. The learned map improved median decode +42.2% (4.5 to 6.3 tok/s; paired bootstrap 95% interval +40.0% to +44.4%); prompt throughput rose 2.7%, first-visible latency fell 2.7%, client time fell 3.0%, and expert cache hits rose from 21.5% to 48.4%. Minimum available RAM was 7.25 GiB; peak sampled swap was 4.66 GiB and sampled OOM kills were zero. CPU/GPU clocks were observed but not controlled; EMC readback was denied and energy was not measured. This confirms the fixed-map decode effect for this synthetic 64K fixture only, not broad quality or general long-context capability. E6/E7 remain open. See the [64K report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
+
+**E6 actual 128K prompt map screen (2026-11-01):** a tokenizer-verified
+131,072-token retrieval/arithmetic fixture completed at 262,144 configured
+context. All six strict-NInfer requests returned the exact 47-token answer.
+The learned map improved decode +35.9% (3.9 to 5.3 tok/s; paired three-pair
+bootstrap 95% screen interval +30.0% to +35.9%), prompt throughput +2.6%,
+first-visible latency −2.5%, and client time −2.8%; expert hits rose from
+21.7% to 48.7%. The screen gate passed, so a separate seven-pair confirmation
+is required. Minimum available RAM was 7.21 GiB; peak swap was 1.07 GiB and
+sampled OOM kills were zero. Clocks were observed but not controlled; EMC
+readback was denied and energy was not measured. One synthetic 128K fixture
+only; semantic and general long-context qualification remain open. E6/E7
+remain open. See the [128K screen report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
