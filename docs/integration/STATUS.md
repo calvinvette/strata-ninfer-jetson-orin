@@ -7917,8 +7917,8 @@ one synthetic 64K workload, not general long-context quality. E6/E7 remain
 open. See the [fixed-map report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
 
 **E6 64K confirmation progress (2026-11-01):** the seven-pair confirmation
-started after the 64K screen passed its gate. Four complete randomized pairs
-(eight supervised processes) have passed with exact 65,536-token prompts and
+started after the 64K screen passed its gate. Five complete randomized pairs
+(ten supervised processes) have passed with exact 65,536-token prompts and
 47-token answers. The lowest available-RAM sample so far is 7.27 GiB; OOM-kill
 counters remain zero. Confirmation is still running, so no confirmation
 performance estimate is reported yet. Raw captures are in

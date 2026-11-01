@@ -2835,7 +2835,7 @@ Minimum available RAM was 7.27 GiB; sampled OOM kills were zero. One synthetic
 the [64K screen report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
 
 **E6 64K confirmation progress (2026-11-01):** the seven-pair randomized
-confirmation began after the screen gate passed. Four complete pairs (eight
+confirmation began after the screen gate passed. Five complete pairs (ten
 supervised processes) have passed exact-output and memory-supervisor checks;
 minimum available RAM so far is 7.27 GiB and sampled OOM kills are zero. Keep
 the campaign open until all seven pairs complete, then calculate and record
