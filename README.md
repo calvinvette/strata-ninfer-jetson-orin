@@ -144,8 +144,8 @@ when reproducing the measurements. Keep the server on `127.0.0.1`; configuring a
 On a 64 GB Orin, setup offers every original Flash-Next size, and `--context` can be set above its 32K recommendation.
 A [community report](bench/results/2026-11-01-community-jetson-agx-orin-64gb-jetpack7/README.md) measured IQ3_S at a
 262,144-token context with prompts of up to 240,212 tokens; it ran about one GiB above the six-GiB headroom while
-other processes were resident. Q2_0 with all experts in RAM fell below that headroom (5 GiB free) in the same
-conditions, so close large memory users first.
+other processes were resident. Q2_0 with all experts in RAM dipped below that headroom once (5 GiB free) and
+stayed just above it (6.88 GiB) in a supervised rerun, so close large memory users first.
 
 ## Original Strata features and desktop results
 

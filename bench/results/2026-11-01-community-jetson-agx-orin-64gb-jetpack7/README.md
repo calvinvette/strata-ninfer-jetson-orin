@@ -124,8 +124,9 @@ For [issue #1](https://github.com/calvinvette/strata-ninfer-jetson-orin/issues/1
   5,956-slot GPU cache; on short prompts it read 290.3 prompt tok/s and decoded 25.5 tok/s at 557 tokens, against
   64.4 and 13.0 for the 32 GB-oriented qualified profile on the same device and day (screening, three rounds;
   [validation report](../2026-11-01-jetpack7-cuda13-orin-validation/README.md#q2_0-on-the-cuda-132-build-screening)).
-  That profile ran with 40 GiB available; the all-in-RAM default ran at 5–7 GiB available, below the 6 GiB floor,
-  and is recorded there as a headroom failure, so its speed is not a within-budget result.
+  That profile ran with 40 GiB available. The all-in-RAM default dipped to 5 GiB, below the 6 GiB floor, in its
+  first (unsupervised) run and stayed at 6.88 GiB or above in a supervised rerun with speeds within 3%: a margin of
+  under 1 GiB.
 - **A Q2 model that is not the Coder.** The original Flash-Next Q2_0 (`69820c02…`) installs with
   `./setup.sh --family qwen --model Q2_0` and served the runs above.
 
