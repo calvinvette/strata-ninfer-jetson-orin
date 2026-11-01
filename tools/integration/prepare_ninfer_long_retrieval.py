@@ -17,16 +17,16 @@ MARKERS = (('10%', 'AMBER-QUARTZ-618'), ('50%', 'SILVER-MEADOW-243'),
            ('90%', 'INDIGO-LANTERN-907'))
 
 
-def build_body(fillers: tuple[int, int, int, int]) -> str:
+def build_body(fillers: tuple[int, int, int, int], markers=MARKERS) -> str:
     parts = ['Archive record 000001: routine calibration nominal; no fault observed.\n',
              'calibration ' * fillers[0],
-             f'\nRetrieval marker {MARKERS[0][0]}: the vault code is {MARKERS[0][1]}. Preserve it exactly.\n',
+             f'\nRetrieval marker {markers[0][0]}: the vault code is {markers[0][1]}. Preserve it exactly.\n',
              'Archive record 000002: routine calibration nominal; no fault observed.\n',
              'calibration ' * fillers[1],
-             f'\nRetrieval marker {MARKERS[1][0]}: the vault code is {MARKERS[1][1]}. Preserve it exactly.\n',
+             f'\nRetrieval marker {markers[1][0]}: the vault code is {markers[1][1]}. Preserve it exactly.\n',
              'Archive record 000003: routine calibration nominal; no fault observed.\n',
              'calibration ' * fillers[2],
-             f'\nRetrieval marker {MARKERS[2][0]}: the vault code is {MARKERS[2][1]}. Preserve it exactly.\n',
+             f'\nRetrieval marker {markers[2][0]}: the vault code is {markers[2][1]}. Preserve it exactly.\n',
              'Archive record 000004: routine calibration nominal; no fault observed.\n',
              'calibration ' * fillers[3],
              '\nReturn the three vault codes in order and calculate the sum of their numeric suffixes. '
@@ -39,10 +39,22 @@ def main() -> int:
     ap.add_argument('--tokenizer', type=Path,
                     default=Path('/home/calvin/models/strata-orin-validation/pack/tokenizer'))
     ap.add_argument('--tokens', type=int, default=4096)
+    ap.add_argument('--codes', nargs=3, metavar=('EARLY', 'MIDDLE', 'LATE'),
+                    default=[code for _, code in MARKERS],
+                    help='three unique marker values for an independently held-out fixture')
+    ap.add_argument('--expected-suffix-sum', type=int,
+                    help='expected arithmetic result; defaults to the sum of numeric code suffixes')
     ap.add_argument('--output', type=Path, required=True)
     a = ap.parse_args()
     if a.tokens < 2048:
         ap.error('--tokens must be at least 2048 for this long-context fixture')
+    markers = tuple((label, code) for (label, _), code in zip(MARKERS, a.codes))
+    try:
+        suffix_sum = sum(int(code.rsplit('-', 1)[1]) for code in a.codes)
+    except (IndexError, ValueError):
+        ap.error('each code must end in a hyphen followed by a numeric suffix')
+    if a.expected_suffix_sum is not None and a.expected_suffix_sum != suffix_sum:
+        ap.error('--expected-suffix-sum does not match the three code suffixes')
     a.output.mkdir(parents=True, exist_ok=False)
     tokenizer = load_tokenizer(a.tokenizer)
     template_path = a.tokenizer / 'chat_template.jinja'
@@ -51,13 +63,13 @@ def main() -> int:
         return tokenizer.encode(template.render([{'role': 'user', 'content': text}],
                                    enable_thinking=False), parse_special=True)
 
-    base_count = len(encode(build_body((0, 0, 0, 0))))
+    base_count = len(encode(build_body((0, 0, 0, 0), markers)))
     remaining = a.tokens - base_count
     weights = (0.10, 0.40, 0.40, 0.10)
     fillers = [int(remaining * weight) for weight in weights]
     fillers[-1] += remaining - sum(fillers)
     for _ in range(16):
-        count = len(encode(build_body(tuple(fillers))))
+        count = len(encode(build_body(tuple(fillers), markers)))
         if count == a.tokens:
             break
         fillers[-1] += a.tokens - count
@@ -65,7 +77,7 @@ def main() -> int:
             raise RuntimeError('tokenizer correction made final filler negative')
     else:
         raise RuntimeError(f'could not make exact {a.tokens}-token prompt; last count={count}')
-    body = build_body(tuple(fillers))
+    body = build_body(tuple(fillers), markers)
     ids = encode(body)
     if len(ids) != a.tokens:
         raise RuntimeError(f'final prompt has {len(ids)} tokens, expected {a.tokens}')
@@ -73,7 +85,7 @@ def main() -> int:
         'prompt_tokens': a.tokens, 'generate_tokens': 48,
         'messages': [{'role': 'user', 'content': body}],
         'chat_template_kwargs': {'enable_thinking': False},
-        'expected_codes': [code for _, code in MARKERS], 'expected_suffix_sum': 1768,
+        'expected_codes': [code for _, code in markers], 'expected_suffix_sum': suffix_sum,
         'allow_natural_stop': True}]}
     path = a.output / 'workload.json'
     path.write_text(json.dumps(workload, indent=2) + '\n')

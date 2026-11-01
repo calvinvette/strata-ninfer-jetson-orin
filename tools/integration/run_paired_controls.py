@@ -17,6 +17,8 @@ def main():
     parser.add_argument('--workloads', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--blocks', type=int, default=3)
+    parser.add_argument('--timeout', type=int, default=1800,
+                        help='per-process supervisor timeout in seconds (increase for very long prompts)')
     parser.add_argument('--seed', type=int, default=870126)
     parser.add_argument('--warmup-workloads', type=Path,
                         help='distinct workload sent once before each measured block')
@@ -70,7 +72,7 @@ def main():
         run_dir = args.output / name
         config = args.baseline_config if row['variant'] == 'baseline' else args.candidate_config
         command = [sys.executable, str(directory / 'run_control.py'), '--output', str(run_dir.resolve()),
-                   '--timeout', '1800']
+                   '--timeout', str(args.timeout)]
         if args.sample_clocks or args.privileged_emc:
             command.append('--sample-clocks')
         if args.privileged_emc:
