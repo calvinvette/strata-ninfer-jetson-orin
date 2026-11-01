@@ -6279,5 +6279,280 @@
     },
     "campaign_checkout_revision": "2c3d46cb",
     "raw_data": "/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task32768-screen/"
+  },
+  "actual_64k_task": {
+    "workload": {
+      "description": "three-position retrieval/arithmetic fixture",
+      "prompt_tokens": 65536,
+      "max_generation_tokens": 48,
+      "actual_completion_tokens": 47,
+      "expected_exact_response": "EARLY=AMBER-QUARTZ-618, MIDDLE=SILVER-MEADOW-243, LATE=INDIGO-LANTERN-907, SUM=1768",
+      "content_sha256": "bee2e6d260872df0ae3079fe2afd372717fe288617650e0f21dab689ffd59ce6",
+      "token_ids_sha256": "610583fbb363bad5da8bde52c4eccd779b64ba53e7890f11bac48fa188dcbe08",
+      "workload_sha256": "0ab719f94047c0c3b05cba06e32e7b06f82c2793ec0818ea38128411d598dd82"
+    },
+    "controls": {
+      "backend": "strict NInfer",
+      "context_capacity": 131072,
+      "original_map_sha256": "781fbe88884fbd263736bd4812c9abddfa59c707e2b2c1acad6cd40f6182cd64",
+      "learned_map_sha256": "76a1644f56d985fdd54a5816aadd39ce9356190dbaa828a293fab8462f507087",
+      "resident_slots": 5000,
+      "ram_complement_entries": 4660,
+      "ram_complement_sha256": "3d7519b9d41ef7bd6462b0cc800408fc4d708d922a5d0968f3dcbaf75f5954f5",
+      "adaptation": false,
+      "prompt_cache": false,
+      "pcie_staging": false,
+      "kv": "fp16",
+      "pool_workers": 8
+    },
+    "screen": {
+      "blocks": 3,
+      "run_count": 6,
+      "all_supervisor_commands_passed": true,
+      "all_measured_responses_exact": true,
+      "metrics": {
+        "decode_tps": {
+          "baseline_median": 4.5,
+          "candidate_median": 6.3,
+          "pair_ratios": [
+            1.4,
+            1.347826086956522,
+            1.4
+          ],
+          "median_ratio": 1.4,
+          "pct_change": 39.99999999999999,
+          "bootstrap95_pct": [
+            34.78260869565219,
+            39.99999999999999
+          ]
+        },
+        "prompt_tps": {
+          "baseline_median": 104.2,
+          "candidate_median": 107.8,
+          "pair_ratios": [
+            1.0305927342256214,
+            1.0338818973862536,
+            1.036468330134357
+          ],
+          "median_ratio": 1.0338818973862536,
+          "pct_change": 3.388189738625358,
+          "bootstrap95_pct": [
+            3.0592734225621365,
+            3.6468330134356908
+          ]
+        },
+        "ttft_s": {
+          "baseline_median": 629.7902377150021,
+          "candidate_median": 608.4670618688688,
+          "pair_ratios": [
+            0.9698013590095437,
+            0.9668636522039804,
+            0.9645118192302963
+          ],
+          "median_ratio": 0.9668636522039804,
+          "pct_change": -3.3136347796019594,
+          "bootstrap95_pct": [
+            -3.5488180769703725,
+            -3.0198640990456327
+          ]
+        },
+        "client_s": {
+          "baseline_median": 639.5322944461368,
+          "candidate_median": 615.5109178209677,
+          "pair_ratios": [
+            0.9657905635323474,
+            0.9634948286391116,
+            0.9608272358384186
+          ],
+          "median_ratio": 0.9634948286391116,
+          "pct_change": -3.6505171360888378,
+          "bootstrap95_pct": [
+            -3.917276416158144,
+            -3.420943646765262
+          ]
+        },
+        "hit_rate": {
+          "baseline_median": 0.215,
+          "candidate_median": 0.484,
+          "pair_ratios": [
+            2.2511627906976743,
+            2.2511627906976743,
+            2.2511627906976743
+          ],
+          "median_ratio": 2.2511627906976743,
+          "pct_change": 125.11627906976743,
+          "bootstrap95_pct": [
+            125.11627906976743,
+            125.11627906976743
+          ]
+        }
+      },
+      "rows": [
+        {
+          "block": 0,
+          "baseline": {
+            "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+            "exact_response": "EARLY=AMBER-QUARTZ-618, MIDDLE=SILVER-MEADOW-243, LATE=INDIGO-LANTERN-907, SUM=1768",
+            "prompt_tps": 104.6,
+            "decode_tps": 4.5,
+            "ttft_s": 627.4141154950485,
+            "client_s": 637.3130376939662,
+            "hit_rate": 0.215,
+            "min_available_gib": 7.543487548828125,
+            "max_swap_gib": 5.145393371582031,
+            "oom_kill_max": 0,
+            "memory_samples": 681,
+            "cpu_clock_mhz": [
+              729.6,
+              2201.6
+            ],
+            "gpu_clock_mhz": [
+              306.0,
+              1300.5
+            ],
+            "energy_scope": "not measured; raw tegrastats rails only",
+            "admission_floor_gib": 6
+          },
+          "candidate": {
+            "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+            "exact_response": "EARLY=AMBER-QUARTZ-618, MIDDLE=SILVER-MEADOW-243, LATE=INDIGO-LANTERN-907, SUM=1768",
+            "prompt_tps": 107.8,
+            "decode_tps": 6.3,
+            "ttft_s": 608.4670618688688,
+            "client_s": 615.5109178209677,
+            "hit_rate": 0.484,
+            "min_available_gib": 7.541999816894531,
+            "max_swap_gib": 5.141414642333984,
+            "oom_kill_max": 0,
+            "memory_samples": 648,
+            "cpu_clock_mhz": [
+              729.6,
+              2201.6
+            ],
+            "gpu_clock_mhz": [
+              306.0,
+              1300.5
+            ],
+            "energy_scope": "not measured; raw tegrastats rails only",
+            "admission_floor_gib": 6
+          }
+        },
+        {
+          "block": 1,
+          "baseline": {
+            "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+            "exact_response": "EARLY=AMBER-QUARTZ-618, MIDDLE=SILVER-MEADOW-243, LATE=INDIGO-LANTERN-907, SUM=1768",
+            "prompt_tps": 103.3,
+            "decode_tps": 4.6,
+            "ttft_s": 635.0699657248333,
+            "client_s": 644.9133123201318,
+            "hit_rate": 0.215,
+            "min_available_gib": 7.273937225341797,
+            "max_swap_gib": 3.0658721923828125,
+            "oom_kill_max": 0,
+            "memory_samples": 687,
+            "cpu_clock_mhz": [
+              729.6,
+              2201.6
+            ],
+            "gpu_clock_mhz": [
+              306.0,
+              1300.5
+            ],
+            "energy_scope": "not measured; raw tegrastats rails only",
+            "admission_floor_gib": 6
+          },
+          "candidate": {
+            "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+            "exact_response": "EARLY=AMBER-QUARTZ-618, MIDDLE=SILVER-MEADOW-243, LATE=INDIGO-LANTERN-907, SUM=1768",
+            "prompt_tps": 106.8,
+            "decode_tps": 6.2,
+            "ttft_s": 614.026066465769,
+            "client_s": 621.3706413409673,
+            "hit_rate": 0.484,
+            "min_available_gib": 7.5062103271484375,
+            "max_swap_gib": 1.0450706481933594,
+            "oom_kill_max": 0,
+            "memory_samples": 653,
+            "cpu_clock_mhz": [
+              729.6,
+              2201.6
+            ],
+            "gpu_clock_mhz": [
+              306.0,
+              1300.5
+            ],
+            "energy_scope": "not measured; raw tegrastats rails only",
+            "admission_floor_gib": 6
+          }
+        },
+        {
+          "block": 2,
+          "baseline": {
+            "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+            "exact_response": "EARLY=AMBER-QUARTZ-618, MIDDLE=SILVER-MEADOW-243, LATE=INDIGO-LANTERN-907, SUM=1768",
+            "prompt_tps": 104.2,
+            "decode_tps": 4.5,
+            "ttft_s": 629.7902377150021,
+            "client_s": 639.5322944461368,
+            "hit_rate": 0.215,
+            "min_available_gib": 7.3043975830078125,
+            "max_swap_gib": 4.604606628417969,
+            "oom_kill_max": 0,
+            "memory_samples": 683,
+            "cpu_clock_mhz": [
+              729.6,
+              2201.6
+            ],
+            "gpu_clock_mhz": [
+              306.0,
+              1300.5
+            ],
+            "energy_scope": "not measured; raw tegrastats rails only",
+            "admission_floor_gib": 6
+          },
+          "candidate": {
+            "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+            "exact_response": "EARLY=AMBER-QUARTZ-618, MIDDLE=SILVER-MEADOW-243, LATE=INDIGO-LANTERN-907, SUM=1768",
+            "prompt_tps": 108.0,
+            "decode_tps": 6.3,
+            "ttft_s": 607.4401279119775,
+            "client_s": 614.4800467020832,
+            "hit_rate": 0.484,
+            "min_available_gib": 7.525360107421875,
+            "max_swap_gib": 4.101505279541016,
+            "oom_kill_max": 0,
+            "memory_samples": 647,
+            "cpu_clock_mhz": [
+              729.6,
+              2201.6
+            ],
+            "gpu_clock_mhz": [
+              306.0,
+              1300.5
+            ],
+            "energy_scope": "not measured; raw tegrastats rails only",
+            "admission_floor_gib": 6
+          }
+        }
+      ]
+    },
+    "resource_summary": {
+      "minimum_available_ram_gib": 7.273937225341797,
+      "maximum_swap_used_gib": 5.145393371582031,
+      "maximum_sampled_cgroup_oom_kills": 0,
+      "cpu_clock_mhz_observed": [
+        729.6,
+        2201.6
+      ],
+      "gpu_clock_mhz_observed": [
+        306.0,
+        1300.5
+      ],
+      "emc_clock": "readback denied",
+      "energy": "not measured"
+    },
+    "campaign_checkout_revision": "2c3d46cb",
+    "raw_data": "/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task65536-screen/"
   }
 }

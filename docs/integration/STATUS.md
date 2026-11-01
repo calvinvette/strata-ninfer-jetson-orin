@@ -7902,3 +7902,16 @@ cause. Clocks were not controlled; EMC readback was denied and energy was not
 measured. The 32K map effect remains unconfirmed; continue E6 with a new
 pre-registered workload/context cell rather than repeating until the gate
 passes. E6/E7 remain open. See the [fixed-map report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
+
+**E6 actual 64K prompt map screen (2026-11-01):** a tokenizer-verified
+65,536-token retrieval/arithmetic fixture completed at 131,072 configured
+context. All six strict-NInfer requests returned the exact answer in 47 tokens.
+The learned map improved decode +40.0% (4.5 to 6.3 tok/s; three-pair paired
+95% interval +34.8% to +40.0%), prompt throughput +3.4%, first-visible
+latency −3.3%, and client time −3.7%; GPU hits rose from 21.5% to 48.4%. This
+clears the pre-set 5% median and interval screen gate and proceeds to separate
+seven-pair confirmation. Minimum available RAM was 7.27 GiB, peak swap 5.15
+GiB and sampled OOM kills were zero. CPU/GPU clocks were observed but not
+controlled; EMC readback was denied and energy was not measured. This screens
+one synthetic 64K workload, not general long-context quality. E6/E7 remain
+open. See the [fixed-map report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).

@@ -226,6 +226,26 @@ not a confirmed map effect, broad quality result, or general context claim.
 Pair-level evidence is recorded in `evidence.json`; raw captures remain under
 `/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task32768-screen/`.
 
+## 64K prompt screen
+
+A tokenizer-verified 65,536-token retrieval/arithmetic fixture was screened at
+131,072 configured context using strict NInfer, the same 5K GPU maps and shared
+6-GiB RAM complement. All six requests returned the full exact answer in 47
+tokens. The learned map improved decode by +40.0% (6.3 versus 4.5 tok/s;
+three-pair paired bootstrap 95% interval +34.8% to +40.0%). Prompt throughput
+increased 3.4% (104.2 to 107.8 tok/s), first-visible latency fell 3.3% (629.8
+to 608.5 s), client time fell 3.7% (639.5 to 615.5 s), and GPU hits rose from
+21.5% to 48.4%. The decode effect clears the pre-set 5% median and interval
+gate, so it qualifies for a separate seven-pair confirmation.
+
+Minimum available RAM was 7.27 GiB, maximum observed swap use was 5.15 GiB,
+and sampled cgroup OOM-kill counts were zero. CPU frequency ranged 729.6–2,201.6
+MHz and GPU frequency 306–1,300.5 MHz; clocks were not controlled. EMC readback
+was denied and energy was not measured. This is a screen for one synthetic
+64K task, not confirmation, broad quality evidence or general long-context
+qualification. Pair data are in `evidence.json`; raw captures remain under
+`/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task65536-screen/`.
+
 ## Controls and identity
 
 - Model: Qwen3.8-Flash-Next GSQ-RCO Q2_0, two GGUF shards. SHA-256 values:

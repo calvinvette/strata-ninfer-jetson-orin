@@ -2821,3 +2821,15 @@ zero. Lower CPU frequency coincided with the slow candidate decode, but no
 causal claim is supported. Pick the next context/workload cell before running
 it, and preserve the same gate and resource floor. E6/E7 remain open. See the
 [32K screen report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
+[32K screen report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
+
+**E6 actual 64K prompt map screen (2026-11-01):** a tokenizer-verified
+65,536-token fixture completed six exact responses at 131,072 configured
+context. The learned map improved decode +40.0% (4.5 to 6.3 tok/s; paired
+three-pair bootstrap 95% interval +34.8% to +40.0%). Prompt throughput rose
+3.4%, first-visible latency fell 3.3%, client time fell 3.7%, and expert hits
+rose from 21.5% to 48.4%. The pre-set screen gate passed, so run a separate
+seven-pair confirmation with the same fixed maps, controls and six-GiB floor.
+Minimum available RAM was 7.27 GiB; sampled OOM kills were zero. One synthetic
+64K retrieval/arithmetic fixture only; not broad quality qualification. See
+the [64K screen report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
