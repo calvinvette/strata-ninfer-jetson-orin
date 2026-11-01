@@ -155,6 +155,32 @@ NInfer backend gain at 4K, but its small sample does not establish equivalence.
 Pair-level data is in `evidence.json`; raw captures are under
 `/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task4096-backend-screen/`.
 
+## 8K prompt replication
+
+An 8,192-token version of the three-position retrieval/arithmetic fixture was
+run at a 16,384-token configured context, retaining the same two fixed maps,
+strict NInfer backend, 5K resident slots and ordered 6-GiB RAM complement.
+Three screening pairs followed by seven confirmation pairs were measured. All
+20 measured requests returned the exact full answer at 8,192 prompt tokens and
+47 naturally stopped output tokens.
+
+| Metric | Original map median | Learned map median | Paired change (95% interval) |
+| --- | ---: | ---: | ---: |
+| Decode throughput | 5.1 tok/s | 7.6 tok/s | +49.0% (+46.2%, +53.8%) |
+| Prompt throughput | 60.7 tok/s | 73.3 tok/s | +17.8% (+14.4%, +27.4%) |
+| First visible token | 135.19 s | 111.91 s | −15.2% (−21.6%, −12.6%) |
+| Client request time | 144.15 s | 117.97 s | −15.5% (−22.4%, −13.9%) |
+
+GPU expert-cache hits increased from 21.3% to 47.4%. Across screen and
+confirmation request windows, minimum available RAM was 8.99 GiB, above the
+six-GiB admission floor; sampled cgroup OOM-kill counts stayed at zero. CPU
+and GPU frequencies were observed dynamically, EMC readback was denied, and
+energy was not measured. This confirms a fixed-residency effect for one
+synthetic 8K retrieval task under NInfer. It does not qualify broad task quality
+or establish a backend advantage; the next step should use another prompt
+family and then test larger actual input lengths. Pair-level data are in
+`evidence.json`, with raw captures under `/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task8192-{screen,confirmation}/`.
+
 ## Controls and identity
 
 - Model: Qwen3.8-Flash-Next GSQ-RCO Q2_0, two GGUF shards. SHA-256 values:
@@ -201,19 +227,19 @@ fell 27.9%. GPU hit rate increased from 22.1% to 73.8%. All 20 processes passed
 the exact `MAPLE-6159` prefix check. Full explanatory text differed between
 maps, so this does not claim text equivalence or semantic grading.
 
-The evidence covers two held-out 512-token exact lookups and 2,048- and
-4,096-token retrieval/arithmetic prompts. The short tasks are in the same
+The evidence covers two held-out 512-token exact lookups and 2,048-, 4,096- and
+8,192-token retrieval/arithmetic prompts. The short tasks are in the same
 synthetic lookup family; the longer fixtures test exact multi-position
-retrieval and arithmetic.
+retrieval and arithmetic. The 8K measurements used a 16K configured context.
 This is still one model and narrow task coverage, not broad quality
 qualification. These results do not qualify other prompt lengths, models,
 memory budgets, or sustained service loads.
 
 The primary finding is that a fixed 5K residency map with more useful experts
 in GPU memory more than doubled decode speed on the two 512-token exact-lookup
-prompts under NInfer. It improved decode 52.0% at 2K and 54.0% at 4K under
-NInfer; the 512-token ORBIT map effect was also confirmed under Strata.
-The same-map screens at 512 tokens, 2K and 4K did not show a 5% NInfer end-to-end
+prompts under NInfer. It improved decode 52.0% at 2K, 54.0% at 4K and 49.0% at
+8K under NInfer; the 512-token ORBIT map effect was also confirmed under Strata.
+Same-map screens at 512 tokens, 2K and 4K did not show a 5% NInfer end-to-end
 gain. Continue the planned context/workload matrix and broader quality/state
 gates before changing release defaults or claiming NInfer acceleration.
 

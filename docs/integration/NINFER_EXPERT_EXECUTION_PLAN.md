@@ -2785,3 +2785,15 @@ intervals, so this does not prove equivalence. It shows no useful backend
 advantage in this small sample. Next extend held-out task families, context
 sizes and semantic/state checks under E6. E6 and E7 remain open. See the [4K
 campaign report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
+
+**E6 actual 8K prompt map confirmation (2026-10-31):** the held-out
+8,192-token retrieval/arithmetic fixture was run with 16K configured context.
+Across three screen pairs and seven confirmation pairs, the complete expected
+answer matched in every measured response. Under strict NInfer, the learned
+fixed map improved decode +49.0% (5.1 to 7.6 tok/s; paired bootstrap 95%
+interval +46.2% to +53.8%), prompt throughput +17.8%, and cache hits from
+21.3% to 47.4%; first-visible latency fell 15.2% and client time 15.5%.
+Minimum available memory was 8.99 GiB, with no sampled OOM kills. This confirms
+the map effect for one synthetic 8K task only. Next broaden prompt families and
+test larger actual input lengths; E6 quality/context coverage and E7 release
+assessment remain open. See the [8K evidence](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).

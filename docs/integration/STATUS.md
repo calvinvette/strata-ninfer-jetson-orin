@@ -7860,3 +7860,17 @@ latency and prompt-throughput intervals wide. This gives no evidence of a
 useful NInfer backend gain at 4K, without establishing equivalence. Extend the
 workload/context matrix and semantic quality/state gates next. E6/E7 remain
 open; see the [fixed-map report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
+
+**E6 actual 8K prompt map confirmation (2026-10-31):** a tokenizer-verified
+8,192-token, three-position retrieval/arithmetic fixture returned the full
+exact answer in all three screen pairs and seven confirmation pairs (47 output
+tokens each). At 16K configured context with strict NInfer and fixed maps, the
+learned residency map improved decode +49.0% (5.1 to 7.6 tok/s; paired 95%
+interval +46.2% to +53.8%), prompt throughput +17.8%, first-visible latency
+−15.2%, and client time −15.5%. GPU hits rose 21.3% to 47.4%. Minimum
+available RAM across these cells was 8.99 GiB, above the six-GiB guard; sampled
+OOM kills remained zero. Clock controls were untouched; EMC readback was
+denied and energy was not measured. This extends the synthetic retrieval map
+effect to one actual 8K input, not broad semantic quality or general context
+qualification. Next use additional prompt families and larger actual input
+lengths under the E6 matrix. See the [fixed-map report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
