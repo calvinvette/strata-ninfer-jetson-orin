@@ -2797,3 +2797,12 @@ Minimum available memory was 8.99 GiB, with no sampled OOM kills. This confirms
 the map effect for one synthetic 8K task only. Next broaden prompt families and
 test larger actual input lengths; E6 quality/context coverage and E7 release
 assessment remain open. See the [8K evidence](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
+
+**E6 actual 16K prompt screen (2026-10-31):** a 16,384-token
+three-position retrieval/arithmetic fixture passed all six strict-NInfer cells
+at 32K configured context. The learned map improved decode +46.9% (4.9 to 7.2
+tok/s; three-pair paired interval +44.0% to +51.0%), with exact full answers,
+47 generated tokens, and hits increasing 21.3% to 48.2%. Minimum available RAM
+was 8.57 GiB with no sampled OOM kills. It cleared the 5% screening gate, so
+the required seven-pair confirmation is underway. This is not yet a confirmed
+16K performance result. E6/E7 remain open; see the [16K screen](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
