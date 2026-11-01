@@ -327,3 +327,19 @@ A tokenizer-verified 131,072-token three-position retrieval/arithmetic fixture w
 The learned map improved median decode from 3.9 to 5.3 tok/s (+35.9%; paired bootstrap 95% screen interval +30.0% to +35.9%). Prompt throughput rose 2.6%, first-visible latency fell 2.5%, client time fell 2.8%, and expert cache hits rose from 21.7% to 48.7%. This met the pre-set 5% median and interval screen gate; a separate seven-pair confirmation is required before treating the effect as confirmed.
 
 Minimum available RAM was 7.21 GiB, maximum sampled swap use 1.07 GiB, and sampled cgroup OOM-kill counters remained zero. Observed CPU clocks ranged 730–2,202 MHz and GPU clocks 306–1,301 MHz; clocks were not controlled. EMC readback was denied and energy was not measured. The result is limited to this synthetic 128K retrieval fixture and does not establish broad quality or general long-context capability. Pair-level values and response hashes are in [`evidence.json`](evidence.json); raw captures remain under `/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task131072-screen/`.
+
+## Actual 128K learned-map confirmation (2026-11-01)
+
+The independent seven-pair randomized confirmation completed at 262,144 configured context with the same 131,072-token fixture, fixed original/learned GPU maps, shared RAM complement and strict-NInfer settings as the screen. Adaptation and prompt cache remained disabled. All 14 supervised processes passed, and every request returned the exact expected 47-token retrieval/arithmetic response. Its SHA-256 was `428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db` in all arms.
+
+| Metric | Original map median | Learned map median | Paired median change | Paired bootstrap 95% interval |
+| --- | ---: | ---: | ---: | ---: |
+| Decode | 3.9 tok/s | 5.5 tok/s | +38.5% | +36.6% to +41.0% |
+| Prompt processing | 108.0 tok/s | 110.6 tok/s | +2.4% | +2.2% to +2.6% |
+| First visible token | 1,214.5 s | 1,185.4 s | −2.3% | −2.5% to −2.1% |
+| Client request duration | 1,225.6 s | 1,193.5 s | −2.5% | −2.8% to −2.4% |
+| NInfer expert hit rate | 21.7% | 48.7% | +27.0 percentage points | same rounded rate in all seven pairs |
+
+Intervals resample the seven within-pair percentage changes (median statistic, 100,000 resamples, seed 42, percentile interval). The decode result confirms the fixed-map performance effect for this exact synthetic 128K fixture; it is not a broad semantic-quality or general long-context qualification.
+
+Minimum available RAM across the 14 processes was 7.22 GiB, above the six-GiB admission floor; maximum sampled swap was 2.96 GiB and sampled cgroup OOM-kill counts were zero. CPU frequencies ranged 729–2,201 MHz and GPU frequencies 306–1,300 MHz; clocks were observed, not controlled. EMC readback was denied and energy was not measured. Pair-level measurements, fixture hashes and response identity are in [`evidence.json`](evidence.json); raw captures remain under `/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task131072-confirmation/`.
