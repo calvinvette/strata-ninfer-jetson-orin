@@ -119,7 +119,7 @@ Medians of three requests in one server process (engine-reported prompt and deco
 
 | Profile | 172 tokens PP / TG / TTFT | 557 tokens PP / TG / TTFT | 1,069 tokens PP / TG / TTFT | Min MemAvailable |
 | --- | ---: | ---: | ---: | ---: |
-| A, setup's 64 GB default | 139.3 / 25.8 / 1.4 s | 290.3 / 25.5 / 2.1 s | 399.0 / 26.5 / 2.8 s | 5 GiB: **headroom failure** |
+| A, setup's 64 GB default | 139.3 / 25.8 / 1.4 s | 290.3 / 25.5 / 2.1 s | 399.0 / 26.5 / 2.8 s | 5 GiB (not supervised; see rerun) |
 | B, author's profile | 35.4 / 9.2 / 5.2 s | 64.4 / 13.0 / 8.9 s | 74.8 / 13.2 / 14.6 s | 40 GiB |
 
 All 18 requests passed the script's checks. Ranges are in [summary.txt](q2_0-screening/summary.txt) and every row
@@ -129,15 +129,30 @@ while serving, so on this shared machine it went below the 6 GiB floor that `run
 were not run under that supervisor (`drive.py` calls `run_cell.main()` directly), so profile A is recorded as a
 headroom failure, not a pass: its speeds are what it measured while breaking the floor.
 
+**Supervised rerun.** Both profiles were run again under `tools/integration/run_control.py` with its 6 GiB floor
+([output](q2_0-screening/supervised-rerun.txt)). Profile A passed with a minimum of 6.88 GiB available, and its
+speeds were within 3% of the table above (297.4 / 25.4 at 557 tokens). Profile B passed at 39.18 GiB. An unrelated
+engine compile ran during this rerun, which makes A's memory result conservative but its timings less clean;
+B's decode was slower and more variable (7.7–13.1) with the compile running, so its rerun speeds are not used.
+Profile A's margin over the floor is under 1 GiB on this shared machine: 5 GiB in one run, 6.88 GiB in the other.
+
 For orientation only: the 2026-10-25 Q2_0 sweep reported 30.9/11.8, 45.0/11.4 and 51.1/12.7 tok/s (PP/TG) for
 profile B's settings on a 32 GB Orin with JetPack 6.2. That is a different device, memory size, JetPack, expert profile
 file and day, not a paired control, so the difference is not attributed to CUDA 13.
+
+## A toolkit newer than the driver
+
+With `STRATA_NVCC=/usr/local/cuda-13.4/bin/nvcc`, setup warns that CUDA 13.4 is newer than the driver's 13.2 and
+continues. An engine built the same way with CUDA 13.4 (`build/strata` SHA-256 `0c4bdb19…`, setup's CMake flags,
+13.4's `libcudart` and `libcublas`) ran on the 13.2 driver: both runs passed and produced the same 64 tokens as the
+installed CUDA 13.2 engine on a fixed 4,096-token IQ3_S prompt. With warm pages it decoded at 20.38 tok/s against
+20.49 for the 13.2 build. Its first run, right after other model runs, decoded at 7.88 tok/s with cold pages.
+[Runs](cuda134-on-132-driver/runs.txt).
 
 ## Not tested
 
 - A CUDA 12.6 build on this device, and this change on a 32 GB Orin or on JetPack 6.2 hardware (JetPack 6.2 is
   covered by unit tests only).
-- An engine built with a toolkit newer than the driver (CUDA 13.4 on a 13.2 driver); the code warns and proceeds.
 - `-DSTRATA_EXPERIMENTAL_SM60=OFF` on Orin.
 - HIP and SYCL builds. Only Jetson branches of `setup.py` changed.
 - Confirmation-level runs (seven independent processes), energy, EMC clocks and output quality.
