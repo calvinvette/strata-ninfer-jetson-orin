@@ -2809,3 +2809,15 @@ GiB, maximum sampled swap use 5.10 GiB, and OOM-kill counters stayed zero.
 This confirms the fixed-map effect for one synthetic 16K input, not broad
 semantic quality or general long-context capability. E6/E7 remain open. See
 the [16K report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
+
+**E6 actual 32K prompt map screen (2026-10-31):** the 32,768-token fixture
+completed six exact 47-token responses at 65,536 configured context. Decode
+median changed +43.8% (6.9 versus 4.7 tok/s), but the three-pair paired 95%
+interval was −30.4% to +46.8%, with one candidate at 3.2 tok/s. The pre-set
+gate therefore did not authorize confirmation. Treat this as an inconclusive
+screen; retain every cell and do not add pairs to rescue this result. Minimum
+available RAM was 7.77 GiB, swap peaked at 5.26 GiB and sampled OOM kills were
+zero. Lower CPU frequency coincided with the slow candidate decode, but no
+causal claim is supported. Pick the next context/workload cell before running
+it, and preserve the same gate and resource floor. E6/E7 remain open. See the
+[32K screen report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).

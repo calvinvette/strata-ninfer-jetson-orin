@@ -201,6 +201,31 @@ synthetic 16K retrieval task under NInfer, not broad quality or long-context
 generalization. Pair-level evidence is in `evidence.json`; raw captures are
 under `/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task16384-{screen,confirmation}/`.
 
+## 32K prompt screen
+
+A tokenizer-verified 32,768-token retrieval/arithmetic fixture was screened at
+65,536 configured context using the same strict-NInfer controls and fixed 5K
+maps. All six measured requests returned the exact expected answer in 47
+tokens. The learned map's decode median was 6.9 versus 4.7 tok/s for the
+original map, a +43.8% paired median, but the three-pair bootstrap 95% interval
+was −30.4% to +46.8%. One learned-map cell decoded at 3.2 tok/s (its paired
+baseline was 4.6); the other two learned-map cells were 6.9 tok/s. The screen
+therefore failed the pre-set confirmation gate and no confirmation was run.
+Do not interpret the median alone as a 32K performance confirmation.
+
+Prompt throughput changed +4.5% (96.3 to 100.6 tok/s), first-visible latency
+fell 4.4% (341.1 to 326.2 s), client time fell 5.0% (350.4 to 332.6 s), and
+GPU hits increased from 21.6% to 48.2%. Minimum available RAM was 7.77 GiB,
+peak observed swap use was 5.26 GiB, and sampled OOM-kill counts stayed zero.
+The GPU clock range was 306–1,300.5 MHz; CPU clocks ranged 729.6–2,201.6 MHz.
+The slower learned-map cell coincided with lower CPU frequency during its
+decode window while GPU frequency remained at 1,300.5 MHz; this observation
+does not establish a cause. Clocks were not controlled, EMC readback was
+denied, and energy was not measured. This is one synthetic 32K task screen,
+not a confirmed map effect, broad quality result, or general context claim.
+Pair-level evidence is recorded in `evidence.json`; raw captures remain under
+`/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task32768-screen/`.
+
 ## Controls and identity
 
 - Model: Qwen3.8-Flash-Next GSQ-RCO Q2_0, two GGUF shards. SHA-256 values:

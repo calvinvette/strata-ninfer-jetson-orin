@@ -7886,3 +7886,19 @@ Clocks were not controlled; EMC readback was denied and energy was not
 measured. This confirms the synthetic residency-map effect at one actual 16K
 input, not broad semantic quality or general long-context capability. E6/E7
 remain open. See the [fixed-map report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
+
+**E6 actual 32K prompt map screen (2026-10-31):** a tokenizer-verified
+32,768-token retrieval/arithmetic fixture was screened at 65,536 configured
+context. All six requests returned the exact answer in 47 tokens. The learned
+map's decode median was 6.9 versus 4.7 tok/s (+43.8%), but one candidate cell
+fell to 3.2 tok/s and the three-pair paired 95% interval was −30.4% to +46.8%.
+Because the interval includes no improvement, the pre-set gate blocked
+confirmation; the screen is inconclusive. Prompt throughput changed +4.5%,
+first-visible latency −4.4%, client time −5.0%, and GPU hits rose 21.6% to
+48.2%. Minimum available RAM was 7.77 GiB, peak swap was 5.26 GiB and sampled
+OOM kills were zero. Lower CPU frequency coincided with the slow candidate
+decode while GPU clock remained at 1,300.5 MHz, but this does not establish
+cause. Clocks were not controlled; EMC readback was denied and energy was not
+measured. The 32K map effect remains unconfirmed; continue E6 with a new
+pre-registered workload/context cell rather than repeating until the gate
+passes. E6/E7 remain open. See the [fixed-map report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).

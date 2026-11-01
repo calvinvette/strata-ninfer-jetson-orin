@@ -5986,5 +5986,298 @@
       ],
       "campaign_seed": 20261031172
     }
+  },
+  "actual_32k_task": {
+    "workload": {
+      "description": "three-position retrieval/arithmetic fixture",
+      "prompt_tokens": 32768,
+      "max_generation_tokens": 48,
+      "actual_completion_tokens": 47,
+      "expected_exact_response": "EARLY=AMBER-QUARTZ-618, MIDDLE=SILVER-MEADOW-243, LATE=INDIGO-LANTERN-907, SUM=1768",
+      "content_sha256": "e618cd12e99465a61ee1c19cb555dff07e27c9d61d1e784e58f8145fc8bac9ca",
+      "token_ids_sha256": "680ab685a1289ecc750608722b87df817fda0a55a97c7b4b8c4e35caef3f22a2",
+      "workload_sha256": "2b0ac2b6737e15e757a7ffee873a9b6f57d131a3e728e1422be23c9a83108e64"
+    },
+    "controls": {
+      "backend": "strict NInfer",
+      "context_capacity": 65536,
+      "original_map_sha256": "781fbe88884fbd263736bd4812c9abddfa59c707e2b2c1acad6cd40f6182cd64",
+      "learned_map_sha256": "76a1644f56d985fdd54a5816aadd39ce9356190dbaa828a293fab8462f507087",
+      "resident_slots": 5000,
+      "ram_complement_entries": 4660,
+      "ram_complement_sha256": "3d7519b9d41ef7bd6462b0cc800408fc4d708d922a5d0968f3dcbaf75f5954f5",
+      "adaptation": false,
+      "prompt_cache": false,
+      "pcie_staging": false,
+      "kv": "fp16",
+      "pool_workers": 8
+    },
+    "screen": {
+      "blocks": 3,
+      "run_count": 6,
+      "all_supervisor_commands_passed": true,
+      "all_measured_responses_exact": true,
+      "metrics": {
+        "decode_tps": {
+          "baseline_median": 4.7,
+          "candidate_median": 6.9,
+          "pair_ratios": [
+            1.4680851063829787,
+            0.6956521739130436,
+            1.4375000000000002
+          ],
+          "median_ratio": 1.4375000000000002,
+          "pct_change": 43.75000000000002,
+          "bootstrap95_pct": [
+            -30.43478260869564,
+            46.808510638297875
+          ]
+        },
+        "prompt_tps": {
+          "baseline_median": 96.3,
+          "candidate_median": 100.6,
+          "pair_ratios": [
+            1.0478668054110303,
+            1.0404564315352696,
+            1.0446521287642783
+          ],
+          "median_ratio": 1.0446521287642783,
+          "pct_change": 4.4652128764278265,
+          "bootstrap95_pct": [
+            4.045643153526957,
+            4.786680541103028
+          ]
+        },
+        "ttft_s": {
+          "baseline_median": 341.05125614535064,
+          "candidate_median": 326.19976006029174,
+          "pair_ratios": [
+            0.9542311729635884,
+            0.9601336049464584,
+            0.956453771046281
+          ],
+          "median_ratio": 0.956453771046281,
+          "pct_change": -4.354622895371896,
+          "bootstrap95_pct": [
+            -4.576882703641161,
+            -3.9866395053541615
+          ]
+        },
+        "client_s": {
+          "baseline_median": 350.44508647499606,
+          "candidate_median": 332.6121262041852,
+          "pair_ratios": [
+            0.9470472446750351,
+            0.9751012364851179,
+            0.9497682157432834
+          ],
+          "median_ratio": 0.9497682157432834,
+          "pct_change": -5.023178425671659,
+          "bootstrap95_pct": [
+            -5.295275532496491,
+            -2.489876351488207
+          ]
+        },
+        "hit_rate": {
+          "baseline_median": 0.216,
+          "candidate_median": 0.482,
+          "pair_ratios": [
+            2.2314814814814814,
+            2.2314814814814814,
+            2.2314814814814814
+          ],
+          "median_ratio": 2.2314814814814814,
+          "pct_change": 123.14814814814814,
+          "bootstrap95_pct": [
+            123.14814814814814,
+            123.14814814814814
+          ]
+        }
+      },
+      "rows": [
+        {
+          "block": 0,
+          "baseline": {
+            "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+            "decode_tps": 4.7,
+            "prompt_tps": 96.1,
+            "ttft_s": 341.66962142428383,
+            "client_s": 351.04395073791966,
+            "hit_rate": 0.216,
+            "min_available_gib": 7.813388824462891,
+            "min_admission_gib": 7.813388824462891,
+            "max_swap_gib": 4.866115570068359,
+            "oom_kill_max": 0,
+            "memory_samples": 409,
+            "gpu_clock_mhz": [
+              306.0,
+              1300.5,
+              409
+            ],
+            "cpu_clock_mhz": [
+              729.6,
+              2201.6,
+              4908
+            ],
+            "emc_clock_mhz": "unsupported",
+            "energy_scope": "not measured; raw tegrastats rails only",
+            "admission_floor_gib": 6.0
+          },
+          "candidate": {
+            "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+            "decode_tps": 6.9,
+            "prompt_tps": 100.7,
+            "ttft_s": 326.03180361771956,
+            "client_s": 332.4552063061856,
+            "hit_rate": 0.482,
+            "min_available_gib": 7.767490386962891,
+            "min_admission_gib": 7.767490386962891,
+            "max_swap_gib": 4.833705902099609,
+            "oom_kill_max": 0,
+            "memory_samples": 380,
+            "gpu_clock_mhz": [
+              306.0,
+              1300.5,
+              380
+            ],
+            "cpu_clock_mhz": [
+              729.6,
+              2201.6,
+              4560
+            ],
+            "emc_clock_mhz": "unsupported",
+            "energy_scope": "not measured; raw tegrastats rails only",
+            "admission_floor_gib": 6.0
+          }
+        },
+        {
+          "block": 1,
+          "baseline": {
+            "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+            "decode_tps": 4.6,
+            "prompt_tps": 96.4,
+            "ttft_s": 340.8240556521341,
+            "client_s": 350.44508647499606,
+            "hit_rate": 0.216,
+            "min_available_gib": 7.814506530761719,
+            "min_admission_gib": 7.814506530761719,
+            "max_swap_gib": 5.263057708740234,
+            "oom_kill_max": 0,
+            "memory_samples": 408,
+            "gpu_clock_mhz": [
+              306.0,
+              1300.5,
+              408
+            ],
+            "cpu_clock_mhz": [
+              729.6,
+              2201.6,
+              4896
+            ],
+            "emc_clock_mhz": "unsupported",
+            "energy_scope": "not measured; raw tegrastats rails only",
+            "admission_floor_gib": 6.0
+          },
+          "candidate": {
+            "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+            "decode_tps": 3.2,
+            "prompt_tps": 100.3,
+            "ttft_s": 327.2366292057559,
+            "client_s": 341.71943714190274,
+            "hit_rate": 0.482,
+            "min_available_gib": 7.805809020996094,
+            "min_admission_gib": 7.805809020996094,
+            "max_swap_gib": 4.847999572753906,
+            "oom_kill_max": 0,
+            "memory_samples": 387,
+            "gpu_clock_mhz": [
+              306.0,
+              1300.5,
+              387
+            ],
+            "cpu_clock_mhz": [
+              729.6,
+              2201.6,
+              4644
+            ],
+            "emc_clock_mhz": "unsupported",
+            "energy_scope": "not measured; raw tegrastats rails only",
+            "admission_floor_gib": 6.0
+          }
+        },
+        {
+          "block": 2,
+          "baseline": {
+            "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+            "decode_tps": 4.8,
+            "prompt_tps": 96.3,
+            "ttft_s": 341.05125614535064,
+            "client_s": 350.20347142685205,
+            "hit_rate": 0.216,
+            "min_available_gib": 7.841510772705078,
+            "min_admission_gib": 7.841510772705078,
+            "max_swap_gib": 4.911144256591797,
+            "oom_kill_max": 0,
+            "memory_samples": 406,
+            "gpu_clock_mhz": [
+              306.0,
+              1300.5,
+              406
+            ],
+            "cpu_clock_mhz": [
+              729.6,
+              2201.6,
+              4872
+            ],
+            "emc_clock_mhz": "unsupported",
+            "energy_scope": "not measured; raw tegrastats rails only",
+            "admission_floor_gib": 6.0
+          },
+          "candidate": {
+            "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+            "decode_tps": 6.9,
+            "prompt_tps": 100.6,
+            "ttft_s": 326.19976006029174,
+            "client_s": 332.6121262041852,
+            "hit_rate": 0.482,
+            "min_available_gib": 7.7955780029296875,
+            "min_admission_gib": 7.7955780029296875,
+            "max_swap_gib": 5.093349456787109,
+            "oom_kill_max": 0,
+            "memory_samples": 380,
+            "gpu_clock_mhz": [
+              306.0,
+              1300.5,
+              380
+            ],
+            "cpu_clock_mhz": [
+              729.6,
+              2201.6,
+              4560
+            ],
+            "emc_clock_mhz": "unsupported",
+            "energy_scope": "not measured; raw tegrastats rails only",
+            "admission_floor_gib": 6.0
+          }
+        }
+      ]
+    },
+    "resource_summary": {
+      "minimum_available_ram_gib": 7.767490386962891,
+      "maximum_swap_used_gib": 5.263057708740234,
+      "maximum_sampled_cgroup_oom_kills": 0,
+      "cpu_clock_mhz_observed": [
+        729.6,
+        2201.6
+      ],
+      "gpu_clock_mhz_observed": [
+        306.0,
+        1300.5
+      ],
+      "emc_clock": "readback denied",
+      "energy": "not measured"
+    },
+    "campaign_checkout_revision": "2c3d46cb",
+    "raw_data": "/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task32768-screen/"
   }
 }
