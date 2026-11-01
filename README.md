@@ -141,6 +141,11 @@ Start with a short context and use the [recorded configuration](bench/results/20
 when reproducing the measurements. Keep the server on `127.0.0.1`; configuring an external listener requires
 `--api-key`. For setup details, see [AI_SETUP.md](docs/AI_SETUP.md) and [INSTALL.md](docs/INSTALL.md).
 
+On a 64 GB Orin, setup offers every original Flash-Next size, and `--context` can be set above its 32K recommendation.
+A [community report](bench/results/2026-11-01-community-jetson-agx-orin-64gb-jetpack7/README.md) measured IQ3_S at a
+262,144-token context with prompts of up to 240,212 tokens, and Q2_0 with all experts in RAM. Both ran with
+about one GiB above the six-GiB headroom while other processes were resident, so close large memory users first.
+
 ## Original Strata features and desktop results
 
 The following overview and desktop measurements are retained from the original Strata project. They describe
