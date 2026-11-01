@@ -343,3 +343,18 @@ The independent seven-pair randomized confirmation completed at 262,144 configur
 Intervals resample the seven within-pair percentage changes (median statistic, 100,000 resamples, seed 42, percentile interval). The decode result confirms the fixed-map performance effect for this exact synthetic 128K fixture; it is not a broad semantic-quality or general long-context qualification.
 
 Minimum available RAM across the 14 processes was 7.22 GiB, above the six-GiB admission floor; maximum sampled swap was 2.96 GiB and sampled cgroup OOM-kill counts were zero. CPU frequencies ranged 729–2,201 MHz and GPU frequencies 306–1,300 MHz; clocks were observed, not controlled. EMC readback was denied and energy was not measured. Pair-level measurements, fixture hashes and response identity are in [`evidence.json`](evidence.json); raw captures remain under `/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task131072-confirmation/`.
+
+
+## Actual near-limit 240K learned-map screen (2026-11-01)
+
+A tokenizer-verified 240,286-token three-position retrieval/arithmetic fixture was screened with a 262,144-token context. Three randomized pairs compared the original and learned fixed 5K GPU maps under strict NInfer. Adaptation and prompt cache were disabled, and both maps used the same 4,660-entry RAM complement. All six measured requests passed and returned the exact same 46-token answer (`EARLY=COPPER-ORBIT-482, MIDDLE=SILVER-CANYON-173, LATE=INDIGO-LANTERN-905, SUM=1560`).
+
+| Metric | Original map median | Learned map median | Paired median change | Paired bootstrap 95% interval |
+| --- | ---: | ---: | ---: | ---: |
+| Decode | 4.0 tok/s | 5.4 tok/s | +35.0% | +35.0% to +38.5% |
+| Prompt processing | 101.5 tok/s | 104.6 tok/s | +3.1% | +2.8% to +3.3% |
+| First visible token | 2,368.3 s | 2,297.8 s | −3.0% | −3.3% to −2.7% |
+| Client request duration | 2,379.0 s | 2,305.7 s | −3.1% | −3.4% to −2.8% |
+| NInfer expert hit rate | 21.5% | 48.2% | +26.7 percentage points | — |
+
+The preset screen threshold (at least 5% median decode improvement with a paired interval above zero) passed, so an independent seven-pair confirmation has started. Minimum available RAM was 7.27 GiB, above the six-GiB admission floor; maximum sampled swap was 2.95 GiB and sampled cgroup OOM kills were zero. CPU/GPU frequencies were observed but uncontrolled; EMC readback was denied and energy was not measured. This is one synthetic near-limit fixture and does not establish semantic quality or general 240K capability. Pair values and response hashes are in [`evidence.json`](evidence.json); raw captures are under `/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task240286-screen/`.
