@@ -2798,11 +2798,14 @@ the map effect for one synthetic 8K task only. Next broaden prompt families and
 test larger actual input lengths; E6 quality/context coverage and E7 release
 assessment remain open. See the [8K evidence](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
 
-**E6 actual 16K prompt screen (2026-10-31):** a 16,384-token
-three-position retrieval/arithmetic fixture passed all six strict-NInfer cells
-at 32K configured context. The learned map improved decode +46.9% (4.9 to 7.2
-tok/s; three-pair paired interval +44.0% to +51.0%), with exact full answers,
-47 generated tokens, and hits increasing 21.3% to 48.2%. Minimum available RAM
-was 8.57 GiB with no sampled OOM kills. It cleared the 5% screening gate, so
-the required seven-pair confirmation is underway. This is not yet a confirmed
-16K performance result. E6/E7 remain open; see the [16K screen](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
+**E6 actual 16K prompt map confirmation (2026-10-31):** a 16,384-token,
+three-position retrieval/arithmetic fixture passed the three-pair screen and
+seven-pair confirmation at 32K configured context. Every one of twenty measured
+requests returned the exact full answer with 47 output tokens. The learned map
+improved decode +49.0% (4.9 to 7.3 tok/s; paired bootstrap 95% interval +43.1%
+to +51.0%), prompt throughput +14.7%, first-visible latency −13.0%, and client
+time −13.8%; expert hits rose 21.3% to 48.2%. Minimum available RAM was 8.57
+GiB, maximum sampled swap use 5.10 GiB, and OOM-kill counters stayed zero.
+This confirms the fixed-map effect for one synthetic 16K input, not broad
+semantic quality or general long-context capability. E6/E7 remain open. See
+the [16K report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).

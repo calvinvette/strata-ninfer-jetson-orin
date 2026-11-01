@@ -181,7 +181,7 @@ or establish a backend advantage; the next step should use another prompt
 family and then test larger actual input lengths. Pair-level data are in
 `evidence.json`, with raw captures under `/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task8192-{screen,confirmation}/`.
 
-## 16K prompt screen
+## 16K prompt replication
 
 A tokenizer-verified 16,384-token retrieval/arithmetic fixture has passed a
 three-pair screen at 32,768 configured context. All six measured cells returned
@@ -189,10 +189,17 @@ the exact answer with 47 output tokens. Under strict NInfer, the learned map
 improved decode +46.9% (4.9 to 7.2 tok/s; three-pair bootstrap interval +44.0%
 to +51.0%), prompt throughput +4.5%, and client time −5.4%; expert hits rose
 21.3% to 48.2%. Minimum available RAM was 8.57 GiB, above the six-GiB floor,
-with zero sampled OOM kills. This clears the 5% decode screen gate; its
-seven-pair confirmation is in progress, so these are screening results only.
-The 16K fixture and screen evidence are recorded in `evidence.json`; raw
-captures are under `/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task16384-screen/`.
+with zero sampled OOM kills. This cleared the 5% decode screen gate. Seven
+randomized confirmation pairs then showed a +49.0% decode change (4.9 to 7.3
+tok/s; paired 95% interval +43.1% to +51.0%), +14.7% prompt throughput,
+−13.0% first-visible latency and −13.8% client time. Confirmation outputs
+also matched exactly in all fourteen cells. Minimum available RAM across
+screen and confirmation was 8.57 GiB, with peak observed swap use of 5.10 GiB
+and no sampled OOM kills. Clock controls were untouched, EMC readback was
+denied and energy was not measured. This confirms a fixed-map effect for one
+synthetic 16K retrieval task under NInfer, not broad quality or long-context
+generalization. Pair-level evidence is in `evidence.json`; raw captures are
+under `/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task16384-{screen,confirmation}/`.
 
 ## Controls and identity
 
@@ -244,15 +251,15 @@ The evidence covers two held-out 512-token exact lookups and 2,048-, 4,096-,
 8,192- and 16,384-token retrieval/arithmetic prompts. The short tasks are in
 the same synthetic lookup family; the longer fixtures test exact
 multi-position retrieval and arithmetic. The 8K and 16K measurements used
-16K and 32K configured contexts respectively; 16K confirmation is pending.
+16K and 32K configured contexts respectively.
 This is still one model and narrow task coverage, not broad quality
 qualification. These results do not qualify other prompt lengths, models,
 memory budgets, or sustained service loads.
 
 The primary finding is that a fixed 5K residency map with more useful experts
 in GPU memory more than doubled decode speed on the two 512-token exact-lookup
-prompts under NInfer. Confirmed decode gains were 52.0% at 2K, 54.0% at 4K and
-49.0% at 8K; a three-pair 16K screen showed +46.9%, with confirmation pending.
+prompts under NInfer. Confirmed decode gains were 52.0% at 2K, 54.0% at 4K,
+49.0% at 8K and 49.0% at 16K.
 The 512-token ORBIT map effect was also confirmed under Strata.
 Same-map screens at 512 tokens, 2K and 4K did not show a 5% NInfer end-to-end
 gain. Continue the planned context/workload matrix and broader quality/state
