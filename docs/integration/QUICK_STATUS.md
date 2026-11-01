@@ -1,6 +1,6 @@
 # Quick status
 
-Updated: 2026-10-24
+Updated: 2026-11-01
 
 This is a short orientation to the integration. The [plan](PLAN.md) defines
 phase gates; the detailed [status](STATUS.md) is the evidence record, and the
@@ -9,6 +9,12 @@ phase gates; the detailed [status](STATUS.md) is the evidence record, and the
 Strata and Splash.
 
 ## Overall status
+
+Setup also builds on JetPack 7 (CUDA 13.x) since 2026-11-01. A 64 GB Orin with
+L4T R39.2.1 and CUDA 13.2 passed 122 of 124 registered CUDA functional tests;
+the two failures were missing default input files and passed once those were
+supplied. See the
+[JetPack 7 validation](../../bench/results/2026-11-01-jetpack7-cuda13-orin-validation/README.md).
 
 Phases 0–8 are complete for the bounded Orin and backend scopes documented in
 their closeouts. Phase 5 supports tested single-live static-routing transaction

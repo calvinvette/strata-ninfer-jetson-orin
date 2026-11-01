@@ -5,7 +5,9 @@ developed at [calvinvette/strata-ninfer-jetson-orin](https://github.com/calvinve
 It starts from [the Strata Orin port](https://github.com/calvinvette/strata-inference-orin) and brings in
 the source, tests, architecture and measured lessons from [the NInfer Orin port](https://github.com/calvinvette/ninfer-jetson-orin).
 The inherited runtime supports ARM64 and shared physical RAM on **NVIDIA Jetson AGX Orin 32 GB**, running
-**JetPack 6.2 with CUDA 12.6 (SM87)**. The original engine, server, web app and desktop features come from Strata.
+**JetPack 6.2 with CUDA 12.6 (SM87)**. Setup also builds it with **JetPack 7's CUDA 13 toolkit**; that path was
+checked on a Jetson AGX Orin 64 GB ([JetPack 7 validation](bench/results/2026-11-01-jetpack7-cuda13-orin-validation/README.md)).
+The original engine, server, web app and desktop features come from Strata.
 Strata retains its [MIT license](LICENSE); imported NInfer code retains its Apache-2.0 license and
 [source attribution](THIRD_PARTY_NOTICES.md).
 
@@ -26,7 +28,8 @@ The translated READMEs describe the original project and have not been updated f
 - Local ARM64 builds targeting SM87, portable CPU kernels and pinned ggml's ARM backend.
 - A single physical RAM budget for CPU and GPU allocations, with file-backed experts when they do not fit in RAM.
 - ARM synchronization for CUDA mapped host buffers, registration fallback and tested VMM cache resizing.
-- Jetson setup that preserves JetPack's CUDA libraries and avoids x86 binaries and desktop CUDA packages.
+- Jetson setup that preserves JetPack's CUDA libraries (CUDA 12.6 on JetPack 6.2, CUDA 13.x on JetPack 7) and avoids
+  x86 binaries and desktop CUDA packages.
 - CPU and CUDA image encoder builds, real API validation and reproducible hardware results.
 
 Orin's CPU and GPU share its 32 GB of RAM; there is no separate 32 GB VRAM pool. The runtime leaves six GiB
@@ -122,7 +125,9 @@ limitations are in the [combined-port context sweep](bench/results/2026-10-25-fl
 ## Install this fork on Orin
 
 Use an NVMe SSD with room for the model downloads and prepared packs. This port builds from source using
-JetPack's installed CUDA 12.6 toolkit:
+JetPack's installed CUDA toolkit: CUDA 12.6 on JetPack 6.2, or CUDA 13.x on JetPack 7. When several 13.x toolkits
+are installed, setup takes the newest one the driver's CUDA version covers; `STRATA_NVCC=<path to nvcc>` picks
+another. The engine still goes to `engine-cuda12/`, the local build slot used by every Orin measurement here.
 
 ```bash
 git clone --branch main https://github.com/calvinvette/strata-ninfer-jetson-orin.git

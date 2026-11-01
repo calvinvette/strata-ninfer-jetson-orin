@@ -3089,14 +3089,43 @@ def sm120_nvcc(nvcc, cuda_v, archs):
     return nvcc, cuda_v
 
 
+def jetson_nvcc(gpu):
+    """JetPack's CUDA toolkit for the Orin engine: (nvcc, (major, minor)), or (None, None).  JetPack 6.2's 12.x first,
+    exactly as before (the newest below 13.0, 12.6 or newer); with none, JetPack 7's 13.x: the newest the driver's CUDA
+    version covers, else the newest at all (CUDA's minor version compatibility, warned).  A toolkit of a newer major
+    version than the driver builds an engine that cannot start, so it is refused.  STRATA_NVCC picks one (#601)."""
+    api = gpu.get("driver_api", 0)
+    ceiling = (api // 1000, api % 1000 // 10 + 1) if api else None      # driver 13020 (CUDA 13.2) -> below (13, 3)
+    pick = os.environ.get("STRATA_NVCC")
+    if pick and Path(pick).exists():                 # a stale override falls through to the bounded search below
+        nvcc, ver = find_nvcc()
+    else:
+        nvcc, ver = find_nvcc(below=(13, 0))
+        if (nvcc is None or ver < (12, 6)) and ceiling:
+            nvcc, ver = find_nvcc(below=ceiling)
+        if nvcc is None or ver < (12, 6):
+            nvcc, ver = find_nvcc()
+    if nvcc is None or ver < (12, 6):
+        return None, None
+    if ceiling and ver >= ceiling:
+        driver = f"CUDA {api // 1000}.{api % 1000 // 10}"
+        if ver[0] > ceiling[0]:
+            fail(f"{nvcc} is CUDA {ver[0]}.{ver[1]}, newer than this Jetson's driver ({driver}): the engine would not start",
+                 "use the CUDA toolkit that came with this JetPack (STRATA_NVCC=<its nvcc>), then run setup again")
+        warn(f"{nvcc} is CUDA {ver[0]}.{ver[1]}, newer than this Jetson's driver ({driver}); the engine relies on "
+             "CUDA's minor version compatibility (STRATA_NVCC=<nvcc> picks another toolkit)")
+    return nvcc, ver
+
+
 def install_build_tools(gpu, yes):
     """The compiler and the CUDA toolkit, installed for the user (asks once).  Returns (nvcc, vcvars)."""
     archs = [int(x) for x in gpu.get("archs", [gpu["arch"]])]
     if gpu.get("jetson"):
-        nvcc, cuda_v = find_nvcc(below=(13, 0))
-        if nvcc is None or cuda_v < (12, 6):
-            fail("Jetson Orin needs the JetPack CUDA 12.6 toolkit",
+        nvcc, cuda_v = jetson_nvcc(gpu)
+        if nvcc is None:
+            fail("Jetson Orin needs JetPack's CUDA toolkit: 12.6 (JetPack 6.2) or 13.x (JetPack 7)",
                  "install JetPack's development packages (nvidia-jetpack-dev), then run setup again")
+        ok(f"JetPack CUDA toolkit: CUDA {cuda_v[0]}.{cuda_v[1]} ({nvcc})")
         if shutil.which("g++") is None:
             fail("g++ is missing", "install build-essential, then run setup again")
         return nvcc, None
@@ -4964,8 +4993,11 @@ def main() -> int:
         ok(f"GPU: {gpu['name']}, {memory_text}, compute capability {cc(gpu)}, driver {gpu['driver']}")
         if gpu.get("jetson"):
             if str(a.cuda) == "13":
-                fail("Jetson Orin support uses JetPack's CUDA 12.6 toolkit", "use --cuda 12")
-            cuda_tk, why = 12, "Jetson Orin uses the installed JetPack CUDA 12.6 toolkit"
+                fail("on Jetson Orin the engine is compiled with JetPack's own CUDA toolkit (12.6 or 13.x) into the "
+                     "local engine slot, engine-cuda12/", "leave --cuda out (or use --cuda 12)")
+            # the local engine slot (engine-cuda12/, the measured Orin build), whichever toolkit compiles it
+            cuda_tk, why = 12, None
+            ok("Jetson Orin: the engine is compiled here with JetPack's CUDA toolkit (12.6 or 13.x)")
             if gpu.get("driver_api", 0) < 12060:
                 fail("Jetson's CUDA driver API is older than 12.6", "update JetPack's compute stack")
         else:
