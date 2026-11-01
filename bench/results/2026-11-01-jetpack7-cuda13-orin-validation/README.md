@@ -12,9 +12,9 @@ configurations. The engine links the CUDA 13.2 runtime and cuBLAS (`ldd` below).
 | --- | --- |
 | `tools/test_setup_jetson.py` | 21 of 21 pass, 6 of them new. On the previous `setup.py` the three JetPack 7 toolkit tests and the new message check fail; the JetPack 6.2 test passes on both. |
 | All `tools/test_setup_*.py` on the Orin | 29 files, 439 tests (433 before). The same four files fail before and after the change ([before](setup-tests-before.txt), [after](setup-tests-after.txt)); see [Setup tests](#setup-tests). |
-| CUDA functional CTest suite, serial | 124 registered, 122 passed, 2 failed for missing default input files ([output](ctest-output.txt)). 306 s. Minimum available RAM 46.3 GiB. Both passed when given their inputs (next rows). |
+| CUDA functional CTest suite, serial | 124 registered, 122 passed (one of them, `expert_parity`, only reports SKIPPED on ARM; see below), 2 failed for missing default input files ([output](ctest-output.txt)). 306 s. Minimum available RAM 46.3 GiB. Both passed when given their inputs (next rows). |
 | `ple_parity` with real inputs | Passed: 0 failures, worst stage relative error 1.148e-07. |
-| `pool_test` and `expert_parity` with a one-layer Q2_0 fixture | Both passed ([output](fixture-ctest-output.txt)). The fixture regenerated with `tools/pack_layer.py` has the same SHA-256 as the one in the [2026-10-22 regression report](../2026-10-22-phase5-current-source-regression/fixture-source-sha256.txt). |
+| `pool_test` with a one-layer Q2_0 fixture | Passed ([output](fixture-ctest-output.txt)). The fixture regenerated with `tools/pack_layer.py` has the same SHA-256 as the one in the [2026-10-22 regression report](../2026-10-22-phase5-current-source-regression/fixture-source-sha256.txt). `expert_parity` is an x86 AVX-512 check: on ARM it prints `SKIPPED, not passed` and exits 0, so CTest lists it as passed although it does not run. |
 | Q2_0 served answers | All 18 screening requests below returned 64 tokens of on-topic text, and profiles A and B begin the same way for the same prompt (text and hashes in the per-run JSON). Output quality was not scored. |
 
 This shows that the CUDA 13.2 build compiles, passes the repository's functional tests and serves the real model
@@ -90,9 +90,11 @@ paths:
   [2026-10-24 CUDA 12.6 run](../2026-10-24-orin-cuda-functional-ctest/README.md). The one-layer S2 fixture was
   rebuilt with `tools/pack_layer.py` from the Q2_0 shard 1 (`build(1, ...)` with `SHARD1` pointed at the local
   file); `experts.bin` and `experts.json` match the published hashes ([fixture-sha256.txt](fixture-sha256.txt)).
-  With `STRATA_TEST_EXPERTS_BIN` set to it, `pool_test` and `expert_parity` passed.
+  With `STRATA_TEST_EXPERTS_BIN` set to it, `pool_test` passed.
 
-With their inputs supplied, all 124 registered tests passed. [ple_parity output](ple-parity-output.txt).
+With their inputs supplied, every registered test passed except `expert_parity`, which is x86-only: on ARM it prints
+`SKIPPED, not passed` and exits 0, so CTest counts it as passed without running it. So 123 tests ran and passed and
+1 was skipped. [ple_parity output](ple-parity-output.txt).
 
 ## Q2_0 on the CUDA 13.2 build (screening)
 
@@ -117,13 +119,15 @@ Medians of three requests in one server process (engine-reported prompt and deco
 
 | Profile | 172 tokens PP / TG / TTFT | 557 tokens PP / TG / TTFT | 1,069 tokens PP / TG / TTFT | Min MemAvailable |
 | --- | ---: | ---: | ---: | ---: |
-| A, setup's 64 GB default | 139.3 / 25.8 / 1.4 s | 290.3 / 25.5 / 2.1 s | 399.0 / 26.5 / 2.8 s | 5 GiB |
+| A, setup's 64 GB default | 139.3 / 25.8 / 1.4 s | 290.3 / 25.5 / 2.1 s | 399.0 / 26.5 / 2.8 s | 5 GiB: **headroom failure** |
 | B, author's profile | 35.4 / 9.2 / 5.2 s | 64.4 / 13.0 / 8.9 s | 74.8 / 13.2 / 14.6 s | 40 GiB |
 
 All 18 requests passed the script's checks. Ranges are in [summary.txt](q2_0-screening/summary.txt) and every row
 is in `q2_0-screening/out-*/`. Each 172-token cell includes the first, cold request of its server (B's first decode
 was 4.6 tok/s). Memory is `MemAvailable` sampled every 2 s and truncated to whole GiB; A ran at 5–7 GiB available
-while serving, so on this shared machine it went below the 6 GiB floor that `run_control.py` enforces.
+while serving, so on this shared machine it went below the 6 GiB floor that `run_control.py` enforces. These cells
+were not run under that supervisor (`drive.py` calls `run_cell.main()` directly), so profile A is recorded as a
+headroom failure, not a pass: its speeds are what it measured while breaking the floor.
 
 For orientation only: the 2026-10-25 Q2_0 sweep reported 30.9/11.8, 45.0/11.4 and 51.1/12.7 tok/s (PP/TG) for
 profile B's settings on a 32 GB Orin with JetPack 6.2. That is a different device, memory size, JetPack, expert profile

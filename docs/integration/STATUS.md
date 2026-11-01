@@ -25,8 +25,9 @@ JetPack 6.2 still selects the same 12.x nvcc, and Orin keeps the
 L4T R39.2.1 and CUDA 13.2, a clean build passed 122 of 124 registered CUDA
 functional tests; the two failures were missing default input files, and both
 passed once given the real Q2_0 files and the regenerated one-layer fixture.
-This is build and functional evidence with screening-level Q2_0 speed, not a
-CUDA 12.6 versus 13.2 comparison ([validation
+(`expert_parity` is an x86-only check that reports SKIPPED on ARM.) This is
+build and functional evidence with screening-level Q2_0 speed, not a CUDA 12.6
+versus 13.2 comparison ([validation
 report](../../bench/results/2026-11-01-jetpack7-cuda13-orin-validation/README.md)).
 
 The current Coder two-live investigation refines that exclusion. At cache 3,000,
