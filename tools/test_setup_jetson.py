@@ -1,4 +1,5 @@
 """ARM CPU detection regression: no GPU or downloads required."""
+import contextlib
 import io
 import json
 import tempfile
@@ -179,6 +180,62 @@ class LocalEngineArchitecture(unittest.TestCase):
                 self.assertEqual(json.loads((eng / "BUILD.json").read_text())["cpu_arch"], "arm64")
 
 
+class JetPackToolkits(unittest.TestCase):
+    """JetPack 6.2 ships CUDA 12.6, JetPack 7 CUDA 13.x: the Orin engine is compiled with the one this Jetson has."""
+
+    def tools(self, driver_api, installed, env=None):
+        """install_build_tools on an Orin whose find_nvcc sees `installed` ((major, minor) versions) -> (nvcc, the
+        `below` arguments asked, printed text).  The fake keeps find_nvcc's contract: the newest older than `below`."""
+        seen = []
+
+        def find(below=None):
+            seen.append(below)
+            fits = [v for v in installed if below is None or v < below]
+            return (f"/usr/local/cuda-{max(fits)[0]}.{max(fits)[1]}/bin/nvcc", max(fits)) if fits else (None, None)
+
+        gpu = {"arch": "87", "archs": [87], "jetson": True, "driver_api": driver_api, "toolkit": 12}
+        out = io.StringIO()
+        with mock.patch.object(setup, "find_nvcc", find), \
+             mock.patch.object(setup.shutil, "which", lambda n: "/usr/bin/" + n), \
+             mock.patch.dict(os.environ, env or {"STRATA_NVCC": ""}), \
+             contextlib.redirect_stdout(out):
+            got = setup.install_build_tools(gpu, True)
+        return got[0], seen, out.getvalue()
+
+    def test_jetpack_62_is_unchanged(self):
+        # the newest 12.x below 13.0, as before this change (a 12.8 beside 12.6 is still taken)
+        self.assertEqual(self.tools(12060, [(12, 6)])[:2], ("/usr/local/cuda-12.6/bin/nvcc", [(13, 0)]))
+        self.assertEqual(self.tools(12060, [(12, 6), (12, 8)])[:2], ("/usr/local/cuda-12.8/bin/nvcc", [(13, 0)]))
+        self.assertEqual(self.tools(12060, [(12, 6), (13, 2)])[:2], ("/usr/local/cuda-12.6/bin/nvcc", [(13, 0)]))
+
+    def test_jetpack_7_takes_the_toolkit_its_driver_covers(self):
+        nvcc, seen, text = self.tools(13020, [(13, 2), (13, 4)])
+        self.assertEqual((nvcc, seen), ("/usr/local/cuda-13.2/bin/nvcc", [(13, 0), (13, 3)]))
+        self.assertIn("JetPack CUDA toolkit: CUDA 13.2", text)
+        self.assertNotIn("newer than this Jetson's driver", text)
+
+    def test_a_newer_minor_version_is_used_with_a_warning(self):
+        nvcc, seen, text = self.tools(13020, [(13, 4)])
+        self.assertEqual((nvcc, seen), ("/usr/local/cuda-13.4/bin/nvcc", [(13, 0), (13, 3), None]))
+        self.assertIn("minor version compatibility", text)
+
+    def test_a_newer_major_version_or_no_toolkit_fails(self):
+        for driver_api, installed in [(12060, [(13, 2)]), (13020, []), (12060, [(12, 4)])]:
+            with self.subTest(driver_api=driver_api, installed=installed), self.assertRaises(SystemExit):
+                self.tools(driver_api, installed)
+
+    def test_strata_nvcc_is_the_only_one_considered(self):
+        with tempfile.NamedTemporaryFile() as pick:
+            nvcc, seen, text = self.tools(13020, [(13, 4)], env={"STRATA_NVCC": pick.name})
+        self.assertEqual((nvcc, seen), ("/usr/local/cuda-13.4/bin/nvcc", [None]))
+        self.assertIn("minor version compatibility", text)
+
+    def test_a_stale_strata_nvcc_keeps_the_bounded_search(self):
+        # JetPack 6.2 with 12.6 and 13.2 installed: a STRATA_NVCC naming a missing file must not pick 13.2
+        nvcc, seen, _ = self.tools(12060, [(12, 6), (13, 2)], env={"STRATA_NVCC": "/missing/bin/nvcc"})
+        self.assertEqual((nvcc, seen), ("/usr/local/cuda-12.6/bin/nvcc", [(13, 0)]))
+
+
 class Installation(unittest.TestCase):
     def test_orin_configuration_uses_local_cuda12_and_file_backing(self):
         from tools.test_setup_golden import install, argv_for
@@ -207,10 +264,40 @@ class Installation(unittest.TestCase):
             self.assertEqual(builds[0][2], 12)
             self.assertEqual(cfg["cuda"], 12)
             self.assertIn("--mmap-experts", cfg["args"])
+            self.assertIn("Jetson Orin: the engine is compiled here with JetPack's CUDA toolkit", out)
+            self.assertNotIn("CUDA 12.6 toolkit", out)
             args = cfg["args"]
             self.assertLessEqual(int(args[args.index("--max-context") + 1]), 32768)
             if vision:
                 self.assertEqual(int(args[args.index("--vram-reserve-mib") + 1]), reserve or 3072)
+
+    def test_jetpack_7_orin_64gb_keeps_the_local_engine_slot(self):
+        """JetPack 7 (driver CUDA 13.2) on a 64 GB Orin: the same local engine slot and config fields as JetPack 6.2;
+        --context is the user's choice above the 32K recommendation."""
+        from tools.test_setup_golden import install, argv_for
+        gpu = {"index": 0, "name": "Orin", "arch": "87", "driver": "CUDA API 13.2", "driver_api": 13020,
+               "vram_gb": 55.4, "uma": True, "dedicated_gb": 0, "shared_gb": 61.4, "jetson": True}
+        builds = []
+        def build(gpu, vision, yes, llama, toolkit=None):
+            builds.append(toolkit)
+            eng = setup.engine_dir(toolkit)
+            eng.mkdir(parents=True, exist_ok=True)
+            (eng / setup.EXE).write_bytes(b"")
+            (eng / "BUILD.json").write_text('{"source":"local","toolkit":12,"archs":[87]}')
+            return eng
+        for model, context in [("Q2_0", None), ("IQ3_S", 262144)]:
+            builds.clear()
+            argv = argv_for("qwen", model) + (["--context", str(context)] if context else [])
+            with self.subTest(model=model), mock.patch.dict(os.environ, {"STRATA_CUDA": ""}):
+                code, out, cfg, _ = install(61, [gpu], argv, extra=[
+                    mock.patch.object(setup, "arm64_host", return_value=True),
+                    mock.patch.object(setup, "build_engine", side_effect=build),
+                    mock.patch.object(setup, "pcie_link", return_value=None),
+                ])
+                self.assertEqual(code, 0, out)
+                self.assertEqual((builds, cfg["cuda"]), ([12], 12))
+                args = cfg["args"]
+                self.assertEqual(int(args[args.index("--max-context") + 1]), context or 32768)
 
 
 if __name__ == "__main__":

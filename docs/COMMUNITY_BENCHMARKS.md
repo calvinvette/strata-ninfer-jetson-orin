@@ -26,6 +26,10 @@ and their limits. Report what you actually measured and label estimates separate
 - [2026-10-07: 2x NVIDIA Quadro RTX 4000 8 GB, Xeon E5-2620 v3, 96 GB RAM](../bench/results/2026-10-07-community-2x-rtx-4000/README.md):
   Strata 0.1.38, Swift-Qwen3.8-Flash-Next IQ2_XS, 131,072-token context, layer split across dual GPUs with RAM-tiered expert cache;
   measured deep-context prompt ingestion (73k–74k tokens at 100–250 tok/s, 18–23 tok/s decode) and production pipeline comparison against a 12B model.
+- [2026-11-01: Jetson AGX Orin 64 GB, JetPack 7 (L4T R39.2.1), CUDA 13.2](../bench/results/2026-11-01-community-jetson-agx-orin-64gb-jetpack7/README.md):
+  source build with the JetPack 7 setup change, original Flash-Next IQ3_S, 262,144-token context, file-backed experts with
+  an 18,348-expert GPU cache; three runs each at 4,096, 32,768 and 128,000 prompt tokens. Decode 23.7/25.5/12.1 tok/s (medians; wide run-to-run
+  spread), prompt 234.7/420.5/358.4 tok/s at those three lengths, needles 6/6 at 32k and 128k and 1/1 with a 240,212-token prompt.
 
 ## What to record
 
