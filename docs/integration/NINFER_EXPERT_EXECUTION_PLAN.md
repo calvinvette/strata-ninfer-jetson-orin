@@ -2834,10 +2834,4 @@ Minimum available RAM was 7.27 GiB; sampled OOM kills were zero. One synthetic
 64K retrieval/arithmetic fixture only; not broad quality qualification. See
 the [64K screen report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
 
-**E6 64K confirmation progress (2026-11-01):** the seven-pair randomized
-confirmation began after the screen gate passed. Six complete pairs (twelve
-supervised processes) have passed exact-output and memory-supervisor checks;
-minimum available RAM so far is 7.27 GiB and sampled OOM kills are zero. Keep
-the campaign open until all seven pairs complete, then calculate and record
-the paired confirmation interval. Raw data remain under
-`/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task65536-confirmation/`.
+**E6 actual 64K prompt map confirmation (2026-11-01):** a separate seven-pair randomized confirmation completed at 131,072 configured context. All fourteen strict-NInfer requests used a 65,536-token prompt and returned the same exact 47-token retrieval/arithmetic answer. The learned map improved median decode +42.2% (4.5 to 6.3 tok/s; paired bootstrap 95% interval +40.0% to +44.4%); prompt throughput rose 2.7%, first-visible latency fell 2.7%, client time fell 3.0%, and expert cache hits rose from 21.5% to 48.4%. Minimum available RAM was 7.25 GiB; peak sampled swap was 4.66 GiB and sampled OOM kills were zero. CPU/GPU clocks were observed but not controlled; EMC readback was denied and energy was not measured. This confirms the fixed-map decode effect for this synthetic 64K fixture only, not broad quality or general long-context capability. E6/E7 remain open. See the [64K report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).

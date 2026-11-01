@@ -313,3 +313,9 @@ gates before changing release defaults or claiming NInfer acceleration.
 Pair-level values, response hashes and memory/clock summaries are in
 [`evidence.json`](evidence.json). Raw process captures remain under
 `/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/` and are not committed.
+
+## Actual 64K learned-map confirmation (2026-11-01)
+
+A separate seven-pair randomized confirmation followed the passing 64K screen. The task used a tokenizer-verified 65,536-token retrieval/arithmetic prompt with 131,072 configured context. All fourteen strict-NInfer requests returned the exact expected 47-token answer. The learned map improved median decode from 4.5 to 6.3 tok/s (+42.2%; paired bootstrap 95% interval +40.0% to +44.4%). Prompt throughput rose 2.7%, first-visible latency fell 2.7%, client time fell 3.0%, and expert cache hits rose from 21.5% to 48.4%.
+
+Minimum available RAM was 7.25 GiB, maximum sampled swap use 4.66 GiB, and sampled OOM-kill counters remained zero. Observed CPU clocks ranged 730–2,202 MHz and GPU clocks 306–1,301 MHz; clocks were not controlled. EMC clock readback was denied and energy was not measured. This confirms a fixed-map decode effect on this one synthetic 64K fixture. It does not establish semantic quality or general performance across long-context workloads. Pair-level data are in [`evidence.json`](evidence.json); raw captures remain under `/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task65536-confirmation/`.
