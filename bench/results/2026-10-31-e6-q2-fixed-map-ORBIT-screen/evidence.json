@@ -7646,7 +7646,7 @@
       "resident_slots": 5000,
       "ram_complement_entries": 4660,
       "original_map_sha256": "781fbe88884fbd263736bd4812c9abddfa59c707e2b2c1acad6cd40f6182cd64",
-      "learned_map_sha256": "76a1644f56d985fdd54a5812c9abddfa59c707e2b2c1acad6cd40f6182cd64",
+      "learned_map_sha256": "76a1644f56d985fdd54a5816aadd39ce9356190dbaa828a293fab8462f507087",
       "ram_complement_sha256": "3d7519b9d41ef7bd6462b0cc800408fc4d708d922a5d0968f3dcbaf75f5954f5",
       "prompt_cache_enabled": false,
       "staging_enabled": false,
@@ -8391,6 +8391,207 @@
               "supervised_elapsed_s": 1260.7260356098413
             }
           }
+        }
+      ]
+    },
+    "backend_screen": {
+      "date": "2026-11-02",
+      "status": "complete; decode useful-effect gate failed; no confirmation",
+      "paired_blocks": 3,
+      "completed_supervised_processes": 6,
+      "all_supervisors_passed": true,
+      "all_responses_exact": true,
+      "backend": "Strata control versus strict NInfer candidate",
+      "primary_metric": "decode_tps",
+      "useful_effect_gate": "at least 5% median improvement and paired interval excludes zero",
+      "context_capacity": 262144,
+      "prompt_tokens": 131072,
+      "maximum_generation_tokens": 48,
+      "actual_completion_tokens": 47,
+      "expected_exact_response": "EARLY=AMBER-QUARTZ-618, MIDDLE=SILVER-MEADOW-243, LATE=INDIGO-LANTERN-907, SUM=1768",
+      "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+      "same_learned_5k_gpu_map": true,
+      "resident_slots": 5000,
+      "ram_complement_entries": 4660,
+      "original_map_sha256": "781fbe88884fbd263736bd4812c9abddfa59c707e2b2c1acad6cd40f6182cd64",
+      "learned_map_sha256": "76a1644f56d985fdd54a5816aadd39ce9356190dbaa828a293fab8462f507087",
+      "ram_complement_sha256": "3d7519b9d41ef7bd6462b0cc800408fc4d708d922a5d0968f3dcbaf75f5954f5",
+      "prompt_cache_enabled": false,
+      "staging_enabled": false,
+      "adaptation_enabled": false,
+      "strict_ninfer": true,
+      "warmup": "same 512-token NIMBUS exact lookup in each process",
+      "order_by_pair": [
+        [
+          "baseline",
+          "candidate"
+        ],
+        [
+          "baseline",
+          "candidate"
+        ],
+        [
+          "baseline",
+          "candidate"
+        ]
+      ],
+      "seed": 131072262144,
+      "performance": {
+        "decode_tps": {
+          "baseline_median": 5.4,
+          "candidate_median": 5.4,
+          "paired_median_change_percent": 0.0,
+          "bootstrap_95_percentile_interval_percent": [
+            0.0,
+            1.8181818181818077
+          ],
+          "per_pair_change_percent": [
+            1.8181818181818077,
+            0.0,
+            0.0
+          ]
+        },
+        "prompt_tps": {
+          "baseline_median": 110.6,
+          "candidate_median": 110.8,
+          "paired_median_change_percent": 0.1808318264014508,
+          "bootstrap_95_percentile_interval_percent": [
+            -0.18050541516245744,
+            0.6352087114337657
+          ],
+          "per_pair_change_percent": [
+            0.6352087114337657,
+            0.1808318264014508,
+            -0.18050541516245744
+          ]
+        },
+        "first_visible_s": {
+          "baseline_median": 1186.2520282100886,
+          "candidate_median": 1184.1178347691894,
+          "paired_median_change_percent": -0.17991062524205237,
+          "bootstrap_95_percentile_interval_percent": [
+            -0.6658012712999928,
+            0.2215139410977729
+          ],
+          "per_pair_change_percent": [
+            -0.6658012712999928,
+            -0.17991062524205237,
+            0.2215139410977729
+          ]
+        },
+        "client_s": {
+          "baseline_median": 1194.435571226757,
+          "candidate_median": 1192.2500621643849,
+          "paired_median_change_percent": -0.18297421100139655,
+          "bootstrap_95_percentile_interval_percent": [
+            -0.6682346095559177,
+            0.22113789038435971
+          ],
+          "per_pair_change_percent": [
+            -0.6682346095559177,
+            -0.18297421100139655,
+            0.22113789038435971
+          ]
+        }
+      },
+      "minimum_available_ram_gib": 7.278606414794922,
+      "maximum_sampled_swap_gib": 2.867664337158203,
+      "maximum_sampled_cgroup_oom_kills": 0,
+      "clock_observation": "CPU/GPU clocks sampled read-only and uncontrolled; EMC readback denied; energy not measured",
+      "raw_data": "/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task131072-backend-screen",
+      "pairs": [
+        {
+          "block": 0,
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "arms": [
+            {
+              "arm": "baseline",
+              "status": "pass",
+              "prompt_tps": 110.2,
+              "decode_tps": 5.5,
+              "first_visible_s": 1190.0654493509792,
+              "client_s": 1198.0654357052408,
+              "expert_hit_rate": 0.487,
+              "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+              "minimum_available_ram_gib": 7.469818115234375
+            },
+            {
+              "arm": "candidate",
+              "status": "pass",
+              "prompt_tps": 110.9,
+              "decode_tps": 5.6,
+              "first_visible_s": 1182.1419784598984,
+              "client_s": 1190.0595478187315,
+              "expert_hit_rate": 0.487,
+              "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+              "minimum_available_ram_gib": 7.307334899902344
+            }
+          ]
+        },
+        {
+          "block": 1,
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "arms": [
+            {
+              "arm": "baseline",
+              "status": "pass",
+              "prompt_tps": 110.6,
+              "decode_tps": 5.4,
+              "first_visible_s": 1186.2520282100886,
+              "client_s": 1194.435571226757,
+              "expert_hit_rate": 0.487,
+              "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+              "minimum_available_ram_gib": 7.528648376464844
+            },
+            {
+              "arm": "candidate",
+              "status": "pass",
+              "prompt_tps": 110.8,
+              "decode_tps": 5.4,
+              "first_visible_s": 1184.1178347691894,
+              "client_s": 1192.2500621643849,
+              "expert_hit_rate": 0.487,
+              "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+              "minimum_available_ram_gib": 7.278606414794922
+            }
+          ]
+        },
+        {
+          "block": 2,
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "arms": [
+            {
+              "arm": "baseline",
+              "status": "pass",
+              "prompt_tps": 110.8,
+              "decode_tps": 5.4,
+              "first_visible_s": 1183.6290556746535,
+              "client_s": 1191.8110292167403,
+              "expert_hit_rate": 0.487,
+              "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+              "minimum_available_ram_gib": 7.4969635009765625
+            },
+            {
+              "arm": "candidate",
+              "status": "pass",
+              "prompt_tps": 110.6,
+              "decode_tps": 5.4,
+              "first_visible_s": 1186.2509590438567,
+              "client_s": 1194.4465749841183,
+              "expert_hit_rate": 0.487,
+              "response_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+              "minimum_available_ram_gib": 7.3398284912109375
+            }
+          ]
         }
       ]
     }

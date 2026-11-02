@@ -413,6 +413,19 @@ A three-pair comparison tested Strata versus strict NInfer with the same learned
 
 The primary decode change was below the 5% useful-effect gate, so no confirmation was run. Minimum available RAM was 7.29 GiB; sampled swap peaked at 3.96 GiB and cgroup OOM-kill counts were zero. CPU/GPU clocks were sampled but uncontrolled; EMC readback was denied and energy was not measured. Persistent-state fingerprints were not captured. This screen shows no useful same-map NInfer gain at 64K and does not establish backend equivalence. Pair data is in [`evidence.json`](evidence.json); raw captures remain under `/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task65536-backend-screen/`.
 
+### Same-map backend screen at 128K
+
+A three-pair comparison tested Strata versus strict NInfer with the same learned 5K GPU map on an exact 131,072-token retrieval/arithmetic request at 262,144 configured context. Model files, ordered 4,660-entry RAM complement, prefill chunk, workers and other launch controls were matched. Prompt cache, PCIe staging and adaptation were disabled. All six supervised requests passed with the exact same 47-token answer and 48.7% expert-cache hit rate. Pair 0 ran Strata first, pair 1 NInfer first, and pair 2 Strata first.
+
+| Metric | Strata median | NInfer median | NInfer paired change (95% screening interval) |
+| --- | ---: | ---: | ---: |
+| Decode throughput | 5.4 tok/s | 5.4 tok/s | 0.0% (0.0%, +1.8%) |
+| Prompt throughput | 110.6 tok/s | 110.8 tok/s | +0.2% (−0.2%, +0.6%) |
+| First visible token | 1186.3 s | 1184.1 s | −0.2% (−0.7%, +0.2%) |
+| Client request duration | 1194.4 s | 1192.3 s | −0.2% (−0.7%, +0.2%) |
+
+Decode, the primary metric, was tied at the paired median and remained far below the 5% useful-effect gate, so no confirmation was run. Minimum available RAM was 7.28 GiB; sampled swap peaked at 2.87 GiB and cgroup OOM-kill counts were zero. CPU/GPU clocks were sampled but uncontrolled; EMC readback was denied and energy was not measured. Persistent-state fingerprints were not captured. This screen shows no useful same-map NInfer gain at 128K and does not establish backend equivalence. Pair data is in [`evidence.json`](evidence.json); raw captures remain under `/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task131072-backend-screen/`.
+
 ### Actual near-limit 240K map confirmation
 
 The independent seven-pair randomized confirmation completed at 262,144 configured context with strict NInfer, adaptation and prompt cache disabled, and the same fixed 5K GPU maps and ordered 4,660-entry RAM complement. All fourteen supervised requests processed 240,286 prompt tokens and returned the same exact 46-token response.
