@@ -7,11 +7,14 @@ Updated: 2026-10-31. Branch: `feat/ninfer-expert-e0`.
 **No NInfer release profile is proposed.** Keep `--expert-backend ninfer`
 experimental and opt-in; the default remains Strata. The bounded CUDA Q2_0 path
 is implemented and has run against the Qwen3.8-Flash-Next Q2_0 model on the
-Jetson AGX Orin. A corrected 6-GiB staged profile now has a seven-pair TTFT
-effect on one short request and passes one held-out exact-answer/state check.
-That is narrow workload evidence; performance across the declared contexts and
-quality across tasks remain unqualified. This is not a general performance
-release.
+Jetson AGX Orin. A corrected 6-GiB staged profile has a seven-pair TTFT effect on one short
+request. Fixed-map Q2_0 trials now also confirm residency-map gains through a
+240,286-token synthetic retrieval fixture (+35.9% decode; paired 95% interval
++35.0% to +38.5%). A same-map NInfer-versus-Strata advantage has not passed the
+5% gate, so this gain does not qualify the NInfer compute backend for release.
+Task-family breadth, state/quality coverage and sustained-service evidence
+remain incomplete. Keep NInfer opt-in and experimental; this is not a general
+performance release.
 
 The implementation outcome is therefore bounded: the selected resident-expert
 path, fallback behavior, operator arithmetic and several static-service state
@@ -19,6 +22,18 @@ cases have direct evidence. The outcome does not imply support for other
 formats, live state migration, or general generation quality. One
 workload-specific TTFT effect is confirmed; a general performance-qualified
 release profile is **not achieved**.
+
+## Current integration decision
+
+The seven-pair 240K fixed-map confirmation supports using the learned resident
+map as an experimental cache policy on this exact Q2_0 retrieval workload. The
+map changes which experts are GPU-resident; Strata retains residency authority,
+and the measured gain appeared under both Strata and strict NInfer. The same-map
+backend screens at 512 tokens, 2K and 4K did not demonstrate a useful NInfer
+request-level gain. There is therefore no evidence to change the default backend
+or propose a general NInfer release profile. The 30-minute soak criterion is
+not triggered without a proposed profile. Reassess after broader quality and
+workload coverage. Pair data and limitations are in the [fixed-map report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
 
 ## Evidence and limits
 
