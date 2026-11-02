@@ -1,6 +1,6 @@
 # Q2_0 fixed-map and backend comparison on held-out tasks
 
-Date: 2026-10-31. Hardware: Jetson AGX Orin, CUDA backend. This experiment
+Date: 2026-10-31 to 2026-11-01. Hardware: Jetson AGX Orin, CUDA backend. This experiment
 measured a held-out prompt, not a representative workload suite.
 
 ## Result
@@ -16,7 +16,7 @@ it does **not** show a comparable NInfer-kernel gain.
 
 With the exact resident map held fixed, same-map NInfer-versus-Strata screens
 showed decode changes of +0.7% on the original 512-token map, −2.2% on the
-learned 512-token map, +4.2% at 2K and 0.0% at 4K. None met the 5% useful-effect
+learned 512-token map, +4.2% at 2K, 0.0% at 4K and 0.0% at 8K. None met the 5% useful-effect
 gate, so these cells were not confirmed. The three-pair intervals are coarse;
 the 4K screen also had one NInfer prefill outlier. These screens give no
 evidence of a useful end-to-end NInfer advantage at these tested settings, but
@@ -360,6 +360,19 @@ A tokenizer-verified 240,286-token three-position retrieval/arithmetic fixture w
 The preset screen threshold (at least 5% median decode improvement with a paired interval above zero) passed, so an independent seven-pair confirmation has started. Minimum available RAM was 7.27 GiB, above the six-GiB admission floor; maximum sampled swap was 2.95 GiB and sampled cgroup OOM kills were zero. CPU/GPU frequencies were observed but uncontrolled; EMC readback was denied and energy was not measured. This is one synthetic near-limit fixture and does not establish semantic quality or general 240K capability. Pair values and response hashes are in [`evidence.json`](evidence.json); raw captures are under `/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task240286-screen/`.
 
 
+
+### Same-map backend screen at 8K
+
+A three-pair screen compared Strata with strict NInfer on the same learned 5K GPU map, same ordered 4,660-entry RAM complement, same Q2_0 model and same 8,192-token retrieval/arithmetic request at 16,384 configured context. Prompt cache, PCIe staging and adaptation were disabled. All six supervised requests passed and returned the identical exact 47-token response. The seeded order placed Strata first in all three pairs.
+
+| Metric | Strata median | NInfer median | NInfer paired change (95% screening interval) |
+| --- | ---: | ---: | ---: |
+| Decode throughput | 7.5 tok/s | 7.5 tok/s | 0.0% (−76.3%, +2.7%) |
+| Prompt throughput | 70.8 tok/s | 69.8 tok/s | −1.6% (−2.0%, +6.4%) |
+| First visible token | 115.9 s | 117.5 s | +1.5% (−6.0%, +2.1%) |
+| Client request duration | 122.0 s | 124.3 s | +1.9% (−5.8%, +18.2%) |
+
+The primary decode median did not meet the 5% useful-effect gate, so no confirmation was run. One NInfer pair decoded at 1.8 tok/s versus 7.6 tok/s for its paired Strata control; the other two NInfer pairs were 7.6 and 7.5 tok/s. All pairs retained the same 47.4% expert hit rate and exact response hash. This outlier is retained, with no causal attribution. Minimum available RAM was 8.93 GiB, peak sampled swap was 1.40 GiB and sampled cgroup OOM-kill counts were zero. Clocks were sampled but not controlled; energy was not measured. This small screen gives no evidence of a useful same-map NInfer advantage at 8K and does not establish backend equivalence. Pair data is in [`evidence.json`](evidence.json); raw captures remain under `/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task8192-backend-screen/`.
 
 ### Actual near-limit 240K map confirmation
 
