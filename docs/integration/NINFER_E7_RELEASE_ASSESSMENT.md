@@ -28,8 +28,8 @@ release profile is **not achieved**.
 The seven-pair 240K fixed-map confirmation supports using the learned resident
 map as an experimental cache policy on this exact Q2_0 retrieval workload. The
 map changes which experts are GPU-resident; Strata retains residency authority,
-and the measured gain appeared under both Strata and strict NInfer. Same-map backend screens at 512 tokens, 2K, 4K, 8K and 16K did not
-demonstrate a useful NInfer request-level gain; the 8K screen retained one 1.8 tok/s NInfer
+and the measured gain appeared under both Strata and strict NInfer. Same-map backend screens at 512 tokens, 2K, 4K, 8K, 16K and 32K did
+not demonstrate a useful NInfer request-level gain; the 8K screen retained one 1.8 tok/s NInfer
 outlier against a 7.6 tok/s paired Strata control, with no causal attribution. There is therefore no evidence to change the default backend
 or propose a general NInfer release profile. The 30-minute soak criterion is
 not triggered without a proposed profile. Reassess after broader quality and
