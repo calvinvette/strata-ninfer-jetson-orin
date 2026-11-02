@@ -7775,15 +7775,30 @@
       "adaptation_enabled": false,
       "prompt_cache_enabled": false,
       "planned_pairs": 7,
-      "completed_pairs": 6,
-      "completed_supervised_processes": 12,
+      "completed_pairs": 7,
+      "completed_supervised_processes": 14,
       "all_completed_processes_passed": true,
       "all_completed_responses_exact": true,
       "seed": 2402867,
       "raw_data": "/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task240286-confirmation",
-      "status": "pairs 0\u20135 passed; block 6 baseline active",
-      "active_cell": "block-6-baseline",
-      "completed_arms": [],
+      "status": "complete; confirmed for this measured synthetic 240K fixture",
+      "active_cell": null,
+      "completed_arms": [
+        "block-0-baseline",
+        "block-0-candidate",
+        "block-1-baseline",
+        "block-1-candidate",
+        "block-2-baseline",
+        "block-2-candidate",
+        "block-3-baseline",
+        "block-3-candidate",
+        "block-4-baseline",
+        "block-4-candidate",
+        "block-5-baseline",
+        "block-5-candidate",
+        "block-6-baseline",
+        "block-6-candidate"
+      ],
       "pairs": [
         {
           "block": 0,
@@ -7982,10 +7997,151 @@
               "minimum_available_ram_gib": 7.4113616943359375
             }
           ]
+        },
+        {
+          "block": 6,
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "arms": [
+            {
+              "arm": "baseline",
+              "status": "pass",
+              "exact_response": "EARLY=COPPER-ORBIT-482, MIDDLE=SILVER-CANYON-173, LATE=INDIGO-LANTERN-905, SUM=1560",
+              "response_sha256": "a6ed23d9461336121ef5ae135fad75e64eb285cdf16a7cd25651104db873e450",
+              "prompt_tps": 101.5,
+              "decode_tps": 3.9,
+              "first_visible_s": 2369.5522475712933,
+              "client_s": 2380.7787857069634,
+              "expert_hit_rate": 0.215,
+              "minimum_available_ram_gib": 7.50396728515625
+            },
+            {
+              "arm": "candidate",
+              "status": "pass",
+              "exact_response": "EARLY=COPPER-ORBIT-482, MIDDLE=SILVER-CANYON-173, LATE=INDIGO-LANTERN-905, SUM=1560",
+              "response_sha256": "a6ed23d9461336121ef5ae135fad75e64eb285cdf16a7cd25651104db873e450",
+              "prompt_tps": 104.5,
+              "decode_tps": 5.4,
+              "first_visible_s": 2301.0979882008396,
+              "client_s": 2309.1110298647545,
+              "expert_hit_rate": 0.48200000000000004,
+              "minimum_available_ram_gib": 7.500587463378906
+            }
+          ]
         }
       ],
       "minimum_available_ram_gib": 7.293418884277344,
-      "maximum_sampled_swap_gib": 2.97467041015625
+      "maximum_sampled_swap_gib": 2.97467041015625,
+      "maximum_sampled_cgroup_oom_kills": 0,
+      "bootstrap": {
+        "method": "paired resampling of seven within-block percentage changes; median statistic; 100,000 resamples; percentile interval",
+        "seed": 42,
+        "percentiles": [
+          2.5,
+          97.5
+        ]
+      },
+      "performance": {
+        "decode_tps": {
+          "baseline_median": 3.9,
+          "candidate_median": 5.4,
+          "paired_median_change_percent": 35.897435897435905,
+          "bootstrap_95_percentile_interval_percent": [
+            35.00000000000001,
+            38.46153846153848
+          ],
+          "per_pair_change_percent": [
+            35.00000000000001,
+            35.00000000000001,
+            35.897435897435905,
+            38.46153846153848,
+            41.025641025641036,
+            35.00000000000001,
+            38.46153846153848
+          ]
+        },
+        "prompt_tps": {
+          "baseline_median": 101.5,
+          "candidate_median": 104.5,
+          "paired_median_change_percent": 2.9556650246305383,
+          "bootstrap_95_percentile_interval_percent": [
+            2.7531956735496577,
+            3.25123152709359
+          ],
+          "per_pair_change_percent": [
+            2.7531956735496577,
+            3.553800592300105,
+            2.9556650246305383,
+            2.7531956735496577,
+            3.25123152709359,
+            2.9556650246305383,
+            2.9556650246305383
+          ]
+        },
+        "first_visible_s": {
+          "baseline_median": 2367.4658184289,
+          "candidate_median": 2300.4402426569723,
+          "paired_median_change_percent": -2.8269438542485648,
+          "bootstrap_95_percentile_interval_percent": [
+            -3.079336518380804,
+            -2.7188039592372815
+          ],
+          "per_pair_change_percent": [
+            -2.7188039592372815,
+            -3.481661491144006,
+            -2.8269438542485648,
+            -2.672662617668775,
+            -3.079336518380804,
+            -2.8047562088726607,
+            -2.8889111620398644
+          ]
+        },
+        "client_s": {
+          "baseline_median": 2378.5059088272974,
+          "candidate_median": 2308.4367977338843,
+          "paired_median_change_percent": -2.9404111227479546,
+          "bootstrap_95_percentile_interval_percent": [
+            -3.2002703187516635,
+            -2.8321302391396297
+          ],
+          "per_pair_change_percent": [
+            -2.8321302391396297,
+            -3.5942617105231722,
+            -2.9404111227479546,
+            -2.7990212083148003,
+            -3.2002703187516635,
+            -2.913760650931363,
+            -3.010265223819497
+          ]
+        },
+        "expert_hit_rate": {
+          "baseline_median": 0.215,
+          "candidate_median": 0.48200000000000004,
+          "paired_median_change_percent": 124.18604651162792,
+          "bootstrap_95_percentile_interval_percent": [
+            124.18604651162792,
+            124.18604651162792
+          ],
+          "per_pair_change_percent": [
+            124.18604651162792,
+            124.18604651162792,
+            124.18604651162792,
+            124.18604651162792,
+            124.18604651162792,
+            124.18604651162792,
+            124.18604651162792
+          ],
+          "paired_median_change_percentage_points": 26.700000000000003
+        }
+      },
+      "prompt_tokens": 240286,
+      "completion_tokens": 46,
+      "exact_response": "EARLY=COPPER-ORBIT-482, MIDDLE=SILVER-CANYON-173, LATE=INDIGO-LANTERN-905, SUM=1560",
+      "response_sha256": "a6ed23d9461336121ef5ae135fad75e64eb285cdf16a7cd25651104db873e450",
+      "energy": "not measured",
+      "clock_observation": "CPU/GPU frequencies sampled read-only; clocks were not controlled; EMC readback denied"
     }
   }
 }

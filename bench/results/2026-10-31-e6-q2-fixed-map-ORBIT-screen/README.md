@@ -360,4 +360,17 @@ A tokenizer-verified 240,286-token three-position retrieval/arithmetic fixture w
 The preset screen threshold (at least 5% median decode improvement with a paired interval above zero) passed, so an independent seven-pair confirmation has started. Minimum available RAM was 7.27 GiB, above the six-GiB admission floor; maximum sampled swap was 2.95 GiB and sampled cgroup OOM kills were zero. CPU/GPU frequencies were observed but uncontrolled; EMC readback was denied and energy was not measured. This is one synthetic near-limit fixture and does not establish semantic quality or general 240K capability. Pair values and response hashes are in [`evidence.json`](evidence.json); raw captures are under `/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task240286-screen/`.
 
 
-The seven-pair confirmation began after the screen passed. The first six randomized pairs completed successfully and all twelve arms returned the exact answer. Candidate decode was 5.8, 5.8, 5.7, 5.8, 5.8 and 5.4 tok/s versus baseline 4.2, 4.2, 4.1, 4.1, 4.1 and 4.0 tok/s. Minimum available RAM across the twelve arms was 7.29 GiB. Pair 7 baseline is now active. The final seven-pair estimate is not yet available.
+
+### Actual near-limit 240K map confirmation
+
+The independent seven-pair randomized confirmation completed at 262,144 configured context with strict NInfer, adaptation and prompt cache disabled, and the same fixed 5K GPU maps and ordered 4,660-entry RAM complement. All fourteen supervised requests processed 240,286 prompt tokens and returned the same exact 46-token response.
+
+| Metric | Original map median | Learned map median | Paired median change (95% interval) |
+| --- | ---: | ---: | ---: |
+| Decode throughput | 3.9 tok/s | 5.4 tok/s | +35.9% (+35.0%, +38.5%) |
+| Prompt throughput | 101.5 tok/s | 104.5 tok/s | +3.0% (+2.8%, +3.3%) |
+| First visible token | 2,367.5 s | 2,300.4 s | −2.8% (−3.1%, −2.7%) |
+| Client request duration | 2,378.5 s | 2,308.4 s | −2.9% (−3.2%, −2.8%) |
+| NInfer expert hit rate | 21.5% | 48.2% | +26.7 percentage points |
+
+Intervals resample the seven within-pair percentage changes (median statistic, 100,000 resamples, seed 42, percentile interval). Minimum available RAM across the fourteen processes was 7.29 GiB, above the six-GiB admission floor. Maximum sampled swap was 2.97 GiB and sampled cgroup OOM-kill counts were zero. Clocks were observed but not controlled; EMC readback was denied and energy was not measured. This confirms the resident-map effect only for this exact synthetic 240K retrieval/arithmetic fixture; it does not establish broad semantic quality or general 240K capability. Full pair data is in [`evidence.json`](evidence.json); raw captures remain under `/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task240286-confirmation/`.
