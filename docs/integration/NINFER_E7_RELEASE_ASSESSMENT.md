@@ -1,6 +1,6 @@
 # NInfer E7 release assessment
 
-Updated: 2026-10-31. Branch: `feat/ninfer-expert-e0`.
+Updated: 2026-11-02. Branch: `feat/ninfer-expert-e0`.
 
 ## Decision
 
@@ -481,3 +481,6 @@ the cause is unresolved. Each traced arm took about 76 minutes. This adds no
 performance or release evidence. A buffered or sampled checkpoint diagnostic
 must first preserve the no-trace output path. The no-release decision and E6/E7
 gates remain. See the [accepted-prefix diagnostic](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/accepted-prefix-instrumentation-README.md).
+
+
+A same-map 64K screen has now also completed on the exact 65,536-token retrieval fixture at 131,072 context. The paired decode change was +1.6% (95% three-pair screening interval +1.6% to +3.1%), below the 5% useful-effect gate; prompt, first-visible and client-time effects were each below 1%. No confirmation was triggered. Together with the 8K, 16K and 32K same-map screens, this is still no demonstrated useful request-level advantage for strict NInfer. The result does not prove equivalence and does not alter the no-release decision. The broader E6 workload, task-quality, persistent-state and sustained-service requirements remain open. See the [64K same-map report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
