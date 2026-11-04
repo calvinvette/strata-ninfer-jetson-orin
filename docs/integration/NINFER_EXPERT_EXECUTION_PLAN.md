@@ -623,6 +623,19 @@ the pre-existing OOM counter did not increment. No state trace or energy
 qualification was collected. E6/E7 remain open. See the [4K-capacity
 ledger screen](../../bench/results/2026-11-04-e6-q2-ledger-capacity-4096/README.md).
 
+**Execution note (2026-11-04):** extended the same 2K signed-ledger task to a
+16,384-token configured context cap, retaining the same Q2_0 model, fixed map,
+fixture and randomized Strata/strict-NInfer comparison. All twelve
+warmup/measured outputs passed the exact JSON oracle. The three-pair decode
+effect was +0.82% (95% screen interval −4.79% to +1.00%), below the 5% gate
+and with the interval crossing zero. One slow final pair is retained without
+causal attribution. Prompt TPS changed −1.99%, first-visible latency +2.17%
+and client duration +0.79%, all with wide intervals. Minimum available RAM
+was 6.94 GiB, just above the 6 GiB floor; sampled swap peaked at 7.05 GiB and
+the pre-existing OOM counter did not increment. This adds the 16K-cap cell but
+does not establish a capacity interaction. E6/E7 remain open. See the
+[16K-capacity ledger screen](../../bench/results/2026-11-04-e6-q2-ledger-capacity-16384/README.md).
+
 **Execution note (2026-11-04):** extended the executable code task to an exact
 8,192-token formatted prompt at 16K configured context. Three randomized
 same-map pairs retained the same controls and passed the independent five-case

@@ -76,6 +76,14 @@ cap screen, this does not establish a context interaction; the samples were
 not jointly randomized across capacities. This adds one capacity cell and no
 release evidence. See the [4K-capacity ledger report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-4096/README.md).
 
+A follow-up at a 16K cap again passed the exact ledger oracle in all twelve
+responses. Decode changed +0.82% (95% three-pair interval −4.79% to +1.00%),
+below the useful-effect gate and with the interval crossing zero. One slow pair
+was retained; its cause is unknown. The 6.94 GiB minimum available RAM and
+7.05 GiB peak swap leave limited margin for this cap. This screen adds no
+release evidence. Together, the 4K/8K/16K-cap measurements are separate cells,
+not an interaction estimate. See the [16K-capacity ledger report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-16384/README.md).
+
 A follow-up three-pair screen used the same executable code task with an exact
 8,192-token formatted prompt at 16K configured context. All twelve warmup and
 measured outputs passed the five-case oracle and matched across arms. Decode

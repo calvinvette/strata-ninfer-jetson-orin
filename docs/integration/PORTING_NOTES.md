@@ -3470,3 +3470,10 @@ work, keep actual prompt length fixed while varying reserved context, and
 randomize capacity/backend combinations within the same thermal/time blocks
 before estimating an interaction. See the [4K-capacity ledger report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-4096/README.md)
 and [8K-capacity ledger report](../../bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/README.md).
+
+A 16K-cap screen of the same task passed its exact JSON oracle in every arm but
+had a wide decode interval (−4.79% to +1.00%), a 6.94 GiB minimum availability
+and 7.05 GiB sampled peak swap. Keep such near-floor, high-swap cells visible
+when comparing capacity policies; the nominal context ceiling alone does not
+describe memory or execution cost. This is another separate cell, not evidence
+of a backend/capacity interaction. See the [16K-capacity ledger report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-16384/README.md).

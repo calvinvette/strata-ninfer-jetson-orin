@@ -1,0 +1,392 @@
+{
+  "date": "2026-11-04",
+  "hardware": "Jetson AGX Orin",
+  "system": {
+    "kernel": "Linux orin1 5.15.148-tegra aarch64",
+    "jetpack_release": "R36 REVISION 4.4",
+    "cuda_compiler": "12.6.68",
+    "driver": "540.4.0",
+    "gpu": "Orin (nvgpu)"
+  },
+  "tested_checkout_revision": "44943c99ea36fddc59f4b43042733191e044c8ac",
+  "runtime_binary_sha256": "fd67288c399d895be036dab344e30caab3d081540bfc552f22dac6a5fc33644a",
+  "runtime_binary_mtime": "2026-10-31 11:10:03.604465309 -0400; unchanged pre-existing executable",
+  "binary_build_source_revision": "not embedded; binary SHA-256 matches the earlier same-map screen",
+  "model": "Qwen3.8-Flash-Next Q2_0",
+  "model_source": {
+    "repo": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
+    "revision": "8f752f8ae475984833f74edf84d9e43c5d1eaf98"
+  },
+  "model_files": [
+    {
+      "name": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+      "size_bytes": 37623740192,
+      "sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720"
+    },
+    {
+      "name": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+      "size_bytes": 28800138432,
+      "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+    }
+  ],
+  "task": {
+    "name": "heldout-ledger-aggregation-2048",
+    "family": "structured data extraction and aggregation",
+    "prompt_tokens": 2048,
+    "generation_limit": 256,
+    "allow_natural_stop": true,
+    "observed_completion_tokens": 184,
+    "fixture_sha256": "9d58563e9a512a0007243414ce13e9c468485549b26901fd2015f11a1133f8d7",
+    "token_ids_sha256": "4416f83fa8af182b48794c73e1e3f7377e90b18efd81feb4605670573dcb7ff7",
+    "quality_oracle": "evaluate_e6_ledger_task.py; exact JSON groups/counts/signed sums/maximum IDs and overall totals",
+    "quality_outcomes": "all 12 warmup/measured outputs passed the exact JSON oracle and produced the same answer SHA-256 bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168",
+    "cell": "heldout-ledger-aggregation-2048-cap16384",
+    "configured_context_tokens": 16384
+  },
+  "controls": {
+    "fixed_map_sha256": "76a1644f56d985fdd54a5816aadd39ce9356190dbaa828a293fab8462f507087",
+    "gpu_expert_slots": 5000,
+    "ram_expert_budget_gib": 6,
+    "max_context": 16384,
+    "prefill_chunk": 128,
+    "speculation_configured": 2,
+    "accepted_drafts": 0,
+    "workers": 8,
+    "prompt_cache": false,
+    "adaptation": false,
+    "pcie_staging_fraction": 0,
+    "randomized_seed": 2026110416384,
+    "paired_blocks": 3,
+    "config_sha256": {
+      "strata": "3376c1a3621dfacc21b06ef589c7a22bf961a5817efaad11d84dedc31f682c61",
+      "ninfer": "a4678cb20fe38831135126dda31d75f76d8221b7452039230360641f702d616f"
+    }
+  },
+  "configuration_note": "Within this campaign, only the expert backend selector differs materially: default Strata versus --expert-backend ninfer --expert-backend-strict. The 16,384-token context cap is identical in every arm. Per-run API model_name, log path and loopback port differ only as labels/ownership; normalized configs were checked by summarize_e6_ledger_screen.py.",
+  "paired_summary": {
+    "prompt_tps": {
+      "baseline_median": 46.25635234330886,
+      "candidate_median": 45.592874332413906,
+      "median_within_block_candidate_over_baseline": 0.9800575699087029,
+      "paired_bootstrap_95_interval": [
+        0.7715770809082603,
+        1.030439568879445
+      ]
+    },
+    "decode_tps": {
+      "baseline_median": 6.5234809861801475,
+      "candidate_median": 6.5888183455620375,
+      "median_within_block_candidate_over_baseline": 1.0082328281315953,
+      "paired_bootstrap_95_interval": [
+        0.952081215238323,
+        1.0100157200611615
+      ]
+    },
+    "client_ttft_s": {
+      "baseline_median": 44.63150195311755,
+      "candidate_median": 45.28308103932068,
+      "median_within_block_candidate_over_baseline": 1.0217101442925898,
+      "paired_bootstrap_95_interval": [
+        0.9721041256595714,
+        1.2979419217312704
+      ]
+    },
+    "client_total_s": {
+      "baseline_median": 72.3461532946676,
+      "candidate_median": 72.91818038001657,
+      "median_within_block_candidate_over_baseline": 1.0079068071942827,
+      "paired_bootstrap_95_interval": [
+        0.9798507879077145,
+        1.1953960593819952
+      ]
+    }
+  },
+  "paired_blocks": [
+    {
+      "block": 0,
+      "api_responses_identical": true,
+      "arms": {
+        "baseline": {
+          "metrics": {
+            "prompt_tps": 46.52060831147001,
+            "decode_tps": 6.5234809861801475,
+            "client_ttft_s": 44.32086858712137,
+            "client_total_s": 72.3461532946676
+          },
+          "completion_tokens": 184,
+          "expert_cache_hit_rate": 0.285,
+          "answer_sha256": "bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168",
+          "resources": {
+            "minimum_available_gib": 9.111061096191406,
+            "minimum_admission_available_gib": 9.111061096191406,
+            "maximum_swap_used_gib": 5.023246765136719,
+            "maximum_oom_kill_counter": 1,
+            "clocks": {
+              "cpu": {
+                "minimum_mhz": 729.6,
+                "maximum_mhz": 2201.6
+              },
+              "gpu": {
+                "minimum_mhz": 306.0,
+                "maximum_mhz": 1300.5
+              },
+              "emc": {
+                "status": "unavailable"
+              }
+            },
+            "cgroup_oom_kill_counter_initial": 1,
+            "cgroup_oom_kill_counter_final": 1,
+            "cgroup_oom_kill_counter_delta": 0
+          }
+        },
+        "candidate": {
+          "metrics": {
+            "prompt_tps": 45.592874332413906,
+            "decode_tps": 6.5888183455620375,
+            "client_ttft_s": 45.28308103932068,
+            "client_total_s": 72.91818038001657
+          },
+          "completion_tokens": 184,
+          "expert_cache_hit_rate": 0.285,
+          "answer_sha256": "bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168",
+          "resources": {
+            "minimum_available_gib": 9.113407135009766,
+            "minimum_admission_available_gib": 9.113407135009766,
+            "maximum_swap_used_gib": 2.602344512939453,
+            "maximum_oom_kill_counter": 1,
+            "clocks": {
+              "cpu": {
+                "minimum_mhz": 729.6,
+                "maximum_mhz": 2201.6
+              },
+              "gpu": {
+                "minimum_mhz": 306.0,
+                "maximum_mhz": 1300.5
+              },
+              "emc": {
+                "status": "unavailable"
+              }
+            },
+            "cgroup_oom_kill_counter_initial": 1,
+            "cgroup_oom_kill_counter_final": 1,
+            "cgroup_oom_kill_counter_delta": 0
+          }
+        }
+      }
+    },
+    {
+      "block": 1,
+      "api_responses_identical": true,
+      "arms": {
+        "baseline": {
+          "metrics": {
+            "prompt_tps": 46.25635234330886,
+            "decode_tps": 6.5840087309681,
+            "client_ttft_s": 44.63150195311755,
+            "client_total_s": 72.27763741882518
+          },
+          "completion_tokens": 184,
+          "expert_cache_hit_rate": 0.285,
+          "answer_sha256": "bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168",
+          "resources": {
+            "minimum_available_gib": 9.141624450683594,
+            "minimum_admission_available_gib": 9.141624450683594,
+            "maximum_swap_used_gib": 2.6458778381347656,
+            "maximum_oom_kill_counter": 1,
+            "clocks": {
+              "cpu": {
+                "minimum_mhz": 729.6,
+                "maximum_mhz": 2201.6
+              },
+              "gpu": {
+                "minimum_mhz": 306.0,
+                "maximum_mhz": 1300.5
+              },
+              "emc": {
+                "status": "unavailable"
+              }
+            },
+            "cgroup_oom_kill_counter_initial": 1,
+            "cgroup_oom_kill_counter_final": 1,
+            "cgroup_oom_kill_counter_delta": 0
+          }
+        },
+        "candidate": {
+          "metrics": {
+            "prompt_tps": 47.66437576657489,
+            "decode_tps": 6.638213743267084,
+            "client_ttft_s": 43.38646718300879,
+            "client_total_s": 70.82129997294396
+          },
+          "completion_tokens": 184,
+          "expert_cache_hit_rate": 0.285,
+          "answer_sha256": "bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168",
+          "resources": {
+            "minimum_available_gib": 9.129520416259766,
+            "minimum_admission_available_gib": 9.129520416259766,
+            "maximum_swap_used_gib": 2.5906105041503906,
+            "maximum_oom_kill_counter": 1,
+            "clocks": {
+              "cpu": {
+                "minimum_mhz": 729.6,
+                "maximum_mhz": 2201.6
+              },
+              "gpu": {
+                "minimum_mhz": 306.0,
+                "maximum_mhz": 1300.5
+              },
+              "emc": {
+                "status": "unavailable"
+              }
+            },
+            "cgroup_oom_kill_counter_initial": 1,
+            "cgroup_oom_kill_counter_final": 1,
+            "cgroup_oom_kill_counter_delta": 0
+          }
+        }
+      }
+    },
+    {
+      "block": 2,
+      "api_responses_identical": true,
+      "arms": {
+        "baseline": {
+          "metrics": {
+            "prompt_tps": 31.951423850926638,
+            "decode_tps": 4.1278465876842105,
+            "client_ttft_s": 64.57850186619908,
+            "client_total_s": 108.72754210280254
+          },
+          "completion_tokens": 184,
+          "expert_cache_hit_rate": 0.285,
+          "answer_sha256": "bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168",
+          "resources": {
+            "minimum_available_gib": 6.941776275634766,
+            "minimum_admission_available_gib": 6.941776275634766,
+            "maximum_swap_used_gib": 4.024436950683594,
+            "maximum_oom_kill_counter": 1,
+            "clocks": {
+              "cpu": {
+                "minimum_mhz": 729.6,
+                "maximum_mhz": 2201.6
+              },
+              "gpu": {
+                "minimum_mhz": 306.0,
+                "maximum_mhz": 1300.5
+              },
+              "emc": {
+                "status": "unavailable"
+              }
+            },
+            "cgroup_oom_kill_counter_initial": 1,
+            "cgroup_oom_kill_counter_final": 1,
+            "cgroup_oom_kill_counter_delta": 0
+          }
+        },
+        "candidate": {
+          "metrics": {
+            "prompt_tps": 24.65298634576054,
+            "decode_tps": 3.930045195519748,
+            "client_ttft_s": 83.81914481474087,
+            "client_total_s": 129.97247537598014
+          },
+          "completion_tokens": 184,
+          "expert_cache_hit_rate": 0.285,
+          "answer_sha256": "bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168",
+          "resources": {
+            "minimum_available_gib": 7.0110626220703125,
+            "minimum_admission_available_gib": 7.0110626220703125,
+            "maximum_swap_used_gib": 7.053276062011719,
+            "maximum_oom_kill_counter": 1,
+            "clocks": {
+              "cpu": {
+                "minimum_mhz": 729.6,
+                "maximum_mhz": 2201.6
+              },
+              "gpu": {
+                "minimum_mhz": 306.0,
+                "maximum_mhz": 1300.5
+              },
+              "emc": {
+                "status": "unavailable"
+              }
+            },
+            "cgroup_oom_kill_counter_initial": 1,
+            "cgroup_oom_kill_counter_final": 1,
+            "cgroup_oom_kill_counter_delta": 0
+          }
+        }
+      }
+    }
+  ],
+  "resource_summary": {
+    "minimum_available_gib": 6.941776275634766,
+    "minimum_admission_available_gib": 6.941776275634766,
+    "maximum_swap_used_gib": 7.053276062011719,
+    "maximum_oom_kill_counter": 1,
+    "cpu_clock_mhz_range": {
+      "minimum_mhz": 729.6,
+      "maximum_mhz": 2201.6
+    },
+    "gpu_clock_mhz_range": {
+      "minimum_mhz": 306.0,
+      "maximum_mhz": 1300.5
+    },
+    "emc_clock": "not available: permission denied",
+    "energy": "instantaneous tegrastats rail samples were captured; energy was not analyzed or used for qualification",
+    "cgroup_oom_kill_counter_initial_max": 1,
+    "cgroup_oom_kill_counter_final_max": 1,
+    "cgroup_oom_kill_counter_delta_max": 0,
+    "interpretation": "minimum available memory was 6.94 GiB, 0.94 GiB above the required floor; peak sampled swap was 7.05 GiB"
+  },
+  "excluded_attempts": [
+    {
+      "directory": "/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task2048-ledger-aggregation-20261104/screen",
+      "reason": "128-token response cap truncated valid JSON"
+    },
+    {
+      "directory": "/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task2048-ledger-aggregation-20261104/screen-tg256",
+      "reason": "correct 184-token natural EOS was rejected because allow_natural_stop was absent"
+    }
+  ],
+  "raw_campaign": "/tmp/e6-q2-ledger-capacity-16384/campaign/",
+  "accepted_prefix_state_check": {
+    "kind": "separate one-process-per-backend diagnostic; state trace timing excluded",
+    "requests_per_backend": 2,
+    "quality_oracle": "both warmup and measured response passed the exact ledger JSON oracle",
+    "all_responses_same_answer_sha256": "bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168",
+    "measured_generated_tokens": 184,
+    "matched_accepted_prefixes": 184,
+    "token_ids_equal": true,
+    "persistent_state_fields": [
+      "L",
+      "gdn",
+      "ple",
+      "tail",
+      "dead",
+      "pooled",
+      "pooled_full",
+      "kv",
+      "mtp",
+      "stale",
+      "ple_prev"
+    ],
+    "all_prefix_state_equal": true,
+    "canonical_trace_sha256": "81349991a2e9039d506f6aff530ef050c19e8864ea3671cb43472fd016048d9e",
+    "minimum_available_gib": {
+      "strata": 9.271793365478516,
+      "ninfer": 9.274356842041016
+    },
+    "maximum_sampled_swap_gib": {
+      "strata": 2.255054473876953,
+      "ninfer": 2.2094879150390625
+    },
+    "sampled_oom_kill_counter": {
+      "strata": 0,
+      "ninfer": 0
+    },
+    "raw_trace_directory": "/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task2048-ledger-aggregation-20261104/screen-tg256-natural/statecheck/"
+  },
+  "state_capture": "not run for this performance screen; the separate 2K ledger state check used an 8K context cap",
+  "decision": "decode median gain below the registered 5% useful-effect threshold and interval includes zero; no confirmation or profile promotion"
+}
