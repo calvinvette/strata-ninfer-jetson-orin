@@ -593,9 +593,11 @@ signed sums, maxima and overall totals. All twelve Strata and strict-NInfer
 warmup/measured answers passed and matched. In three randomized pairs,
 same-map decode changed +1.22% (95% screen interval +0.33% to +3.05%), below
 the 5% useful-effect gate; prompt throughput changed −0.43%, TTFT +0.48% and
-client duration +0.15%. The result adds task-quality coverage but no useful
-backend gain or multi-model evidence. The combined chart now includes a
-separate ledger cell. E6/E7 remain open. See the [ledger screen](../../bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/README.md).
+client duration +0.15%. A separate accepted-prefix capture matched all 184
+token IDs and persistent-state fingerprints across the backends. The result
+adds task-quality and bounded state coverage but no useful backend gain or
+multi-model evidence. The combined chart now includes a separate ledger cell.
+E6/E7 remain open. See the [ledger screen](../../bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/README.md).
 
 **Execution note (2026-11-04):** a fixed-map 2K state diagnostic compared
 Strata and strict NInfer with accepted-prefix tracing enabled. Both fresh

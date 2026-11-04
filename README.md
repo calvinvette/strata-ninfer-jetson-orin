@@ -78,7 +78,9 @@ An additional 2K ledger aggregation task passed an exact JSON oracle in all
 twelve warmup/measured responses. Its same-map decode change was +1.22% (95%
 three-pair screen interval +0.33% to +3.05%), below the 5% gate. The chart
 shows this as a third, separate 2K task cell; it is still one Q2_0 model and
-does not establish multi-model performance.
+does not establish multi-model performance. A separate instrumented pair
+matched all 184 accepted-prefix token IDs and persistent-state fingerprints;
+trace timings are excluded.
 The chart keeps each workload separate and shows the paired effects and
 uncertainty:
 

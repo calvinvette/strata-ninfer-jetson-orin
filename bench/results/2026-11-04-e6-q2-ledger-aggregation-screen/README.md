@@ -48,6 +48,36 @@ python3 tools/integration/make_e6_ledger_workload.py \
   --output /tmp/ledger-workload.json --prompt-tokens 2048 --generate-tokens 256
 PYTHONPATH=tools/integration python3 tools/integration/test_evaluate_e6_ledger_task.py
 PYTHONPATH=tools/integration python3 tools/integration/test_summarize_e6_ledger_screen.py
+PYTHONPATH=tools/integration python3 tools/integration/test_compare_e6_ledger_state.py
+```
+
+## Accepted-prefix state check
+
+A separate instrumented Strata/NInfer pair ran the same fixture with one
+warmup and one measured request per backend. Both warmups and measured answers
+passed the oracle and returned the same 184-token JSON. At every one of the 184
+measured accepted-prefix commits, token IDs and all recorded state fingerprints
+matched exactly across backends: `L`, GDN, PLE, tail, dead, pooled,
+pooled-full, KV, MTP, stale and PLE previous-token state. The canonical trace
+SHA-256 is `81349991a2e9039d506f6aff530ef050c19e8864ea3671cb43472fd016048d9e`.
+Minimum available memory was 9.27 GiB for each arm, sampled swap peaked at
+2.26 GiB for Strata and 2.21 GiB for NInfer, and sampled OOM-kill counters were
+zero. The raw traces are outside Git in the `statecheck/` subdirectory of the
+campaign path. Trace hashing slowed decode to about 1 tok/s, so these timings
+are excluded; this establishes state parity only for this task, model, map and
+request shape.
+
+The compact machine-readable comparison is in
+[`statecheck-summary.json`](statecheck-summary.json). Recreate it from the
+external raw capture with:
+
+```sh
+python3 tools/integration/compare_e6_ledger_state.py \
+  --strata-log /tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task2048-ledger-aggregation-20261104/statecheck/strata/engine.log \
+  --ninfer-log /tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task2048-ledger-aggregation-20261104/statecheck/ninfer/engine.log \
+  --strata-requests /tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task2048-ledger-aggregation-20261104/statecheck/strata/requests.json \
+  --ninfer-requests /tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task2048-ledger-aggregation-20261104/statecheck/ninfer/requests.json \
+  --output bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/statecheck-summary.json
 ```
 
 Two setup attempts are retained in the raw directory and excluded from the

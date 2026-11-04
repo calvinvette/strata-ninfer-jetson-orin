@@ -62,9 +62,11 @@ aggregation with an exact JSON oracle. All twelve warmup and measured answers
 passed and matched across the backends. Decode changed +1.22% (95% three-pair
 screen interval +0.33% to +3.05%), below the 5% gate; TTFT and client duration
 were effectively tied within their intervals. The combined chart now shows a
-separate ledger cell. This broadens task coverage on Q2_0 but does not supply
-multi-model evidence or a performance-qualified NInfer profile. See the
-[ledger report](../../bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/README.md).
+separate ledger cell. A separate instrumented pair also matched all 184
+accepted-prefix token IDs and recorded state fingerprints across the backends;
+trace timings are excluded. This broadens task and bounded state coverage on
+Q2_0 but does not supply multi-model evidence or a performance-qualified
+NInfer profile. See the [ledger report](../../bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/README.md).
 
 ## Evidence and limits
 
