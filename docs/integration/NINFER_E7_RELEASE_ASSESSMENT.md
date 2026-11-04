@@ -22,6 +22,12 @@ request ordinals. This is bounded short-task correctness evidence; tracing
 invalidates its timing values and it does not resolve the prior long-prompt
 state differences or supply broader quality coverage.
 
+A three-pair 2K code-generation screen on the same map added an independent
+five-case executable oracle. All twelve Strata/NInfer warmup and measured
+outputs passed, but the paired decode effect was +1.0% (95% screening interval
+−5.9% to +9.6%), below the 5% threshold. This broadens the bounded task sample
+and does not change the no-release decision.
+
 The implementation outcome is therefore bounded: the selected resident-expert
 path, fallback behavior, operator arithmetic and several static-service state
 cases have direct evidence. The outcome does not imply support for other

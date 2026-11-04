@@ -1,0 +1,258 @@
+{
+  "date": "2026-11-04",
+  "hardware": "Jetson AGX Orin",
+  "model": "Qwen3.8-Flash-Next Q2_0",
+  "model_files": [
+    {
+      "name": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+      "size_bytes": 37623740192
+    },
+    {
+      "name": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+      "size_bytes": 28800138432
+    }
+  ],
+  "runtime_binary_sha256": "fd67288c399d895be036dab344e30caab3d081540bfc552f22dac6a5fc33644a",
+  "task": {
+    "name": "heldout-code-merge-ranges-2048",
+    "prompt_tokens": 2048,
+    "max_completion_tokens": 128,
+    "fixture_sha256": "db7cb127085f0642fbdf69fbeaa2a8749b6dd4a854b519d545e2240ca09c3d7e",
+    "quality_oracle": "evaluate_e6_code_task.py; five executable cases plus no-input-mutation assertion",
+    "quality_results": "all 12 warmup/measured responses passed",
+    "all_responses_same_code_sha256": "5df0a140c98a2222561b219450c8298cd4bc023bdeea65e815626cded949cc58"
+  },
+  "controls": {
+    "map_sha256": "76a1644f56d985fdd54a5816aadd39ce9356190dbaa828a293fab8462f507087",
+    "gpu_expert_slots": 5000,
+    "ram_expert_budget_gib": 6,
+    "max_context": 8192,
+    "prefill_chunk": 128,
+    "mtp": 2,
+    "workers": 8,
+    "prompt_cache": false,
+    "adaptation": false,
+    "pcie_staging_fraction": 0,
+    "blocks": 3,
+    "seed": 20261104,
+    "randomized_pair_order": true
+  },
+  "configuration_note": "Only compute selector differs materially: baseline uses the default Strata backend; candidate adds --expert-backend ninfer --expert-backend-strict. Per-run API model_name labels differed (strata/ninfer) but model files and all other launch settings matched. Summary analysis normalized those two metadata/selector fields only; raw configs and campaign are retained outside Git.",
+  "paired_summary": {
+    "cell": "heldout-code-merge-ranges-2048",
+    "paired_blocks": 3,
+    "api_content_matching_blocks": 3,
+    "prompt_tps": {
+      "baseline_median": 27.57926007323048,
+      "candidate_median": 28.34825723275054,
+      "median_within_block_candidate_over_baseline": 1.0278831686375256,
+      "paired_bootstrap_95_interval": [
+        1.0133475177100773,
+        2.590377889849244
+      ]
+    },
+    "decode_tps": {
+      "baseline_median": 5.330782528983017,
+      "candidate_median": 5.333998005982054,
+      "median_within_block_candidate_over_baseline": 1.0095706325794822,
+      "paired_bootstrap_95_interval": [
+        0.9411414424636851,
+        1.096146560319043
+      ]
+    },
+    "client_ttft_s": {
+      "baseline_median": 74.51569337863475,
+      "candidate_median": 72.49849569192156,
+      "median_within_block_candidate_over_baseline": 0.9729292234259533,
+      "paired_bootstrap_95_interval": [
+        0.38681540987780233,
+        0.9869401296060284
+      ]
+    },
+    "client_total_s": {
+      "baseline_median": 94.38562696194276,
+      "candidate_median": 93.62426675111055,
+      "median_within_block_candidate_over_baseline": 0.9876765708041875,
+      "paired_bootstrap_95_interval": [
+        0.4403520683548342,
+        0.9919335153525102
+      ]
+    }
+  },
+  "pairs": [
+    {
+      "block": 0,
+      "first_backend": "candidate",
+      "responses_identical": true,
+      "arms": {
+        "baseline": {
+          "backend": "strata",
+          "warmup_and_measured_quality_pass": true,
+          "completion_tokens": 107,
+          "answer_sha256": "ddac6edacd0105401e4c105421b5fbcab5a6c77c7de60cf1b22c65b99ddd6e0e",
+          "code_sha256": "5df0a140c98a2222561b219450c8298cd4bc023bdeea65e815626cded949cc58",
+          "prompt_tps": 10.7,
+          "decode_tps": 4.9,
+          "first_visible_s": 191.97702462598681,
+          "client_total_s": 213.7383077852428,
+          "expert_cache_hit_rate": 0.199,
+          "resources": {
+            "memory_samples": 205,
+            "minimum_available_gib": 9.152755737304688,
+            "maximum_swap_used_gib": 0.9014129638671875,
+            "maximum_observed_oom_kill_counter": 0,
+            "cpu_mhz_min": 729.6,
+            "cpu_mhz_max": 2201.6,
+            "gpu_mhz_min": 306.0,
+            "gpu_mhz_max": 1300.5,
+            "emc_samples": 0,
+            "clock_control": "none; dynamically observed"
+          }
+        },
+        "candidate": {
+          "backend": "ninfer",
+          "warmup_and_measured_quality_pass": true,
+          "completion_tokens": 107,
+          "answer_sha256": "ddac6edacd0105401e4c105421b5fbcab5a6c77c7de60cf1b22c65b99ddd6e0e",
+          "code_sha256": "5df0a140c98a2222561b219450c8298cd4bc023bdeea65e815626cded949cc58",
+          "prompt_tps": 27.7,
+          "decode_tps": 5.3,
+          "first_visible_s": 74.25967146782205,
+          "client_total_s": 94.12010591989383,
+          "expert_cache_hit_rate": 0.199,
+          "resources": {
+            "memory_samples": 90,
+            "minimum_available_gib": 9.132072448730469,
+            "maximum_swap_used_gib": 0.9448699951171875,
+            "maximum_observed_oom_kill_counter": 0,
+            "cpu_mhz_min": 729.6,
+            "cpu_mhz_max": 2201.6,
+            "gpu_mhz_min": 306.0,
+            "gpu_mhz_max": 1300.5,
+            "emc_samples": 0,
+            "clock_control": "none; dynamically observed"
+          }
+        }
+      }
+    },
+    {
+      "block": 1,
+      "first_backend": "baseline",
+      "responses_identical": true,
+      "arms": {
+        "baseline": {
+          "backend": "strata",
+          "warmup_and_measured_quality_pass": true,
+          "completion_tokens": 107,
+          "answer_sha256": "ddac6edacd0105401e4c105421b5fbcab5a6c77c7de60cf1b22c65b99ddd6e0e",
+          "code_sha256": "5df0a140c98a2222561b219450c8298cd4bc023bdeea65e815626cded949cc58",
+          "prompt_tps": 27.6,
+          "decode_tps": 5.3,
+          "first_visible_s": 74.51569337863475,
+          "client_total_s": 94.38562696194276,
+          "expert_cache_hit_rate": 0.199,
+          "resources": {
+            "memory_samples": 90,
+            "minimum_available_gib": 9.176891326904297,
+            "maximum_swap_used_gib": 0.8994598388671875,
+            "maximum_observed_oom_kill_counter": 0,
+            "cpu_mhz_min": 729.6,
+            "cpu_mhz_max": 2201.6,
+            "gpu_mhz_min": 306.0,
+            "gpu_mhz_max": 1300.5,
+            "emc_samples": 0,
+            "clock_control": "none; dynamically observed"
+          }
+        },
+        "candidate": {
+          "backend": "ninfer",
+          "warmup_and_measured_quality_pass": true,
+          "completion_tokens": 107,
+          "answer_sha256": "ddac6edacd0105401e4c105421b5fbcab5a6c77c7de60cf1b22c65b99ddd6e0e",
+          "code_sha256": "5df0a140c98a2222561b219450c8298cd4bc023bdeea65e815626cded949cc58",
+          "prompt_tps": 28.3,
+          "decode_tps": 5.0,
+          "first_visible_s": 72.49849569192156,
+          "client_total_s": 93.62426675111055,
+          "expert_cache_hit_rate": 0.199,
+          "resources": {
+            "memory_samples": 90,
+            "minimum_available_gib": 9.197120666503906,
+            "maximum_swap_used_gib": 0.9360809326171875,
+            "maximum_observed_oom_kill_counter": 0,
+            "cpu_mhz_min": 729.6,
+            "cpu_mhz_max": 2201.6,
+            "gpu_mhz_min": 306.0,
+            "gpu_mhz_max": 1300.5,
+            "emc_samples": 0,
+            "clock_control": "none; dynamically observed"
+          }
+        }
+      }
+    },
+    {
+      "block": 2,
+      "first_backend": "baseline",
+      "responses_identical": true,
+      "arms": {
+        "baseline": {
+          "backend": "strata",
+          "warmup_and_measured_quality_pass": true,
+          "completion_tokens": 107,
+          "answer_sha256": "ddac6edacd0105401e4c105421b5fbcab5a6c77c7de60cf1b22c65b99ddd6e0e",
+          "code_sha256": "5df0a140c98a2222561b219450c8298cd4bc023bdeea65e815626cded949cc58",
+          "prompt_tps": 29.1,
+          "decode_tps": 5.3,
+          "first_visible_s": 70.64751789020374,
+          "client_total_s": 90.46932708984241,
+          "expert_cache_hit_rate": 0.199,
+          "resources": {
+            "memory_samples": 86,
+            "minimum_available_gib": 9.183807373046875,
+            "maximum_swap_used_gib": 0.9143524169921875,
+            "maximum_observed_oom_kill_counter": 0,
+            "cpu_mhz_min": 729.6,
+            "cpu_mhz_max": 2201.6,
+            "gpu_mhz_min": 306.0,
+            "gpu_mhz_max": 1300.5,
+            "emc_samples": 0,
+            "clock_control": "none; dynamically observed"
+          }
+        },
+        "candidate": {
+          "backend": "ninfer",
+          "warmup_and_measured_quality_pass": true,
+          "completion_tokens": 107,
+          "answer_sha256": "ddac6edacd0105401e4c105421b5fbcab5a6c77c7de60cf1b22c65b99ddd6e0e",
+          "code_sha256": "5df0a140c98a2222561b219450c8298cd4bc023bdeea65e815626cded949cc58",
+          "prompt_tps": 29.5,
+          "decode_tps": 5.4,
+          "first_visible_s": 69.72487046290189,
+          "client_total_s": 89.35443474305794,
+          "expert_cache_hit_rate": 0.199,
+          "resources": {
+            "memory_samples": 85,
+            "minimum_available_gib": 9.181446075439453,
+            "maximum_swap_used_gib": 0.9104461669921875,
+            "maximum_observed_oom_kill_counter": 0,
+            "cpu_mhz_min": 729.6,
+            "cpu_mhz_max": 2201.6,
+            "gpu_mhz_min": 306.0,
+            "gpu_mhz_max": 1300.5,
+            "emc_samples": 0,
+            "clock_control": "none; dynamically observed"
+          }
+        }
+      }
+    }
+  ],
+  "raw_capture_directory": "/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task2048-code-generation-20261104/screen",
+  "energy": "not measured",
+  "emc": "readback denied/unsupported",
+  "limitations": [
+    "three-pair screen only; bootstrap is coarse",
+    "one code-generation task and Q2_0 model",
+    "one Strata prefill/TTFT outlier in block 0, retained without causal attribution",
+    "no persistent-state trace in this performance campaign"
+  ]
+}

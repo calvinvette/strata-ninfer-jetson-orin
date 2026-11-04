@@ -3429,3 +3429,11 @@ traces matched for both warmup and measured requests, but this result is
 limited to one short Q2_0 task. Keep these captures out of timed trials because
 state hashing and accepted-prefix tracing change runtime cost. See the
 [bounded state-parity report](../../bench/results/2026-11-04-e6-q2-fixed-map-2048-state-parity/README.md).
+
+The held-out code-generation screen adds a second kind of independent oracle
+for a future Splash integration: execute generated outputs against a compact
+behavioral test suite and check that inputs remain unchanged. Identical model
+outputs across backends are useful parity evidence, but the executable oracle
+is what qualifies the task. Keep the task's map and resident hit rate fixed
+when attributing backend effects; this screen's code-task hit rate was only
+19.9%. See the [code-task report](../../bench/results/2026-11-04-e6-q2-code-generation-screen/README.md).

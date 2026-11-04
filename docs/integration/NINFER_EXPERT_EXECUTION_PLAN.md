@@ -599,6 +599,16 @@ short-task accepted-prefix parity only; prior long-prompt state differences,
 broader task quality, multi-model performance and E6's performance gate remain
 open. See the [state-parity report](../../bench/results/2026-11-04-e6-q2-fixed-map-2048-state-parity/README.md).
 
+**Execution note (2026-11-04):** added a held-out 2K code-generation task
+with an independent Python oracle (five executable interval-merging cases and
+input-immutability checks). All twelve warmup/measured Strata and strict-NInfer
+responses passed and generated the same code. In three randomized pairs,
+same-map NInfer decode changed +1.0% (95% screen interval −5.9% to +9.6%),
+below the 5% useful-effect gate; prompt throughput changed +2.8%. One Strata
+prefill/TTFT outlier is retained without causal attribution. This broadens
+quality coverage by one task but supplies no useful backend gain and does not
+close E6. See the [code-generation screen](../../bench/results/2026-11-04-e6-q2-code-generation-screen/README.md).
+
 The ordinary single-request verifier path now invokes the opt-in multi-layer
 MoE bundle serializer after its captured device results are available. A
 held-out 2K retrieval diagnostic confirmed exact backend equality for routes,
