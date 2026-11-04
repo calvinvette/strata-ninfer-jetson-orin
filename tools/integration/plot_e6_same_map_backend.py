@@ -32,7 +32,7 @@ def path_get(obj, dotted):
     return obj
 
 
-def collect(evidence):
+def collect(evidence, codegen_evidence=None):
     rows = []
     for label, _, root_key, metric_path, point_key, interval_key in SERIES:
         root = path_get(evidence, root_key)
@@ -47,7 +47,21 @@ def collect(evidence):
             if metric is None:
                 raise ValueError(f"missing {name} under {root_key}.{metric_path}")
             item["metrics"][name] = {"effect": metric[point_key], "interval": metric[interval_key]}
+        if label == "2K":
+            item["label"] = "2K retrieval"
         rows.append(item)
+    if codegen_evidence is not None:
+        summary = codegen_evidence["paired_summary"]
+        aliases = {"decode_tps": "decode_tps", "prompt_tps": "prompt_tps",
+                   "ttft": "client_ttft_s", "client": "client_total_s"}
+        item = {"label": "2K code", "metrics": {}}
+        for name, key in aliases.items():
+            metric = summary[key]
+            item["metrics"][name] = {
+                "effect": (metric["median_within_block_candidate_over_baseline"] - 1) * 100,
+                "interval": [(x - 1) * 100 for x in metric["paired_bootstrap_95_interval"]],
+            }
+        rows.insert(1, item)
     return rows
 
 
@@ -60,7 +74,7 @@ def svg_chart(rows):
              '<rect width="100%" height="100%" fill="#fff"/>',
              '<style>text{font-family:Arial,Helvetica,sans-serif;fill:#17212b}.small{font-size:12px}.label{font-size:14px}.title{font-size:22px;font-weight:bold}.panel{font-size:17px;font-weight:bold}.grid{stroke:#d7dde3;stroke-width:1}.zero{stroke:#536575;stroke-width:1.5;stroke-dasharray:5 4}.err{stroke:#176b87;stroke-width:3}.cap{stroke:#176b87;stroke-width:2}.point{fill:#e06b32;stroke:#873b1b;stroke-width:1.2}</style>',
              '<text x="40" y="35" class="title">Q2_0 same-map backend screens</text>',
-             '<text x="40" y="57" class="small">Strict NInfer relative to Strata · paired median effect and 95% three-pair screen interval</text>']
+             '<text x="40" y="57" class="small">Strict NInfer relative to Strata · separate retrieval and code tasks · 95% three-pair screen intervals</text>']
     for p, (metric, title, subtitle) in enumerate(METRICS):
         y0 = top + p * panel_h
         chart_top, chart_bottom = y0 + 34, y0 + panel_h - 42
@@ -90,11 +104,13 @@ def svg_chart(rows):
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--evidence',type=Path,default=Path('bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/evidence.json'))
+    parser.add_argument('--codegen-evidence',type=Path,default=Path('bench/results/2026-11-04-e6-q2-code-generation-screen/evidence.json'))
     parser.add_argument('--output',type=Path,default=Path('bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/same-map-backend-screens.svg'))
     args=parser.parse_args()
-    rows=collect(json.loads(args.evidence.read_text()))
+    codegen = json.loads(args.codegen_evidence.read_text()) if args.codegen_evidence.exists() else None
+    rows=collect(json.loads(args.evidence.read_text()), codegen)
     args.output.write_text(svg_chart(rows))
-    print(f'wrote {args.output} with {len(rows)} prompt-length cells and {len(METRICS)} paired metrics')
+    print(f'wrote {args.output} with {len(rows)} task/context cells and {len(METRICS)} paired metrics')
 
 if __name__=='__main__':
     main()

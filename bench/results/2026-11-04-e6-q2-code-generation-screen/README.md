@@ -46,6 +46,11 @@ estimates, not confirmation. This one code-generation task broadens E6 quality
 coverage but does not resolve the lack of a useful NInfer backend effect,
 long-prompt state differences or the broader task/model requirements.
 
+The [combined task/context chart](../../2026-10-31-e6-q2-fixed-map-ORBIT-screen/same-map-backend-screens.svg)
+shows this code-task cell alongside the separate 2K retrieval cell and the
+retrieval screens through 240K. Points and intervals remain per-task screens;
+they are not pooled.
+
 Reproduce the oracle with:
 
 ```sh

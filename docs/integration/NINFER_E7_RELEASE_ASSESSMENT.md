@@ -47,6 +47,11 @@ or propose a general NInfer release profile. The 30-minute soak criterion is
 not triggered without a proposed profile. Reassess after broader quality and
 workload coverage. Pair data and limitations are in the [fixed-map report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
 
+The additional three-pair 2K code-generation screen also failed the useful
+decode gate (+1.0%, 95% screen interval −5.9% to +9.6%), despite passing its
+independent executable quality oracle. The chart now shows this result as a
+separate task point. It does not change the no-release decision.
+
 ## Evidence and limits
 
 ### 2026-10-31 Q2_0 graph-node kernel inventory
