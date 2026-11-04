@@ -67,6 +67,21 @@ Strata and strict-NInfer arms. Minimum available memory was 11.44 GiB. This is
 one held-out task per backend, not a general quality or performance
 qualification; the successful run used an experiment-only 300-second watchdog
 allowance. See the [near-256K retrieval record](bench/results/2026-10-25-phase-e5-q2-ninfer-240k-retrieval/README.md).
+Same-map backend screens now cover retrieval/arithmetic prompts from 2K to
+240K plus a separate 2K code-generation task. On the code task, all twelve
+Strata/NInfer warmup and measured answers passed five executable tests; the
+paired decode change was +1.0% (95% three-pair screen interval −5.9% to +9.6%),
+below the useful-effect threshold. A separate accepted-prefix check matched
+all 107 token IDs and recorded state fingerprints across both backends. These
+results broaden correctness coverage but show no useful NInfer kernel gain.
+The chart keeps each workload separate and shows the paired effects and
+uncertainty:
+
+<p align="center"><img src="bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/same-map-backend-screens.svg" width="100%" alt="Same-map Strata versus strict NInfer paired effects for retrieval tasks from 2K to 240K and one 2K code-generation task"></p>
+
+See the [code-generation report](bench/results/2026-11-04-e6-q2-code-generation-screen/README.md)
+and [combined fixed-map screen report](bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md)
+for workload, memory, clock and measurement limits.
 No general performance-qualified profile is available,
 so this option remains experimental. See the [E6 results](bench/results/2026-10-25-phase-e6-q2-grouped-throughput/README.md)
 and [full E7 assessment](docs/integration/NINFER_E7_RELEASE_ASSESSMENT.md).

@@ -23,6 +23,13 @@ answer, generated-token and final-state parity for the Q2_0 Strata/NInfer pair;
 this is one functional workload, not general long-context quality or
 performance qualification.
 
+Same-map backend screens now cover the Q2_0 retrieval task from 2K through
+240K and a separate 2K code-generation task with an executable oracle. The
+code task's three-pair decode effect was +1.0% (95% screening interval −5.9%
+to +9.6%); its accepted-prefix state also matched across backends for 107
+tokens. No same-map NInfer performance gate has passed. The main [README](../../README.md)
+shows the combined task/context graph; full data and limits are in [status](STATUS.md).
+
 The earlier phases have bounded closeouts for their tested Strata changes,
 correctness gates and profiles. Those closeouts do not establish NInfer expert
 execution or a combined-runtime speedup. The [bounded Orin profile](RELEASE_PROFILE.md)
