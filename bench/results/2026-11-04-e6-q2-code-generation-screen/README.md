@@ -38,6 +38,11 @@ PCIe staging. The Strata arm used the default backend; strict NInfer added
 by backend, but model files and runtime controls were identical; the report
 does not treat those labels as different model artifacts.
 
+The evidence records SHA-256 for both model shards. The second Q2_0 shard has
+the same size and digest as the local IQ1_M second shard, while the first-shard
+digest differs; retain the complete two-shard identity when reproducing this
+result instead of identifying the quantization from shard two alone.
+
 Minimum available memory was 9.13 GiB, peak sampled swap was 0.95 GiB, and
 sampled cgroup OOM kills were zero. CPU and GPU clocks were observed dynamically
 (729.6–2,201.6 MHz CPU; 306–1,300.5 MHz GPU) and not controlled. EMC readback
