@@ -59,6 +59,19 @@ separate task point. It does not change the no-release decision.
 
 ## Evidence and limits
 
+### Q2_0 artifact identity for the 2026-11-04 code-task screen
+
+The held-out code-generation screen used the two Q2_0 shards from
+[`ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF`](https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF/tree/8f752f8ae475984833f74edf84d9e43c5d1eaf98)
+at revision `8f752f8ae475984833f74edf84d9e43c5d1eaf98`. Both local SHA-256
+digests match the publisher's artifact metadata: shard 1 is
+`69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720`, and
+shard 2 is `316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113`.
+Shard 2 is byte-identical to the second shard of the separate Coder IQ1_M
+artifact. This is also true in the publisher's files; use the complete pair of
+Q2_0 shard names and hashes when identifying the tested model. The detailed
+per-run record is in the [code-generation evidence](../../bench/results/2026-11-04-e6-q2-code-generation-screen/evidence.json).
+
 ### 2026-10-31 Q2_0 graph-node kernel inventory
 
 Nsight Systems graph-node collection exposed the strict NInfer Q2_0 expert

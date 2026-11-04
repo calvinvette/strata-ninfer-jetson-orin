@@ -38,10 +38,12 @@ PCIe staging. The Strata arm used the default backend; strict NInfer added
 by backend, but model files and runtime controls were identical; the report
 does not treat those labels as different model artifacts.
 
-The evidence records SHA-256 for both model shards. The second Q2_0 shard has
-the same size and digest as the local IQ1_M second shard, while the first-shard
-digest differs; retain the complete two-shard identity when reproducing this
-result instead of identifying the quantization from shard two alone.
+The evidence records SHA-256 for both model shards and the source revision
+[`8f752f8ae475984833f74edf84d9e43c5d1eaf98`](https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF/commit/8f752f8ae475984833f74edf84d9e43c5d1eaf98).
+Both hashes match the published Q2_0 files. The second Q2_0 shard is byte
+identical to the IQ1_M second shard, also upstream; retain the complete
+two-shard identity, including the first-shard digest, to distinguish this
+model.
 
 Minimum available memory was 9.13 GiB, peak sampled swap was 0.95 GiB, and
 sampled cgroup OOM kills were zero. CPU and GPU clocks were observed dynamically
