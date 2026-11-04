@@ -3457,3 +3457,16 @@ The separate 8K code-task state capture matched all 107 accepted token IDs and
 persistent-state fingerprints across backends for its exact filler-extended
 prompt. This is a state-check pattern, not natural long-context qualification;
 traced timing is excluded. See the [8K code report](../../bench/results/2026-11-04-e6-q2-code-generation-8k-screen/README.md).
+
+## 2026-11-04 — Separate prompt length from reserved context
+
+A same-day 2K signed-ledger task was screened at both 4K and 8K configured
+context with identical model weights, prompt, resident map and backend pair.
+The decode medians were +1.71% and +1.22% for strict NInfer, respectively;
+both were below the 5% useful-effect threshold. Since capacity was tested in
+separate randomized screens rather than a jointly randomized factorial, these
+points do not establish a context-by-backend interaction. For future Splash
+work, keep actual prompt length fixed while varying reserved context, and
+randomize capacity/backend combinations within the same thermal/time blocks
+before estimating an interaction. See the [4K-capacity ledger report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-4096/README.md)
+and [8K-capacity ledger report](../../bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/README.md).

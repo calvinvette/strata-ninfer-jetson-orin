@@ -68,6 +68,14 @@ trace timings are excluded. This broadens task and bounded state coverage on
 Q2_0 but does not supply multi-model evidence or a performance-qualified
 NInfer profile. See the [ledger report](../../bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/README.md).
 
+A same-day follow-up repeated the exact 2K ledger task at a 4K configured
+context cap. All twelve warmup/measured outputs passed the JSON oracle and
+matched. Decode changed +1.71% (95% three-pair screen interval +1.09% to
++2.94%), still below the 5% useful-effect gate. Compared with the separate 8K
+cap screen, this does not establish a context interaction; the samples were
+not jointly randomized across capacities. This adds one capacity cell and no
+release evidence. See the [4K-capacity ledger report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-4096/README.md).
+
 A follow-up three-pair screen used the same executable code task with an exact
 8,192-token formatted prompt at 16K configured context. All twelve warmup and
 measured outputs passed the five-case oracle and matched across arms. Decode

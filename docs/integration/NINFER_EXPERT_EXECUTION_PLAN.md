@@ -609,6 +609,20 @@ adds task-quality and bounded state coverage but no useful backend gain or
 multi-model evidence. The combined chart now includes a separate ledger cell.
 E6/E7 remain open. See the [ledger screen](../../bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/README.md).
 
+**Execution note (2026-11-04):** repeated the same 2,048-token signed-ledger
+task at a 4,096-token configured context cap, keeping the Q2_0 model, fixed
+5K expert map, request fixture and backend pair unchanged. All twelve
+warmup/measured outputs passed the exact JSON oracle. The three-pair NInfer
+decode effect was +1.71% (95% screening interval +1.09% to +2.94%), below the
+5% useful-effect gate; prompt TPS changed +1.42%, first-visible latency
+−1.33% and client duration −1.26%, with all three intervals spanning zero.
+Both this and the separate 8K-cap ledger screen show small positive decode
+effects, but their separate samples do not establish a context-by-backend
+interaction. Minimum available RAM was 9.30 GiB; swap peaked at 2.38 GiB and
+the pre-existing OOM counter did not increment. No state trace or energy
+qualification was collected. E6/E7 remain open. See the [4K-capacity
+ledger screen](../../bench/results/2026-11-04-e6-q2-ledger-capacity-4096/README.md).
+
 **Execution note (2026-11-04):** extended the executable code task to an exact
 8,192-token formatted prompt at 16K configured context. Three randomized
 same-map pairs retained the same controls and passed the independent five-case
