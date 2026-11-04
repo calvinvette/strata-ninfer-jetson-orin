@@ -13,6 +13,21 @@ GiB sampled swap. E6/E7 remain open, the NInfer path remains opt-in, and no
 release profile is qualified. [8K code report](../../bench/results/2026-11-04-e6-q2-code-generation-8k-screen/README.md)
 · [release assessment](NINFER_E7_RELEASE_ASSESSMENT.md).
 
+The same 2K signed-ledger task now has separate 4K/8K/16K/32K context-cap
+screens. Decode paired medians were +1.71%, +1.22%, +0.82% and −15.12%, all
+below the 5% useful-effect threshold; the 32K interval was wide
+(−37.35% to +1.52%) after one slow NInfer arm. These cells were not jointly
+randomized and do not estimate a capacity interaction. The new
+[32K-cap report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-32768/README.md)
+records the task and memory limits.
+
+The `neroued/Qwen3.8-Flash-Next-NInfer` package is now downloaded under
+`~/models/Qwen3.8-Flash-Next-NInfer/`. Its manifest identifies a mixed-format
+BF16/NVFP4-based artifact, not the Q2_0 GGUF used in the paired backend screens;
+it has not been runtime-qualified. The backend tests continue to use identical
+Q2_0 GGUF files in both arms, so the packed artifact's effect remains
+unmeasured. See [porting notes](PORTING_NOTES.md) for the artifact/backend distinction.
+
 An opt-in Nsight graph-node diagnostic showed NInfer D3/D4 plus SwiGLU kernels account for 0.95% of the GPU-active interval union in the captured pp512 request pair; event overlap was only 0.35%. This is not a request wall-time fraction or a general speedup ceiling. Wait-flag, dequantization and other work remains. [Report](../../bench/results/2026-10-31-e6-q2-ninfer-kernel-share-diagnostic/README.md).
 
 A new three-pair 5K adaptive-cache NIMBUS screen reached 76.0% GPU expert hits after warmup in both backends, yet NInfer decode TPS was 1.08% lower at the paired median; all measured outputs matched. No 5% gain or follow-up confirmation. [Report](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/README.md).

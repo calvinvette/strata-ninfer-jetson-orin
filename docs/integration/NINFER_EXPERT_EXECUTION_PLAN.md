@@ -112,8 +112,9 @@ matching the Q2_0 GGUF used by the same-map backend screens. A separate
 Flash-Next `.ninfer` artifact from `neroued/Qwen3.8-Flash-Next-NInfer` at
 revision `001057dd1e73954b631c9b3b456d1917d01446c7` was subsequently identified;
 its manifest describes a mixed-format conversion from base BF16 and NVIDIA
-NVFP4 sources, not the tested Q2_0 weights, and its download is still in
-progress. It cannot measure a same-weight file-format effect. The current
+NVFP4 sources, not the tested Q2_0 weights. Its four data files are downloaded
+under `~/models/Qwen3.8-Flash-Next-NInfer/`, but it has not been runtime-
+qualified and cannot measure a same-weight file-format effect. The current
 Strata-versus-NInfer results therefore hold the Q2_0 GGUF constant; the effect
 of using this separate packed artifact remains unmeasured. A future comparison
 requires the same source weights and model identity, a documented conversion/
@@ -639,6 +640,18 @@ was 6.94 GiB, just above the 6 GiB floor; sampled swap peaked at 7.05 GiB and
 the pre-existing OOM counter did not increment. This adds the 16K-cap cell but
 does not establish a capacity interaction. E6/E7 remain open. See the
 [16K-capacity ledger screen](../../bench/results/2026-11-04-e6-q2-ledger-capacity-16384/README.md).
+
+**Execution note (2026-11-04):** extended the same 2K ledger task to a
+32,768-token configured context cap. All twelve warmup/measured outputs passed
+the exact JSON oracle and paired responses matched. The three-pair decode
+effect was −15.12% (95% screen interval −37.35% to +1.52%), below the +5%
+useful-effect gate and with the interval crossing zero. One slow NInfer arm in
+block 0 is retained without causal attribution. Minimum available memory was
+8.47 GiB, sampled swap peaked at 1.41 GiB, and the pre-existing OOM counter did
+not increment. The `model_name` API label retained `cap16384`; the health
+response and actual launch argument confirmed a 32,768-token cap. This adds a
+separate capacity cell and no confirmation or profile promotion. E6/E7 remain
+open. See the [32K-capacity ledger screen](../../bench/results/2026-11-04-e6-q2-ledger-capacity-32768/README.md).
 
 **Execution note (2026-11-04):** extended the executable code task to an exact
 8,192-token formatted prompt at 16K configured context. Three randomized

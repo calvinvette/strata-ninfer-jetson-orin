@@ -3445,8 +3445,9 @@ code-task hit rate was only 19.9%. See the [code-task report](../../bench/result
 The previously inventoried `.ninfer` artifacts were Qwen3.6-35B-A3B and dense
 Qwen3.8-27B. A separate Flash-Next artifact was later identified in
 `neroued/Qwen3.8-Flash-Next-NInfer`, revision
-`001057dd1e73954b631c9b3b456d1917d01446c7`; its download is in progress under
-`~/models/Qwen3.8-Flash-Next-NInfer/`. The conversion manifest describes an
+`001057dd1e73954b631c9b3b456d1917d01446c7`; its four data files are now
+downloaded under `~/models/Qwen3.8-Flash-Next-NInfer/`, and no incomplete
+download parts remain. The conversion manifest describes an
 NInfer v3 `qwen3.8-flash-next` artifact with 108.44 GB payload, built from base
 BF16 and NVIDIA NVFP4 sources, with Q8, NF4, FP8, FP32 and Q4 tensor formats.
 It is not a matching representation or source tensor payload for the Q2_0
@@ -3482,3 +3483,12 @@ and 7.05 GiB sampled peak swap. Keep such near-floor, high-swap cells visible
 when comparing capacity policies; the nominal context ceiling alone does not
 describe memory or execution cost. This is another separate cell, not evidence
 of a backend/capacity interaction. See the [16K-capacity ledger report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-16384/README.md).
+
+The 32K-cap follow-up passed all twelve exact JSON checks, but decode was
+−15.12% by paired median (95% three-pair interval −37.35% to +1.52%). One slow
+NInfer arm was retained without causal attribution. Minimum availability was
+8.47 GiB and peak swap 1.41 GiB. This remains a separate capacity cell, not a
+capacity/backend interaction estimate. For Splash experiments, record the
+actual context argument and health response separately from API model labels;
+the saved label for this run still said `cap16384` while runtime context was
+32,768. See the [32K-capacity ledger report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-32768/README.md).

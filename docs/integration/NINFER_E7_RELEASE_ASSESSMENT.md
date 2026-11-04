@@ -84,6 +84,15 @@ was retained; its cause is unknown. The 6.94 GiB minimum available RAM and
 release evidence. Together, the 4K/8K/16K-cap measurements are separate cells,
 not an interaction estimate. See the [16K-capacity ledger report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-16384/README.md).
 
+A 32K-cap follow-up also passed the exact JSON oracle for all twelve responses.
+Decode changed −15.12% by paired median (95% three-pair interval −37.35% to
++1.52%), with one slow NInfer arm retained in block 0 and no cause assigned.
+The 8.47 GiB minimum available memory and 1.41 GiB peak sampled swap stayed
+within the guard. The wide interval crosses zero; this is a negative screen,
+not evidence of equivalence or a useful backend effect. The separate capacity
+cells do not estimate an interaction and do not change the no-release decision.
+See the [32K-capacity ledger report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-32768/README.md).
+
 A follow-up three-pair screen used the same executable code task with an exact
 8,192-token formatted prompt at 16K configured context. All twelve warmup and
 measured outputs passed the five-case oracle and matched across arms. Decode
@@ -116,7 +125,7 @@ per-run record is in the [code-generation evidence](../../bench/results/2026-11-
 The local `.ninfer` inventory includes Qwen3.6-35B-A3B and dense Qwen3.8-27B
 artifacts. A separate Qwen3.8-Flash-Next artifact from
 `neroued/Qwen3.8-Flash-Next-NInfer` (revision
-`001057dd1e73954b631c9b3b456d1917d01446c7`) is being downloaded. Its manifest
+`001057dd1e73954b631c9b3b456d1917d01446c7`) has been downloaded. Its manifest
 describes an NInfer v3 artifact built from base BF16 and NVIDIA NVFP4 sources,
 with mixed tensor formats; it is not the same weight representation as the
 Q2_0 GGUF used here, and it has not been runtime-qualified. Both arms in the

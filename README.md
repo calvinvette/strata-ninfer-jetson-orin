@@ -78,12 +78,15 @@ An additional 2K ledger aggregation task passed an exact JSON oracle in all
 twelve warmup/measured responses. At an 8K context cap, same-map decode
 changed +1.22% (95% three-pair screen interval +0.33% to +3.05%); at a 4K
 cap, it changed +1.71% (+1.09% to +2.94%); at a 16K cap, it changed +0.82%
-(−4.79% to +1.00%). All medians are below the 5% useful-effect gate; the 16K
-interval includes zero, and one slow pair makes its screening intervals wide. The
-cap screens are separate and do not establish a context-by-backend interaction.
+(−4.79% to +1.00%); at a 32K cap, it changed −15.12% (−37.35% to +1.52%).
+All medians are below the 5% useful-effect gate. One slow pair at 16K and one
+slow NInfer arm at 32K widen those cells' intervals; neither is attributed to
+a cause. The cap screens are separate and do not establish a
+context-by-backend interaction.
 The chart shows each as a distinct 2K ledger cell; they remain one Q2_0 model
 and do not establish multi-model performance. At 16K, minimum available RAM
-was 6.94 GiB and peak swap reached 7.05 GiB.
+was 6.94 GiB and peak swap reached 7.05 GiB. At 32K, minimum available RAM
+was 8.47 GiB and peak swap reached 1.41 GiB.
 A separate instrumented pair matched all 184 accepted-prefix token IDs and
 persistent-state fingerprints at the 8K cap; trace timings are excluded.
 An 8K code-generation screen also passed its independent five-case oracle in
@@ -97,13 +100,14 @@ useful backend effect or state parity for natural long-context tasks.
 The chart keeps each workload separate and shows the paired effects and
 uncertainty:
 
-<p align="center"><img src="bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/same-map-backend-screens.svg" width="100%" alt="Same-map Strata versus strict NInfer paired effects for retrieval tasks from 2K to 240K, code tasks, and 2K ledger tasks at 4K, 8K, and 16K context caps"></p>
+<p align="center"><img src="bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/same-map-backend-screens.svg" width="100%" alt="Same-map Strata versus strict NInfer paired effects for retrieval tasks from 2K to 240K, code tasks, and 2K ledger tasks at 4K, 8K, 16K, and 32K context caps"></p>
 
 See the [code-generation report](bench/results/2026-11-04-e6-q2-code-generation-screen/README.md)
 and [8K code-generation report](bench/results/2026-11-04-e6-q2-code-generation-8k-screen/README.md)
 and [ledger aggregation report](bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/README.md)
 and [4K-capacity ledger report](bench/results/2026-11-04-e6-q2-ledger-capacity-4096/README.md)
 and [16K-capacity ledger report](bench/results/2026-11-04-e6-q2-ledger-capacity-16384/README.md)
+and [32K-capacity ledger report](bench/results/2026-11-04-e6-q2-ledger-capacity-32768/README.md)
 and [combined fixed-map screen report](bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md)
 for workload, memory, clock and measurement limits.
 No general performance-qualified profile is available,

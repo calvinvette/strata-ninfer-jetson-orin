@@ -1,0 +1,332 @@
+{
+  "date": "2026-11-04",
+  "hardware": "Jetson AGX Orin",
+  "system": {
+    "kernel": "Linux orin1 5.15.148-tegra aarch64",
+    "jetpack_release": "R36 REVISION 4.4",
+    "cuda_compiler": "12.6.68",
+    "driver": "540.4.0",
+    "gpu": "Orin (nvgpu)"
+  },
+  "tested_checkout_revision": "8ee75616d0fc697a3a947c3dff4e7d4d90dcaf98",
+  "runtime_binary_sha256": "fd67288c399d895be036dab344e30caab3d081540bfc552f22dac6a5fc33644a",
+  "runtime_binary_mtime": "2026-10-31 11:10:03.604465309 -0400; unchanged pre-existing executable",
+  "binary_build_source_revision": "not embedded; binary SHA-256 matches the earlier same-map screen",
+  "model": "Qwen3.8-Flash-Next Q2_0",
+  "model_source": {
+    "repo": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
+    "revision": "8f752f8ae475984833f74edf84d9e43c5d1eaf98"
+  },
+  "model_files": [
+    {
+      "name": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+      "size_bytes": 37623740192,
+      "sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720"
+    },
+    {
+      "name": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+      "size_bytes": 28800138432,
+      "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+    }
+  ],
+  "task": {
+    "name": "heldout-ledger-aggregation-2048",
+    "family": "structured data extraction and aggregation",
+    "prompt_tokens": 2048,
+    "generation_limit": 256,
+    "allow_natural_stop": true,
+    "observed_completion_tokens": 184,
+    "fixture_sha256": "9d58563e9a512a0007243414ce13e9c468485549b26901fd2015f11a1133f8d7",
+    "token_ids_sha256": "4416f83fa8af182b48794c73e1e3f7377e90b18efd81feb4605670573dcb7ff7",
+    "quality_oracle": "evaluate_e6_ledger_task.py; exact JSON groups/counts/signed sums/maximum IDs and overall totals",
+    "quality_outcomes": "all 12 warmup/measured outputs passed the exact JSON oracle and produced the same answer SHA-256 bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168; all three baseline/candidate response pairs matched",
+    "cell": "heldout-ledger-aggregation-2048-cap32768",
+    "configured_context_tokens": 32768
+  },
+  "controls": {
+    "fixed_map_sha256": "76a1644f56d985fdd54a5816aadd39ce9356190dbaa828a293fab8462f507087",
+    "gpu_expert_slots": 5000,
+    "ram_expert_budget_gib": 6,
+    "max_context": 32768,
+    "prefill_chunk": 128,
+    "speculation_configured": 2,
+    "accepted_drafts": 0,
+    "workers": 8,
+    "prompt_cache": false,
+    "adaptation": false,
+    "pcie_staging_fraction": 0,
+    "randomized_seed": 2026110432768,
+    "paired_blocks": 3,
+    "config_sha256": {
+      "strata": "247f545c845e89b2413bb92342439bbc91d84169a7c32597dd1fcdcbce6ace7d",
+      "ninfer": "2fb239811db9958f53f6cf35f7d5259510260ed69a7a792b6e09f940e279a0b8"
+    }
+  },
+  "configuration_note": "Within the campaign, the only material backend difference is default Strata versus strict NInfer. --max-context 32768 is identical in every arm. The retained API model_name label still says cap16384; health responses confirmed max_context=32768. API labels, log paths and loopback ports vary only for ownership. Configs are the exact launched files; summary script verifies normalized configuration.",
+  "paired_summary": {
+    "prompt_tps": {
+      "baseline_median": 39.775408775837995,
+      "candidate_median": 38.24427409641367,
+      "median_within_block_candidate_over_baseline": 0.9944473544232354,
+      "paired_bootstrap_95_interval": [
+        0.4342305113619592,
+        1.0279474514710414
+      ]
+    },
+    "decode_tps": {
+      "baseline_median": 6.110236638838524,
+      "candidate_median": 5.260930727266489,
+      "median_within_block_candidate_over_baseline": 0.8487625375984995,
+      "paired_bootstrap_95_interval": [
+        0.6265349517512285,
+        1.0151878160755798
+      ]
+    },
+    "client_ttft_s": {
+      "baseline_median": 51.72913981275633,
+      "candidate_median": 53.81796441413462,
+      "median_within_block_candidate_over_baseline": 1.004397808221726,
+      "paired_bootstrap_95_interval": [
+        0.9729616560708072,
+        2.2992751562773557
+      ]
+    },
+    "client_total_s": {
+      "baseline_median": 81.67408721428365,
+      "candidate_median": 84.49336248869076,
+      "median_within_block_candidate_over_baseline": 1.0697648776788713,
+      "paired_bootstrap_95_interval": [
+        0.9770594196857048,
+        2.0412708422414325
+      ]
+    }
+  },
+  "paired_blocks": [
+    {
+      "block": 0,
+      "api_responses_identical": true,
+      "arms": {
+        "baseline": {
+          "metrics": {
+            "prompt_tps": 39.775408775837995,
+            "decode_tps": 6.110236638838524,
+            "client_ttft_s": 51.72913981275633,
+            "client_total_s": 81.67408721428365
+          },
+          "completion_tokens": 184,
+          "expert_cache_hit_rate": 0.285,
+          "answer_sha256": "bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168",
+          "resources": {
+            "minimum_available_gib": 8.467609405517578,
+            "minimum_admission_available_gib": 8.467609405517578,
+            "maximum_swap_used_gib": 1.4055709838867188,
+            "maximum_oom_kill_counter": 1,
+            "clocks": {
+              "cpu": {
+                "minimum_mhz": 729.6,
+                "maximum_mhz": 2201.6
+              },
+              "gpu": {
+                "minimum_mhz": 306.0,
+                "maximum_mhz": 1300.5
+              },
+              "emc": {
+                "status": "unavailable"
+              }
+            }
+          }
+        },
+        "candidate": {
+          "metrics": {
+            "prompt_tps": 17.271696092363094,
+            "decode_tps": 3.8282768177032835,
+            "client_ttft_s": 118.9395260270685,
+            "client_total_s": 166.71893279720098
+          },
+          "completion_tokens": 184,
+          "expert_cache_hit_rate": 0.285,
+          "answer_sha256": "bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168",
+          "resources": {
+            "minimum_available_gib": 8.620010375976562,
+            "minimum_admission_available_gib": 8.620010375976562,
+            "maximum_swap_used_gib": 1.0689010620117188,
+            "maximum_oom_kill_counter": 1,
+            "clocks": {
+              "cpu": {
+                "minimum_mhz": 729.6,
+                "maximum_mhz": 2201.6
+              },
+              "gpu": {
+                "minimum_mhz": 306.0,
+                "maximum_mhz": 1300.5
+              },
+              "emc": {
+                "status": "unavailable"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "block": 1,
+      "api_responses_identical": true,
+      "arms": {
+        "baseline": {
+          "metrics": {
+            "prompt_tps": 37.2045030528402,
+            "decode_tps": 5.868151564149421,
+            "client_ttft_s": 55.313551236409694,
+            "client_total_s": 86.4771996322088
+          },
+          "completion_tokens": 184,
+          "expert_cache_hit_rate": 0.285,
+          "answer_sha256": "bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168",
+          "resources": {
+            "minimum_available_gib": 8.610984802246094,
+            "minimum_admission_available_gib": 8.610984802246094,
+            "maximum_swap_used_gib": 1.0696334838867188,
+            "maximum_oom_kill_counter": 1,
+            "clocks": {
+              "cpu": {
+                "minimum_mhz": 729.6,
+                "maximum_mhz": 2201.6
+              },
+              "gpu": {
+                "minimum_mhz": 306.0,
+                "maximum_mhz": 1300.5
+              },
+              "emc": {
+                "status": "unavailable"
+              }
+            }
+          }
+        },
+        "candidate": {
+          "metrics": {
+            "prompt_tps": 38.24427409641367,
+            "decode_tps": 5.957275970809348,
+            "client_ttft_s": 53.81796441413462,
+            "client_total_s": 84.49336248869076
+          },
+          "completion_tokens": 184,
+          "expert_cache_hit_rate": 0.285,
+          "answer_sha256": "bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168",
+          "resources": {
+            "minimum_available_gib": 8.643054962158203,
+            "minimum_admission_available_gib": 8.643054962158203,
+            "maximum_swap_used_gib": 1.0630416870117188,
+            "maximum_oom_kill_counter": 1,
+            "clocks": {
+              "cpu": {
+                "minimum_mhz": 729.6,
+                "maximum_mhz": 2201.6
+              },
+              "gpu": {
+                "minimum_mhz": 306.0,
+                "maximum_mhz": 1300.5
+              },
+              "emc": {
+                "status": "unavailable"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "block": 2,
+      "api_responses_identical": true,
+      "arms": {
+        "baseline": {
+          "metrics": {
+            "prompt_tps": 41.81102153226777,
+            "decode_tps": 6.198354067501423,
+            "client_ttft_s": 49.30362271377817,
+            "client_total_s": 78.80863030580804
+          },
+          "completion_tokens": 184,
+          "expert_cache_hit_rate": 0.285,
+          "answer_sha256": "bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168",
+          "resources": {
+            "minimum_available_gib": 8.647163391113281,
+            "minimum_admission_available_gib": 8.647163391113281,
+            "maximum_swap_used_gib": 1.0742721557617188,
+            "maximum_oom_kill_counter": 1,
+            "clocks": {
+              "cpu": {
+                "minimum_mhz": 729.6,
+                "maximum_mhz": 2201.6
+              },
+              "gpu": {
+                "minimum_mhz": 306.0,
+                "maximum_mhz": 1300.5
+              },
+              "emc": {
+                "status": "unavailable"
+              }
+            }
+          }
+        },
+        "candidate": {
+          "metrics": {
+            "prompt_tps": 41.57885974849662,
+            "decode_tps": 5.260930727266489,
+            "client_ttft_s": 49.52045059110969,
+            "client_total_s": 84.30670475913212
+          },
+          "completion_tokens": 184,
+          "expert_cache_hit_rate": 0.285,
+          "answer_sha256": "bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168",
+          "resources": {
+            "minimum_available_gib": 8.645805358886719,
+            "minimum_admission_available_gib": 8.645805358886719,
+            "maximum_swap_used_gib": 1.0679244995117188,
+            "maximum_oom_kill_counter": 1,
+            "clocks": {
+              "cpu": {
+                "minimum_mhz": 729.6,
+                "maximum_mhz": 2201.6
+              },
+              "gpu": {
+                "minimum_mhz": 306.0,
+                "maximum_mhz": 1300.5
+              },
+              "emc": {
+                "status": "unavailable"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "resource_summary": {
+    "minimum_available_gib": 8.467609405517578,
+    "minimum_admission_available_gib": 8.467609405517578,
+    "maximum_swap_used_gib": 1.4055709838867188,
+    "maximum_oom_kill_counter": 1,
+    "cpu_clock_mhz_range": {
+      "minimum_mhz": 729.6,
+      "maximum_mhz": 2201.6
+    },
+    "gpu_clock_mhz_range": {
+      "minimum_mhz": 306.0,
+      "maximum_mhz": 1300.5
+    },
+    "emc_clock": "not available: permission denied",
+    "energy": "instantaneous tegrastats rail samples were captured; energy was not analyzed or used for qualification",
+    "cgroup_oom_kill_counter_initial_max": 1,
+    "cgroup_oom_kill_counter_final_max": 1,
+    "cgroup_oom_kill_counter_delta_max": 0,
+    "interpretation": "Minimum available/admission memory was 8.47 GiB, 2.47 GiB above the required floor; maximum sampled swap was 1.41 GiB. The pre-existing cgroup OOM-kill counter remained at 1 throughout."
+  },
+  "excluded_attempts": [],
+  "raw_campaign": "/tmp/e6-q2-ledger-capacity-32768/campaign/",
+  "accepted_prefix_state_check": {
+    "kind": "not run",
+    "reason": "accepted-prefix tracing was not enabled in this timing campaign"
+  },
+  "state_capture": "not run for this 32K configured-context performance screen",
+  "decision": "decode median effect was −15.12% (95% three-pair interval −37.35% to +1.52%), below the registered +5% useful-effect gate and with the interval crossing zero; no confirmation or profile promotion. One slow NInfer-first pair is retained without causal attribution."
+}
