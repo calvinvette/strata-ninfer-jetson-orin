@@ -1,0 +1,371 @@
+{
+  "date": "2026-11-04",
+  "hardware": "Jetson AGX Orin, CUDA",
+  "system": {
+    "kernel": "Linux orin1 5.15.148-tegra #1 SMP PREEMPT Mon Jun 16 08:24:48 PDT 2025 aarch64 aarch64 aarch64 GNU/Linux",
+    "architecture": "aarch64",
+    "jetpack_release": "R36 REVISION 4.4",
+    "cuda_compiler": "12.6.68",
+    "driver": "540.4.0",
+    "gpu": "Orin (nvgpu)"
+  },
+  "tested_checkout_revision": "bcc324c41307be74c76164a6feef9f821657bafd",
+  "runtime_binary_sha256": "fd67288c399d895be036dab344e30caab3d081540bfc552f22dac6a5fc33644a",
+  "runtime_binary_mtime": "2026-10-31 11:10:03.604465309 -0400",
+  "binary_build_source_revision": "pre-existing executable; its build revision is not embedded",
+  "model": {
+    "name": "Qwen3.8-Flash-Next Q2_0",
+    "source_repo": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
+    "source_revision": "8f752f8ae475984833f74edf84d9e43c5d1eaf98",
+    "files": [
+      {
+        "path": "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+        "size_bytes": 37623740192,
+        "sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720"
+      },
+      {
+        "path": "/home/calvin/models/strata-orin-validation/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+        "size_bytes": 28800138432,
+        "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+      }
+    ]
+  },
+  "task": {
+    "cell": "heldout-code-merge-ranges-8192",
+    "family": "code generation with executable interval-merging oracle",
+    "prompt_tokens": 8192,
+    "generation_limit": 128,
+    "completion_tokens": 107,
+    "allow_natural_stop": true,
+    "fixture_sha256": "73ec5921eb4f99dc630b9d361c1f4f76fbe1b474638fe11c1922614ea9f48841",
+    "formatted_token_ids_sha256": "0466a531b9de7a596d35753195f2cce7b543260bea36c5902f80299c74103484",
+    "quality_oracle": "tools/integration/evaluate_e6_code_task.py; five executable cases plus input immutability",
+    "quality_outcomes": "all warmup and measured outputs passed in six arms; one identical code SHA-256 5df0a140c98a2222561b219450c8298cd4bc023bdeea65e815626cded949cc58",
+    "filler": "8089 repetitions of \u201cred\u201d before the task, solely to construct an exact formatted 8K prompt"
+  },
+  "controls": {
+    "fixed_map_sha256": "76a1644f56d985fdd54a5816aadd39ce9356190dbaa828a293fab8462f507087",
+    "gpu_expert_slots": 5000,
+    "ram_expert_budget_gib": 6,
+    "max_context": 16384,
+    "prefill_chunk": 128,
+    "speculation_configured": 2,
+    "accepted_drafts": 0,
+    "workers": 8,
+    "prompt_cache": false,
+    "adaptation": false,
+    "pcie_staging_fraction": 0,
+    "paired_blocks": 3,
+    "randomized_seed": 202611048192,
+    "configs": {
+      "strata": {
+        "sha256": "aeb39341268ed998af813ce634a61c2423d2849b16f65c9f655387a61e3b15e8",
+        "path": "/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task8192-code-generation-20261104/strata.json"
+      },
+      "ninfer": {
+        "sha256": "fd8637287e34fb7c1f76f9b0f9ba83b8d8cae3f3bc91ab767fe4a91abe583806",
+        "path": "/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task8192-code-generation-20261104/ninfer.json"
+      }
+    },
+    "backend_control": "default Strata vs --expert-backend ninfer --expert-backend-strict"
+  },
+  "result": {
+    "decode_primary_effect_percent": 0.13958095695503214,
+    "decode_primary_interval_percent": [
+      -0.15658798789454087,
+      3.7458774168171116
+    ],
+    "effect_gate_percent": 5,
+    "decision": "screen below the 5% useful-effect gate; no confirmation or profile promotion",
+    "task_quality_and_backend_response_parity": true
+  },
+  "paired_summary": {
+    "cell": "heldout-code-merge-ranges-8192",
+    "paired_blocks": 3,
+    "api_content_matching_blocks": 3,
+    "prompt_tps": {
+      "baseline_median": 80.68614743344772,
+      "candidate_median": 81.16484230717406,
+      "median_within_block_candidate_over_baseline": 1.0059328012174726,
+      "paired_bootstrap_95_interval": [
+        0.9859571475437531,
+        1.0175012406550659
+      ]
+    },
+    "decode_tps": {
+      "baseline_median": 5.345643300709922,
+      "candidate_median": 5.3701649694603235,
+      "median_within_block_candidate_over_baseline": 1.0013958095695503,
+      "paired_bootstrap_95_interval": [
+        0.9984341201210546,
+        1.0374587741681711
+      ]
+    },
+    "client_ttft_s": {
+      "baseline_median": 101.77560222800821,
+      "candidate_median": 101.18450343189761,
+      "median_within_block_candidate_over_baseline": 0.9941921365909842,
+      "paired_bootstrap_95_interval": [
+        0.9827155236587434,
+        1.01647122752801
+      ]
+    },
+    "client_total_s": {
+      "baseline_median": 121.48743463400751,
+      "candidate_median": 120.91911111632362,
+      "median_within_block_candidate_over_baseline": 0.9953219563867158,
+      "paired_bootstrap_95_interval": [
+        0.9797580953619001,
+        1.0116905163110854
+      ]
+    },
+    "fixture_sha256": "73ec5921eb4f99dc630b9d361c1f4f76fbe1b474638fe11c1922614ea9f48841",
+    "prompt_tokens": 8192,
+    "generate_token_limit": 128,
+    "allow_natural_stop": true,
+    "resources": {
+      "minimum_available_gib": 8.968990325927734,
+      "minimum_admission_available_gib": 8.968990325927734,
+      "maximum_swap_used_gib": 4.442295074462891,
+      "maximum_oom_kill_counter": 0,
+      "cpu_clock_mhz_range": {
+        "minimum_mhz": 729.6,
+        "maximum_mhz": 2201.6
+      },
+      "gpu_clock_mhz_range": {
+        "minimum_mhz": 306.0,
+        "maximum_mhz": 1300.5
+      },
+      "emc_clock": "unavailable: permission denied",
+      "energy": "rail samples captured; energy was not integrated or used for qualification"
+    },
+    "pairs": [
+      {
+        "block": 0,
+        "api_responses_identical": true,
+        "arms": {
+          "baseline": {
+            "metrics": {
+              "prompt_tps": 81.60980114584464,
+              "decode_tps": 5.345643300709922,
+              "client_ttft_s": 100.62828117609024,
+              "client_total_s": 120.45415529794991
+            },
+            "prompt_tokens": 8192,
+            "completion_tokens": 107,
+            "drafts_offered": 0,
+            "drafts_accepted": 0,
+            "expert_cache_hit_rate": 0.2,
+            "answer_sha256": "5df0a140c98a2222561b219450c8298cd4bc023bdeea65e815626cded949cc58",
+            "resources": {
+              "minimum_available_gib": 9.047664642333984,
+              "minimum_admission_available_gib": 9.047664642333984,
+              "maximum_swap_used_gib": 1.4739570617675781,
+              "maximum_oom_kill_counter": 0,
+              "clocks": {
+                "cpu": {
+                  "minimum_mhz": 729.6,
+                  "maximum_mhz": 2201.6
+                },
+                "gpu": {
+                  "minimum_mhz": 306.0,
+                  "maximum_mhz": 1300.5
+                },
+                "emc": {
+                  "status": "unavailable"
+                }
+              }
+            }
+          },
+          "candidate": {
+            "metrics": {
+              "prompt_tps": 80.4637667493699,
+              "decode_tps": 5.353104800784455,
+              "client_ttft_s": 102.28575249109417,
+              "client_total_s": 121.8623265651986
+            },
+            "prompt_tokens": 8192,
+            "completion_tokens": 107,
+            "drafts_offered": 0,
+            "drafts_accepted": 0,
+            "expert_cache_hit_rate": 0.2,
+            "answer_sha256": "5df0a140c98a2222561b219450c8298cd4bc023bdeea65e815626cded949cc58",
+            "resources": {
+              "minimum_available_gib": 8.968990325927734,
+              "minimum_admission_available_gib": 8.968990325927734,
+              "maximum_swap_used_gib": 4.442295074462891,
+              "maximum_oom_kill_counter": 0,
+              "clocks": {
+                "cpu": {
+                  "minimum_mhz": 729.6,
+                  "maximum_mhz": 2201.6
+                },
+                "gpu": {
+                  "minimum_mhz": 306.0,
+                  "maximum_mhz": 1300.5
+                },
+                "emc": {
+                  "status": "unavailable"
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "block": 1,
+        "api_responses_identical": true,
+        "arms": {
+          "baseline": {
+            "metrics": {
+              "prompt_tps": 80.68614743344772,
+              "decode_tps": 5.378587190919738,
+              "client_ttft_s": 101.77560222800821,
+              "client_total_s": 121.48743463400751
+            },
+            "prompt_tokens": 8192,
+            "completion_tokens": 107,
+            "drafts_offered": 0,
+            "drafts_accepted": 0,
+            "expert_cache_hit_rate": 0.2,
+            "answer_sha256": "5df0a140c98a2222561b219450c8298cd4bc023bdeea65e815626cded949cc58",
+            "resources": {
+              "minimum_available_gib": 9.020347595214844,
+              "minimum_admission_available_gib": 9.020347595214844,
+              "maximum_swap_used_gib": 1.3782806396484375,
+              "maximum_oom_kill_counter": 0,
+              "clocks": {
+                "cpu": {
+                  "minimum_mhz": 729.6,
+                  "maximum_mhz": 2201.6
+                },
+                "gpu": {
+                  "minimum_mhz": 306.0,
+                  "maximum_mhz": 1300.5
+                },
+                "emc": {
+                  "status": "unavailable"
+                }
+              }
+            }
+          },
+          "candidate": {
+            "metrics": {
+              "prompt_tps": 81.16484230717406,
+              "decode_tps": 5.3701649694603235,
+              "client_ttft_s": 101.18450343189761,
+              "client_total_s": 120.91911111632362
+            },
+            "prompt_tokens": 8192,
+            "completion_tokens": 107,
+            "drafts_offered": 0,
+            "drafts_accepted": 0,
+            "expert_cache_hit_rate": 0.2,
+            "answer_sha256": "5df0a140c98a2222561b219450c8298cd4bc023bdeea65e815626cded949cc58",
+            "resources": {
+              "minimum_available_gib": 9.059562683105469,
+              "minimum_admission_available_gib": 9.059562683105469,
+              "maximum_swap_used_gib": 1.2716293334960938,
+              "maximum_oom_kill_counter": 0,
+              "clocks": {
+                "cpu": {
+                  "minimum_mhz": 729.6,
+                  "maximum_mhz": 2201.6
+                },
+                "gpu": {
+                  "minimum_mhz": 306.0,
+                  "maximum_mhz": 1300.5
+                },
+                "emc": {
+                  "status": "unavailable"
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "block": 2,
+        "api_responses_identical": true,
+        "arms": {
+          "baseline": {
+            "metrics": {
+              "prompt_tps": 80.55349058570413,
+              "decode_tps": 5.201092715553698,
+              "client_ttft_s": 101.94722456904128,
+              "client_total_s": 122.32445248682052
+            },
+            "prompt_tokens": 8192,
+            "completion_tokens": 107,
+            "drafts_offered": 0,
+            "drafts_accepted": 0,
+            "expert_cache_hit_rate": 0.2,
+            "answer_sha256": "5df0a140c98a2222561b219450c8298cd4bc023bdeea65e815626cded949cc58",
+            "resources": {
+              "minimum_available_gib": 8.994987487792969,
+              "minimum_admission_available_gib": 8.994987487792969,
+              "maximum_swap_used_gib": 1.13739013671875,
+              "maximum_oom_kill_counter": 0,
+              "clocks": {
+                "cpu": {
+                  "minimum_mhz": 729.6,
+                  "maximum_mhz": 2201.6
+                },
+                "gpu": {
+                  "minimum_mhz": 306.0,
+                  "maximum_mhz": 1300.5
+                },
+                "emc": {
+                  "status": "unavailable"
+                }
+              }
+            }
+          },
+          "candidate": {
+            "metrics": {
+              "prompt_tps": 81.96327661005012,
+              "decode_tps": 5.395919273013344,
+              "client_ttft_s": 100.18512017792091,
+              "client_total_s": 119.84837258467451
+            },
+            "prompt_tokens": 8192,
+            "completion_tokens": 107,
+            "drafts_offered": 0,
+            "drafts_accepted": 0,
+            "expert_cache_hit_rate": 0.2,
+            "answer_sha256": "5df0a140c98a2222561b219450c8298cd4bc023bdeea65e815626cded949cc58",
+            "resources": {
+              "minimum_available_gib": 9.045974731445312,
+              "minimum_admission_available_gib": 9.045974731445312,
+              "maximum_swap_used_gib": 2.246356964111328,
+              "maximum_oom_kill_counter": 0,
+              "clocks": {
+                "cpu": {
+                  "minimum_mhz": 729.6,
+                  "maximum_mhz": 2201.6
+                },
+                "gpu": {
+                  "minimum_mhz": 306.0,
+                  "maximum_mhz": 1300.5
+                },
+                "emc": {
+                  "status": "unavailable"
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "raw_capture_directory": "/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task8192-code-generation-20261104/screen",
+  "energy": "not measured; instantaneous rail samples were captured only",
+  "emc": "readback denied/unsupported",
+  "limitations": [
+    "three-pair screen only; bootstrap interval is coarse",
+    "one filler-extended code task on one Q2_0 model and a 5K map learned from a different workload",
+    "available memory remained above 6 GiB; one NInfer arm reached 4.44 GiB sampled swap",
+    "CPU/GPU clocks were dynamic and uncontrolled",
+    "no 8K accepted-prefix state trace; separate 2K code and ledger tasks have bounded state parity evidence"
+  ]
+}

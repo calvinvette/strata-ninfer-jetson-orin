@@ -599,6 +599,20 @@ adds task-quality and bounded state coverage but no useful backend gain or
 multi-model evidence. The combined chart now includes a separate ledger cell.
 E6/E7 remain open. See the [ledger screen](../../bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/README.md).
 
+**Execution note (2026-11-04):** extended the executable code task to an exact
+8,192-token formatted prompt at 16K configured context. Three randomized
+same-map pairs retained the same controls and passed the independent five-case
+oracle for every warmup and measured response; all generated functions had the
+same hash. NInfer decode changed +0.14% (95% screen interval −0.16% to +3.75%),
+below the 5% useful-effect gate; prompt TPS changed +0.59%, first-visible
+latency −0.58% and client duration −0.47%, with all intervals including zero.
+Expert-cache hit rate was 20.0% in every arm. Minimum available memory was
+8.97 GiB with no sampled OOM kills; one NInfer arm reached 4.44 GiB swap.
+Repeated filler extended the prompt, so this is not a natural 8K document or
+codebase task. It adds longer-input task evidence but no useful backend gain,
+8K state-parity claim or multi-model evidence. E6/E7 remain open. See the
+[8K code-generation screen](../../bench/results/2026-11-04-e6-q2-code-generation-8k-screen/README.md).
+
 **Execution note (2026-11-04):** a fixed-map 2K state diagnostic compared
 Strata and strict NInfer with accepted-prefix tracing enabled. Both fresh
 processes returned the exact expected 47-token answer for both the warmup and

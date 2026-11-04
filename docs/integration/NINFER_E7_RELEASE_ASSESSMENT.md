@@ -68,6 +68,18 @@ trace timings are excluded. This broadens task and bounded state coverage on
 Q2_0 but does not supply multi-model evidence or a performance-qualified
 NInfer profile. See the [ledger report](../../bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/README.md).
 
+A follow-up three-pair screen used the same executable code task with an exact
+8,192-token formatted prompt at 16K configured context. All twelve warmup and
+measured outputs passed the five-case oracle and matched across arms. Decode
+changed +0.14% (95% screen interval −0.16% to +3.75%); prompt TPS, first-visible
+latency and client duration also remained within small intervals spanning no
+effect. One NInfer process reached 4.44 GiB sampled swap, while the memory
+floor held at 8.97 GiB minimum available. Repeated filler extended this prompt,
+so it is a synthetic-length code task. It adds neither an 8K state-parity claim
+nor a useful NInfer performance effect. The [8K code
+screen](../../bench/results/2026-11-04-e6-q2-code-generation-8k-screen/README.md)
+does not change the no-release decision.
+
 ## Evidence and limits
 
 ### Q2_0 artifact identity for the 2026-11-04 code-task screen

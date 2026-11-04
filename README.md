@@ -81,12 +81,19 @@ shows this as a third, separate 2K task cell; it is still one Q2_0 model and
 does not establish multi-model performance. A separate instrumented pair
 matched all 184 accepted-prefix token IDs and persistent-state fingerprints;
 trace timings are excluded.
+An 8K code-generation screen also passed its independent five-case oracle in
+all six measured responses and matched outputs across the three pairs, but
+NInfer decode changed only +0.14% (95% screen interval −0.16% to +3.75%).
+Maximum sampled swap reached 4.44 GiB in one NInfer arm, while minimum
+available RAM remained 8.97 GiB. This adds longer-input task evidence, not a
+useful backend effect or an 8K state-parity claim.
 The chart keeps each workload separate and shows the paired effects and
 uncertainty:
 
-<p align="center"><img src="bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/same-map-backend-screens.svg" width="100%" alt="Same-map Strata versus strict NInfer paired effects for retrieval tasks from 2K to 240K and separate 2K code-generation and ledger tasks"></p>
+<p align="center"><img src="bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/same-map-backend-screens.svg" width="100%" alt="Same-map Strata versus strict NInfer paired effects for retrieval tasks from 2K to 240K and separate 2K and 8K code-generation and 2K ledger tasks"></p>
 
 See the [code-generation report](bench/results/2026-11-04-e6-q2-code-generation-screen/README.md)
+and [8K code-generation report](bench/results/2026-11-04-e6-q2-code-generation-8k-screen/README.md)
 and [ledger aggregation report](bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/README.md)
 and [combined fixed-map screen report](bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md)
 for workload, memory, clock and measurement limits.

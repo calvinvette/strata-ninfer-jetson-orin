@@ -1,6 +1,17 @@
 # Quick status
 
-Updated: 2026-10-31
+Updated: 2026-11-04
+
+## Current E6/E7 position
+
+The 2026-11-04 8K code-generation screen passed its executable oracle in all
+three paired Strata/NInfer runs, but showed no useful same-map NInfer effect:
+decode +0.14% (95% three-pair interval −0.16% to +3.75%). The exact 8K prompt
+was extended with repeated filler, so this is not a natural long-document
+task. Minimum available memory was 8.97 GiB; one NInfer process reached 4.44
+GiB sampled swap. E6/E7 remain open, the NInfer path remains opt-in, and no
+release profile is qualified. [8K code report](../../bench/results/2026-11-04-e6-q2-code-generation-8k-screen/README.md)
+· [release assessment](NINFER_E7_RELEASE_ASSESSMENT.md).
 
 An opt-in Nsight graph-node diagnostic showed NInfer D3/D4 plus SwiGLU kernels account for 0.95% of the GPU-active interval union in the captured pp512 request pair; event overlap was only 0.35%. This is not a request wall-time fraction or a general speedup ceiling. Wait-flag, dequantization and other work remains. [Report](../../bench/results/2026-10-31-e6-q2-ninfer-kernel-share-diagnostic/README.md).
 

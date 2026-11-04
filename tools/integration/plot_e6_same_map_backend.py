@@ -32,7 +32,7 @@ def path_get(obj, dotted):
     return obj
 
 
-def collect(evidence, codegen_evidence=None, ledger_evidence=None):
+def collect(evidence, codegen_evidence=None, ledger_evidence=None, code8k_evidence=None):
     rows = []
     for label, _, root_key, metric_path, point_key, interval_key in SERIES:
         root = path_get(evidence, root_key)
@@ -74,6 +74,18 @@ def collect(evidence, codegen_evidence=None, ledger_evidence=None):
                 "interval": [(x - 1) * 100 for x in metric["paired_bootstrap_95_interval"]],
             }
         rows.insert(2, item)
+    if code8k_evidence is not None:
+        summary = code8k_evidence["paired_summary"]
+        aliases = {"decode_tps": "decode_tps", "prompt_tps": "prompt_tps",
+                   "ttft": "client_ttft_s", "client": "client_total_s"}
+        item = {"label": "8K code", "metrics": {}}
+        for name, key in aliases.items():
+            metric = summary[key]
+            item["metrics"][name] = {
+                "effect": (metric["median_within_block_candidate_over_baseline"] - 1) * 100,
+                "interval": [(x - 1) * 100 for x in metric["paired_bootstrap_95_interval"]],
+            }
+        rows.insert(4, item)
     return rows
 
 
@@ -118,11 +130,13 @@ def main():
     parser.add_argument('--evidence',type=Path,default=Path('bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/evidence.json'))
     parser.add_argument('--codegen-evidence',type=Path,default=Path('bench/results/2026-11-04-e6-q2-code-generation-screen/evidence.json'))
     parser.add_argument('--ledger-evidence',type=Path,default=Path('bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/evidence.json'))
+    parser.add_argument('--code8k-evidence',type=Path,default=Path('bench/results/2026-11-04-e6-q2-code-generation-8k-screen/evidence.json'))
     parser.add_argument('--output',type=Path,default=Path('bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/same-map-backend-screens.svg'))
     args=parser.parse_args()
     codegen = json.loads(args.codegen_evidence.read_text()) if args.codegen_evidence.exists() else None
     ledger = json.loads(args.ledger_evidence.read_text()) if args.ledger_evidence.exists() else None
-    rows=collect(json.loads(args.evidence.read_text()), codegen, ledger)
+    code8k = json.loads(args.code8k_evidence.read_text()) if args.code8k_evidence.exists() else None
+    rows=collect(json.loads(args.evidence.read_text()), codegen, ledger, code8k)
     args.output.write_text(svg_chart(rows))
     print(f'wrote {args.output} with {len(rows)} task/context cells and {len(METRICS)} paired metrics')
 
