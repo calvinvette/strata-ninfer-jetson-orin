@@ -255,6 +255,11 @@ qualification. Pair data are in `evidence.json`; raw captures remain under
 - Model: Qwen3.8-Flash-Next GSQ-RCO Q2_0, two GGUF shards. SHA-256 values:
   `69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720` and
   `316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113`.
+- Model source: [`ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF` at
+  `8f752f8ae475984833f74edf84d9e43c5d1eaf98`](https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF/tree/8f752f8ae475984833f74edf84d9e43c5d1eaf98).
+  These are the same shard digests recorded for the 2026-11-04 code-task
+  screen; shard two is also byte-identical to the upstream Coder IQ1_M shard
+  two, so both shard hashes are needed to identify the quant.
 - Source revision: `29a26c8f702cd06fcc4a12812f10fe8225d2f8ca`; executable SHA-256:
   `fd67288c399d895be036dab344e30caab3d081540bfc552f22dac6a5fc33644a`.
 - Both maps have 5,000 GPU-resident slots. They overlap in 2,091 slots and
