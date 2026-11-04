@@ -587,6 +587,16 @@ treat exact short-task text as sufficient evidence for other tasks.
 
 ### E6 — Demonstrate end-to-end performance and context behavior
 
+**Execution note (2026-11-04):** a third 2K held-out task family checked
+structured ledger aggregation using an exact JSON oracle for region counts,
+signed sums, maxima and overall totals. All twelve Strata and strict-NInfer
+warmup/measured answers passed and matched. In three randomized pairs,
+same-map decode changed +1.22% (95% screen interval +0.33% to +3.05%), below
+the 5% useful-effect gate; prompt throughput changed −0.43%, TTFT +0.48% and
+client duration +0.15%. The result adds task-quality coverage but no useful
+backend gain or multi-model evidence. The combined chart now includes a
+separate ledger cell. E6/E7 remain open. See the [ledger screen](../../bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/README.md).
+
 **Execution note (2026-11-04):** a fixed-map 2K state diagnostic compared
 Strata and strict NInfer with accepted-prefix tracing enabled. Both fresh
 processes returned the exact expected 47-token answer for both the warmup and

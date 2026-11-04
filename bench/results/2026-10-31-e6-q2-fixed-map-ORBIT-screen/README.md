@@ -81,9 +81,9 @@ screen was not confirmed. Minimum request-window available RAM was 9.17 GiB,
 with zero sampled cgroup OOM kills. This gives no evidence of a useful NInfer
 kernel advantage at 2K either, although the three-pair interval remains coarse.
 
-The chart below summarizes paired same-map backend screens by task and actual prompt length. At 2K it shows separate retrieval/arithmetic and code-generation cells; the remaining lengths are retrieval/arithmetic. Each error bar is that cell's 95% paired screening interval from three randomized process pairs; positive throughput changes favor NInfer, while negative latency changes favor NInfer. The 8K decode outlier is retained. Cells were collected in separate campaigns and remain separate points, not pooled estimates. Both task families use Q2_0; the chart does not provide a multi-model result. Recreate it with `python3 tools/integration/plot_e6_same_map_backend.py`.
+The chart below summarizes paired same-map backend screens by task and actual prompt length. At 2K it shows separate retrieval/arithmetic, code-generation and ledger-aggregation cells; the remaining lengths are retrieval/arithmetic. Each error bar is that cell's 95% paired screening interval from three randomized process pairs; positive throughput changes favor NInfer, while negative latency changes favor NInfer. The 8K decode outlier is retained. Cells were collected in separate campaigns and remain separate points, not pooled estimates. All three task families use Q2_0; the chart does not provide a multi-model result. Recreate it with `python3 tools/integration/plot_e6_same_map_backend.py`.
 
-![Q2_0 same-map backend paired effects across retrieval and code-generation tasks](same-map-backend-screens.svg)
+![Q2_0 same-map backend paired effects across retrieval, code-generation and ledger-aggregation tasks](same-map-backend-screens.svg)
 
 ## 2K prompt replication
 
