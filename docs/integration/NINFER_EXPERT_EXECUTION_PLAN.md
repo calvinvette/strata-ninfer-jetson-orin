@@ -609,8 +609,10 @@ latency −0.58% and client duration −0.47%, with all intervals including zero
 Expert-cache hit rate was 20.0% in every arm. Minimum available memory was
 8.97 GiB with no sampled OOM kills; one NInfer arm reached 4.44 GiB swap.
 Repeated filler extended the prompt, so this is not a natural 8K document or
-codebase task. It adds longer-input task evidence but no useful backend gain,
-8K state-parity claim or multi-model evidence. E6/E7 remain open. See the
+codebase task. A separate instrumented pair matched all 107 accepted token IDs
+and persistent-state fingerprints for this exact task; trace timings are
+excluded. It adds bounded longer-input state and task evidence but no useful
+backend gain or multi-model evidence. E6/E7 remain open. See the
 [8K code-generation screen](../../bench/results/2026-11-04-e6-q2-code-generation-8k-screen/README.md).
 
 **Execution note (2026-11-04):** a fixed-map 2K state diagnostic compared

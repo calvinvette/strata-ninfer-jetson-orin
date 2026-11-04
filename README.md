@@ -85,8 +85,10 @@ An 8K code-generation screen also passed its independent five-case oracle in
 all six measured responses and matched outputs across the three pairs, but
 NInfer decode changed only +0.14% (95% screen interval −0.16% to +3.75%).
 Maximum sampled swap reached 4.44 GiB in one NInfer arm, while minimum
-available RAM remained 8.97 GiB. This adds longer-input task evidence, not a
-useful backend effect or an 8K state-parity claim.
+available RAM remained 8.97 GiB. A separate instrumented pair matched all 107
+accepted token IDs and persistent-state fingerprints for this same task;
+trace timings are excluded. This adds longer-input task evidence, not a
+useful backend effect or state parity for natural long-context tasks.
 The chart keeps each workload separate and shows the paired effects and
 uncertainty:
 

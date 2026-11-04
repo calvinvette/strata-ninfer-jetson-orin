@@ -32,8 +32,28 @@ zero sampled OOM kills. Maximum sampled swap was 4.44 GiB in one NInfer arm;
 other arms peaked between 1.14 and 1.47 GiB. CPU/GPU clocks were dynamic and
 uncontrolled (729.6–2,201.6 / 306–1,300.5 MHz). EMC readback was denied and
 energy was not measured. This resource variability and three-pair sample limit
-the performance interpretation. No 8K accepted-prefix state capture was run;
-state parity evidence remains limited to the separate 2K code and ledger tasks.
+the performance interpretation. The separate instrumented capture below adds
+accepted-prefix state parity for this exact synthetic-length code task; its
+timings are not part of the performance result.
+
+## Accepted-prefix state check
+
+A separate instrumented process per backend ran one warmup and one measured
+request. Both warmups and measured responses passed the executable oracle and
+returned the same 107-token function. All 107 committed token IDs and recorded
+persistent-state fingerprints matched at every accepted prefix across Strata
+and strict NInfer. The canonical Strata trace SHA-256 is
+`50a2a6d39e0ae78dccfabb1c08fe92c4dc30feb0a5ce86ba5cc8834c064c2536`.
+Minimum available memory was 9.11 GiB for Strata and 9.08 GiB for NInfer;
+sampled swap peaked at 2.24 and 5.14 GiB. The cgroup OOM-kill counter was 1
+before and after both processes, with zero increment. Accepted-prefix hashing
+reduced traced decode to about 0.4 tok/s, so these timings are excluded. This
+is bounded state evidence for the same filler-extended code task, model, map
+and request shape; it does not resolve the existing state differences on much
+longer prompts. The compact machine-readable result is in
+[`statecheck-summary.json`](statecheck-summary.json); full traces and memory
+samples remain outside Git under the raw-capture path recorded in
+[`evidence.json`](evidence.json).
 
 ## Reproduction
 
@@ -58,7 +78,36 @@ python3 tools/integration/summarize_e6_code_screen.py \
   --campaign /tmp/e6-code-8k-repeat \
   --fixture bench/results/2026-11-04-e6-q2-code-generation-8k-screen/fixture.json \
   --output /tmp/e6-code-8k-repeat-summary.json
+python3 tools/integration/compare_e6_code_state.py \
+  --strata-log /tmp/e6-code-8k-state/strata/engine.log \
+  --ninfer-log /tmp/e6-code-8k-state/ninfer/engine.log \
+  --strata-requests /tmp/e6-code-8k-state/strata/requests.json \
+  --ninfer-requests /tmp/e6-code-8k-state/ninfer/requests.json \
+  --strata-dir /tmp/e6-code-8k-state/strata \
+  --ninfer-dir /tmp/e6-code-8k-state/ninfer \
+  --output /tmp/e6-code-8k-state/summary.json
 ```
+
+For a fresh state capture, run one supervised process per backend, sequentially
+and into new output directories. Use the exact state-check configs recorded in
+the original raw capture (`statecheck/strata.json` and `statecheck/ninfer.json`);
+they reference the same model, fixed map and runtime binary as this screen. For
+each backend, run:
+
+```sh
+python3 tools/integration/run_control.py \
+  --output /tmp/e6-code-8k-state/strata \
+  -- python3 tools/integration/api_control_block.py \
+  --config /path/to/statecheck/strata.json \
+  --workloads bench/results/2026-11-04-e6-q2-code-generation-8k-screen/fixture.json \
+  --output /tmp/e6-code-8k-state/strata/requests.json \
+  --variant baseline --rounds 1 --no-trace --accepted-prefix-trace --state-hash
+```
+
+Repeat with `ninfer` in the output paths, `statecheck/ninfer.json` as the
+config, and `--variant candidate`. Then run the comparator command above.
+Accepted-prefix hashing slows the run substantially; do not use its timings for
+performance comparisons.
 
 The combined same-map screen chart includes this as a separate 8K code-task
 point from the retrieval workload.
