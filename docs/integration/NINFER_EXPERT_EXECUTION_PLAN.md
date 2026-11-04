@@ -609,6 +609,12 @@ prefill/TTFT outlier is retained without causal attribution. This broadens
 quality coverage by one task but supplies no useful backend gain and does not
 close E6. See the [code-generation screen](../../bench/results/2026-11-04-e6-q2-code-generation-screen/README.md).
 
+A follow-up accepted-prefix capture on the same 2K code task matched all 107
+token IDs and recorded persistent-state fingerprints across backends and both
+request ordinals. All outputs again passed the independent code oracle. This
+is bounded short-task state evidence only; trace timings are excluded. The
+capture and canonical trace hash are recorded in the same report.
+
 The ordinary single-request verifier path now invokes the opt-in multi-layer
 MoE bundle serializer after its captured device results are available. A
 held-out 2K retrieval diagnostic confirmed exact backend equality for routes,

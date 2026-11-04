@@ -51,6 +51,21 @@ shows this code-task cell alongside the separate 2K retrieval cell and the
 retrieval screens through 240K. Points and intervals remain per-task screens;
 they are not pooled.
 
+## Accepted-prefix state check
+
+A separate instrumented pair ran the same code task in fresh Strata and strict
+NInfer processes, each with a warmup and measured request. Both requests in
+both processes passed the executable oracle and returned the same 107-token
+code. All committed token IDs and recorded GDN, PLE, QSA tail, pooled, KV,
+MTP, stale, dead, pooled-full and PLE previous-token fingerprints matched at
+all 107 accepted prefixes across backends and request ordinals. Minimum
+available memory was 9.14 GiB for Strata and 9.17 GiB for NInfer; both reported
+19.9% expert hits. Hashing and accepted-prefix tracing invalidate timing
+interpretation, so those rates are excluded. This closes state parity only for
+this fixed-map code task and does not resolve long-prompt state differences.
+Full traces remain outside Git under the `statecheck/` directory of the raw
+capture path; the canonical trace hash is in [`evidence.json`](evidence.json).
+
 Reproduce the oracle with:
 
 ```sh

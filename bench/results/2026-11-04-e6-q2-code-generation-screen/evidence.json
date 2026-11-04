@@ -254,5 +254,48 @@
     "one code-generation task and Q2_0 model",
     "one Strata prefill/TTFT outlier in block 0, retained without causal attribution",
     "no persistent-state trace in this performance campaign"
-  ]
+  ],
+  "state_diagnostic": {
+    "capture_mode": [
+      "--no-trace",
+      "--accepted-prefix-trace",
+      "--state-hash"
+    ],
+    "fresh_processes_per_backend": 1,
+    "requests_per_process": [
+      "warmup",
+      "measured"
+    ],
+    "prompt_tokens": 2048,
+    "accepted_prefix_positions_per_request": 107,
+    "position_range_in_log": [
+      2047,
+      2153
+    ],
+    "all_api_requests_passed": true,
+    "all_generated_outputs_passed_independent_code_oracle": true,
+    "all_output_sha256": "ddac6edacd0105401e4c105421b5fbcab5a6c77c7de60cf1b22c65b99ddd6e0e",
+    "all_accepted_token_ids_and_state_fingerprints_match_between_backends": true,
+    "warmup_and_measured_state_sequences_match_within_each_backend": true,
+    "state_fields": [
+      "gdn",
+      "ple",
+      "tail",
+      "pooled",
+      "kv",
+      "mtp",
+      "stale",
+      "dead",
+      "pooled_full",
+      "ple_prev"
+    ],
+    "canonical_two_request_trace_sha256": "072f08edcce06648e364b235ad40ab4950187940bf4ed8c0640d0b7a70b2281a",
+    "expert_cache_hit_rate": 0.199,
+    "minimum_available_gib": {
+      "strata": 9.137,
+      "ninfer": 9.171
+    },
+    "energy": "not measured; trace timings excluded",
+    "raw_capture_directory": "/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task2048-code-generation-20261104/statecheck/"
+  }
 }

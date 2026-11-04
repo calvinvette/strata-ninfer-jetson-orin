@@ -28,6 +28,11 @@ outputs passed, but the paired decode effect was +1.0% (95% screening interval
 −5.9% to +9.6%), below the 5% threshold. This broadens the bounded task sample
 and does not change the no-release decision.
 
+A separate instrumented pair matched all 107 accepted-prefix token IDs and
+recorded persistent-state fingerprints across the two backends and both
+request ordinals for that code task. This does not address long-prompt state
+divergence; tracing is excluded from performance results.
+
 The implementation outcome is therefore bounded: the selected resident-expert
 path, fallback behavior, operator arithmetic and several static-service state
 cases have direct evidence. The outcome does not imply support for other

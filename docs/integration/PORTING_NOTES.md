@@ -3434,6 +3434,8 @@ The held-out code-generation screen adds a second kind of independent oracle
 for a future Splash integration: execute generated outputs against a compact
 behavioral test suite and check that inputs remain unchanged. Identical model
 outputs across backends are useful parity evidence, but the executable oracle
-is what qualifies the task. Keep the task's map and resident hit rate fixed
-when attributing backend effects; this screen's code-task hit rate was only
-19.9%. See the [code-task report](../../bench/results/2026-11-04-e6-q2-code-generation-screen/README.md).
+is what qualifies the task. Also capture accepted-prefix token IDs and
+persistent state on that task; the 107-token Strata/NInfer traces matched at
+every commit and across warmup/measured requests. Keep the task's map and
+resident hit rate fixed when attributing backend effects; this screen's
+code-task hit rate was only 19.9%. See the [code-task report](../../bench/results/2026-11-04-e6-q2-code-generation-screen/README.md).
