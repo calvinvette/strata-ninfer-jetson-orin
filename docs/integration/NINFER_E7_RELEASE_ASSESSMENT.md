@@ -490,3 +490,6 @@ A same-map 128K screen also completed on the exact 131,072-token retrieval fixtu
 
 
 A same-map near-limit screen has now compared Strata and strict NInfer on the exact 240,286-token retrieval fixture at 262,144 context. The paired decode change was +1.9% (95% three-pair interval −1.9% to +5.9%), below the 5% useful-effect gate, and the interval includes zero. No confirmation was triggered. The outputs and 48.2% expert hit rates matched across both backends. This screen does not prove equivalence and does not change the no-release decision. E6 task-family, quality, persistent-state and sustained-service exits remain open. See the [near-limit same-map report](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
+
+
+The Q2_0 same-map screen chart now spans actual prompt lengths from 2K through 240K and shows per-cell paired uncertainty for throughput and request latency. Across these single-task-family screens, no decode result met the useful-effect gate. The cells were run on different dates, so they are not a pooled estimate; no multi-model chart is available from this cohort. This reporting update leaves the no-release decision unchanged and E6/E7 open. See the [screen chart](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).

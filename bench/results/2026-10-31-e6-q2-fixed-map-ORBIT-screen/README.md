@@ -1,6 +1,6 @@
 # Q2_0 fixed-map and backend comparison on held-out tasks
 
-Date: 2026-10-31 to 2026-11-02. Hardware: Jetson AGX Orin, CUDA backend. This experiment
+Date: 2026-10-31 to 2026-11-04. Hardware: Jetson AGX Orin, CUDA backend. This experiment
 measured a held-out prompt, not a representative workload suite.
 
 ## Result
@@ -80,6 +80,10 @@ The decode median remained below the 5% useful-effect threshold, so this
 screen was not confirmed. Minimum request-window available RAM was 9.17 GiB,
 with zero sampled cgroup OOM kills. This gives no evidence of a useful NInfer
 kernel advantage at 2K either, although the three-pair interval remains coarse.
+
+The chart below summarizes the paired same-map backend screens by actual prompt length. Each error bar is that cell's 95% paired screening interval from three randomized process pairs; positive throughput changes favor NInfer, while negative latency changes favor NInfer. The 8K decode outlier is retained. The cells were collected on different dates and are shown as individual screens, not pooled into a shared estimate. They use one Q2_0 synthetic retrieval/arithmetic task family and do not provide a multi-model combined result. Recreate the figure with `python3 tools/integration/plot_e6_same_map_backend.py`.
+
+![Q2_0 same-map backend paired effects across actual prompt lengths](same-map-backend-screens.svg)
 
 ## 2K prompt replication
 
