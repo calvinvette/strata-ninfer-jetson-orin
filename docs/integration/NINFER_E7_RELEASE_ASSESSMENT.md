@@ -113,11 +113,17 @@ artifact. This is also true in the publisher's files; use the complete pair of
 Q2_0 shard names and hashes when identifying the tested model. The detailed
 per-run record is in the [code-generation evidence](../../bench/results/2026-11-04-e6-q2-code-generation-screen/evidence.json).
 
-The local `.ninfer` inventory contains Qwen3.6-35B-A3B and dense Qwen3.8-27B
-artifacts, but no matching Qwen3.8-Flash-Next Q2_0 artifact. These are different
-model families and cannot quantify a `.ninfer`-versus-GGUF representation
-effect. Both arms in the same-map results use the same Q2_0 GGUF; the impact of
-a native same-weight `.ninfer` artifact remains unmeasured.
+The local `.ninfer` inventory includes Qwen3.6-35B-A3B and dense Qwen3.8-27B
+artifacts. A separate Qwen3.8-Flash-Next artifact from
+`neroued/Qwen3.8-Flash-Next-NInfer` (revision
+`001057dd1e73954b631c9b3b456d1917d01446c7`) is being downloaded. Its manifest
+describes an NInfer v3 artifact built from base BF16 and NVIDIA NVFP4 sources,
+with mixed tensor formats; it is not the same weight representation as the
+Q2_0 GGUF used here, and it has not been runtime-qualified. Both arms in the
+same-map results use identical Q2_0 GGUF files, so those measurements isolate
+the expert backend path. The impact of using the separate packed artifact is
+unmeasured and would require its own model-quality, memory and performance
+comparison.
 
 ### 2026-10-31 Q2_0 graph-node kernel inventory
 

@@ -3442,16 +3442,21 @@ code-task hit rate was only 19.9%. See the [code-task report](../../bench/result
 
 ## 2026-11-04 — Keep model-artifact effects separate from backend effects
 
-The local `.ninfer` artifacts are Qwen3.6-35B-A3B and dense Qwen3.8-27B; no
-Qwen3.8-Flash-Next `.ninfer` artifact matching the tested Q2_0 GGUF is present.
-Those files cannot answer whether native NInfer packing changes Flash-Next
-performance. The current same-map comparison correctly uses one identical GGUF
-for Strata and strict NInfer to isolate their expert execution paths. For a
-future Strata + Splash comparison, pin the source model, tokenizer, quantizer
-and packed representation independently; first verify that a converted/native
-artifact preserves the intended model quality, then compare runtime backends
-using the same artifact. Do not attribute differences between distinct model
-families or quantizations to an inference engine.
+The previously inventoried `.ninfer` artifacts were Qwen3.6-35B-A3B and dense
+Qwen3.8-27B. A separate Flash-Next artifact was later identified in
+`neroued/Qwen3.8-Flash-Next-NInfer`, revision
+`001057dd1e73954b631c9b3b456d1917d01446c7`; its download is in progress under
+`~/models/Qwen3.8-Flash-Next-NInfer/`. The conversion manifest describes an
+NInfer v3 `qwen3.8-flash-next` artifact with 108.44 GB payload, built from base
+BF16 and NVIDIA NVFP4 sources, with Q8, NF4, FP8, FP32 and Q4 tensor formats.
+It is not a matching representation or source tensor payload for the Q2_0
+GGUF used by the current paired screens, and it has not yet been runtime-
+qualified. The same-map comparison uses identical Q2_0 GGUF files in both arms
+to isolate expert execution paths; it does not measure the effect of loading
+this packed artifact. For a future Strata + Splash comparison, pin the source
+model, tokenizer, quantizer and packed representation independently; verify a
+converted/native artifact's quality before timing it, and do not attribute
+differences between distinct representations to the inference engine.
 
 The separate 8K code-task state capture matched all 107 accepted token IDs and
 persistent-state fingerprints across backends for its exact filler-extended
