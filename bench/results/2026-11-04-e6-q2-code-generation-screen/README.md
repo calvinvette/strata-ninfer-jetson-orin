@@ -49,6 +49,7 @@ long-prompt state differences or the broader task/model requirements.
 Reproduce the oracle with:
 
 ```sh
+python3 tools/integration/test_evaluate_e6_code_task.py
 python3 tools/integration/evaluate_e6_code_task.py <requests.json>
 ```
 
