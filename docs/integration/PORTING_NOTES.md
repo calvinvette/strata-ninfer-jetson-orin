@@ -3439,3 +3439,21 @@ persistent state on that task; the 107-token Strata/NInfer traces matched at
 every commit and across warmup/measured requests. Keep the task's map and
 resident hit rate fixed when attributing backend effects; this screen's
 code-task hit rate was only 19.9%. See the [code-task report](../../bench/results/2026-11-04-e6-q2-code-generation-screen/README.md).
+
+## 2026-11-04 — Keep model-artifact effects separate from backend effects
+
+The local `.ninfer` artifacts are Qwen3.6-35B-A3B and dense Qwen3.8-27B; no
+Qwen3.8-Flash-Next `.ninfer` artifact matching the tested Q2_0 GGUF is present.
+Those files cannot answer whether native NInfer packing changes Flash-Next
+performance. The current same-map comparison correctly uses one identical GGUF
+for Strata and strict NInfer to isolate their expert execution paths. For a
+future Strata + Splash comparison, pin the source model, tokenizer, quantizer
+and packed representation independently; first verify that a converted/native
+artifact preserves the intended model quality, then compare runtime backends
+using the same artifact. Do not attribute differences between distinct model
+families or quantizations to an inference engine.
+
+The separate 8K code-task state capture matched all 107 accepted token IDs and
+persistent-state fingerprints across backends for its exact filler-extended
+prompt. This is a state-check pattern, not natural long-context qualification;
+traced timing is excluded. See the [8K code report](../../bench/results/2026-11-04-e6-q2-code-generation-8k-screen/README.md).

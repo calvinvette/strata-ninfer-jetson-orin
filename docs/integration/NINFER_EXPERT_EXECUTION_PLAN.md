@@ -106,6 +106,16 @@ Do not print a generic NInfer-enabled banner when all work fell back.
 - Requantization or conversion to a different `.ninfer` artifact is a separately
   labeled model/quality experiment. It cannot establish a same-weight kernel gain.
 
+The local model inventory checked on 2026-11-04 contains `.ninfer` artifacts
+for Qwen3.6-35B-A3B and dense Qwen3.8-27B, but no Qwen3.8-Flash-Next artifact
+matching the Q2_0 GGUF used by the same-map backend screens. Those artifact
+families cannot measure a file-format effect for this integration. The current
+Strata-versus-NInfer results therefore hold the Q2_0 GGUF constant; the effect
+of a same-weight native `.ninfer` representation remains unmeasured. A future
+comparison requires the same source weights and model identity, a documented
+conversion/packing path, independent output-quality checks and paired timing;
+results from another architecture or quantization cannot substitute.
+
 ## Implementation sequence
 
 E0 is complete for the bounded controls and current Q2_0 timing audit; E1–E4

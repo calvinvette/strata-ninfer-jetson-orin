@@ -97,6 +97,12 @@ artifact. This is also true in the publisher's files; use the complete pair of
 Q2_0 shard names and hashes when identifying the tested model. The detailed
 per-run record is in the [code-generation evidence](../../bench/results/2026-11-04-e6-q2-code-generation-screen/evidence.json).
 
+The local `.ninfer` inventory contains Qwen3.6-35B-A3B and dense Qwen3.8-27B
+artifacts, but no matching Qwen3.8-Flash-Next Q2_0 artifact. These are different
+model families and cannot quantify a `.ninfer`-versus-GGUF representation
+effect. Both arms in the same-map results use the same Q2_0 GGUF; the impact of
+a native same-weight `.ninfer` artifact remains unmeasured.
+
 ### 2026-10-31 Q2_0 graph-node kernel inventory
 
 Nsight Systems graph-node collection exposed the strict NInfer Q2_0 expert
