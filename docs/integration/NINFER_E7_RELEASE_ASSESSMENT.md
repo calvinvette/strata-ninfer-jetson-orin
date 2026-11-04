@@ -1,6 +1,6 @@
 # NInfer E7 release assessment
 
-Updated: 2026-11-02. Branch: `feat/ninfer-expert-e0`.
+Updated: 2026-11-04. Branch: `feat/ninfer-expert-e0`.
 
 ## Decision
 
@@ -15,6 +15,12 @@ request. Fixed-map Q2_0 trials now also confirm residency-map gains through a
 Task-family breadth, state/quality coverage and sustained-service evidence
 remain incomplete. Keep NInfer opt-in and experimental; this is not a general
 performance release.
+
+A same-map 2K diagnostic on 2026-11-04 matched all 47 accepted-prefix token
+IDs and persistent-state fingerprints between Strata and strict NInfer for two
+request ordinals. This is bounded short-task correctness evidence; tracing
+invalidates its timing values and it does not resolve the prior long-prompt
+state differences or supply broader quality coverage.
 
 The implementation outcome is therefore bounded: the selected resident-expert
 path, fallback behavior, operator arithmetic and several static-service state

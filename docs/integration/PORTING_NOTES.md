@@ -3420,3 +3420,12 @@ nodes or whole-graph events; the latter can hide the very kernel needed for
 attribution. Pair the detailed trace with an unprofiled request, record the
 active route/owner shape, and label overlapping-duration sums explicitly.
 See the [Q2_0 kernel inventory](../../bench/results/2026-10-31-e6-q2-ninfer-kernel-share-diagnostic/README.md).
+
+The 2026-11-04 fixed-map 2K state diagnostic is a useful cross-backend test
+pattern for Splash: compare every accepted-prefix token and recurrent/KV state
+field on the same exact prompt, map and request ordinal, then repeat within
+each backend to reveal shared request-history effects. The NInfer and Strata
+traces matched for both warmup and measured requests, but this result is
+limited to one short Q2_0 task. Keep these captures out of timed trials because
+state hashing and accepted-prefix tracing change runtime cost. See the
+[bounded state-parity report](../../bench/results/2026-11-04-e6-q2-fixed-map-2048-state-parity/README.md).

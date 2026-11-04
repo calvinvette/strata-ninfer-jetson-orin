@@ -1,0 +1,82 @@
+{
+  "date": "2026-11-04",
+  "hardware": "Jetson AGX Orin",
+  "model": "Qwen3.8-Flash-Next Q2_0",
+  "model_shards": [
+    {
+      "path": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+      "size_bytes": 37623740192
+    },
+    {
+      "path": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+      "size_bytes": 28800138432
+    }
+  ],
+  "runtime_binary_sha256": "fd67288c399d895be036dab344e30caab3d081540bfc552f22dac6a5fc33644a",
+  "task": {
+    "name": "heldout-retrieval-arithmetic-2048",
+    "prompt_tokens": 2048,
+    "completion_tokens": 47,
+    "answer": "EARLY=AMBER-QUARTZ-618, MIDDLE=SILVER-MEADOW-243, LATE=INDIGO-LANTERN-907, SUM=1768",
+    "answer_sha256": "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db"
+  },
+  "controls": {
+    "map_path": "/tmp/e6-ninfer-adapt-5k/maps/matched-complement-profiles/learned-map.bin",
+    "map_sha256": "76a1644f56d985fdd54a5816aadd39ce9356190dbaa828a293fab8462f507087",
+    "gpu_expert_slots": 5000,
+    "ram_resident_expert_budget_gib": 6,
+    "configured_context": 8192,
+    "prefill_chunk": 128,
+    "mtp": 2,
+    "pool_workers": 8,
+    "prompt_cache": false,
+    "adaptation": false,
+    "pcie_staging_fraction": 0,
+    "same_process_requests_per_backend": 2,
+    "request_ordinals": ["warmup", "measured"]
+  },
+  "capture": {
+    "flags": ["--no-trace", "--accepted-prefix-trace", "--state-hash"],
+    "accepted_prefix_positions_per_request": 47,
+    "persistent_fields": [
+      "gdn", "ple", "tail", "pooled", "kv", "mtp", "stale", "dead", "pooled_full", "ple_prev"
+    ],
+    "raw_logs_retained_outside_git": "/tmp/e6-ninfer-adapt-5k/fixed-map-ORBIT-pp512-tg64/task2048-backend-statecheck-20261104/"
+  },
+  "results": {
+    "strata": {
+      "backend": "strata",
+      "answer_matches_oracle": true,
+      "answer_hash_by_request": [
+        "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+        "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db"
+      ],
+      "gpu_cache_hits_per_request": 10759,
+      "gpu_cache_lookups_per_request": 22560,
+      "minimum_available_gib": 8.692
+    },
+    "ninfer": {
+      "backend": "ninfer",
+      "strict": true,
+      "resident_q2_dispatch_observed": true,
+      "answer_matches_oracle": true,
+      "answer_hash_by_request": [
+        "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db",
+        "428c6ebe1bed005d5e6d7dae8f57f15e923d8be65c6b164487dbec032b3f31db"
+      ],
+      "gpu_cache_hits_per_request": 10759,
+      "gpu_cache_lookups_per_request": 22560,
+      "minimum_available_gib": 8.716
+    },
+    "accepted_prefix_sequence_equal_between_backends": true,
+    "accepted_prefix_sequence_equal_between_request_ordinals": true,
+    "paired_performance_claim": false,
+    "canonical_two_request_state_trace_sha256": "85d4e2b4ed8828cc958b815a8895971154df46dd44a9680d544603b2f15efee8"
+  },
+  "limitations": [
+    "single fixture and fixed residency map",
+    "does not qualify long-context state parity or broad semantic quality",
+    "trace instrumentation invalidates performance interpretation",
+    "energy was not measured; clocks were not controlled"
+  ]
+}

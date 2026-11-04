@@ -587,6 +587,18 @@ treat exact short-task text as sufficient evidence for other tasks.
 
 ### E6 — Demonstrate end-to-end performance and context behavior
 
+**Execution note (2026-11-04):** a fixed-map 2K state diagnostic compared
+Strata and strict NInfer with accepted-prefix tracing enabled. Both fresh
+processes returned the exact expected 47-token answer for both the warmup and
+measured request. All 47 committed token IDs and persistent-state fingerprints
+matched at every prefix across backends and request ordinals, including GDN,
+PLE, QSA tail, pooled, KV, MTP, stale, dead and pooled-full state. The 5K
+resident map and 47.7% hit rate matched; each process stayed above the 6 GiB
+memory floor. Trace overhead invalidates timing interpretation. This closes
+short-task accepted-prefix parity only; prior long-prompt state differences,
+broader task quality, multi-model performance and E6's performance gate remain
+open. See the [state-parity report](../../bench/results/2026-11-04-e6-q2-fixed-map-2048-state-parity/README.md).
+
 The ordinary single-request verifier path now invokes the opt-in multi-layer
 MoE bundle serializer after its captured device results are available. A
 held-out 2K retrieval diagnostic confirmed exact backend equality for routes,
