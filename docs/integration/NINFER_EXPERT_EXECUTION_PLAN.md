@@ -916,6 +916,17 @@ existing OOM-kill count stayed at one. The prompt uses synthetic filler and
 does not establish natural long-context quality. See the
 [repeat report](../../bench/results/2026-11-05-e6-coder-pp512-tg89-repeat/README.md).
 
+**Coder 2K retrieval backend screen (2026-11-05):** four fixed balanced-order
+pairs at a 4K context cap returned the exact `73192` answer and identical six
+token IDs in every Strata/strict-NInfer pair. Decode change was −0.11% at the
+paired median (four-pair screening interval −1.03% to +0.30%); prompt TPS,
+client TTFT and client duration each changed by about +0.17% at the median.
+All arms logged 111/2,880 resident hits. No metric reached the 5% useful-gain
+gate. This synthetic retrieval fixture adds task coverage but does not isolate
+staged-miss kernel performance or generalize to natural prompts. No
+confirmation is indicated. See the
+[screen report](../../bench/results/2026-11-05-e6-coder-retrieval-2k/README.md).
+
 **Execution note (2026-11-05):** a four-pair order-balanced follow-up to the
 Coder IQ1_M `is_prime` performance screen used two pairs in each backend order.
 All eight answers matched the exact 89-token stream and passed the 11-case
