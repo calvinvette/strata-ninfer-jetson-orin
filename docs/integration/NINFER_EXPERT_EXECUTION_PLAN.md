@@ -496,6 +496,12 @@ performance-qualified. The other model variants are explicitly unsupported.
 64/128-token throughput, mixed-codec support and HIP/SYCL qualification remain
 open; this stage closes with partial model support as allowed by its exit.
 
+Execution note (2026-11-04): Coder IQ1_M layer 2, expert 0 is now pinned as a
+real-weight baseline for the first shared mixed tuple, IQ2_S/IQ4_NL. The existing
+Strata parity harness passed and its GGML dequant check was bit-exact. This does
+not exercise NInfer-derived code; the adapter and captured-activation oracle
+remain to be implemented. See the [real-weight baseline](../../bench/results/2026-11-04-e4-iq2s-iq4nl-realweight-baseline/README.md).
+
 ### E5 — Qualify numerical behavior and useful execution policies
 
 Use the numerical policy below throughout implementation; this stage completes
