@@ -70,6 +70,15 @@ evidence. This adds one bounded context cell, with broader E5 state/quality
 coverage still open. See the
 [8K retrieval report](../../bench/results/2026-11-05-e5-coder-natural-prompt/retrieval-8k-final-only/README.md).
 
+A separate accepted-prefix trace pair at the same 8K retrieval point returned
+the exact answer and token IDs on both backends, matched all 11 terminal state
+fields, and matched all shared accepted-prefix hashes at committed lengths 1,
+2, 3 and 6. The final grouped commit accepted three tokens, so lengths 4 and 5
+were not observed. This is one instrumented pair; it adds no timing evidence
+and does not establish repeatability or trace invariance. Minimum available
+RAM was 20.70 GiB, peak swap was 1.38 GiB, and the existing OOM-kill count
+stayed at one. See the [trace report](../../bench/results/2026-11-05-e5-coder-natural-prompt/retrieval-8k-trace/README.md).
+
 **E5 Coder IQ1_M MTP window check (2026-11-05):** two fresh MTP-2 and two
 fresh MTP-4 pairs used the same 512-token retrieval prompt and static expert
 map. All eight requests returned `73192` with identical token IDs; all 11
