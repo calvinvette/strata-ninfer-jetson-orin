@@ -48,3 +48,18 @@ for Strata and strict NInfer; see the [state diagnostic](state-parity-8token-rec
 E5 remains open for localization and correction, held-out quality, longer
 state parity, cancellation and recovery. E6/E7 performance and release gates
 remain open.
+
+### First-logit follow-up on the direct CLI path
+
+A matched Coder IQ1_M direct-CLI pair repeated prompt IDs `1,2,3` with
+`STRATA_PREFILL_CPU_SHARE=0` and the same 391-slot runtime cache. Both backends
+selected token `5`, but all 248,320 captured logit values differed (relative
+L2 `1.66e-2`, maximum absolute delta `0.2055`). Token `5` led token `4` by
+`0.0759` for Strata and `0.0458` for NInfer. This result is limited to the
+direct CLI invocation: it does not reproduce the service `GEN` result, where
+the same token-ID prompt first differed (`4` versus `5`). It is not state or
+quality parity. The top-ten summary and dump hashes are in
+[`comparison.json`](../2026-11-05-e5-coder-natural-prompt/direct-cli-cpu-share-off/comparison.json);
+the 993,280-byte float dumps remain in `/tmp/e5-coder-logits-cpu-share-off/`.
+Both supervised commands passed; minimum available RAM was 20.86 GiB for
+Strata and 21.23 GiB for NInfer, with no cgroup OOM-counter increment.
