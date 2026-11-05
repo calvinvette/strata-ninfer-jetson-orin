@@ -46,6 +46,20 @@ remain open. See the
 
 # Integration status
 
+**E6 Coder IQ1_M performance screen (2026-11-05):** three same-profile
+Strata/strict-NInfer pairs measured the held-out `is_prime` task with state
+hashing disabled. All six requests generated the same 89 tokens, passed the
+11-case function oracle, and recorded 1,649 expert hits from 44,640 lookups.
+NInfer decode changed +0.49% at the paired median (three-pair screen interval
+−0.64% to +7.28%); prompt TPS, first-token latency and client duration were
+near ties. The 5% useful-effect bar was not reached, so this is not evidence
+of a meaningful speedup and does not warrant confirmation. All randomized
+orders happened to place NInfer first; order was not balanced. Minimum sampled
+available RAM was 21.14 GiB, peak swap was 1.40 GiB, and the existing
+OOM-kill counter stayed at one. Clocks were dynamic; initial GPU readback was
+306 MHz, EMC readback was denied and energy was not computed. See the
+[screen report](../../bench/results/2026-11-05-e5-coder-natural-prompt/perf-isprime/README.md).
+
 NInfer expert execution follow-up (2026-11-05): the CUDA-only opt-in backend
 now has routes for all seven observed mixed tuples at 2560/640. Strict one-
 token service requests traversed Coder IQ1_M and actual ISTA IQ3_S, logged all
