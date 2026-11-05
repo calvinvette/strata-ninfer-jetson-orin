@@ -478,7 +478,12 @@ and [seven-pair confirmation](../../bench/results/2026-10-25-phase-e3-q2-ninfer-
 3. Header-only inventories identify exact expert codec pairs in Coder IQ1_M
    and ISTA-DASLab IQ3_S. Both are mixed-codec; their full-model expert routes
    are explicitly unsupported by the current Q2_0-only selector. The exact
-   Q2_0 artifact remains the only supported codec pair in this prototype.
+   Q2_0 artifact remains the only supported codec pair in this prototype. NInfer's reference sparse-MoE contract instead admits its packed Q4G64/Q5G64,
+   Q4G64/Q6G64 and W8G32/W8G32 profiles; these are not byte/layout-compatible
+   with the GGUF IQ2_S/IQ3_S/IQ3_XXS/IQ4_XS gate/up and Q2_0/IQ4_NL down tensors.
+   Extending model support requires adding and independently validating those
+   GGUF codecs in an adapted schedule, rather than passing their pointers to the
+   unmodified sparse-MoE operator. See the [codec boundary map](IMPORT_MAP.md#keep-the-negative-results).
 4. Publish the current model/codec, shape, residency and backend capability
    table. HIP/SYCL runtime cells remain unsupported/unqualified; no shared
    backend implementation was changed in E4.

@@ -20,6 +20,19 @@ eligible: gate/up use other codecs at those layers. Tensor codec and model
 expert-count differences are artifact-specific; the Q2_0 contract must not be
 generalized to IQ1_M or IQ3_S.
 
+## NInfer codec boundary audit (2026-11-04)
+
+The pinned NInfer sparse-MoE contract is not a generic GGUF expert interface.
+Its routed profiles are Q4G64_F16S/Q5G64_F16S, Q4G64_F16S/Q6G64_F16S, and
+W8G32_F16S/W8G32_F16S, with NInfer-owned packed planes and group scales. The
+Flash-Next mixed artifacts use ggml IQ2_S, IQ3_S, IQ3_XXS or IQ4_XS gate/up
+tensors and Q2_0 or IQ4_NL down tensors. Similar nominal bit widths do not
+make their codebooks, scale layout or row bytes interchangeable. A future
+model-expansion implementation must decode the actual GGUF rows (or prove an
+exact bounded repack) and add the complete per-layer tensor-pair set to
+capability checks and independent real-payload tests. The immutable reference
+remains unchanged. See the [import and adaptation map](../../../docs/integration/IMPORT_MAP.md).
+
 ## Grouped prefill-shaped functional check
 
 The `ninfer_q2_expert_parity` harness ran against real Q2_0 weights at layer 0,
