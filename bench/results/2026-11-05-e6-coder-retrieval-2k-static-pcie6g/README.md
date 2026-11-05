@@ -6,9 +6,9 @@ profile as the [un-staged 2K screen](../2026-11-05-e6-coder-retrieval-2k/README.
 This variant used `--pcie-frac 1.0`, a 6 GiB pinned complement, six GiB host
 headroom, the existing three GiB workspace reserve, and `--adapt-every 0`.
 Logs confirm adaptive swaps were off, so the profile and pinned complement
-were static across each warmup and measured request. Per-expert owner IDs were
-not captured during timing; the same ordered inputs and aggregate route counts
-provide bounded, not per-expert, ownership evidence.
+were static across each warmup and measured request. A separate [instrumented route/owner capture](owner-capture-all/README.md)
+records all 2,880 layer/expert assignments for one request per backend. Timing
+remains uninstrumented; route-set differences limit causal interpretation.
 
 All eight measured responses returned `73192` with identical six-token IDs.
 Both backends logged 86 resident hits, 2,087 GPU/cache lookups and 793 PCIe

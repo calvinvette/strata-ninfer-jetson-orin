@@ -3555,3 +3555,23 @@ available RAM was 20.86 GiB, and peak sampled machine swap was 1.80 GiB.
 This extends static mixed-codec correctness to a longer retrieval request but
 does not measure performance or cover other contexts/policies. See the
 [2K retrieval check](../../bench/results/2026-11-05-e5-coder-natural-prompt/retrieval-2k-final-only/README.md).
+
+### E6 route-selection follow-up (2026-11-05)
+
+An instrumented rerun of the 2K Coder retrieval under a static six-GiB
+complement captured all 48 layers for Strata and strict NInfer. Both outputs
+matched exactly, as did aggregate route-owner totals (86 resident GPU, 792
+PCIe, 2,002 CPU/file). The selected expert sets differed at 72 of 288 aligned
+layer/position rows and ordered top-10 IDs differed at 179 rows. Static
+per-expert ownership was stable for every expert selected by both arms, but
+the arms did not execute identical routed work. Natural-generation performance
+screens therefore mix kernel effects with backend-induced route changes even
+when output tokens and aggregate owner counters match.
+
+Next, add an opt-in verifier route replay using captured IDs and router weights,
+then compare backend arithmetic on identical route inputs and verify persistent
+state/output behavior. The current route diagnostic does not capture weights;
+the existing verifier dump is single-layer and is not a route override. Keep
+this replay diagnostic separate from same-day natural-generation E6 screens,
+which remain necessary for product-level performance. See the
+[owner capture report](../../bench/results/2026-11-05-e6-coder-retrieval-2k-static-pcie6g/owner-capture-all/README.md).
