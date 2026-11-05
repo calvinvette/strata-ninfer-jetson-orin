@@ -3622,3 +3622,18 @@ uses unrelated filler before the held-out function task, so it is a synthetic
 length-controlled workload rather than natural long-form input. This screen
 shows no useful NInfer end-to-end gain and does not close E6/E7. See the
 [8K-prompt report](../../bench/results/2026-11-05-e6-coder-actual-prompt-screen/README.md).
+
+**E6 Coder actual 16K-prompt screen (2026-11-05):** four fresh-process,
+order-balanced pairs extended the synthetic function-generation prompt to
+16,384 tokens with a 32,768-token context reservation, retaining the same
+model, binary, profile, fixed owners and memory policy. All eight outputs
+matched at 91 tokens and passed the independent 11-case oracle; all pairs
+logged 1,468/33,213 resident hits/lookups for both backends. NInfer decode
+changed −1.19% at the paired median (four-pair screening interval −2.88% to
+−0.56%). Prompt throughput changed −0.14%, first-token latency increased
+0.15%, and client duration increased 0.18%. Minimum available RAM was
+14.02 GiB; the six-GiB guard passed. Clocks were observed but uncontrolled,
+EMC readback was denied and energy was not measured. This synthetic task does
+not qualify natural long-form prompts or general 16K quality. It adds no useful
+NInfer performance gain and leaves E6/E7 open. See the [paired 8K and 16K
+reports](../../bench/results/2026-11-05-e6-coder-actual-prompt-screen/README.md).

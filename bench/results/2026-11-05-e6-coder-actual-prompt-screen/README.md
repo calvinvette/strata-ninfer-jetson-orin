@@ -1,50 +1,42 @@
-# Coder IQ1_M actual 8K-prompt backend screen
+# Coder IQ1_M actual-prompt backend screens
 
-Date: 2026-11-05. Hardware: Jetson Orin AGX (SM87), CUDA 12.6. Four fresh-
-process order-balanced pairs compared the same Strata build with its default
-expert backend and strict NInfer. The model was Qwen3.8-Flash-Next-GSQ-RCO
-Coder IQ1_M, using both GGUF shards, a 256-slot profile, a 16,384-token context,
-6 GiB static PCIe complement, `--adapt-every 0`, and CPU prefill sharing off.
-The exact 8,192-token prompt was generated from unrelated filler followed by a
-held-out `is_prime(n)` function task; this is a synthetic length-controlled
-prompt, not natural document or codebase input. Each arm warmed up on the same
-prompt before the measured request.
+These screens compare the same Strata build with its default expert backend
+and strict NInfer on Jetson Orin AGX (SM87, CUDA 12.6). Both used Qwen3.8-
+Flash-Next-GSQ-RCO Coder IQ1_M, the same 256-slot profile, 6 GiB static PCIe
+complement, `--adapt-every 0`, CPU prefill sharing off, and a six-GiB memory
+floor. Each arm warmed up on its exact measured prompt. Prompts use
+length-controlled unrelated filler followed by a held-out `is_prime(n)` task;
+they are synthetic inputs, not natural documents or codebases.
 
-## Results
+## Summary
 
-| Metric | Strata median | Strict NInfer median | Paired NInfer change (median; four-pair screen interval) |
-|---|---:|---:|---:|
-| Prompt throughput | 53.352 tok/s | 53.344 tok/s | +0.06% (−0.03% to +0.12%) |
-| Decode throughput | 8.394 tok/s | 8.356 tok/s | −0.39% (−0.61% to −0.08%) |
-| First-token latency | 153.671 s | 153.696 s | 0.06% reduction (−0.03% to +0.12%) |
-| Client request duration | 164.425 s | 164.471 s | 0.03% reduction (−0.05% to +0.08%) |
+| Actual prompt / context | Pairs | Prompt TPS change | Decode TPS change | TTFT reduction | Client-time reduction | Quality / minimum RAM |
+|---|---:|---:|---:|---:|---:|---|
+| 8,192 / 16,384 tokens | 4 | +0.06% (−0.03%, +0.12%) | −0.39% (−0.61%, −0.08%) | +0.06% (−0.03%, +0.12%) | +0.03% (−0.05%, +0.08%) | All outputs matched, 11-case oracle passed; 14.46 GiB |
+| 16,384 / 32,768 tokens | 4 | −0.14% (−0.47%, +0.04%) | −1.19% (−2.88%, −0.56%) | −0.15% (−0.47%, +0.04%) | −0.18% (−0.48%, −0.07%) | All outputs matched, 11-case oracle passed; 14.02 GiB |
 
-All eight measured responses emitted the same 91 token IDs and passed the
-independent 11-case executable oracle. Each pair logged the same 1,470 resident
-expert hits from 33,213 lookups for both backends. All four supervised runs
-passed the six-GiB available-memory floor; minimum available physical RAM was
-14.46 GiB. The supervisor ran for 2,814 seconds. CPU/GPU clocks were observed
-but uncontrolled; EMC readback was denied and energy was not measured.
+Parentheses show the four-pair screening interval from the saved paired
+bootstrap summary; they describe only each tested task/profile. At both lengths,
+the backends recorded identical resident hits and lookups within every pair:
+1,470/33,213 at 8K and 1,468/33,213 at 16K. The 8K decode interval is entirely
+negative but its effect is under 1%; at 16K the measured decode regression is
+larger but remains below the pre-registered 5% useful-effect threshold.
+Neither screen demonstrates a useful NInfer speedup.
 
-The screen shows a small decode regression for strict NInfer on this workload,
-not an end-to-end gain. The four-pair intervals are screening summaries from
-this one task/profile, not broad confidence claims. No state capture was used.
-The synthetic filler prompt and one code-generation task do not qualify long-
-context quality or general backend behavior. E6 and E7 remain open; no profile
-is promoted.
+The 16K supervisor passed its six-GiB available-memory floor with 14.02 GiB
+minimum available RAM. CPU/GPU clocks were observed but uncontrolled; EMC
+readback was denied and energy was not measured. No state capture was used.
+These results do not qualify general long-context quality or other prompt
+families. E6/E7 remain open and no profile is promoted.
 
-## Evidence and reproduction
+## Evidence
 
-- [Per-arm measurements and paired summary](input-8192-retry2/results.json)
-- [Supervisor result](supervisor-8192-retry2/result.json)
-- The raw per-arm logs and telemetry remain local and are intentionally not
-  included in Git.
+- [8K measurements](input-8192-retry2/results.json)
+- [8K supervisor result](supervisor-8192-retry2/result.json)
+- [16K measurements](input-16384/results.json)
+- [16K supervisor result](supervisor-16384/result.json)
 
-The run used `tools/integration/run_control.py --sample-clocks --timeout
-10800` around `bench/results/2026-11-05-e5-coder-natural-prompt/run_is_prime_perf_screen.py`
-with four fixed balanced orders: Strata/NInfer, NInfer/Strata, Strata/NInfer,
-NInfer/Strata; `--input-tokens=8192 --context-tokens=16384
---staged-pcie-gib=6 --static-owner`.
-
-Model shard SHA-256 values and the executable/profile hashes are recorded in
-the result JSON.
+Raw arm logs and telemetry remain local and are not included in Git. Each JSON
+records model-shard hashes, prompt hash, binary/profile hashes and exact runtime
+options. The 8K and 16K screens ran on the same date but are separate prompt
+length points, not a combined randomized context-by-backend experiment.

@@ -8329,3 +8329,16 @@ uses unrelated filler before a held-out function task, so this is a synthetic
 length-controlled input, not natural long-form text. It shows no useful NInfer
 end-to-end gain and does not close E6/E7. See the
 [screen report](../../bench/results/2026-11-05-e6-coder-actual-prompt-screen/README.md).
+
+**E6 Coder actual 16K-prompt screen (2026-11-05):** four order-balanced
+Strata/strict-NInfer pairs used a 16,384-token synthetic function-generation
+prompt and 32,768-token context. All eight 91-token outputs matched and passed
+the independent 11-case oracle; each pair recorded identical 1,468/33,213
+resident hits/lookups. NInfer decode changed −1.19% (four-pair screening
+interval −2.88% to −0.56%); prompt throughput changed −0.14%, first-token
+latency increased 0.15%, and client duration increased 0.18%. Minimum
+available RAM was 14.02 GiB and the six-GiB supervisor passed. Clocks were
+observed but uncontrolled; EMC readback was denied and energy was not measured.
+This synthetic task adds a longer prompt point but does not qualify natural
+long-form input or general context quality; no useful NInfer gain was shown.
+E6/E7 remain open. See the [paired 8K and 16K reports](../../bench/results/2026-11-05-e6-coder-actual-prompt-screen/README.md).
