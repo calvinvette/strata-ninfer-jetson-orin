@@ -39,12 +39,17 @@ def compile_generated_function(source: str):
                ast.Return, ast.Compare, ast.Name, ast.Load, ast.Constant,
                ast.BinOp, ast.Mod, ast.Eq, ast.Lt, ast.Gt, ast.GtE, ast.LtE,
                ast.While, ast.AugAssign, ast.Add, ast.Sub, ast.Mult, ast.FloorDiv,
-               ast.USub, ast.UAdd, ast.Pass, ast.Store)
+               ast.USub, ast.UAdd, ast.Pass, ast.Store, ast.For, ast.Call, ast.Pow)
     if len(tree.body) != 1 or not isinstance(tree.body[0], ast.FunctionDef) or tree.body[0].name != 'is_prime':
         raise RuntimeError('generated source must contain only the is_prime definition')
     if any(not isinstance(node, allowed) for node in ast.walk(tree)):
         raise RuntimeError('generated source uses syntax outside the safe arithmetic subset')
-    namespace: dict[str, object] = {'__builtins__': {}}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call) and (
+                not isinstance(node.func, ast.Name) or node.func.id not in {'int', 'range'}
+                or node.keywords):
+            raise RuntimeError('generated source uses a call outside the safe subset')
+    namespace: dict[str, object] = {'__builtins__': {}, 'int': int, 'range': range}
     exec(compile(tree, '<generated-is-prime>', 'exec'), namespace)
     return namespace['is_prime']
 
