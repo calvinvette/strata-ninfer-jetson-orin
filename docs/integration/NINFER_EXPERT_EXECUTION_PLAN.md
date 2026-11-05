@@ -601,6 +601,17 @@ cause or model-layer mapping. See the [static pinned-PCIe state
 report](../../bench/results/2026-11-05-e5-mixed-static-one-token-pair/state-parity-8token-recheck/pinned-pcie1-1g-static/README.md)
 and [first-token GDN report](../../bench/results/2026-11-05-e5-mixed-static-one-token-pair/state-parity-8token-recheck/pinned-pcie1-1g-first-gdn/README.md).
 
+Execution note (2026-11-05): teacher-forced scoring of the validated 89-token
+Coder `is_prime` answer after its exact 50-token prompt produced byte-identical
+Strata and strict-NInfer score records for all 138 next-token targets. The 89
+answer tokens had total log probability `-1.105776162`, 100% top-1 agreement
+and 100% top-10 overlap. The canonical profile logged 109 resident hits from
+480 lookups in both arms; remaining work used Strata fallback. This is bounded
+score evidence for one sequence, not a general quality tolerance and not a
+performance result. Minimum available RAM was 14.66 GiB, sampled swap peaked
+at 1.64 GiB and the existing OOM-kill count stayed at one. See the
+[scoring report](../../bench/results/2026-11-05-e5-coder-natural-prompt/is-prime-scoring/README.md).
+
 
 Execution note (2026-11-05): an exact owner capture of the layer-0 service
 row at position 2 found four primary-GPU/foresight experts and six CPU experts

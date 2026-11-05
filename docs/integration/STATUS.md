@@ -46,6 +46,18 @@ remain open. See the
 
 # Integration status
 
+**E5 Coder teacher-forced scoring (2026-11-05):** the validated 89-token
+`is_prime` answer was teacher-forced after its exact 50-token prompt using the
+canonical Coder profile. Strata and strict NInfer produced byte-identical
+score files across all 138 next-token targets; answer-token total logprob was
+`-1.105776162` (mean `-0.01242445`, perplexity `1.012502`), with 100% top-1
+agreement and top-10 overlap. Both arms logged 109/480 resident hits; the
+remaining expert work used Strata fallback. Minimum available RAM was 14.66
+GiB, peak swap 1.64 GiB and the existing OOM-kill count stayed at one. Scoring
+instrumentation was not used for performance. This bounds score parity for one
+sequence and the observed routes; mixed-codec quality/state limits remain open.
+See the [scoring report](../../bench/results/2026-11-05-e5-coder-natural-prompt/is-prime-scoring/README.md).
+
 **E5 4K mixed-codec Coder retrieval (2026-11-05):** two fresh final-only
 Strata/strict-NInfer pairs used a 4,096-token active-ticket retrieval prompt
 under an 8,192-token context reservation. All four responses returned
