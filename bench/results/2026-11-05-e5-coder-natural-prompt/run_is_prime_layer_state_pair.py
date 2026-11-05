@@ -42,20 +42,21 @@ def parse_layer_hashes(log: Path, count: int) -> list[dict]:
     return [{'gdn_layers': row, 'qsa_layers': qsa_rows[i]} for i, row in enumerate(gdn_rows[:count])]
 
 
-def cumulative(arm: dict) -> dict[int, dict]:
-    total, out, flat = 0, {}, []
+def cumulative(arm: dict, prompt_tokens: int) -> dict[int, dict]:
+    out = {}
     for record, hashes in zip(arm['accepted_prefix'], arm['layer_hashes']):
-        total += record['committed']
-        flat.extend(record['token_ids'])
-        out[total] = {'state': record['state'], **hashes}
-    if flat != arm['token_ids']:
-        raise RuntimeError(f"{arm['backend']}: accepted token trace mismatch")
+        endpoint = int(record['state']['L']) - prompt_tokens + 1
+        start = endpoint - record['committed']
+        if arm['token_ids'][start:endpoint] != record['token_ids']:
+            raise RuntimeError(f"{arm['backend']}: sampled accepted-token group mismatch at {endpoint}")
+        out[endpoint] = {'state': record['state'], **hashes}
     return out
 
 
 def main() -> int:
     output = Path(sys.argv[1]).resolve()
     token_limit = int(sys.argv[2]) if len(sys.argv) > 2 else 42
+    trace_stride = int(sys.argv[3]) if len(sys.argv) > 3 else 1
     output.mkdir(parents=True, exist_ok=False)
     command = json.loads(BASE.read_text())['command']
     index = next(i for i, value in enumerate(command)
@@ -72,9 +73,11 @@ def main() -> int:
     env = os.environ.copy()
     env.update({'STRATA_PREFILL_CPU_SHARE': '0', 'STRATA_STATE_HASH': '1',
                 'STRATA_ACCEPTED_PREFIX_TRACE': '1', 'STRATA_STATE_HASH_GDN': '1',
-                'STRATA_STATE_HASH_QSA_LAYERS': '1', 'STRATA_MTP_BATCH': '1'})
-    result = {'task': 'held-out is_prime(n); truncated state trace',
-              'prompt_tokens': len(prompt), 'token_limit': token_limit, 'arms': []}
+                'STRATA_STATE_HASH_QSA_LAYERS': '1', 'STRATA_MTP_BATCH': '1',
+                'STRATA_ACCEPTED_PREFIX_TRACE_STRIDE': str(trace_stride)})
+    result = {'task': 'held-out is_prime(n); per-layer state trace',
+              'prompt_tokens': len(prompt), 'token_limit': token_limit,
+              'trace_stride': trace_stride, 'arms': []}
     for backend in ('strata', 'ninfer'):
         arm_args = args.copy()
         arm_args[arm_args.index('--expert-backend') + 1] = backend
@@ -96,7 +99,7 @@ def main() -> int:
         finally:
             engine.close()
     left, right = result['arms']
-    lmap, rmap = cumulative(left), cumulative(right)
+    lmap, rmap = cumulative(left, len(prompt)), cumulative(right, len(prompt))
     shared = sorted(set(lmap) & set(rmap))
     first = next((position for position in shared if lmap[position]['state'] != rmap[position]['state']), None)
     first_live = next((position for position in shared if any(

@@ -3296,3 +3296,16 @@ passed with 20.91–21.02 GiB minimum available RAM; sampled machine swap was
 1.07–1.12 GiB and the existing OOM-kill count stayed at one. Trace timings are
 excluded. E5's mixed-codec state/quality gate remains open. See the [held-out
 task and state report](../../bench/results/2026-11-05-e5-coder-natural-prompt/is-prime-heldout/README.md).
+
+Follow-up: the same complete 89-token request was repeated twice with
+accepted-prefix tracing disabled. Both backends matched all 89 tokens, passed
+the 11-case function check and matched the complete final state fingerprint,
+including MTP and page-tail fields, in both pairs. A stride-8 accepted-prefix
+per-layer run matched all 10 sampled endpoints through the final token and all
+GDN/QSA layer hashes; the stride-1 42-token repeat also matched all 38
+checkpoints. This contrasts with the state split under per-token prefix
+hashing. The hash helper synchronizes the device and copies state to the host,
+so the observer may affect scheduling; this remains a hypothesis. Sparse
+checks do not rule out a transient difference between samples. No general
+state tolerance or performance claim follows. E5 mixed-codec broader task and
+profile coverage remains open; see the [held-out task and state report](../../bench/results/2026-11-05-e5-coder-natural-prompt/is-prime-heldout/README.md).

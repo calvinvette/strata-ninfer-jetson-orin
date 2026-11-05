@@ -16,7 +16,7 @@ sys.path[:0] = [str(ROOT), str(ROOT / 'tools'), str(ROOT / 'tools/integration')]
 from serve.frontend import ChatTemplate
 from serve.server import StrataEngine
 from tools.conversation_cache_parity import load_tokenizer
-from tools.integration.pool_worker_screen import read_accepted_prefix_trace, read_state_hashes
+from tools.integration.pool_worker_screen import read_accepted_prefix_trace
 
 BASE = ROOT / 'bench/results/2026-11-05-e5-mixed-static-one-token-pair/coder-strata-cpu-share-off/result.json'
 TASK = ('Write a Python function named is_prime(n) that returns True exactly when n is a prime integer. '
@@ -62,6 +62,16 @@ def compare_arms(left: dict, right: dict) -> dict:
             raise RuntimeError(f"{arm['backend']}: accepted-prefix trace tokens do not match stream")
         return states
 
+    if not left['accepted_prefix'] or not right['accepted_prefix']:
+        fields = [key for key in left['final_state']
+                  if left['final_state'][key] != right['final_state'][key]]
+        return {
+            'tokens_equal': left['token_ids'] == right['token_ids'],
+            'task_passes_both': left['cases_pass'] and right['cases_pass'],
+            'accepted_prefix_capture': 'disabled',
+            'final_state_equal': not fields,
+            'final_state_difference_fields': fields,
+        }
     left_states, right_states = endpoint_states(left), endpoint_states(right)
     shared = sorted(set(left_states) & set(right_states))
     changed = {position: [key for key in left_states[position]
@@ -96,8 +106,23 @@ def file_sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def read_complete_final_state(log: Path) -> dict:
+    rows = []
+    for line in log.read_text(errors='replace').splitlines():
+        if not line.startswith('strata serve: STATE_HASH L='):
+            continue
+        fields = dict(re.findall(r'(\w+)=([0-9a-f,-]+)', line))
+        if {'L', 'gdn', 'ple', 'tail', 'pooled', 'kv', 'mtp', 'stale',
+                'dead', 'pooled_full', 'ple_prev'} <= fields.keys():
+            rows.append(fields)
+    if not rows:
+        raise RuntimeError(f'{log}: no complete final-state hash')
+    return rows[-1]
+
+
 def main() -> int:
     out = Path(sys.argv[1]).resolve()
+    trace_prefix = len(sys.argv) < 3 or sys.argv[2] != '--no-prefix-trace'
     out.mkdir(parents=True, exist_ok=False)
     command = json.loads(BASE.read_text())['command']
     index = next(i for i, value in enumerate(command)
@@ -112,10 +137,12 @@ def main() -> int:
     prompt = tokenizer.encode(template.render([{'role': 'user', 'content': TASK}],
                                              enable_thinking=False), parse_special=True)
     env = os.environ.copy()
-    env.update({'STRATA_PREFILL_CPU_SHARE': '0', 'STRATA_STATE_HASH': '1',
-                'STRATA_ACCEPTED_PREFIX_TRACE': '1', 'STRATA_MTP_BATCH': '1'})
+    env.update({'STRATA_PREFILL_CPU_SHARE': '0', 'STRATA_STATE_HASH': '1', 'STRATA_MTP_BATCH': '1'})
+    if trace_prefix:
+        env['STRATA_ACCEPTED_PREFIX_TRACE'] = '1'
     result = {'task': TASK, 'cases': CASES, 'prompt_tokens': len(prompt),
-              'max_new': 128, 'temperature': 0, 'arms': []}
+              'max_new': 128, 'temperature': 0,
+              'accepted_prefix_capture': trace_prefix, 'arms': []}
     profile_path = Path(args[args.index('--expert-profile') + 1])
     model_paths = [Path(args[args.index(flag) + 1]) for flag in ('--native', '--ple-gguf')]
     result['identity'] = {
@@ -150,8 +177,8 @@ def main() -> int:
             expected = {str(n): value for n, value in CASES.items()}
             actual_json = {str(n): value for n, value in actual.items()}
             trace = read_accepted_prefix_trace(log)
-            hashes = read_state_hashes(log)
-            if not ids or not trace or not hashes:
+            final_state = read_complete_final_state(log)
+            if not ids or (trace_prefix and not trace):
                 raise RuntimeError(f'{backend}: missing token, accepted-prefix or final-state evidence')
             result['arms'].append({'backend': backend, 'token_ids': ids,
                                    'token_sha256': hashlib.sha256(bytes().join(
@@ -159,7 +186,7 @@ def main() -> int:
                                    'text': text, 'function': function,
                                    'case_results': actual_json, 'cases_pass': actual_json == expected,
                                    'finish': engine.last, 'accepted_prefix': trace,
-                                   'final_state': hashes[-1], 'log': log.name})
+                                   'final_state': final_state, 'log': log.name})
         finally:
             engine.close()
     left, right = result['arms']
