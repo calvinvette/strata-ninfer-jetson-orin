@@ -46,6 +46,17 @@ remain open. See the
 
 # Integration status
 
+**E5 4K mixed-codec Coder retrieval (2026-11-05):** two fresh final-only
+Strata/strict-NInfer pairs used a 4,096-token active-ticket retrieval prompt
+under an 8,192-token context reservation. All four responses returned
+`73192` with identical six-token IDs; all 11 final-state fields matched within
+each pair and reproduced across pairs. Minimum available RAM was 20.80 and
+21.24 GiB, peak swap 1.34 and 1.86 GiB, and the existing OOM-kill count stayed
+at one. Prefix-level state was not captured. Sequential Strata-then-NInfer
+times are diagnostic only. This adds one bounded mixed-codec context point;
+broader state and quality qualification remains open. See the
+[4K retrieval report](../../bench/results/2026-11-05-e5-coder-natural-prompt/retrieval-4k-final-only/README.md).
+
 **E6 Coder IQ1_M performance screen (2026-11-05):** three same-profile
 Strata/strict-NInfer pairs measured the held-out `is_prime` task with state
 hashing disabled. All six requests generated the same 89 tokens, passed the

@@ -11,7 +11,8 @@ from pathlib import Path
 
 ROOT = Path('/home/calvin/workspace/strata-ninfer-expert-e0')
 EXPECTED = '73192'
-TARGET_PROMPT = 2048
+TARGET_PROMPT = int(sys.argv[2]) if len(sys.argv) > 2 else 2048
+CONTEXT_RESERVATION = int(sys.argv[3]) if len(sys.argv) > 3 else 4096
 PREFIX = 'Archived closed tickets: '
 FILLER = 'ticket closed code 11804; status resolved. '
 SUFFIX = (
@@ -38,7 +39,7 @@ def main() -> int:
     args = command[index + 1:].copy()
     del args[args.index('--tokens'):args.index('--tokens') + 2]
     args[args.index('--max-new') + 1] = '16'
-    args[args.index('--max-context') + 1] = '4096'
+    args[args.index('--max-context') + 1] = str(CONTEXT_RESERVATION)
     tokenizer_path = Path('/home/calvin/models/strata-orin-validation/pack/tokenizer')
     tokenizer = load_tokenizer(tokenizer_path)
     template = ChatTemplate(tokenizer_path / 'chat_template.jinja')
@@ -59,8 +60,20 @@ def main() -> int:
             low = count + 1
         else:
             high = count - 1
+    # Tokenization can jump over a target when each repeated ticket sentence
+    # adds multiple tokens. Fill the remaining one-token gaps with a harmless
+    # repeated word while keeping the active ticket and query unchanged.
     if content is None:
-        raise RuntimeError('could not construct exact 2,048-token retrieval prompt')
+        for count in range(max(0, high - 2), low + 3):
+            for padding in range(1, 20):
+                candidate = PREFIX + FILLER * count + 'closed ' * padding + SUFFIX
+                if len(encode_content(candidate)) == TARGET_PROMPT:
+                    content = candidate
+                    break
+            if content is not None:
+                break
+    if content is None:
+        raise RuntimeError(f'could not construct exact {TARGET_PROMPT:,}-token retrieval prompt')
     prompt = encode_content(content)
     if len(prompt) != TARGET_PROMPT:
         raise RuntimeError(f'prompt token count changed: {len(prompt)}')
@@ -71,7 +84,7 @@ def main() -> int:
     models = [Path(args[args.index(flag) + 1]) for flag in ('--native', '--ple-gguf')]
     result = {
         'task': 'retrieve open active ticket code among repeated closed-ticket distractors',
-        'expected_answer': EXPECTED, 'prompt_tokens': len(prompt), 'context_reservation': 4096,
+        'expected_answer': EXPECTED, 'prompt_tokens': len(prompt), 'context_reservation': CONTEXT_RESERVATION,
         'prompt_token_ids_sha256': hashlib.sha256(json.dumps(prompt, separators=(',', ':')).encode()).hexdigest(),
         'prompt_content_sha256': hashlib.sha256(content.encode()).hexdigest(),
         'max_new': 16, 'temperature': 0, 'accepted_prefix_capture': False,
@@ -80,7 +93,7 @@ def main() -> int:
             'expert_profile': profile.name,
             'model_shards': [{'name': p.name, 'bytes': p.stat().st_size} for p in models],
             'runtime_options': {'expert_cache_arg': args[args.index('--expert-cache') + 1],
-                                'prefill': args[args.index('--prefill') + 1], 'context': '4096',
+                                'prefill': args[args.index('--prefill') + 1], 'context': str(CONTEXT_RESERVATION),
                                 'spec': args[args.index('--spec') + 1], 'prompt_cache': args[args.index('--prompt-cache') + 1],
                                 'prefill_cpu_share': 0}
         }, 'arms': []

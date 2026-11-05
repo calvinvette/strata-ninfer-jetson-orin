@@ -667,6 +667,18 @@ as the source of this row's MoE input delta, but does not identify the earlier
 residual/normalization source. See the
 [layer-boundary report](../../bench/results/2026-11-05-e5-coder-natural-prompt/README.md#prompt-position-41-layer-boundary-capture).
 
+Execution note (2026-11-05): two fresh final-only pairs extended the Coder
+IQ1_M active-ticket retrieval from a 2,048-token prompt to 4,096 tokens under
+an 8,192-token context reservation. All four requests returned the same exact
+six-token answer, and all 11 final-state fingerprints matched across backends
+and reproduced across pairs. Minimum available RAM was 20.80 and 21.24 GiB;
+peak swap was 1.34 and 1.86 GiB, with no increment to the pre-existing
+OOM-kill count. Accepted-prefix state was not captured. The sequential fixed
+Strata-then-NInfer timings are diagnostic and not performance evidence. This
+adds one retrieval task/context cell only; it does not establish broad mixed-
+codec state or quality support. See the
+[4K Coder retrieval report](../../bench/results/2026-11-05-e5-coder-natural-prompt/retrieval-4k-final-only/README.md).
+
 1. Test held-out short and long requests, repeated continuation, retrieval and
    scoring, cancellation and recovery. Compare state and numerical results in
    addition to text. Retain original/default-route regression evidence.
