@@ -8342,3 +8342,18 @@ observed but uncontrolled; EMC readback was denied and energy was not measured.
 This synthetic task adds a longer prompt point but does not qualify natural
 long-form input or general context quality; no useful NInfer gain was shown.
 E6/E7 remain open. See the [paired 8K and 16K reports](../../bench/results/2026-11-05-e6-coder-actual-prompt-screen/README.md).
+
+**E6 Coder actual 32K-prompt screen (2026-11-05):** four order-balanced
+Strata/strict-NInfer pairs used a 32,768-token synthetic function-generation
+prompt and 65,536-token context. All eight 91-token outputs matched and passed
+the independent 11-case oracle. Three pairs had matching resident-hit and
+lookup counts; in the fourth, NInfer recorded 1,505/34,037 versus Strata's
+1,470/33,219. NInfer decode changed −2.92% at the paired median, with a very
+wide four-pair screening interval (−71.69% to +4.82%) because one pair
+regressed −71.69%; the cause is unknown. Prompt TPS changed +0.02%, TTFT
+reduction +0.01%, and client-time reduction −0.16%. Minimum available RAM was
+13.09 GiB and the six-GiB supervisor passed. Clocks were observed but
+uncontrolled; EMC readback was denied and energy was not measured. This
+synthetic prompt screen shows no useful end-to-end gain and does not establish
+general long-context quality. E6/E7 remain open. See the
+[8K–32K screen report](../../bench/results/2026-11-05-e6-coder-actual-prompt-screen/README.md).

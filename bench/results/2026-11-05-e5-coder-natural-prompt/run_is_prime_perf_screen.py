@@ -75,6 +75,27 @@ def measure(engine: StrataEngine, prompt: list[int], budget: int, tokenizer,
     return row
 
 
+def exact_length_filler_prompt(input_target: int, tokenizer, template) -> tuple[str, int]:
+    """Build the unrelated-filler task prompt with logarithmic tokenization passes."""
+    prefix = 'The following notes are unrelated. Ignore them and follow the final request. '
+    low, high = 0, input_target * 3
+    attempts = 0
+    while low <= high:
+        filler_tokens = (low + high) // 2
+        candidate = prefix + ' irrelevant' * filler_tokens + '\n\n' + TASK
+        rendered = template.render([{'role': 'user', 'content': candidate}],
+                                   enable_thinking=False)
+        candidate_ids = tokenizer.encode(rendered, parse_special=True)
+        attempts += 1
+        if len(candidate_ids) == input_target:
+            return candidate, attempts
+        if len(candidate_ids) < input_target:
+            low = filler_tokens + 1
+        else:
+            high = filler_tokens - 1
+    raise RuntimeError(f'could not construct exact {input_target}-token prompt')
+
+
 def bootstrap_median(values: list[float], seed: int = 20261105, n_boot: int = 20000) -> list[float]:
     rng = random.Random(seed)
     samples = sorted(statistics.median(rng.choices(values, k=len(values))) for _ in range(n_boot))
@@ -136,23 +157,12 @@ def main() -> int:
     tokenizer_path = Path('/home/calvin/models/strata-orin-validation/pack/tokenizer')
     tokenizer = load_tokenizer(tokenizer_path)
     template = ChatTemplate(tokenizer_path / 'chat_template.jinja')
+    prompt_search_attempts = 0
     if input_target is None:
         user_content = TASK
     else:
-        user_content = None
-        prefix = 'The following notes are unrelated. Ignore them and follow the final request. '
-        for filler_tokens in range(input_target * 3):
-            candidate = prefix + ' irrelevant' * filler_tokens + '\n\n' + TASK
-            candidate_ids = tokenizer.encode(
-                template.render([{'role': 'user', 'content': candidate}], enable_thinking=False),
-                parse_special=True)
-            if len(candidate_ids) == input_target:
-                user_content = candidate
-                break
-            if len(candidate_ids) > input_target:
-                break
-        if user_content is None:
-            raise RuntimeError(f'could not construct exact {input_target}-token prompt')
+        user_content, prompt_search_attempts = exact_length_filler_prompt(
+            input_target, tokenizer, template)
     prompt = tokenizer.encode(template.render([{'role': 'user', 'content': user_content}],
                                              enable_thinking=False), parse_special=True)
     env = os.environ.copy()
@@ -228,8 +238,9 @@ def main() -> int:
         'warmup': 'one eight-token same-prompt request per fresh arm process; measured request follows in that process',
         'context_tokens': int(args[args.index('--max-context') + 1]),
         'max_new': 128, 'prompt_tokens': len(prompt),
-        'prompt_construction': ('exact-count unrelated filler followed by the held-out task'
+        'prompt_construction': ('exact-count unrelated filler followed by the held-out task; binary-searched'
                                 if input_target is not None else 'original exact 50-token held-out task'),
+        'prompt_search_attempts': prompt_search_attempts,
         'prompt_ids_sha256': hashlib.sha256(json.dumps(prompt, separators=(',', ':')).encode()).hexdigest(),
         'temperature': 0, 'accepted_prefix_trace': False, 'state_hash': False,
         'expert_profile_sha256': file_sha256(profile),
