@@ -3173,3 +3173,15 @@ slice 26. This demonstrates early downstream amplification, not a causal layer
 or operator diagnosis. Minimum available RAM was 20.93 GiB and the pre-existing
 cgroup OOM-kill count remained one. Raw arrays remain local; hashes and
 per-slice comparisons are retained in the [E5 report](../../bench/results/2026-11-05-e5-coder-natural-prompt/README.md#first-accepted-token-gdn-state).
+
+Execution note (2026-11-05): an independent oracle checked a resident Coder
+IQ1_M layer-0 expert row using the exact captured activation and GGUF weights.
+Profile rank confirmed expert 25 was resident (rank 281 of 391 loaded slots)
+and selected at route rank 3. GGML `to_float` decoded 4,915,200 weight values
+bit-for-bit; the service Strata output matched the harness native CUDA row,
+and strict NInfer differed from it by relative L2 `8.76e-8` (max absolute
+`1.86e-8`, no invalid values). Both service outputs differed from the
+unquantized FP64 projection by about `1.1211e-2`, which includes activation
+and hidden quantization and is not a universal error tolerance. This verifies
+one resident IQ3_XXS/IQ4_NL row, not whole-model state behavior. See the [oracle
+report](../../bench/results/2026-11-05-e5-coder-natural-prompt/README.md#independent-oracle-for-a-resident-mixed-codec-service-row).
