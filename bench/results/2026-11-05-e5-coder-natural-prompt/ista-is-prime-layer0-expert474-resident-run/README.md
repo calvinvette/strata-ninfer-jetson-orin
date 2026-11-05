@@ -41,8 +41,14 @@ Under the same forced-resident binary and profile, the light capture
 in two pairs: full hashes first differed at endpoint 50 (`stale`), live hashes
 at endpoint 60, and 50/80 shared endpoints matched. A layer-0 bundle by itself
 also differed (first full endpoint 32, live endpoint 41; 32/80 matched).
-A trace-free final-only pair returned identical task tokens but differed in
-`gdn`, `ple`, `tail`, `pooled`, `kv` and `pooled_full` final hashes.
+Four fresh trace-free final-only pairs returned identical task tokens and
+passed the code oracle. Cross-backend final state matched in only one pair.
+Across the four runs, Strata produced two distinct final fingerprints and
+NInfer produced four; the two backend orders were balanced 2/2. The differing
+pairs changed `gdn`, `ple`, `tail`, `pooled`, `kv` and `pooled_full` hashes.
+This is evidence of state instability without accepted-prefix tracing or
+layer-dump hooks; it does not attribute the cause to the NInfer kernel because
+ownership of all other routed experts was not fixed.
 
 By contrast, the standalone `moe-exec` capture matched all 81 shared state
 endpoints, and all-layer MoE bundles at either position 81 or 109 matched all
@@ -58,6 +64,9 @@ actual owner, so neither profile comparison isolates the full-sequence cause.
 See the [capture-sensitivity matrix](state-capture-sensitivity.json). This
 confirms that exact local kernel parity for expert 474 does not resolve the
 long-task state discrepancy or its instrumentation sensitivity.
+The four [trace-free final-state repeats](final-only-state-repeats.json) are
+the higher-confidence evidence that state divergence is not limited to the
+accepted-prefix trace or single-layer capture path.
 
 ## Reproduction and evidence
 

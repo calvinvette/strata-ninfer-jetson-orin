@@ -75,11 +75,15 @@ fallback distribution. See the [resident-row report](../../bench/results/2026-11
 The same long task also exposed diagnostic-mode sensitivity: with the same
 forced-resident binary and profile, a light layer-0 capture and a trace-free
 final-only pair showed state differences, while all-layer MoE captures and a
-single-expert execution capture produced exact recorded state hashes. All
-cases returned the same tokens. Do not count a debug-capture parity result as
-service qualification until its effect is tested against trace-free controls.
-For Splash, use paired diagnostic-on/off requests and vary one capture hook at
-a time before inferring that a state mismatch is fixed by an added dump.
+single-expert execution capture produced exact recorded state hashes. The
+exact-state captures are not service parity evidence. Four fresh trace-free
+final-only pairs then returned the same task tokens, but Strata produced two
+final-state fingerprints and NInfer four, with mismatched cross-backend state
+in three pairs despite balanced backend order. This is not attributed to the
+NInfer kernel because all other routed owners were not fixed. For future
+Splash work, qualify fresh-run state repeatability before interpreting one
+cross-backend result, and pair diagnostic-on/off requests while varying one
+capture hook at a time.
 
 ## 2026-10-09 — Start at the measurement boundary
 

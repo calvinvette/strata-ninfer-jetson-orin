@@ -158,9 +158,11 @@ def main() -> int:
         env['STRATA_COMMIT_SYNC'] = '1'
     if trace_prefix:
         env['STRATA_ACCEPTED_PREFIX_TRACE'] = '1'
+    backend_order = ('ninfer', 'strata') if '--reverse-backends' in options else ('strata', 'ninfer')
     result = {'task': TASK, 'cases': CASES, 'prompt_tokens': len(prompt),
               'max_new': 128, 'temperature': 0,
-              'accepted_prefix_capture': trace_prefix, 'arms': []}
+              'accepted_prefix_capture': trace_prefix,
+              'backend_order': list(backend_order), 'arms': []}
     def option_csv(name: str, default: str) -> list[int]:
         raw = next((option.split('=', 1)[1] for option in options
                     if option.startswith(name + '=')), default)
@@ -207,7 +209,7 @@ def main() -> int:
                             'prefill_cpu_share': 0,
                             'adaptive_swaps': 'inherited profile; see command in supervisor'}
     }
-    for backend in ('strata', 'ninfer'):
+    for backend in backend_order:
         arm_args = args.copy()
         arm_args[arm_args.index('--expert-backend') + 1] = backend
         if backend == 'ninfer':

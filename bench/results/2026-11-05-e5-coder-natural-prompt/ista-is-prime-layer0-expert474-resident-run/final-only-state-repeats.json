@@ -1,0 +1,247 @@
+{
+  "schema": 1,
+  "model": "ISTA-DASLab Qwen3.8-Flash-Next IQ3_S GGUF + iq3-s-pack",
+  "task": "held-out is_prime, exact 50-token prompt, 91 generated tokens",
+  "runtime": "same current E0 CUDA binary and experiment-only forced-resident expert profile across four fresh paired service runs; accepted-prefix trace and MoE/GDN dump hooks disabled; only final state hashes recorded",
+  "binary_sha256": "df8e666b8d19dbdc5f687826b4d7187783f4c91aaf5ba2037497a65823d4be98",
+  "profile_sha256": "0141f1c379ca1460423e17583eb59e1504554c7c6a72e4eb6b50a52fe8060269",
+  "summary": {
+    "pairs": 4,
+    "token_and_task_oracle_passes": true,
+    "cross_backend_final_state_equal_pairs": 1,
+    "distinct_strata_final_states": 2,
+    "distinct_ninfer_final_states": 4,
+    "interpretation": "All four pairs produced the same token IDs and passed the code oracle. Cross-backend final state matched in only one pair; Strata produced two distinct final states and NInfer four. The repeated state variation occurs without prefix tracing or layer dumps. This does not attribute cause to the NInfer kernel: request order was balanced 2/2, but the selected expert is only one of the routed rows and actual ownership for every other row was not fixed."
+  },
+  "runs": [
+    {
+      "pair": "strata_first_1",
+      "runner_directory": "ista-is-prime-forced-resident-final-only-run",
+      "supervisor_directory": "ista-is-prime-forced-resident-final-only-supervisor",
+      "backend_order": [
+        "strata",
+        "ninfer"
+      ],
+      "task_passes_both": true,
+      "token_ids_equal": true,
+      "final_state_equal": false,
+      "difference_fields": [
+        "gdn",
+        "ple",
+        "tail",
+        "pooled",
+        "kv",
+        "pooled_full"
+      ],
+      "arms": {
+        "strata": {
+          "token_sha256": "0dcc863e044482ba5710c38b40e77f638e0eb3596a9e03a3734fcff19b8d571e",
+          "token_count": 91,
+          "cases_pass": true,
+          "final_state": {
+            "L": "140",
+            "gdn": "6828a150b780ab61",
+            "ple": "31766a82e2ce61a7",
+            "tail": "1a9e62389d4a41d2",
+            "pooled": "ec25aa5066b0126e",
+            "kv": "0488e4ccd8042ab5",
+            "mtp": "14650fb0739d0383",
+            "stale": "14650fb0739d0383",
+            "dead": "5394b4e5ab7464e2",
+            "pooled_full": "0154faded64a135f",
+            "ple_prev": "198,71093"
+          }
+        },
+        "ninfer": {
+          "token_sha256": "0dcc863e044482ba5710c38b40e77f638e0eb3596a9e03a3734fcff19b8d571e",
+          "token_count": 91,
+          "cases_pass": true,
+          "final_state": {
+            "L": "140",
+            "gdn": "5d01092123738d19",
+            "ple": "ae4751810a040cb4",
+            "tail": "12718aae434417d3",
+            "pooled": "fe6215ddd047eec2",
+            "kv": "8a324e78592ff2c1",
+            "mtp": "14650fb0739d0383",
+            "stale": "14650fb0739d0383",
+            "dead": "5394b4e5ab7464e2",
+            "pooled_full": "86b6bca817b9aae7",
+            "ple_prev": "198,71093"
+          }
+        }
+      },
+      "minimum_available_bytes": 21128642560
+    },
+    {
+      "pair": "strata_first_2",
+      "runner_directory": "ista-is-prime-forced-resident-final-only-repeat-run",
+      "supervisor_directory": "ista-is-prime-forced-resident-final-only-repeat-supervisor",
+      "backend_order": [
+        "strata",
+        "ninfer"
+      ],
+      "task_passes_both": true,
+      "token_ids_equal": true,
+      "final_state_equal": true,
+      "difference_fields": [],
+      "arms": {
+        "strata": {
+          "token_sha256": "0dcc863e044482ba5710c38b40e77f638e0eb3596a9e03a3734fcff19b8d571e",
+          "token_count": 91,
+          "cases_pass": true,
+          "final_state": {
+            "L": "140",
+            "gdn": "6828a150b780ab61",
+            "ple": "31766a82e2ce61a7",
+            "tail": "1a9e62389d4a41d2",
+            "pooled": "ec25aa5066b0126e",
+            "kv": "0488e4ccd8042ab5",
+            "mtp": "14650fb0739d0383",
+            "stale": "14650fb0739d0383",
+            "dead": "5394b4e5ab7464e2",
+            "pooled_full": "0154faded64a135f",
+            "ple_prev": "198,71093"
+          }
+        },
+        "ninfer": {
+          "token_sha256": "0dcc863e044482ba5710c38b40e77f638e0eb3596a9e03a3734fcff19b8d571e",
+          "token_count": 91,
+          "cases_pass": true,
+          "final_state": {
+            "L": "140",
+            "gdn": "6828a150b780ab61",
+            "ple": "31766a82e2ce61a7",
+            "tail": "1a9e62389d4a41d2",
+            "pooled": "ec25aa5066b0126e",
+            "kv": "0488e4ccd8042ab5",
+            "mtp": "14650fb0739d0383",
+            "stale": "14650fb0739d0383",
+            "dead": "5394b4e5ab7464e2",
+            "pooled_full": "0154faded64a135f",
+            "ple_prev": "198,71093"
+          }
+        }
+      },
+      "minimum_available_bytes": 21143126016
+    },
+    {
+      "pair": "ninfer_first_1",
+      "runner_directory": "ista-is-prime-forced-resident-final-only-reverse-run",
+      "supervisor_directory": "ista-is-prime-forced-resident-final-only-reverse-supervisor",
+      "backend_order": [
+        "ninfer",
+        "strata"
+      ],
+      "task_passes_both": true,
+      "token_ids_equal": true,
+      "final_state_equal": false,
+      "difference_fields": [
+        "gdn",
+        "ple",
+        "tail",
+        "pooled",
+        "kv",
+        "pooled_full"
+      ],
+      "arms": {
+        "ninfer": {
+          "token_sha256": "0dcc863e044482ba5710c38b40e77f638e0eb3596a9e03a3734fcff19b8d571e",
+          "token_count": 91,
+          "cases_pass": true,
+          "final_state": {
+            "L": "140",
+            "gdn": "0deed83ec3a5ff96",
+            "ple": "e1ce6067ca4bb553",
+            "tail": "58def5bdf99a01a8",
+            "pooled": "a1ed7b4d0d975a39",
+            "kv": "3ee23139ac74f7bd",
+            "mtp": "14650fb0739d0383",
+            "stale": "14650fb0739d0383",
+            "dead": "5394b4e5ab7464e2",
+            "pooled_full": "a4ded63fae049278",
+            "ple_prev": "198,71093"
+          }
+        },
+        "strata": {
+          "token_sha256": "0dcc863e044482ba5710c38b40e77f638e0eb3596a9e03a3734fcff19b8d571e",
+          "token_count": 91,
+          "cases_pass": true,
+          "final_state": {
+            "L": "140",
+            "gdn": "2216cf1db4c57d2d",
+            "ple": "eb16e2fc575a6ac3",
+            "tail": "318708c5782512ff",
+            "pooled": "08b5788ced9e7da0",
+            "kv": "8fe0c4eab43c8544",
+            "mtp": "14650fb0739d0383",
+            "stale": "14650fb0739d0383",
+            "dead": "5394b4e5ab7464e2",
+            "pooled_full": "b4a54bfa66fdf555",
+            "ple_prev": "198,71093"
+          }
+        }
+      },
+      "minimum_available_bytes": 21116796928
+    },
+    {
+      "pair": "ninfer_first_2",
+      "runner_directory": "ista-is-prime-forced-resident-final-only-reverse-repeat-run",
+      "supervisor_directory": "ista-is-prime-forced-resident-final-only-reverse-repeat-supervisor",
+      "backend_order": [
+        "ninfer",
+        "strata"
+      ],
+      "task_passes_both": true,
+      "token_ids_equal": true,
+      "final_state_equal": false,
+      "difference_fields": [
+        "gdn",
+        "ple",
+        "tail",
+        "pooled",
+        "kv",
+        "pooled_full"
+      ],
+      "arms": {
+        "ninfer": {
+          "token_sha256": "0dcc863e044482ba5710c38b40e77f638e0eb3596a9e03a3734fcff19b8d571e",
+          "token_count": 91,
+          "cases_pass": true,
+          "final_state": {
+            "L": "140",
+            "gdn": "df3d659f107dca6c",
+            "ple": "eb16e2fc575a6ac3",
+            "tail": "247ab364f22ff3eb",
+            "pooled": "b03f634460548104",
+            "kv": "bf2e0d139df9212d",
+            "mtp": "14650fb0739d0383",
+            "stale": "14650fb0739d0383",
+            "dead": "5394b4e5ab7464e2",
+            "pooled_full": "f721331d18f4c1f1",
+            "ple_prev": "198,71093"
+          }
+        },
+        "strata": {
+          "token_sha256": "0dcc863e044482ba5710c38b40e77f638e0eb3596a9e03a3734fcff19b8d571e",
+          "token_count": 91,
+          "cases_pass": true,
+          "final_state": {
+            "L": "140",
+            "gdn": "6828a150b780ab61",
+            "ple": "31766a82e2ce61a7",
+            "tail": "1a9e62389d4a41d2",
+            "pooled": "ec25aa5066b0126e",
+            "kv": "0488e4ccd8042ab5",
+            "mtp": "14650fb0739d0383",
+            "stale": "14650fb0739d0383",
+            "dead": "5394b4e5ab7464e2",
+            "pooled_full": "0154faded64a135f",
+            "ple_prev": "198,71093"
+          }
+        }
+      },
+      "minimum_available_bytes": 21093945344
+    }
+  ]
+}
