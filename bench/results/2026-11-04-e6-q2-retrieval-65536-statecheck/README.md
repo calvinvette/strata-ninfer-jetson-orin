@@ -19,6 +19,24 @@ see the [65K same-map screen](../2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.
 Combining that answer check with this final-state comparison does not make the
 two separate runs an accepted-prefix trace or prove state parity at every token.
 
+## Full-answer and final-state follow-up
+
+A second corrected pair used the same exact prompt and configuration without
+accepted-prefix trace collection. Both Strata and strict NInfer generated all
+47 expected tokens and returned the exact answer. Token IDs, all nine final
+state fingerprints, and the 5K residency maps matched. The NInfer request log
+records the strict Q2_0 resident grouped dispatch. The one-token check above
+and this full-answer check are independent runs; this full-answer run verifies
+the terminal state only, not state at every intermediate commit.
+
+The guarded pair ran for 1,355 seconds. Minimum available/admission RAM was
+6.84 GiB, just above the 6 GiB floor; peak sampled swap was 2.03 GiB and the
+existing cgroup OOM-kill counter stayed at 1. CPU clocks ranged from 729.6 to
+2,201.6 MHz and GPU clocks from 306 to 1,300.5 MHz; clocks were uncontrolled,
+EMC readback was denied, and energy was not measured. Prompt and decode stage
+times are retained in the evidence but are from one instrumented pair and are
+not performance evidence. See [full-answer evidence](full-answer-evidence.json).
+
 | Measure | Strata | Strict NInfer |
 | --- | ---: | ---: |
 | Prompt tokens | 65,536 | 65,536 |
@@ -61,6 +79,7 @@ and has focused regression coverage (11 tests passed). The corrected run used
 the NInfer config as its base, and its engine log confirms strict NInfer
 dispatch. The checker fix was committed and pushed as `8c1bbe5a`.
 
-This closes only one final-state comparison for one one-token continuation after
-a synthetic 65K prompt. Broader task quality, multi-model evidence, state at
-intermediate accepted prefixes and the E6 performance gate remain open.
+This adds one exact full-answer/final-state comparison for the synthetic 65K
+retrieval task and a separate one-token state check. It does not establish
+intermediate accepted-prefix parity for the full answer or repeatability across
+requests. Multi-model evidence and E6's performance gate remain open.

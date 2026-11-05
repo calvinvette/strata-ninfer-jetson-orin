@@ -2,6 +2,20 @@
 
 Updated: 2026-11-04. Branch: `feat/ninfer-expert-e0`.
 
+## 2026-11-04 long-prompt full-answer/final-state check
+
+A fresh-process pair compared Strata and strict NInfer on the same held-out
+65,536-token Q2_0 retrieval prompt at 131,072 configured context. Both returned
+the exact expected 47-token answer with identical token IDs, all nine terminal
+state fingerprints and the same 5K residency map. Minimum available RAM was
+6.84 GiB; swap peaked at 2.03 GiB and the existing OOM-kill counter did not
+increase. This is one final-state comparison without intermediate
+accepted-prefix capture. The earlier one-token check is separately recorded;
+neither combined scope proves within-service repeatability. This adds bounded
+long-prompt quality/state evidence but supplies no performance qualification
+or multi-model coverage, so the no-release decision and E6/E7 open status remain.
+See the [65K state report](../../bench/results/2026-11-04-e6-q2-retrieval-65536-statecheck/README.md#full-answer-and-final-state-follow-up).
+
 ## Decision
 
 **No NInfer release profile is proposed.** Keep `--expert-backend ninfer`

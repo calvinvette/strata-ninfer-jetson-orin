@@ -690,6 +690,17 @@ check the full answer or intermediate accepted prefixes; the exact full answer
 is covered by the separate 65K backend screen. Trace-enabled timings are not
 performance evidence. See the [state-check report](../../bench/results/2026-11-04-e6-q2-retrieval-65536-statecheck/README.md).
 
+**E6 65K retrieval full-answer/final-state follow-up (2026-11-04):** without
+accepted-prefix tracing, a fresh Strata/strict-NInfer pair generated the exact
+47-token answer for the same 65,536-token prompt. Token IDs, all nine terminal
+state fingerprints and byte-identical 5K residency maps matched; the strict
+NInfer log records the resident Q2_0 dispatch. Minimum available memory was
+6.84 GiB, peak sampled swap was 2.03 GiB, and the pre-existing OOM-kill counter
+did not change. This is one pair and checks terminal state only, not each
+intermediate accepted prefix or within-service repeatability. Its timings are
+not performance evidence. E6/E7 remain open. See the [full-answer state
+report](../../bench/results/2026-11-04-e6-q2-retrieval-65536-statecheck/README.md#full-answer-and-final-state-follow-up).
+
 **Execution note (2026-11-04):** extended the executable code task to an exact
 8,192-token formatted prompt at 16K configured context. Three randomized
 same-map pairs retained the same controls and passed the independent five-case

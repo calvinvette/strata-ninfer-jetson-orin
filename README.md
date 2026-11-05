@@ -67,6 +67,12 @@ Strata and strict-NInfer arms. Minimum available memory was 11.44 GiB. This is
 one held-out task per backend, not a general quality or performance
 qualification; the successful run used an experiment-only 300-second watchdog
 allowance. See the [near-256K retrieval record](bench/results/2026-10-25-phase-e5-q2-ninfer-240k-retrieval/README.md).
+A separate fresh-process pair processed the exact 65,536-token retrieval prompt
+at a 131,072-token cap and returned the expected 47-token answer under both
+backends. Token IDs, all nine final-state fingerprints and the 5K resident map
+matched. Minimum available memory was 6.84 GiB. This is one full-answer/
+terminal-state pair, not an intermediate-prefix trace or repeated-request
+qualification; see the [65K state report](bench/results/2026-11-04-e6-q2-retrieval-65536-statecheck/README.md).
 Same-map backend screens now cover retrieval/arithmetic prompts from 2K to
 240K plus a separate 2K code-generation task. On the code task, all twelve
 Strata/NInfer warmup and measured answers passed five executable tests; the

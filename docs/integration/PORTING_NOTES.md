@@ -1,5 +1,18 @@
 # Integration notebook and future Strata + Splash work
 
+## 2026-11-04 — Pair long-prompt answer and terminal state checks
+
+A fresh Q2_0 Strata/strict-NInfer pair processed the same 65,536-token prompt,
+returned the exact 47-token answer and matched all nine final-state fingerprints
+and the 5K resident map. A separate one-token run had also matched the first
+token and terminal state. This extends one synthetic workload's parity evidence;
+it is not an accepted-prefix trace and does not establish repeated-request
+stability. For a future Strata + Splash comparison, validate the complete task
+answer and terminal state together, capture intermediate accepted prefixes when
+needed, and separately test within-engine repeatability. Keep owner maps and
+strict-dispatch evidence with the run so equality cannot be attributed to a
+fallback arm. See the [Q2_0 report](../../bench/results/2026-11-04-e6-q2-retrieval-65536-statecheck/README.md#full-answer-and-final-state-follow-up).
+
 ## 2026-10-30 — Record the actual owner of each routed expert
 
 The Q2_0 NInfer service trace showed that a routed expert is not necessarily

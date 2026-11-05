@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "date": "2026-11-04",
+  "scope": "one fresh-process pair; full held-out answer and final-state comparison after 65536-token prompt; no performance qualification",
+  "hardware": "Jetson AGX Orin 64 GB, ARM64, CUDA 12.6",
+  "source_checkout_commit": "0aea9ad6d6f40169d91b698cd6031781ae9fd0c8",
+  "binary_sha256": "fd67288c399d895be036dab344e30caab3d081540bfc552f22dac6a5fc33644a",
+  "model": {
+    "name": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0",
+    "native_shard_sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720",
+    "ple_shard_sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113",
+    "ple_dense_sha256": "a43d7d0b69525335f4b000d5197a1d3aefcd3c0014fc3e12b3455e0a5d827ba2",
+    "ple_index_sha256": "c758314d495a1261d06a806b1c415596dfabe62e0cbf44ce592dc84c53229ccd"
+  },
+  "workload": {
+    "name": "heldout-retrieval-arithmetic-65536",
+    "fixture_sha256": "0ab719f94047c0c3b05cba06e32e7b06f82c2793ec0818ea38128411d598dd82",
+    "prompt_tokens": 65536,
+    "prompt_content_sha256": "bee2e6d260872df0ae3079fe2afd372717fe288617650e0f21dab689ffd59ce6",
+    "prompt_ids_sha256": "610583fbb363bad5da8bde52c4eccd779b64ba53e7890f11bac48fa188dcbe08",
+    "configured_context_tokens": 131072,
+    "max_new_tokens": 48,
+    "expected_answer": "EARLY=AMBER-QUARTZ-618, MIDDLE=SILVER-MEADOW-243, LATE=INDIGO-LANTERN-907, SUM=1768"
+  },
+  "runtime": {
+    "expert_cache_slots": 5000,
+    "resident_map_sha256_strata": "337d43f4d672f5abec0db0379a48454c3e70eacd7f1bd356af50c04f20fb0080",
+    "resident_map_sha256_ninfer": "337d43f4d672f5abec0db0379a48454c3e70eacd7f1bd356af50c04f20fb0080",
+    "backend_strata": "strata",
+    "backend_ninfer": "ninfer",
+    "ninfer_strict": true,
+    "prefill_chunk": 128,
+    "workers": 8,
+    "adaptive_swaps": 0,
+    "staging_pcie_fraction": 0.0,
+    "state_hash_enabled": true,
+    "accepted_prefix_trace_enabled": false,
+    "mtp_drafts_offered": 0,
+    "mtp_drafts_accepted": 0
+  },
+  "comparison": {
+    "supervisor_status": "pass",
+    "exact_answer_check": true,
+    "strata_answer": "EARLY=AMBER-QUARTZ-618, MIDDLE=SILVER-MEADOW-243, LATE=INDIGO-LANTERN-907, SUM=1768",
+    "ninfer_answer": "EARLY=AMBER-QUARTZ-618, MIDDLE=SILVER-MEADOW-243, LATE=INDIGO-LANTERN-907, SUM=1768",
+    "strata_generated_tokens": 47,
+    "ninfer_generated_tokens": 47,
+    "token_ids_equal": true,
+    "strata_token_ids": [19910, 8662, 28, 1354, 9269, 12, 5579, 2897, 57, 12, 21, 16, 23, 11, 380, 46567, 69744, 1655, 3635, 5084, 36, 57328, 12, 17, 19, 18, 11, 436, 2260, 28, 5078, 58451, 7869, 2731, 13267, 12, 24, 15, 22, 11, 29732, 28, 16, 22, 21, 23, 248046],
+    "ninfer_token_ids": [19910, 8662, 28, 1354, 9269, 12, 5579, 2897, 57, 12, 21, 16, 23, 11, 380, 46567, 69744, 1655, 3635, 5084, 36, 57328, 12, 17, 19, 18, 11, 436, 2260, 28, 5078, 58451, 7869, 2731, 13267, 12, 24, 15, 22, 11, 29732, 28, 16, 22, 21, 23, 248046],
+    "state_fields": ["L", "gdn", "ple", "tail", "dead", "pooled", "pooled_full", "kv", "ple_prev"],
+    "strata_final_state": {
+      "L": "65582",
+      "gdn": "55cc5be5bf06d878",
+      "ple": "bbdf3e09be7a2b97",
+      "tail": "b38a7e70b7784804",
+      "dead": "dcaae02b3e09f282",
+      "pooled": "431cf0e13e20c26a",
+      "pooled_full": "255961e93d94827b",
+      "kv": "8965912ef186437f",
+      "ple_prev": "21,23"
+    },
+    "ninfer_final_state": {
+      "L": "65582",
+      "gdn": "55cc5be5bf06d878",
+      "ple": "bbdf3e09be7a2b97",
+      "tail": "b38a7e70b7784804",
+      "dead": "dcaae02b3e09f282",
+      "pooled": "431cf0e13e20c26a",
+      "pooled_full": "255961e93d94827b",
+      "kv": "8965912ef186437f",
+      "ple_prev": "21,23"
+    },
+    "final_state_equal": true,
+    "resident_maps_equal": true,
+    "ninfer_dispatch_log_excerpt": "queued NInfer Q2_0 resident grouped dispatch at layer 0 (CUDA Q2_0/Q2_0, 2560/640)"
+  },
+  "supervisor": {
+    "elapsed_seconds": 1355.019,
+    "memory_floor_bytes": 6442450944,
+    "minimum_available_gib": 6.8433,
+    "minimum_admission_gib": 6.8433,
+    "peak_sampled_swap_gib": 2.0315,
+    "cgroup_oom_kill_initial": 1,
+    "cgroup_oom_kill_final": 1,
+    "observed_cpu_clock_mhz_range": [729.6, 2201.6],
+    "observed_gpu_clock_mhz_range": [306.0, 1300.5],
+    "clock_control": "none",
+    "emc_clock_readback": "denied",
+    "energy_measured": false
+  },
+  "diagnostic_timings_seconds": {
+    "strata_prompt": 621.8705,
+    "ninfer_prompt": 618.9941,
+    "strata_decode": 7.3414,
+    "ninfer_decode": 7.529,
+    "interpretation": "one trace-enabled pair; not a performance estimate"
+  }
+}
