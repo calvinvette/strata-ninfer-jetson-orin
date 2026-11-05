@@ -3578,3 +3578,18 @@ No useful NInfer gain was demonstrated. See the [screen report](../../bench/resu
 The static owner map report and layer-16 route/input report are linked here: [all-layer
 capture](../../bench/results/2026-11-05-e6-coder-retrieval-2k-static-pcie6g/owner-capture-all/README.md),
 [layer-16 capture](../../bench/results/2026-11-05-e6-coder-retrieval-2k-static-pcie6g/first-route-boundary/README.md).
+
+### E6 Coder context-capacity screen (interim, 2026-11-05)
+
+Four order-balanced pairs at each configured capacity from 1K through 16K used
+the same 512-token Coder IQ1_M `is_prime(n)` prompt, 89-token output, static
+six-GiB PCIe complement, fixed owners, CPU prefill sharing off and six-GiB
+memory guard. All outputs matched and passed the independent 11-case oracle;
+all supervisors passed. Paired median NInfer decode changes were −0.56%,
+−0.25%, +0.63%, −1.42% and −0.88% at 1K, 2K, 4K, 8K and 16K respectively.
+None demonstrated the 5% gain threshold; the 2K interval is especially wide due
+to a retained severe outlier. Minimum available memory ranged from 14.90 GiB
+at 1K to 14.44 GiB at 16K. These configured-capacity results do not measure
+long-prompt ingestion. The 32K–256K cells remain in progress; E6/E7 remain open
+and no profile is promoted. See the [interim report](../../bench/results/2026-11-05-e6-coder-capacity-screen/README.md)
+and its per-cell records.
