@@ -611,7 +611,12 @@ Minimum available RAM was 19.13–19.76 GiB, peak swap 1.37–1.67 GiB, and the
 existing OOM-kill count stayed at one. This is one repeatable positive
 mixed-codec point and does not resolve Coder IQ1_M drift or close broad E5
 quality/state gates. Traced fixed-order timings are excluded from performance
-claims. See the [ISTA IQ3_S report](../../bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-even/README.md).
+claims. A teacher-forced scoring follow-up covered all 64 targets for this
+answer: the serialized records matched at target-logprob precision 1e-9 and
+top-k precision 1e-6, with 100% top-1 agreement and top-10 overlap. This adds
+one bounded distribution-score point, not bitwise logit parity. See the
+[ISTA IQ3_S report](../../bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-even/README.md)
+and [score report](../../bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-even-scoring/README.md).
 
 Execution note (2026-11-05): teacher-forced scoring of the validated 89-token
 Coder `is_prime` answer after its exact 50-token prompt produced byte-identical

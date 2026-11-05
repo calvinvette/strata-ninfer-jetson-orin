@@ -1,0 +1,363 @@
+{
+  "measurement": {
+    "date": "2026-11-05",
+    "hardware": "Jetson Orin AGX, CUDA 12.6",
+    "task": "teacher-force the held-out is_even answer on the actual ISTA IQ3_S model",
+    "target_answer_tokens": 21,
+    "prompt_tokens": 44,
+    "input_tokens": 65,
+    "answer_positions": [
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63
+    ],
+    "prompt_token_ids_sha256": "585e6a024bf8c7dd4a918d3504309d1cb71d57edba58e3a05dcf15d507dcb0fa",
+    "answer_token_ids_sha256": "16427cd475c265ea21999cd61f5815f40a4766c415ce234b681d21c24d5e75a3",
+    "binary_sha256": "df8e666b8d19dbdc5f687826b4d7187783f4c91aaf5ba2037497a65823d4be98",
+    "expert_profile_sha256": "b43df7bfd01dcc07205c6ca480c079a027994fc989a347d4741fe4893d434439",
+    "model_shards": [
+      {
+        "name": "Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00001-of-00002.gguf",
+        "bytes": 54817524224,
+        "sha256": "4c1eb2ceb4915e1192f4f386021897bde56a97f40a0bb78bb86465e0f7d2aca3"
+      },
+      {
+        "name": "Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00002-of-00002.gguf",
+        "bytes": 28800138432,
+        "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+      }
+    ],
+    "runtime": {
+      "expert_profile": "e0-ista-iq3s-layer1-first-profile.bin",
+      "expert_cache_arg": "512",
+      "context": 512,
+      "short_read": 512,
+      "expert_backend": [
+        "strata",
+        "ninfer-strict"
+      ],
+      "mtp_window": "2",
+      "prefill_cpu_share": 0,
+      "logpos_topk": 20,
+      "timing_used": false
+    },
+    "arms": [
+      {
+        "backend": "strata",
+        "input_token_count": 65,
+        "generated_probe_token_ids": [
+          198
+        ],
+        "score_row_count": 64,
+        "score_file_sha256": "ba4bad06c25b2346084e7f1adbe3c4f980826852946cf95f47fafcafaf4d5250",
+        "finish": {
+          "generated": 1,
+          "prompt_tokens": 65,
+          "prompt_ms": 19588.0,
+          "decode_ms": 376.6,
+          "finish": "length",
+          "drafts_accepted": 0,
+          "drafts_offered": 0,
+          "reused": 0,
+          "hits": 16,
+          "lookups": 480,
+          "ram_blobs": 0,
+          "file_blobs": 0,
+          "file_mb": 954.1,
+          "prompt_read": 65,
+          "offloaded": 0
+        },
+        "log": "strata.log"
+      },
+      {
+        "backend": "ninfer",
+        "input_token_count": 65,
+        "generated_probe_token_ids": [
+          198
+        ],
+        "score_row_count": 64,
+        "score_file_sha256": "ba4bad06c25b2346084e7f1adbe3c4f980826852946cf95f47fafcafaf4d5250",
+        "finish": {
+          "generated": 1,
+          "prompt_tokens": 65,
+          "prompt_ms": 16767.5,
+          "decode_ms": 379.8,
+          "finish": "length",
+          "drafts_accepted": 0,
+          "drafts_offered": 0,
+          "reused": 0,
+          "hits": 16,
+          "lookups": 480,
+          "ram_blobs": 0,
+          "file_blobs": 0,
+          "file_mb": 954.1,
+          "prompt_read": 65,
+          "offloaded": 0
+        },
+        "log": "ninfer.log"
+      }
+    ],
+    "score": {
+      "scored_answer_tokens": 21,
+      "strata_sum_logprob": -0.119250531,
+      "ninfer_sum_logprob": -0.119250531,
+      "strata_mean_logprob": -0.005678596714285715,
+      "ninfer_mean_logprob": -0.005678596714285715,
+      "strata_perplexity": 1.0056947505070908,
+      "ninfer_perplexity": 1.0056947505070908,
+      "ninfer_minus_strata_total_logprob": 0.0,
+      "mean_target_logprob_delta_ninfer_minus_strata": 0.0,
+      "median_abs_target_logprob_delta": 0.0,
+      "max_abs_target_logprob_delta": 0.0,
+      "top1_agreement_fraction": 1,
+      "mean_top10_overlap_fraction": 1.0,
+      "per_answer_token": [
+        {
+          "position": 43,
+          "target_id": 71093,
+          "strata_logprob": -0.053109484,
+          "ninfer_logprob": -0.053109484,
+          "delta": 0.0,
+          "top1_equal": true,
+          "top10_overlap": 10
+        },
+        {
+          "position": 44,
+          "target_id": 12305,
+          "strata_logprob": -0.00125203,
+          "ninfer_logprob": -0.00125203,
+          "delta": 0.0,
+          "top1_equal": true,
+          "top10_overlap": 10
+        },
+        {
+          "position": 45,
+          "target_id": 198,
+          "strata_logprob": -0.006236238,
+          "ninfer_logprob": -0.006236238,
+          "delta": 0.0,
+          "top1_equal": true,
+          "top10_overlap": 10
+        },
+        {
+          "position": 46,
+          "target_id": 727,
+          "strata_logprob": -0.000478602,
+          "ninfer_logprob": -0.000478602,
+          "delta": 0.0,
+          "top1_equal": true,
+          "top10_overlap": 10
+        },
+        {
+          "position": 47,
+          "target_id": 369,
+          "strata_logprob": -6.5999e-05,
+          "ninfer_logprob": -6.5999e-05,
+          "delta": 0.0,
+          "top1_equal": true,
+          "top10_overlap": 10
+        },
+        {
+          "position": 48,
+          "target_id": 66034,
+          "strata_logprob": -0.000155358,
+          "ninfer_logprob": -0.000155358,
+          "delta": 0.0,
+          "top1_equal": true,
+          "top10_overlap": 10
+        },
+        {
+          "position": 49,
+          "target_id": 1393,
+          "strata_logprob": -5.2094e-05,
+          "ninfer_logprob": -5.2094e-05,
+          "delta": 0.0,
+          "top1_equal": true,
+          "top10_overlap": 10
+        },
+        {
+          "position": 50,
+          "target_id": 1590,
+          "strata_logprob": -0.048303308,
+          "ninfer_logprob": -0.048303308,
+          "delta": 0.0,
+          "top1_equal": true,
+          "top10_overlap": 10
+        },
+        {
+          "position": 51,
+          "target_id": 198,
+          "strata_logprob": -0.000795846,
+          "ninfer_logprob": -0.000795846,
+          "delta": 0.0,
+          "top1_equal": true,
+          "top10_overlap": 10
+        },
+        {
+          "position": 52,
+          "target_id": 262,
+          "strata_logprob": -0.000331825,
+          "ninfer_logprob": -0.000331825,
+          "delta": 0.0,
+          "top1_equal": true,
+          "top10_overlap": 10
+        },
+        {
+          "position": 53,
+          "target_id": 460,
+          "strata_logprob": -0.001167177,
+          "ninfer_logprob": -0.001167177,
+          "delta": 0.0,
+          "top1_equal": true,
+          "top10_overlap": 10
+        },
+        {
+          "position": 54,
+          "target_id": 307,
+          "strata_logprob": -0.001058499,
+          "ninfer_logprob": -0.001058499,
+          "delta": 0.0,
+          "top1_equal": true,
+          "top10_overlap": 10
+        },
+        {
+          "position": 55,
+          "target_id": 984,
+          "strata_logprob": -0.000132876,
+          "ninfer_logprob": -0.000132876,
+          "delta": 0.0,
+          "top1_equal": true,
+          "top10_overlap": 10
+        },
+        {
+          "position": 56,
+          "target_id": 220,
+          "strata_logprob": -2.1211e-05,
+          "ninfer_logprob": -2.1211e-05,
+          "delta": 0.0,
+          "top1_equal": true,
+          "top10_overlap": 10
+        },
+        {
+          "position": 57,
+          "target_id": 17,
+          "strata_logprob": -1.744e-05,
+          "ninfer_logprob": -1.744e-05,
+          "delta": 0.0,
+          "top1_equal": true,
+          "top10_overlap": 10
+        },
+        {
+          "position": 58,
+          "target_id": 606,
+          "strata_logprob": -8.6123e-05,
+          "ninfer_logprob": -8.6123e-05,
+          "delta": 0.0,
+          "top1_equal": true,
+          "top10_overlap": 10
+        },
+        {
+          "position": 59,
+          "target_id": 220,
+          "strata_logprob": -0.000155042,
+          "ninfer_logprob": -0.000155042,
+          "delta": 0.0,
+          "top1_equal": true,
+          "top10_overlap": 10
+        },
+        {
+          "position": 60,
+          "target_id": 15,
+          "strata_logprob": -7.7899e-05,
+          "ninfer_logprob": -7.7899e-05,
+          "delta": 0.0,
+          "top1_equal": true,
+          "top10_overlap": 10
+        },
+        {
+          "position": 61,
+          "target_id": 198,
+          "strata_logprob": -0.005411125,
+          "ninfer_logprob": -0.005411125,
+          "delta": 0.0,
+          "top1_equal": true,
+          "top10_overlap": 10
+        },
+        {
+          "position": 62,
+          "target_id": 71093,
+          "strata_logprob": -0.000103722,
+          "ninfer_logprob": -0.000103722,
+          "delta": 0.0,
+          "top1_equal": true,
+          "top10_overlap": 10
+        },
+        {
+          "position": 63,
+          "target_id": 248046,
+          "strata_logprob": -0.000238633,
+          "ninfer_logprob": -0.000238633,
+          "delta": 0.0,
+          "top1_equal": true,
+          "top10_overlap": 10
+        }
+      ]
+    },
+    "coverage": {
+      "all_prefill_targets_scored": 64,
+      "answer_targets_scored": 21,
+      "all_target_ids_verified_against_input": true
+    }
+  },
+  "model_shards": [
+    {
+      "name": "Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00001-of-00002.gguf",
+      "bytes": 54817524224,
+      "sha256": "4c1eb2ceb4915e1192f4f386021897bde56a97f40a0bb78bb86465e0f7d2aca3"
+    },
+    {
+      "name": "Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00002-of-00002.gguf",
+      "bytes": 28800138432,
+      "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+    }
+  ],
+  "binary_sha256": "df8e666b8d19dbdc5f687826b4d7187783f4c91aaf5ba2037497a65823d4be98",
+  "expert_profile": {
+    "path": "/tmp/e0-ista-iq3s-layer1-first-profile.bin",
+    "bytes": 196632,
+    "sha256": "b43df7bfd01dcc07205c6ca480c079a027994fc989a347d4741fe4893d434439",
+    "cache_arg": 512
+  },
+  "supervisor": {
+    "status": "pass",
+    "minimum_available_bytes": 21167591424,
+    "minimum_admission_available_bytes": 21167591424,
+    "elapsed_s": 62.136406695935875,
+    "reason": "command exit; numerical/workload qualification is separate",
+    "energy_scope": "not measured; raw tegrastats rails only",
+    "clock_sampling": "read-only CPU/GPU/EMC frequency observations; no clock controls"
+  },
+  "interpretation": {
+    "serialized_precision": "target log probabilities 9 decimal places; top-k values 6 decimal places",
+    "performance_use": false,
+    "scope": "one answer sequence on the actual ISTA IQ3_S GGUF with static 512-slot profile; remaining cache lookups are outside the counted resident hits"
+  }
+}

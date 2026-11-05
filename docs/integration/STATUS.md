@@ -56,7 +56,13 @@ hashes in the second fresh pair. Minimum available RAM was 19.13 and 19.76 GiB,
 peak swap was 1.37 and 1.67 GiB, and the existing OOM-kill count stayed at one.
 This is a repeatable positive point for this model/task/profile, not broad
 quality or performance qualification and not resolution of the Coder IQ1_M
-state drift. See the [ISTA report](../../bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-even/README.md).
+state drift. A follow-up teacher-forced check covered all 64 targets for the
+same answer; score files were byte-identical at the logger precision (target
+log-probabilities to nine decimals, top-k values to six), with 100% top-1 and
+top-10 overlap. Both arms logged 16/480 resident hits. Minimum available RAM
+was 19.71 GiB and the existing OOM-kill count stayed at one. See the
+[ISTA task report](../../bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-even/README.md)
+and [scoring report](../../bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-even-scoring/README.md).
 
 **E5 Coder teacher-forced scoring (2026-11-05):** the validated 89-token
 `is_prime` answer was teacher-forced after its exact 50-token prompt using the
