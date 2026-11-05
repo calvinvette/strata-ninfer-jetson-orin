@@ -2782,6 +2782,17 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                 const auto& f = lay.fmt[(size_t) l];
                 const NativeExpertLayout L = native_expert_layout(f.gu_type, f.d_type, f.n_embd, f.n_ff);
 #if defined(STRATA_NINFER_Q2_CUDA)
+                if (ninfer_iq3xxs_iq4nl_backend_enabled() && f.gu_type == 18 && f.d_type == 20 &&
+                    f.n_embd == 2560 && f.n_ff == 640) {
+                    if (ninfer_iq3xxs_iq4nl_dispatch_count() == 0) {
+                        std::fprintf(stderr, "strata verify: queued NInfer IQ3_XXS/IQ4_NL resident grouped dispatch at layer "
+                                             "%lld (CUDA IQ3_XXS/IQ4_NL, 2560/640)\n", (long long) l);
+                    }
+                    ninfer_iq3xxs_iq4nl_expert_grouped(L, gp, gs, gn, p_dst, p_tok, cap, cap,
+                                                       nat_xq_ + (size_t) tb * (N / 32) * 36,
+                                                       hit_scratch_, dst_buf, cs, gy);
+                    return true;
+                }
                 if (ninfer_iq2s_iq4nl_backend_enabled() && f.gu_type == 22 && f.d_type == 20 &&
                     f.n_embd == 2560 && f.n_ff == 640) {
                     if (ninfer_iq2s_iq4nl_dispatch_count() == 0) {

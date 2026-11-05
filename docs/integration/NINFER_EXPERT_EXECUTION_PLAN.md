@@ -476,9 +476,9 @@ and [seven-pair confirmation](../../bench/results/2026-10-25-phase-e3-q2-ninfer-
    no fusion or performance claim is made.
 3. Header-only inventories identify exact expert codec pairs in Coder IQ1_M
    and ISTA-DASLab IQ3_S. Both are mixed-codec. The CUDA selector now supports
-   IQ2_S/IQ4_NL at the exact 2560/640 geometry, with real-weight operator
-   parity and one Coder IQ1_M service dispatch; the other six observed tuple
-   pairs remain unsupported. The Q2_0 artifact remains the only fully
+   IQ2_S/IQ4_NL and IQ3_XXS/IQ4_NL at the exact 2560/640 geometry, each with
+   one real-weight Coder operator check and one nonstrict service dispatch;
+   the other five observed tuple pairs remain unsupported. The Q2_0 artifact remains the only fully
    supported model. NInfer's original sparse-MoE packed Q4/Q5/W8 layouts are
    not byte-compatible with these GGUF codecs. See the [codec boundary map](IMPORT_MAP.md#keep-the-negative-results).
 4. Publish the current model/codec, shape, residency and backend capability
@@ -490,8 +490,8 @@ the other target variants are recorded in
 [E4 model and shape coverage](../../bench/results/2026-10-25-phase-e4-model-codec-coverage/README.md).
 The Q2_0/Q2_0 artifact has the only complete-model functional adapter coverage
 and is not performance-qualified. Mixed IQ1_M/IQ3_S have only experimental
-IQ2_S/IQ4_NL tuple coverage; they remain incomplete and are not performance-qualified.
-64/128-token throughput, mixed-codec support and HIP/SYCL qualification remain
+IQ2_S/IQ4_NL and IQ3_XXS/IQ4_NL tuple coverage; they remain incomplete and are not performance-qualified.
+64/128-token throughput, remaining mixed-codec support and HIP/SYCL qualification remain
 open; this stage closes with partial model support as allowed by its exit.
 
 Execution note (2026-11-04): Coder IQ1_M layer 2 is now pinned as a real-weight
@@ -502,11 +502,21 @@ CUDA adapter was then exercised on the same expert and a captured service
 activation: gate/up intermediates and hidden Q8_1 bytes matched Strata exactly;
 the final output relative L2 was `8.77e-8`, with one candidate dispatch. A
 nonstrict full-model request logged that layer-2 resident dispatch, while
-falling back on unsupported pairs. Strict mode rejected the model at layer 0
-(IQ3_XXS/IQ4_NL), as intended. This qualifies one operator tuple and one
-service route, not complete IQ1_M or IQ3_S support, request quality, or a
-performance benefit. See the [real-weight baseline](../../bench/results/2026-11-04-e4-iq2s-iq4nl-realweight-baseline/README.md)
-and [service/operator report](../../bench/results/2026-11-04-e4-iq2s-iq4nl-service-smoke/README.md).
+falling back on unsupported pairs. Strict mode then rejected the model at
+layer 1 (IQ2_S/Q2_0), after the now-supported IQ3_XXS/IQ4_NL layer-0 route.
+This qualifies two operator tuples and one service route each, not complete
+IQ1_M or IQ3_S support, request quality, or a performance benefit. The other
+mixed model tuples remain unsupported. See the [real-weight baseline](../../bench/results/2026-11-04-e4-iq2s-iq4nl-realweight-baseline/README.md),
+[IQ2S report](../../bench/results/2026-11-04-e4-iq2s-iq4nl-service-smoke/README.md)
+and [IQ3XXS report](../../bench/results/2026-11-04-e4-iq3xxs-iq4nl-next-pair-baseline/README.md).
+
+IQ3_XXS/IQ4_NL is present in 14 layers of each mixed artifact and occurs at
+Coder IQ1_M layer 0. The CUDA adapter passed the pinned layer-0/expert-70
+real-weight operator check (gate/up and hidden Q8_1 exact; final output
+relative L2 `8.92e-8`) and a nonstrict service dispatch smoke. Layer 1's
+IQ2_S/Q2_0 pair still fell back. This remains partial model coverage and has
+no held-out quality or performance qualification. See the
+[next-pair report](../../bench/results/2026-11-04-e4-iq3xxs-iq4nl-next-pair-baseline/README.md).
 
 ### E5 — Qualify numerical behavior and useful execution policies
 

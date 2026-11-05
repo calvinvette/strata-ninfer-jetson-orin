@@ -48,8 +48,11 @@ adapter step; it does not qualify Q8_1 dot arithmetic or NInfer dispatch.
 This is a pre-integration Strata baseline and fixture qualification. It does
 not exercise any NInfer-derived IQ2_S/IQ4_NL code, prove whole-model support,
 or establish a performance benefit. The generated-input run is supplemental;
-the held captured activation is the model-input check. A follow-up adapter test
-must use an independent mathematical/codec oracle and explicit dispatch evidence.
+the held captured activation is the model-input check. The follow-up adapter
+used an independent scalar byte traversal and explicit dispatch evidence; its
+operator and service smoke are documented in the
+[adapter report](../2026-11-04-e4-iq2s-iq4nl-service-smoke/README.md). The
+measurements above remain the pre-adapter Strata control.
 
 ## Reproduction
 

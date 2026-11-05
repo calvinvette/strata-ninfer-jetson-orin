@@ -47,19 +47,22 @@ int main(int argc, char** argv) {
         const std::string prefix = "blk." + std::to_string(layer) + ".ffn_";
         size_t shard = 0;
         const auto* gate = model.find(prefix + "gate_exps.weight", &shard);
-        if (!gate || gate->type != 22 || gate->shape != std::vector<uint64_t>{kHidden, kIntermediate, 256})
-            throw std::runtime_error("gate is not IQ2_S [2560,640,256]");
+        if (!gate || (gate->type != 22 && gate->type != 18) ||
+            gate->shape != std::vector<uint64_t>{kHidden, kIntermediate, 256})
+            throw std::runtime_error("gate is not IQ2_S or IQ3_XXS [2560,640,256]");
+        const int gu_type = gate->type;
         const uint8_t* gate_data = model.shard(shard).tensor_data(*gate);
         const auto* up = model.find(prefix + "up_exps.weight", &shard);
-        if (!up || up->type != 22 || up->shape != std::vector<uint64_t>{kHidden, kIntermediate, 256})
-            throw std::runtime_error("up is not IQ2_S [2560,640,256]");
+        if (!up || up->type != static_cast<uint32_t>(gu_type) ||
+            up->shape != std::vector<uint64_t>{kHidden, kIntermediate, 256})
+            throw std::runtime_error("up codec/shape does not match gate");
         const uint8_t* up_data = model.shard(shard).tensor_data(*up);
         const auto* down = model.find(prefix + "down_exps.weight", &shard);
         if (!down || down->type != 20 || down->shape != std::vector<uint64_t>{kIntermediate, kHidden, 256})
             throw std::runtime_error("down is not IQ4_NL [640,2560,256]");
         const uint8_t* down_data = model.shard(shard).tensor_data(*down);
 
-        const auto layout = strata::kernels::native_expert_layout(22, 20, kHidden, kIntermediate);
+        const auto layout = strata::kernels::native_expert_layout(gu_type, 20, kHidden, kIntermediate);
         std::vector<uint8_t> blob(layout.bytes);
         const auto* eg = gate_data + static_cast<size_t>(expert) * layout.up_off;
         const auto* eu = up_data + static_cast<size_t>(expert) * layout.up_off;
@@ -78,8 +81,7 @@ int main(int argc, char** argv) {
         check(cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking), "stream");
         const size_t q8_bytes = kHidden / 32 * 36;
         const size_t scratch_bytes = strata::kernels::native_expert_scratch_bytes(1, kIntermediate);
-        const size_t candidate_scratch_bytes =
-            strata::kernels::ninfer_iq2s_iq4nl_workspace_bytes(1, kIntermediate);
+        const size_t candidate_scratch_bytes = strata::kernels::ninfer_iq2s_iq4nl_workspace_bytes(1, kIntermediate);
         if (candidate_scratch_bytes != scratch_bytes)
             throw std::runtime_error("NInfer and Strata grouped scratch layouts differ: " +
                                      std::to_string(candidate_scratch_bytes) + " vs " +
@@ -110,9 +112,17 @@ int main(int argc, char** argv) {
         check(cudaMemcpyAsync(d_candidate, sentinel.data(), sentinel.size() * sizeof(float), cudaMemcpyHostToDevice, stream), "init candidate");
         check(cudaMemcpyAsync(d_native, sentinel.data(), sentinel.size() * sizeof(float), cudaMemcpyHostToDevice, stream), "init native");
 
-        strata::kernels::ninfer_iq2s_iq4nl_expert_grouped(layout, d_ptr, d_starts, d_count, d_dst, d_tok,
-                                                          1, 1, d_xq, d_candidate_scratch, d_candidate,
-                                                          stream, 1);
+        if (gu_type == 22) {
+            strata::kernels::ninfer_iq2s_iq4nl_backend_set(true);
+            strata::kernels::ninfer_iq2s_iq4nl_expert_grouped(layout, d_ptr, d_starts, d_count, d_dst, d_tok,
+                                                              1, 1, d_xq, d_candidate_scratch, d_candidate,
+                                                              stream, 1);
+        } else {
+            strata::kernels::ninfer_iq3xxs_iq4nl_backend_set(true);
+            strata::kernels::ninfer_iq3xxs_iq4nl_expert_grouped(layout, d_ptr, d_starts, d_count, d_dst, d_tok,
+                                                               1, 1, d_xq, d_candidate_scratch, d_candidate,
+                                                               stream, 1);
+        }
         strata::kernels::native_expert_grouped(layout, d_ptr, d_starts, d_count, d_dst, d_tok,
                                                1, 1, d_xq, d_native_scratch, d_native, stream, 1);
         std::vector<float> candidate(kHidden), native(kHidden);
@@ -156,15 +166,17 @@ int main(int argc, char** argv) {
         const auto up_error = stage(candidate_up, native_up);
         size_t hidden_bytes_differ = 0;
         for (size_t i = 0; i < candidate_hidden.size(); ++i) hidden_bytes_differ += candidate_hidden[i] != native_hidden[i];
-        std::printf("NInfer IQ2_S/IQ4_NL grouped: layer=%d expert=%d bytes=%zu dispatch=%llu "
+        const uint64_t dispatch = gu_type == 22 ? strata::kernels::ninfer_iq2s_iq4nl_dispatch_count()
+                                                : strata::kernels::ninfer_iq3xxs_iq4nl_dispatch_count();
+        std::printf("NInfer %s/IQ4_NL grouped: layer=%d expert=%d bytes=%zu dispatch=%llu "
                     "relative_l2=%.9g relative_l1=%.9g max_abs=%.9g changed=%zu invalid=%zu\n",
-                    layer, expert, blob.size(),
-                    static_cast<unsigned long long>(strata::kernels::ninfer_iq2s_iq4nl_dispatch_count()),
+                    gu_type == 22 ? "IQ2_S" : "IQ3_XXS", layer, expert, blob.size(),
+                    static_cast<unsigned long long>(dispatch),
                     rel_l2, err1 / std::max(std::sqrt(ref2 * kHidden), 1.0e-300), max_abs, changed, invalid);
         std::printf("stages: gate_rel_l2=%.9g gate_max_abs=%.9g up_rel_l2=%.9g up_max_abs=%.9g hidden_q8_bytes_differ=%zu/%zu\n",
                     gate_error.first, gate_error.second, up_error.first, up_error.second,
                     hidden_bytes_differ, candidate_hidden.size());
-        if (strata::kernels::ninfer_iq2s_iq4nl_dispatch_count() != 1 || invalid != 0) return 1;
+        if (dispatch != 1 || invalid != 0) return 1;
         cudaFree(d_tok); cudaFree(d_dst); cudaFree(d_count); cudaFree(d_starts); cudaFree(d_ptr);
         cudaFree(d_native); cudaFree(d_candidate); cudaFree(d_native_scratch); cudaFree(d_candidate_scratch);
         cudaFree(d_xq); cudaFree(d_x); cudaFree(d_blob); cudaStreamDestroy(stream);
