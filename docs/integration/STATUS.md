@@ -46,6 +46,18 @@ remain open. See the
 
 # Integration status
 
+**E5 ISTA IQ3_S held-out code task (2026-11-05):** two fresh supervised
+Strata/strict-NInfer pairs used the actual ISTA-DASLab IQ3_S GGUF shards, the
+matching `iq3-s-pack`, and a static 512-slot profile. All four responses
+produced the same 21-token `is_even(n)` function and passed six executable
+cases. All 11 persistent-state fields matched at each of 21 accepted-token
+boundaries and at completion; each backend reproduced its tokens and boundary
+hashes in the second fresh pair. Minimum available RAM was 19.13 and 19.76 GiB,
+peak swap was 1.37 and 1.67 GiB, and the existing OOM-kill count stayed at one.
+This is a repeatable positive point for this model/task/profile, not broad
+quality or performance qualification and not resolution of the Coder IQ1_M
+state drift. See the [ISTA report](../../bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-even/README.md).
+
 **E5 Coder teacher-forced scoring (2026-11-05):** the validated 89-token
 `is_prime` answer was teacher-forced after its exact 50-token prompt using the
 canonical Coder profile. Strata and strict NInfer produced byte-identical

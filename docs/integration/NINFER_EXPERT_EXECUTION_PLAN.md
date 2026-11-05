@@ -601,6 +601,18 @@ cause or model-layer mapping. See the [static pinned-PCIe state
 report](../../bench/results/2026-11-05-e5-mixed-static-one-token-pair/state-parity-8token-recheck/pinned-pcie1-1g-static/README.md)
 and [first-token GDN report](../../bench/results/2026-11-05-e5-mixed-static-one-token-pair/state-parity-8token-recheck/pinned-pcie1-1g-first-gdn/README.md).
 
+Execution note (2026-11-05): two fresh supervised pairs extended E5 to the
+actual ISTA-DASLab IQ3_S GGUF with its matching pack, using a held-out
+`is_even(n)` task and a static 512-slot profile. All four outputs matched the
+same 21 token IDs and passed six executable cases. At all 21 accepted-token
+boundaries, all 11 state fingerprints matched across backends; both engines
+also reproduced their token and state traces across the second fresh pair.
+Minimum available RAM was 19.13–19.76 GiB, peak swap 1.37–1.67 GiB, and the
+existing OOM-kill count stayed at one. This is one repeatable positive
+mixed-codec point and does not resolve Coder IQ1_M drift or close broad E5
+quality/state gates. Traced fixed-order timings are excluded from performance
+claims. See the [ISTA IQ3_S report](../../bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-even/README.md).
+
 Execution note (2026-11-05): teacher-forced scoring of the validated 89-token
 Coder `is_prime` answer after its exact 50-token prompt produced byte-identical
 Strata and strict-NInfer score records for all 138 next-token targets at
