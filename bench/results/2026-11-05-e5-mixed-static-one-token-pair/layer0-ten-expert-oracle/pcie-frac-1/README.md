@@ -35,3 +35,8 @@ path first, with Orin shared-memory headroom and transition peaks admitted.
 The guarded run passed with minimum available RAM 20.74 GiB and no increase in
 the pre-existing cgroup OOM-kill count (1). Clocks and energy were not measured.
 See [`comparison.json`](comparison.json) and the supervisor memory record.
+
+
+A bounded follow-up with `--resident-budget-gib 1` and
+`STRATA_RESIDENT_HEADROOM_GIB=6` made these rows PCIe-eligible and passed the
+all-ten-row CUDA oracle; see the [pinned-complement result](../pcie-frac-1-pinned1g/README.md).

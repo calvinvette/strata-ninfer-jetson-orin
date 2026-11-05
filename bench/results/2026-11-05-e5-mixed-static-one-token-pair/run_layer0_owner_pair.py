@@ -15,6 +15,7 @@ from serve.server import StrataEngine
 def main() -> int:
     output = Path(sys.argv[1]).resolve()
     pcie_frac = sys.argv[2] if len(sys.argv) > 2 else None
+    extra_args = sys.argv[3:]
     output.mkdir(parents=True, exist_ok=False)
     base = ROOT / 'bench/results/2026-11-05-e5-mixed-static-one-token-pair/coder-strata-cpu-share-off/result.json'
     command = json.loads(base.read_text())['command']
@@ -28,6 +29,7 @@ def main() -> int:
             args[args.index('--pcie-frac') + 1] = pcie_frac
         else:
             args.extend(['--pcie-frac', pcie_frac])
+    args.extend(extra_args)
     base_env = os.environ.copy()
     base_env.update({'STRATA_PREFILL_CPU_SHARE': '0', 'STRATA_CAPTURE_MOE_LAYER': '0',
                      'STRATA_CAPTURE_MOE_POSITION': '2', 'STRATA_CAPTURE_MOE_ROWS': '1',
@@ -42,8 +44,16 @@ def main() -> int:
         env = base_env.copy()
         owner = prefix.with_suffix('.owner.jsonl')
         cpu = prefix.with_suffix('.cpu-output.jsonl')
+        parts = prefix.with_suffix('.parts.stmparts')
         env['STRATA_CAPTURE_MOE_PATH'] = str(owner)
         env['STRATA_CAPTURE_MOE_OUTPUT_PATH'] = str(cpu)
+        env['STRATA_VERIFY_DUMP_MOE_PARTS_LAYER'] = '0'
+        env['STRATA_VERIFY_DUMP_MOE_PARTS_POSITION'] = '2'
+        env['STRATA_VERIFY_DUMP_MOE_PARTS_PATH'] = str(parts)
+        inputs = prefix.with_suffix('.input.stminput')
+        env['STRATA_VERIFY_DUMP_MOE_INPUT_LAYER'] = '0'
+        env['STRATA_VERIFY_DUMP_MOE_INPUT_POSITION'] = '2'
+        env['STRATA_VERIFY_DUMP_MOE_INPUT_PATH'] = str(inputs)
         log = prefix.with_suffix('.log')
         engine = StrataEngine(exe, arm_args, cwd=str(ROOT), log=str(log), env=env)
         try:
@@ -54,11 +64,16 @@ def main() -> int:
                          'owner_file': owner.name, 'owner_sha256': hashlib.sha256(owner.read_bytes()).hexdigest(),
                          'cpu_output_file': cpu.name,
                          'cpu_output_sha256': hashlib.sha256(cpu.read_bytes()).hexdigest(),
+                         'parts_file': parts.name,
+                         'parts_sha256': hashlib.sha256(parts.read_bytes()).hexdigest(),
+                         'input_file': inputs.name,
+                         'input_sha256': hashlib.sha256(inputs.read_bytes()).hexdigest(),
                          'log_file': log.name})
         finally:
             engine.close()
     result = {'prompt_token_ids': [1, 2, 3], 'captured_layer': 0,
               'captured_position': 2, 'temperature': 0, 'pcie_frac': pcie_frac,
+              'extra_args': extra_args,
               'arms': arms,
               'token_ids_equal': arms[0]['token_ids'] == arms[1]['token_ids']}
     (output / 'results.json').write_text(json.dumps(result, indent=2) + '\n')

@@ -73,8 +73,10 @@ open.
 The exact layer-0 owner trace shows that only four of those ten rows were
 resident on the primary GPU/foresight path; six were CPU-owned. Setting
 `--pcie-frac 1.0` did not stage the misses in this `--mmap-experts`
-configuration because it had no pinned device complement. See the
-[owner-routing diagnostic](../layer0-ten-expert-oracle/pcie-frac-1/README.md).
+configuration because it had no pinned device complement. A subsequent
+1 GiB pinned-complement pair assigned all six misses to PCIe and passed an
+independent native CUDA oracle for all ten rows; see the
+[bounded PCIe follow-up](../layer0-ten-expert-oracle/pcie-frac-1-pinned1g/README.md).
 State instrumentation changes execution cost, so no timing comparison is
 reported. These short synthetic token-ID requests do not measure answer quality,
 held-out tasks, long-context behavior, or memory minima.

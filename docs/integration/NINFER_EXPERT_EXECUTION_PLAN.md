@@ -601,8 +601,15 @@ with `--pcie-frac 1.0` still assigned all six misses to CPU because this
 The captured CPU-output rows confirm that owner assignment. This bounds the
 current mixed-codec coverage claim and identifies pinned source support as a
 prerequisite for staged-miss coverage; it is not evidence of NInfer kernel
-performance. See the [ten-expert oracle](../../bench/results/2026-11-05-e5-mixed-static-one-token-pair/layer0-ten-expert-oracle/README.md)
-and [PCIe-share diagnostic](../../bench/results/2026-11-05-e5-mixed-static-one-token-pair/layer0-ten-expert-oracle/pcie-frac-1/README.md).
+performance. A follow-up with `--resident-budget-gib 1`, six GiB host headroom
+and `--pcie-frac 1.0` assigned all six misses to PCIe. Captured per-expert
+outputs for all ten routes used the same pre-expert activation; Strata matched
+the native CUDA oracle bitwise and strict NInfer was within relative L2
+`7.64e-8`–`9.24e-8`. This confirms one-request mixed-codec staged execution,
+while longer state, quality and performance gates remain open. See the
+[ten-expert oracle](../../bench/results/2026-11-05-e5-mixed-static-one-token-pair/layer0-ten-expert-oracle/README.md),
+[unpinned PCIe-share diagnostic](../../bench/results/2026-11-05-e5-mixed-static-one-token-pair/layer0-ten-expert-oracle/pcie-frac-1/README.md)
+and [bounded pinned follow-up](../../bench/results/2026-11-05-e5-mixed-static-one-token-pair/layer0-ten-expert-oracle/pcie-frac-1-pinned1g/README.md).
 
 Execution note (2026-11-05): a natural short arithmetic prompt (“What is 2 +
 2? Respond with only the numeral.”) returned exact answer `4` and identical

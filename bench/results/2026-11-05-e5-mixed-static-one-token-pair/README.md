@@ -57,13 +57,16 @@ primary-VRAM/foresight rows (25, 54, 35, 19) and six CPU rows (143, 175, 252,
 240, 204, 246); it found no PCIe or peer rows. Thus the `queued NInfer ...
 resident grouped dispatch at layer 0` log only describes the resident group,
 not all ten routed experts. Forcing `--pcie-frac 1.0` left the same six misses
-on CPU: this `--mmap-experts` configuration has no pinned device complement,
-which the planner requires for PCIe ownership. The companion CPU-output
-capture verifies execution ownership. This is a source/configuration coverage
-limit, not an NInfer operator result. Minimum available RAM was 20.74 GiB and
-the pre-existing cgroup OOM-kill count did not increase. Details and hashes are
-in the [owner/PCIe diagnostic](layer0-ten-expert-oracle/pcie-frac-1/README.md)
-and [ten-row oracle report](layer0-ten-expert-oracle/README.md).
+on CPU in that first run because this `--mmap-experts` configuration had no
+pinned device complement. A follow-up added a bounded 1 GiB pinned complement
+with six GiB host headroom; all six misses then became PCIe-owned, and strict
+NInfer matched the native CUDA oracle within relative L2 `7.64e-8`–`9.24e-8`
+for all ten rows. Minimum available RAM in the paired service run was 18.61
+GiB, and the pre-existing cgroup OOM-kill count did not increase. This proves
+one-request staged mixed-codec execution, not state parity or a speedup. Details
+are in the [unpinned owner diagnostic](layer0-ten-expert-oracle/pcie-frac-1/README.md),
+[bounded pinned follow-up](layer0-ten-expert-oracle/pcie-frac-1-pinned1g/README.md)
+and [ten-row resident oracle report](layer0-ten-expert-oracle/README.md).
 
 ### First-logit follow-up on the direct CLI path
 
