@@ -120,6 +120,20 @@ observed. This single traced pair does not establish general trace invariance.
 Broader state and quality qualification remains open. See the
 [4K retrieval report](../../bench/results/2026-11-05-e5-coder-natural-prompt/retrieval-4k-final-only/README.md).
 
+**E6 order-balanced Coder IQ1_M screen (2026-11-05):** four pairs of the
+held-out 50-token `is_prime` prompt used two Strata-first and two NInfer-first
+pairs on the same binary/profile. All eight 89-token outputs and 11-case task
+oracles passed. NInfer median decode change was −0.37% (four-pair bootstrap
+screen interval −67.25% to −0.05%); prompt TPS −0.06%, TTFT reduction −0.05%
+and client-time reduction −0.28%. One NInfer arm was a retained outlier at
+2.07 tok/s versus 6.32 for Strata; the other three pairs were near 7.8 tok/s
+for both. The 5% useful-effect gate failed, so no confirmation was run. Minimum
+available RAM was 20.30 GiB, swap peaked at 1.36 GiB and the existing OOM-kill
+count stayed at one. Clocks were dynamic; EMC readback and energy were
+unavailable. Pair order was balanced but fixed, and the outlier cause is
+unknown. This does not establish an NInfer performance benefit. See the
+[report](../../bench/results/2026-11-05-e6-coder-order-balanced-repeat/README.md).
+
 **E5 default-profile final-state repeats (2026-11-05):** four fresh,
 trace-free pairs on the held-out ISTA IQ3_S `is_prime` task (two per backend
 order) returned identical 91-token outputs and passed the 11-case oracle. Both

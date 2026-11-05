@@ -77,6 +77,26 @@ def bootstrap_median(values: list[float], seed: int = 20261105, n_boot: int = 20
 
 def main() -> int:
     output = Path(sys.argv[1]).resolve()
+    order_arg = next((arg.split('=', 1)[1] for arg in sys.argv[2:]
+                      if arg.startswith('--orders=')), None)
+    if order_arg is None:
+        rng = random.Random(20261105)
+        orders = []
+        for _ in range(3):
+            order = ['strata', 'ninfer']
+            rng.shuffle(order)
+            orders.append(order)
+        study = 'three-pair randomized same-profile Coder IQ1_M screen'
+    else:
+        orders = [[backend.strip() for backend in pair.split(',')]
+                  for pair in order_arg.split(';')]
+        if any(len(order) != 2 or sorted(order) != ['ninfer', 'strata'] for order in orders):
+            raise ValueError('--orders must be semicolon-separated strata,ninfer or ninfer,strata pairs')
+        counts = {order[0]: sum(pair[0] == order[0] for pair in orders)
+                  for order in orders}
+        if len(orders) < 4 or counts.get('strata', 0) != counts.get('ninfer', 0):
+            raise ValueError('explicit screening order must have at least four pairs balanced by first backend')
+        study = f'{len(orders)}-pair order-balanced same-profile Coder IQ1_M screen'
     output.mkdir(parents=True, exist_ok=False)
     command = json.loads(BASE.read_text())['command']
     index = next(i for i, value in enumerate(command)
@@ -94,11 +114,8 @@ def main() -> int:
     env['STRATA_PREFILL_CPU_SHARE'] = '0'
     profile = Path(args[args.index('--expert-profile') + 1])
     models = [Path(args[args.index(flag) + 1]) for flag in ('--native', '--ple-gguf')]
-    rng = random.Random(20261105)
     blocks = []
-    for block in range(3):
-        order = ['strata', 'ninfer']
-        rng.shuffle(order)
+    for block, order in enumerate(orders):
         block_result = {'block': block + 1, 'order': order, 'arms': []}
         for backend in order:
             arm_args = args.copy()
@@ -149,7 +166,7 @@ def main() -> int:
                              'paired_bootstrap_95_pct': bootstrap_median(values)}
     result = {
         'date': '2026-11-05', 'hardware': 'Jetson Orin AGX, SM87, CUDA 12.6',
-        'study': 'three-pair randomized same-profile Coder IQ1_M screen',
+        'study': study,
         'primary_metric': 'server decode tokens/s; generated_tokens / decode_ms includes the first token',
         'warmup': 'one eight-token same-prompt request per fresh arm process; measured request follows in that process',
         'context_tokens': 512, 'max_new': 128, 'prompt_tokens': len(prompt),
@@ -168,9 +185,12 @@ def main() -> int:
                             'spec': args[args.index('--spec') + 1],
                             'prompt_cache': args[args.index('--prompt-cache') + 1],
                             'prefill_cpu_share': 0},
-        'blocks': blocks, 'paired_quality': pairs, 'summary': summaries,
-        'limits': ['three pairs are screen-only', 'dynamic clocks; no clock controls',
-                   'EMC readback denied', 'energy not measured',
+        'orders': orders, 'blocks': blocks, 'paired_quality': pairs, 'summary': summaries,
+        'limits': [f'{len(orders)} pairs are screen-only; confirmation is not implied',
+                   'dynamic clocks; no clock controls', 'EMC readback denied',
+                   'energy not measured',
+                   'explicit pair orders are fixed, not randomized' if order_arg is not None
+                   else 'pair order is seeded-randomized',
                    'client timing is sequential and instrumented by the harness']
     }
     (output / 'results.json').write_text(json.dumps(result, indent=2) + '\n')
