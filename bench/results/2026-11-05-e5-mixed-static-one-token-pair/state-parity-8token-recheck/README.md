@@ -120,3 +120,14 @@ timings are excluded. Full logs, owner summary and comparator output are in the
 The next E5 work should localize the first state-hash divergence under this
 pinned static profile and add held-out task checks; identical tokens on this
 synthetic prompt do not establish state tolerance or answer quality.
+
+
+### First accepted-token GDN state under the static pinned route
+
+A one-token repeat using the static 1 GiB pinned complement generated token `4`
+in both backends and dumped the accepted GDN state. Slice 0 was bit-identical;
+serialized slice 1 was the first difference (relative L2 `1.14e-5`), with global
+relative L2 `1.08e-2` across 36 slices. This localizes the first GDN-state
+change but does not establish the causal operator or map the serialized slice
+to a model layer. The [GDN comparison report](pinned-pcie1-1g-first-gdn/README.md)
+contains the per-slice summary; 113 MiB raw arrays remain local.

@@ -1,0 +1,55 @@
+[strata] 2026-11-05 02:11:46 engine started: /home/calvin/workspace/strata-ninfer-expert-e0/build/integration/e0-cuda-build/strata --serve --pack /home/calvin/models/strata-orin-validation/pack --native /home/calvin/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf --ple-gguf /home/calvin/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf --expert-profile /tmp/e0-coder-iq1m-layer1-first-profile.bin --expert-cache 256 --mmap-experts --pool-workers 4 --prefill 64 --max-context 512 --max-new 1 --expert-backend strata --spec 2 --prompt-cache 0 --vram-reserve-mib 3072 --pcie-frac 1.0 --resident-budget-gib 1 --adapt-every 0 --adapt-swaps 0
+strata generate: ARM CPU experts use ggml-cpu's native kernels
+strata generate: native pack: /home/calvin/models/strata-orin-validation/pack experts (largest blob 2.66 MB), token embedding IQ4_XS in mapped host memory (322 MiB, 0.2 s)
+strata generate: 1406 MiB of weights loaded from /home/calvin/models/strata-orin-validation/pack in 0.6 s (302 canonical tensors skipped: served natively)
+strata generate: 300 native projection matrices, 2018.88 MiB of weights, in 1.0 s
+strata generate: the SSD is kept awake while rows are read: one page of the table after 100 ms without a read, until 60 s after the last request (STRATA_SSD_KEEPALIVE=0 turns it off)
+strata generate: profile /tmp/e0-coder-iq1m-layer1-first-profile.bin: 12288 ranked pairs, built for 12288 slots
+strata generate: PLE on, table 320001536 rows of /home/calvin/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf
+strata generate: experimental native Q5_K head, 521472000 bytes, in 0.3 s
+strata generate: integrated CUDA GPU: CPU and GPU share physical RAM; allocation headroom 6.00 GiB, managed concurrency 0
+strata generate: GPU 0: Orin, compute capability 8.7
+strata generate: experts via mmap (--mmap-experts; the A/B arm of R2.1)
+strata generate: the file tier reads through the file cache (22.2 GiB available, 1.0 GiB of it still to be taken by the RAM copy, 22.4 GiB of experts read from the files: the file cache can keep the ones that come back)
+strata generate: CPU pool tasks/phase: 15 (automatic), participating threads: 5
+strata generate: 4 pool workers on logical processors 1,2,3,4, the host thread on 0 (draining too) (--host-core first)
+strata generate: expert cache 391 slots, 0.63 GiB of shared RAM allocated to the GPU; policy is
+strata generate: the GPU computes the experts in the cache; it rounds differently from the CPU,
+                 so a reply can differ slightly from a run without the cache (same quality:
+                 bench/results/2026-09-27-cache-parity).
+                 PROFILE, ranked by routing frequency, no eviction.
+strata generate: the profile fill asks for 256 pairs ahead (STRATA_FILL_AHEAD)
+strata generate: pre-filled 391 of 391 slots from the profile in 0.3 s (2688 MB/s); slot 0 verified
+strata generate: R4 hit path ON - resident experts are computed on the GPU
+strata generate: 4 expert-pool workers + the host thread
+strata generate: session is up (engine 0.1.41)
+strata generate: token graph hit path: 391 resident experts, decided on the device
+FileExpertSource: RAM budget 1.00 GiB: 532 of the 22.79 GiB of experts the GPU cache does not hold, by profile rank; the rest are read from the files
+FileExpertSource: allocating 1.00 GiB page-locked cache complement
+FileExpertSource: 3.44 GiB really free for a 1.00 GiB page-locked complement; the model files' cached pages were released: 7.02 GiB free
+FileExpertSource: copied cache complement through layer 8/48 (0.00 GiB, 0 s)
+FileExpertSource: copied cache complement through layer 16/48 (0.00 GiB, 0 s)
+FileExpertSource: copied cache complement through layer 24/48 (0.00 GiB, 0 s)
+FileExpertSource: copied cache complement through layer 32/48 (0.00 GiB, 0 s)
+FileExpertSource: copied cache complement through layer 40/48 (0.00 GiB, 0 s)
+FileExpertSource: copied cache complement through layer 48/48 (1.00 GiB, 1 s)
+FileExpertSource: mapped pinned cache complement ready: resident 1.00 GiB, pinned 1.00 GiB in 2 s; page-locked and mapped
+strata generate: resident RAM mode: 1.00 GiB of experts in RAM (page-locked), 391 in the GPU cache; adaptive swaps off
+strata generate: the file tier reads through the file cache (re-checked with the RAM copy built (1.00 GiB): 20.5 GiB available, 0.0 GiB of it still to be taken by the RAM copy, 22.4 GiB of experts read from the files: the file cache can keep the ones that come back)
+strata serve: the prompt path allocates its own buffers (too few cache slots to borrow)
+strata hc: CUDA0: the hyper-connection read runs as staged (the norm per token and stream, the down projection's activations staged ahead by cp.async); checked bit for bit against the plain read on this card (STRATA_HC_SPLIT=1 or 0 for the earlier ones)
+strata verify: window up to 4 tokens, 63.1 MiB of device buffers
+strata serve: 19733 MiB shared RAM available with everything loaded; 6144 MiB physical RAM headroom
+strata verify: capturing the 2-token window (19732 MiB of VRAM free)
+strata verify: captured the 2-token window (upload no error, sync no error)
+strata verify: capturing the 1-token window (19703 MiB of VRAM free)
+strata verify: captured the 1-token window (upload no error, sync no error)
+strata serve: STATE_DUMP_GDN path=/tmp/e5-coder-pinned-first-gdn/strata.gdn.bin cells=3 layers=36 occurrence=1 floats_per_layer=817152
+strata serve: STATE_HASH_GDN fd51f445f663bccc ef19f938b98a1916 e449fced4c9ccb4f 0299c0144f1bf013 cc5ec2692a1aaf64 58673efbe44fd45e 813fcdb1ca9eeaec e5e5f15e93c0919e 6396d2ed834fe98b 7cbdba5cbed4cd2d 76ec46b5abc8277b 44834a5bafe8950a 8706162968c7b02d 4611990c321ba2bf 268f9f3b01e87ff6 a422fb2daa7369ed 96bd3932d8750e96 6a88ba6eda93c151 6c33960c1311f40c 1ac61583a1698e15 6dc2cd185ed51ec1 9ab24ac6e4c666a9 ea68c8ec7cdd2cda 7605e8115f48b312 5c6282d649be93e1 f61107e07c9a7011 91814a792e61d580 ce21f1d8ae695c32 5b3f2b1a39c2589c eb8fa0e35cebe1f4 0d021af2131b6826 553a270be95f1af8 f74f330d2e4be3d6 eb4d92eac825cdb4 62dd523d984d5122 c21beb9914adafc7
+strata serve: ACCEPTED_PREFIX position=2 window=1 accepted_drafts=0 committed=1 tokens=4 state={STATE_HASH L=3 gdn=d5020f38ad7153a2 ple=b137497c6b6e4cec tail=2632f02798de6976 pooled=14650fb0739d0383 kv=dfe43d5947b4cb6e mtp=14650fb0739d0383 stale=011a3fe290018383 dead=2b0bf0a3ccd10f71 pooled_full=2b0bf0a3ccd10f71 ple_prev=2,3}
+strata serve: STATE_HASH_GDN fd51f445f663bccc ef19f938b98a1916 e449fced4c9ccb4f 0299c0144f1bf013 cc5ec2692a1aaf64 58673efbe44fd45e 813fcdb1ca9eeaec e5e5f15e93c0919e 6396d2ed834fe98b 7cbdba5cbed4cd2d 76ec46b5abc8277b 44834a5bafe8950a 8706162968c7b02d 4611990c321ba2bf 268f9f3b01e87ff6 a422fb2daa7369ed 96bd3932d8750e96 6a88ba6eda93c151 6c33960c1311f40c 1ac61583a1698e15 6dc2cd185ed51ec1 9ab24ac6e4c666a9 ea68c8ec7cdd2cda 7605e8115f48b312 5c6282d649be93e1 f61107e07c9a7011 91814a792e61d580 ce21f1d8ae695c32 5b3f2b1a39c2589c eb8fa0e35cebe1f4 0d021af2131b6826 553a270be95f1af8 f74f330d2e4be3d6 eb4d92eac825cdb4 62dd523d984d5122 c21beb9914adafc7
+strata serve: STATE_HASH L=3 gdn=d5020f38ad7153a2 ple=b137497c6b6e4cec tail=2632f02798de6976 pooled=14650fb0739d0383 kv=dfe43d5947b4cb6e mtp=14650fb0739d0383 stale=011a3fe290018383 dead=2b0bf0a3ccd10f71 pooled_full=2b0bf0a3ccd10f71 ple_prev=2,3
+strata serve: prompt 3 tokens = 0 reused + 3 read in 782 ms (3.8 tok/s), 1 generated in 951 ms (1.1 tok/s), drafts accepted 0 of 0, 0 checkpoints
+strata serve: decode expert cache hit rate: 3.1% (14 hits / 458 lookups); 22 more read by the GPU over PCIe or from another GPU (4.6% of all 480 routed)
+strata serve: resident RAM: 1.00 GiB of experts in RAM, 0 exchanged with the VRAM tier, 1087 blob reads from the file
+strata serve: expert tiers: GPU 14 hits this request; since the start RAM 57 blobs, files 1087 blobs 2919.8 MB read

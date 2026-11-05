@@ -593,8 +593,13 @@ numerical-oracle and held-out quality checks before making broader claims. With
 a bounded pinned complement and static cache, an eight-token pair later produced
 identical tokens on both backends while all accepted-prefix state fingerprints
 still differed beginning with the first committed token. This shows that token
-agreement does not close the persistent-state gate. See the [static pinned-PCIe
-state report](../../bench/results/2026-11-05-e5-mixed-static-one-token-pair/state-parity-8token-recheck/pinned-pcie1-1g-static/README.md).
+agreement does not close the persistent-state gate. A first-token GDN dump
+under that same static pinned profile found slice 0 exact, the first difference
+at serialized slice 1 (relative L2 `1.14e-5`), and global relative L2 `1.08e-2`
+across 36 GDN slices. This narrows the state trace target but does not assign a
+cause or model-layer mapping. See the [static pinned-PCIe state
+report](../../bench/results/2026-11-05-e5-mixed-static-one-token-pair/state-parity-8token-recheck/pinned-pcie1-1g-static/README.md)
+and [first-token GDN report](../../bench/results/2026-11-05-e5-mixed-static-one-token-pair/state-parity-8token-recheck/pinned-pcie1-1g-first-gdn/README.md).
 
 
 Execution note (2026-11-05): an exact owner capture of the layer-0 service
