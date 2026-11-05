@@ -8313,3 +8313,19 @@ in each pair (median −8.72%, interval −17.70% to −3.35%) and also regresse
 prompt TPS, TTFT and client time. Minimum available RAM was 8.52 GiB. The full
 configured-capacity sweep is complete, but it keeps actual prompt length at
 512 tokens and does not close E6. See the updated [capacity report](../../bench/results/2026-11-05-e6-coder-capacity-screen/README.md).
+
+**E6 Coder actual 8K-prompt screen (2026-11-05):** four order-balanced fresh-
+process pairs compared Strata and strict NInfer on the same Coder IQ1_M
+build/profile with an actual 8,192-token synthetic prompt and 16,384-token
+context. All eight outputs matched token-for-token (91 tokens) and passed the
+independent 11-case `is_prime` oracle; every pair recorded 1,470 resident hits
+from 33,213 lookups for both backends. NInfer decode changed −0.39% at the
+paired median (four-pair screening interval −0.61% to −0.08%). Prompt TPS
+changed +0.06%, first-token latency reduction was +0.06%, and client-time
+reduction +0.03%; those intervals span zero. Minimum available RAM was
+14.46 GiB and the six-GiB supervisor passed. Clocks were observed but
+uncontrolled, EMC readback was denied, and energy was not measured. The prompt
+uses unrelated filler before a held-out function task, so this is a synthetic
+length-controlled input, not natural long-form text. It shows no useful NInfer
+end-to-end gain and does not close E6/E7. See the
+[screen report](../../bench/results/2026-11-05-e6-coder-actual-prompt-screen/README.md).

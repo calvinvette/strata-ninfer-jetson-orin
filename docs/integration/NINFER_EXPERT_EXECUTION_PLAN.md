@@ -3604,3 +3604,21 @@ six-GiB supervisor passed. This screen does not establish long-prompt behavior.
 No configured-capacity cell supports a useful NInfer gain. E6/E7 remain open
 and no profile is promoted. See the [completed capacity screen](../../bench/results/2026-11-05-e6-coder-capacity-screen/README.md)
 and its per-cell records.
+
+### E6 Coder actual 8K-prompt screen (2026-11-05)
+
+Four order-balanced fresh-process pairs compared Strata and strict NInfer on
+the same Coder IQ1_M build/profile with an actual 8,192-token synthetic prompt
+and 16,384-token context. Each arm warmed up on the exact same prompt. All eight
+responses matched token-for-token (91 tokens) and passed the independent
+11-case `is_prime` oracle; both backends recorded 1,470 resident hits from
+33,213 lookups in every pair. NInfer decode changed −0.39% at the paired
+median (four-pair screening interval −0.61% to −0.08%). Prompt TPS changed
++0.06%, first-token latency reduction was +0.06%, and client-time reduction
++0.03%; the latter three intervals span zero. Minimum available RAM was
+14.46 GiB and the six-GiB supervisor passed. Clocks were observed but
+uncontrolled, EMC readback was denied, and energy was not measured. The prompt
+uses unrelated filler before the held-out function task, so it is a synthetic
+length-controlled workload rather than natural long-form input. This screen
+shows no useful NInfer end-to-end gain and does not close E6/E7. See the
+[8K-prompt report](../../bench/results/2026-11-05-e6-coder-actual-prompt-screen/README.md).
