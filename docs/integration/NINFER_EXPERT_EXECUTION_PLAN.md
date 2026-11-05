@@ -586,6 +586,17 @@ contains raw logs and a reusable comparator. E5 correctness is currently
 failing strict bitwise token/state parity for this Coder request; continue
 numerical-oracle and held-out quality checks before making broader claims.
 
+Execution note (2026-11-05): a natural short arithmetic prompt (“What is 2 +
+2? Respond with only the numeral.”) returned exact answer `4` and identical
+accepted token IDs on Strata and strict NInfer. Two fresh runs per backend had
+bit-identical GDN state within each backend, while the cross-backend state at
+accepted length 33 differed in 28,205,015/29,417,472 floats (global relative
+L2 `0.03626`); the first changed layer was 1 (`1.51e-9`), rising to `0.09134`
+at layer 23. The paired state delta repeated exactly. Thus the synthetic
+one-token mismatch does not imply every task's answer differs, but this
+successful answer does not qualify NInfer state behavior: no state-drift budget
+or task-quality bound exists. See the [natural-prompt state report](../../bench/results/2026-11-05-e5-coder-natural-prompt/README.md).
+
 1. Test held-out short and long requests, repeated continuation, retrieval and
    scoring, cancellation and recovery. Compare state and numerical results in
    addition to text. Retain original/default-route regression evidence.
