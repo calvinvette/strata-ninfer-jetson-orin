@@ -1,6 +1,6 @@
 # NInfer E7 release assessment
 
-Updated: 2026-11-04. Branch: `feat/ninfer-expert-e0`.
+Updated: 2026-11-05. Branch: `feat/ninfer-expert-e0`.
 
 ## 2026-11-04 long-prompt full-answer/final-state check
 
@@ -53,6 +53,28 @@ cases have direct evidence. The outcome does not imply support for other
 formats, live state migration, or general generation quality. One
 workload-specific TTFT effect is confirmed; a general performance-qualified
 release profile is **not achieved**.
+
+## 2026-11-05 corrected Coder E6 evidence
+
+The 2K Coder IQ1_M retrieval was rerun with `STRATA_PREFILL_CPU_SHARE=0`,
+matching the timing-screen environment. One instrumented request per backend
+selected identical ordered top-10 expert IDs at all 288 captured layer/position
+rows. Aggregate owners matched (86 resident GPU, 793 PCIe, 2,001 CPU/file), and
+the layer-16/position-2047 input and route weights matched bitwise. An earlier
+capture used default CPU prefill sharing and showed route changes; it is
+superseded and does not support a backend-induced route-divergence claim.
+
+A four-pair order-balanced 2K function-generation screen then matched all 91
+output tokens and passed the independent 11-case oracle in every Strata and
+NInfer arm. NInfer decode changed −1.49% (95% four-pair bootstrap interval
+−2.40% to −0.42%); full client-duration reduction was −0.13% with an interval
+spanning zero. This is another small negative screen, not a useful NInfer gain
+or an equivalence claim. It does not justify a release profile. The 30-minute
+NInfer soak remains unrun because no release profile has been nominated; E6
+performance, state/quality breadth, and E7 release gates remain open. See the
+[route/owner capture](../../bench/results/2026-11-05-e6-coder-retrieval-2k-static-pcie6g/owner-capture-all/README.md),
+[layer-16 capture](../../bench/results/2026-11-05-e6-coder-retrieval-2k-static-pcie6g/first-route-boundary/README.md),
+and [2K function-generation screen](../../bench/results/2026-11-05-e6-coder-2k-isprime-screen/README.md).
 
 ## Current integration decision
 
