@@ -1,0 +1,190 @@
+{
+  "schema": 1,
+  "study": "Failed order-balanced Coder IQ1_M 512-token prompt screen",
+  "date": "2026-11-05",
+  "hardware": "Jetson Orin AGX, SM87, CUDA 12.6",
+  "status": "failed; no performance estimate",
+  "intended_orders": [
+    [
+      "strata",
+      "ninfer"
+    ],
+    [
+      "ninfer",
+      "strata"
+    ],
+    [
+      "strata",
+      "ninfer"
+    ],
+    [
+      "ninfer",
+      "strata"
+    ]
+  ],
+  "prompt_tokens": 512,
+  "context_tokens": 1024,
+  "output_budget": 128,
+  "task": "held-out is_prime with 446 repeated unrelated filler tokens before the final instruction",
+  "identity": {
+    "binary_sha256": "df8e666b8d19dbdc5f687826b4d7187783f4c91aaf5ba2037497a65823d4be98",
+    "expert_profile_sha256": "c1e66c2e60ae8e7880befa303fb6bb79da1ccdd59895053eb95d433c648ef047",
+    "model_shards": [
+      {
+        "name": "Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "bytes": 29608446496,
+        "sha256": "e11083ba855e7666b48ea3f2db6a9c3a20c18751a012cc24f948de91b7087fad"
+      },
+      {
+        "name": "Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "bytes": 28800138432,
+        "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+      }
+    ],
+    "profile": "e0-coder-iq1m-layer1-first-profile.bin",
+    "runtime_options": {
+      "prefill_chunk": "64",
+      "context": "1024",
+      "spec": "2",
+      "prompt_cache": "0",
+      "prefill_cpu_share": 0,
+      "max_new": "128",
+      "warmup_tokens": 8
+    },
+    "prompt_ids_sha256": "1d4445d0256abf177efb9532159c7a42a91e013ee3ad008b2c450bcfe92a4fc2"
+  },
+  "supervision": {
+    "status": "fail",
+    "returncode": 1,
+    "floor_bytes": 6442450944,
+    "minimum_available_bytes": 22394220544,
+    "minimum_available_gib": 20.856243133544922,
+    "maximum_sampled_swap_bytes": 1937559552,
+    "oom_kill_count_start": 1,
+    "oom_kill_count_end": 1,
+    "elapsed_s": 497.4062712248415,
+    "clock_control": "none; dynamic clocks",
+    "emc_readback": "denied",
+    "energy": "not measured"
+  },
+  "completed_measurements": [
+    {
+      "block_file": "block-1-ninfer.log",
+      "backend": "ninfer",
+      "prompt_tokens": 512,
+      "prompt_ms": 17229.0,
+      "prompt_tps_logged": 29.7,
+      "generated_tokens": 89,
+      "decode_ms": 11392.0,
+      "decode_tps_logged": 7.8,
+      "drafts_accepted": 0,
+      "drafts_offered": 4,
+      "expert_hits": 146,
+      "expert_lookups": 4800,
+      "oracle_status": "not serialized; runner proceeded past quality validation"
+    },
+    {
+      "block_file": "block-1-strata.log",
+      "backend": "strata",
+      "prompt_tokens": 512,
+      "prompt_ms": 17544.0,
+      "prompt_tps_logged": 29.2,
+      "generated_tokens": 89,
+      "decode_ms": 12653.0,
+      "decode_tps_logged": 7.0,
+      "drafts_accepted": 0,
+      "drafts_offered": 4,
+      "expert_hits": 146,
+      "expert_lookups": 4800,
+      "oracle_status": "not serialized; runner proceeded past quality validation"
+    },
+    {
+      "block_file": "block-2-ninfer.log",
+      "backend": "ninfer",
+      "prompt_tokens": 512,
+      "prompt_ms": 17098.0,
+      "prompt_tps_logged": 29.9,
+      "generated_tokens": 89,
+      "decode_ms": 61346.0,
+      "decode_tps_logged": 1.5,
+      "drafts_accepted": 1,
+      "drafts_offered": 8,
+      "expert_hits": 146,
+      "expert_lookups": 4800,
+      "oracle_status": "not serialized; runner proceeded past quality validation"
+    },
+    {
+      "block_file": "block-2-strata.log",
+      "backend": "strata",
+      "prompt_tokens": 512,
+      "prompt_ms": 17372.0,
+      "prompt_tps_logged": 29.5,
+      "generated_tokens": 89,
+      "decode_ms": 12903.0,
+      "decode_tps_logged": 6.9,
+      "drafts_accepted": 0,
+      "drafts_offered": 4,
+      "expert_hits": 146,
+      "expert_lookups": 4800,
+      "oracle_status": "not serialized; runner proceeded past quality validation"
+    },
+    {
+      "block_file": "block-3-ninfer.log",
+      "backend": "ninfer",
+      "prompt_tokens": 512,
+      "prompt_ms": 17613.0,
+      "prompt_tps_logged": 29.1,
+      "generated_tokens": 89,
+      "decode_ms": 12890.0,
+      "decode_tps_logged": 6.9,
+      "drafts_accepted": 0,
+      "drafts_offered": 4,
+      "expert_hits": 146,
+      "expert_lookups": 4800,
+      "oracle_status": "not serialized; runner proceeded past quality validation"
+    },
+    {
+      "block_file": "block-3-strata.log",
+      "backend": "strata",
+      "prompt_tokens": 512,
+      "prompt_ms": 16986.0,
+      "prompt_tps_logged": 30.1,
+      "generated_tokens": 89,
+      "decode_ms": 11481.0,
+      "decode_tps_logged": 7.8,
+      "drafts_accepted": 0,
+      "drafts_offered": 4,
+      "expert_hits": 146,
+      "expert_lookups": 4800,
+      "oracle_status": "not serialized; runner proceeded past quality validation"
+    },
+    {
+      "block_file": "block-4-ninfer.log",
+      "backend": "ninfer",
+      "prompt_tokens": 512,
+      "prompt_ms": 17262.0,
+      "prompt_tps_logged": 29.7,
+      "generated_tokens": 91,
+      "decode_ms": 13153.0,
+      "decode_tps_logged": 6.9,
+      "drafts_accepted": 5,
+      "drafts_offered": 7,
+      "expert_hits": 146,
+      "expert_lookups": 4800,
+      "oracle_status": "restricted AST parser rejected syntax; executable cases not run"
+    }
+  ],
+  "failure": {
+    "block": 4,
+    "backend": "ninfer",
+    "generated_tokens": 91,
+    "cause": "run_is_prime_perf_screen.py raised RuntimeError: generated source uses syntax outside the safe arithmetic subset while evaluating compile_generated_function; the executable oracle did not run. The runner exited before writing aggregate results.json and before starting the block-4 Strata arm.",
+    "consequence": "Only three complete performance blocks were run. Per-arm engine log times exist, but exact token sequences, cross-backend token comparisons, client TTFT/duration, pair summaries, and bootstrap intervals were not serialized. Do not calculate or publish a backend performance effect from these partial logs."
+  },
+  "limits": [
+    "the recorded six accepted arms were individually accepted by the restricted AST oracle, but their paired token equality is unavailable",
+    "one completed NInfer request was a large decode outlier at 1.5 tok/s versus 6.9 tok/s for its Strata pair; cause unknown",
+    "the prompt contains synthetic repeated filler; it is not a natural long-context quality fixture",
+    "no performance claim or screen-level pass is made"
+  ]
+}

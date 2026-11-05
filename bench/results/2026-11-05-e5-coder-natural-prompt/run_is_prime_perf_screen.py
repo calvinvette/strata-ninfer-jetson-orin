@@ -77,8 +77,13 @@ def bootstrap_median(values: list[float], seed: int = 20261105, n_boot: int = 20
 
 def main() -> int:
     output = Path(sys.argv[1]).resolve()
-    order_arg = next((arg.split('=', 1)[1] for arg in sys.argv[2:]
+    cli_options = sys.argv[2:]
+    order_arg = next((arg.split('=', 1)[1] for arg in cli_options
                       if arg.startswith('--orders=')), None)
+    input_target = next((int(arg.split('=', 1)[1]) for arg in cli_options
+                         if arg.startswith('--input-tokens=')), None)
+    context_target = next((int(arg.split('=', 1)[1]) for arg in cli_options
+                           if arg.startswith('--context-tokens=')), None)
     if order_arg is None:
         rng = random.Random(20261105)
         orders = []
@@ -97,6 +102,8 @@ def main() -> int:
         if len(orders) < 4 or counts.get('strata', 0) != counts.get('ninfer', 0):
             raise ValueError('explicit screening order must have at least four pairs balanced by first backend')
         study = f'{len(orders)}-pair order-balanced same-profile Coder IQ1_M screen'
+    if input_target is not None:
+        study += f' at {input_target}-token prompt'
     output.mkdir(parents=True, exist_ok=False)
     command = json.loads(BASE.read_text())['command']
     index = next(i for i, value in enumerate(command)
@@ -105,10 +112,29 @@ def main() -> int:
     args = command[index + 1:].copy()
     del args[args.index('--tokens'):args.index('--tokens') + 2]
     args[args.index('--max-new') + 1] = '128'
+    if context_target is not None:
+        args[args.index('--max-context') + 1] = str(context_target)
     tokenizer_path = Path('/home/calvin/models/strata-orin-validation/pack/tokenizer')
     tokenizer = load_tokenizer(tokenizer_path)
     template = ChatTemplate(tokenizer_path / 'chat_template.jinja')
-    prompt = tokenizer.encode(template.render([{'role': 'user', 'content': TASK}],
+    if input_target is None:
+        user_content = TASK
+    else:
+        user_content = None
+        prefix = 'The following notes are unrelated. Ignore them and follow the final request. '
+        for filler_tokens in range(input_target * 3):
+            candidate = prefix + ' irrelevant' * filler_tokens + '\n\n' + TASK
+            candidate_ids = tokenizer.encode(
+                template.render([{'role': 'user', 'content': candidate}], enable_thinking=False),
+                parse_special=True)
+            if len(candidate_ids) == input_target:
+                user_content = candidate
+                break
+            if len(candidate_ids) > input_target:
+                break
+        if user_content is None:
+            raise RuntimeError(f'could not construct exact {input_target}-token prompt')
+    prompt = tokenizer.encode(template.render([{'role': 'user', 'content': user_content}],
                                              enable_thinking=False), parse_special=True)
     env = os.environ.copy()
     env['STRATA_PREFILL_CPU_SHARE'] = '0'
@@ -169,7 +195,10 @@ def main() -> int:
         'study': study,
         'primary_metric': 'server decode tokens/s; generated_tokens / decode_ms includes the first token',
         'warmup': 'one eight-token same-prompt request per fresh arm process; measured request follows in that process',
-        'context_tokens': 512, 'max_new': 128, 'prompt_tokens': len(prompt),
+        'context_tokens': int(args[args.index('--max-context') + 1]),
+        'max_new': 128, 'prompt_tokens': len(prompt),
+        'prompt_construction': ('exact-count unrelated filler followed by the held-out task'
+                                if input_target is not None else 'original exact 50-token held-out task'),
         'prompt_ids_sha256': hashlib.sha256(json.dumps(prompt, separators=(',', ':')).encode()).hexdigest(),
         'temperature': 0, 'accepted_prefix_trace': False, 'state_hash': False,
         'expert_profile_sha256': file_sha256(profile),

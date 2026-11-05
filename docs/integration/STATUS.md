@@ -120,6 +120,17 @@ observed. This single traced pair does not establish general trace invariance.
 Broader state and quality qualification remains open. See the
 [4K retrieval report](../../bench/results/2026-11-05-e5-coder-natural-prompt/retrieval-4k-final-only/README.md).
 
+**E6 failed Coder 512-token-prompt cell (2026-11-05):** the planned
+four-pair order-balanced screen at 1K context completed three pairs; all six
+responses passed the restricted-AST task check. The fourth NInfer response
+generated 91 tokens and the parser rejected its syntax before the executable
+oracle, so the runner exited before writing aggregates or starting the matched
+Strata arm. This is a failed cell, not a performance result. One completed
+NInfer arm logged 1.5 tok/s versus 6.9 tok/s for Strata; cause is unknown.
+Minimum available RAM was 20.86 GiB, swap peaked at 1.80 GiB, and the existing
+OOM-kill count stayed at one. See the
+[failure report](../../bench/results/2026-11-05-e6-coder-pp512-tg89-screen/README.md).
+
 **E6 order-balanced Coder IQ1_M screen (2026-11-05):** four pairs of the
 held-out 50-token `is_prime` prompt used two Strata-first and two NInfer-first
 pairs on the same binary/profile. All eight 89-token outputs and 11-case task
