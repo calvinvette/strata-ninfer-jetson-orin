@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **E0–E5 are complete for their documented bounded Q2_0 prototype scopes. E6 remains open and E7 has no release profile. Fixed-map trials show the 5K learned residency map improves strict-NInfer decode on held-out 512-token, 2K, 4K, 8K, 16K, 64K, 128K and 240K synthetic retrieval tasks; the 240K seven-pair confirmation measured +35.9% decode (paired bootstrap 95% interval +35.0% to +38.5%), while 128K measured +38.5%. Same-map Q2_0 backend screens now span actual prompts from 2K through 240K. None cleared the 5% decode gate with an interval excluding zero; the 8K outlier remains in the record. These are map-selection gains and do not establish an NInfer-kernel advantage. Mixed-codec Coder checks show a small layer-0 resident-kernel delta followed by larger divergence at a CPU-owned layer-1 MoE boundary; state tolerance and cause remain open. Broader task families, state/quality coverage and the E7 release assessment remain open. maestro1 HIP/SYCL results are x86 build-only; no device execution is claimed. Updated 2026-11-05.**
+Status: **E0–E5 are complete for their documented bounded Q2_0 prototype scopes. E6 remains open and E7 has no release profile. Fixed-map trials show the 5K learned residency map improves strict-NInfer decode on held-out 512-token, 2K, 4K, 8K, 16K, 64K, 128K and 240K synthetic retrieval tasks; the 240K seven-pair confirmation measured +35.9% decode (paired bootstrap 95% interval +35.0% to +38.5%), while 128K measured +38.5%. Same-map Q2_0 backend screens now span actual prompts from 2K through 240K. None cleared the 5% decode gate with an interval excluding zero; the 8K outlier remains in the record. These are map-selection gains and do not establish an NInfer-kernel advantage. Mixed-codec Coder checks show exact same-input parity for all ten sampled layer-1 GPU expert rows, while small activation differences produce larger output changes across the quantized operator; the upstream source and state budget remain open. Broader task families, state/quality coverage and the E7 release assessment remain open. maestro1 HIP/SYCL results are x86 build-only; no device execution is claimed. Updated 2026-11-05.**
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -615,15 +615,17 @@ Execution note (2026-11-05): a direct layer-boundary capture on the same
 combined output within relative L2 `6.31e-8` and `3.50e-8`, respectively. At
 prompt position 41, layer 1 received inputs differing by `3.80e-7`, but its
 expert parts and combined MoE output differed by `1.18e-3` and `1.334e-3`.
-The 256-slot static map had only layer-0 entries, so layer-1 routes were CPU
-misses; the logged layer-1 dispatch marker is not evidence of GPU NInfer
-execution for those rows. A separate same-input operator oracle for one
-captured layer-1 expert returned bit-exact NInfer/Strata grouped results on
-both service input rows, but does not cover the CPU miss path. Quantization
-sensitivity is a plausible explanation, not established causality. This
-narrows the mixed-codec Coder state investigation but does not set a state
-tolerance or pass E5's broader correctness gate. See the [layer-boundary
-report](../../bench/results/2026-11-05-e5-coder-natural-prompt/README.md#prompt-position-41-layer-boundary-capture).
+The owner trace records GPU/foresight ownership for all ten layer-1 experts;
+startup reports a 391-slot cache after memory sizing. For both captured
+service inputs, all ten outputs match Strata's native grouped GPU oracle
+bitwise, and the NInfer same-input kernel oracle also passes all twenty rows.
+However, replaying the native grouped kernel on the two slightly different
+inputs changes each expert output by relative L2 `2.36e-4`–`1.75e-3`. This
+points to amplification of an upstream activation difference rather than an
+NInfer-versus-Strata operator discrepancy for fixed inputs. The source of that
+input difference, the exact quantization interaction and an acceptable state
+budget remain open; the broader E5 correctness gate is not passed. See the
+[layer-boundary report](../../bench/results/2026-11-05-e5-coder-natural-prompt/README.md#prompt-position-41-layer-boundary-capture).
 
 1. Test held-out short and long requests, repeated continuation, retrieval and
    scoring, cancellation and recovery. Compare state and numerical results in

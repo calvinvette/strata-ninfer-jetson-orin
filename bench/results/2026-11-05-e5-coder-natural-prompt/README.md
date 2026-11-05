@@ -142,33 +142,47 @@ The GDN raw output at layer 1 remained close (`7.55e-8` relative L2) at that
 position. Later sampled MoE boundaries show the difference growing through
 the remaining network; layer 21 and layer 47 also had changed route IDs.
 
-The pair used the same 256-slot static profile. Its top 256 entries cover
-layer 0, so all ten layer-1 experts at position 41 were CPU misses; the
-service's layer-1 NInfer dispatch line does not mean those expert rows ran on
-the NInfer GPU kernels. A separate actual-weight oracle for layer 1/expert
-198, run on each backend's captured layer-1 input, dispatched the NInfer CUDA
-operator and matched the Strata grouped reference bitwise for both inputs,
-including all hidden Q8_1 bytes. That oracle checks the operator on fixed
-inputs, not the service's CPU-miss path. The evidence therefore places a
-small difference at the resident layer-0 output and a much larger change at a
-subsequent CPU-owned MoE boundary, but does not yet prove the mechanism. Input
-quantization sensitivity is a candidate explanation, not a demonstrated
-cause; do not attribute this amplification to an NInfer kernel defect.
+The owner capture corrects the initial CPU-miss interpretation: all ten layer-1
+routes at position 41 have owner kind `0` (primary VRAM/foresight), and the
+captured activation is marked invalid because there are no CPU-owned experts.
+The engine log reports 391 allocated slots; the `--expert-cache 256` request
+was raised by memory sizing. Thus the row did run through GPU expert execution,
+and the layer-1 dispatch marker corresponds to actual work in this prompt
+prefill.
 
-The supervised boundary pair passed with minimum available RAM 21.36 GiB;
-the pre-existing cgroup OOM-kill count remained one. The GPU clock was observed
-at 306 MHz, CPU clocks varied, EMC readback was denied, and energy was not
-measured. These are functional diagnostics; their timings are excluded. The
-structured data are in [`moe-comparison.json`](moe-boundaries-pos41/moe-comparison.json),
-[`diag-comparison.json`](gdn-layer1-diag/diag-comparison.json) and
-[`layer1-expert198-service-input-oracle/results.json`](layer1-expert198-service-input-oracle/results.json).
-Supervisor memory/clock evidence is in
-[`supervisor-moe-boundaries-pos41/result.json`](supervisor-moe-boundaries-pos41/result.json)
-and [`supervisor-layer1-expert198-service-input-oracle/result.json`](supervisor-layer1-expert198-service-input-oracle/result.json).
+Independent same-input checks cover all ten routed layer-1 experts for both
+service activations (20 checks total). In every case the service expert output
+is bit-identical to Strata's native grouped GPU oracle, and the NInfer
+grouped-kernel oracle is bit-identical to that same reference (`0/2560` output
+values changed; hidden Q8_1 bytes also match). Yet replaying the native grouped
+GPU operation on the two slightly different service inputs changes each
+expert output by relative L2 `2.36e-4` to `1.75e-3`, matching the direction and
+scale of the service bundle differences. This is strong evidence that the
+layer-1 divergence is driven by the changed activation entering the experts,
+not an NInfer-versus-Strata kernel mismatch for a fixed input. The exact source
+of the small upstream activation difference and its interaction with expert
+quantization remain open; the Q8_1 boundary mechanism has not been independently
+proven.
+
+The owner-capture service pair passed with minimum available RAM 20.88 GiB;
+the independent grouped-kernel oracle retained 24.32 GiB minimum. The
+pre-existing cgroup OOM-kill count remained one. The GPU clock was observed at
+306 MHz, CPU clocks varied, EMC readback was denied, and energy was not
+measured. These functional diagnostics' timings are excluded. Structured data
+are in [`moe-comparison.json`](moe-cpu-owner-pos41/moe-comparison.json),
+[`owner.jsonl`](moe-cpu-owner-pos41/strata.moe-owner.jsonl),
+[`layer1-gpu-input-oracle/results.json`](layer1-gpu-input-oracle/results.json),
+[`diag-comparison.json`](gdn-layer1-diag/diag-comparison.json) and the
+[single-expert check](layer1-expert198-service-input-oracle/results.json).
+Supervisor metadata is in
+[`supervisor-moe-cpu-owner-pos41/result.json`](supervisor-moe-cpu-owner-pos41/result.json)
+and [`supervisor-layer1-gpu-input-oracle/result.json`](supervisor-layer1-gpu-input-oracle/result.json).
 Reproduction helpers are [`run_gdn_layer_diag_pair.py`](run_gdn_layer_diag_pair.py),
-[`run_layer1_expert_input_oracle.py`](run_layer1_expert_input_oracle.py), and
+[`run_layer1_expert_input_oracle.py`](run_layer1_expert_input_oracle.py),
+[`run_layer1_gpu_input_oracle.py`](run_layer1_gpu_input_oracle.py), and
 [`compare_gdn_layer_diag.py`](../../../tools/integration/compare_gdn_layer_diag.py).
-Raw GDN, MoE and activation captures remain local and are excluded from Git.
+Large GDN/MoE captures and generated weight/output arrays remain local and are
+excluded from Git.
 
 ### Independent oracle for a resident mixed-codec service row
 

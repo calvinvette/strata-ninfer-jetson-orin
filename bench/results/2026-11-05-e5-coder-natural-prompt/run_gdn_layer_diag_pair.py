@@ -59,6 +59,12 @@ def main() -> int:
         env = base_env.copy()
         env['STRATA_VERIFY_DUMP_GDN_PATH'] = str(prefix.with_suffix('.gdn-diag').resolve())
         env['STRATA_VERIFY_DUMP_MOE_BUNDLE_PATH'] = str(prefix.with_suffix('.moe-bundle').resolve())
+        env['STRATA_CAPTURE_MOE_PATH'] = str(prefix.with_suffix('.moe-owner.jsonl').resolve())
+        env['STRATA_CAPTURE_MOE_LAYER'] = '1'
+        env['STRATA_CAPTURE_MOE_POSITION'] = '41'
+        env['STRATA_CAPTURE_MOE_ROWS'] = '1'
+        env['STRATA_CAPTURE_MOE_OUTPUT_PATH'] = str(prefix.with_suffix('.moe-cpu-output.jsonl').resolve())
+        env['STRATA_CAPTURE_MOE_OUTPUT_LAYER'] = '1'
         log = prefix.with_suffix('.log')
         engine = StrataEngine(executable, arm_args, cwd=str(ROOT), log=str(log), env=env)
         try:
@@ -67,12 +73,17 @@ def main() -> int:
             diag = prefix.with_suffix('.gdn-diag')
             raw_o = Path(str(diag) + '.o')
             bundle = prefix.with_suffix('.moe-bundle')
+            owner = prefix.with_suffix('.moe-owner.jsonl')
+            cpu_output = prefix.with_suffix('.moe-cpu-output.jsonl')
             arms.append({
                 'backend': backend, 'token_ids': ids, 'finish': engine.last,
                 'diag_file': diag.name, 'diag_sha256': hashlib.sha256(diag.read_bytes()).hexdigest(),
                 'raw_o_file': raw_o.name, 'raw_o_sha256': hashlib.sha256(raw_o.read_bytes()).hexdigest(),
                 'moe_bundle_file': bundle.name,
                 'moe_bundle_sha256': hashlib.sha256(bundle.read_bytes()).hexdigest(),
+                'moe_owner_file': owner.name, 'moe_owner_sha256': hashlib.sha256(owner.read_bytes()).hexdigest(),
+                'moe_cpu_output_file': cpu_output.name,
+                'moe_cpu_output_sha256': hashlib.sha256(cpu_output.read_bytes()).hexdigest(),
                 'log_file': log.name,
             })
         finally:
