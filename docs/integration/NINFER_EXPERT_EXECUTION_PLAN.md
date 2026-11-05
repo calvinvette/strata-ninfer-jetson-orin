@@ -562,6 +562,30 @@ layer, prefill and staged-expert behavior still need qualification. See the
 Use the numerical policy below throughout implementation; this stage completes
 the model and service gates and expands beyond the initial static profile.
 
+Execution note (2026-11-05): with `STRATA_PREFILL_CPU_SHARE=0` and matching
+static profiles, two Coder IQ1_M Strata/strict-NInfer one-token pairs returned
+token `5` in all four arms. One pair on the actual ISTA IQ3_S artifact returned
+token `4` in both arms. Each strict request logged all seven tuple routes.
+Minimum available memory was 19.28–19.62 GiB for Coder and 18.96–19.11 GiB
+for ISTA, above the 6 GiB floor; the pre-existing OOM counter did not change.
+This is one manual prompt and one output token per request, not quality or state
+parity. These earlier checks used the one-shot CLI path and did not emit
+final-state fingerprints. A later service-path capture materially disagreed:
+on the same Coder prompt IDs, Strata returned token `4` while strict NInfer
+returned `5`, and persistent-state fingerprints differed. An eight-token pair
+also differed at its first token and at every accepted-prefix state. The service
+comparison supersedes the CLI smoke for parity claims. All-layer verifier
+captures show bit-identical layer-0 inputs and route IDs/weights; captured
+layer-0 expert parts differ by relative L2 `5.83e-8`–`7.14e-8`, followed by
+first activation differences at layer 1 of `7.11e-8`–`8.40e-8` relative L2.
+This localizes a small arithmetic delta after layer 0 but does not establish
+why the sampled token changes or its task-quality impact; see the
+[paired mixed-codec check](../../bench/results/2026-11-05-e5-mixed-static-one-token-pair/README.md).
+The [service state diagnostic](../../bench/results/2026-11-05-e5-mixed-static-one-token-pair/state-parity-8token-recheck/README.md)
+contains raw logs and a reusable comparator. E5 correctness is currently
+failing strict bitwise token/state parity for this Coder request; continue
+numerical-oracle and held-out quality checks before making broader claims.
+
 1. Test held-out short and long requests, repeated continuation, retrieval and
    scoring, cancellation and recovery. Compare state and numerical results in
    addition to text. Retain original/default-route regression evidence.

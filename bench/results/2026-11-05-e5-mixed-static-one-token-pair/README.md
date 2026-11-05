@@ -1,0 +1,50 @@
+# Mixed-codec one-token Strata/NInfer check
+
+Date: 2026-11-05. Jetson Orin AGX, SM87, CUDA 12.6. This is a small E5
+functional check after all seven mixed IQ/Q2_0 tuples gained CUDA resident
+routes. It is not an answer-quality suite or a performance experiment.
+
+## Controlled arms
+
+Both backends used the same model artifact, token-ID prompt `1,2,3`, matching
+model pack and expert profile, the same respective `--expert-cache` setting,
+`--prefill 64`,
+512-token context, one generated token, greedy sampling and MTP-2. The only
+backend difference was `--expert-backend strata` versus strict
+`--expert-backend ninfer`. `STRATA_PREFILL_CPU_SHARE=0` was set in both arms to
+keep prompt expert ownership fixed.
+
+| Artifact | Strata outputs | Strict NInfer outputs | NInfer tuple dispatch | Minimum available RAM |
+| --- | --- | --- | --- | ---: |
+| Coder IQ1_M, 256 experts | `5`, `5` | `5`, `5` | All seven, layers 0, 1, 2, 12, 17, 21, 47 | 19.28–19.62 GiB |
+| ISTA IQ3_S, 512 experts | `4` | `4` | All seven, layers 0, 1, 2, 12, 17, 21, 47 | 18.96–19.11 GiB |
+
+All six supervised commands exited successfully. The pre-existing cgroup
+OOM-kill count remained one in every run; none of these runs incremented it.
+The raw commands, memory samples and logs are retained in the per-arm
+subdirectories. No throughput, latency or energy effect is inferred from these
+single-request checks; clocks were uncontrolled and CPU prefill sharing was
+explicitly disabled.
+
+## Limits and next gate
+
+These runs compare one generated token for one manual token-ID prompt per
+artifact, not natural prompts, held-out tasks or useful-answer quality. They
+do not compare accepted-prefix state or final persistent-state fingerprints.
+`STRATA_STATE_HASH=1` and `STRATA_PROMPT_BOUNDARY_STATE_HASH=1` were tried in
+separate direct one-shot CLI invocations, but this path emitted no fingerprint;
+use the service capture path or another validated state-dump path before
+claiming state parity. Earlier exploratory invocations with CPU prefill sharing
+left at its default and with diagnostic environment hooks produced varying
+one-token outputs; they are not used as controlled evidence here. The fixed
+CPU-share-off pairs were repeatable for Coder across two processes per arm.
+
+The result supports a narrow claim about the direct one-shot CLI path only:
+with fixed ownership, strict NInfer traversed the complete mixed-codec model
+and matched Strata's one-token output for these exact prompts on both artifacts.
+It does not establish service parity. A later service `GEN` path comparison on
+the same Coder prompt IDs returned different first tokens and persistent state
+for Strata and strict NInfer; see the [state diagnostic](state-parity-8token-recheck/README.md).
+E5 remains open for localization and correction, held-out quality, longer
+state parity, cancellation and recovery. E6/E7 performance and release gates
+remain open.
