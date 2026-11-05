@@ -3380,13 +3380,14 @@ does not establish intermediate state equality without tracing. Cancellation,
 broader mixed-codec quality and a declared numerical tolerance remain open.
 See the [continuation/recovery report](../../bench/results/2026-11-05-e5-coder-natural-prompt/continuation-recovery/README.md).
 
-Execution note (2026-11-05): one guarded 8K Coder retrieval trace pair returned
-the exact answer and token IDs and matched all 11 final-state fields. All shared
-accepted-prefix hashes matched at committed lengths 1, 2, 3 and 6; the last
-verifier commit accepted three tokens, leaving interior lengths 4 and 5
-unsampled. Minimum available RAM was 20.70 GiB and the existing OOM-kill count
-did not change. This is a single instrumented state check, not repeatability,
-trace-invariance or performance evidence. See the [trace report](../../bench/results/2026-11-05-e5-coder-natural-prompt/retrieval-8k-trace/README.md).
+Execution note (2026-11-05): two guarded 8K Coder retrieval trace pairs
+returned the exact answer and token IDs and matched all 11 final-state fields.
+All shared accepted-prefix hashes matched at committed lengths 1, 2, 3 and 6
+in both runs; the last verifier commit accepted three tokens, leaving interior
+lengths 4 and 5 unsampled. Minimum available RAM was 20.70–20.99 GiB and the
+existing OOM-kill count did not change. This establishes repeatability only at
+sampled boundaries under this diagnostic setting, not trace invariance or
+performance. See the [trace report](../../bench/results/2026-11-05-e5-coder-natural-prompt/retrieval-8k-trace/README.md).
 Keep mixed-codec E5 open pending additional tasks, sampled prefix validation
 and broader profiles. See the [arithmetic recheck](../../bench/results/2026-11-05-e5-coder-natural-prompt/arithmetic-final-only/README.md).
 
