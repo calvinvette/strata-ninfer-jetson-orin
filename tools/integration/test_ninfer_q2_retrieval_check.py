@@ -10,6 +10,7 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from ninfer_q2_retrieval_check import (parse_gdn_commit_layer,
                                        repeated_staged_backend_arms,
+                                       select_expert_backend,
                                        staged_backend_arms)
 
 
@@ -44,6 +45,28 @@ class StagedBackendOrderTests(unittest.TestCase):
     def test_same_backend_repeat_rejects_unknown_backend(self):
         with self.assertRaises(ValueError):
             repeated_staged_backend_arms('other')
+
+
+class ExpertBackendSelectionTests(unittest.TestCase):
+    def test_ninfer_arm_is_explicit_and_strict(self):
+        self.assertEqual(select_expert_backend(
+            ['--expert-backend', 'strata', '--prefill', '128'], 'ninfer'),
+            ['--expert-backend', 'ninfer', '--prefill', '128',
+             '--expert-backend-strict'])
+
+    def test_strata_arm_removes_strict_mode(self):
+        self.assertEqual(select_expert_backend(
+            ['--expert-backend', 'ninfer', '--expert-backend-strict'], 'strata'),
+            ['--expert-backend', 'strata'])
+
+    def test_backend_is_added_when_config_omits_it(self):
+        self.assertEqual(select_expert_backend(['--prefill', '128'], 'ninfer'),
+                         ['--prefill', '128', '--expert-backend', 'ninfer',
+                          '--expert-backend-strict'])
+
+    def test_rejects_unknown_backend(self):
+        with self.assertRaises(ValueError):
+            select_expert_backend([], 'other')
 
 
 if __name__ == '__main__':

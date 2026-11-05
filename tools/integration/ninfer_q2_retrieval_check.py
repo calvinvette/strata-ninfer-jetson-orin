@@ -43,6 +43,23 @@ def repeated_staged_backend_arms(backend: str) -> tuple[tuple[str, str, int], ..
             (f'{backend}-repeat-2', backend, 0))
 
 
+def select_expert_backend(args: list[str], backend: str) -> list[str]:
+    """Set each comparison arm explicitly, including strict NInfer dispatch."""
+    if backend not in ('strata', 'ninfer'):
+        raise ValueError("backend must be 'strata' or 'ninfer'")
+    result = list(args)
+    if '--expert-backend' in result:
+        result[result.index('--expert-backend') + 1] = backend
+    else:
+        result += ['--expert-backend', backend]
+    if backend == 'ninfer':
+        if '--expert-backend-strict' not in result:
+            result.append('--expert-backend-strict')
+    elif '--expert-backend-strict' in result:
+        result.remove('--expert-backend-strict')
+    return result
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--config', type=Path, required=True)
@@ -281,11 +298,7 @@ def main() -> int:
     for name, backend, window in arms:
         log = a.output / f'{name}.log'
         command = args_for(cfg, window, disable_adaptive_swaps=True)
-        if backend == 'strata':
-            if '--expert-backend' in command:
-                command[command.index('--expert-backend') + 1] = 'strata'
-            if '--expert-backend-strict' in command:
-                command.remove('--expert-backend-strict')
+        command = select_expert_backend(command, backend)
         staged_mode = (a.compare_cpu_miss_staged or a.compare_staged_backends or
                        a.repeat_staged_backend is not None)
         if staged_mode and '--pcie-frac' in command:
