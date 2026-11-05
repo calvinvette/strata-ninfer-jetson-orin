@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **E0–E5 are complete for their documented bounded Q2_0 prototype scopes. E6 remains open and E7 has no release profile. Fixed-map trials show the 5K learned residency map improves strict-NInfer decode on held-out 512-token, 2K, 4K, 8K, 16K, 64K, 128K and 240K synthetic retrieval tasks; the 240K seven-pair confirmation measured +35.9% decode (paired bootstrap 95% interval +35.0% to +38.5%), while 128K measured +38.5%. Same-map Q2_0 backend screens now span actual prompts from 2K through 240K. None cleared the 5% decode gate with an interval excluding zero; the 8K outlier remains in the record. These are map-selection gains and do not establish an NInfer-kernel advantage. A Coder IQ1_M IQ4_NL down-projection reduction difference was corrected to match Strata's native arithmetic. Same-input operator checks now pass for one routed expert in all 48 layers across seven codec tuples; one paired service capture is exact across every MoE field in all 48 layers, and repeated pinned-PCIe plus natural-prompt state checks pass. A three-pair Coder IQ1_M `is_prime` screen matched all 89 output tokens and passed its 11-case oracle, but measured only +0.49% median decode change (screen interval −0.64% to +7.28%); all pairs ran NInfer first, so order is unbalanced. This does not show a useful speedup. A subsequent four-pair order-balanced screen also matched tokens and task checks but measured −0.37% median decode change (four-pair bootstrap interval −67.25% to −0.05%); one NInfer arm was a severe retained outlier. This did not meet the 5% gain gate and does not justify confirmation. The first 512-token-prompt Coder screen at a 1K context did not complete because the restricted-AST oracle rejected syntax that its task needed; its partial arm times do not form a performance estimate. After the oracle was safely extended, a fresh four-pair order-balanced screen matched all 89 output tokens and passed all task checks, but measured −0.11% median decode change (screen interval −10.60% to +13.43%), below the useful-gain gate. No confirmation is indicated. Broader mixed-codec task/context, performance and state/quality limits remain open. maestro1 HIP/SYCL results are x86 build-only; no device execution is claimed. Updated 2026-11-05.**
+Status: **E0–E5 are complete for their documented bounded Q2_0 prototype scopes. E6 remains open and E7 has no release profile. Fixed-map trials show the 5K learned residency map improves strict-NInfer decode on held-out 512-token, 2K, 4K, 8K, 16K, 64K, 128K and 240K synthetic retrieval tasks; the 240K seven-pair confirmation measured +35.9% decode (paired bootstrap 95% interval +35.0% to +38.5%), while 128K measured +38.5%. Same-map Q2_0 backend screens now span actual prompts from 2K through 240K. None cleared the 5% decode gate with an interval excluding zero; the 8K outlier remains in the record. These are map-selection gains and do not establish an NInfer-kernel advantage. A Coder IQ1_M IQ4_NL down-projection reduction difference was corrected to match Strata's native arithmetic. Same-input operator checks now pass for one routed expert in all 48 layers across seven codec tuples; one paired service capture is exact across every MoE field in all 48 layers, and repeated pinned-PCIe plus natural-prompt state checks pass. A three-pair Coder IQ1_M `is_prime` screen matched all 89 output tokens and passed its 11-case oracle, but measured only +0.49% median decode change (screen interval −0.64% to +7.28%); all pairs ran NInfer first, so order is unbalanced. This does not show a useful speedup. A subsequent four-pair order-balanced screen also matched tokens and task checks but measured −0.37% median decode change (four-pair bootstrap interval −67.25% to −0.05%); one NInfer arm was a severe retained outlier. This did not meet the 5% gain gate and does not justify confirmation. The first 512-token-prompt Coder screen at a 1K context did not complete because the restricted-AST oracle rejected syntax that its task needed; its partial arm times do not form a performance estimate. After the oracle was safely extended, a fresh four-pair order-balanced screen matched all 89 output tokens and passed all task checks, but measured −0.11% median decode change (screen interval −10.60% to +13.43%), below the useful-gain gate. A further corrected 2K Coder retrieval diagnostic matched ordered expert IDs in all 288 layer/position rows and matched layer-16 router input/weights bitwise. Four balanced 2K `is_prime` pairs passed all 11 function cases and matched all 91 output tokens; NInfer decode changed −1.49% (bootstrap 95% interval −2.40% to −0.42%), with no useful gain. No confirmation is indicated. Broader mixed-codec task/context, performance and state/quality limits remain open. maestro1 HIP/SYCL results are x86 build-only; no device execution is claimed. Updated 2026-11-05.**
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -3558,20 +3558,23 @@ does not measure performance or cover other contexts/policies. See the
 
 ### E6 route-selection follow-up (2026-11-05)
 
-An instrumented rerun of the 2K Coder retrieval under a static six-GiB
-complement captured all 48 layers for Strata and strict NInfer. Both outputs
-matched exactly, as did aggregate route-owner totals (86 resident GPU, 792
-PCIe, 2,002 CPU/file). The selected expert sets differed at 72 of 288 aligned
-layer/position rows and ordered top-10 IDs differed at 179 rows. Static
-per-expert ownership was stable for every expert selected by both arms, but
-the arms did not execute identical routed work. Natural-generation performance
-screens therefore mix kernel effects with backend-induced route changes even
-when output tokens and aggregate owner counters match.
+A corrected instrumented rerun of the 2K Coder retrieval matched the timing
+screen's `STRATA_PREFILL_CPU_SHARE=0` setting. Across 288 rows in 48 layers,
+Strata and strict NInfer selected identical ordered top-10 expert IDs and had
+identical owner totals (86 resident GPU, 793 PCIe, 2,001 CPU/file). At layer
+16, position 2,047, the 2,560-value MoE input and all ten router weights were
+bit-identical. Both services returned the same six-token answer. An earlier
+capture that inherited the default CPU prefill sharing showed route divergence;
+it did not match the benchmark setting and is superseded.
 
-Next, add an opt-in verifier route replay using captured IDs and router weights,
-then compare backend arithmetic on identical route inputs and verify persistent
-state/output behavior. The current route diagnostic does not capture weights;
-the existing verifier dump is single-layer and is not a route override. Keep
-this replay diagnostic separate from same-day natural-generation E6 screens,
-which remain necessary for product-level performance. See the
-[owner capture report](../../bench/results/2026-11-05-e6-coder-retrieval-2k-static-pcie6g/owner-capture-all/README.md).
+This removes a route-selection confound for the corrected single-task screen;
+it does not qualify a general numerical or performance result. The 2K screen
+remains below the 5% useful-effect threshold. A subsequent four-pair, order-
+balanced 2K `is_prime` function-generation screen under the same static profile
+matched all 91 generated token IDs and passed the 11-case oracle in every arm.
+NInfer decode was −1.49% (95% four-pair bootstrap interval −2.40% to −0.42%);
+full client duration reduction was −0.13%, with its interval spanning zero.
+No useful NInfer gain was demonstrated. See the [screen report](../../bench/results/2026-11-05-e6-coder-2k-isprime-screen/README.md).
+The static owner map report and layer-16 route/input report are linked here: [all-layer
+capture](../../bench/results/2026-11-05-e6-coder-retrieval-2k-static-pcie6g/owner-capture-all/README.md),
+[layer-16 capture](../../bench/results/2026-11-05-e6-coder-retrieval-2k-static-pcie6g/first-route-boundary/README.md).

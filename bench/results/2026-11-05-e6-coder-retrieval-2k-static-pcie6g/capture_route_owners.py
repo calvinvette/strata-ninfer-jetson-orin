@@ -76,7 +76,7 @@ def main() -> int:
             arm_args.append('--expert-backend-strict')
         capture = output / f'{backend}-all-layer-routes.jsonl'
         env = os.environ.copy()
-        env.update({'STRATA_RESIDENT_HEADROOM_GIB': '6',
+        env.update({'STRATA_RESIDENT_HEADROOM_GIB': '6', 'STRATA_PREFILL_CPU_SHARE': '0',
                     'STRATA_CAPTURE_MOE_PATH': str(capture),
                     'STRATA_CAPTURE_MOE_LAYER': '-1',
                     'STRATA_CAPTURE_MOE_ROWS': '4096'})

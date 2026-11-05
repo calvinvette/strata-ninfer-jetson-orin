@@ -84,6 +84,11 @@ def bootstrap_median(values: list[float], seed: int = 20261105, n_boot: int = 20
 def main() -> int:
     output = Path(sys.argv[1]).resolve()
     cli_options = sys.argv[2:]
+    staged_budget = next((float(arg.split('=', 1)[1]) for arg in cli_options
+                          if arg.startswith('--staged-pcie-gib=')), None)
+    static_owner = '--static-owner' in cli_options
+    cli_options = [arg for arg in cli_options
+                   if not arg.startswith('--staged-pcie-gib=') and arg != '--static-owner']
     order_arg = next((arg.split('=', 1)[1] for arg in cli_options
                       if arg.startswith('--orders=')), None)
     input_target = next((int(arg.split('=', 1)[1]) for arg in cli_options
@@ -110,6 +115,8 @@ def main() -> int:
         study = f'{len(orders)}-pair order-balanced same-profile Coder IQ1_M screen'
     if input_target is not None:
         study += f' at {input_target}-token prompt'
+    if staged_budget is not None:
+        study += f' with {staged_budget:g} GiB static PCIe complement'
     output.mkdir(parents=True, exist_ok=False)
     command = json.loads(BASE.read_text())['command']
     index = next(i for i, value in enumerate(command)
@@ -120,6 +127,12 @@ def main() -> int:
     args[args.index('--max-new') + 1] = '128'
     if context_target is not None:
         args[args.index('--max-context') + 1] = str(context_target)
+    if staged_budget is not None:
+        args.extend(['--pcie-frac', '1.0', '--resident-budget-gib', f'{staged_budget:g}'])
+    if static_owner:
+        if staged_budget is None:
+            raise ValueError('--static-owner requires --staged-pcie-gib=GIB')
+        args.extend(['--adapt-every', '0'])
     tokenizer_path = Path('/home/calvin/models/strata-orin-validation/pack/tokenizer')
     tokenizer = load_tokenizer(tokenizer_path)
     template = ChatTemplate(tokenizer_path / 'chat_template.jinja')
@@ -144,6 +157,8 @@ def main() -> int:
                                              enable_thinking=False), parse_special=True)
     env = os.environ.copy()
     env['STRATA_PREFILL_CPU_SHARE'] = '0'
+    if staged_budget is not None:
+        env['STRATA_RESIDENT_HEADROOM_GIB'] = '6'
     profile = Path(args[args.index('--expert-profile') + 1])
     models = [Path(args[args.index(flag) + 1]) for flag in ('--native', '--ple-gguf')]
     blocks = []
@@ -229,7 +244,11 @@ def main() -> int:
                             'context': args[args.index('--max-context') + 1],
                             'spec': args[args.index('--spec') + 1],
                             'prompt_cache': args[args.index('--prompt-cache') + 1],
-                            'prefill_cpu_share': 0},
+                            'prefill_cpu_share': 0,
+                            'pcie_frac': '1.0' if staged_budget is not None else '0.55',
+                            'resident_budget_gib': staged_budget,
+                            'resident_headroom_gib': 6 if staged_budget is not None else None,
+                            'adapt_every': '0' if static_owner else '4 (default)'},
         'orders': orders, 'blocks': blocks, 'paired_quality': pairs, 'summary': summaries,
         'status': ('complete_quality_pass' if all(
             p['tokens_equal'] and p['quality_pass_both'] for p in pairs
