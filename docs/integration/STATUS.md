@@ -46,6 +46,24 @@ remain open. See the
 
 # Integration status
 
+NInfer expert execution follow-up (2026-11-04): the CUDA-only opt-in backend now
+has a second experimental codec tuple, IQ2_S gate/up plus IQ4_NL down at
+2560/640. On actual Coder IQ1_M layer-2/expert-174 weights and a captured
+activation, its grouped dispatch count was one; gate/up and hidden Q8_1 matched
+Strata exactly, and final output relative L2 was `8.77e-8`. A nonstrict Coder
+IQ1_M service request logged this dispatch at layer 2, while unsupported pairs
+fell back. Strict mode rejected layer 0's IQ3_XXS/IQ4_NL pair. The tuple occurs
+at 15 layers in the Coder and original IQ3_S inventories, but only layer 2 on
+Coder has a direct operator/service check; the IQ3_S artifact has not been run
+through this backend. This is partial codec coverage, not whole-model support,
+quality qualification or a performance result. Minimum sampled available RAM
+was 21.72 GiB in the nonstrict request and 21.20 GiB in the strict rejection;
+both stayed above the 6 GiB floor, with no increase from the pre-existing
+cgroup OOM-kill count of one. The implementation follows the NInfer grouped
+schedule but decodes GGUF bytes and leaves routing/merge semantics in Strata.
+HIP/SYCL builds remain unverified for this shared CMake change because maestro1
+has only 1.0 GiB free. See the [operator/service report](../../bench/results/2026-11-04-e4-iq2s-iq4nl-service-smoke/README.md).
+
 **E0/E6 Q2_0 Nsight kernel inventory (2026-10-31):** CUDA graph-node tracing confirmed that the NInfer Q2_0 grouped D3/D4 and SwiGLU kernels ran on the strict backend. Their combined duration was 287 ms across one warmup and one 32-token measured request, 0.95% of the CUDA kernel interval union. Summed kernel events overlap by only 105 ms out of 30.25 seconds in the NInfer trace, so the corrected GPU-active-time share remains 0.95%. This is not a request wall-time fraction or end-to-end ceiling; CPU/GPU overlap and profiler overhead remain, and Strata type-42 matmuls are not separated by dense versus expert work. Large wait-flag and dequantization activity also remains. The limited kernel share makes a large service gain from optimizing only these kernels unlikely for this short workload, but does not close E6 or justify a release profile. [Diagnostic report](../../bench/results/2026-10-31-e6-q2-ninfer-kernel-share-diagnostic/README.md).
 
 **E6 4K-cache longer-prompt backend follow-up (2026-10-31):** a three-pair pp2048+tg128 natural-stop retrieval/arithmetic screen compared Strata and strict NInfer at the same 4K cache. All six outputs matched the exact ordered codes and suffix sum, naturally stopping at 47 tokens. Decode TPS, the primary metric, was tied (0.00% paired median; 95% three-pair interval −2.47% to +1.15%); prompt/TTFT/client medians favored NInfer slightly but intervals were wide and crossed zero. No metric met the 5% screen. [Report](../../bench/results/2026-10-31-e6-q2-ninfer-backend-4k-pp2048-tg128-screen/README.md).
@@ -641,8 +659,11 @@ which had one output mismatch. See the [256K 512-token report](../../bench/resul
 The [NInfer expert execution plan](NINFER_EXPERT_EXECUTION_PLAN.md) is now in
 progress: E0 is complete for bounded controls and Q2_0 timing; E1–E4 have
 bounded Q2_0 prototype evidence, including 3/64/128-token grouped parity
-checks, while
-E4 leaves mixed-codec Coder IQ1_M and ISTA-DASLab IQ3_S unsupported; E5 is
+checks. E4 now also has experimental CUDA IQ2_S/IQ4_NL tuple support at
+2560/640, verified on Coder IQ1_M layer 2/expert 174 and exercised in one
+nonstrict request; the mixed-codec Coder IQ1_M and ISTA-DASLab IQ3_S models
+remain only partially supported, with strict mode rejecting unsupported pairs.
+E5 is
 complete for a bounded static Q2_0 profile, with passing MTP-2/MTP-4
 cancellation-state checks and
 MTP-off-versus-MTP-2/MTP-4 accepted-prefix parity runs, plus a three-request

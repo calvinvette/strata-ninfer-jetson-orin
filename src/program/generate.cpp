@@ -46,6 +46,9 @@
 #if defined(STRATA_NINFER_Q2_CUDA)
 #include "strata/kernels/ninfer_q2_expert.hpp"
 #endif
+#if defined(STRATA_NINFER_IQ_CUDA)
+#include "strata/kernels/ninfer_iq_expert.hpp"
+#endif
 #include "strata/kernels/s2_expert_grouped.hpp"
 #include "strata/kernels/sampler.hpp"
 #include "strata/kernels/verify_kernels.hpp"
@@ -1115,7 +1118,7 @@ void usage() {
                  "                       with --expert-cache-per-layer: 54.4%% hits, CPU pool drain 19.1 -> 10.3\n"
                  "                       ms/token, -2.7 ms/token end to end.\n"
                  "  --expert-backend strata|ninfer  select resident expert compute (default strata; NInfer supports\n"
-                 "                       CUDA Q2_0/Q2_0 Flash-Next 2560/640 only; unsupported pairs fall back)\n"
+                 "                       CUDA Q2_0/Q2_0 and IQ2_S/IQ4_NL Flash-Next 2560/640; unsupported pairs fall back)\n"
                  "  --expert-backend-strict  with ninfer, reject unsupported codec/geometry instead of fallback\n"
                  "  --expert-cache-device1 N|auto  fill CUDA1 with N experts or as many as fit\n"
                  "  --expert-cache-device2 N|auto  fill CUDA2 with more experts\n"
@@ -2667,6 +2670,9 @@ int main(int argc, char** argv) {
     }
 #else
     strata::kernels::ninfer_q2_0_expert_backend_set(o.expert_backend == "ninfer", o.expert_backend_strict);
+#if defined(STRATA_NINFER_IQ_CUDA)
+    strata::kernels::ninfer_iq2s_iq4nl_backend_set(o.expert_backend == "ninfer");
+#endif
 #endif
     if (o.remote_expert_opt && !o.serve) {
         std::fprintf(stderr, "strata generate: --remote-expert-opt requires --serve\n");

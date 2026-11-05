@@ -126,9 +126,8 @@ from another architecture or quantization cannot substitute.
 E0 is complete for the bounded controls and current Q2_0 timing audit; E1–E4
 have bounded Q2_0 prototype evidence. E5 has MTP-2/MTP-4 cancellation,
 accepted-prefix, continuation/recovery and short retrieval/arithmetic evidence.
-E4 explicitly leaves the mixed-codec
-Coder IQ1_M and ISTA-DASLab IQ3_S models unsupported by
-the NInfer selector; E5 is complete for the bounded single-live static Q2_0
+E4 leaves the mixed-codec Coder IQ1_M and ISTA-DASLab IQ3_S models only
+partially supported by the NInfer selector; E5 is complete for the bounded single-live static Q2_0
 profile, with cross-backend state migration, adaptive residency and broader
 quality coverage explicitly excluded. E6's 1K–256K context screen is complete. Added 2K and 8K configured-capacity pp512+tg64 screens also show no median effect at or above 5%; E6 overall remains open pending broader confirmation and quality gates.
 After a grouped SwiGLU precision correction, one short-request 6-GiB staged
@@ -476,35 +475,38 @@ and [seven-pair confirmation](../../bench/results/2026-10-25-phase-e3-q2-ninfer-
    token/expert entries. The initial operator screen was slower than Strata;
    no fusion or performance claim is made.
 3. Header-only inventories identify exact expert codec pairs in Coder IQ1_M
-   and ISTA-DASLab IQ3_S. Both are mixed-codec; their full-model expert routes
-   are explicitly unsupported by the current Q2_0-only selector. The exact
-   Q2_0 artifact remains the only supported codec pair in this prototype. NInfer's reference sparse-MoE contract instead admits its packed Q4G64/Q5G64,
-   Q4G64/Q6G64 and W8G32/W8G32 profiles; these are not byte/layout-compatible
-   with the GGUF IQ2_S/IQ3_S/IQ3_XXS/IQ4_XS gate/up and Q2_0/IQ4_NL down tensors.
-   Extending model support requires adding and independently validating those
-   GGUF codecs in an adapted schedule, rather than passing their pointers to the
-   unmodified sparse-MoE operator. See the [codec boundary map](IMPORT_MAP.md#keep-the-negative-results).
+   and ISTA-DASLab IQ3_S. Both are mixed-codec. The CUDA selector now supports
+   IQ2_S/IQ4_NL at the exact 2560/640 geometry, with real-weight operator
+   parity and one Coder IQ1_M service dispatch; the other six observed tuple
+   pairs remain unsupported. The Q2_0 artifact remains the only fully
+   supported model. NInfer's original sparse-MoE packed Q4/Q5/W8 layouts are
+   not byte-compatible with these GGUF codecs. See the [codec boundary map](IMPORT_MAP.md#keep-the-negative-results).
 4. Publish the current model/codec, shape, residency and backend capability
-   table. HIP/SYCL runtime cells remain unsupported/unqualified; no shared
-   backend implementation was changed in E4.
+   table. HIP/SYCL runtime cells remain unsupported/unqualified; the new mixed
+   tuple implementation is CUDA-only.
 
 **Exit:** the bounded Q2_0 shape and codec result and explicit partial status for
 the other target variants are recorded in
 [E4 model and shape coverage](../../bench/results/2026-10-25-phase-e4-model-codec-coverage/README.md).
-Only the Q2_0/Q2_0 artifact has functional adapter coverage, and it is not
-performance-qualified. The other model variants are explicitly unsupported.
+The Q2_0/Q2_0 artifact has the only complete-model functional adapter coverage
+and is not performance-qualified. Mixed IQ1_M/IQ3_S have only experimental
+IQ2_S/IQ4_NL tuple coverage; they remain incomplete and are not performance-qualified.
 64/128-token throughput, mixed-codec support and HIP/SYCL qualification remain
 open; this stage closes with partial model support as allowed by its exit.
 
 Execution note (2026-11-04): Coder IQ1_M layer 2 is now pinned as a real-weight
-baseline for the first shared mixed tuple, IQ2_S/IQ4_NL. The existing Strata
-parity harness passed both a generated-input check and a held service activation
-for expert 174; its FP64 projection reference uses GGML `to_float` weights. This
-does not exercise NInfer-derived code. A separate IQ2_S scalar decoder and an
-IQ4_NL nibble decoder matched GGML `to_float` bit-for-bit for all 4,915,200
-values in that expert. The canonical codebook values are shared with GGML, so
-this qualifies traversal/layout rather than independent codebook provenance.
-See the [real-weight baseline](../../bench/results/2026-11-04-e4-iq2s-iq4nl-realweight-baseline/README.md).
+baseline for the first shared mixed tuple, IQ2_S/IQ4_NL. A scalar IQ2_S and
+IQ4_NL decoder matched GGML `to_float` bit-for-bit for all 4,915,200 values in
+expert 174; canonical codebook values are shared with GGML. The new grouped
+CUDA adapter was then exercised on the same expert and a captured service
+activation: gate/up intermediates and hidden Q8_1 bytes matched Strata exactly;
+the final output relative L2 was `8.77e-8`, with one candidate dispatch. A
+nonstrict full-model request logged that layer-2 resident dispatch, while
+falling back on unsupported pairs. Strict mode rejected the model at layer 0
+(IQ3_XXS/IQ4_NL), as intended. This qualifies one operator tuple and one
+service route, not complete IQ1_M or IQ3_S support, request quality, or a
+performance benefit. See the [real-weight baseline](../../bench/results/2026-11-04-e4-iq2s-iq4nl-realweight-baseline/README.md)
+and [service/operator report](../../bench/results/2026-11-04-e4-iq2s-iq4nl-service-smoke/README.md).
 
 ### E5 — Qualify numerical behavior and useful execution policies
 

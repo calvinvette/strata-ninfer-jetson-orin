@@ -16,6 +16,9 @@
 #if defined(STRATA_NINFER_Q2_CUDA)
 #include "strata/kernels/ninfer_q2_expert.hpp"
 #endif
+#if defined(STRATA_NINFER_IQ_CUDA)
+#include "strata/kernels/ninfer_iq_expert.hpp"
+#endif
 #include "strata/kernels/cpu/expert_layout.hpp"
 #include "strata/kernels/bf16_gemv.hpp"
 #include "strata/kernels/native_router.hpp"
@@ -2779,6 +2782,17 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                 const auto& f = lay.fmt[(size_t) l];
                 const NativeExpertLayout L = native_expert_layout(f.gu_type, f.d_type, f.n_embd, f.n_ff);
 #if defined(STRATA_NINFER_Q2_CUDA)
+                if (ninfer_iq2s_iq4nl_backend_enabled() && f.gu_type == 22 && f.d_type == 20 &&
+                    f.n_embd == 2560 && f.n_ff == 640) {
+                    if (ninfer_iq2s_iq4nl_dispatch_count() == 0) {
+                        std::fprintf(stderr, "strata verify: queued NInfer IQ2_S/IQ4_NL resident grouped dispatch at layer "
+                                             "%lld (CUDA IQ2_S/IQ4_NL, 2560/640)\n", (long long) l);
+                    }
+                    ninfer_iq2s_iq4nl_expert_grouped(L, gp, gs, gn, p_dst, p_tok, cap, cap,
+                                                      nat_xq_ + (size_t) tb * (N / 32) * 36,
+                                                      hit_scratch_, dst_buf, cs, gy);
+                    return true;
+                }
                 if (ninfer_q2_0_expert_backend_enabled()) {
                     if (f.gu_type == 42 && f.d_type == 42 && f.n_embd == 2560 && f.n_ff == 640) {
                         if (ninfer_q2_0_expert_dispatch_count() == 0) {
@@ -2798,7 +2812,7 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                     }
                     static bool warned = false;
                     if (!warned) {
-                        std::fprintf(stderr, "strata verify: NInfer Q2_0 backend fell back to Strata for unsupported "
+                        std::fprintf(stderr, "strata verify: NInfer expert backend fell back to Strata for unsupported "
                                              "expert codec/geometry (layer %lld)\n", (long long) l);
                         warned = true;
                     }
