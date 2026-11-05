@@ -612,6 +612,16 @@ performance result. Minimum available RAM was 14.66 GiB, sampled swap peaked
 at 1.64 GiB and the existing OOM-kill count stayed at one. See the
 [scoring report](../../bench/results/2026-11-05-e5-coder-natural-prompt/is-prime-scoring/README.md).
 
+Execution note (2026-11-05): a second teacher-forced sequence from the held-out
+Coder `is_even` task covered all 64 next-token targets after the exact 44-token
+prompt. All 21 generated answer-token scores were identical, with total log
+probability `-0.122645558`, 100% top-1 agreement and 100% top-10 overlap. The
+canonical profile recorded 117/480 resident hits in each arm. Minimum
+available RAM was 14.67 GiB; the existing OOM-kill count stayed at one. Two
+short tasks now show exact score parity at these sampled routes, but do not
+define a general quality tolerance or close E5's state/quality gates. See the
+[is_even scoring report](../../bench/results/2026-11-05-e5-coder-natural-prompt/is-even-scoring/README.md).
+
 
 Execution note (2026-11-05): an exact owner capture of the layer-0 service
 row at position 2 found four primary-GPU/foresight experts and six CPU experts

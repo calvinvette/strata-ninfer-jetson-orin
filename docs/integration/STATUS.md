@@ -58,6 +58,16 @@ instrumentation was not used for performance. This bounds score parity for one
 sequence and the observed routes; mixed-codec quality/state limits remain open.
 See the [scoring report](../../bench/results/2026-11-05-e5-coder-natural-prompt/is-prime-scoring/README.md).
 
+A second teacher-forced check used the independently validated 21-token
+`is_even` function after its exact 44-token prompt. All 64 target rows were
+covered, and Strata/NInfer score files again matched byte-for-byte; answer
+logprob totals were `-0.122645558`, with 100% top-1 agreement and top-10
+overlap. The canonical profile logged 117/480 resident hits in both arms.
+Minimum available RAM was 14.67 GiB and the existing OOM-kill count stayed at
+one. Together these two short Coder checks show no measurable scoring delta on
+the tested sequences, while leaving broader quality and persistent-state
+qualification open. See the [score report](../../bench/results/2026-11-05-e5-coder-natural-prompt/is-even-scoring/README.md).
+
 **E5 4K mixed-codec Coder retrieval (2026-11-05):** two fresh final-only
 Strata/strict-NInfer pairs used a 4,096-token active-ticket retrieval prompt
 under an 8,192-token context reservation. All four responses returned
