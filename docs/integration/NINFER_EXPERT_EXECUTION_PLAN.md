@@ -618,6 +618,25 @@ one bounded distribution-score point, not bitwise logit parity. See the
 [ISTA IQ3_S report](../../bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-even/README.md)
 and [score report](../../bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-even-scoring/README.md).
 
+Execution note (2026-11-05): a longer ISTA IQ3_S `is_prime` task returned the
+same 91 token IDs and passed all 11 executable oracle cases in two fresh
+pairs. However, recurrent state was not equal: the first shared endpoint
+differed in `stale` at token 32 and in live state at token 33; final GDN, PLE,
+tail, pooled, pooled-full and KV hashes differed in both pairs. Each backend's
+token and state trace was repeatable across the fresh runs. Minimum available
+RAM was 19.74 and 19.64 GiB, sampled swap peaked at 1.79 and 1.83 GiB, and the
+existing OOM-kill count stayed at one. The initial harness attempt was
+incomplete because its restricted AST oracle rejected the generated `for`,
+`range`, `int` and power syntax; after allowing only those constructs, the
+captured code passed and both backend pairs completed. This confirms task
+output parity while failing persistent-state parity on this task. It does not
+close broad E5 quality/state gates. Teacher-forced scoring of the same answer
+covered 140 next-token targets; serialized records matched at target-logprob
+precision 1e-9 and top-k precision 1e-6, with 100% top-1 agreement and top-10
+overlap. This does not establish bitwise logit parity or erase the state
+mismatch. See the [ISTA long-task report](../../bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-prime/README.md)
+and [scoring report](../../bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-prime-scoring/README.md).
+
 Execution note (2026-11-05): teacher-forced scoring of the validated 89-token
 Coder `is_prime` answer after its exact 50-token prompt produced byte-identical
 Strata and strict-NInfer score records for all 138 next-token targets at

@@ -64,6 +64,22 @@ was 19.71 GiB and the existing OOM-kill count stayed at one. See the
 [ISTA task report](../../bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-even/README.md)
 and [scoring report](../../bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-even-scoring/README.md).
 
+An additional longer ISTA IQ3_S `is_prime` task emitted the same 91 token IDs
+and passed the 11-case oracle in two fresh pairs. State drift was repeatable:
+the first shared-boundary difference was `stale` at token 32, live fields
+first differed at token 33, and final GDN, PLE, tail, pooled, pooled-full and
+KV hashes differed in both pairs. Each backend reproduced its own state at
+shared endpoints across the two runs. Minimum available RAM was 19.74 and
+19.64 GiB; peak swap was 1.79 and 1.83 GiB, with the existing OOM-kill count
+unchanged. This shows the short `is_even` parity point does not generalize to
+all task lengths, despite identical generated code and oracle outcomes. No
+performance conclusion follows. A teacher-forced follow-up covered all 140
+next-token targets for the same sequence; serialized scores matched at the
+logger precision (target log-probabilities to nine decimals, top-k values to
+six), with 100% top-1 and top-10 overlap. This is scoring evidence only and
+does not erase the state mismatch. See the [long-task report](../../bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-prime/README.md)
+and [score report](../../bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-prime-scoring/README.md).
+
 **E5 Coder teacher-forced scoring (2026-11-05):** the validated 89-token
 `is_prime` answer was teacher-forced after its exact 50-token prompt using the
 canonical Coder profile. Strata and strict NInfer produced byte-identical
