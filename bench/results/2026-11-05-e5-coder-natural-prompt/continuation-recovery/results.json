@@ -1,0 +1,721 @@
+{
+  "date": "2026-11-05",
+  "hardware": "Jetson Orin AGX, CUDA 12.6",
+  "task": "generate the existing is_prime Coder task in three same-engine request segments",
+  "prompt_tokens": 50,
+  "prompt_token_ids_sha256": "9826ad790e7bed1b6b24685a85298f222c5cf563f8565e6fba82dfaeeac87915",
+  "request_token_budgets": [
+    32,
+    32,
+    32
+  ],
+  "context_reservation": 4096,
+  "model_shards": [
+    {
+      "name": "Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+      "bytes": 29608446496,
+      "sha256": "e11083ba855e7666b48ea3f2db6a9c3a20c18751a012cc24f948de91b7087fad"
+    },
+    {
+      "name": "Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+      "bytes": 28800138432,
+      "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+    }
+  ],
+  "binary_sha256": "df8e666b8d19dbdc5f687826b4d7187783f4c91aaf5ba2037497a65823d4be98",
+  "profile_sha256": "c1e66c2e60ae8e7880befa303fb6bb79da1ccdd59895053eb95d433c648ef047",
+  "experiments": [
+    {
+      "label": "mtp4-accepted-prefix-trace",
+      "mtp_window": 4,
+      "accepted_prefix_trace": true,
+      "quality_pass_both": true,
+      "full_token_ids_equal": true,
+      "full_output_tokens": 89,
+      "full_output_token_ids_sha256": "70ddb7d7606fd66fb195c8484b701d3fe3d5e16854467d275597dd6b7dd6b5cf",
+      "wrapper_status": "fail",
+      "wrapper_returncode": 1,
+      "minimum_available_gib": 20.94812774658203,
+      "maximum_swap_gib": 1.3774337768554688,
+      "oom_kill_counts": [
+        1
+      ],
+      "requests": [
+        {
+          "ordinal": 1,
+          "token_ids_equal": true,
+          "final_state_equal": false,
+          "trace_checkpoint_count": 28,
+          "trace_mismatch_count": 2,
+          "first_trace_mismatch_token": 25,
+          "last_trace_mismatch_token": 32,
+          "backend_final_states": {
+            "strata": {
+              "L": "81",
+              "gdn": "871c6ce712d1b5f5",
+              "ple": "2ff79f479156e3cb",
+              "tail": "f9c35cabe7bc9cac",
+              "pooled": "5f2a3d5c269411e3",
+              "kv": "13f181e91fa86fe3",
+              "mtp": "14650fb0739d0383",
+              "stale": "8ee822a18ad1554b",
+              "dead": "dc4b75fe160a5f32",
+              "pooled_full": "99e00b0425bdcc6a",
+              "ple_prev": "285,460"
+            },
+            "ninfer": {
+              "L": "81",
+              "gdn": "871c6ce712d1b5f5",
+              "ple": "2ff79f479156e3cb",
+              "tail": "f9c35cabe7bc9cac",
+              "pooled": "5f2a3d5c269411e3",
+              "kv": "13f181e91fa86fe3",
+              "mtp": "14650fb0739d0383",
+              "stale": "9b733d05768dd336",
+              "dead": "dc4b75fe160a5f32",
+              "pooled_full": "99e00b0425bdcc6a",
+              "ple_prev": "285,460"
+            }
+          },
+          "per_backend": {
+            "strata": {
+              "generated_tokens": 32,
+              "finish": "length",
+              "drafts_accepted": 3,
+              "drafts_offered": 8
+            },
+            "ninfer": {
+              "generated_tokens": 32,
+              "finish": "length",
+              "drafts_accepted": 3,
+              "drafts_offered": 7
+            }
+          }
+        },
+        {
+          "ordinal": 2,
+          "token_ids_equal": true,
+          "final_state_equal": false,
+          "trace_checkpoint_count": 28,
+          "trace_mismatch_count": 25,
+          "first_trace_mismatch_token": 5,
+          "last_trace_mismatch_token": 32,
+          "backend_final_states": {
+            "strata": {
+              "L": "113",
+              "gdn": "97257672569c01b6",
+              "ple": "903014b7dd8c4259",
+              "tail": "7ad7d45eb7ae7dd9",
+              "pooled": "fcc61a35cadf3184",
+              "kv": "3ebdda5c95f910ec",
+              "mtp": "14650fb0739d0383",
+              "stale": "3452ac1b08ca8383",
+              "dead": "21635497d4b12c5b",
+              "pooled_full": "30624d2855bb9360",
+              "ple_prev": "25,198"
+            },
+            "ninfer": {
+              "L": "113",
+              "gdn": "f365ee5d58ce0534",
+              "ple": "3a031dbf1a39a8f6",
+              "tail": "7fde775933feeaa7",
+              "pooled": "eaf2effd16f55ee6",
+              "kv": "a798c1671e68ad50",
+              "mtp": "14650fb0739d0383",
+              "stale": "3452ac1b08ca8383",
+              "dead": "21635497d4b12c5b",
+              "pooled_full": "b2d5f4c6898da02a",
+              "ple_prev": "25,198"
+            }
+          },
+          "per_backend": {
+            "strata": {
+              "generated_tokens": 32,
+              "finish": "length",
+              "drafts_accepted": 4,
+              "drafts_offered": 9
+            },
+            "ninfer": {
+              "generated_tokens": 32,
+              "finish": "length",
+              "drafts_accepted": 4,
+              "drafts_offered": 6
+            }
+          }
+        },
+        {
+          "ordinal": 3,
+          "token_ids_equal": true,
+          "final_state_equal": false,
+          "trace_checkpoint_count": 23,
+          "trace_mismatch_count": 14,
+          "first_trace_mismatch_token": 4,
+          "last_trace_mismatch_token": 25,
+          "backend_final_states": {
+            "strata": {
+              "L": "138",
+              "gdn": "10963890919e8473",
+              "ple": "75785f9294909fea",
+              "tail": "3c4be5d91c0c08ac",
+              "pooled": "60537000ee5aa24c",
+              "kv": "c80be58dafc32553",
+              "mtp": "14650fb0739d0383",
+              "stale": "3c6fd5ba150977a0",
+              "dead": "21635497d4b12c5b",
+              "pooled_full": "e358701cace6b9d8",
+              "ple_prev": "198,71093"
+            },
+            "ninfer": {
+              "L": "138",
+              "gdn": "ef93a3770f5f6a6f",
+              "ple": "a6ad17ec88099bcb",
+              "tail": "aeff3cd756c9d1b4",
+              "pooled": "6ef275a50cf735bc",
+              "kv": "10469653758e33d1",
+              "mtp": "14650fb0739d0383",
+              "stale": "98f3d8744a51b3b5",
+              "dead": "21635497d4b12c5b",
+              "pooled_full": "c4c6bdac2a35ec3c",
+              "ple_prev": "198,71093"
+            }
+          },
+          "per_backend": {
+            "strata": {
+              "generated_tokens": 25,
+              "finish": "stop",
+              "drafts_accepted": 2,
+              "drafts_offered": 12
+            },
+            "ninfer": {
+              "generated_tokens": 25,
+              "finish": "stop",
+              "drafts_accepted": 2,
+              "drafts_offered": 8
+            }
+          }
+        }
+      ],
+      "all_request_boundary_states_equal": false,
+      "all_common_trace_prefix_states_equal": false
+    },
+    {
+      "label": "mtp2-accepted-prefix-trace",
+      "mtp_window": 2,
+      "accepted_prefix_trace": true,
+      "quality_pass_both": true,
+      "full_token_ids_equal": true,
+      "full_output_tokens": 89,
+      "full_output_token_ids_sha256": "70ddb7d7606fd66fb195c8484b701d3fe3d5e16854467d275597dd6b7dd6b5cf",
+      "wrapper_status": "fail",
+      "wrapper_returncode": 1,
+      "minimum_available_gib": 21.029449462890625,
+      "maximum_swap_gib": 1.2299728393554688,
+      "oom_kill_counts": [
+        1
+      ],
+      "requests": [
+        {
+          "ordinal": 1,
+          "token_ids_equal": true,
+          "final_state_equal": false,
+          "trace_checkpoint_count": 28,
+          "trace_mismatch_count": 2,
+          "first_trace_mismatch_token": 25,
+          "last_trace_mismatch_token": 32,
+          "backend_final_states": {
+            "strata": {
+              "L": "81",
+              "gdn": "871c6ce712d1b5f5",
+              "ple": "2ff79f479156e3cb",
+              "tail": "f9c35cabe7bc9cac",
+              "pooled": "5f2a3d5c269411e3",
+              "kv": "13f181e91fa86fe3",
+              "mtp": "14650fb0739d0383",
+              "stale": "8ee822a18ad1554b",
+              "dead": "dc4b75fe160a5f32",
+              "pooled_full": "99e00b0425bdcc6a",
+              "ple_prev": "285,460"
+            },
+            "ninfer": {
+              "L": "81",
+              "gdn": "871c6ce712d1b5f5",
+              "ple": "2ff79f479156e3cb",
+              "tail": "f9c35cabe7bc9cac",
+              "pooled": "5f2a3d5c269411e3",
+              "kv": "13f181e91fa86fe3",
+              "mtp": "14650fb0739d0383",
+              "stale": "9b733d05768dd336",
+              "dead": "dc4b75fe160a5f32",
+              "pooled_full": "99e00b0425bdcc6a",
+              "ple_prev": "285,460"
+            }
+          },
+          "per_backend": {
+            "strata": {
+              "generated_tokens": 32,
+              "finish": "length",
+              "drafts_accepted": 3,
+              "drafts_offered": 8
+            },
+            "ninfer": {
+              "generated_tokens": 32,
+              "finish": "length",
+              "drafts_accepted": 3,
+              "drafts_offered": 7
+            }
+          }
+        },
+        {
+          "ordinal": 2,
+          "token_ids_equal": true,
+          "final_state_equal": false,
+          "trace_checkpoint_count": 28,
+          "trace_mismatch_count": 25,
+          "first_trace_mismatch_token": 5,
+          "last_trace_mismatch_token": 32,
+          "backend_final_states": {
+            "strata": {
+              "L": "113",
+              "gdn": "97257672569c01b6",
+              "ple": "903014b7dd8c4259",
+              "tail": "7ad7d45eb7ae7dd9",
+              "pooled": "fcc61a35cadf3184",
+              "kv": "3ebdda5c95f910ec",
+              "mtp": "14650fb0739d0383",
+              "stale": "3452ac1b08ca8383",
+              "dead": "21635497d4b12c5b",
+              "pooled_full": "30624d2855bb9360",
+              "ple_prev": "25,198"
+            },
+            "ninfer": {
+              "L": "113",
+              "gdn": "f365ee5d58ce0534",
+              "ple": "3a031dbf1a39a8f6",
+              "tail": "7fde775933feeaa7",
+              "pooled": "eaf2effd16f55ee6",
+              "kv": "a798c1671e68ad50",
+              "mtp": "14650fb0739d0383",
+              "stale": "3452ac1b08ca8383",
+              "dead": "21635497d4b12c5b",
+              "pooled_full": "b2d5f4c6898da02a",
+              "ple_prev": "25,198"
+            }
+          },
+          "per_backend": {
+            "strata": {
+              "generated_tokens": 32,
+              "finish": "length",
+              "drafts_accepted": 4,
+              "drafts_offered": 9
+            },
+            "ninfer": {
+              "generated_tokens": 32,
+              "finish": "length",
+              "drafts_accepted": 4,
+              "drafts_offered": 6
+            }
+          }
+        },
+        {
+          "ordinal": 3,
+          "token_ids_equal": true,
+          "final_state_equal": false,
+          "trace_checkpoint_count": 23,
+          "trace_mismatch_count": 14,
+          "first_trace_mismatch_token": 4,
+          "last_trace_mismatch_token": 25,
+          "backend_final_states": {
+            "strata": {
+              "L": "138",
+              "gdn": "10963890919e8473",
+              "ple": "75785f9294909fea",
+              "tail": "3c4be5d91c0c08ac",
+              "pooled": "60537000ee5aa24c",
+              "kv": "c80be58dafc32553",
+              "mtp": "14650fb0739d0383",
+              "stale": "e5462c6ba2f44646",
+              "dead": "21635497d4b12c5b",
+              "pooled_full": "e358701cace6b9d8",
+              "ple_prev": "198,71093"
+            },
+            "ninfer": {
+              "L": "138",
+              "gdn": "ef93a3770f5f6a6f",
+              "ple": "a6ad17ec88099bcb",
+              "tail": "aeff3cd756c9d1b4",
+              "pooled": "6ef275a50cf735bc",
+              "kv": "10469653758e33d1",
+              "mtp": "14650fb0739d0383",
+              "stale": "98f3d8744a51b3b5",
+              "dead": "21635497d4b12c5b",
+              "pooled_full": "c4c6bdac2a35ec3c",
+              "ple_prev": "198,71093"
+            }
+          },
+          "per_backend": {
+            "strata": {
+              "generated_tokens": 25,
+              "finish": "stop",
+              "drafts_accepted": 2,
+              "drafts_offered": 11
+            },
+            "ninfer": {
+              "generated_tokens": 25,
+              "finish": "stop",
+              "drafts_accepted": 2,
+              "drafts_offered": 8
+            }
+          }
+        }
+      ],
+      "all_request_boundary_states_equal": false,
+      "all_common_trace_prefix_states_equal": false
+    },
+    {
+      "label": "mtp2-final-only",
+      "mtp_window": 2,
+      "accepted_prefix_trace": false,
+      "quality_pass_both": true,
+      "full_token_ids_equal": true,
+      "full_output_tokens": 89,
+      "full_output_token_ids_sha256": "70ddb7d7606fd66fb195c8484b701d3fe3d5e16854467d275597dd6b7dd6b5cf",
+      "wrapper_status": "pass",
+      "wrapper_returncode": 0,
+      "minimum_available_gib": 20.8082275390625,
+      "maximum_swap_gib": 1.2241134643554688,
+      "oom_kill_counts": [
+        1
+      ],
+      "requests": [
+        {
+          "ordinal": 1,
+          "token_ids_equal": true,
+          "final_state_equal": true,
+          "trace_checkpoint_count": 0,
+          "trace_mismatch_count": 0,
+          "first_trace_mismatch_token": null,
+          "last_trace_mismatch_token": null,
+          "backend_final_states": {
+            "strata": {
+              "L": "81",
+              "gdn": "a18d24f271b62a8a",
+              "ple": "369c7842f450bc66",
+              "tail": "ef84e6096c859ac6",
+              "pooled": "5f2a3d5c269411e3",
+              "kv": "cf7cb2f4ca057522",
+              "mtp": "14650fb0739d0383",
+              "stale": "3452ac1b08ca8383",
+              "dead": "dc4b75fe160a5f32",
+              "pooled_full": "99e00b0425bdcc6a",
+              "ple_prev": "285,460"
+            },
+            "ninfer": {
+              "L": "81",
+              "gdn": "a18d24f271b62a8a",
+              "ple": "369c7842f450bc66",
+              "tail": "ef84e6096c859ac6",
+              "pooled": "5f2a3d5c269411e3",
+              "kv": "cf7cb2f4ca057522",
+              "mtp": "14650fb0739d0383",
+              "stale": "3452ac1b08ca8383",
+              "dead": "dc4b75fe160a5f32",
+              "pooled_full": "99e00b0425bdcc6a",
+              "ple_prev": "285,460"
+            }
+          },
+          "per_backend": {
+            "strata": {
+              "generated_tokens": 32,
+              "finish": "length",
+              "drafts_accepted": 4,
+              "drafts_offered": 6
+            },
+            "ninfer": {
+              "generated_tokens": 32,
+              "finish": "length",
+              "drafts_accepted": 4,
+              "drafts_offered": 6
+            }
+          }
+        },
+        {
+          "ordinal": 2,
+          "token_ids_equal": true,
+          "final_state_equal": true,
+          "trace_checkpoint_count": 0,
+          "trace_mismatch_count": 0,
+          "first_trace_mismatch_token": null,
+          "last_trace_mismatch_token": null,
+          "backend_final_states": {
+            "strata": {
+              "L": "113",
+              "gdn": "752638942d656dc4",
+              "ple": "e3054895fd310512",
+              "tail": "c730ad4add792bda",
+              "pooled": "43d62b464ddf33a8",
+              "kv": "9732dc0edbf1027b",
+              "mtp": "14650fb0739d0383",
+              "stale": "3452ac1b08ca8383",
+              "dead": "21635497d4b12c5b",
+              "pooled_full": "09d7a21e3b597810",
+              "ple_prev": "25,198"
+            },
+            "ninfer": {
+              "L": "113",
+              "gdn": "752638942d656dc4",
+              "ple": "e3054895fd310512",
+              "tail": "c730ad4add792bda",
+              "pooled": "43d62b464ddf33a8",
+              "kv": "9732dc0edbf1027b",
+              "mtp": "14650fb0739d0383",
+              "stale": "3452ac1b08ca8383",
+              "dead": "21635497d4b12c5b",
+              "pooled_full": "09d7a21e3b597810",
+              "ple_prev": "25,198"
+            }
+          },
+          "per_backend": {
+            "strata": {
+              "generated_tokens": 32,
+              "finish": "length",
+              "drafts_accepted": 1,
+              "drafts_offered": 3
+            },
+            "ninfer": {
+              "generated_tokens": 32,
+              "finish": "length",
+              "drafts_accepted": 1,
+              "drafts_offered": 3
+            }
+          }
+        },
+        {
+          "ordinal": 3,
+          "token_ids_equal": true,
+          "final_state_equal": true,
+          "trace_checkpoint_count": 0,
+          "trace_mismatch_count": 0,
+          "first_trace_mismatch_token": null,
+          "last_trace_mismatch_token": null,
+          "backend_final_states": {
+            "strata": {
+              "L": "138",
+              "gdn": "b708d9189ae70652",
+              "ple": "1dfefed22e5820ef",
+              "tail": "0587feea763cdab9",
+              "pooled": "d0c2a6fc02d66a76",
+              "kv": "f8264ea5c90f4122",
+              "mtp": "14650fb0739d0383",
+              "stale": "b1c3695b6c660383",
+              "dead": "21635497d4b12c5b",
+              "pooled_full": "cc082767941873da",
+              "ple_prev": "198,71093"
+            },
+            "ninfer": {
+              "L": "138",
+              "gdn": "b708d9189ae70652",
+              "ple": "1dfefed22e5820ef",
+              "tail": "0587feea763cdab9",
+              "pooled": "d0c2a6fc02d66a76",
+              "kv": "f8264ea5c90f4122",
+              "mtp": "14650fb0739d0383",
+              "stale": "b1c3695b6c660383",
+              "dead": "21635497d4b12c5b",
+              "pooled_full": "cc082767941873da",
+              "ple_prev": "198,71093"
+            }
+          },
+          "per_backend": {
+            "strata": {
+              "generated_tokens": 25,
+              "finish": "stop",
+              "drafts_accepted": 0,
+              "drafts_offered": 0
+            },
+            "ninfer": {
+              "generated_tokens": 25,
+              "finish": "stop",
+              "drafts_accepted": 0,
+              "drafts_offered": 0
+            }
+          }
+        }
+      ],
+      "all_request_boundary_states_equal": true,
+      "all_common_trace_prefix_states_equal": true
+    },
+    {
+      "label": "mtp2-final-only-repeat",
+      "mtp_window": 2,
+      "accepted_prefix_trace": false,
+      "quality_pass_both": true,
+      "full_token_ids_equal": true,
+      "full_output_tokens": 89,
+      "full_output_token_ids_sha256": "70ddb7d7606fd66fb195c8484b701d3fe3d5e16854467d275597dd6b7dd6b5cf",
+      "wrapper_status": "pass",
+      "wrapper_returncode": 0,
+      "minimum_available_gib": 20.74151611328125,
+      "maximum_swap_gib": 1.2204513549804688,
+      "oom_kill_counts": [
+        1
+      ],
+      "requests": [
+        {
+          "ordinal": 1,
+          "token_ids_equal": true,
+          "final_state_equal": true,
+          "trace_checkpoint_count": 0,
+          "trace_mismatch_count": 0,
+          "first_trace_mismatch_token": null,
+          "last_trace_mismatch_token": null,
+          "backend_final_states": {
+            "strata": {
+              "L": "81",
+              "gdn": "a18d24f271b62a8a",
+              "ple": "369c7842f450bc66",
+              "tail": "ef84e6096c859ac6",
+              "pooled": "5f2a3d5c269411e3",
+              "kv": "cf7cb2f4ca057522",
+              "mtp": "14650fb0739d0383",
+              "stale": "3452ac1b08ca8383",
+              "dead": "dc4b75fe160a5f32",
+              "pooled_full": "99e00b0425bdcc6a",
+              "ple_prev": "285,460"
+            },
+            "ninfer": {
+              "L": "81",
+              "gdn": "a18d24f271b62a8a",
+              "ple": "369c7842f450bc66",
+              "tail": "ef84e6096c859ac6",
+              "pooled": "5f2a3d5c269411e3",
+              "kv": "cf7cb2f4ca057522",
+              "mtp": "14650fb0739d0383",
+              "stale": "3452ac1b08ca8383",
+              "dead": "dc4b75fe160a5f32",
+              "pooled_full": "99e00b0425bdcc6a",
+              "ple_prev": "285,460"
+            }
+          },
+          "per_backend": {
+            "strata": {
+              "generated_tokens": 32,
+              "finish": "length",
+              "drafts_accepted": 4,
+              "drafts_offered": 6
+            },
+            "ninfer": {
+              "generated_tokens": 32,
+              "finish": "length",
+              "drafts_accepted": 4,
+              "drafts_offered": 6
+            }
+          }
+        },
+        {
+          "ordinal": 2,
+          "token_ids_equal": true,
+          "final_state_equal": true,
+          "trace_checkpoint_count": 0,
+          "trace_mismatch_count": 0,
+          "first_trace_mismatch_token": null,
+          "last_trace_mismatch_token": null,
+          "backend_final_states": {
+            "strata": {
+              "L": "113",
+              "gdn": "752638942d656dc4",
+              "ple": "e3054895fd310512",
+              "tail": "c730ad4add792bda",
+              "pooled": "43d62b464ddf33a8",
+              "kv": "9732dc0edbf1027b",
+              "mtp": "14650fb0739d0383",
+              "stale": "3452ac1b08ca8383",
+              "dead": "21635497d4b12c5b",
+              "pooled_full": "09d7a21e3b597810",
+              "ple_prev": "25,198"
+            },
+            "ninfer": {
+              "L": "113",
+              "gdn": "752638942d656dc4",
+              "ple": "e3054895fd310512",
+              "tail": "c730ad4add792bda",
+              "pooled": "43d62b464ddf33a8",
+              "kv": "9732dc0edbf1027b",
+              "mtp": "14650fb0739d0383",
+              "stale": "3452ac1b08ca8383",
+              "dead": "21635497d4b12c5b",
+              "pooled_full": "09d7a21e3b597810",
+              "ple_prev": "25,198"
+            }
+          },
+          "per_backend": {
+            "strata": {
+              "generated_tokens": 32,
+              "finish": "length",
+              "drafts_accepted": 1,
+              "drafts_offered": 3
+            },
+            "ninfer": {
+              "generated_tokens": 32,
+              "finish": "length",
+              "drafts_accepted": 1,
+              "drafts_offered": 3
+            }
+          }
+        },
+        {
+          "ordinal": 3,
+          "token_ids_equal": true,
+          "final_state_equal": true,
+          "trace_checkpoint_count": 0,
+          "trace_mismatch_count": 0,
+          "first_trace_mismatch_token": null,
+          "last_trace_mismatch_token": null,
+          "backend_final_states": {
+            "strata": {
+              "L": "138",
+              "gdn": "b708d9189ae70652",
+              "ple": "1dfefed22e5820ef",
+              "tail": "0587feea763cdab9",
+              "pooled": "d0c2a6fc02d66a76",
+              "kv": "f8264ea5c90f4122",
+              "mtp": "14650fb0739d0383",
+              "stale": "b1c3695b6c660383",
+              "dead": "21635497d4b12c5b",
+              "pooled_full": "cc082767941873da",
+              "ple_prev": "198,71093"
+            },
+            "ninfer": {
+              "L": "138",
+              "gdn": "b708d9189ae70652",
+              "ple": "1dfefed22e5820ef",
+              "tail": "0587feea763cdab9",
+              "pooled": "d0c2a6fc02d66a76",
+              "kv": "f8264ea5c90f4122",
+              "mtp": "14650fb0739d0383",
+              "stale": "b1c3695b6c660383",
+              "dead": "21635497d4b12c5b",
+              "pooled_full": "cc082767941873da",
+              "ple_prev": "198,71093"
+            }
+          },
+          "per_backend": {
+            "strata": {
+              "generated_tokens": 25,
+              "finish": "stop",
+              "drafts_accepted": 0,
+              "drafts_offered": 0
+            },
+            "ninfer": {
+              "generated_tokens": 25,
+              "finish": "stop",
+              "drafts_accepted": 0,
+              "drafts_offered": 0
+            }
+          }
+        }
+      ],
+      "all_request_boundary_states_equal": true,
+      "all_common_trace_prefix_states_equal": true
+    }
+  ]
+}

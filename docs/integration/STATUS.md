@@ -81,6 +81,20 @@ counter stayed at one. This is correctness evidence only; prefix-state,
 cancellation/recovery and performance gates remain open. See the
 [MTP window report](../../bench/results/2026-11-05-e5-coder-natural-prompt/mtp-window-comparison/README.md).
 
+**E5 Coder continuation/recovery check (2026-11-05):** one `is_prime` task was
+split across three same-engine requests (32, 32 and 25 generated tokens) and
+repeated with MTP-2 and MTP-4. Both backends returned the same 89 token IDs and
+passed the 11-case function oracle. With per-token state tracing, accepted
+prefix hashes first differed at tokens 25, 5 and 4 in the initial,
+continuation and recovery requests for both windows. In two fresh final-only
+MTP-2 pairs, all 11 state fields matched at every request boundary and
+reproduced across runs. This points to trace/scheduling sensitivity for this
+sequence, but does not establish intermediate state equality when tracing is
+disabled or its exact mechanism. Minimum available RAM was 20.74–21.03 GiB;
+swap peaked at 1.22–1.38 GiB and the existing OOM-kill counter stayed at one.
+This is functional/state evidence only. See the
+[continuation report](../../bench/results/2026-11-05-e5-coder-natural-prompt/continuation-recovery/README.md).
+
 **E6 Coder IQ1_M performance screen (2026-11-05):** three same-profile
 Strata/strict-NInfer pairs measured the held-out `is_prime` task with state
 hashing disabled. All six requests generated the same 89 tokens, passed the

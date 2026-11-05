@@ -3368,6 +3368,17 @@ This differs from earlier accepted-prefix-traced captures of the same task,
 which had divergent GDN dumps. No trace ran between tokens in the final-only
 case, so instrumentation/scheduling effects are plausible, not proven. This
 is one short prompt under one static profile and is not performance evidence.
+
+Follow-up (2026-11-05): a held-out Coder `is_prime` request was continued and
+recovered across three requests on one engine process (32/32/25 tokens), with
+MTP-2 and MTP-4. Both backends returned the same 89-token stream and passed the
+11-case oracle. Per-token trace pairs first diverged at accepted tokens 25, 5
+and 4 in the three requests for both MTP windows; two final-only MTP-2 pairs
+instead matched all 11 state fields at all request boundaries and reproduced
+across runs. This supports trace/scheduling sensitivity in this sequence but
+does not establish intermediate state equality without tracing. Cancellation,
+broader mixed-codec quality and a declared numerical tolerance remain open.
+See the [continuation/recovery report](../../bench/results/2026-11-05-e5-coder-natural-prompt/continuation-recovery/README.md).
 Keep mixed-codec E5 open pending additional tasks, sampled prefix validation
 and broader profiles. See the [arithmetic recheck](../../bench/results/2026-11-05-e5-coder-natural-prompt/arithmetic-final-only/README.md).
 
