@@ -58,14 +58,20 @@ def measure(engine: StrataEngine, prompt: list[int], budget: int, tokenizer,
     row['ttft_scope'] = 'client request start through first streamed token'
     row['decode_tps_scope'] = 'generated token count divided by server decode_ms; includes first token per engine counter'
     if validate:
-        body = row['text'].split('<|im_end|>', 1)[0].strip()
-        function = extract_function(body)
-        is_prime = compile_generated_function(function)
-        actual = {str(n): bool(is_prime(n)) for n in CASES}
-        expected = {str(n): value for n, value in CASES.items()}
-        row['function'] = function
-        row['quality_cases'] = actual
-        row['quality_pass'] = actual == expected
+        try:
+            body = row['text'].split('<|im_end|>', 1)[0].strip()
+            function = extract_function(body)
+            is_prime = compile_generated_function(function)
+            actual = {str(n): bool(is_prime(n)) for n in CASES}
+            expected = {str(n): value for n, value in CASES.items()}
+            row['function'] = function
+            row['quality_cases'] = actual
+            row['quality_pass'] = actual == expected
+        except Exception as exc:
+            # Preserve the completed measurement, but never treat an output
+            # that the independent task oracle could not validate as a pass.
+            row['quality_pass'] = False
+            row['quality_error'] = f'{type(exc).__name__}: {exc}'
     return row
 
 
@@ -141,6 +147,7 @@ def main() -> int:
     profile = Path(args[args.index('--expert-profile') + 1])
     models = [Path(args[args.index(flag) + 1]) for flag in ('--native', '--ple-gguf')]
     blocks = []
+    progress_path = output / 'progress.json'
     for block, order in enumerate(orders):
         block_result = {'block': block + 1, 'order': order, 'arms': []}
         for backend in order:
@@ -159,6 +166,15 @@ def main() -> int:
                                                         'finish': warm['finish']},
                                              'measured': measured, 'log': log.name,
                                              'engine_info': startup})
+                # Persist each completed arm so interruption or a later arm
+                # failure cannot erase already collected measurements.
+                progress_path.write_text(json.dumps({
+                    'study': study,
+                    'prompt_tokens': len(prompt),
+                    'context_tokens': int(args[args.index('--max-context') + 1]),
+                    'blocks': blocks + [block_result],
+                    'status': 'in_progress',
+                }, indent=2) + '\n')
             finally:
                 engine.close()
         blocks.append(block_result)
@@ -191,7 +207,7 @@ def main() -> int:
                              'paired_median_pct': statistics.median(values),
                              'paired_bootstrap_95_pct': bootstrap_median(values)}
     result = {
-        'date': '2026-11-05', 'hardware': 'Jetson Orin AGX, SM87, CUDA 12.6',
+        'date': time.strftime('%Y-%m-%d'), 'hardware': 'Jetson Orin AGX, SM87, CUDA 12.6',
         'study': study,
         'primary_metric': 'server decode tokens/s; generated_tokens / decode_ms includes the first token',
         'warmup': 'one eight-token same-prompt request per fresh arm process; measured request follows in that process',
@@ -215,6 +231,9 @@ def main() -> int:
                             'prompt_cache': args[args.index('--prompt-cache') + 1],
                             'prefill_cpu_share': 0},
         'orders': orders, 'blocks': blocks, 'paired_quality': pairs, 'summary': summaries,
+        'status': ('complete_quality_pass' if all(
+            p['tokens_equal'] and p['quality_pass_both'] for p in pairs
+        ) else 'complete_quality_failed'),
         'limits': [f'{len(orders)} pairs are screen-only; confirmation is not implied',
                    'dynamic clocks; no clock controls', 'EMC readback denied',
                    'energy not measured',
@@ -223,8 +242,9 @@ def main() -> int:
                    'client timing is sequential and instrumented by the harness']
     }
     (output / 'results.json').write_text(json.dumps(result, indent=2) + '\n')
+    progress_path.unlink(missing_ok=True)
     print(json.dumps({'paired_quality': pairs, 'summary': summaries}, indent=2))
-    return 0 if all(p['tokens_equal'] and p['quality_pass_both'] for p in pairs) else 2
+    return 0 if result['status'] == 'complete_quality_pass' else 2
 
 
 if __name__ == '__main__':

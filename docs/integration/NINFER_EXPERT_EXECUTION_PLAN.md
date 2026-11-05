@@ -896,6 +896,13 @@ estimate. One completed NInfer request logged 1.5 tok/s versus 6.9 for Strata;
 cause is unknown. The run retained 20.86 GiB minimum available RAM and did not
 increment the existing OOM-kill count. See the [failed-cell report](../../bench/results/2026-11-05-e6-coder-pp512-tg89-screen/README.md).
 
+**Harness follow-up (2026-11-05):** the Coder performance screen now records
+completed arm measurements even when the generated function cannot be parsed
+or fails its executable oracle. It writes a progress file after each completed
+arm and a final result marked `complete_quality_failed`; such a cell remains
+ineligible for a performance effect. Python bytecode compilation and
+`git diff --check` passed. No new model run was made during this follow-up.
+
 **Execution note (2026-11-05):** a four-pair order-balanced follow-up to the
 Coder IQ1_M `is_prime` performance screen used two pairs in each backend order.
 All eight answers matched the exact 89-token stream and passed the 11-case
