@@ -211,29 +211,55 @@ __device__ __forceinline__ float dot_iq3s_q8_1(const uint8_t* row,
     return warp_sum(total);
 }
 
-__device__ __forceinline__ float dot_iq4nl_q8_1(const uint8_t* row,
-                                                 const Q8_1Block* xq,
-                                                 int width) {
-    const int lane = threadIdx.x & 31;
-    const int blocks = width / 32;
-    float total = 0.0f;
-    for (int b = lane; b < blocks; b += 32) {
-        const auto* w = reinterpret_cast<const block_iq4_nl*>(row) + b;
-        int subtotal = 0;
+// Match Strata's native IQ4_NL down-projection arithmetic for n_ff=640.
+// The native row dot splits each 32-value IQ4_NL block into two 16-value
+// fragments, distributes the resulting 40 fragment products over an
+// eight-lane subgroup, then reduces in the subgroup's XOR tree. Keeping the
+// fragment scaling and addition tree also keeps FP32 rounding identical.
+__device__ __forceinline__ float iq4nl_q8_1_fragment(const block_iq4_nl* w,
+                                                      const Q8_1Block* xq,
+                                                      int iqs) {
+    int subtotal = 0;
+    const int8_t* q8 = xq->qs;
 #pragma unroll
-        for (int group = 0; group < 4; ++group) {
+    for (int l = 0; l < 2; ++l) {
+        const int group = iqs + l;
 #pragma unroll
-            for (int j = 0; j < 4; ++j) {
-                const uint8_t packed = w->qs[4 * group + j];
-                const int lo = kvalues_iq4nl[packed & 0x0f];
-                const int hi = kvalues_iq4nl[packed >> 4];
-                subtotal += lo * reinterpret_cast<const int8_t*>(xq[b].qs)[4 * group + j];
-                subtotal += hi * reinterpret_cast<const int8_t*>(xq[b].qs)[16 + 4 * group + j];
-            }
+        for (int j = 0; j < 4; ++j) {
+            const uint8_t packed = w->qs[group * 4 + j];
+            subtotal += kvalues_iq4nl[packed & 0x0f] * q8[group * 4 + j];
+            subtotal += kvalues_iq4nl[packed >> 4] * q8[16 + group * 4 + j];
         }
-        total += __half2float(w->d) * __half2float(xq[b].d) * static_cast<float>(subtotal);
     }
-    return warp_sum(total);
+    const float d = __half2float(w->d) * __half2float(xq->d);
+    return d * static_cast<float>(subtotal);
+}
+
+__device__ __forceinline__ float dot_iq4nl_q8_1_native_order(const uint8_t* row,
+                                                              const Q8_1Block* xq,
+                                                              int lane) {
+    const auto* weights = reinterpret_cast<const block_iq4_nl*>(row);
+    float sum = 0.0f;
+    for (int k = lane; k < 40; k += 32) {
+        sum += iq4nl_q8_1_fragment(weights + k / 2, xq + k / 2, 2 * (k % 2));
+    }
+    float sum16 = 0.0f;
+    sum16 += iq4nl_q8_1_fragment(weights + (lane + 16) / 2, xq + (lane + 16) / 2,
+                                 2 * ((lane + 16) % 2));
+    sum = __fadd_rn(sum, sum16);
+
+    float sum8 = 0.0f;
+    sum8 += iq4nl_q8_1_fragment(weights + (lane + 8) / 2, xq + (lane + 8) / 2,
+                                2 * ((lane + 8) % 2));
+    float sum24 = 0.0f;
+    sum24 += iq4nl_q8_1_fragment(weights + (lane + 24) / 2, xq + (lane + 24) / 2,
+                                 2 * ((lane + 24) % 2));
+    sum = __fadd_rn(sum, __fadd_rn(sum8, sum24));
+#pragma unroll
+    for (int offset = 4; offset > 0; offset >>= 1) {
+        sum += __shfl_xor_sync(0xffffffffu, sum, offset);
+    }
+    return sum;
 }
 
 __device__ __forceinline__ float iq4xs_q8_1_block(const uint8_t* weight,
@@ -383,16 +409,17 @@ __global__ void d4_iq4nl_grouped(const unsigned long long* grp_ptr,
                                 const int32_t* ent_dst, const Q8_1Block* hq,
                                 NativeExpertLayout L, float* output,
                                 int64_t grid_groups) {
-    const int lane = threadIdx.x & 31;
+    const int lane = threadIdx.x & 7;
     const int warp = threadIdx.x >> 5;
-    const int row = static_cast<int>(blockIdx.x) * kRowsPerCta + warp;
+    const int row_in_warp = (threadIdx.x & 31) >> 3;
+    const int row = static_cast<int>(blockIdx.x) * 16 + warp * 4 + row_in_warp;
     if (row >= L.n_embd) return;
     const size_t offset = L.down_off + static_cast<size_t>(row) * L.d_row;
     for (int g = static_cast<int>(blockIdx.y); g < *n_groups; g += static_cast<int>(grid_groups)) {
         const auto* weights = reinterpret_cast<const uint8_t*>(grp_ptr[g]) + offset;
         for (int e = grp_start[g]; e < grp_start[g + 1]; ++e) {
             const auto* hidden = hq + static_cast<size_t>(e) * (L.n_ff / 32);
-            const float value = dot_iq4nl_q8_1(weights, hidden, static_cast<int>(L.n_ff));
+            const float value = dot_iq4nl_q8_1_native_order(weights, hidden, lane);
             if (lane == 0) output[static_cast<size_t>(ent_dst[e]) * L.n_embd + row] = value;
         }
     }
@@ -461,7 +488,7 @@ void ninfer_iq2s_iq4nl_expert_grouped(const NativeExpertLayout& L,
         grp_ptr, grp_start, n_groups, ent_tok, static_cast<const Q8_1Block*>(x_q8_1), L, gate, up, gy);
     const int64_t values = cap_entries * kIntermediate;
     swiglu_quantize<<<static_cast<unsigned>((values + 255) / 256), 256, 0, s>>>(gate, up, hidden, values);
-    d4_iq4nl_grouped<<<dim3((kHidden + kRowsPerCta - 1) / kRowsPerCta,
+    d4_iq4nl_grouped<<<dim3((kHidden + 15) / 16,
                              static_cast<unsigned>(gy)), 128, 0, s>>>(
         grp_ptr, grp_start, n_groups, ent_dst, hidden, L, output, gy);
     const cudaError_t error = cudaGetLastError();

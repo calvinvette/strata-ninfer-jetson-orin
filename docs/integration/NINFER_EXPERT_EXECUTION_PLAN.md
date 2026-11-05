@@ -1,6 +1,6 @@
 # NInfer expert execution inside Strata
 
-Status: **E0–E5 are complete for their documented bounded Q2_0 prototype scopes. E6 remains open and E7 has no release profile. Fixed-map trials show the 5K learned residency map improves strict-NInfer decode on held-out 512-token, 2K, 4K, 8K, 16K, 64K, 128K and 240K synthetic retrieval tasks; the 240K seven-pair confirmation measured +35.9% decode (paired bootstrap 95% interval +35.0% to +38.5%), while 128K measured +38.5%. Same-map Q2_0 backend screens now span actual prompts from 2K through 240K. None cleared the 5% decode gate with an interval excluding zero; the 8K outlier remains in the record. These are map-selection gains and do not establish an NInfer-kernel advantage. Mixed-codec Coder checks show exact same-input parity for all ten sampled layer-1 GPU expert rows, while small activation differences produce larger output changes across the quantized operator; the upstream source and state budget remain open. Broader task families, state/quality coverage and the E7 release assessment remain open. maestro1 HIP/SYCL results are x86 build-only; no device execution is claimed. Updated 2026-11-05.**
+Status: **E0–E5 are complete for their documented bounded Q2_0 prototype scopes. E6 remains open and E7 has no release profile. Fixed-map trials show the 5K learned residency map improves strict-NInfer decode on held-out 512-token, 2K, 4K, 8K, 16K, 64K, 128K and 240K synthetic retrieval tasks; the 240K seven-pair confirmation measured +35.9% decode (paired bootstrap 95% interval +35.0% to +38.5%), while 128K measured +38.5%. Same-map Q2_0 backend screens now span actual prompts from 2K through 240K. None cleared the 5% decode gate with an interval excluding zero; the 8K outlier remains in the record. These are map-selection gains and do not establish an NInfer-kernel advantage. A Coder IQ1_M IQ4_NL down-projection reduction difference was corrected to match Strata's native arithmetic. Same-input operator checks now pass for one routed expert in all 48 layers across seven codec tuples; one paired service capture is exact across every MoE field in all 48 layers, and repeated pinned-PCIe plus natural-prompt state checks pass. Broader mixed-codec task/context, performance and state/quality limits remain open. maestro1 HIP/SYCL results are x86 build-only; no device execution is claimed. Updated 2026-11-05.**
 Prepared: 2026-10-25. Planning baseline: integration commit `5829a4a9`;
 NInfer reference: `b07248f2528125aeda7550055580204541f1714c`.
 
@@ -3267,3 +3267,18 @@ layer-1 Q8_1 scale-boundary crossing for expert 198. It identifies a plausible
 amplification chain for this single request row, not a universal cause or an
 acceptable persistent-state drift budget. See the [first-divergence
 report](../../bench/results/2026-11-05-e5-coder-natural-prompt/layer0-first-divergence/README.md).
+
+Execution note (2026-11-05): the IQ4_NL down kernel was changed to match
+Strata's native 16-value fragment scaling and eight-lane reduction order. CUDA
+`strata` and `ninfer_iq_expert_parity` targets rebuilt successfully. One
+same-input routed expert from each of 48 Coder layers matched the native CUDA
+oracle exactly across seven observed tuples; gate/up and hidden Q8_1 stages
+also matched. A paired service capture was exact for every MoE field across
+all 48 layers at prompt position 41. Two guarded pinned-PCIe service pairs
+matched all eight tokens and every recorded persistent-state field at every
+prefix; a separate natural-prompt one-token pair matched its final state
+hashes and GDN dump. The prior reduction order diverged at every prefix from
+token one under the same profile. This is strong bounded evidence for the
+corrected path, not broad task/context or performance qualification; service
+timings were instrumented/sequential. See the [reduction-match
+report](../../bench/results/2026-11-05-e5-coder-natural-prompt/down-projection-reduction-match/README.md).
