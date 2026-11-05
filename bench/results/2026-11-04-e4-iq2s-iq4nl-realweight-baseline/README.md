@@ -26,12 +26,30 @@ dequantizer followed by independent FP64 projection arithmetic; codec decode
 is not independent of GGML. The raw captured activation remains in its
 existing evidence directory and was not copied.
 
+## IQ2_S byte decoder qualification
+
+Added `tools/integration/iq2_s_codec_oracle.py`, which walks IQ2_S block bytes
+with a standalone scalar decoder. It reads the canonical 1,024-entry grid from
+the pinned ggml header but independently applies the byte indices, per-group
+scales, signs and output placement. Its synthetic self-check covered all 1,024
+grid indices with three sign-bit positions (3,072 cases). On the actual layer-2,
+expert-174 gate/up payloads, it decoded all 3,276,800 IQ2_S values bit-for-bit
+against the GGML `to_float` arrays dumped by the parity executable. The same
+check applied a separate scalar IQ4_NL nibble decoder to the 1,638,400 down
+values. All 4,915,200 decoded values matched exactly; combined decoder output
+SHA256 is `5c7a752f019b0fcb6dfa41716637ffba76daae00edbf054f91f4a2fd02f3d83d`.
+Temporary GGML arrays were written under `/tmp` and are not retained in Git.
+
+This comparison independently checks traversal and scale/sign/code placement
+against ggml's implementation, but shares the canonical IQ2_S grid constants
+and IQ4_NL symbol list. It qualifies those real weight bytes for the next CUDA
+adapter step; it does not qualify Q8_1 dot arithmetic or NInfer dispatch.
+
 This is a pre-integration Strata baseline and fixture qualification. It does
 not exercise any NInfer-derived IQ2_S/IQ4_NL code, prove whole-model support,
-or establish a performance benefit. The random harness input is not a captured
-model activation. A follow-up adapter test must use real weights and a pinned
-activation, an independent mathematical/codec oracle, and explicit dispatch
-evidence.
+or establish a performance benefit. The generated-input run is supplemental;
+the held captured activation is the model-input check. A follow-up adapter test
+must use an independent mathematical/codec oracle and explicit dispatch evidence.
 
 ## Reproduction
 
@@ -47,8 +65,18 @@ build/integration/e0-cuda-build/native_expert_parity \
   ~/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf \
   --expert 174 --activation-f32 \
   bench/results/2026-10-19-phase5-coder-layer2-operator-oracle/activation-position-511-token-271-layer-2.f32 2
+python3 tools/integration/iq2_s_codec_oracle.py \
+  --ggml-common third_party/ggml/ggml-common.h --self-test \
+  --model-shard ~/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf \
+  --layer 2 --expert 174 --reference-dir /tmp/e0-iq2s-iq4nl-ggml-reference
 ```
 
+Before the final command, create `/tmp/e0-iq2s-iq4nl-ggml-reference` and rerun
+the second `native_expert_parity` command above with
+`--dump-f32-dir /tmp/e0-iq2s-iq4nl-ggml-reference` appended before layer `2`.
+The raw GGML float arrays are temporary because they are model-derived data.
+
 The source revision, executable hash, and two shard hashes are recorded beside
-this report. Raw model weights and activation payloads are not copied into the
-repository.
+this report. The decoder script hash and run output are also recorded. Raw model
+weights, temporary GGML float arrays, and activation payloads are not copied
+into the repository.
