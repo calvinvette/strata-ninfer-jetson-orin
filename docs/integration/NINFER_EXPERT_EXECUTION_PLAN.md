@@ -3595,6 +3595,8 @@ long-prompt ingestion. At 32K, decode changed −0.34% (95% interval −1.47% to
 +242.32% because one Strata arm fell to 2.34 tok/s; its cause is unresolved.
 That cell also regressed prompt TPS by 1.18% and had a 1.09% median reduction
 in client duration. The 64K result does not clear the performance gate. The
-128K and 256K cells remain in progress; E6/E7 remain open
+128K screen passed quality and memory guards and measured −0.02% decode change
+(95% interval −1.39% to +1.32%); prompt TPS, TTFT and client-time changes were
+within 1.1%. Only 256K remains in progress; E6/E7 remain open
 and no profile is promoted. See the [interim report](../../bench/results/2026-11-05-e6-coder-capacity-screen/README.md)
 and its per-cell records.

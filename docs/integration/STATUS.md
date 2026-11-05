@@ -8297,7 +8297,7 @@ guards passed. Median NInfer decode changes were −0.56%, −0.25%, +0.63%,
 gate; the 2K interval includes a severe retained outlier. Minimum available
 RAM was 14.44–14.90 GiB. These cells reserve context capacity but keep the
 prompt at 512 tokens, so they do not establish long-prompt throughput. The
-32K–256K cells remain in progress. E6/E7 remain open and no release profile is
+256K cell remains in progress. E6/E7 remain open and no release profile is
 proposed. See the [interim report](../../bench/results/2026-11-05-e6-coder-capacity-screen/README.md).
 
 **E6 Coder capacity screen follow-up (2026-11-05):** the 32K cell also passed
@@ -8305,5 +8305,7 @@ all quality and memory guards, with −0.34% median NInfer decode change (95%
 interval −1.47% to +1.49%). At 64K the median was +4.54%, but the interval
 spanned −2.32% to +242.32% because one Strata decode arm fell to 2.34 tok/s;
 its cause is unknown. Prompt TPS regressed 1.18%. This is not a useful-gain
-result. The 128K and 256K cells remain in progress. See the updated
+result. The 128K cell then passed all pairs and quality checks; its decode
+median was −0.02% (95% interval −1.39% to +1.32%) with 11.78 GiB minimum
+available RAM. Only 256K remains in progress. See the updated
 [capacity report](../../bench/results/2026-11-05-e6-coder-capacity-screen/README.md).

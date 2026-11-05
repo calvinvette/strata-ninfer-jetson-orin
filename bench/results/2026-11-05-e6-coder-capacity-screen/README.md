@@ -18,6 +18,7 @@ guard. Each output is checked against an 11-case independent function oracle.
 | 16K | −0.88% [−1.23%, +0.38%] | −0.16% | −0.16% | −0.17% | 89 tokens equal; pass | 14.44 GiB |
 | 32K | −0.34% [−1.47%, +1.49%] | +0.44% | +0.40% | +0.27% | 89 tokens equal; pass | 14.07 GiB |
 | 64K | +4.54% [−2.32%, +242.32%] | −1.18% | −1.21% | +1.09% | 89 tokens equal; pass | 13.31 GiB |
+| 128K | −0.02% [−1.39%, +1.32%] | +1.02% | +0.93% | +0.67% | 89 tokens equal; pass | 11.78 GiB |
 
 Effects are NInfer relative to Strata; positive decode/prompt changes and TTFT/client
 reductions favor NInfer. The 2K cell contains one severe retained outlier, reflected
@@ -37,8 +38,8 @@ uses the same 512-token prompt and 89-token generation. They do not establish
 performance at a matching actual prompt length, broad task quality, or a release
 profile. The evidence so far does not support a context-capacity-dependent
 NInfer gain. Keep E6/E7 open and do not promote a profile. Larger configured
-capacities (32K through 256K) are still running; this interim report will be
-updated when the campaign terminates.
+the 256K configured-capacity cell is still running; this interim report will
+be updated when the campaign terminates.
 
 Per-cell records: [`context-1024/results.json`](context-1024/results.json),
 [`context-2048/results.json`](context-2048/results.json),
@@ -46,6 +47,7 @@ Per-cell records: [`context-1024/results.json`](context-1024/results.json),
 [`context-8192/results.json`](context-8192/results.json),
 [`context-16384/results.json`](context-16384/results.json),
 [`context-32768/results.json`](context-32768/results.json),
-[`context-65536/results.json`](context-65536/results.json). Supervisor summaries
+[`context-65536/results.json`](context-65536/results.json),
+[`context-131072/results.json`](context-131072/results.json). Supervisor summaries
 are adjacent under `supervisor-{capacity}/result.json`; raw telemetry and arm logs
 remain local and are not part of this interim report.
