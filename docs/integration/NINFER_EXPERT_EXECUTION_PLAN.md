@@ -476,9 +476,10 @@ and [seven-pair confirmation](../../bench/results/2026-10-25-phase-e3-q2-ninfer-
    no fusion or performance claim is made.
 3. Header-only inventories identify exact expert codec pairs in Coder IQ1_M
    and ISTA-DASLab IQ3_S. Both are mixed-codec. The CUDA selector now supports
-   IQ2_S/IQ4_NL and IQ3_XXS/IQ4_NL at the exact 2560/640 geometry, each with
-   one real-weight Coder operator check and one nonstrict service dispatch;
-   the other five observed tuple pairs remain unsupported. The Q2_0 artifact remains the only fully
+   IQ2_S/IQ4_NL, IQ3_XXS/IQ4_NL and IQ3_S/IQ4_NL at the exact 2560/640
+   geometry. Each has one real-weight operator check and a nonstrict service
+   dispatch; IQ3_S/IQ4_NL also dispatched on the actual ISTA IQ3_S artifact.
+   The other four observed tuple pairs remain unsupported. The Q2_0 artifact remains the only fully
    supported model. NInfer's original sparse-MoE packed Q4/Q5/W8 layouts are
    not byte-compatible with these GGUF codecs. See the [codec boundary map](IMPORT_MAP.md#keep-the-negative-results).
 4. Publish the current model/codec, shape, residency and backend capability
@@ -490,7 +491,7 @@ the other target variants are recorded in
 [E4 model and shape coverage](../../bench/results/2026-10-25-phase-e4-model-codec-coverage/README.md).
 The Q2_0/Q2_0 artifact has the only complete-model functional adapter coverage
 and is not performance-qualified. Mixed IQ1_M/IQ3_S have only experimental
-IQ2_S/IQ4_NL and IQ3_XXS/IQ4_NL tuple coverage; they remain incomplete and are not performance-qualified.
+IQ2_S/IQ4_NL, IQ3_XXS/IQ4_NL and IQ3_S/IQ4_NL tuple coverage; they remain incomplete and are not performance-qualified.
 64/128-token throughput, remaining mixed-codec support and HIP/SYCL qualification remain
 open; this stage closes with partial model support as allowed by its exit.
 
@@ -517,6 +518,15 @@ relative L2 `8.92e-8`) and a nonstrict service dispatch smoke. Layer 1's
 IQ2_S/Q2_0 pair still fell back. This remains partial model coverage and has
 no held-out quality or performance qualification. See the
 [next-pair report](../../bench/results/2026-11-04-e4-iq3xxs-iq4nl-next-pair-baseline/README.md).
+
+IQ3_S/IQ4_NL is also supported at 2560/640. The operator check used actual
+ISTA IQ3_S weights at layer 17/expert 183 and a captured Coder activation row;
+gate/up and hidden Q8_1 matched exactly and final relative L2 was `9.01e-8`.
+An opt-in service request on the actual 512-expert ISTA artifact, with all
+layer-17 experts resident, logged the IQ3_S dispatch. It returned one token,
+which is dispatch evidence only. Full quality/performance and remaining mixed
+tuple coverage remain open. See the
+[IQ3_S report](../../bench/results/2026-11-04-e4-iq3s-iq4nl-layer25/README.md).
 
 ### E5 — Qualify numerical behavior and useful execution policies
 

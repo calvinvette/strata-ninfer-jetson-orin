@@ -10,8 +10,8 @@ other backends, or end-to-end performance.
 | Artifact | Routed expert inventory | NInfer Q2_0 adapter coverage | Status |
 | --- | --- | --- | --- |
 | ISTA-DASLab Coder Q2_0, `Qwen3.8-Flash-Next-GSQ-RCO-Q2_0` | 48 layers; gate/up/down Q2_0, 2560/640; metadata reports 512 experts, top-10 | Q2_0/Q2_0 on CUDA; resident, staged and direct-mapped prototype paths exercised in E2/E3 | Bounded functional support; performance rejected against Strata |
-| ISTA-DASLab Coder IQ1_M | 48 layers; expert count 256, top-10; gate/up: IQ2_S 20 layers, IQ3_S 10, IQ3_XXS 17, IQ4_XS 1; down: Q2_0 9, IQ4_NL 39 | CUDA IQ2_S/IQ4_NL at 15 layers (2,3,4,5,6,9,11,15,19,23,24,26,32,34,39) and IQ3_XXS/IQ4_NL at 14 layers (0,7,14,16,18,22,31,33,37,38,41,42,43,46). Layer 2/expert 174 and layer 0/expert 70 passed real-weight operator checks and nonstrict service dispatch smokes. | Partial; five other tuples and 19 layers remain unsupported; strict full-model use rejects at layer 1 |
-| ISTA-DASLab original IQ3_S | 48 layers; expert count 512, top-10; gate/up: IQ2_S 20 layers, IQ3_S 10, IQ3_XXS 17, IQ4_XS 1; down: Q2_0 9, IQ4_NL 39 | Both CUDA tuple implementations exist in the same 15/14-layer inventory positions, but direct runtime validation has only used Coder IQ1_M weights | Partial/unqualified; IQ3_S artifact has not had an operator or service request with the new backend |
+| ISTA-DASLab Coder IQ1_M | 48 layers; expert count 256, top-10; gate/up: IQ2_S 20 layers, IQ3_S 10, IQ3_XXS 17, IQ4_XS 1; down: Q2_0 9, IQ4_NL 39 | CUDA IQ2_S/IQ4_NL at 15 layers (2,3,4,5,6,9,11,15,19,23,24,26,32,34,39), IQ3_XXS/IQ4_NL at 14 layers (0,7,14,16,18,22,31,33,37,38,41,42,43,46), and IQ3_S/IQ4_NL at 9 layers (17,25,27,28,29,35,40,44,45). Real-weight operator checks exist for one expert per tuple; nonstrict service dispatch checks exist for all three. | Partial; four other tuples and 10 layers remain unsupported; strict full-model use rejects at layer 1 |
+| ISTA-DASLab original IQ3_S | 48 layers; expert count 512, top-10; gate/up: IQ2_S 20 layers, IQ3_S 10, IQ3_XXS 17, IQ4_XS 1; down: Q2_0 9, IQ4_NL 39 | The same three CUDA tuples exist at 15/14/9 layers. IQ3_S/IQ4_NL was exercised with an actual ISTA artifact service request (layer 17); its operator check used actual ISTA weights with a cross-variant Coder activation | Partial; three tuples have implementations, but remaining codec pairs and full-model quality/performance are not qualified |
 
 The mixed-codec counts above are tensor counts across 48 layers for each of
 `gate_exps`, `up_exps` (same distribution), and `down_exps`. The nine Q2_0
@@ -22,10 +22,12 @@ generalized to IQ1_M or IQ3_S.
 
 For both mixed artifacts, the observed layer-pair distribution is: IQ2_S/IQ4_NL
 15 layers; IQ3_XXS/IQ4_NL 14; IQ3_S/IQ4_NL 9; IQ2_S/Q2_0 5;
-IQ3_XXS/Q2_0 3; IQ3_S/Q2_0 1; IQ4_XS/IQ4_NL 1. The first two tuples have
-CUDA implementations and one Coder real-weight operator/service check each.
-Inventory coverage does not prove service dispatch on every layer or on the
-ISTA IQ3_S artifact.
+IQ3_XXS/Q2_0 3; IQ3_S/Q2_0 1; IQ4_XS/IQ4_NL 1. The first three tuples have
+CUDA implementations. IQ2_S/IQ4_NL and IQ3_XXS/IQ4_NL each have one Coder
+real-weight operator check. IQ3_S/IQ4_NL has one actual ISTA-weight operator
+check with a Coder activation. Service dispatch checks exist for each tuple on
+the Coder artifact, and IQ3_S/IQ4_NL also ran on the actual ISTA artifact.
+Only one layer per tuple has direct operator/service validation.
 
 ## NInfer codec boundary audit (2026-11-04)
 
@@ -120,8 +122,10 @@ build/integration/e0-cuda-build/ninfer_q2_expert_parity \
 ```
 
 The inventory scope is header/codec geometry only, not element-level numerical
-qualification. Q2_0 route parity reuses the E2 real-weight FP64 fixture and is
-cross-variant activation evidence, not Q2_0-model-native activation evidence.
+qualification. The IQ3_S operator check uses actual ISTA weights but a Coder
+captured activation, so it is cross-variant activation evidence. Q2_0 route
+parity reuses the E2 real-weight FP64 fixture and is cross-variant activation
+evidence, not Q2_0-model-native activation evidence.
 The E2/E3 reports hold the service and staged/direct mapping details. This E4
 result closes only the bounded Q2_0 grouped-shape check and explicit partial
 coverage decision; 64/128-token performance, codec expansion, strict rejection

@@ -41,25 +41,28 @@ int main(int argc, char** argv) {
     try {
         const int layer = std::stoi(argv[2]);
         const int expert = std::stoi(argv[3]);
-        if (layer < 0 || layer >= 48 || expert < 0 || expert >= 256)
-            throw std::invalid_argument("layer/expert outside Coder IQ1_M bounds");
+        if (layer < 0 || layer >= 48 || expert < 0)
+            throw std::invalid_argument("layer/expert outside model bounds");
         auto model = strata::GgufModel::open(argv[1]);
         const std::string prefix = "blk." + std::to_string(layer) + ".ffn_";
         size_t shard = 0;
         const auto* gate = model.find(prefix + "gate_exps.weight", &shard);
-        if (!gate || (gate->type != 22 && gate->type != 18) ||
-            gate->shape != std::vector<uint64_t>{kHidden, kIntermediate, 256})
-            throw std::runtime_error("gate is not IQ2_S or IQ3_XXS [2560,640,256]");
+        if (!gate || (gate->type != 22 && gate->type != 18 && gate->type != 21) ||
+            gate->shape.size() != 3 || gate->shape[0] != kHidden || gate->shape[1] != kIntermediate ||
+            (gate->shape[2] != 256 && gate->shape[2] != 512))
+            throw std::runtime_error("gate is not a supported IQ tensor [2560,640,256|512]");
         const int gu_type = gate->type;
+        const uint64_t n_experts = gate->shape[2];
+        if (static_cast<uint64_t>(expert) >= n_experts)
+            throw std::invalid_argument("expert outside model expert count");
         const uint8_t* gate_data = model.shard(shard).tensor_data(*gate);
         const auto* up = model.find(prefix + "up_exps.weight", &shard);
-        if (!up || up->type != static_cast<uint32_t>(gu_type) ||
-            up->shape != std::vector<uint64_t>{kHidden, kIntermediate, 256})
+        if (!up || up->type != static_cast<uint32_t>(gu_type) || up->shape != gate->shape)
             throw std::runtime_error("up codec/shape does not match gate");
         const uint8_t* up_data = model.shard(shard).tensor_data(*up);
         const auto* down = model.find(prefix + "down_exps.weight", &shard);
-        if (!down || down->type != 20 || down->shape != std::vector<uint64_t>{kIntermediate, kHidden, 256})
-            throw std::runtime_error("down is not IQ4_NL [640,2560,256]");
+        if (!down || down->type != 20 || down->shape != std::vector<uint64_t>{kIntermediate, kHidden, n_experts})
+            throw std::runtime_error("down is not IQ4_NL [640,2560,experts]");
         const uint8_t* down_data = model.shard(shard).tensor_data(*down);
 
         const auto layout = strata::kernels::native_expert_layout(gu_type, 20, kHidden, kIntermediate);
@@ -117,11 +120,16 @@ int main(int argc, char** argv) {
             strata::kernels::ninfer_iq2s_iq4nl_expert_grouped(layout, d_ptr, d_starts, d_count, d_dst, d_tok,
                                                               1, 1, d_xq, d_candidate_scratch, d_candidate,
                                                               stream, 1);
-        } else {
+        } else if (gu_type == 18) {
             strata::kernels::ninfer_iq3xxs_iq4nl_backend_set(true);
             strata::kernels::ninfer_iq3xxs_iq4nl_expert_grouped(layout, d_ptr, d_starts, d_count, d_dst, d_tok,
                                                                1, 1, d_xq, d_candidate_scratch, d_candidate,
                                                                stream, 1);
+        } else {
+            strata::kernels::ninfer_iq3s_iq4nl_backend_set(true);
+            strata::kernels::ninfer_iq3s_iq4nl_expert_grouped(layout, d_ptr, d_starts, d_count, d_dst, d_tok,
+                                                             1, 1, d_xq, d_candidate_scratch, d_candidate,
+                                                             stream, 1);
         }
         strata::kernels::native_expert_grouped(layout, d_ptr, d_starts, d_count, d_dst, d_tok,
                                                1, 1, d_xq, d_native_scratch, d_native, stream, 1);
@@ -167,10 +175,11 @@ int main(int argc, char** argv) {
         size_t hidden_bytes_differ = 0;
         for (size_t i = 0; i < candidate_hidden.size(); ++i) hidden_bytes_differ += candidate_hidden[i] != native_hidden[i];
         const uint64_t dispatch = gu_type == 22 ? strata::kernels::ninfer_iq2s_iq4nl_dispatch_count()
-                                                : strata::kernels::ninfer_iq3xxs_iq4nl_dispatch_count();
+                                  : gu_type == 18 ? strata::kernels::ninfer_iq3xxs_iq4nl_dispatch_count()
+                                                  : strata::kernels::ninfer_iq3s_iq4nl_dispatch_count();
         std::printf("NInfer %s/IQ4_NL grouped: layer=%d expert=%d bytes=%zu dispatch=%llu "
                     "relative_l2=%.9g relative_l1=%.9g max_abs=%.9g changed=%zu invalid=%zu\n",
-                    gu_type == 22 ? "IQ2_S" : "IQ3_XXS", layer, expert, blob.size(),
+                    gu_type == 22 ? "IQ2_S" : gu_type == 18 ? "IQ3_XXS" : "IQ3_S", layer, expert, blob.size(),
                     static_cast<unsigned long long>(dispatch),
                     rel_l2, err1 / std::max(std::sqrt(ref2 * kHidden), 1.0e-300), max_abs, changed, invalid);
         std::printf("stages: gate_rel_l2=%.9g gate_max_abs=%.9g up_rel_l2=%.9g up_max_abs=%.9g hidden_q8_bytes_differ=%zu/%zu\n",
