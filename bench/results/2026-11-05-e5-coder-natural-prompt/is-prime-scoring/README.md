@@ -9,9 +9,11 @@ cache were used; the diagnostic score rows cover all 138 next-token targets,
 including all 89 generated sequence tokens (the end-of-turn token is included
 in that count).
 
-The serialized score files were byte-identical (SHA-256
+The serialized score files were byte-identical at the instrumentation's output
+precision (target log-probabilities to nine decimals and top-k values to six;
+this does not establish bitwise-equal logits; SHA-256
 `1d44a08b8263f49f8ed7abe4d06e203a06be2fab508248478f4a5ca36ad69eac`). For the
-89 answer tokens, both had total log probability `-1.105776162`, mean
+89 answer tokens, both recorded total log probability `-1.105776162`, mean
 `-0.01242445`, and perplexity `1.012502`; target-token log-probability deltas
 were zero, top-1 agreement was 100%, and mean top-10 overlap was 100%. The
 requests logged 109/480 resident hits/lookups per backend. This is a bounded

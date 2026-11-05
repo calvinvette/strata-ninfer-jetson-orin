@@ -6,9 +6,11 @@ teacher-forced after its exact 44-token chat prompt, producing coverage for all
 64 next-token targets. Both runs used the canonical Coder expert profile,
 3,000 cache setting, strict NInfer, MTP-2, context 512 and short-read 512.
 
-The Strata and NInfer score files were byte-identical (SHA-256
+The Strata and NInfer score files were byte-identical at the instrumentation's
+output precision (target log-probabilities to nine decimals and top-k values
+to six; this does not establish bitwise-equal logits; SHA-256
 `beb63d047ac99253298d592fd04aa30faad6f3669c13179237644d299cb63c89`). For all
-21 answer tokens, total log probability was `-0.122645558`, mean
+21 answer tokens, recorded total log probability was `-0.122645558`, mean
 `-0.005840265`, and perplexity `1.005857`; target log-probability deltas were
 zero, top-1 agreement was 100%, and top-10 overlap was 100%. Each backend logged
 117 resident hits from 480 expert lookups; the remaining expert work followed

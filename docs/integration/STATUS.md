@@ -49,7 +49,9 @@ remain open. See the
 **E5 Coder teacher-forced scoring (2026-11-05):** the validated 89-token
 `is_prime` answer was teacher-forced after its exact 50-token prompt using the
 canonical Coder profile. Strata and strict NInfer produced byte-identical
-score files across all 138 next-token targets; answer-token total logprob was
+score files across all 138 next-token targets at capture precision (target
+log-probabilities to nine decimals, top-k values to six; not bitwise-equal
+logits); answer-token total recorded logprob was
 `-1.105776162` (mean `-0.01242445`, perplexity `1.012502`), with 100% top-1
 agreement and top-10 overlap. Both arms logged 109/480 resident hits; the
 remaining expert work used Strata fallback. Minimum available RAM was 14.66
@@ -60,12 +62,13 @@ See the [scoring report](../../bench/results/2026-11-05-e5-coder-natural-prompt/
 
 A second teacher-forced check used the independently validated 21-token
 `is_even` function after its exact 44-token prompt. All 64 target rows were
-covered, and Strata/NInfer score files again matched byte-for-byte; answer
+covered, and Strata/NInfer score files again matched byte-for-byte at capture
+precision (target log-probabilities to nine decimals, top-k values to six); answer
 logprob totals were `-0.122645558`, with 100% top-1 agreement and top-10
 overlap. The canonical profile logged 117/480 resident hits in both arms.
 Minimum available RAM was 14.67 GiB and the existing OOM-kill count stayed at
-one. Together these two short Coder checks show no measurable scoring delta on
-the tested sequences, while leaving broader quality and persistent-state
+one. Together these two short Coder checks show no scoring delta at the
+recorded precision on the tested sequences, while leaving broader quality and persistent-state
 qualification open. See the [score report](../../bench/results/2026-11-05-e5-coder-natural-prompt/is-even-scoring/README.md).
 
 **E5 4K mixed-codec Coder retrieval (2026-11-05):** two fresh final-only

@@ -603,8 +603,10 @@ and [first-token GDN report](../../bench/results/2026-11-05-e5-mixed-static-one-
 
 Execution note (2026-11-05): teacher-forced scoring of the validated 89-token
 Coder `is_prime` answer after its exact 50-token prompt produced byte-identical
-Strata and strict-NInfer score records for all 138 next-token targets. The 89
-answer tokens had total log probability `-1.105776162`, 100% top-1 agreement
+Strata and strict-NInfer score records for all 138 next-token targets at
+capture precision (target log-probabilities to nine decimals, top-k values to
+six; this does not establish bitwise-equal logits). The 89 answer tokens had
+recorded total log probability `-1.105776162`, 100% top-1 agreement
 and 100% top-10 overlap. The canonical profile logged 109 resident hits from
 480 lookups in both arms; remaining work used Strata fallback. This is bounded
 score evidence for one sequence, not a general quality tolerance and not a
@@ -614,11 +616,12 @@ at 1.64 GiB and the existing OOM-kill count stayed at one. See the
 
 Execution note (2026-11-05): a second teacher-forced sequence from the held-out
 Coder `is_even` task covered all 64 next-token targets after the exact 44-token
-prompt. All 21 generated answer-token scores were identical, with total log
-probability `-0.122645558`, 100% top-1 agreement and 100% top-10 overlap. The
+prompt. All 21 generated answer-token scores were identical at capture
+precision (target log-probabilities to nine decimals, top-k values to six),
+with total log probability `-0.122645558`, 100% top-1 agreement and 100% top-10 overlap. The
 canonical profile recorded 117/480 resident hits in each arm. Minimum
 available RAM was 14.67 GiB; the existing OOM-kill count stayed at one. Two
-short tasks now show exact score parity at these sampled routes, but do not
+short tasks now show score parity at recorded precision for these sampled routes, but do not
 define a general quality tolerance or close E5's state/quality gates. See the
 [is_even scoring report](../../bench/results/2026-11-05-e5-coder-natural-prompt/is-even-scoring/README.md).
 
