@@ -77,3 +77,21 @@ Next E5 action: reproduce with a natural held-out prompt and layer/operator
 captures, then identify and fix the first numerical/state divergence before
 expanding MTP or adaptive-policy tests. The reusable comparator is
 [`compare_ninfer_backend_state.py`](../../../../tools/integration/compare_ninfer_backend_state.py).
+
+### First-window service logits
+
+A matched one-token replay of the same prompt IDs and CPU-share-off backend
+configs used the service `StrataEngine` `GEN` path with first-window logits
+capture enabled. The output again differed (`4` Strata, `5` strict NInfer).
+All 248,320 captured logits differed (relative L2 `4.47e-2`, maximum absolute
+delta `0.659`). The two leading candidates swapped: Strata's token `4` led
+token `5` by `0.0781`, while NInfer's token `5` led token `4` by only `0.00387`.
+This directly records the decision boundary in the service path; it does not
+identify which earlier kernel or activation caused the logit movement. A
+separate direct-CLI capture with the same prompt and ownership policy selected
+token `5` in both arms, so the standalone CLI is not a substitute for this
+service diagnostic. The service-logit summary and supervisor record are in
+[`service-logit-pair/`](../service-logit-pair/); raw vectors remain under
+`/tmp/e5-coder-service-logits-share-off/`. Minimum available RAM during the
+paired service probe was 20.70 GiB; the pre-existing OOM-kill count stayed at
+one.

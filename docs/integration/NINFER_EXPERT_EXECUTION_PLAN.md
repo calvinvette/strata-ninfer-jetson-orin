@@ -582,7 +582,12 @@ This localizes a small arithmetic delta after layer 0 but does not establish
 why the sampled token changes or its task-quality impact; see the
 [paired mixed-codec check](../../bench/results/2026-11-05-e5-mixed-static-one-token-pair/README.md).
 The [service state diagnostic](../../bench/results/2026-11-05-e5-mixed-static-one-token-pair/state-parity-8token-recheck/README.md)
-contains raw logs and a reusable comparator. E5 correctness is currently
+now includes the matched first-window logits: all 248,320 values differ
+(relative L2 `4.47e-2`), with the top-two token logits reversing order. A
+direct CLI capture chose the same token in both arms despite changed logits,
+confirming that CLI output alone does not substitute for the service gate.
+These observations expose the decision boundary but do not identify its
+upstream cause. E5 correctness is currently
 failing strict bitwise token/state parity for this Coder request; continue
 numerical-oracle and held-out quality checks before making broader claims.
 
