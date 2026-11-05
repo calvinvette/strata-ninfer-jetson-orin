@@ -927,6 +927,23 @@ staged-miss kernel performance or generalize to natural prompts. No
 confirmation is indicated. See the
 [screen report](../../bench/results/2026-11-05-e6-coder-retrieval-2k/README.md).
 
+**Coder 2K staged-miss screens (2026-11-05):** with a 1 GiB complement,
+four pairs passed the answer/token checks but showed −0.04% median decode
+change; only 93/2,880 routes (3.2%) were PCIe-offloaded. At 6 GiB with
+adaptive swaps, 768/2,880 routes (26.7%) were offloaded and all responses
+matched, but NInfer decode changed −1.48% (four-pair interval −3.26% to
+−0.85%). A separate 6 GiB static-owner screen disabled adaptation; 793/2,880
+routes (27.5%) were offloaded, outputs and aggregate route counts matched, and
+decode changed −1.40% (interval −3.97% to +0.18%). The static result does not
+establish a useful gain or equivalence; no confirmation is indicated. Minimum
+available RAM was 14.87–19.67 GiB, preserving the six GiB floor and three GiB
+workspace reserve. The larger staged share did not produce an end-to-end
+benefit on this synthetic retrieval task. Per-expert owner IDs were not
+captured during timing. See the [1 GiB](../../bench/results/2026-11-05-e6-coder-retrieval-2k-pcie1g/README.md),
+[6 GiB adaptive](../../bench/results/2026-11-05-e6-coder-retrieval-2k-pcie6g/README.md),
+and [6 GiB static](../../bench/results/2026-11-05-e6-coder-retrieval-2k-static-pcie6g/README.md)
+reports.
+
 **Execution note (2026-11-05):** a four-pair order-balanced follow-up to the
 Coder IQ1_M `is_prime` performance screen used two pairs in each backend order.
 All eight answers matched the exact 89-token stream and passed the 11-case

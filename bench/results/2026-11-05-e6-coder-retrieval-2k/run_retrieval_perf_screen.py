@@ -62,6 +62,7 @@ def measure(engine: StrataEngine, prompt: list[int], budget: int, tokenizer,
         'client_total_ms': (ended - started) * 1000,
         'expert_hits': int(last.get('hits', 0)),
         'expert_lookups': int(last.get('lookups', 0)),
+        'pcie_offloaded': int(last.get('offloaded', 0)),
     }
     if validate:
         row['quality_pass'] = answer == EXPECTED
@@ -69,8 +70,18 @@ def measure(engine: StrataEngine, prompt: list[int], budget: int, tokenizer,
 
 
 def main() -> int:
-    if len(sys.argv) != 2:
-        raise SystemExit(f'usage: {sys.argv[0]} OUTPUT_DIR')
+    staged_budget_gib = None
+    static_owner = '--static-owner' in sys.argv[2:]
+    options = [arg for arg in sys.argv[2:] if arg != '--static-owner']
+    if len(options) == 1 and options[0] == '--staged-pcie':
+        staged_budget_gib = 1.0
+    elif len(options) == 1 and options[0].startswith('--staged-pcie-gib='):
+        staged_budget_gib = float(options[0].split('=', 1)[1])
+    elif options:
+        raise SystemExit(f'usage: {sys.argv[0]} OUTPUT_DIR [--staged-pcie | --staged-pcie-gib=GIB] [--static-owner]')
+    if static_owner and staged_budget_gib is None:
+        raise SystemExit('--static-owner requires a staged PCIe budget')
+    staged_pcie = staged_budget_gib is not None
     output = Path(sys.argv[1]).resolve()
     output.mkdir(parents=True, exist_ok=False)
     command = json.loads(BASE.read_text())['command']
@@ -81,6 +92,10 @@ def main() -> int:
     del args[args.index('--tokens'):args.index('--tokens') + 2]
     args[args.index('--max-new') + 1] = '16'
     args[args.index('--max-context') + 1] = '4096'
+    if staged_pcie:
+        args.extend(['--pcie-frac', '1.0', '--resident-budget-gib', f'{staged_budget_gib:g}'])
+    if static_owner:
+        args.extend(['--adapt-every', '0'])
 
     tokenizer_path = Path('/home/calvin/models/strata-orin-validation/pack/tokenizer')
     tokenizer = load_tokenizer(tokenizer_path)
@@ -120,6 +135,8 @@ def main() -> int:
               ['strata', 'ninfer'], ['ninfer', 'strata']]
     env = os.environ.copy()
     env.update({'STRATA_PREFILL_CPU_SHARE': '0'})
+    if staged_pcie:
+        env['STRATA_RESIDENT_HEADROOM_GIB'] = '6'
     profile = Path(args[args.index('--expert-profile') + 1])
     models = [Path(args[args.index(flag) + 1]) for flag in ('--native', '--ple-gguf')]
     blocks, progress = [], output / 'progress.json'
@@ -164,7 +181,8 @@ def main() -> int:
                       'answers': [s['answer'], n['answer']],
                       'generated_counts': [s['generated_tokens'], n['generated_tokens']],
                       'expert_hits': [s['expert_hits'], n['expert_hits']],
-                      'expert_lookups': [s['expert_lookups'], n['expert_lookups']]})
+                      'expert_lookups': [s['expert_lookups'], n['expert_lookups']],
+                      'pcie_offloaded': [s['pcie_offloaded'], n['pcie_offloaded']]})
     summary = {name: {'pair_effects_pct': values,
                       'paired_median_pct': statistics.median(values),
                       'paired_bootstrap_95_pct': bootstrap_median(values)}
@@ -187,7 +205,15 @@ def main() -> int:
                      'runtime_options': {'prefill': args[args.index('--prefill') + 1],
                                          'spec': args[args.index('--spec') + 1],
                                          'prompt_cache': args[args.index('--prompt-cache') + 1],
-                                         'prefill_cpu_share': 0}},
+                                         'prefill_cpu_share': 0,
+                                         'pcie_frac': '1.0' if staged_pcie else '0.55',
+                                         'resident_budget_gib': (f'{staged_budget_gib:g}'
+                                                                  if staged_pcie else None),
+                                         'resident_headroom_gib': 6 if staged_pcie else None,
+                                         'adapt_every': '0' if static_owner else '4 (default)'}},
+        'staged_pcie_mode': staged_pcie,
+        'staged_pcie_budget_gib': staged_budget_gib,
+        'static_owner': static_owner,
         'orders': orders, 'blocks': blocks, 'paired_quality': pairs, 'summary': summary,
         'status': ('complete_quality_pass' if all(
             p['tokens_equal'] and p['quality_pass_both'] for p in pairs
