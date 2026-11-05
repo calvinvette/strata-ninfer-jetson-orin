@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "date": "2026-11-04",
+  "scope": "single final-state comparison after a 65536-token prompt and one generated token; not task-quality or performance qualification",
+  "hardware": "Jetson AGX Orin 64 GB, ARM64, CUDA 12.6",
+  "source_checkout_commit": "8c1bbe5a15050c8bd0020e94992f046cb0c69cf7",
+  "binary_sha256": "fd67288c399d895be036dab344e30caab3d081540bfc552f22dac6a5fc33644a",
+  "model": {
+    "name": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0",
+    "native_shard_sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720",
+    "ple_shard_sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113",
+    "ple_dense_sha256": "a43d7d0b69525335f4b000d5197a1d3aefcd3c0014fc3e12b3455e0a5d827ba2",
+    "ple_index_sha256": "c758314d495a1261d06a806b1c415596dfabe62e0cbf44ce592dc84c53229ccd"
+  },
+  "workload": {
+    "name": "heldout-retrieval-arithmetic-65536",
+    "fixture_sha256": "0ab719f94047c0c3b05cba06e32e7b06f82c2793ec0818ea38128411d598dd82",
+    "prompt_tokens": 65536,
+    "prompt_content_sha256": "bee2e6d260872df0ae3079fe2afd372717fe288617650e0f21dab689ffd59ce6",
+    "prompt_ids_sha256": "610583fbb363bad5da8bde52c4eccd779b64ba53e7890f11bac48fa188dcbe08",
+    "configured_context_tokens": 131072,
+    "expected_full_answer": "EARLY=AMBER-QUARTZ-618, MIDDLE=SILVER-MEADOW-243, LATE=INDIGO-LANTERN-907, SUM=1768",
+    "full_answer_checked_in_this_run": false
+  },
+  "map": {
+    "path": "/tmp/e6-ninfer-adapt-5k/maps/matched-complement-profiles/learned-map.bin",
+    "sha256": "76a1644f56d985fdd54a5816aadd39ce9356190dbaa828a293fab8462f507087",
+    "resident_experts": 5000,
+    "strata_residency_csv_sha256": "337d43f4d672f5abec0db0379a48454c3e70eacd7f1bd356af50c04f20fb0080",
+    "ninfer_residency_csv_sha256": "337d43f4d672f5abec0db0379a48454c3e70eacd7f1bd356af50c04f20fb0080",
+    "residency_maps_equal": true
+  },
+  "run": {
+    "supervisor": "tools/integration/run_control.py",
+    "status": "pass",
+    "elapsed_seconds": 1315.347,
+    "memory_floor_bytes": 6442450944,
+    "minimum_available_gib": 7.1473,
+    "minimum_admission_gib": 7.1473,
+    "peak_sampled_swap_gib": 1.1866,
+    "cgroup_oom_kill_counter_initial": 1,
+    "cgroup_oom_kill_counter_final": 1,
+    "energy_measured": false,
+    "emc_clock_readback": "denied",
+    "clock_control": "none; observed dynamic clocks",
+    "observed_cpu_clock_mhz_range": [729.6, 2201.6],
+    "observed_gpu_clock_mhz_range": [306.0, 1300.5]
+  },
+  "comparison": {
+    "max_generated_tokens": 1,
+    "strata_token_ids": [19910],
+    "ninfer_token_ids": [19910],
+    "token_ids_equal": true,
+    "decoded_first_token": "EAR",
+    "mtp_drafts_accepted": 0,
+    "mtp_drafts_offered": 0,
+    "state_fields": ["L", "gdn", "ple", "tail", "dead", "pooled", "pooled_full", "kv", "ple_prev"],
+    "strata_state": {
+      "L": "65536",
+      "gdn": "d3e564525da30871",
+      "ple": "77a5d7f0c5b5585b",
+      "tail": "a9a37d3aa6c92e4e",
+      "dead": "dcaae02b3e09f282",
+      "pooled": "f1bfeaac83503659",
+      "pooled_full": "c84fed3d5d5ac580",
+      "kv": "1666a2adeee0d79b",
+      "ple_prev": "248069,271"
+    },
+    "ninfer_state": {
+      "L": "65536",
+      "gdn": "d3e564525da30871",
+      "ple": "77a5d7f0c5b5585b",
+      "tail": "a9a37d3aa6c92e4e",
+      "dead": "dcaae02b3e09f282",
+      "pooled": "f1bfeaac83503659",
+      "pooled_full": "c84fed3d5d5ac580",
+      "kv": "1666a2adeee0d79b",
+      "ple_prev": "248069,271"
+    },
+    "final_state_equal": true,
+    "ninfer_dispatch_log_excerpt": "queued NInfer Q2_0 resident grouped dispatch at layer 0 (CUDA Q2_0/Q2_0, 2560/640)",
+    "exact_answer_check": false
+  },
+  "diagnostic_timings_seconds": {
+    "strata_prompt": 614.5899,
+    "ninfer_prompt": 615.7615,
+    "strata_decode": 0.1443,
+    "ninfer_decode": 0.1482,
+    "interpretation": "single trace-enabled pair; not a performance estimate"
+  }
+}

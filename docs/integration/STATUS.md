@@ -1,3 +1,12 @@
+**E6 update (2026-11-04):** a corrected strict-NInfer/Strata state diagnostic
+on the held-out 65,536-token Q2_0 retrieval prompt matched the first token,
+all nine final-state fingerprints and the 5K resident map after a one-token
+continuation. Minimum available memory was 7.15 GiB; peak sampled swap was
+1.19 GiB and the pre-existing OOM-kill count did not change. This does not
+verify the full task answer or intermediate accepted-prefix states and is not
+a performance result. E6/E7 remain open. See the
+[state-check report](../../bench/results/2026-11-04-e6-q2-retrieval-65536-statecheck/README.md).
+
 **E6 Q2_0 CTA schedule screen (2026-10-31):** an opt-in 256-thread CTA mapping passed independent D3/D4 oracle and grouped-output checks, including exact grouped intermediates and output hashes. Across six paired operator blocks it was slower than the 128-thread default by 2.46% for one token, 2.92% for grouped 64 and 2.50% for grouped 128; paired bootstrap intervals excluded zero but the small, imperfectly balanced screen is not confirmation. The grouped NInfer/Strata descriptive ratio also worsened from about 1.14–1.15x to 1.17–1.18x. Keep the default unchanged and do not advance this candidate to service testing. The opt-in path remains available only for reproducible schedule experiments. Minimum available RAM was 24.33 GiB; clocks were dynamic and energy was not measured. E6/E7 remain open. See the [operator report](../../bench/results/2026-10-31-e6-ninfer-q2-cta256-screen/README.md).
 
 **E6 Q2_0 adaptive 5K backend screen (2026-10-31):** three randomized NIMBUS pp512+tg128 pairs compared Strata and strict NInfer with 5,000 starting slots and the same adaptive-swap policy. After warmup, both backends recorded 76.0% GPU-cache hits and 1,142 exchanges. NInfer decode TPS was −1.08% at the paired median (95% three-pair screening interval −5.21% to 0.00%); prompt TPS was tied, TTFT was −0.23%, and client time was −0.30%. All six measured responses returned the exact answer, 128 tokens and one shared text hash. Minimum available RAM was 8.98 GiB; peak swap was 2.42 GiB; sampled OOM kills were zero. The high-hit condition still showed no NInfer-specific end-to-end benefit, so no confirmation is justified. A static 5K pilot reached only 21.4% NIMBUS hits and was not used for performance inference. [Report and paired data](../../bench/results/2026-10-31-e6-q2-ninfer-adaptive-5k-screen/README.md).

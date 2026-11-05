@@ -680,6 +680,16 @@ hashing reduced decode to about 1 token/s, so timing is excluded. This is
 short-prompt state parity under a 64K reservation, not near-limit ingestion or
 broad state qualification. See the [64K-cap ledger state diagnostic](../../bench/results/2026-11-04-e6-q2-ledger-capacity-65536/README.md#accepted-prefix-state-diagnostic).
 
+**E6 65K retrieval final-state check (2026-11-04):** after one generated token
+from the exact 65,536-token held-out retrieval prompt at 131,072 configured
+context, Strata and strict NInfer matched the token ID, all nine final-state
+fingerprints and the 5K resident map. The strict NInfer log confirms a resident
+Q2_0 dispatch. Minimum available memory was 7.15 GiB and peak sampled swap was
+1.19 GiB; OOM-kill count stayed at its existing 1. The one-token cap does not
+check the full answer or intermediate accepted prefixes; the exact full answer
+is covered by the separate 65K backend screen. Trace-enabled timings are not
+performance evidence. See the [state-check report](../../bench/results/2026-11-04-e6-q2-retrieval-65536-statecheck/README.md).
+
 **Execution note (2026-11-04):** extended the executable code task to an exact
 8,192-token formatted prompt at 16K configured context. Three randomized
 same-map pairs retained the same controls and passed the independent five-case
