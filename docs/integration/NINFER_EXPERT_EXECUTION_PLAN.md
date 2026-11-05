@@ -138,6 +138,17 @@ mismatches, so their performance effects are not quality-qualified. Current-
 source HIP/SYCL builds and help checks passed on maestro1, but accelerator
 execution and any release-candidate soak remain open. E7's assessment proposes
 no general profile.
+Four trace-free default-profile pairs on the held-out ISTA IQ3_S `is_prime`
+task now balance backend order (two pairs per order). All returned identical
+tokens and passed the 11-case task oracle. Both Strata-first pairs had different
+cross-backend final hashes; both NInfer-first pairs matched. Each backend
+produced two distinct final fingerprints across the four runs. This small sample
+shows an association between pair outcome and backend order, alongside
+within-backend variation; it does not establish causality or a stable state
+contract because all routed expert owners were not controlled. Mixed-codec E5
+remains open.
+See the [default-profile final-state repeats](../../bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-prime-layer0-expert474-resident-run/default-profile-final-only-repeats.json).
+
 The 1,069-token follow-up found exact CPU/NInfer token parity at each paired
 request ordinal and exact final-state parity wherever capture was available.
 Fresh-engine repeats were stable, while same-service repeats changed output

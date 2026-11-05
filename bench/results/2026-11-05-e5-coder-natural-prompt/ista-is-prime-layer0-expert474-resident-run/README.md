@@ -61,6 +61,15 @@ unknown; the exact-state dump modes are observer-sensitive and are not used as
 service parity qualification. The default-profile comparison also changed the
 actual owner, so neither profile comparison isolates the full-sequence cause.
 
+The canonical default-profile comparison adds a second view of this behavior.
+Four trace-free pairs, balanced across backend order, passed the task oracle and
+emitted identical tokens. Both Strata-first pairs had unequal cross-backend
+final hashes; both NInfer-first pairs matched. Each backend produced two
+distinct fingerprints across repeats. This small sample associates pair outcome
+with order but does not establish the mechanism or implicate NInfer, since all
+routed expert owners were not fixed. See the [default-profile final-state
+repeats](default-profile-final-only-repeats.json).
+
 See the [capture-sensitivity matrix](state-capture-sensitivity.json). This
 confirms that exact local kernel parity for expert 474 does not resolve the
 long-task state discrepancy or its instrumentation sensitivity.
