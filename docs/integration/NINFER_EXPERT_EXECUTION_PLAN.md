@@ -3319,3 +3319,12 @@ case, so instrumentation/scheduling effects are plausible, not proven. This
 is one short prompt under one static profile and is not performance evidence.
 Keep mixed-codec E5 open pending additional tasks, sampled prefix validation
 and broader profiles. See the [arithmetic recheck](../../bench/results/2026-11-05-e5-coder-natural-prompt/arithmetic-final-only/README.md).
+
+Follow-up (2026-11-05): two fresh final-only pairs ran a tokenizer-exact
+2,048-token Coder retrieval prompt with a 4,096-token context reservation.
+Both backends returned the exact six-token answer `73192`; all 11 final state
+fields matched within each pair and reproduced across the two pairs. Minimum
+available RAM was 20.86 GiB, and peak sampled machine swap was 1.80 GiB.
+This extends static mixed-codec correctness to a longer retrieval request but
+does not measure performance or cover other contexts/policies. See the
+[2K retrieval check](../../bench/results/2026-11-05-e5-coder-natural-prompt/retrieval-2k-final-only/README.md).

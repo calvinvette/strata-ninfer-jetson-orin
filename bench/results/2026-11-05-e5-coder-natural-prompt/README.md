@@ -68,6 +68,19 @@ minimum available RAM was 20.94 GiB, sampled swap peaked at 1.18 GiB, and the
 pre-existing OOM counter remained one. The two-token request is not a
 performance measurement. See the [final-only report](arithmetic-final-only/README.md).
 
+### 2K retrieval final-only recheck
+
+Two fresh Strata/strict-NInfer pairs were run on an exact 2,048-token prompt
+with closed-ticket distractors and an active-ticket retrieval answer of
+`73192`, using a 4,096-token context reservation and no accepted-prefix
+tracing. All four requests returned the same six token IDs and exact answer.
+The 11 final state fields matched between backends in each pair and repeated
+exactly within each backend across pairs. The supervisor retained at least
+20.86 GiB available RAM; peak sampled machine swap was 1.80 GiB. This adds a
+longer retrieval quality point to the final-only arithmetic and code-task
+checks, while earlier per-token traces remain instrumented diagnostics. No
+timings are used for performance claims. See the [2K retrieval report](retrieval-2k-final-only/README.md).
+
 ## Next E5 gate
 
 Repeat accepted-prefix numerical state checks over varied natural short tasks
