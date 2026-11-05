@@ -3254,3 +3254,16 @@ scale-rounding boundary that can amplify the small upstream activation delta;
 it does not establish the sole cause of subsequent MoE/state divergence or a
 permissible numerical tolerance. See the [expert-198 stage
 report](../../bench/results/2026-11-05-e5-coder-natural-prompt/layer1-expert198-service-input-oracle/README.md).
+
+Execution note (2026-11-05): a same-profile layer-0 owner/stage replay now
+locates the first delta for that prompt row. Inputs, route IDs/weights and GDN
+stages through the MoE input were exact. Five CPU-owned expert outputs were
+exact across backends; all five GPU-owned rows differed by relative L2
+`8.39e-8`–`8.54e-8`. Their gate/up outputs and hidden Q8_1 bytes matched the
+native CUDA oracle, isolating the difference to IQ4_NL down-projection
+arithmetic. NInfer's full-warp accumulation and Strata's eight-lane subwarp
+reduction use different floating-point addition trees. This is followed by a
+layer-1 Q8_1 scale-boundary crossing for expert 198. It identifies a plausible
+amplification chain for this single request row, not a universal cause or an
+acceptable persistent-state drift budget. See the [first-divergence
+report](../../bench/results/2026-11-05-e5-coder-natural-prompt/layer0-first-divergence/README.md).

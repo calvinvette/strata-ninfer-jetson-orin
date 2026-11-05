@@ -171,6 +171,15 @@ quantization report](layer1-expert198-service-input-oracle/README.md). The
 source of the small upstream activation difference, numerical tolerance and
 user-visible impact remain open.
 
+The follow-up layer-0 capture now identifies the first numerical delta in this
+trace. With identical layer-0 inputs/routes, five CPU-owned expert outputs
+matched exactly while all five GPU-owned rows differed by relative L2
+`8.39e-8`–`8.54e-8`. Gate/up values and hidden Q8_1 bytes matched the native
+CUDA oracle; the discrepancy is isolated to the IQ4_NL down projection's
+different floating-point accumulation order. See the [layer-0 first-divergence
+report](layer0-first-divergence/README.md). This explains the observed small
+delta for this sampled row, not every request or the acceptable state budget.
+
 The layer-1 GDN stage capture further narrows that boundary at position 41:
 incoming `x` differs by relative L2 `7.75e-8`, while `qkv` and recurrent `h`
 are bit-identical. Captured `gdn_out` is also bit-identical; the later `ffn_x`
