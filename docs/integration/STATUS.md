@@ -105,6 +105,17 @@ swap peaked at 1.22–1.38 GiB and the existing OOM-kill counter stayed at one.
 This is functional/state evidence only. See the
 [continuation report](../../bench/results/2026-11-05-e5-coder-natural-prompt/continuation-recovery/README.md).
 
+**E5 strict-NInfer Coder cancellation/recovery (2026-11-05):** a streamed MTP-2
+request was canceled after five visible deltas; seven tokens had committed at
+accepted-prefix lengths 48, 50, 52 and 54. Two fresh strict-NInfer references
+matched all seven token IDs and all 11 state fields at every committed
+boundary, and repeated exactly. The same service recovered and returned
+`Hello Orin!`. This is one static Coder profile and cancellation boundary.
+Minimum available RAM was 20.30 GiB, swap peaked at 1.29 GiB, and the existing
+OOM-kill counter stayed at one. Other boundaries and profiles remain open; no
+performance claim follows. See the
+[cancellation report](../../bench/results/2026-11-05-e5-coder-natural-prompt/cancel-ninfer/README.md).
+
 **E6 Coder IQ1_M performance screen (2026-11-05):** three same-profile
 Strata/strict-NInfer pairs measured the held-out `is_prime` task with state
 hashing disabled. All six requests generated the same 89 tokens, passed the

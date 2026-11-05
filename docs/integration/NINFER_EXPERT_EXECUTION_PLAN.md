@@ -3388,6 +3388,14 @@ lengths 4 and 5 unsampled. Minimum available RAM was 20.70–20.99 GiB and the
 existing OOM-kill count did not change. This establishes repeatability only at
 sampled boundaries under this diagnostic setting, not trace invariance or
 performance. See the [trace report](../../bench/results/2026-11-05-e5-coder-natural-prompt/retrieval-8k-trace/README.md).
+
+Execution note (2026-11-05): a current static Coder IQ1_M strict-NInfer service
+was canceled during streamed MTP-2 decode after five visible deltas. Seven
+tokens had committed at accepted-prefix lengths 48, 50, 52 and 54. Two fresh
+strict-NInfer references matched the tokens and all 11 state fields at each
+accepted boundary, and the original process passed a same-service recovery
+request. This is one cancellation point/profile and does not close the wider
+cancellation or model-quality gate. See the [cancellation report](../../bench/results/2026-11-05-e5-coder-natural-prompt/cancel-ninfer/README.md).
 Keep mixed-codec E5 open pending additional tasks, sampled prefix validation
 and broader profiles. See the [arithmetic recheck](../../bench/results/2026-11-05-e5-coder-natural-prompt/arithmetic-final-only/README.md).
 

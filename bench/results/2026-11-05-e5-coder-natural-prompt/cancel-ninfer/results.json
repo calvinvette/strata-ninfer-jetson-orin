@@ -1,0 +1,203 @@
+{
+  "date": "2026-11-05",
+  "hardware": "Jetson Orin AGX, CUDA 12.6",
+  "scope": "strict NInfer Coder IQ1_M MTP-2 streamed decode cancellation, accepted-prefix state parity and same-process recovery",
+  "runtime": {
+    "binary_sha256": "df8e666b8d19dbdc5f687826b4d7187783f4c91aaf5ba2037497a65823d4be98",
+    "profile_sha256": "c1e66c2e60ae8e7880befa303fb6bb79da1ccdd59895053eb95d433c648ef047",
+    "model_shards": [
+      {
+        "name": "Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf",
+        "bytes": 29608446496,
+        "sha256": "e11083ba855e7666b48ea3f2db6a9c3a20c18751a012cc24f948de91b7087fad"
+      },
+      {
+        "name": "Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf",
+        "bytes": 28800138432,
+        "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+      }
+    ],
+    "expert_backend": "ninfer",
+    "strict": true,
+    "expert_cache_request": 256,
+    "profile_actual_slots_from_startup": 391,
+    "context": 4096,
+    "prefill_chunk": 64,
+    "pool_workers": 4,
+    "mtp_window": 2,
+    "adaptive_residency": false,
+    "prompt_cache": 0,
+    "prefill_cpu_share": 0,
+    "q6k_warp_dequant": true
+  },
+  "prompt_sha256": "552c8f0bd9b6fabc91cfce05162efa0d860d66b770e58ff7bde298ad78b26aff",
+  "cancellation": {
+    "status": "pass",
+    "visible_deltas": 5,
+    "visible_text": "1 2 3",
+    "committed_tokens": 7,
+    "accepted_prefixes": [
+      {
+        "length": "48",
+        "committed": 1,
+        "accepted_drafts": 0,
+        "token_ids": [
+          16
+        ],
+        "state": {
+          "L": "48",
+          "gdn": "c15f470ac0259980",
+          "ple": "2655731cc3181d93",
+          "tail": "8ecfaa552ed9646c",
+          "dead": "dc4b75fe160a5f32",
+          "pooled": "66fd04d0851b4c73",
+          "pooled_full": "ff2431b27538875e",
+          "kv": "2daa223de0e2d5eb",
+          "mtp": "ae873387f4815007",
+          "stale": "14650fb0739d0383",
+          "ple_prev": "248069,271"
+        }
+      },
+      {
+        "length": "50",
+        "committed": 2,
+        "accepted_drafts": 1,
+        "token_ids": [
+          220,
+          17
+        ],
+        "state": {
+          "L": "50",
+          "gdn": "35fa5d9de8b4d86e",
+          "ple": "02d9f11484681c28",
+          "tail": "054bd15af99585c7",
+          "dead": "dc4b75fe160a5f32",
+          "pooled": "66fd04d0851b4c73",
+          "pooled_full": "ff2431b27538875e",
+          "kv": "6467c95802d41ac2",
+          "mtp": "8449ae7423511919",
+          "stale": "b1c3695b6c660383",
+          "ple_prev": "16,220"
+        }
+      },
+      {
+        "length": "52",
+        "committed": 2,
+        "accepted_drafts": 1,
+        "token_ids": [
+          220,
+          18
+        ],
+        "state": {
+          "L": "52",
+          "gdn": "c0194c1d5142ac92",
+          "ple": "461c275e51ac8300",
+          "tail": "6c5dbaf7b642a935",
+          "dead": "dc4b75fe160a5f32",
+          "pooled": "fcc1985b21c9e13b",
+          "pooled_full": "3302f86d61d39712",
+          "kv": "47953e68a6ff0305",
+          "mtp": "fa1a607b886a6cba",
+          "stale": "14650fb0739d0383",
+          "ple_prev": "17,220"
+        }
+      },
+      {
+        "length": "54",
+        "committed": 2,
+        "accepted_drafts": 1,
+        "token_ids": [
+          220,
+          19
+        ],
+        "state": {
+          "L": "54",
+          "gdn": "dc2ab2579277c802",
+          "ple": "0f7e35503ab5d9c1",
+          "tail": "bb7053132724b160",
+          "dead": "dc4b75fe160a5f32",
+          "pooled": "fcc1985b21c9e13b",
+          "pooled_full": "3302f86d61d39712",
+          "kv": "dfc9146009901bc8",
+          "mtp": "5a4c1797c9c47f45",
+          "stale": "b1c3695b6c660383",
+          "ple_prev": "18,220"
+        }
+      }
+    ]
+  },
+  "recovery": {
+    "status": "pass",
+    "response_text": "Hello Orin!",
+    "server_alive": true
+  },
+  "fresh_exact_length_references": {
+    "status": "pass",
+    "repeat_count": 2,
+    "references_repeatable": true,
+    "runs": [
+      {
+        "status": "pass",
+        "completion_tokens": 7,
+        "cancel_text_is_reference_prefix": true,
+        "cancellation_state_match": true,
+        "shared_state_lengths": [
+          "48",
+          "50",
+          "52",
+          "54"
+        ],
+        "reference_final_state": {
+          "L": "54",
+          "gdn": "dc2ab2579277c802",
+          "ple": "0f7e35503ab5d9c1",
+          "tail": "bb7053132724b160",
+          "dead": "dc4b75fe160a5f32",
+          "pooled": "fcc1985b21c9e13b",
+          "pooled_full": "3302f86d61d39712",
+          "kv": "dfc9146009901bc8",
+          "mtp": "5a4c1797c9c47f45",
+          "stale": "b1c3695b6c660383",
+          "ple_prev": "18,220"
+        }
+      },
+      {
+        "status": "pass",
+        "completion_tokens": 7,
+        "cancel_text_is_reference_prefix": true,
+        "cancellation_state_match": true,
+        "shared_state_lengths": [
+          "48",
+          "50",
+          "52",
+          "54"
+        ],
+        "reference_final_state": {
+          "L": "54",
+          "gdn": "dc2ab2579277c802",
+          "ple": "0f7e35503ab5d9c1",
+          "tail": "bb7053132724b160",
+          "dead": "dc4b75fe160a5f32",
+          "pooled": "fcc1985b21c9e13b",
+          "pooled_full": "3302f86d61d39712",
+          "kv": "dfc9146009901bc8",
+          "mtp": "5a4c1797c9c47f45",
+          "stale": "b1c3695b6c660383",
+          "ple_prev": "18,220"
+        }
+      }
+    ]
+  },
+  "supervisor": {
+    "status": "pass",
+    "returncode": 0,
+    "elapsed_s": 66.15506310993806,
+    "minimum_available_gib": 20.305381774902344,
+    "minimum_admission_available_gib": 20.305381774902344,
+    "maximum_swap_gib": 1.2498855590820312,
+    "oom_kill_counts": [
+      1,
+      1
+    ]
+  }
+}
