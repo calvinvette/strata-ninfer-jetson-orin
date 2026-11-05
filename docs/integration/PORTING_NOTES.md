@@ -53,6 +53,25 @@ requests. This Orin result concerns one Q2_0 model and one request pair; it is
 a method to reuse, not a general CPU/Metal parity claim. See the [full
 expert-320 report](../../bench/results/2026-10-30-e6-q2-identical-65k-request-repeat/layer1-moe-expert320-transition.md).
 
+## 2026-11-05 — Strict NInfer does not mean every routed row used its kernel
+
+On the ISTA IQ3_S long task, layer-0 expert 474 had identical route and input
+bytes across Strata and strict NInfer. The first capture nevertheless compared
+different owners: Strata had the weight in VRAM while NInfer had no resident
+slot and used its CPU miss path. Their outputs matched the corresponding
+native CUDA and CPU references, respectively. Moving that expert to the front
+of an experiment-only resident profile gave both backends the same GPU owner;
+the exact service row then matched bitwise, as did the native CUDA result. This
+was one IQ3_XXS/IQ4_NL expert row and does not explain the complete task's state
+drift.
+
+For future NInfer and Splash comparisons, record the selected expert's cache
+slot/weight presence and actual compute owner. Strict dispatch can rule out an
+unsupported kernel tuple without ruling out a nonresident CPU fallback. A
+resident-kernel comparison must hold the input, route, weights and owner fixed;
+separately measure ordinary policy behavior with its real residency and
+fallback distribution. See the [resident-row report](../../bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-prime-layer0-expert474-resident-run/README.md).
+
 ## 2026-10-09 — Start at the measurement boundary
 
 The first implementation adds Python harnesses outside the engine. No NInfer

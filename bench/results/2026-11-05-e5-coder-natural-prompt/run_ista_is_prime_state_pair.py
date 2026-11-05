@@ -127,7 +127,8 @@ def read_complete_final_state(log: Path) -> dict:
 
 def main() -> int:
     out = Path(sys.argv[1]).resolve()
-    trace_prefix = len(sys.argv) < 3 or sys.argv[2] != '--no-prefix-trace'
+    options = set(sys.argv[2:])
+    trace_prefix = '--no-prefix-trace' not in options
     out.mkdir(parents=True, exist_ok=False)
     command = json.loads(BASE.read_text())['command']
     index = next(i for i, value in enumerate(command)
@@ -138,6 +139,14 @@ def main() -> int:
         args.remove('--expert-backend-strict')
     del args[args.index('--tokens'):args.index('--tokens') + 2]
     args[args.index('--max-new') + 1] = '128'
+    profile_override = next((option.split('=', 1)[1] for option in options
+                             if option.startswith('--profile=')), None)
+    if profile_override is not None:
+        args[args.index('--expert-profile') + 1] = profile_override
+    spec_window = next((option.split('=', 1)[1] for option in options
+                        if option.startswith('--spec-window=')), None)
+    if spec_window is not None:
+        args[args.index('--spec') + 1] = spec_window
     tokenizer_path = Path('/home/calvin/models/strata-orin-validation/iq3-s-pack/tokenizer')
     tokenizer = load_tokenizer(tokenizer_path)
     template = ChatTemplate(tokenizer_path / 'chat_template.jinja')
@@ -145,11 +154,34 @@ def main() -> int:
                                              enable_thinking=False), parse_special=True)
     env = os.environ.copy()
     env.update({'STRATA_PREFILL_CPU_SHARE': '0', 'STRATA_STATE_HASH': '1', 'STRATA_MTP_BATCH': '1'})
+    if '--commit-sync' in options:
+        env['STRATA_COMMIT_SYNC'] = '1'
     if trace_prefix:
         env['STRATA_ACCEPTED_PREFIX_TRACE'] = '1'
     result = {'task': TASK, 'cases': CASES, 'prompt_tokens': len(prompt),
               'max_new': 128, 'temperature': 0,
               'accepted_prefix_capture': trace_prefix, 'arms': []}
+    if '--gdn-commit-capture' in options:
+        result['diagnostics'] = {'gdn_commit_positions': [80, 81], 'gdn_layers': 'all'}
+    gdn_capture_layer = next((int(option.split('=', 1)[1]) for option in options
+                              if option.startswith('--gdn-layer-capture=')), None)
+    if '--gdn-layer1-capture' in options and gdn_capture_layer is None:
+        gdn_capture_layer = 1
+    if gdn_capture_layer is not None:
+        result.setdefault('diagnostics', {})['gdn_layer_capture'] = {
+            'layer': gdn_capture_layer, 'positions': [80, 81]}
+    moe_bundle_layer = next((int(option.split('=', 1)[1]) for option in options
+                             if option.startswith('--moe-bundle-layer=')), None)
+    if moe_bundle_layer is not None:
+        result.setdefault('diagnostics', {})['moe_bundle_capture'] = {
+            'layer': moe_bundle_layer, 'position': 81}
+    moe_exec = next((tuple(int(value) for value in option.split('=', 1)[1].split(','))
+                     for option in options if option.startswith('--moe-exec=')), None)
+    if moe_exec is not None:
+        if len(moe_exec) != 3:
+            raise ValueError('--moe-exec must be LAYER,EXPERT,POSITION')
+        result.setdefault('diagnostics', {})['moe_exec_capture'] = {
+            'layer': moe_exec[0], 'expert': moe_exec[1], 'position': moe_exec[2]}
     profile_path = Path(args[args.index('--expert-profile') + 1])
     model_paths = [Path(args[args.index(flag) + 1]) for flag in ('--native', '--ple-gguf')]
     ista_identity = json.loads((ROOT / 'bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-even/results.json').read_text())
@@ -172,7 +204,34 @@ def main() -> int:
         if backend == 'ninfer':
             arm_args.append('--expert-backend-strict')
         log = out / f'{backend}.log'
-        engine = StrataEngine(executable, arm_args, cwd=str(ROOT), log=str(log), env=env)
+        arm_env = dict(env)
+        if '--gdn-commit-capture' in options:
+            arm_env.update({
+                'STRATA_VERIFY_DUMP_GDN_COMMIT_LAYER': 'all',
+                'STRATA_VERIFY_DUMP_GDN_COMMIT_PATH': str(out / f'{backend}.gdncommit'),
+                'STRATA_VERIFY_DUMP_GDN_COMMIT_POSITIONS': '80,81',
+            })
+        if gdn_capture_layer is not None:
+            arm_env.update({
+                'STRATA_VERIFY_DUMP_GDN_LAYER': str(gdn_capture_layer),
+                'STRATA_VERIFY_DUMP_GDN_PATH': str(out / f'{backend}.gdn-layer1'),
+                'STRATA_VERIFY_DUMP_GDN_POSITIONS': '80,81',
+                'STRATA_VERIFY_DUMP_GDN_O': '1',
+            })
+        if moe_bundle_layer is not None:
+            arm_env.update({
+                'STRATA_VERIFY_DUMP_MOE_BUNDLE_LAYERS': str(moe_bundle_layer),
+                'STRATA_VERIFY_DUMP_MOE_BUNDLE_POSITION': '81',
+                'STRATA_VERIFY_DUMP_MOE_BUNDLE_PATH': str(out / f'{backend}.moe-bundle'),
+            })
+        if moe_exec is not None:
+            arm_env.update({
+                'STRATA_VERIFY_DUMP_MOE_EXEC_LAYER': str(moe_exec[0]),
+                'STRATA_VERIFY_DUMP_MOE_EXEC_EXPERT': str(moe_exec[1]),
+                'STRATA_VERIFY_DUMP_MOE_EXEC_POSITION': str(moe_exec[2]),
+                'STRATA_VERIFY_DUMP_MOE_EXEC_PATH': str(out / f'{backend}.moe-exec'),
+            })
+        engine = StrataEngine(executable, arm_args, cwd=str(ROOT), log=str(log), env=arm_env)
         try:
             ids = [int(value) for value in engine.generate(prompt, 128,
                                                            {'temperature': 0}, threading.Event())

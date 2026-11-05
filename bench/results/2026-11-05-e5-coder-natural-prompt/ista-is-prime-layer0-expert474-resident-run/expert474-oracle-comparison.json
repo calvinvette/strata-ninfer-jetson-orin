@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "model": "ISTA-DASLab Qwen3.8-Flash-Next IQ3_S GGUF plus iq3-s-pack",
+  "layer": 0,
+  "position": 81,
+  "token": 2912,
+  "expert": 474,
+  "codec_pair": "IQ3_XXS/IQ4_NL",
+  "oracle": "native_expert_parity on the exact service activation and GGUF expert weights",
+  "weight_dequant": "GGML to_float and native CUDA GPU dequant matched for 4,915,200 values",
+  "rows": {
+    "default_profile/strata": {
+      "input_sha256": "c6c5c3d4e08de3e765994d9f9a184dc7f0ad74f5ea12cc7c8a79fa7d46b21791",
+      "output_sha256": "3dc462981a46727cc658fff3a430cce73a52ee84318d2cc64882c9b24dc6185c",
+      "vs_native_cpu": {
+        "different": 2560,
+        "relative_l2": 0.015507385251759431,
+        "max_abs": 0.0008400129154324532
+      },
+      "vs_native_cuda": {
+        "different": 0,
+        "relative_l2": 0.0,
+        "max_abs": 0.0
+      }
+    },
+    "default_profile/ninfer": {
+      "input_sha256": "c6c5c3d4e08de3e765994d9f9a184dc7f0ad74f5ea12cc7c8a79fa7d46b21791",
+      "output_sha256": "347d2e77ca1fd536f3393a078a2ee5ed0cda69911ab0ee07eace8018a047f45f",
+      "vs_native_cpu": {
+        "different": 0,
+        "relative_l2": 0.0,
+        "max_abs": 0.0
+      },
+      "vs_native_cuda": {
+        "different": 2560,
+        "relative_l2": 0.015515363996835582,
+        "max_abs": 0.0008400129154324532
+      }
+    },
+    "forced_resident/strata": {
+      "input_sha256": "c6c5c3d4e08de3e765994d9f9a184dc7f0ad74f5ea12cc7c8a79fa7d46b21791",
+      "output_sha256": "3dc462981a46727cc658fff3a430cce73a52ee84318d2cc64882c9b24dc6185c",
+      "vs_native_cpu": {
+        "different": 2560,
+        "relative_l2": 0.015507385251759431,
+        "max_abs": 0.0008400129154324532
+      },
+      "vs_native_cuda": {
+        "different": 0,
+        "relative_l2": 0.0,
+        "max_abs": 0.0
+      }
+    },
+    "forced_resident/ninfer": {
+      "input_sha256": "c6c5c3d4e08de3e765994d9f9a184dc7f0ad74f5ea12cc7c8a79fa7d46b21791",
+      "output_sha256": "3dc462981a46727cc658fff3a430cce73a52ee84318d2cc64882c9b24dc6185c",
+      "vs_native_cpu": {
+        "different": 2560,
+        "relative_l2": 0.015507385251759431,
+        "max_abs": 0.0008400129154324532
+      },
+      "vs_native_cuda": {
+        "different": 0,
+        "relative_l2": 0.0,
+        "max_abs": 0.0
+      }
+    }
+  },
+  "interpretation": "The default-profile pair compares different owners (Strata resident CUDA, NInfer CPU fallback). The forced-resident pair compares the same resident row and matches the native CUDA output exactly."
+}

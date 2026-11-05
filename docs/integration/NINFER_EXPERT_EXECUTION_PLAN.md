@@ -868,6 +868,8 @@ services. Live migration is unsupported; wider quality coverage remains open.
 See the [E5 closeout](NINFER_E5_CLOSEOUT.md). Keep NInfer opt-in and do not
 treat exact short-task text as sufficient evidence for other tasks.
 
+Execution note (2026-11-05): a same-input ISTA IQ3_S layer-0 expert check distinguished owner fallback from resident-kernel behavior. Under the default profile, the captured expert row was GPU-resident in Strata but absent from NInfer's resident cache, so Strata's output matched the native CUDA oracle and NInfer's matched the native CPU output. With an experiment-only profile that made expert 474 resident in both backends, all captured MoE fields matched bitwise, including the expert outputs and combined result; the common output also matched the native CUDA oracle. This is one resident IQ3_XXS/IQ4_NL row, not general mixed-codec or state qualification. The long task's persistent state still differed, and the onset changed under the modified residency map. Keep owner identity explicit in future state and performance pairs. See the [resident-row report](../../bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-prime-layer0-expert474-resident-run/README.md).
+
 ### E6 — Demonstrate end-to-end performance and context behavior
 
 **Execution note (2026-11-05):** a three-pair static-profile screen on Coder

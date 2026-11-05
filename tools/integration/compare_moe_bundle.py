@@ -11,7 +11,7 @@ import struct
 HEADER = struct.Struct('<8sIIIIQqii')
 
 
-def read_bundle(path: Path) -> dict[tuple[int, int], tuple[dict, dict[str, tuple]]]:
+def read_bundle(path: Path) -> dict[tuple[int, int, int, int], tuple[dict, dict[str, tuple]]]:
     raw = path.read_bytes()
     records = {}
     offset = 0
@@ -33,9 +33,12 @@ def read_bundle(path: Path) -> dict[tuple[int, int], tuple[dict, dict[str, tuple
             fmt = f'<{count}i' if name == 'route_ids' else f'<{count}f'
             values[name] = struct.unpack_from(fmt, raw, cursor)
             cursor += count * 4
-        key = (layer, position)
+        # A selected position can appear more than once in a verifier window
+        # when different candidate tokens occupy that position across replay
+        # rows. Include slot and token so those distinct records remain paired.
+        key = (layer, position, slot, token)
         if key in records:
-            raise ValueError(f'{path}: duplicate MoE bundle record for layer {layer}, position {position}')
+            raise ValueError(f'{path}: duplicate MoE bundle record for layer {layer}, position {position}, slot {slot}, token {token}')
         records[key] = ({'version': version, 'layer': layer, 'k': k, 'n_embd': n_embd,
                          'position': position, 'slot': slot, 'token': token}, values)
         offset += record_bytes
@@ -62,14 +65,15 @@ def main() -> int:
     args = parser.parse_args()
     ref = read_bundle(args.reference)
     cand = read_bundle(args.candidate)
-    if set(ref) != set(cand):
-        raise SystemExit('MoE bundle layer/position records differ')
-    result = {'schema': 1, 'format': 'STMOEBN1', 'records': []}
-    for key in sorted(ref):
+    common = set(ref) & set(cand)
+    result = {'schema': 1, 'format': 'STMOEBN1', 'records': [],
+              'reference_only_records': [list(key) for key in sorted(set(ref) - common)],
+              'candidate_only_records': [list(key) for key in sorted(set(cand) - common)]}
+    for key in sorted(common):
         rh, rv = ref[key]
         ch, cv = cand[key]
         if (rh['k'], rh['n_embd'], rh['slot'], rh['token']) != (ch['k'], ch['n_embd'], ch['slot'], ch['token']):
-            raise SystemExit(f'incompatible MoE bundle headers at layer {key[0]}, position {key[1]}')
+            raise SystemExit(f'incompatible MoE bundle headers at layer {key[0]}, position {key[1]}, slot {key[2]}, token {key[3]}')
         fields = {name: metrics(rv[name], cv[name]) for name in rv}
         result['records'].append({'header': rh, 'fields': fields})
     result['first_differing_layer'] = next(
