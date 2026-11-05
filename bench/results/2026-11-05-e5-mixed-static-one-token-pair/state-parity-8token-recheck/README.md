@@ -103,3 +103,20 @@ service diagnostic. The service-logit summary and supervisor record are in
 `/tmp/e5-coder-service-logits-share-off/`. Minimum available RAM during the
 paired service probe was 20.70 GiB; the pre-existing OOM-kill count stayed at
 one.
+
+
+### Static pinned-PCIe eight-token state follow-up
+
+With the same bounded 1 GiB pinned complement and all six layer-0 misses
+assigned to PCIe, a fresh eight-token service pair emitted identical tokens
+`4,5,6,24218,10,4838,1665,15`. Adaptation was disabled so the 391-slot profile
+remained static. Accepted-prefix state fingerprints still differed from the
+first committed token through the final state. This separates token-sequence
+agreement from exact recurrent/persistent-state parity. Minimum available RAM
+was 19.29 GiB, the pre-existing OOM-kill count stayed at one, and state-trace
+timings are excluded. Full logs, owner summary and comparator output are in the
+[static pinned-PCIe report](pinned-pcie1-1g-static/README.md).
+
+The next E5 work should localize the first state-hash divergence under this
+pinned static profile and add held-out task checks; identical tokens on this
+synthetic prompt do not establish state tolerance or answer quality.

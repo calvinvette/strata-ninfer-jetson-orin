@@ -66,7 +66,10 @@ GiB, and the pre-existing cgroup OOM-kill count did not increase. This proves
 one-request staged mixed-codec execution, not state parity or a speedup. Details
 are in the [unpinned owner diagnostic](layer0-ten-expert-oracle/pcie-frac-1/README.md),
 [bounded pinned follow-up](layer0-ten-expert-oracle/pcie-frac-1-pinned1g/README.md)
-and [ten-row resident oracle report](layer0-ten-expert-oracle/README.md).
+and [ten-row resident oracle report](layer0-ten-expert-oracle/README.md). An
+additional static-profile eight-token pair generated identical token IDs on
+both backends, but accepted-prefix state hashes differed from the first token;
+see the [pinned-PCIe state report](state-parity-8token-recheck/pinned-pcie1-1g-static/README.md).
 
 ### First-logit follow-up on the direct CLI path
 
