@@ -60,3 +60,36 @@ and longer answer/retrieval tasks. Add a declared state-drift contract before
 accepting the NInfer backend for service use. Keep MTP and adaptive residency
 out of this comparison until the static resident-backend state behavior is
 understood. E5, E6 and E7 remain open.
+
+## Held-out executable code task
+
+Date: 2026-11-05. A second functional screen used the same Coder IQ1_M two-shard
+model, pack, binary, static profile, cache and service settings. The prompt
+asked for a Python `is_even(n)` function. Its 44-token chat-formatted prompt
+was followed by a maximum of 64 generated tokens. The independent executable
+oracle checked `0`, `1`, `2`, `3`, `-2` and `-3`.
+
+Strata and strict NInfer each generated the same 21 token IDs and the exact
+code `def is_even(n): return n % 2 == 0`; all six oracle cases passed. All 21
+accepted-prefix token IDs matched, but the persistent-state fingerprints first
+differed after the first accepted token and remained different at all 21
+captured boundaries. Final GDN, PLE, tail, dead, pooled, pooled-full and KV
+fingerprints differed. NInfer dispatched all seven observed mixed-codec
+tuples. Each arm offered two speculative drafts and accepted zero, so this run
+did not commit drafted tokens.
+
+The supervised pair completed in 42.16 seconds with 21.08 GiB minimum
+available physical RAM; the pre-existing cgroup OOM-kill count stayed at one.
+Clocks were observed but uncontrolled, EMC readback was denied, and energy was
+not measured. The request order was sequential (Strata then NInfer), and
+hashing/trace instrumentation was enabled. The per-request timings are
+diagnostic only and must not be read as a backend performance comparison. The
+one initial launch attempt with `--spec 0` exited before model loading because
+this native pack requires a verifier window of at least two; the recorded
+result uses `--spec 2`.
+
+This adds one executable code-quality point with exact answer-token parity,
+while reinforcing that matching text does not imply matching recurrent state.
+It neither sets a numerical drift tolerance nor establishes broader code
+quality. Raw supervised logs and the state comparator output are in
+`even-pair-retry/` and `supervisor-even-pair-retry/`.

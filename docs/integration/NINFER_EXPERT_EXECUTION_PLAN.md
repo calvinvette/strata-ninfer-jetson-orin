@@ -597,6 +597,19 @@ one-token mismatch does not imply every task's answer differs, but this
 successful answer does not qualify NInfer state behavior: no state-drift budget
 or task-quality bound exists. See the [natural-prompt state report](../../bench/results/2026-11-05-e5-coder-natural-prompt/README.md).
 
+Execution note (2026-11-05): a held-out Coder IQ1_M code-generation task asked
+for `is_even(n)` and checked the generated function against six positive,
+negative and zero inputs. Strata and strict NInfer emitted identical 21-token
+IDs and both passed all six cases. Their accepted-prefix tokens matched, but
+state fingerprints diverged after the first accepted token and at all 21
+captured boundaries; final GDN, PLE, tail, dead, pooled, pooled-full and KV
+fields differed. Strict NInfer logged all seven mixed-codec routes; two
+speculative drafts were offered and none accepted. Minimum available RAM was
+21.08 GiB, with no increase in the pre-existing cgroup OOM-kill count. The
+request was sequential and trace/hash instrumented, so timings are excluded.
+This is one additional functional point, not a numerical tolerance or broad
+code-quality qualification. See the [natural-prompt report](../../bench/results/2026-11-05-e5-coder-natural-prompt/README.md#held-out-executable-code-task).
+
 1. Test held-out short and long requests, repeated continuation, retrieval and
    scoring, cancellation and recovery. Compare state and numerical results in
    addition to text. Retain original/default-route regression evidence.

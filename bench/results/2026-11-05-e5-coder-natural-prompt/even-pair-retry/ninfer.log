@@ -1,0 +1,202 @@
+[strata] 2026-11-05 00:36:26 engine started: /home/calvin/workspace/strata-ninfer-expert-e0/build/integration/e0-cuda-build/strata --serve --pack /home/calvin/models/strata-orin-validation/pack --native /home/calvin/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00001-of-00002.gguf --ple-gguf /home/calvin/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf --expert-profile /tmp/e0-coder-iq1m-layer1-first-profile.bin --expert-cache 256 --mmap-experts --pool-workers 4 --prefill 64 --max-context 512 --max-new 64 --expert-backend ninfer --spec 2 --prompt-cache 0 --vram-reserve-mib 3072 --expert-backend-strict
+strata generate: PCIe probe: 23.1 GB/s host->device (best of 8.7 21.1 23.1 23.1) -> pcie_frac 0.55 (default 0.55)
+strata generate: ARM CPU experts use ggml-cpu's native kernels
+strata generate: native pack: /home/calvin/models/strata-orin-validation/pack experts (largest blob 2.66 MB), token embedding IQ4_XS in mapped host memory (322 MiB, 0.2 s)
+strata integration: {"schema":1,"monotonic_s":3126156.335235712,"owner":"weight-arena","kind":"allocate","instance":281474810611112,"allocation":9064321024,"requested_bytes":1475120640,"device":0,"count":0}
+strata generate: 1406 MiB of weights loaded from /home/calvin/models/strata-orin-validation/pack in 0.6 s (302 canonical tensors skipped: served natively)
+strata generate: 300 native projection matrices, 2018.88 MiB of weights, in 0.8 s
+strata generate: the SSD is kept awake while rows are read: one page of the table after 100 ms without a read, until 60 s after the last request (STRATA_SSD_KEEPALIVE=0 turns it off)
+strata generate: profile /tmp/e0-coder-iq1m-layer1-first-profile.bin: 12288 ranked pairs, built for 12288 slots
+strata integration: {"schema":1,"monotonic_s":3126157.787888660,"owner":"session","kind":"allocate","instance":281474810652400,"allocation":12691300352,"requested_bytes":140472832,"device":0,"count":0}
+strata generate: PLE on, table 320001536 rows of /home/calvin/models/strata-orin-validation/Coder-GGUF/IQ1_M/Qwen3.8-Flash-Next-GSQ-RCO-IQ1_M-00002-of-00002.gguf
+strata generate: experimental native Q5_K head, 521472000 bytes, in 0.2 s
+strata generate: integrated CUDA GPU: CPU and GPU share physical RAM; allocation headroom 6.00 GiB, managed concurrency 0
+strata generate: GPU 0: Orin, compute capability 8.7
+strata generate: experts via mmap (--mmap-experts; the A/B arm of R2.1)
+strata generate: CPU pool tasks/phase: 15 (automatic), participating threads: 5
+strata generate: 4 pool workers on logical processors 1,2,3,4, the host thread on 0 (draining too) (--host-core first)
+strata integration: {"schema":1,"monotonic_s":3126158.178749901,"owner":"expert-cache","kind":"allocate","instance":281474810619648,"allocation":13353250816,"requested_bytes":680422400,"device":0,"count":0}
+strata generate: expert cache 391 slots, 0.63 GiB of shared RAM allocated to the GPU; policy is
+strata generate: the GPU computes the experts in the cache; it rounds differently from the CPU,
+                 so a reply can differ slightly from a run without the cache (same quality:
+                 bench/results/2026-09-27-cache-parity).
+                 PROFILE, ranked by routing frequency, no eviction.
+strata generate: the profile fill asks for 256 pairs ahead (STRATA_FILL_AHEAD)
+strata generate: pre-filled 391 of 391 slots from the profile in 0.2 s (3644 MB/s); slot 0 verified
+strata generate: R4 hit path ON - resident experts are computed on the GPU
+strata generate: 4 expert-pool workers + the host thread
+strata generate: session is up (engine 0.1.41)
+strata integration: {"schema":1,"monotonic_s":3126158.372267197,"owner":"session-loop-scratch-host","kind":"allocate","instance":281474810615920,"allocation":12689227776,"requested_bytes":102400,"device":-1,"count":0}
+strata generate: token graph hit path: 391 resident experts, decided on the device
+strata serve: the prompt path allocates its own buffers (too few cache slots to borrow)
+strata integration: {"schema":1,"monotonic_s":3126158.374253320,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":11349996032,"requested_bytes":256,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126158.403081694,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":14076272640,"requested_bytes":67109120,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126158.411446696,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":14143385600,"requested_bytes":33554688,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.888325679,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":10745274880,"requested_bytes":655616,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.888664459,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":14362148864,"requested_bytes":2621696,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.888694379,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":11349997568,"requested_bytes":1280,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.888889641,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":14364774400,"requested_bytes":1310976,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.888914281,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":10745930752,"requested_bytes":82176,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.888933449,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":11588673536,"requested_bytes":41216,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.889154566,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":14366871552,"requested_bytes":2621696,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.889176902,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":11021454336,"requested_bytes":1280,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.889190726,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":10794820096,"requested_bytes":655616,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.889207142,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":12686749696,"requested_bytes":327936,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.889222214,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":10835624448,"requested_bytes":327936,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.889238214,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":11021455872,"requested_bytes":1280,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.891362576,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":14369497088,"requested_bytes":34328320,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.891371696,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14369497088,"requested_bytes":2621696,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891377167,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14372118784,"requested_bytes":1573120,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891381359,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14373691904,"requested_bytes":24832,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891384975,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14373716736,"requested_bytes":12544,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891388143,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14373729280,"requested_bytes":12544,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891391055,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14373741824,"requested_bytes":2621696,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891413423,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14376363520,"requested_bytes":1573120,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891417327,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14377936640,"requested_bytes":786688,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891420335,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14369497088,"requested_bytes":131328,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891423215,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14369628416,"requested_bytes":131328,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891425967,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14369759744,"requested_bytes":3145984,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891428687,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14372905728,"requested_bytes":1573120,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891431471,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14374478848,"requested_bytes":33024,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891434319,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14374511872,"requested_bytes":131328,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891437295,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14374643200,"requested_bytes":1573120,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891440303,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14376216320,"requested_bytes":786688,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891443151,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14377003008,"requested_bytes":525312,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891445903,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14377528320,"requested_bytes":133376,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891449167,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14377661696,"requested_bytes":26163456,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891452111,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14369497088,"requested_bytes":65792,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891455119,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14369562880,"requested_bytes":2816,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891458191,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14369565696,"requested_bytes":2816,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891460943,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14369568512,"requested_bytes":2816,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891463759,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14369571328,"requested_bytes":2816,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891466543,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14369574144,"requested_bytes":3277056,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891469422,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14372851200,"requested_bytes":6553856,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891472238,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14379405056,"requested_bytes":164096,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891479918,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14379569152,"requested_bytes":164096,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891483310,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14379733248,"requested_bytes":82176,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891486254,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14379815424,"requested_bytes":655616,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891488974,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14380471040,"requested_bytes":512,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891492014,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14380471552,"requested_bytes":1861888,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891494862,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14382333440,"requested_bytes":1638656,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891497614,"owner":"prefill","kind":"view","instance":187651011216400,"allocation":14383972096,"requested_bytes":755968,"device":0,"count":1}
+strata integration: {"schema":1,"monotonic_s":3126159.891899434,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":14403825664,"requested_bytes":6553856,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.892131688,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":14410383360,"requested_bytes":3277056,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.892478820,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":14413664256,"requested_bytes":6553856,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.892683298,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":14420221952,"requested_bytes":3277056,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.892708290,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":11588715008,"requested_bytes":2816,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.892725218,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":11588718080,"requested_bytes":2560,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.894017460,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":14423502848,"requested_bytes":27857152,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.894801964,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":14451363840,"requested_bytes":14749952,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.895914017,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":14466117632,"requested_bytes":21299456,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.895939264,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":11055497728,"requested_bytes":655616,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126159.895957920,"owner":"prefill","kind":"allocate","instance":187651011216400,"allocation":11627274240,"requested_bytes":41216,"device":0,"count":0}
+strata hc: CUDA0: the hyper-connection read runs as staged (the norm per token and stream, the down projection's activations staged ahead by cp.async); checked bit for bit against the plain read on this card (STRATA_HC_SPLIT=1 or 0 for the earlier ones)
+strata integration: {"schema":1,"monotonic_s":3126160.090406248,"owner":"verifier-mapped-host","kind":"allocate","instance":281474810660760,"allocation":12690651136,"requested_bytes":16,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126160.090494247,"owner":"verifier-mapped-host","kind":"allocate","instance":281474810660760,"allocation":12690651648,"requested_bytes":64,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126160.090521127,"owner":"verifier-mapped-host","kind":"allocate","instance":281474810660760,"allocation":12690652160,"requested_bytes":480,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126160.090537095,"owner":"verifier-mapped-host","kind":"allocate","instance":281474810660760,"allocation":12690652672,"requested_bytes":40,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126160.090557223,"owner":"verifier-mapped-host","kind":"allocate","instance":281474810660760,"allocation":12690653184,"requested_bytes":40960,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126160.090581894,"owner":"verifier-mapped-host","kind":"allocate","instance":281474810660760,"allocation":12690694144,"requested_bytes":32,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126160.090598246,"owner":"verifier-mapped-host","kind":"allocate","instance":281474810660760,"allocation":12690694656,"requested_bytes":40960,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126160.090625830,"owner":"verifier-mapped-host","kind":"allocate","instance":281474810660760,"allocation":12690735616,"requested_bytes":160,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126160.090643238,"owner":"verifier-mapped-host","kind":"allocate","instance":281474810660760,"allocation":12690736128,"requested_bytes":160,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126160.090656806,"owner":"verifier-mapped-host","kind":"allocate","instance":281474810660760,"allocation":12690736640,"requested_bytes":64,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126160.090669893,"owner":"verifier-mapped-host","kind":"allocate","instance":281474810660760,"allocation":12690737152,"requested_bytes":64,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126160.090683493,"owner":"verifier-mapped-host","kind":"allocate","instance":281474810660760,"allocation":12690737664,"requested_bytes":64,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126160.090697093,"owner":"verifier-mapped-host","kind":"allocate","instance":281474810660760,"allocation":12690738176,"requested_bytes":64,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126160.090709541,"owner":"verifier-mapped-host","kind":"allocate","instance":281474810660760,"allocation":12690738688,"requested_bytes":64,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126160.090725893,"owner":"verifier-mapped-host","kind":"allocate","instance":281474810660760,"allocation":12690739200,"requested_bytes":409600,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126160.090850372,"owner":"verifier-mapped-host","kind":"allocate","instance":281474810660760,"allocation":12691148800,"requested_bytes":2688,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126160.095259318,"owner":"verifier","kind":"allocate","instance":281474810660760,"allocation":14487420928,"requested_bytes":66183936,"device":0,"count":0}
+strata verify: window up to 4 tokens, 63.1 MiB of device buffers
+strata serve: 21932 MiB shared RAM available with everything loaded; 6144 MiB physical RAM headroom
+strata verify: capturing the 4-token window (21932 MiB of VRAM free)
+strata verify: queued NInfer IQ3_XXS/IQ4_NL resident grouped dispatch at layer 0 (CUDA IQ3_XXS/IQ4_NL, 2560/640)
+strata verify: queued NInfer IQ2_S/Q2_0 resident grouped dispatch at layer 1 (CUDA IQ2_S/Q2_0, 2560/640)
+strata verify: queued NInfer IQ2_S/IQ4_NL resident grouped dispatch at layer 2 (CUDA IQ2_S/IQ4_NL, 2560/640)
+strata verify: queued NInfer IQ3_XXS/Q2_0 resident grouped dispatch at layer 12 (CUDA IQ3_XXS/Q2_0, 2560/640)
+strata verify: queued NInfer IQ3_S/IQ4_NL resident grouped dispatch at layer 17 (CUDA IQ3_S/IQ4_NL, 2560/640)
+strata verify: queued NInfer IQ3_S/Q2_0 resident grouped dispatch at layer 21 (CUDA IQ3_S/Q2_0, 2560/640)
+strata verify: queued NInfer IQ4_XS/IQ4_NL resident grouped dispatch at layer 47 (CUDA IQ4_XS/IQ4_NL, 2560/640)
+strata integration: {"schema":1,"monotonic_s":3126160.120762479,"owner":"verifier","kind":"graph_instantiate","instance":281474810660760,"allocation":0,"requested_bytes":0,"device":0,"count":1}
+strata verify: captured the 4-token window (upload no error, sync no error)
+strata integration: {"schema":1,"monotonic_s":3126160.127158125,"owner":"verifier-commit-graph","kind":"graph_instantiate","instance":281474810660760,"allocation":0,"requested_bytes":0,"device":0,"count":1}
+strata verify: capturing the 3-token window (21880 MiB of VRAM free)
+strata integration: {"schema":1,"monotonic_s":3126164.539594586,"owner":"verifier","kind":"graph_instantiate","instance":281474810660760,"allocation":0,"requested_bytes":0,"device":0,"count":1}
+strata verify: captured the 3-token window (upload no error, sync no error)
+strata verify: capturing the 1-token window (21807 MiB of VRAM free)
+strata integration: {"schema":1,"monotonic_s":3126164.884238042,"owner":"verifier","kind":"graph_instantiate","instance":281474810660760,"allocation":0,"requested_bytes":0,"device":0,"count":1}
+strata verify: captured the 1-token window (upload no error, sync no error)
+strata serve: ACCEPTED_PREFIX position=43 window=1 accepted_drafts=0 committed=1 tokens=71093 state={STATE_HASH L=44 gdn=8c9331161a194f65 ple=5c8711e674efe627 tail=4efc38f8b9861596 pooled=4cb48847fc88aa84 kv=aea68258a7b0b673 mtp=14650fb0739d0383 stale=14650fb0739d0383 dead=22aab9b698ec768b pooled_full=e724a3b680d60418 ple_prev=248069,271}
+strata serve: ACCEPTED_PREFIX position=44 window=1 accepted_drafts=0 committed=1 tokens=12305 state={STATE_HASH L=45 gdn=45d9488981ed7aa7 ple=7b69dc1254c7d8b5 tail=75969d895edf4da5 pooled=4cb48847fc88aa84 kv=4d9dc0251b1b21b3 mtp=14650fb0739d0383 stale=3452ac1b08ca8383 dead=22aab9b698ec768b pooled_full=e724a3b680d60418 ple_prev=271,71093}
+strata serve: ACCEPTED_PREFIX position=45 window=1 accepted_drafts=0 committed=1 tokens=198 state={STATE_HASH L=46 gdn=26472f7322f9d315 ple=16ce0029d5541a84 tail=7adc992cb5d8bf40 pooled=4cb48847fc88aa84 kv=9983c8bb478fc2f5 mtp=14650fb0739d0383 stale=b1c3695b6c660383 dead=22aab9b698ec768b pooled_full=e724a3b680d60418 ple_prev=71093,12305}
+strata serve: ACCEPTED_PREFIX position=46 window=1 accepted_drafts=0 committed=1 tokens=727 state={STATE_HASH L=47 gdn=ed7945a7b37ba158 ple=99cad91bd0577a31 tail=01a96d39d8d301d1 pooled=4cb48847fc88aa84 kv=8a2e2071e7cec47b mtp=14650fb0739d0383 stale=011a3fe290018383 dead=22aab9b698ec768b pooled_full=e724a3b680d60418 ple_prev=12305,198}
+strata serve: ACCEPTED_PREFIX position=47 window=1 accepted_drafts=0 committed=1 tokens=369 state={STATE_HASH L=48 gdn=41580293a0d5a507 ple=695dd16b27c8980d tail=01a96d39d8d301d1 pooled=ed9ee05f26ceff35 kv=a007227bb65f5475 mtp=14650fb0739d0383 stale=14650fb0739d0383 dead=22aab9b698ec768b pooled_full=d49ff6c779c0d2cd ple_prev=198,727}
+strata serve: ACCEPTED_PREFIX position=48 window=1 accepted_drafts=0 committed=1 tokens=66034 state={STATE_HASH L=49 gdn=fe6f2c527562abd1 ple=5daca097d55baf26 tail=117dd561cac26ed2 pooled=ed9ee05f26ceff35 kv=c0b904c6ba0f0966 mtp=14650fb0739d0383 stale=3452ac1b08ca8383 dead=22aab9b698ec768b pooled_full=d49ff6c779c0d2cd ple_prev=727,369}
+strata serve: ACCEPTED_PREFIX position=49 window=1 accepted_drafts=0 committed=1 tokens=1393 state={STATE_HASH L=50 gdn=79d5ac70040162db ple=b7cc558191ae440e tail=19869d4c765b5b41 pooled=ed9ee05f26ceff35 kv=95915c976a96eb33 mtp=14650fb0739d0383 stale=b1c3695b6c660383 dead=22aab9b698ec768b pooled_full=d49ff6c779c0d2cd ple_prev=369,66034}
+strata serve: ACCEPTED_PREFIX position=50 window=3 accepted_drafts=0 committed=1 tokens=1590 state={STATE_HASH L=51 gdn=5f833cc809a56993 ple=7fb8f803754c190b tail=0ed2429d3ecaceea pooled=ed9ee05f26ceff35 kv=d0eb55b5a2721ae5 mtp=14650fb0739d0383 stale=2d1f88623137fd6e dead=22aab9b698ec768b pooled_full=d49ff6c779c0d2cd ple_prev=66034,1393}
+strata serve: ACCEPTED_PREFIX position=51 window=1 accepted_drafts=0 committed=1 tokens=198 state={STATE_HASH L=52 gdn=5e24c6dcbd14aeae ple=79f1f98a6c902c91 tail=0ed2429d3ecaceea pooled=ae4def4d0cae128e kv=a7ca6f4367d5f4c3 mtp=14650fb0739d0383 stale=14650fb0739d0383 dead=22aab9b698ec768b pooled_full=f686e90b61762b1e ple_prev=1393,1590}
+strata serve: ACCEPTED_PREFIX position=52 window=1 accepted_drafts=0 committed=1 tokens=262 state={STATE_HASH L=53 gdn=bee0fbf2799c7b4b ple=67969e18e0d3ddd9 tail=47a364f02178e5f3 pooled=ae4def4d0cae128e kv=5a7f2ef5d27b140d mtp=14650fb0739d0383 stale=3452ac1b08ca8383 dead=22aab9b698ec768b pooled_full=f686e90b61762b1e ple_prev=1590,198}
+strata serve: ACCEPTED_PREFIX position=53 window=1 accepted_drafts=0 committed=1 tokens=460 state={STATE_HASH L=54 gdn=e341719c6ad7aae3 ple=cee6ca56538ca902 tail=ce34fecb880f8d36 pooled=ae4def4d0cae128e kv=dd738fc3ed842ecb mtp=14650fb0739d0383 stale=b1c3695b6c660383 dead=22aab9b698ec768b pooled_full=f686e90b61762b1e ple_prev=198,262}
+strata serve: ACCEPTED_PREFIX position=54 window=1 accepted_drafts=0 committed=1 tokens=307 state={STATE_HASH L=55 gdn=86a93dcd6c0ecd29 ple=2f1f300dcbf5bfa9 tail=900266e14797ca46 pooled=ae4def4d0cae128e kv=56cdc803ee0514f3 mtp=14650fb0739d0383 stale=011a3fe290018383 dead=22aab9b698ec768b pooled_full=f686e90b61762b1e ple_prev=262,460}
+strata serve: ACCEPTED_PREFIX position=55 window=1 accepted_drafts=0 committed=1 tokens=984 state={STATE_HASH L=56 gdn=45e533e6a2c014fe ple=ef9d7b0ffb6a8fa4 tail=900266e14797ca46 pooled=428bc1f01632ae29 kv=51605951de7c762e mtp=14650fb0739d0383 stale=14650fb0739d0383 dead=22aab9b698ec768b pooled_full=6f4d4a107edbfd05 ple_prev=460,307}
+strata serve: ACCEPTED_PREFIX position=56 window=1 accepted_drafts=0 committed=1 tokens=220 state={STATE_HASH L=57 gdn=c28a987e9cd24ebe ple=57c80cc8117cd308 tail=b8d1478df95df467 pooled=428bc1f01632ae29 kv=9ae4d27ad3dec003 mtp=14650fb0739d0383 stale=3452ac1b08ca8383 dead=22aab9b698ec768b pooled_full=6f4d4a107edbfd05 ple_prev=307,984}
+strata serve: ACCEPTED_PREFIX position=57 window=1 accepted_drafts=0 committed=1 tokens=17 state={STATE_HASH L=58 gdn=73d7f0b0c502fa6c ple=31be3ba06d3332ee tail=12ead774befc135d pooled=428bc1f01632ae29 kv=a19640ac021bd161 mtp=14650fb0739d0383 stale=b1c3695b6c660383 dead=22aab9b698ec768b pooled_full=6f4d4a107edbfd05 ple_prev=984,220}
+strata serve: ACCEPTED_PREFIX position=58 window=1 accepted_drafts=0 committed=1 tokens=606 state={STATE_HASH L=59 gdn=a0a876aa047aed20 ple=d95760502016617e tail=4e1148524441560e pooled=428bc1f01632ae29 kv=d4a06682640a989e mtp=14650fb0739d0383 stale=011a3fe290018383 dead=22aab9b698ec768b pooled_full=6f4d4a107edbfd05 ple_prev=220,17}
+strata serve: ACCEPTED_PREFIX position=59 window=1 accepted_drafts=0 committed=1 tokens=220 state={STATE_HASH L=60 gdn=acf6e205efc234d3 ple=083550bcf5c6d77d tail=4e1148524441560e pooled=e43e2a79c1744f61 kv=eb7367e2cf72185d mtp=14650fb0739d0383 stale=14650fb0739d0383 dead=22aab9b698ec768b pooled_full=7ab7adfe90c89d9d ple_prev=17,606}
+strata serve: ACCEPTED_PREFIX position=60 window=1 accepted_drafts=0 committed=1 tokens=15 state={STATE_HASH L=61 gdn=a05a06643a30b893 ple=dcc1809aab923a7a tail=db669de396ad9623 pooled=e43e2a79c1744f61 kv=808b2e5dff85a518 mtp=14650fb0739d0383 stale=3452ac1b08ca8383 dead=22aab9b698ec768b pooled_full=7ab7adfe90c89d9d ple_prev=606,220}
+strata serve: ACCEPTED_PREFIX position=61 window=1 accepted_drafts=0 committed=1 tokens=198 state={STATE_HASH L=62 gdn=c752bfe2545240d3 ple=86b4818be8671921 tail=e4ca8012dfc5aedc pooled=e43e2a79c1744f61 kv=62e6f8bcfaedbf30 mtp=14650fb0739d0383 stale=b1c3695b6c660383 dead=22aab9b698ec768b pooled_full=7ab7adfe90c89d9d ple_prev=220,15}
+strata serve: ACCEPTED_PREFIX position=62 window=1 accepted_drafts=0 committed=1 tokens=71093 state={STATE_HASH L=63 gdn=460056f08455c214 ple=dffa2f4c10f9dbe8 tail=fad6f550d65ba5fd pooled=e43e2a79c1744f61 kv=329f66b19b9a0e62 mtp=14650fb0739d0383 stale=011a3fe290018383 dead=22aab9b698ec768b pooled_full=7ab7adfe90c89d9d ple_prev=15,198}
+strata serve: ACCEPTED_PREFIX position=63 window=1 accepted_drafts=0 committed=1 tokens=248046 state={STATE_HASH L=64 gdn=7a769f6b4b3dd469 ple=da68d8ed3bfccf16 tail=fad6f550d65ba5fd pooled=4e981835a5744e30 kv=0625035807247f9c mtp=14650fb0739d0383 stale=14650fb0739d0383 dead=22aab9b698ec768b pooled_full=0886a7a46c988a84 ple_prev=198,71093}
+strata serve: STATE_HASH L=64 gdn=7a769f6b4b3dd469 ple=da68d8ed3bfccf16 tail=fad6f550d65ba5fd pooled=4e981835a5744e30 kv=0625035807247f9c mtp=14650fb0739d0383 stale=14650fb0739d0383 dead=22aab9b698ec768b pooled_full=0886a7a46c988a84 ple_prev=198,71093
+strata serve: prompt 44 tokens = 0 reused + 44 read in 4765 ms (9.2 tok/s), 21 generated in 7735 ms (2.7 tok/s), drafts accepted 0 of 2, 0 checkpoints
+strata serve: decode expert cache hit rate: 3.4% (380 hits / 11040 lookups)
+strata serve: expert tiers: GPU 380 hits this request; since the start RAM 0 blobs, files 0 blobs 48066.5 MB read
+strata serve: suffix drafts: 1 windows, 0 of 2 drafts accepted
+strata integration: {"schema":1,"monotonic_s":3126172.835697283,"owner":"verifier","kind":"free","instance":281474810660760,"allocation":14487420928,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.835812098,"owner":"verifier-mapped-host","kind":"free","instance":281474810660760,"allocation":12690651136,"requested_bytes":0,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.835840002,"owner":"verifier-mapped-host","kind":"free","instance":281474810660760,"allocation":12690651648,"requested_bytes":0,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.835863041,"owner":"verifier-mapped-host","kind":"free","instance":281474810660760,"allocation":12690652160,"requested_bytes":0,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.835879649,"owner":"verifier-mapped-host","kind":"free","instance":281474810660760,"allocation":12690652672,"requested_bytes":0,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.835895201,"owner":"verifier-mapped-host","kind":"free","instance":281474810660760,"allocation":12690653184,"requested_bytes":0,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.835907329,"owner":"verifier-mapped-host","kind":"free","instance":281474810660760,"allocation":12690694144,"requested_bytes":0,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.835923841,"owner":"verifier-mapped-host","kind":"free","instance":281474810660760,"allocation":12690694656,"requested_bytes":0,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.835941440,"owner":"verifier-mapped-host","kind":"free","instance":281474810660760,"allocation":12690735616,"requested_bytes":0,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.835952576,"owner":"verifier-mapped-host","kind":"free","instance":281474810660760,"allocation":12690736128,"requested_bytes":0,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.835964704,"owner":"verifier-mapped-host","kind":"free","instance":281474810660760,"allocation":12690736640,"requested_bytes":0,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.835975456,"owner":"verifier-mapped-host","kind":"free","instance":281474810660760,"allocation":12690737152,"requested_bytes":0,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.835989856,"owner":"verifier-mapped-host","kind":"free","instance":281474810660760,"allocation":12690739200,"requested_bytes":0,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.836013696,"owner":"verifier-mapped-host","kind":"free","instance":281474810660760,"allocation":12690737664,"requested_bytes":0,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.836034272,"owner":"verifier-mapped-host","kind":"free","instance":281474810660760,"allocation":12691148800,"requested_bytes":0,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.836077855,"owner":"verifier-mapped-host","kind":"free","instance":281474810660760,"allocation":12690738176,"requested_bytes":0,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.836090303,"owner":"verifier-mapped-host","kind":"free","instance":281474810660760,"allocation":12690738688,"requested_bytes":0,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.836558586,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":11349996032,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.838149162,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":14076272640,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.838986849,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":14143385600,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.839018081,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":10745274880,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.839190399,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":14362148864,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.839214175,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":11349997568,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.839345469,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":14364774400,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.839365213,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":10745930752,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.839379581,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":11588673536,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.839523836,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":14366871552,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.839544923,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":11021454336,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.839559387,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":10794820096,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.839574651,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":12686749696,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.839584987,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":10835624448,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.839599451,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":11021455872,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.840533201,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":14369497088,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.840765583,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":14403825664,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.840917357,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":14410383360,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.841133739,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":14413664256,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.841283498,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":14420221952,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.841327945,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":11588715008,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.841345161,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":11588718080,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.842035234,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":14423502848,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.842456670,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":14451363840,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.843013272,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":14466117632,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.843033624,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":11055497728,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.843052983,"owner":"prefill","kind":"free","instance":187651011216400,"allocation":11627274240,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.846062872,"owner":"session-loop-scratch-host","kind":"free","instance":281474810615920,"allocation":12689227776,"requested_bytes":0,"device":-1,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126172.860305062,"owner":"expert-cache","kind":"free","instance":281474810619648,"allocation":13353250816,"requested_bytes":0,"device":0,"count":0}
+strata integration: {"schema":1,"monotonic_s":3126173.685712872,"owner":"session","kind":"free","instance":281474810652400,"allocation":12691300352,"requested_bytes":0,"device":0,"count":0}
