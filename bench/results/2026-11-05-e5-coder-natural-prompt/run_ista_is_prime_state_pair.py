@@ -161,20 +161,29 @@ def main() -> int:
     result = {'task': TASK, 'cases': CASES, 'prompt_tokens': len(prompt),
               'max_new': 128, 'temperature': 0,
               'accepted_prefix_capture': trace_prefix, 'arms': []}
+    def option_csv(name: str, default: str) -> list[int]:
+        raw = next((option.split('=', 1)[1] for option in options
+                    if option.startswith(name + '=')), default)
+        return [int(value) for value in raw.split(',') if value]
+
+    commit_positions = option_csv('--gdn-commit-positions', '80,81')
     if '--gdn-commit-capture' in options:
-        result['diagnostics'] = {'gdn_commit_positions': [80, 81], 'gdn_layers': 'all'}
+        result['diagnostics'] = {'gdn_commit_positions': commit_positions, 'gdn_layers': 'all'}
     gdn_capture_layer = next((int(option.split('=', 1)[1]) for option in options
                               if option.startswith('--gdn-layer-capture=')), None)
     if '--gdn-layer1-capture' in options and gdn_capture_layer is None:
         gdn_capture_layer = 1
+    gdn_layer_positions = option_csv('--gdn-layer-positions', '80,81')
     if gdn_capture_layer is not None:
         result.setdefault('diagnostics', {})['gdn_layer_capture'] = {
-            'layer': gdn_capture_layer, 'positions': [80, 81]}
-    moe_bundle_layer = next((int(option.split('=', 1)[1]) for option in options
+            'layer': gdn_capture_layer, 'positions': gdn_layer_positions}
+    moe_bundle_layer = next((option.split('=', 1)[1] for option in options
                              if option.startswith('--moe-bundle-layer=')), None)
+    moe_position = int(next((option.split('=', 1)[1] for option in options
+                             if option.startswith('--moe-position=')), '81'))
     if moe_bundle_layer is not None:
         result.setdefault('diagnostics', {})['moe_bundle_capture'] = {
-            'layer': moe_bundle_layer, 'position': 81}
+            'layer': moe_bundle_layer, 'position': moe_position}
     moe_exec = next((tuple(int(value) for value in option.split('=', 1)[1].split(','))
                      for option in options if option.startswith('--moe-exec=')), None)
     if moe_exec is not None:
@@ -209,19 +218,20 @@ def main() -> int:
             arm_env.update({
                 'STRATA_VERIFY_DUMP_GDN_COMMIT_LAYER': 'all',
                 'STRATA_VERIFY_DUMP_GDN_COMMIT_PATH': str(out / f'{backend}.gdncommit'),
-                'STRATA_VERIFY_DUMP_GDN_COMMIT_POSITIONS': '80,81',
+                'STRATA_VERIFY_DUMP_GDN_COMMIT_POSITIONS': ','.join(map(str, commit_positions)),
             })
         if gdn_capture_layer is not None:
             arm_env.update({
                 'STRATA_VERIFY_DUMP_GDN_LAYER': str(gdn_capture_layer),
-                'STRATA_VERIFY_DUMP_GDN_PATH': str(out / f'{backend}.gdn-layer1'),
-                'STRATA_VERIFY_DUMP_GDN_POSITIONS': '80,81',
+                'STRATA_VERIFY_DUMP_GDN_PATH': str(out / f'{backend}.gdn-layer{gdn_capture_layer}'),
+                'STRATA_VERIFY_DUMP_GDN_POSITIONS': ','.join(map(str, gdn_layer_positions)),
                 'STRATA_VERIFY_DUMP_GDN_O': '1',
             })
         if moe_bundle_layer is not None:
             arm_env.update({
-                'STRATA_VERIFY_DUMP_MOE_BUNDLE_LAYERS': str(moe_bundle_layer),
-                'STRATA_VERIFY_DUMP_MOE_BUNDLE_POSITION': '81',
+                'STRATA_VERIFY_DUMP_MOE_BUNDLE_LAYERS': ','.join(map(str, range(48)))
+                    if moe_bundle_layer == 'all' else moe_bundle_layer,
+                'STRATA_VERIFY_DUMP_MOE_BUNDLE_POSITION': str(moe_position),
                 'STRATA_VERIFY_DUMP_MOE_BUNDLE_PATH': str(out / f'{backend}.moe-bundle'),
             })
         if moe_exec is not None:

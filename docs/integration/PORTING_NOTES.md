@@ -72,6 +72,15 @@ resident-kernel comparison must hold the input, route, weights and owner fixed;
 separately measure ordinary policy behavior with its real residency and
 fallback distribution. See the [resident-row report](../../bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-prime-layer0-expert474-resident-run/README.md).
 
+The same long task also exposed diagnostic-mode sensitivity: with the same
+forced-resident binary and profile, a light layer-0 capture and a trace-free
+final-only pair showed state differences, while all-layer MoE captures and a
+single-expert execution capture produced exact recorded state hashes. All
+cases returned the same tokens. Do not count a debug-capture parity result as
+service qualification until its effect is tested against trace-free controls.
+For Splash, use paired diagnostic-on/off requests and vary one capture hook at
+a time before inferring that a state mismatch is fixed by an added dump.
+
 ## 2026-10-09 — Start at the measurement boundary
 
 The first implementation adds Python harnesses outside the engine. No NInfer

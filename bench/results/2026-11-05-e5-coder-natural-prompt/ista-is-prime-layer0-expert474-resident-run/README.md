@@ -34,12 +34,30 @@ output were bit-identical between Strata and strict NInfer. The common output
 also matched the native CUDA reference, establishing exact parity for this
 single resident IQ3_XXS/IQ4_NL row and activation.
 
-The forced-resident service pair still had differing persistent-state hashes;
-its first live-field difference moved to generated-token endpoint 60, versus
-endpoint 33 in the default-profile paired capture. This profile changes other
-expert residency and is not a controlled state-cause ablation. It does show
-that exact local kernel parity for expert 474 does not by itself resolve the
-long-task state discrepancy.
+## Persistent-state capture sensitivity
+
+Under the same forced-resident binary and profile, the light capture
+(`moe-bundle layer 0 + moe-exec expert 474`) reproduced persistent-state drift
+in two pairs: full hashes first differed at endpoint 50 (`stale`), live hashes
+at endpoint 60, and 50/80 shared endpoints matched. A layer-0 bundle by itself
+also differed (first full endpoint 32, live endpoint 41; 32/80 matched).
+A trace-free final-only pair returned identical task tokens but differed in
+`gdn`, `ple`, `tail`, `pooled`, `kv` and `pooled_full` final hashes.
+
+By contrast, the standalone `moe-exec` capture matched all 81 shared state
+endpoints, and all-layer MoE bundles at either position 81 or 109 matched all
+80 shared endpoints and final hashes. The combined all-layer MoE/GDN capture
+also matched every recorded endpoint; at position 109 its 48 MoE layers and
+all 36 GDN commit states were bit-identical. All eight cases used the same
+binary hash, forced-resident profile hash, model, prompt and output token IDs.
+The diagnostic mode therefore correlates with the state result. Its cause is
+unknown; the exact-state dump modes are observer-sensitive and are not used as
+service parity qualification. The default-profile comparison also changed the
+actual owner, so neither profile comparison isolates the full-sequence cause.
+
+See the [capture-sensitivity matrix](state-capture-sensitivity.json). This
+confirms that exact local kernel parity for expert 474 does not resolve the
+long-task state discrepancy or its instrumentation sensitivity.
 
 ## Reproduction and evidence
 
@@ -47,8 +65,12 @@ long-task state discrepancy.
   [`../ista-is-prime-layer1-plus-layer0-moe-run/results.json`](../ista-is-prime-layer1-plus-layer0-moe-run/results.json)
 - Forced-resident paired capture and comparator:
   [`moe-layer0-comparison.json`](moe-layer0-comparison.json)
+- Forced-resident run telemetry and command:
+  [`../ista-is-prime-layer0-expert474-resident-supervisor/result.json`](../ista-is-prime-layer0-expert474-resident-supervisor/result.json)
 - Same-input Strata/NInfer and native CPU/GPU output comparison:
   [`expert474-oracle-comparison.json`](expert474-oracle-comparison.json)
+- Persistent-state diagnostic-mode matrix:
+  [`state-capture-sensitivity.json`](state-capture-sensitivity.json)
 - Reproducible bundle/oracle analyzer:
   [`compare_expert474_oracle.py`](../compare_expert474_oracle.py)
 - Exact-input CPU/GPU native oracle supervisor:

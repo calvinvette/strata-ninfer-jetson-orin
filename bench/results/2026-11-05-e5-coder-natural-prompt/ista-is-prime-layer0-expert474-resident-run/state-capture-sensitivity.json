@@ -1,0 +1,150 @@
+{
+  "schema": 1,
+  "model": "ISTA-DASLab Qwen3.8-Flash-Next IQ3_S GGUF + iq3-s-pack",
+  "prompt": "held-out is_prime; 50 prompt tokens; 91 generated tokens",
+  "runtime": "E0 CUDA binary, strict NInfer vs Strata, forced-resident profile moving layer0/expert474 to rank0; spec2; same model, binary and profile across all listed cases",
+  "binary_sha256": "df8e666b8d19dbdc5f687826b4d7187783f4c91aaf5ba2037497a65823d4be98",
+  "profile_sha256": "0141f1c379ca1460423e17583eb59e1504554c7c6a72e4eb6b50a52fe8060269",
+  "interpretation": "Diagnostic configuration correlates with persistent-state outcome despite identical model, binary, profile and token IDs. The 1-layer MoE bundle cases and trace-free final-only case show state differences; all-layer bundles and single-expert exec-only show exact traced state. This is instrumentation-sensitive evidence and does not identify the underlying race/order dependency. Do not use the exact-state diagnostic modes as service parity qualification.",
+  "experiments": [
+    {
+      "case": "forced_resident_light_first",
+      "run_directory": "ista-is-prime-layer0-expert474-resident-run",
+      "diagnostics": [
+        "moe_bundle_layer=0@81",
+        "moe_exec=0,474,81"
+      ],
+      "accepted_prefix_capture": true,
+      "task_passes_both": true,
+      "token_ids_equal": true,
+      "first_full_state_difference_endpoint": 50,
+      "first_non_stale_state_difference_endpoint": 60,
+      "equal_shared_full_state_endpoints": 50,
+      "shared_state_endpoints": 80,
+      "final_state_equal": false,
+      "final_state_difference_fields": []
+    },
+    {
+      "case": "forced_resident_light_repeat",
+      "run_directory": "ista-is-prime-forced-resident-light-repeat-run",
+      "diagnostics": [
+        "moe_bundle_layer=0@81",
+        "moe_exec=0,474,81"
+      ],
+      "accepted_prefix_capture": true,
+      "task_passes_both": true,
+      "token_ids_equal": true,
+      "first_full_state_difference_endpoint": 50,
+      "first_non_stale_state_difference_endpoint": 60,
+      "equal_shared_full_state_endpoints": 50,
+      "shared_state_endpoints": 80,
+      "final_state_equal": false,
+      "final_state_difference_fields": []
+    },
+    {
+      "case": "forced_resident_single_layer_bundle",
+      "run_directory": "ista-is-prime-moe-layer0-only-run",
+      "diagnostics": [
+        "moe_bundle_layer=0@81"
+      ],
+      "accepted_prefix_capture": true,
+      "task_passes_both": true,
+      "token_ids_equal": true,
+      "first_full_state_difference_endpoint": 32,
+      "first_non_stale_state_difference_endpoint": 41,
+      "equal_shared_full_state_endpoints": 32,
+      "shared_state_endpoints": 80,
+      "final_state_equal": false,
+      "final_state_difference_fields": []
+    },
+    {
+      "case": "forced_resident_single_expert_exec",
+      "run_directory": "ista-is-prime-exec-only-run",
+      "diagnostics": [
+        "moe_exec=0,474,81"
+      ],
+      "accepted_prefix_capture": true,
+      "task_passes_both": true,
+      "token_ids_equal": true,
+      "first_full_state_difference_endpoint": null,
+      "first_non_stale_state_difference_endpoint": null,
+      "equal_shared_full_state_endpoints": 81,
+      "shared_state_endpoints": 81,
+      "final_state_equal": true,
+      "final_state_difference_fields": []
+    },
+    {
+      "case": "forced_resident_all_layer_bundle_pos81",
+      "run_directory": "ista-is-prime-all-moe-pos81-run",
+      "diagnostics": [
+        "moe_bundle_layer=all@81"
+      ],
+      "accepted_prefix_capture": true,
+      "task_passes_both": true,
+      "token_ids_equal": true,
+      "first_full_state_difference_endpoint": null,
+      "first_non_stale_state_difference_endpoint": null,
+      "equal_shared_full_state_endpoints": 80,
+      "shared_state_endpoints": 80,
+      "final_state_equal": true,
+      "final_state_difference_fields": []
+    },
+    {
+      "case": "forced_resident_all_layer_bundle_pos109",
+      "run_directory": "ista-is-prime-all-moe-only-run",
+      "diagnostics": [
+        "moe_bundle_layer=all@109"
+      ],
+      "accepted_prefix_capture": true,
+      "task_passes_both": true,
+      "token_ids_equal": true,
+      "first_full_state_difference_endpoint": null,
+      "first_non_stale_state_difference_endpoint": null,
+      "equal_shared_full_state_endpoints": 80,
+      "shared_state_endpoints": 80,
+      "final_state_equal": true,
+      "final_state_difference_fields": []
+    },
+    {
+      "case": "forced_resident_full_capture_pos109",
+      "run_directory": "ista-is-prime-state-boundary-followup-run",
+      "diagnostics": [
+        "gdn_commit=108,109",
+        "gdn_layer=1@108,109",
+        "moe_bundle_layer=all@109"
+      ],
+      "accepted_prefix_capture": true,
+      "task_passes_both": true,
+      "token_ids_equal": true,
+      "first_full_state_difference_endpoint": null,
+      "first_non_stale_state_difference_endpoint": null,
+      "equal_shared_full_state_endpoints": 80,
+      "shared_state_endpoints": 80,
+      "final_state_equal": true,
+      "final_state_difference_fields": []
+    },
+    {
+      "case": "forced_resident_final_only",
+      "run_directory": "ista-is-prime-forced-resident-final-only-run",
+      "diagnostics": [
+        "no_prefix_trace"
+      ],
+      "accepted_prefix_capture": false,
+      "task_passes_both": true,
+      "token_ids_equal": true,
+      "first_full_state_difference_endpoint": null,
+      "first_non_stale_state_difference_endpoint": null,
+      "equal_shared_full_state_endpoints": null,
+      "shared_state_endpoints": null,
+      "final_state_equal": false,
+      "final_state_difference_fields": [
+        "gdn",
+        "ple",
+        "tail",
+        "pooled",
+        "kv",
+        "pooled_full"
+      ]
+    }
+  ]
+}
