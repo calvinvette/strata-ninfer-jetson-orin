@@ -1,4 +1,4 @@
-# Coder context-capacity screen (interim)
+# Coder configured-context-capacity screen
 
 Date: 2026-11-05. Jetson AGX Orin, SM87, CUDA 12.6. The sweep compares the
 Strata and strict-NInfer expert backends on the same Coder IQ1_M 512-token
@@ -19,11 +19,14 @@ guard. Each output is checked against an 11-case independent function oracle.
 | 32K | −0.34% [−1.47%, +1.49%] | +0.44% | +0.40% | +0.27% | 89 tokens equal; pass | 14.07 GiB |
 | 64K | +4.54% [−2.32%, +242.32%] | −1.18% | −1.21% | +1.09% | 89 tokens equal; pass | 13.31 GiB |
 | 128K | −0.02% [−1.39%, +1.32%] | +1.02% | +0.93% | +0.67% | 89 tokens equal; pass | 11.78 GiB |
+| 256K | −8.72% [−17.70%, −3.35%] | −1.93% | −2.07% | −4.52% | 89 tokens equal; pass | 8.52 GiB |
 
 Effects are NInfer relative to Strata; positive decode/prompt changes and TTFT/client
 reductions favor NInfer. The 2K cell contains one severe retained outlier, reflected
-in its wide interval. No completed cell meets the 5% decode-gain criterion. Each
-supervisor passed with return code zero and retained the six-GiB memory floor.
+in its wide interval. No cell demonstrates a useful NInfer gain. Each supervisor
+passed with return code zero and retained the six-GiB memory floor. The 256K
+decode effect was negative in all four pairs; its existing cgroup OOM-kill
+counter stayed at one.
 At 64K, the fourth Strata arm decoded at 2.34 tok/s versus 7.66–8.29 tok/s in
 the other Strata arms; that pair alone produced a +242% NInfer decode effect and
 +50.9% client-time reduction. Its expert lookups and file-read volume were also
@@ -31,15 +34,20 @@ higher (34,354 / 66.9 GB versus 32,498 / 64.4 GB in the other arms). The source
 of that single-arm slowdown is unresolved. The 64K median is below 5%, and its
 interval spans zero by a wide margin; it is not evidence of a gain.
 
-## Scope and current decision
+## Scope and decision
 
 These are context **reservations**, not long-prompt ingestion tests: every cell
 uses the same 512-token prompt and 89-token generation. They do not establish
 performance at a matching actual prompt length, broad task quality, or a release
-profile. The evidence so far does not support a context-capacity-dependent
-NInfer gain. Keep E6/E7 open and do not promote a profile. Larger configured
-the 256K configured-capacity cell is still running; this interim report will
-be updated when the campaign terminates.
+profile. NInfer decode regressed 8.72% at the 256K reservation, with the paired
+interval wholly below zero; prompt TPS, TTFT and client duration also regressed.
+At lower reservations the paired effects were small, mostly negative or too
+uncertain, including one severe Strata outlier at 64K. This screen gives no
+performance basis to promote NInfer for this Coder profile. Keep E6/E7 open;
+broader task, actual long-prompt and release gates remain unaddressed. Clock
+sampling was read-only and clocks remained dynamic; EMC readback was unavailable,
+energy was not measured, and arm orders were fixed/balanced rather than
+randomized.
 
 Per-cell records: [`context-1024/results.json`](context-1024/results.json),
 [`context-2048/results.json`](context-2048/results.json),
@@ -48,6 +56,7 @@ Per-cell records: [`context-1024/results.json`](context-1024/results.json),
 [`context-16384/results.json`](context-16384/results.json),
 [`context-32768/results.json`](context-32768/results.json),
 [`context-65536/results.json`](context-65536/results.json),
-[`context-131072/results.json`](context-131072/results.json). Supervisor summaries
+[`context-131072/results.json`](context-131072/results.json),
+[`context-262144/results.json`](context-262144/results.json). Supervisor summaries
 are adjacent under `supervisor-{capacity}/result.json`; raw telemetry and arm logs
 remain local and are not part of this interim report.

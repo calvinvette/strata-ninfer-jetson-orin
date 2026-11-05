@@ -3597,6 +3597,10 @@ That cell also regressed prompt TPS by 1.18% and had a 1.09% median reduction
 in client duration. The 64K result does not clear the performance gate. The
 128K screen passed quality and memory guards and measured −0.02% decode change
 (95% interval −1.39% to +1.32%); prompt TPS, TTFT and client-time changes were
-within 1.1%. Only 256K remains in progress; E6/E7 remain open
-and no profile is promoted. See the [interim report](../../bench/results/2026-11-05-e6-coder-capacity-screen/README.md)
+within 1.1%. At 256K, decode changed −8.72% (95% interval −17.70% to −3.35%),
+prompt TPS −1.93%, TTFT reduction −2.07% and client-time reduction −4.52%; all
+four pairs regressed on decode. Minimum available RAM was 8.52 GiB and the
+six-GiB supervisor passed. This screen does not establish long-prompt behavior.
+No configured-capacity cell supports a useful NInfer gain. E6/E7 remain open
+and no profile is promoted. See the [completed capacity screen](../../bench/results/2026-11-05-e6-coder-capacity-screen/README.md)
 and its per-cell records.
