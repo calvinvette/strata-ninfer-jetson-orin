@@ -11,7 +11,8 @@
     "cross_backend_final_state_equal_pairs": 2,
     "distinct_strata_final_states": 2,
     "distinct_ninfer_final_states": 2,
-    "interpretation": "All four pairs returned identical task tokens and passed the 11-case code oracle. Both Strata-first pairs had different final state hashes across backends; both NInfer-first pairs matched across backends. Each backend produced two distinct final fingerprints across the four runs. Thus pair outcome is associated with backend order in this small balanced sample, but fingerprints also vary across repeats and this does not prove causality or a stable state contract; actual ownership of all routed expert rows was not fixed."
+    "interpretation": "Four cross-backend pairs returned identical task tokens and passed the 11-case code oracle. Both Strata-first pairs had different final state hashes across backends; both NInfer-first pairs matched across backends. Each backend produced two distinct fingerprints across those four runs. Separate same-backend controls then produced exact state equality in two adjacent fresh-process pairs. The Strata control fingerprint was a third value relative to the cross-backend campaign; the NInfer control matched one of its two prior values. Thus adjacent same-backend repeatability is possible, while fingerprints still vary across campaigns and cross-backend outcome is associated with order in this small sample. This does not establish causality or a stable state contract; actual ownership of all routed expert rows was not fixed.",
+    "same_backend_self_repeat_pairs_equal": 2
   },
   "runs": [
     {
@@ -236,5 +237,114 @@
         }
       }
     }
-  ]
+  ],
+  "same_backend_controls": {
+    "interpretation": "Each control starts and closes two fresh engine processes in sequence, using the same backend and otherwise identical task/profile. Both produced identical tokens, passed the task oracle, and had identical terminal state hashes within the pair. Their fingerprints are recorded independently from the cross-backend pairs; this demonstrates immediate same-backend pair repeatability only, not stability across campaign runs.",
+    "pairs": [
+      {
+        "backend": "strata",
+        "runner_directory": "ista-is-prime-strata-self-repeat-run",
+        "supervisor_directory": "ista-is-prime-strata-self-repeat-supervisor",
+        "backend_order": [
+          "strata",
+          "strata"
+        ],
+        "task_passes_both": true,
+        "token_ids_equal": true,
+        "final_state_equal": true,
+        "difference_fields": [],
+        "minimum_available_bytes": 21062881280,
+        "arms": [
+          {
+            "token_sha256": "0dcc863e044482ba5710c38b40e77f638e0eb3596a9e03a3734fcff19b8d571e",
+            "token_count": 91,
+            "cases_pass": true,
+            "final_state": {
+              "L": "140",
+              "gdn": "6eeed0513070613a",
+              "ple": "eb16e2fc575a6ac3",
+              "tail": "630e4f2b1c1ddab1",
+              "pooled": "41dfeb790aec8c22",
+              "kv": "34f27b4f7f4f03d4",
+              "mtp": "14650fb0739d0383",
+              "stale": "14650fb0739d0383",
+              "dead": "5394b4e5ab7464e2",
+              "pooled_full": "7f8fbc0b0ab7e40f",
+              "ple_prev": "198,71093"
+            }
+          },
+          {
+            "token_sha256": "0dcc863e044482ba5710c38b40e77f638e0eb3596a9e03a3734fcff19b8d571e",
+            "token_count": 91,
+            "cases_pass": true,
+            "final_state": {
+              "L": "140",
+              "gdn": "6eeed0513070613a",
+              "ple": "eb16e2fc575a6ac3",
+              "tail": "630e4f2b1c1ddab1",
+              "pooled": "41dfeb790aec8c22",
+              "kv": "34f27b4f7f4f03d4",
+              "mtp": "14650fb0739d0383",
+              "stale": "14650fb0739d0383",
+              "dead": "5394b4e5ab7464e2",
+              "pooled_full": "7f8fbc0b0ab7e40f",
+              "ple_prev": "198,71093"
+            }
+          }
+        ]
+      },
+      {
+        "backend": "ninfer",
+        "runner_directory": "ista-is-prime-ninfer-self-repeat-run",
+        "supervisor_directory": "ista-is-prime-ninfer-self-repeat-supervisor",
+        "backend_order": [
+          "ninfer",
+          "ninfer"
+        ],
+        "task_passes_both": true,
+        "token_ids_equal": true,
+        "final_state_equal": true,
+        "difference_fields": [],
+        "minimum_available_bytes": 21146681344,
+        "arms": [
+          {
+            "token_sha256": "0dcc863e044482ba5710c38b40e77f638e0eb3596a9e03a3734fcff19b8d571e",
+            "token_count": 91,
+            "cases_pass": true,
+            "final_state": {
+              "L": "140",
+              "gdn": "c86e1feabadf0e54",
+              "ple": "31766a82e2ce61a7",
+              "tail": "564b5ef90688faca",
+              "pooled": "b8de775489323436",
+              "kv": "c4603871c12727f2",
+              "mtp": "14650fb0739d0383",
+              "stale": "14650fb0739d0383",
+              "dead": "5394b4e5ab7464e2",
+              "pooled_full": "6bd6ba3df2e58e43",
+              "ple_prev": "198,71093"
+            }
+          },
+          {
+            "token_sha256": "0dcc863e044482ba5710c38b40e77f638e0eb3596a9e03a3734fcff19b8d571e",
+            "token_count": 91,
+            "cases_pass": true,
+            "final_state": {
+              "L": "140",
+              "gdn": "c86e1feabadf0e54",
+              "ple": "31766a82e2ce61a7",
+              "tail": "564b5ef90688faca",
+              "pooled": "b8de775489323436",
+              "kv": "c4603871c12727f2",
+              "mtp": "14650fb0739d0383",
+              "stale": "14650fb0739d0383",
+              "dead": "5394b4e5ab7464e2",
+              "pooled_full": "6bd6ba3df2e58e43",
+              "ple_prev": "198,71093"
+            }
+          }
+        ]
+      }
+    ]
+  }
 }

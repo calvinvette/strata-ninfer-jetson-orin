@@ -158,7 +158,14 @@ def main() -> int:
         env['STRATA_COMMIT_SYNC'] = '1'
     if trace_prefix:
         env['STRATA_ACCEPTED_PREFIX_TRACE'] = '1'
-    backend_order = ('ninfer', 'strata') if '--reverse-backends' in options else ('strata', 'ninfer')
+    order_option = next((option.split('=', 1)[1] for option in options
+                         if option.startswith('--backend-order=')), None)
+    if order_option is not None:
+        backend_order = tuple(value.strip() for value in order_option.split(','))
+        if len(backend_order) != 2 or any(value not in {'strata', 'ninfer'} for value in backend_order):
+            raise ValueError('--backend-order must name two backends (strata,ninfer); repeats are allowed')
+    else:
+        backend_order = ('ninfer', 'strata') if '--reverse-backends' in options else ('strata', 'ninfer')
     result = {'task': TASK, 'cases': CASES, 'prompt_tokens': len(prompt),
               'max_new': 128, 'temperature': 0,
               'accepted_prefix_capture': trace_prefix,

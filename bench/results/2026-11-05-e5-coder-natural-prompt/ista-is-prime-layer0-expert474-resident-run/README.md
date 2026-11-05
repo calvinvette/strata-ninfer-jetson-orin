@@ -65,9 +65,14 @@ The canonical default-profile comparison adds a second view of this behavior.
 Four trace-free pairs, balanced across backend order, passed the task oracle and
 emitted identical tokens. Both Strata-first pairs had unequal cross-backend
 final hashes; both NInfer-first pairs matched. Each backend produced two
-distinct fingerprints across repeats. This small sample associates pair outcome
-with order but does not establish the mechanism or implicate NInfer, since all
-routed expert owners were not fixed. See the [default-profile final-state
+distinct fingerprints across the four cross-backend runs. Separate pairs of
+back-to-back fresh Strata processes and fresh NInfer processes matched their
+tokens and final hashes internally. The Strata self-control had a third
+fingerprint relative to the cross-backend campaign; NInfer repeated an earlier
+one. This supports immediate same-backend repeatability, but not stable hashes
+across campaigns. The cross-backend outcome associates with order in this small
+sample but does not establish the mechanism or implicate NInfer, since all routed
+expert owners were not fixed. See the [default-profile final-state
 repeats](default-profile-final-only-repeats.json).
 
 See the [capture-sensitivity matrix](state-capture-sensitivity.json). This

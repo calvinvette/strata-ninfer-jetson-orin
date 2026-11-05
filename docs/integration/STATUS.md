@@ -124,11 +124,15 @@ Broader state and quality qualification remains open. See the
 trace-free pairs on the held-out ISTA IQ3_S `is_prime` task (two per backend
 order) returned identical 91-token outputs and passed the 11-case oracle. Both
 Strata-first pairs had different cross-backend final hashes; both NInfer-first
-pairs matched. Each backend produced two distinct fingerprints across the four
-runs. This small balanced sample shows pair outcome associated with backend
-order plus within-backend variation, but not causality or a stable state
-contract because all routed expert owners were not controlled. Minimum available
-RAM was 19.65–19.69 GiB. Mixed-codec E5 state qualification remains open. See the
+pairs matched. Each backend produced two distinct fingerprints across those
+four runs. Additional back-to-back same-backend fresh-process pairs (Strata
+then NInfer) matched tokens and final hashes internally; the Strata pair
+produced a third fingerprint relative to the cross-backend runs, while the
+NInfer pair repeated an earlier one. This supports immediate same-backend
+repeatability, not cross-campaign stability. The cross-backend outcome remains
+associated with order in this small sample, without causal attribution because
+all routed expert owners were not controlled. Available RAM minima were
+19.62–19.69 GiB. Mixed-codec E5 state qualification remains open. See the
 [repeat summary](../../bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-prime-layer0-expert474-resident-run/default-profile-final-only-repeats.json).
 
 **E5 8K mixed-codec Coder retrieval (2026-11-05):** two fresh final-only

@@ -69,9 +69,12 @@ A follow-up on the canonical default profile used four fresh, trace-free
 `is_prime` pairs, balanced at two per backend order. All tokens and task checks
 matched. Both Strata-first pairs had cross-backend final-state differences;
 both NInfer-first pairs matched. Each backend produced two final fingerprints
-across repeats. The small sample shows an association between pair outcome and
-backend order plus within-backend variation, but does not prove a mechanism or
-implicate NInfer, since all routed expert owners were not fixed. See the
+across repeats. Back-to-back fresh-process self-controls matched within each
+backend, although the Strata control had a new fingerprint relative to the
+cross-backend campaign. This supports immediate repeatability while showing
+that fingerprints can vary between campaigns. The small cross-backend sample
+shows an association between pair outcome and order, but does not prove a
+mechanism or implicate NInfer, since all routed expert owners were not fixed. See the
 [default-profile summary](../../bench/results/2026-11-05-e5-coder-natural-prompt/ista-is-prime-layer0-expert474-resident-run/default-profile-final-only-repeats.json).
 
 For future NInfer and Splash comparisons, record the selected expert's cache
