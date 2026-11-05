@@ -14,6 +14,7 @@ EXPECTED = '73192'
 TARGET_PROMPT = int(sys.argv[2]) if len(sys.argv) > 2 else 2048
 CONTEXT_RESERVATION = int(sys.argv[3]) if len(sys.argv) > 3 else 4096
 TRACE_PREFIXES = len(sys.argv) > 4 and sys.argv[4] == 'trace'
+SPEC_WINDOW = int(sys.argv[5]) if len(sys.argv) > 5 and sys.argv[5] != '-' else None
 PREFIX = 'Archived closed tickets: '
 FILLER = 'ticket closed code 11804; status resolved. '
 SUFFIX = (
@@ -42,6 +43,8 @@ def main() -> int:
     del args[args.index('--tokens'):args.index('--tokens') + 2]
     args[args.index('--max-new') + 1] = '16'
     args[args.index('--max-context') + 1] = str(CONTEXT_RESERVATION)
+    if SPEC_WINDOW is not None:
+        args[args.index('--spec') + 1] = str(SPEC_WINDOW)
     tokenizer_path = Path('/home/calvin/models/strata-orin-validation/pack/tokenizer')
     tokenizer = load_tokenizer(tokenizer_path)
     template = ChatTemplate(tokenizer_path / 'chat_template.jinja')
@@ -91,7 +94,8 @@ def main() -> int:
         'expected_answer': EXPECTED, 'prompt_tokens': len(prompt), 'context_reservation': CONTEXT_RESERVATION,
         'prompt_token_ids_sha256': hashlib.sha256(json.dumps(prompt, separators=(',', ':')).encode()).hexdigest(),
         'prompt_content_sha256': hashlib.sha256(content.encode()).hexdigest(),
-        'max_new': 16, 'temperature': 0, 'accepted_prefix_capture': TRACE_PREFIXES,
+        'max_new': 16, 'temperature': 0, 'spec_window': args[args.index('--spec') + 1],
+        'accepted_prefix_capture': TRACE_PREFIXES,
         'identity': {
             'binary_sha256': file_sha256(Path(executable)), 'profile_sha256': file_sha256(profile),
             'expert_profile': profile.name,

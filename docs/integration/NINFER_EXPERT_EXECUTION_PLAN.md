@@ -693,6 +693,17 @@ timings are descriptive only. It does not close broader E5 state/quality
 coverage or E6. See the
 [8K Coder retrieval report](../../bench/results/2026-11-05-e5-coder-natural-prompt/retrieval-8k-final-only/README.md).
 
+Execution note (2026-11-05): two fresh pairs each compared Coder IQ1_M MTP-2
+and MTP-4 on the same exact 512-token retrieval prompt with the static expert
+profile. All eight backend requests returned identical six-token answers;
+all 11 final-state fingerprints matched across backends, repeats and MTP
+windows. Both settings accepted two of two offered drafts. The native IQ pack
+rejected MTP-off (`--spec 0`) before loading because its CLI requires `T >= 2`;
+MTP-off is unsupported in this configuration. This is one short task and
+terminal-state check, not MTP performance or rejected-suffix isolation
+evidence. See the
+[MTP window report](../../bench/results/2026-11-05-e5-coder-natural-prompt/mtp-window-comparison/README.md).
+
 1. Test held-out short and long requests, repeated continuation, retrieval and
    scoring, cancellation and recovery. Compare state and numerical results in
    addition to text. Retain original/default-route regression evidence.

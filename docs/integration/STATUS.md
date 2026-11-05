@@ -70,6 +70,17 @@ evidence. This adds one bounded context cell, with broader E5 state/quality
 coverage still open. See the
 [8K retrieval report](../../bench/results/2026-11-05-e5-coder-natural-prompt/retrieval-8k-final-only/README.md).
 
+**E5 Coder IQ1_M MTP window check (2026-11-05):** two fresh MTP-2 and two
+fresh MTP-4 pairs used the same 512-token retrieval prompt and static expert
+map. All eight requests returned `73192` with identical token IDs; all 11
+final-state fields matched across backend, repeat and MTP window. Each arm
+accepted 2/2 draft tokens. MTP-off was rejected before model load because the
+native IQ pack requires `--spec T` with `T >= 2`; record it as unsupported for
+this configuration. Memory stayed above 21.02 GiB and the existing OOM-kill
+counter stayed at one. This is correctness evidence only; prefix-state,
+cancellation/recovery and performance gates remain open. See the
+[MTP window report](../../bench/results/2026-11-05-e5-coder-natural-prompt/mtp-window-comparison/README.md).
+
 **E6 Coder IQ1_M performance screen (2026-11-05):** three same-profile
 Strata/strict-NInfer pairs measured the held-out `is_prime` task with state
 hashing disabled. All six requests generated the same 89 tokens, passed the
