@@ -3242,3 +3242,15 @@ unquantized FP64 projection by about `1.1211e-2`, which includes activation
 and hidden quantization and is not a universal error tolerance. This verifies
 one resident IQ3_XXS/IQ4_NL row, not whole-model state behavior. See the [oracle
 report](../../bench/results/2026-11-05-e5-coder-natural-prompt/README.md#independent-oracle-for-a-resident-mixed-codec-service-row).
+
+Execution note (2026-11-05): a held-out local replay of layer 1 / prompt
+position 41 / expert 198 compared the paired service-captured activation rows
+with the independent Q8_1 oracle. Relative input L2 was `3.80e-7`; one of 80
+Q8_1 input blocks changed its stored FP16 scale while all integer codes stayed
+identical. The pre-rounding scales differed by `4.66e-10`. Actual CUDA Q8_1
+quantization agreed with the oracle on both rows, and NInfer/native grouped
+expert replay was bit-identical on each same input. This establishes a local
+scale-rounding boundary that can amplify the small upstream activation delta;
+it does not establish the sole cause of subsequent MoE/state divergence or a
+permissible numerical tolerance. See the [expert-198 stage
+report](../../bench/results/2026-11-05-e5-coder-natural-prompt/layer1-expert198-service-input-oracle/README.md).

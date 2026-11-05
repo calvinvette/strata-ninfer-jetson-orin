@@ -159,10 +159,17 @@ GPU operation on the two slightly different service inputs changes each
 expert output by relative L2 `2.36e-4` to `1.75e-3`, matching the direction and
 scale of the service bundle differences. This is strong evidence that the
 layer-1 divergence is driven by the changed activation entering the experts,
-not an NInfer-versus-Strata kernel mismatch for a fixed input. The exact source
-of the small upstream activation difference and its interaction with expert
-quantization remain open; the Q8_1 boundary mechanism has not been independently
-proven.
+not an NInfer-versus-Strata kernel mismatch for a fixed input. A follow-up on
+layer 1 / position 41 / expert 198 found that the two input activations differ
+by relative L2 `3.80e-7`, yet one of 80 input Q8_1 blocks stores a different
+FP16 scale while all integer codes match. The actual CUDA quantizer agrees
+with the independent Q8_1 oracle for both rows, and same-input NInfer/native
+expert replays are bit-identical. This proves a local input-quantization scale
+boundary, but does not assign all layer-1 output or later state drift to that
+one block or define an acceptable state tolerance. See the [expert-198
+quantization report](layer1-expert198-service-input-oracle/README.md). The
+source of the small upstream activation difference, numerical tolerance and
+user-visible impact remain open.
 
 The layer-1 GDN stage capture further narrows that boundary at position 41:
 incoming `x` differs by relative L2 `7.75e-8`, while `qkv` and recurrent `h`
