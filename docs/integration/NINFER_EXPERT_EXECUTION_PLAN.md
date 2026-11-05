@@ -624,7 +624,12 @@ inputs changes each expert output by relative L2 `2.36e-4`–`1.75e-3`. This
 points to amplification of an upstream activation difference rather than an
 NInfer-versus-Strata operator discrepancy for fixed inputs. The source of that
 input difference, the exact quantization interaction and an acceptable state
-budget remain open; the broader E5 correctness gate is not passed. See the
+budget remain open; the broader E5 correctness gate is not passed. The layer-1
+GDN stage trace shows `qkv`, recurrent `h` and `gdn_out` bit-identical at this
+position, while the incoming `x` differs by `7.75e-8` relative L2 and the later
+MoE input `ffn_x` by `3.80e-7`. This excludes a changed layer-1 recurrent update
+as the source of this row's MoE input delta, but does not identify the earlier
+residual/normalization source. See the
 [layer-boundary report](../../bench/results/2026-11-05-e5-coder-natural-prompt/README.md#prompt-position-41-layer-boundary-capture).
 
 1. Test held-out short and long requests, repeated continuation, retrieval and

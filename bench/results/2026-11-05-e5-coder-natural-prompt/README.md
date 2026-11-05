@@ -164,6 +164,15 @@ of the small upstream activation difference and its interaction with expert
 quantization remain open; the Q8_1 boundary mechanism has not been independently
 proven.
 
+The layer-1 GDN stage capture further narrows that boundary at position 41:
+incoming `x` differs by relative L2 `7.75e-8`, while `qkv` and recurrent `h`
+are bit-identical. Captured `gdn_out` is also bit-identical; the later `ffn_x`
+passed into MoE differs by `3.80e-7`, followed by `ffn_y` at `1.334e-3`.
+Thus the expert-input delta is present before MoE dispatch, and this layer's
+recurrent update does not add a state/output delta at this row. The capture does
+not identify which preceding residual or normalization operation created the
+`x`/`ffn_x` movement, or why the quantized projections amplify it.
+
 The owner-capture service pair passed with minimum available RAM 20.88 GiB;
 the independent grouped-kernel oracle retained 24.32 GiB minimum. The
 pre-existing cgroup OOM-kill count remained one. The GPU clock was observed at
