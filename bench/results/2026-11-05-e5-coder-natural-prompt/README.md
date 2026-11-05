@@ -93,3 +93,32 @@ while reinforcing that matching text does not imply matching recurrent state.
 It neither sets a numerical drift tolerance nor establishes broader code
 quality. Raw supervised logs and the state comparator output are in
 `even-pair-retry/` and `supervisor-even-pair-retry/`.
+
+### First accepted-token GDN state
+
+A supervised follow-up captured both backends' raw GDN arrays at the first
+accepted token of the same `is_even(n)` prompt (engine state boundary `L=44`).
+Both emitted token ID `71093`. The 36 GDN state slices contain 29,417,472 FP32
+values total. Strata slice 0 was bit-identical; slice 1 first differed at
+relative L2 `1.71e-9`; slice 2 reached `9.32e-4`. Drift then grew across the
+remaining recurrent state, reaching `3.03e-2` at slice 18 and a maximum
+per-slice relative L2 of `9.19e-2` at slice 26. Overall, 28,242,042 values
+(96.0%) differed and global relative L2 was `5.41e-2`. The maximum absolute
+delta was `3.093` at slice 33. Slice numbers here are the serialized GDN
+state ordinals, not a causal attribution to a specific operator.
+
+The same binary, profile and cache were used in a sequential Strata-then-NInfer
+service pair with greedy sampling and prefill CPU share disabled. The
+supervisor passed in 23.29 seconds with 20.93 GiB minimum available physical
+RAM; the pre-existing cgroup OOM-kill count stayed at one. Clocks were
+observed but uncontrolled, EMC readback was denied, and energy was not measured.
+Raw 113 MiB state arrays are local and excluded from Git. Their hashes, logs
+and the per-slice comparison are retained under `even-gdn-pair-retry/`.
+
+This confirms that substantial downstream recurrent-state divergence is
+already present after the first generated token, even though that token and
+the completed function match. It does not determine whether the difference
+arises during prompt prefill, at a particular expert operator, or in a later
+state update. An opt-in prefill-state hook did not produce a capture in this
+service path and is not used as evidence. The numerical tolerance and user-
+visible impact remain open.

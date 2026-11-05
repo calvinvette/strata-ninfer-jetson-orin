@@ -3163,3 +3163,13 @@ Three randomized fresh-process pairs compared Strata and strict NInfer on the sa
 ### E6 same-map screen chart update (2026-11-04)
 
 Added a reproducible SVG chart for the Q2_0 same-map Strata-versus-strict-NInfer request screens at 2K, 4K, 8K, 16K, 32K, 64K, 128K and 240K actual prompt lengths. It plots the paired median changes and three-pair bootstrap intervals for decode TPS, prompt TPS, first-visible latency and client duration. The 8K decode outlier remains plotted. These per-cell intervals cover single-task screens performed on their respective run dates; the figure does not pool them into one estimate or claim multi-model aggregation. E6 still requires broader task-family coverage and its combined cross-model chart once comparable cohorts exist. See the [backend screen chart and evidence](../../bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md).
+
+Execution note (2026-11-05): raw service GDN snapshots at the first accepted
+`is_even(n)` token (engine boundary L=44) matched token ID `71093`, but state
+slice 0 was exact, slice 1 differed at relative L2 `1.71e-9`, and slice 2 at
+`9.32e-4`. Across 36 serialized GDN slices, 96.0% of values differed and
+global relative L2 was `5.41e-2`; the largest per-slice value was `9.19e-2` at
+slice 26. This demonstrates early downstream amplification, not a causal layer
+or operator diagnosis. Minimum available RAM was 20.93 GiB and the pre-existing
+cgroup OOM-kill count remained one. Raw arrays remain local; hashes and
+per-slice comparisons are retained in the [E5 report](../../bench/results/2026-11-05-e5-coder-natural-prompt/README.md#first-accepted-token-gdn-state).
