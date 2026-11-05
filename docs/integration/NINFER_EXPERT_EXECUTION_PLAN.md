@@ -479,7 +479,9 @@ and [seven-pair confirmation](../../bench/results/2026-10-25-phase-e3-q2-ninfer-
    IQ2_S/IQ4_NL, IQ3_XXS/IQ4_NL and IQ3_S/IQ4_NL at the exact 2560/640
    geometry. Each has one real-weight operator check and a nonstrict service
    dispatch; IQ3_S/IQ4_NL also dispatched on the actual ISTA IQ3_S artifact.
-   The other four observed tuple pairs remain unsupported. The Q2_0 artifact remains the only fully
+   IQ2_S/Q2_0 is now also supported at five Coder layers by reusing the grouped
+   Q2_0 down-projection schedule. The remaining three tuple pairs account for
+   five unsupported layers. The Q2_0 artifact remains the only fully
    supported model. NInfer's original sparse-MoE packed Q4/Q5/W8 layouts are
    not byte-compatible with these GGUF codecs. See the [codec boundary map](IMPORT_MAP.md#keep-the-negative-results).
 4. Publish the current model/codec, shape, residency and backend capability
@@ -527,6 +529,21 @@ layer-17 experts resident, logged the IQ3_S dispatch. It returned one token,
 which is dispatch evidence only. Full quality/performance and remaining mixed
 tuple coverage remain open. See the
 [IQ3_S report](../../bench/results/2026-11-04-e4-iq3s-iq4nl-layer25/README.md).
+
+Execution note (2026-11-05): the selector now supports IQ2_S/Q2_0, the
+five-layer tuple that caused the prior strict request to stop at layer 1. The
+adapter reuses the existing grouped Q2_0 down projection while retaining the
+IQ2_S gate/up dot and Q8_1 hidden quantization. A Coder IQ1_M layer-1/expert-5
+real-weight check dispatched once; gate/up, hidden Q8_1 and final output were
+bit-identical to Strata for the captured Coder activation row. The activation
+was captured at another layer, so this is an operator check, not a paired
+layer-1 service activation oracle. A strict one-token service request logged
+the new layer-1 dispatch and then rejected the next unsupported pair at layer
+12 (IQ3_XXS/Q2_0). Minimum available RAM was 21.58 GiB; the pre-existing
+cgroup OOM-kill count remained one. Four tuples now cover 43/48 layers, but
+direct operator checks are still one layer per tuple and the final three tuples,
+broader model quality, performance and accelerator-runtime coverage remain
+open. See the [IQ2_S/Q2_0 report](../../bench/results/2026-11-05-e4-iq2s-q2-layer1/README.md).
 
 ### E5 — Qualify numerical behavior and useful execution policies
 

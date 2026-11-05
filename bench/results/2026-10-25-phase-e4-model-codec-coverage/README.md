@@ -22,12 +22,14 @@ generalized to IQ1_M or IQ3_S.
 
 For both mixed artifacts, the observed layer-pair distribution is: IQ2_S/IQ4_NL
 15 layers; IQ3_XXS/IQ4_NL 14; IQ3_S/IQ4_NL 9; IQ2_S/Q2_0 5;
-IQ3_XXS/Q2_0 3; IQ3_S/Q2_0 1; IQ4_XS/IQ4_NL 1. The first three tuples have
-CUDA implementations. IQ2_S/IQ4_NL and IQ3_XXS/IQ4_NL each have one Coder
+IQ3_XXS/Q2_0 3; IQ3_S/Q2_0 1; IQ4_XS/IQ4_NL 1. The first four tuples have
+CUDA implementations. IQ2_S/IQ4_NL, IQ3_XXS/IQ4_NL and IQ2_S/Q2_0 each have one Coder
 real-weight operator check. IQ3_S/IQ4_NL has one actual ISTA-weight operator
 check with a Coder activation. Service dispatch checks exist for each tuple on
 the Coder artifact, and IQ3_S/IQ4_NL also ran on the actual ISTA artifact.
-Only one layer per tuple has direct operator/service validation.
+Only one layer per tuple has direct operator/service validation. The four
+implemented tuples cover 43/48 layers; IQ3_XXS/Q2_0, IQ3_S/Q2_0 and
+IQ4_XS/IQ4_NL account for the remaining five layers.
 
 ## NInfer codec boundary audit (2026-11-04)
 

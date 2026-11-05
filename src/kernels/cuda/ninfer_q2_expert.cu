@@ -462,4 +462,34 @@ void ninfer_q2_0_expert_grouped(const NativeExpertLayout& L, const unsigned long
     if (error != cudaSuccess) throw std::runtime_error(cudaGetErrorString(error));
 }
 
+void ninfer_q2_0_down_grouped(const NativeExpertLayout& L, const unsigned long long* grp_ptr,
+                              const int32_t* grp_start, const int32_t* n_groups,
+                              const int32_t* ent_dst, int64_t cap_groups, int64_t cap_entries,
+                              const void* hidden_q8_1, float* output, void* stream, int64_t grid_groups) {
+    if (L.d_type != 42 || L.n_embd != kHidden || L.n_ff != kIntermediate ||
+        cap_groups <= 0 || cap_entries <= 0 || grp_ptr == nullptr || grp_start == nullptr ||
+        n_groups == nullptr || ent_dst == nullptr || hidden_q8_1 == nullptr || output == nullptr)
+        throw std::invalid_argument("ninfer_q2_0_down_grouped: unsupported profile or null buffer");
+    const int64_t gy = grid_groups <= 0 || grid_groups > cap_groups ? cap_groups : grid_groups;
+    const auto s = static_cast<cudaStream_t>(stream);
+    static const bool exact_n = [] {
+        const char* value = std::getenv("STRATA_NINFER_Q2_EXACT_N");
+        return value != nullptr && value[0] == '1';
+    }();
+    static const bool cta256 = [] {
+        const char* value = std::getenv("STRATA_NINFER_Q2_CTA256");
+        return value != nullptr && value[0] == '1';
+    }();
+    if (cta256 && exact_n)
+        d4_q2_0_grouped<16, true><<<dim3((kHidden + 15) / 16, static_cast<unsigned>(gy)), 256, 0, s>>>(grp_ptr, grp_start, n_groups, ent_dst, static_cast<const Q8_1Block*>(hidden_q8_1), L, output, gy);
+    else if (cta256)
+        d4_q2_0_grouped<16><<<dim3((kHidden + 15) / 16, static_cast<unsigned>(gy)), 256, 0, s>>>(grp_ptr, grp_start, n_groups, ent_dst, static_cast<const Q8_1Block*>(hidden_q8_1), L, output, gy);
+    else if (exact_n)
+        d4_q2_0_grouped<8, true><<<dim3((kHidden + 7) / 8, static_cast<unsigned>(gy)), 128, 0, s>>>(grp_ptr, grp_start, n_groups, ent_dst, static_cast<const Q8_1Block*>(hidden_q8_1), L, output, gy);
+    else
+        d4_q2_0_grouped<8><<<dim3((kHidden + 7) / 8, static_cast<unsigned>(gy)), 128, 0, s>>>(grp_ptr, grp_start, n_groups, ent_dst, static_cast<const Q8_1Block*>(hidden_q8_1), L, output, gy);
+    const cudaError_t error = cudaGetLastError();
+    if (error != cudaSuccess) throw std::runtime_error(cudaGetErrorString(error));
+}
+
 } // namespace strata::kernels

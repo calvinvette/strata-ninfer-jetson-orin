@@ -46,8 +46,15 @@ remain open. See the
 
 # Integration status
 
-NInfer expert execution follow-up (2026-11-04): the CUDA-only opt-in backend
-supports three experimental mixed tuples at 2560/640. For IQ2_S/IQ4_NL, actual
+NInfer expert execution follow-up (2026-11-05): the CUDA-only opt-in backend
+supports four experimental mixed tuples at 2560/640. IQ2_S/Q2_0 now reuses the
+grouped Q2_0 down projection for the five Coder layers with IQ2_S gate/up and
+Q2_0 down. Actual Coder IQ1_M layer-1/expert-5 weights produced one grouped
+dispatch with exact gate/up, hidden Q8_1 and final output against Strata for a
+captured activation row from another layer. A strict service request logged
+the layer-1 route, then rejected IQ3_XXS/Q2_0 at layer 12. Minimum sampled
+available RAM was 21.58 GiB and the pre-existing cgroup OOM-kill count stayed
+at one. For IQ2_S/IQ4_NL, actual
 Coder IQ1_M layer-2/expert-174 weights and a captured activation produced one
 grouped dispatch; gate/up and hidden Q8_1 matched Strata exactly, and final
 output relative L2 was `8.77e-8`. For IQ3_XXS/IQ4_NL, the same checks on actual
@@ -60,14 +67,15 @@ the actual 512-expert ISTA model with its layer-17 experts resident. IQ3_XXS
 service also fell back at layer 1 (IQ2_S/Q2_0) before dispatching IQ2_S/IQ4_NL
 at layer 2. Strict full-model coverage remains unsupported. These are operator
 and dispatch checks, not whole-model quality or performance results. The
-three tuples cover 38 of 48 layers in each inventory, but only one layer per
+four tuples cover 43 of 48 layers in each inventory, but only one layer per
 tuple has direct operator/service validation. The IQ2S, IQ3XXS and IQ3S service
 smokes had minimum sampled available RAM of 21.72, 20.87 and 19.81 GiB,
 respectively, above the 6 GiB floor; the pre-existing cgroup OOM-kill count
 stayed at one. The adapter follows
 NInfer's grouped schedule but decodes GGUF bytes and leaves routing/merge
 semantics in Strata. HIP/SYCL builds remain unverified because maestro1 has only
-1.0 GiB free. See the [IQ2S report](../../bench/results/2026-11-04-e4-iq2s-iq4nl-service-smoke/README.md)
+1.0 GiB free. See the [IQ2_S/Q2_0 report](../../bench/results/2026-11-05-e4-iq2s-q2-layer1/README.md),
+[IQ2S report](../../bench/results/2026-11-04-e4-iq2s-iq4nl-service-smoke/README.md)
 and [IQ3XXS report](../../bench/results/2026-11-04-e4-iq3xxs-iq4nl-next-pair-baseline/README.md),
 plus the [IQ3S report](../../bench/results/2026-11-04-e4-iq3s-iq4nl-layer25/README.md).
 

@@ -5,6 +5,7 @@
 // shared-expert, route-weight and residual epilogues are not copied.
 
 #include "strata/kernels/ninfer_iq_expert.hpp"
+#include "strata/kernels/ninfer_q2_expert.hpp"
 #include "strata/kernels/dp4a.hpp"
 #include "strata/kernels/q8_1_finite.hpp"
 
@@ -28,6 +29,8 @@ struct Q8_1Block { __half d; __half s; int8_t qs[32]; };
 static_assert(sizeof(Q8_1Block) == 36, "Q8_1 block ABI");
 std::atomic_bool g_enabled{false};
 std::atomic<uint64_t> g_dispatch_count{0};
+std::atomic_bool g_iq2s_q2_enabled{false};
+std::atomic<uint64_t> g_iq2s_q2_dispatch_count{0};
 std::atomic_bool g_iq3xxs_enabled{false};
 std::atomic<uint64_t> g_iq3xxs_dispatch_count{0};
 std::atomic_bool g_iq3s_enabled{false};
@@ -346,6 +349,9 @@ size_t ninfer_iq2s_iq4nl_workspace_bytes(int64_t cap_entries, int64_t n_ff) noex
 void ninfer_iq2s_iq4nl_backend_set(bool enabled) noexcept { g_enabled.store(enabled); }
 bool ninfer_iq2s_iq4nl_backend_enabled() noexcept { return g_enabled.load(); }
 uint64_t ninfer_iq2s_iq4nl_dispatch_count() noexcept { return g_dispatch_count.load(); }
+void ninfer_iq2s_q2_0_backend_set(bool enabled) noexcept { g_iq2s_q2_enabled.store(enabled); }
+bool ninfer_iq2s_q2_0_backend_enabled() noexcept { return g_iq2s_q2_enabled.load(); }
+uint64_t ninfer_iq2s_q2_0_dispatch_count() noexcept { return g_iq2s_q2_dispatch_count.load(); }
 void ninfer_iq3xxs_iq4nl_backend_set(bool enabled) noexcept { g_iq3xxs_enabled.store(enabled); }
 bool ninfer_iq3xxs_iq4nl_backend_enabled() noexcept { return g_iq3xxs_enabled.load(); }
 uint64_t ninfer_iq3xxs_iq4nl_dispatch_count() noexcept { return g_iq3xxs_dispatch_count.load(); }
@@ -463,6 +469,36 @@ void ninfer_iq3s_iq4nl_expert_grouped(const NativeExpertLayout& L,
     d4_iq4nl_grouped<<<dim3((kHidden + kRowsPerCta - 1) / kRowsPerCta,
                              static_cast<unsigned>(gy)), 128, 0, s>>>(
         grp_ptr, grp_start, n_groups, ent_dst, hidden, L, output, gy);
+    const cudaError_t error = cudaGetLastError();
+    if (error != cudaSuccess) throw std::runtime_error(cudaGetErrorString(error));
+}
+
+void ninfer_iq2s_q2_0_expert_grouped(const NativeExpertLayout& L,
+                                     const unsigned long long* grp_ptr, const int32_t* grp_start,
+                                     const int32_t* n_groups, const int32_t* ent_dst,
+                                     const int32_t* ent_tok, int64_t cap_groups, int64_t cap_entries,
+                                     const void* x_q8_1, void* workspace, float* output,
+                                     void* stream, int64_t grid_groups) {
+    if (L.gu_type != 22 || L.d_type != 42 || L.n_embd != kHidden || L.n_ff != kIntermediate ||
+        cap_groups <= 0 || cap_entries <= 0 || !grp_ptr || !grp_start || !n_groups || !ent_dst ||
+        !ent_tok || !x_q8_1 || !workspace || !output)
+        throw std::invalid_argument("ninfer_iq2s_q2_0_expert_grouped: unsupported profile or null buffer");
+    g_iq2s_q2_dispatch_count.fetch_add(1, std::memory_order_relaxed);
+    const int64_t gy = grid_groups <= 0 || grid_groups > cap_groups ? cap_groups : grid_groups;
+    const size_t f = static_cast<size_t>(cap_entries) * kIntermediate * sizeof(float);
+    const size_t fa = (f + 255) & ~size_t(255);
+    auto* scratch = static_cast<uint8_t*>(workspace);
+    auto* gate = reinterpret_cast<float*>(scratch);
+    auto* up = reinterpret_cast<float*>(scratch + fa);
+    auto* hidden = reinterpret_cast<Q8_1Block*>(scratch + 3 * fa);
+    const auto s = static_cast<cudaStream_t>(stream);
+    d3_iq2s_grouped<<<dim3((2 * kIntermediate + kRowsPerCta - 1) / kRowsPerCta,
+                            static_cast<unsigned>(gy)), 128, 0, s>>>(
+        grp_ptr, grp_start, n_groups, ent_tok, static_cast<const Q8_1Block*>(x_q8_1), L, gate, up, gy);
+    const int64_t values = cap_entries * kIntermediate;
+    swiglu_quantize<<<static_cast<unsigned>((values + 255) / 256), 256, 0, s>>>(gate, up, hidden, values);
+    ninfer_q2_0_down_grouped(L, grp_ptr, grp_start, n_groups, ent_dst, cap_groups, cap_entries,
+                             hidden, output, stream, gy);
     const cudaError_t error = cudaGetLastError();
     if (error != cudaSuccess) throw std::runtime_error(cudaGetErrorString(error));
 }

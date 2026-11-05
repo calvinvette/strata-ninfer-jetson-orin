@@ -33,4 +33,11 @@ void ninfer_q2_0_expert_grouped(const NativeExpertLayout& L, const unsigned long
                                int64_t cap_groups, int64_t cap_entries, const void* x_q8_1,
                                void* workspace, float* output, void* stream, int64_t grid_groups = 0);
 
+/// Q2_0 down projection for mixed gate/up codecs using grouped descriptors.
+void ninfer_q2_0_down_grouped(const NativeExpertLayout& L, const unsigned long long* grp_ptr,
+                              const int32_t* grp_start, const int32_t* n_groups,
+                              const int32_t* ent_dst, int64_t cap_groups, int64_t cap_entries,
+                              const void* hidden_q8_1, float* output, void* stream,
+                              int64_t grid_groups = 0);
+
 } // namespace strata::kernels
