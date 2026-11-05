@@ -3282,3 +3282,14 @@ token one under the same profile. This is strong bounded evidence for the
 corrected path, not broad task/context or performance qualification; service
 timings were instrumented/sequential. See the [reduction-match
 report](../../bench/results/2026-11-05-e5-coder-natural-prompt/down-projection-reduction-match/README.md).
+
+Execution note (2026-11-05): a longer held-out Coder task generated the same 89
+token IDs and a function passing 11 prime/composite edge cases on both
+backends. MTP used 85 Strata versus 80 NInfer verifier commits, so state was
+aligned at 79 shared cumulative-token endpoints. The first differing hash at
+endpoint 25 was `stale` only (KV cells beyond live length in the current page);
+the first non-stale state difference appeared at endpoint 37, and final state
+still differed. Minimum available RAM was 21.02 GiB; sampled machine swap was
+1.07–1.12 GiB and the existing OOM-kill count stayed at one. Trace timings are
+excluded. This extends task evidence but does not establish a state budget or
+explain the live-state split. See the [held-out task and state report](../../bench/results/2026-11-05-e5-coder-natural-prompt/is-prime-heldout/README.md).
