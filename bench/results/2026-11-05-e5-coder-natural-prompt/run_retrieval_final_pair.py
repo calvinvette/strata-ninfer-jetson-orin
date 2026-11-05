@@ -13,6 +13,7 @@ ROOT = Path('/home/calvin/workspace/strata-ninfer-expert-e0')
 EXPECTED = '73192'
 TARGET_PROMPT = int(sys.argv[2]) if len(sys.argv) > 2 else 2048
 CONTEXT_RESERVATION = int(sys.argv[3]) if len(sys.argv) > 3 else 4096
+TRACE_PREFIXES = len(sys.argv) > 4 and sys.argv[4] == 'trace'
 PREFIX = 'Archived closed tickets: '
 FILLER = 'ticket closed code 11804; status resolved. '
 SUFFIX = (
@@ -25,6 +26,7 @@ from serve.frontend import ChatTemplate
 from serve.server import StrataEngine
 from tools.conversation_cache_parity import load_tokenizer
 from run_is_prime_state_pair import file_sha256, read_complete_final_state
+from tools.integration.pool_worker_screen import read_accepted_prefix_trace
 
 BASE = ROOT / 'bench/results/2026-11-05-e5-mixed-static-one-token-pair/coder-strata-cpu-share-off/result.json'
 
@@ -80,6 +82,8 @@ def main() -> int:
 
     env = os.environ.copy()
     env.update({'STRATA_PREFILL_CPU_SHARE': '0', 'STRATA_STATE_HASH': '1'})
+    if TRACE_PREFIXES:
+        env.update({'STRATA_ACCEPTED_PREFIX_TRACE': '1', 'STRATA_INTEGRATION_TRACE': '1'})
     profile = Path(args[args.index('--expert-profile') + 1])
     models = [Path(args[args.index(flag) + 1]) for flag in ('--native', '--ple-gguf')]
     result = {
@@ -87,7 +91,7 @@ def main() -> int:
         'expected_answer': EXPECTED, 'prompt_tokens': len(prompt), 'context_reservation': CONTEXT_RESERVATION,
         'prompt_token_ids_sha256': hashlib.sha256(json.dumps(prompt, separators=(',', ':')).encode()).hexdigest(),
         'prompt_content_sha256': hashlib.sha256(content.encode()).hexdigest(),
-        'max_new': 16, 'temperature': 0, 'accepted_prefix_capture': False,
+        'max_new': 16, 'temperature': 0, 'accepted_prefix_capture': TRACE_PREFIXES,
         'identity': {
             'binary_sha256': file_sha256(Path(executable)), 'profile_sha256': file_sha256(profile),
             'expert_profile': profile.name,
@@ -111,12 +115,15 @@ def main() -> int:
                    if value is not None]
             decoded = tokenizer.decode(ids).strip()
             answer = decoded.split('<|im_end|>', 1)[0].strip()
+            accepted_prefix_trace = read_accepted_prefix_trace(log) if TRACE_PREFIXES else []
             result['arms'].append({'backend': backend, 'token_ids': ids,
                                    'token_ids_sha256': hashlib.sha256(b''.join(
                                        value.to_bytes(4, 'little') for value in ids)).hexdigest(),
                                    'decoded': decoded, 'answer': answer,
                                    'answer_pass': answer == EXPECTED, 'finish': engine.last,
-                                   'final_state': read_complete_final_state(log), 'log': log.name})
+                                   'final_state': read_complete_final_state(log),
+                                   'accepted_prefix_trace': accepted_prefix_trace,
+                                   'log': log.name})
         finally:
             engine.close()
     left, right = result['arms']
@@ -124,6 +131,23 @@ def main() -> int:
     result['comparison'] = {'tokens_equal': left['token_ids'] == right['token_ids'],
                             'answer_passes_both': left['answer_pass'] and right['answer_pass'],
                             'final_state_equal': not diffs, 'final_state_difference_fields': diffs}
+    if TRACE_PREFIXES:
+        def by_prefix(trace):
+            total, states = 0, {}
+            for row in trace:
+                total += row['committed']
+                states[total] = row['state']
+            return states
+        left_prefixes, right_prefixes = (by_prefix(arm['accepted_prefix_trace'])
+                                         for arm in (left, right))
+        common = sorted(left_prefixes.keys() & right_prefixes.keys())
+        result['comparison']['accepted_prefixes'] = [
+            {'committed_tokens': count,
+             'equal': left_prefixes[count] == right_prefixes[count],
+             'left_state': left_prefixes[count], 'right_state': right_prefixes[count]}
+            for count in common]
+        result['comparison']['all_common_prefix_states_equal'] = (
+            bool(common) and all(row['equal'] for row in result['comparison']['accepted_prefixes']))
     (output / 'results.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(result['comparison'], indent=2))
     return 0 if result['comparison']['answer_passes_both'] else 2

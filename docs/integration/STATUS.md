@@ -52,9 +52,11 @@ under an 8,192-token context reservation. All four responses returned
 `73192` with identical six-token IDs; all 11 final-state fields matched within
 each pair and reproduced across pairs. Minimum available RAM was 20.80 and
 21.24 GiB, peak swap 1.34 and 1.86 GiB, and the existing OOM-kill count stayed
-at one. Prefix-level state was not captured. Sequential Strata-then-NInfer
-times are diagnostic only. This adds one bounded mixed-codec context point;
-broader state and quality qualification remains open. See the
+at one. Sequential Strata-then-NInfer times are diagnostic only. A separate
+trace pair matched hashes at shared commit boundaries 1, 2, 3 and 6; its final
+commit accepted three tokens, so the two interior token states were not
+observed. This single traced pair does not establish general trace invariance.
+Broader state and quality qualification remains open. See the
 [4K retrieval report](../../bench/results/2026-11-05-e5-coder-natural-prompt/retrieval-4k-final-only/README.md).
 
 **E6 Coder IQ1_M performance screen (2026-11-05):** three same-profile

@@ -673,10 +673,13 @@ an 8,192-token context reservation. All four requests returned the same exact
 six-token answer, and all 11 final-state fingerprints matched across backends
 and reproduced across pairs. Minimum available RAM was 20.80 and 21.24 GiB;
 peak swap was 1.34 and 1.86 GiB, with no increment to the pre-existing
-OOM-kill count. Accepted-prefix state was not captured. The sequential fixed
-Strata-then-NInfer timings are diagnostic and not performance evidence. This
-adds one retrieval task/context cell only; it does not establish broad mixed-
-codec state or quality support. See the
+OOM-kill count. The sequential fixed Strata-then-NInfer timings are diagnostic
+and not performance evidence. A separate trace-instrumented pair on the same
+4K prompt matched all state hashes at shared cumulative commits 1, 2, 3 and 6;
+the final verifier group committed three tokens, so its two internal token
+boundaries were not sampled. This is one paired trace observation and does
+not establish general trace invariance or broad mixed-codec quality support.
+See the
 [4K Coder retrieval report](../../bench/results/2026-11-05-e5-coder-natural-prompt/retrieval-4k-final-only/README.md).
 
 1. Test held-out short and long requests, repeated continuation, retrieval and

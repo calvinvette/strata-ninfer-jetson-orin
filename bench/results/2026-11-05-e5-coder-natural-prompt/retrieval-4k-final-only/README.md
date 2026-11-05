@@ -28,6 +28,18 @@ intermediate accepted prefix. The paired execution order was always Strata
 then NInfer, so prompt/decode times below are diagnostic and are not an
 order-balanced performance estimate.
 
+## Accepted-prefix trace follow-up
+
+One separately supervised trace-instrumented pair used the exact same prompt
+and runtime profile. Both backends again returned the same answer and token
+IDs. Persistent-state fingerprints matched at every shared cumulative commit
+boundary: 1, 2, 3 and 6 accepted tokens, including all 11 final fields. The
+last verifier commit accepted three tokens at once, so this run has no state
+snapshot for the two interior token boundaries. This is one trace pair; its
+timings are excluded because instrumentation can change scheduling. The
+compact per-prefix record is in
+[`accepted-prefix.json`](accepted-prefix.json); full trace logs remain local.
+
 | Pair | Strata prefill | Strict NInfer prefill | Strata decode | Strict NInfer decode |
 |---|---:|---:|---:|---:|
 | 1 | 223.3 s (18.3 tok/s) | 187.9 s (21.8 tok/s) | 0.94 s (6.4 tok/s) | 1.15 s (5.2 tok/s) |
@@ -59,5 +71,5 @@ python tools/integration/run_control.py \
 
 The run requires the local model shards, tokenizer, qualified executable,
 profile and Orin runtime environment. This adds a bounded 4K Coder correctness
-cell; it does not close E5's broader numerical, accepted-prefix or quality
-gates, E6 performance qualification, or E7 release assessment.
+cell and one traced prefix pair; it does not close E5's broader numerical or
+quality gates, E6 performance qualification, or E7 release assessment.
