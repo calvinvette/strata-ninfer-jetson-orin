@@ -7,11 +7,11 @@ other backends, or end-to-end performance.
 
 ## Result
 
-| Artifact | Routed expert inventory | NInfer Q2_0 adapter coverage | Status |
+| Artifact | Routed expert inventory | NInfer adapter coverage | Status |
 | --- | --- | --- | --- |
 | ISTA-DASLab Coder Q2_0, `Qwen3.8-Flash-Next-GSQ-RCO-Q2_0` | 48 layers; gate/up/down Q2_0, 2560/640; metadata reports 512 experts, top-10 | Q2_0/Q2_0 on CUDA; resident, staged and direct-mapped prototype paths exercised in E2/E3 | Bounded functional support; performance rejected against Strata |
-| ISTA-DASLab Coder IQ1_M | 48 layers; expert count 256, top-10; gate/up: IQ2_S 20 layers, IQ3_S 10, IQ3_XXS 17, IQ4_XS 1; down: Q2_0 9, IQ4_NL 39 | CUDA IQ2_S/IQ4_NL at 15 layers (2,3,4,5,6,9,11,15,19,23,24,26,32,34,39), IQ3_XXS/IQ4_NL at 14 layers (0,7,14,16,18,22,31,33,37,38,41,42,43,46), IQ3_S/IQ4_NL at 9 layers (17,25,27,28,29,35,40,44,45), and IQ2_S/Q2_0 at 5 layers. One real-weight operator check exists per implemented tuple; service dispatch checks exist for all four. | Partial; three other tuples and five layers remain unsupported; strict full-model use next rejects at layer 12 |
-| ISTA-DASLab original IQ3_S | 48 layers; expert count 512, top-10; gate/up: IQ2_S 20 layers, IQ3_S 10, IQ3_XXS 17, IQ4_XS 1; down: Q2_0 9, IQ4_NL 39 | The same four CUDA tuples exist, covering 43/48 layers. IQ3_S/IQ4_NL was exercised with an actual ISTA artifact service request (layer 17); its operator check used actual ISTA weights with a cross-variant Coder activation | Partial; three tuples remain unsupported, and full-model quality/performance are not qualified |
+| ISTA-DASLab Coder IQ1_M | 48 layers; expert count 256, top-10; gate/up: IQ2_S 20 layers, IQ3_S 10, IQ3_XXS 17, IQ4_XS 1; down: Q2_0 9, IQ4_NL 39 | All seven observed pairs have CUDA resident routes: IQ2_S/IQ4_NL (15 layers), IQ3_XXS/IQ4_NL (14), IQ3_S/IQ4_NL (9), IQ2_S/Q2_0 (5), IQ3_XXS/Q2_0 (3), IQ3_S/Q2_0 (1), IQ4_XS/IQ4_NL (1). One real-weight operator check per pair; strict one-token full-model traversal passed. | Experimental full tuple coverage; prompt quality, state equivalence, grouped prefill, staging and performance remain unqualified |
+| ISTA-DASLab original IQ3_S | 48 layers; expert count 512, top-10; gate/up: IQ2_S 20 layers, IQ3_S 10, IQ3_XXS 17, IQ4_XS 1; down: Q2_0 9, IQ4_NL 39 | The same seven CUDA tuples cover all 48 layers. Strict one-token traversal passed on the actual artifact using its matching pack. IQ3_S/IQ4_NL also has a direct actual-weight operator check with cross-variant Coder activation. | Experimental full tuple coverage; prompt quality, state equivalence, grouped prefill, staging and performance remain unqualified |
 
 The mixed-codec counts above are tensor counts across 48 layers for each of
 `gate_exps`, `up_exps` (same distribution), and `down_exps`. The nine Q2_0
@@ -22,14 +22,13 @@ generalized to IQ1_M or IQ3_S.
 
 For both mixed artifacts, the observed layer-pair distribution is: IQ2_S/IQ4_NL
 15 layers; IQ3_XXS/IQ4_NL 14; IQ3_S/IQ4_NL 9; IQ2_S/Q2_0 5;
-IQ3_XXS/Q2_0 3; IQ3_S/Q2_0 1; IQ4_XS/IQ4_NL 1. The first four tuples have
-CUDA implementations. IQ2_S/IQ4_NL, IQ3_XXS/IQ4_NL and IQ2_S/Q2_0 each have one Coder
-real-weight operator check. IQ3_S/IQ4_NL has one actual ISTA-weight operator
-check with a Coder activation. Service dispatch checks exist for each tuple on
-the Coder artifact, and IQ3_S/IQ4_NL also ran on the actual ISTA artifact.
-Only one layer per tuple has direct operator/service validation. The four
-implemented tuples cover 43/48 layers; IQ3_XXS/Q2_0, IQ3_S/Q2_0 and
-IQ4_XS/IQ4_NL account for the remaining five layers.
+IQ3_XXS/Q2_0 3; IQ3_S/Q2_0 1; IQ4_XS/IQ4_NL 1. All seven tuples have CUDA
+implementations. Each has one direct real-weight operator check; IQ3_S/IQ4_NL
+was checked with ISTA weights, while other checks used Coder weights and
+activation rows captured from a different layer. Strict one-token service
+traversal passed on both the Coder IQ1_M and actual ISTA IQ3_S artifacts. This
+establishes tuple selection at request time, not every layer's operator parity,
+request quality/state equivalence, performance, prefill or staged-miss behavior.
 
 ## NInfer codec boundary audit (2026-11-04)
 

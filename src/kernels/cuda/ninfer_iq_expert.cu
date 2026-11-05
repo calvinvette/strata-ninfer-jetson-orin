@@ -31,6 +31,12 @@ std::atomic_bool g_enabled{false};
 std::atomic<uint64_t> g_dispatch_count{0};
 std::atomic_bool g_iq2s_q2_enabled{false};
 std::atomic<uint64_t> g_iq2s_q2_dispatch_count{0};
+std::atomic_bool g_iq3xxs_q2_enabled{false};
+std::atomic<uint64_t> g_iq3xxs_q2_dispatch_count{0};
+std::atomic_bool g_iq3s_q2_enabled{false};
+std::atomic<uint64_t> g_iq3s_q2_dispatch_count{0};
+std::atomic_bool g_iq4xs_iq4nl_enabled{false};
+std::atomic<uint64_t> g_iq4xs_iq4nl_dispatch_count{0};
 std::atomic_bool g_iq3xxs_enabled{false};
 std::atomic<uint64_t> g_iq3xxs_dispatch_count{0};
 std::atomic_bool g_iq3s_enabled{false};
@@ -230,6 +236,39 @@ __device__ __forceinline__ float dot_iq4nl_q8_1(const uint8_t* row,
     return warp_sum(total);
 }
 
+__device__ __forceinline__ float iq4xs_q8_1_block(const uint8_t* weight,
+                                                  const Q8_1Block* activation,
+                                                  int subgroup) {
+    const auto* block = reinterpret_cast<const block_iq4_xs*>(weight);
+    const int iqs = 4 * subgroup;
+    const int scale = ((block->scales_l[iqs / 8] >> (iqs & 0x04)) & 0x0f) |
+                      (((block->scales_h >> (iqs / 2)) & 0x03) << 4);
+    const int8_t* q8 = activation->qs;
+    int subtotal = 0;
+#pragma unroll
+    for (int j = 0; j < 16; ++j) {
+        const uint8_t packed = block->qs[subgroup * 16 + j];
+        subtotal += kvalues_iq4nl[packed & 0x0f] * q8[j];
+        subtotal += kvalues_iq4nl[packed >> 4] * q8[j + 16];
+    }
+    subtotal *= scale - 32;
+    return __half2float(block->d) * __half2float(activation->d) * static_cast<float>(subtotal);
+}
+
+__device__ __forceinline__ float dot_iq4xs_q8_1(const uint8_t* row,
+                                                 const Q8_1Block* xq,
+                                                 int width) {
+    const int lane = threadIdx.x & 31;
+    const int blocks = width / 32;
+    float total = 0.0f;
+    for (int b = lane; b < blocks; b += 32) {
+        const int super = b / 8;
+        const int sub = b & 7;
+        total += iq4xs_q8_1_block(row + super * sizeof(block_iq4_xs), xq + b, sub);
+    }
+    return warp_sum(total);
+}
+
 __global__ void d3_iq2s_grouped(const unsigned long long* grp_ptr,
                                const int32_t* grp_start, const int32_t* n_groups,
                                const int32_t* ent_tok, const Q8_1Block* xq,
@@ -299,6 +338,29 @@ __global__ void d3_iq3s_grouped(const unsigned long long* grp_ptr,
     }
 }
 
+__global__ void d3_iq4xs_grouped(const unsigned long long* grp_ptr,
+                                 const int32_t* grp_start, const int32_t* n_groups,
+                                 const int32_t* ent_tok, const Q8_1Block* xq,
+                                 NativeExpertLayout L, float* gate, float* up,
+                                 int64_t grid_groups) {
+    const int lane = threadIdx.x & 31;
+    const int warp = threadIdx.x >> 5;
+    const int row = static_cast<int>(blockIdx.x) * kRowsPerCta + warp;
+    if (row >= 2 * L.n_ff) return;
+    const bool is_up = row >= L.n_ff;
+    const int r = is_up ? row - static_cast<int>(L.n_ff) : row;
+    float* dst = is_up ? up : gate;
+    const size_t offset = (is_up ? L.up_off : 0) + static_cast<size_t>(r) * L.gu_row;
+    for (int g = static_cast<int>(blockIdx.y); g < *n_groups; g += static_cast<int>(grid_groups)) {
+        const auto* weights = reinterpret_cast<const uint8_t*>(grp_ptr[g]) + offset;
+        for (int e = grp_start[g]; e < grp_start[g + 1]; ++e) {
+            const auto* activation = xq + static_cast<size_t>(ent_tok[e]) * (L.n_embd / 32);
+            const float value = dot_iq4xs_q8_1(weights, activation, static_cast<int>(L.n_embd));
+            if (lane == 0) dst[static_cast<size_t>(e) * L.n_ff + r] = value;
+        }
+    }
+}
+
 __global__ void swiglu_quantize(const float* gate, const float* up,
                                 Q8_1Block* output, int64_t values) {
     const int64_t i = static_cast<int64_t>(blockIdx.x) * blockDim.x + threadIdx.x;
@@ -352,6 +414,15 @@ uint64_t ninfer_iq2s_iq4nl_dispatch_count() noexcept { return g_dispatch_count.l
 void ninfer_iq2s_q2_0_backend_set(bool enabled) noexcept { g_iq2s_q2_enabled.store(enabled); }
 bool ninfer_iq2s_q2_0_backend_enabled() noexcept { return g_iq2s_q2_enabled.load(); }
 uint64_t ninfer_iq2s_q2_0_dispatch_count() noexcept { return g_iq2s_q2_dispatch_count.load(); }
+void ninfer_iq3xxs_q2_0_backend_set(bool enabled) noexcept { g_iq3xxs_q2_enabled.store(enabled); }
+bool ninfer_iq3xxs_q2_0_backend_enabled() noexcept { return g_iq3xxs_q2_enabled.load(); }
+uint64_t ninfer_iq3xxs_q2_0_dispatch_count() noexcept { return g_iq3xxs_q2_dispatch_count.load(); }
+void ninfer_iq3s_q2_0_backend_set(bool enabled) noexcept { g_iq3s_q2_enabled.store(enabled); }
+bool ninfer_iq3s_q2_0_backend_enabled() noexcept { return g_iq3s_q2_enabled.load(); }
+uint64_t ninfer_iq3s_q2_0_dispatch_count() noexcept { return g_iq3s_q2_dispatch_count.load(); }
+void ninfer_iq4xs_iq4nl_backend_set(bool enabled) noexcept { g_iq4xs_iq4nl_enabled.store(enabled); }
+bool ninfer_iq4xs_iq4nl_backend_enabled() noexcept { return g_iq4xs_iq4nl_enabled.load(); }
+uint64_t ninfer_iq4xs_iq4nl_dispatch_count() noexcept { return g_iq4xs_iq4nl_dispatch_count.load(); }
 void ninfer_iq3xxs_iq4nl_backend_set(bool enabled) noexcept { g_iq3xxs_enabled.store(enabled); }
 bool ninfer_iq3xxs_iq4nl_backend_enabled() noexcept { return g_iq3xxs_enabled.load(); }
 uint64_t ninfer_iq3xxs_iq4nl_dispatch_count() noexcept { return g_iq3xxs_dispatch_count.load(); }
@@ -499,6 +570,97 @@ void ninfer_iq2s_q2_0_expert_grouped(const NativeExpertLayout& L,
     swiglu_quantize<<<static_cast<unsigned>((values + 255) / 256), 256, 0, s>>>(gate, up, hidden, values);
     ninfer_q2_0_down_grouped(L, grp_ptr, grp_start, n_groups, ent_dst, cap_groups, cap_entries,
                              hidden, output, stream, gy);
+    const cudaError_t error = cudaGetLastError();
+    if (error != cudaSuccess) throw std::runtime_error(cudaGetErrorString(error));
+}
+
+void ninfer_iq3xxs_q2_0_expert_grouped(const NativeExpertLayout& L,
+                                       const unsigned long long* grp_ptr, const int32_t* grp_start,
+                                       const int32_t* n_groups, const int32_t* ent_dst,
+                                       const int32_t* ent_tok, int64_t cap_groups, int64_t cap_entries,
+                                       const void* x_q8_1, void* workspace, float* output,
+                                       void* stream, int64_t grid_groups) {
+    if (L.gu_type != 18 || L.d_type != 42 || L.n_embd != kHidden || L.n_ff != kIntermediate ||
+        cap_groups <= 0 || cap_entries <= 0 || !grp_ptr || !grp_start || !n_groups || !ent_dst ||
+        !ent_tok || !x_q8_1 || !workspace || !output)
+        throw std::invalid_argument("ninfer_iq3xxs_q2_0_expert_grouped: unsupported profile or null buffer");
+    g_iq3xxs_q2_dispatch_count.fetch_add(1, std::memory_order_relaxed);
+    const int64_t gy = grid_groups <= 0 || grid_groups > cap_groups ? cap_groups : grid_groups;
+    const size_t f = static_cast<size_t>(cap_entries) * kIntermediate * sizeof(float);
+    const size_t fa = (f + 255) & ~size_t(255);
+    auto* scratch = static_cast<uint8_t*>(workspace);
+    auto* gate = reinterpret_cast<float*>(scratch);
+    auto* up = reinterpret_cast<float*>(scratch + fa);
+    auto* hidden = reinterpret_cast<Q8_1Block*>(scratch + 3 * fa);
+    const auto s = static_cast<cudaStream_t>(stream);
+    d3_iq3xxs_grouped<<<dim3((2 * kIntermediate + kRowsPerCta - 1) / kRowsPerCta,
+                              static_cast<unsigned>(gy)), 128, 0, s>>>(
+        grp_ptr, grp_start, n_groups, ent_tok, static_cast<const Q8_1Block*>(x_q8_1), L, gate, up, gy);
+    const int64_t values = cap_entries * kIntermediate;
+    swiglu_quantize<<<static_cast<unsigned>((values + 255) / 256), 256, 0, s>>>(gate, up, hidden, values);
+    ninfer_q2_0_down_grouped(L, grp_ptr, grp_start, n_groups, ent_dst, cap_groups, cap_entries,
+                             hidden, output, stream, gy);
+    const cudaError_t error = cudaGetLastError();
+    if (error != cudaSuccess) throw std::runtime_error(cudaGetErrorString(error));
+}
+
+void ninfer_iq3s_q2_0_expert_grouped(const NativeExpertLayout& L,
+                                     const unsigned long long* grp_ptr, const int32_t* grp_start,
+                                     const int32_t* n_groups, const int32_t* ent_dst,
+                                     const int32_t* ent_tok, int64_t cap_groups, int64_t cap_entries,
+                                     const void* x_q8_1, void* workspace, float* output,
+                                     void* stream, int64_t grid_groups) {
+    if (L.gu_type != 21 || L.d_type != 42 || L.n_embd != kHidden || L.n_ff != kIntermediate ||
+        cap_groups <= 0 || cap_entries <= 0 || !grp_ptr || !grp_start || !n_groups || !ent_dst ||
+        !ent_tok || !x_q8_1 || !workspace || !output)
+        throw std::invalid_argument("ninfer_iq3s_q2_0_expert_grouped: unsupported profile or null buffer");
+    g_iq3s_q2_dispatch_count.fetch_add(1, std::memory_order_relaxed);
+    const int64_t gy = grid_groups <= 0 || grid_groups > cap_groups ? cap_groups : grid_groups;
+    const size_t f = static_cast<size_t>(cap_entries) * kIntermediate * sizeof(float);
+    const size_t fa = (f + 255) & ~size_t(255);
+    auto* scratch = static_cast<uint8_t*>(workspace);
+    auto* gate = reinterpret_cast<float*>(scratch);
+    auto* up = reinterpret_cast<float*>(scratch + fa);
+    auto* hidden = reinterpret_cast<Q8_1Block*>(scratch + 3 * fa);
+    const auto s = static_cast<cudaStream_t>(stream);
+    d3_iq3s_grouped<<<dim3((2 * kIntermediate + kRowsPerCta - 1) / kRowsPerCta,
+                            static_cast<unsigned>(gy)), 128, 0, s>>>(
+        grp_ptr, grp_start, n_groups, ent_tok, static_cast<const Q8_1Block*>(x_q8_1), L, gate, up, gy);
+    const int64_t values = cap_entries * kIntermediate;
+    swiglu_quantize<<<static_cast<unsigned>((values + 255) / 256), 256, 0, s>>>(gate, up, hidden, values);
+    ninfer_q2_0_down_grouped(L, grp_ptr, grp_start, n_groups, ent_dst, cap_groups, cap_entries,
+                             hidden, output, stream, gy);
+    const cudaError_t error = cudaGetLastError();
+    if (error != cudaSuccess) throw std::runtime_error(cudaGetErrorString(error));
+}
+
+void ninfer_iq4xs_iq4nl_expert_grouped(const NativeExpertLayout& L,
+                                       const unsigned long long* grp_ptr, const int32_t* grp_start,
+                                       const int32_t* n_groups, const int32_t* ent_dst,
+                                       const int32_t* ent_tok, int64_t cap_groups, int64_t cap_entries,
+                                       const void* x_q8_1, void* workspace, float* output,
+                                       void* stream, int64_t grid_groups) {
+    if (L.gu_type != 23 || L.d_type != 20 || L.n_embd != kHidden || L.n_ff != kIntermediate ||
+        cap_groups <= 0 || cap_entries <= 0 || !grp_ptr || !grp_start || !n_groups || !ent_dst ||
+        !ent_tok || !x_q8_1 || !workspace || !output)
+        throw std::invalid_argument("ninfer_iq4xs_iq4nl_expert_grouped: unsupported profile or null buffer");
+    g_iq4xs_iq4nl_dispatch_count.fetch_add(1, std::memory_order_relaxed);
+    const int64_t gy = grid_groups <= 0 || grid_groups > cap_groups ? cap_groups : grid_groups;
+    const size_t f = static_cast<size_t>(cap_entries) * kIntermediate * sizeof(float);
+    const size_t fa = (f + 255) & ~size_t(255);
+    auto* scratch = static_cast<uint8_t*>(workspace);
+    auto* gate = reinterpret_cast<float*>(scratch);
+    auto* up = reinterpret_cast<float*>(scratch + fa);
+    auto* hidden = reinterpret_cast<Q8_1Block*>(scratch + 3 * fa);
+    const auto s = static_cast<cudaStream_t>(stream);
+    d3_iq4xs_grouped<<<dim3((2 * kIntermediate + kRowsPerCta - 1) / kRowsPerCta,
+                             static_cast<unsigned>(gy)), 128, 0, s>>>(
+        grp_ptr, grp_start, n_groups, ent_tok, static_cast<const Q8_1Block*>(x_q8_1), L, gate, up, gy);
+    const int64_t values = cap_entries * kIntermediate;
+    swiglu_quantize<<<static_cast<unsigned>((values + 255) / 256), 256, 0, s>>>(gate, up, hidden, values);
+    d4_iq4nl_grouped<<<dim3((kHidden + kRowsPerCta - 1) / kRowsPerCta,
+                             static_cast<unsigned>(gy)), 128, 0, s>>>(
+        grp_ptr, grp_start, n_groups, ent_dst, hidden, L, output, gy);
     const cudaError_t error = cudaGetLastError();
     if (error != cudaSuccess) throw std::runtime_error(cudaGetErrorString(error));
 }

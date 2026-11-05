@@ -1118,7 +1118,7 @@ void usage() {
                  "                       with --expert-cache-per-layer: 54.4%% hits, CPU pool drain 19.1 -> 10.3\n"
                  "                       ms/token, -2.7 ms/token end to end.\n"
                  "  --expert-backend strata|ninfer  select resident expert compute (default strata; NInfer supports\n"
-                 "                       CUDA Q2_0/Q2_0, IQ2_S/IQ4_NL, IQ2_S/Q2_0, IQ3_XXS/IQ4_NL and IQ3_S/IQ4_NL Flash-Next 2560/640; unsupported pairs fall back)\n"
+                 "                       CUDA Q2_0/Q2_0, IQ2_S/IQ4_NL, IQ2_S/Q2_0, IQ3_XXS/IQ4_NL, IQ3_XXS/Q2_0, IQ3_S/IQ4_NL, IQ3_S/Q2_0 and IQ4_XS/IQ4_NL Flash-Next 2560/640; unsupported pairs fall back)\n"
                  "  --expert-backend-strict  with ninfer, reject unsupported codec/geometry instead of fallback\n"
                  "  --expert-cache-device1 N|auto  fill CUDA1 with N experts or as many as fit\n"
                  "  --expert-cache-device2 N|auto  fill CUDA2 with more experts\n"
@@ -2673,6 +2673,9 @@ int main(int argc, char** argv) {
 #if defined(STRATA_NINFER_IQ_CUDA)
     strata::kernels::ninfer_iq2s_iq4nl_backend_set(o.expert_backend == "ninfer");
     strata::kernels::ninfer_iq2s_q2_0_backend_set(o.expert_backend == "ninfer");
+    strata::kernels::ninfer_iq3xxs_q2_0_backend_set(o.expert_backend == "ninfer");
+    strata::kernels::ninfer_iq3s_q2_0_backend_set(o.expert_backend == "ninfer");
+    strata::kernels::ninfer_iq4xs_iq4nl_backend_set(o.expert_backend == "ninfer");
     strata::kernels::ninfer_iq3xxs_iq4nl_backend_set(o.expert_backend == "ninfer");
     strata::kernels::ninfer_iq3s_iq4nl_backend_set(o.expert_backend == "ninfer");
 #endif

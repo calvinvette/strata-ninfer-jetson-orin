@@ -47,14 +47,19 @@ remain open. See the
 # Integration status
 
 NInfer expert execution follow-up (2026-11-05): the CUDA-only opt-in backend
-supports four experimental mixed tuples at 2560/640. IQ2_S/Q2_0 now reuses the
-grouped Q2_0 down projection for the five Coder layers with IQ2_S gate/up and
-Q2_0 down. Actual Coder IQ1_M layer-1/expert-5 weights produced one grouped
-dispatch with exact gate/up, hidden Q8_1 and final output against Strata for a
-captured activation row from another layer. A strict service request logged
-the layer-1 route, then rejected IQ3_XXS/Q2_0 at layer 12. Minimum sampled
-available RAM was 21.58 GiB and the pre-existing cgroup OOM-kill count stayed
-at one. For IQ2_S/IQ4_NL, actual
+now has routes for all seven observed mixed tuples at 2560/640. Strict one-
+token service requests traversed Coder IQ1_M and actual ISTA IQ3_S, logged all
+tuple routes through IQ4_XS/IQ4_NL at layer 47 and returned token `4`. Minimum
+available RAM was 20.56 and 19.66 GiB, respectively; cgroup OOM-kill counts
+did not increase. Individual operator evidence below uses cross-layer
+activations in several cases, so route traversal is not quality or state
+equivalence evidence.
+
+IQ2_S/Q2_0 reuses the grouped Q2_0 down projection for the five Coder layers
+with IQ2_S gate/up and Q2_0 down. Actual Coder IQ1_M layer-1/expert-5 weights
+produced one grouped dispatch with exact gate/up, hidden Q8_1 and final output
+against Strata for a captured activation row from another layer. For
+IQ2_S/IQ4_NL, actual
 Coder IQ1_M layer-2/expert-174 weights and a captured activation produced one
 grouped dispatch; gate/up and hidden Q8_1 matched Strata exactly, and final
 output relative L2 was `8.77e-8`. For IQ3_XXS/IQ4_NL, the same checks on actual
@@ -64,20 +69,22 @@ ISTA-DASLab IQ3_S layer-17/expert-183 weights with a cross-variant Coder
 activation; gate/up and hidden Q8_1 matched and final output relative L2 was
 `9.01e-8`. Nonstrict service requests logged each route, including IQ3_S on
 the actual 512-expert ISTA model with its layer-17 experts resident. IQ3_XXS
-service also fell back at layer 1 (IQ2_S/Q2_0) before dispatching IQ2_S/IQ4_NL
-at layer 2. Strict full-model coverage remains unsupported. These are operator
-and dispatch checks, not whole-model quality or performance results. The
-four tuples cover 43 of 48 layers in each inventory, but only one layer per
-tuple has direct operator/service validation. The IQ2S, IQ3XXS and IQ3S service
+an earlier IQ3_XXS service smoke fell back at layer 1, before IQ2_S/Q2_0 was
+implemented. These are operator and dispatch checks, not whole-model quality or
+performance results. All seven tuples cover 48 of 48 layers in each inventory,
+but only one layer per tuple has a direct operator check. The IQ2S, IQ3XXS and IQ3S service
 smokes had minimum sampled available RAM of 21.72, 20.87 and 19.81 GiB,
 respectively, above the 6 GiB floor; the pre-existing cgroup OOM-kill count
 stayed at one. The adapter follows
 NInfer's grouped schedule but decodes GGUF bytes and leaves routing/merge
 semantics in Strata. HIP/SYCL builds remain unverified because maestro1 has only
 1.0 GiB free. See the [IQ2_S/Q2_0 report](../../bench/results/2026-11-05-e4-iq2s-q2-layer1/README.md),
-[IQ2S report](../../bench/results/2026-11-04-e4-iq2s-iq4nl-service-smoke/README.md)
-and [IQ3XXS report](../../bench/results/2026-11-04-e4-iq3xxs-iq4nl-next-pair-baseline/README.md),
-plus the [IQ3S report](../../bench/results/2026-11-04-e4-iq3s-iq4nl-layer25/README.md).
+[IQ3_XXS/Q2_0](../../bench/results/2026-11-05-e4-iq3xxs-q2/README.md),
+[IQ3_S/Q2_0](../../bench/results/2026-11-05-e4-iq3s-q2/README.md),
+[IQ4_XS/IQ4_NL](../../bench/results/2026-11-05-e4-iq4xs-iq4nl/README.md),
+[IQ2S report](../../bench/results/2026-11-04-e4-iq2s-iq4nl-service-smoke/README.md),
+[IQ3XXS report](../../bench/results/2026-11-04-e4-iq3xxs-iq4nl-next-pair-baseline/README.md)
+and [IQ3S report](../../bench/results/2026-11-04-e4-iq3s-iq4nl-layer25/README.md).
 
 **E0/E6 Q2_0 Nsight kernel inventory (2026-10-31):** CUDA graph-node tracing confirmed that the NInfer Q2_0 grouped D3/D4 and SwiGLU kernels ran on the strict backend. Their combined duration was 287 ms across one warmup and one 32-token measured request, 0.95% of the CUDA kernel interval union. Summed kernel events overlap by only 105 ms out of 30.25 seconds in the NInfer trace, so the corrected GPU-active-time share remains 0.95%. This is not a request wall-time fraction or end-to-end ceiling; CPU/GPU overlap and profiler overhead remain, and Strata type-42 matmuls are not separated by dense versus expert work. Large wait-flag and dequantization activity also remains. The limited kernel share makes a large service gain from optimizing only these kernels unlikely for this short workload, but does not close E6 or justify a release profile. [Diagnostic report](../../bench/results/2026-10-31-e6-q2-ninfer-kernel-share-diagnostic/README.md).
 

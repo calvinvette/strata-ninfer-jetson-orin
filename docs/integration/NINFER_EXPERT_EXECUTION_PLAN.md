@@ -477,25 +477,25 @@ and [seven-pair confirmation](../../bench/results/2026-10-25-phase-e3-q2-ninfer-
 3. Header-only inventories identify exact expert codec pairs in Coder IQ1_M
    and ISTA-DASLab IQ3_S. Both are mixed-codec. The CUDA selector now supports
    IQ2_S/IQ4_NL, IQ3_XXS/IQ4_NL and IQ3_S/IQ4_NL at the exact 2560/640
-   geometry. Each has one real-weight operator check and a nonstrict service
-   dispatch; IQ3_S/IQ4_NL also dispatched on the actual ISTA IQ3_S artifact.
-   IQ2_S/Q2_0 is now also supported at five Coder layers by reusing the grouped
-   Q2_0 down-projection schedule. The remaining three tuple pairs account for
-   five unsupported layers. The Q2_0 artifact remains the only fully
-   supported model. NInfer's original sparse-MoE packed Q4/Q5/W8 layouts are
+   geometry. IQ2_S/Q2_0, IQ3_XXS/Q2_0 and IQ3_S/Q2_0 reuse the grouped Q2_0
+   down projection; IQ4_XS/IQ4_NL has a GGML-layout D3 adapter. All seven
+   observed tuples now have CUDA routes, and strict one-token traversal passed
+   on Coder IQ1_M and actual ISTA IQ3_S. The Q2_0 artifact remains the only
+   model with broader resident/staged-route coverage; mixed-codec support is
+   currently strict single-token CUDA traversal. NInfer's original sparse-MoE packed Q4/Q5/W8 layouts are
    not byte-compatible with these GGUF codecs. See the [codec boundary map](IMPORT_MAP.md#keep-the-negative-results).
 4. Publish the current model/codec, shape, residency and backend capability
    table. HIP/SYCL runtime cells remain unsupported/unqualified; the new mixed
-   tuple implementation is CUDA-only.
+   tuple implementations are CUDA-only.
 
 **Exit:** the bounded Q2_0 shape and codec result and explicit partial status for
 the other target variants are recorded in
 [E4 model and shape coverage](../../bench/results/2026-10-25-phase-e4-model-codec-coverage/README.md).
-The Q2_0/Q2_0 artifact has the only complete-model functional adapter coverage
-and is not performance-qualified. Mixed IQ1_M/IQ3_S have only experimental
-IQ2_S/IQ4_NL, IQ3_XXS/IQ4_NL and IQ3_S/IQ4_NL tuple coverage; they remain incomplete and are not performance-qualified.
-64/128-token throughput, remaining mixed-codec support and HIP/SYCL qualification remain
-open; this stage closes with partial model support as allowed by its exit.
+The Q2_0/Q2_0 artifact remains the only performance-evaluated adapter. All
+observed IQ1_M/IQ3_S mixed-codec tuples now have experimental CUDA routes and
+strict one-token traversal has passed on both artifacts. Tuple coverage does
+not qualify request quality, persistent state, grouped prefill, staging or
+performance. 64/128-token throughput and HIP/SYCL qualification remain open.
 
 Execution note (2026-11-04): Coder IQ1_M layer 2 is now pinned as a real-weight
 baseline for the first shared mixed tuple, IQ2_S/IQ4_NL. A scalar IQ2_S and
@@ -540,10 +540,22 @@ was captured at another layer, so this is an operator check, not a paired
 layer-1 service activation oracle. A strict one-token service request logged
 the new layer-1 dispatch and then rejected the next unsupported pair at layer
 12 (IQ3_XXS/Q2_0). Minimum available RAM was 21.58 GiB; the pre-existing
-cgroup OOM-kill count remained one. Four tuples now cover 43/48 layers, but
-direct operator checks are still one layer per tuple and the final three tuples,
-broader model quality, performance and accelerator-runtime coverage remain
-open. See the [IQ2_S/Q2_0 report](../../bench/results/2026-11-05-e4-iq2s-q2-layer1/README.md).
+cgroup OOM-kill count remained one. See the [IQ2_S/Q2_0 report](../../bench/results/2026-11-05-e4-iq2s-q2-layer1/README.md).
+
+Execution note (2026-11-05): IQ3_XXS/Q2_0, IQ3_S/Q2_0 and IQ4_XS/IQ4_NL
+complete the observed mixed-codec tuple set. Each passed one actual Coder
+real-weight operator check; for IQ4_XS/IQ4_NL, gate/up and hidden Q8_1 were
+bit-exact to Strata and the final output relative L2 was `8.85e-8`. Their
+activation rows came from other Coder layers. Strict Coder and actual ISTA
+IQ3_S one-token requests both traversed all 48 layers, logged the tuple routes
+through IQ4_XS/IQ4_NL at layer 47 and generated token `4`. Minimum available
+memory was 20.56 and 19.66 GiB, respectively, with no new cgroup OOM kills.
+This is dispatch/traversal evidence, not paired answer/state quality or
+performance. All seven observed tuples are now implemented for CUDA; every
+layer, prefill and staged-expert behavior still need qualification. See the
+[mixed tuple closeout](../../bench/results/2026-11-05-e4-iq4xs-iq4nl/README.md),
+[IQ3_XXS/Q2_0](../../bench/results/2026-11-05-e4-iq3xxs-q2/README.md) and
+[IQ3_S/Q2_0](../../bench/results/2026-11-05-e4-iq3s-q2/README.md) reports.
 
 ### E5 — Qualify numerical behavior and useful execution policies
 

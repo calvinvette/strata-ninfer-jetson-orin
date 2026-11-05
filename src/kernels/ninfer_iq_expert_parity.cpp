@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
         const std::string prefix = "blk." + std::to_string(layer) + ".ffn_";
         size_t shard = 0;
         const auto* gate = model.find(prefix + "gate_exps.weight", &shard);
-        if (!gate || (gate->type != 22 && gate->type != 18 && gate->type != 21) ||
+        if (!gate || (gate->type != 22 && gate->type != 18 && gate->type != 21 && gate->type != 23) ||
             gate->shape.size() != 3 || gate->shape[0] != kHidden || gate->shape[1] != kIntermediate ||
             (gate->shape[2] != 256 && gate->shape[2] != 512))
             throw std::runtime_error("gate is not a supported IQ tensor [2560,640,256|512]");
@@ -116,9 +116,24 @@ int main(int argc, char** argv) {
         check(cudaMemcpyAsync(d_candidate, sentinel.data(), sentinel.size() * sizeof(float), cudaMemcpyHostToDevice, stream), "init candidate");
         check(cudaMemcpyAsync(d_native, sentinel.data(), sentinel.size() * sizeof(float), cudaMemcpyHostToDevice, stream), "init native");
 
-        if (down_type == 42) {
+        if (gu_type == 23) {
+            strata::kernels::ninfer_iq4xs_iq4nl_backend_set(true);
+            strata::kernels::ninfer_iq4xs_iq4nl_expert_grouped(layout, d_ptr, d_starts, d_count, d_dst, d_tok,
+                                                              1, 1, d_xq, d_candidate_scratch, d_candidate,
+                                                              stream, 1);
+        } else if (down_type == 42 && gu_type == 22) {
             strata::kernels::ninfer_iq2s_q2_0_backend_set(true);
             strata::kernels::ninfer_iq2s_q2_0_expert_grouped(layout, d_ptr, d_starts, d_count, d_dst, d_tok,
+                                                            1, 1, d_xq, d_candidate_scratch, d_candidate,
+                                                            stream, 1);
+        } else if (down_type == 42 && gu_type == 18) {
+            strata::kernels::ninfer_iq3xxs_q2_0_backend_set(true);
+            strata::kernels::ninfer_iq3xxs_q2_0_expert_grouped(layout, d_ptr, d_starts, d_count, d_dst, d_tok,
+                                                              1, 1, d_xq, d_candidate_scratch, d_candidate,
+                                                              stream, 1);
+        } else if (down_type == 42 && gu_type == 21) {
+            strata::kernels::ninfer_iq3s_q2_0_backend_set(true);
+            strata::kernels::ninfer_iq3s_q2_0_expert_grouped(layout, d_ptr, d_starts, d_count, d_dst, d_tok,
                                                             1, 1, d_xq, d_candidate_scratch, d_candidate,
                                                             stream, 1);
         } else if (gu_type == 22) {
@@ -180,13 +195,16 @@ int main(int argc, char** argv) {
         const auto up_error = stage(candidate_up, native_up);
         size_t hidden_bytes_differ = 0;
         for (size_t i = 0; i < candidate_hidden.size(); ++i) hidden_bytes_differ += candidate_hidden[i] != native_hidden[i];
-        const uint64_t dispatch = down_type == 42 ? strata::kernels::ninfer_iq2s_q2_0_dispatch_count()
+        const uint64_t dispatch = gu_type == 23 ? strata::kernels::ninfer_iq4xs_iq4nl_dispatch_count()
+                                  : down_type == 42 && gu_type == 22 ? strata::kernels::ninfer_iq2s_q2_0_dispatch_count()
+                                  : down_type == 42 && gu_type == 18 ? strata::kernels::ninfer_iq3xxs_q2_0_dispatch_count()
+                                  : down_type == 42 && gu_type == 21 ? strata::kernels::ninfer_iq3s_q2_0_dispatch_count()
                                   : gu_type == 22 ? strata::kernels::ninfer_iq2s_iq4nl_dispatch_count()
                                   : gu_type == 18 ? strata::kernels::ninfer_iq3xxs_iq4nl_dispatch_count()
                                                   : strata::kernels::ninfer_iq3s_iq4nl_dispatch_count();
         std::printf("NInfer %s/%s grouped: layer=%d expert=%d bytes=%zu dispatch=%llu "
                     "relative_l2=%.9g relative_l1=%.9g max_abs=%.9g changed=%zu invalid=%zu\n",
-                    gu_type == 22 ? "IQ2_S" : gu_type == 18 ? "IQ3_XXS" : "IQ3_S",
+                    gu_type == 22 ? "IQ2_S" : gu_type == 18 ? "IQ3_XXS" : gu_type == 21 ? "IQ3_S" : "IQ4_XS",
                     down_type == 42 ? "Q2_0" : "IQ4_NL", layer, expert, blob.size(),
                     static_cast<unsigned long long>(dispatch),
                     rel_l2, err1 / std::max(std::sqrt(ref2 * kHidden), 1.0e-300), max_abs, changed, invalid);
