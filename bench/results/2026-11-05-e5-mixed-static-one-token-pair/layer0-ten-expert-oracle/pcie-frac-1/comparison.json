@@ -1,0 +1,137 @@
+{
+  "date": "2026-11-05",
+  "device": "Jetson Orin AGX SM87, CUDA 12.6",
+  "model": "Coder IQ1_M, two GGUF shards",
+  "prompt_token_ids": [
+    1,
+    2,
+    3
+  ],
+  "captured_layer": 0,
+  "captured_position": 2,
+  "requested_pcie_frac": 1.0,
+  "profile_loaded_slots": 391,
+  "route_ids": [
+    143,
+    175,
+    252,
+    25,
+    54,
+    240,
+    35,
+    204,
+    19,
+    246
+  ],
+  "route_kind_definition": {
+    "-1": "CPU",
+    "0": "primary VRAM/foresight",
+    "1": "PCIe",
+    "2": "peer/helper GPU"
+  },
+  "owner_counts": {
+    "CPU": 6,
+    "primary_vram_foresight": 4,
+    "PCIe": 0,
+    "peer_helper_gpu": 0
+  },
+  "arms": {
+    "strata": {
+      "token_ids": [
+        4
+      ],
+      "route_ids": [
+        143,
+        175,
+        252,
+        25,
+        54,
+        240,
+        35,
+        204,
+        19,
+        246
+      ],
+      "route_kind": [
+        -1,
+        -1,
+        -1,
+        0,
+        0,
+        -1,
+        0,
+        -1,
+        0,
+        -1
+      ],
+      "owner_sha256": "3550466e3dfb32dafc567e2400d864418d28bf9ee08e1f0968325ee3bfe46d31",
+      "cpu_captured_experts": [
+        143,
+        175,
+        252,
+        240,
+        204,
+        246
+      ],
+      "cpu_output_sha256_by_expert": {
+        "143": "9d26fa43e6854890605d4057758e68b38c5768a65e1d600a7d718cd225e5f88d",
+        "175": "3835d76e7ad1acb8d96295c95e537e325e06de6a81d9a3ac0a40228c5c82d770",
+        "252": "3c1f49bba395332f7b6ddf2fd3e293c4417e8efb31b2397e65aaf83392271a87",
+        "240": "6dd49a960804035a282ad33fd87d8792d5df9d954fe1d5c372694462087c1807",
+        "204": "151cce7a40cea374e327b1ecd810100532c07afa8e342a2f7cfa8cfdd42e762a",
+        "246": "b7243e226829628eafdc3aa0420829c1e9f7adcb9f50df8680348cb227016a22"
+      }
+    },
+    "ninfer": {
+      "token_ids": [
+        5
+      ],
+      "route_ids": [
+        143,
+        175,
+        252,
+        25,
+        54,
+        240,
+        35,
+        204,
+        19,
+        246
+      ],
+      "route_kind": [
+        -1,
+        -1,
+        -1,
+        0,
+        0,
+        -1,
+        0,
+        -1,
+        0,
+        -1
+      ],
+      "owner_sha256": "3550466e3dfb32dafc567e2400d864418d28bf9ee08e1f0968325ee3bfe46d31",
+      "cpu_captured_experts": [
+        143,
+        175,
+        252,
+        240,
+        204,
+        246
+      ],
+      "cpu_output_sha256_by_expert": {
+        "143": "9d26fa43e6854890605d4057758e68b38c5768a65e1d600a7d718cd225e5f88d",
+        "175": "3835d76e7ad1acb8d96295c95e537e325e06de6a81d9a3ac0a40228c5c82d770",
+        "252": "3c1f49bba395332f7b6ddf2fd3e293c4417e8efb31b2397e65aaf83392271a87",
+        "240": "6dd49a960804035a282ad33fd87d8792d5df9d954fe1d5c372694462087c1807",
+        "204": "151cce7a40cea374e327b1ecd810100532c07afa8e342a2f7cfa8cfdd42e762a",
+        "246": "b7243e226829628eafdc3aa0420829c1e9f7adcb9f50df8680348cb227016a22"
+      }
+    }
+  },
+  "token_ids_equal": false,
+  "minimum_available_bytes": 22259482624,
+  "cgroup_oom_kill_count_before_and_after": 1,
+  "qualification": "functional owner diagnostic only; no timing, energy, task-quality, or state-parity claim",
+  "source_reason": "The verifier assigns PCIe only when pcie_layer() is true and each selected source blob is pinned; the exercised --mmap-experts run has no pinned device complement. At pcie_frac=1.0, the six missing experts remained CPU-owned."
+}

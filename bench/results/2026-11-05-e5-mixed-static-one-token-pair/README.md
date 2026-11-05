@@ -49,6 +49,22 @@ E5 remains open for localization and correction, held-out quality, longer
 state parity, cancellation and recovery. E6/E7 performance and release gates
 remain open.
 
+### Exact layer-0 owners and PCIe-share follow-up
+
+At layer 0, position 2 of the service request, the ten routed experts were
+`143,175,252,25,54,240,35,204,19,246`. A fresh owner trace found four
+primary-VRAM/foresight rows (25, 54, 35, 19) and six CPU rows (143, 175, 252,
+240, 204, 246); it found no PCIe or peer rows. Thus the `queued NInfer ...
+resident grouped dispatch at layer 0` log only describes the resident group,
+not all ten routed experts. Forcing `--pcie-frac 1.0` left the same six misses
+on CPU: this `--mmap-experts` configuration has no pinned device complement,
+which the planner requires for PCIe ownership. The companion CPU-output
+capture verifies execution ownership. This is a source/configuration coverage
+limit, not an NInfer operator result. Minimum available RAM was 20.74 GiB and
+the pre-existing cgroup OOM-kill count did not increase. Details and hashes are
+in the [owner/PCIe diagnostic](layer0-ten-expert-oracle/pcie-frac-1/README.md)
+and [ten-row oracle report](layer0-ten-expert-oracle/README.md).
+
 ### First-logit follow-up on the direct CLI path
 
 A matched Coder IQ1_M direct-CLI pair repeated prompt IDs `1,2,3` with

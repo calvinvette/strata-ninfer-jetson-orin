@@ -591,6 +591,19 @@ upstream cause. E5 correctness is currently
 failing strict bitwise token/state parity for this Coder request; continue
 numerical-oracle and held-out quality checks before making broader claims.
 
+
+Execution note (2026-11-05): an exact owner capture of the layer-0 service
+row at position 2 found four primary-GPU/foresight experts and six CPU experts
+out of ten. The layer-0 NInfer dispatch message describes its resident group;
+it does not establish that all ten rows ran through NInfer. A paired request
+with `--pcie-frac 1.0` still assigned all six misses to CPU because this
+`--mmap-experts` configuration did not provide a pinned device complement.
+The captured CPU-output rows confirm that owner assignment. This bounds the
+current mixed-codec coverage claim and identifies pinned source support as a
+prerequisite for staged-miss coverage; it is not evidence of NInfer kernel
+performance. See the [ten-expert oracle](../../bench/results/2026-11-05-e5-mixed-static-one-token-pair/layer0-ten-expert-oracle/README.md)
+and [PCIe-share diagnostic](../../bench/results/2026-11-05-e5-mixed-static-one-token-pair/layer0-ten-expert-oracle/pcie-frac-1/README.md).
+
 Execution note (2026-11-05): a natural short arithmetic prompt (“What is 2 +
 2? Respond with only the numeral.”) returned exact answer `4` and identical
 accepted token IDs on Strata and strict NInfer. Two fresh runs per backend had

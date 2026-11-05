@@ -69,6 +69,12 @@ position 2. Candidate-versus-Strata operator relative L2 ranged from
 confirms the small operator delta across the routed set; an independent
 mathematical oracle for these exact service rows and a task-quality test remain
 open.
+
+The exact layer-0 owner trace shows that only four of those ten rows were
+resident on the primary GPU/foresight path; six were CPU-owned. Setting
+`--pcie-frac 1.0` did not stage the misses in this `--mmap-experts`
+configuration because it had no pinned device complement. See the
+[owner-routing diagnostic](../layer0-ten-expert-oracle/pcie-frac-1/README.md).
 State instrumentation changes execution cost, so no timing comparison is
 reported. These short synthetic token-ID requests do not measure answer quality,
 held-out tasks, long-context behavior, or memory minima.
