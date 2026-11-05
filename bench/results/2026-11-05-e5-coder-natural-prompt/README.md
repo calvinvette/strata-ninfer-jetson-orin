@@ -53,6 +53,21 @@ measured. Raw command logs, memory samples and supervisor records are retained
 in this directory. The 113 MiB per-arm GDN dumps remain local and are excluded
 from Git; their comparison JSON and hashes are retained.
 
+### Final-only arithmetic state recheck
+
+Two additional fresh service pairs repeated this exact arithmetic prompt with
+accepted-prefix tracing and GDN dumps disabled. Both backends returned answer
+`4` and token IDs `[19, 248046]` in both pairs. All 11 final state fields,
+including MTP and stale-page hashes, matched across backends and repeated
+within each backend. This differs from the per-token trace's state mismatch
+above. The trace helper synchronizes and copies state after each accepted
+token; final-only hashing runs after generation and therefore has less
+opportunity to affect scheduling. Instrumentation sensitivity is plausible,
+not proven, and the final-only check cannot test intermediate states. The
+minimum available RAM was 20.94 GiB, sampled swap peaked at 1.18 GiB, and the
+pre-existing OOM counter remained one. The two-token request is not a
+performance measurement. See the [final-only report](arithmetic-final-only/README.md).
+
 ## Next E5 gate
 
 Repeat accepted-prefix numerical state checks over varied natural short tasks

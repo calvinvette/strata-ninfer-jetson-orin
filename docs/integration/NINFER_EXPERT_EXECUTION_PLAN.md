@@ -3309,3 +3309,13 @@ so the observer may affect scheduling; this remains a hypothesis. Sparse
 checks do not rule out a transient difference between samples. No general
 state tolerance or performance claim follows. E5 mixed-codec broader task and
 profile coverage remains open; see the [held-out task and state report](../../bench/results/2026-11-05-e5-coder-natural-prompt/is-prime-heldout/README.md).
+
+Follow-up (2026-11-05): two final-only checks repeated the existing 2+2
+arithmetic task. Both backends returned `4` and the same two token IDs in both
+pairs; all 11 final-state fields matched across backends and across repeats.
+This differs from earlier accepted-prefix-traced captures of the same task,
+which had divergent GDN dumps. No trace ran between tokens in the final-only
+case, so instrumentation/scheduling effects are plausible, not proven. This
+is one short prompt under one static profile and is not performance evidence.
+Keep mixed-codec E5 open pending additional tasks, sampled prefix validation
+and broader profiles. See the [arithmetic recheck](../../bench/results/2026-11-05-e5-coder-natural-prompt/arithmetic-final-only/README.md).
