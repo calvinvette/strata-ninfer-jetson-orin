@@ -59,6 +59,17 @@ observed. This single traced pair does not establish general trace invariance.
 Broader state and quality qualification remains open. See the
 [4K retrieval report](../../bench/results/2026-11-05-e5-coder-natural-prompt/retrieval-4k-final-only/README.md).
 
+**E5 8K mixed-codec Coder retrieval (2026-11-05):** two fresh final-only
+Strata/strict-NInfer pairs used an exact 8,192-token retrieval prompt under a
+16,384-token context reservation. All four outputs returned `73192` with
+identical six-token IDs; all 11 final-state fields matched within each pair
+and reproduced across pairs. Minimum available RAM was 20.88 and 20.94 GiB,
+peak swap 1.81 and 1.71 GiB, and the existing OOM-kill count stayed at one.
+No prefix trace was collected; fixed-order timings are not performance
+evidence. This adds one bounded context cell, with broader E5 state/quality
+coverage still open. See the
+[8K retrieval report](../../bench/results/2026-11-05-e5-coder-natural-prompt/retrieval-8k-final-only/README.md).
+
 **E6 Coder IQ1_M performance screen (2026-11-05):** three same-profile
 Strata/strict-NInfer pairs measured the held-out `is_prime` task with state
 hashing disabled. All six requests generated the same 89 tokens, passed the

@@ -682,6 +682,17 @@ not establish general trace invariance or broad mixed-codec quality support.
 See the
 [4K Coder retrieval report](../../bench/results/2026-11-05-e5-coder-natural-prompt/retrieval-4k-final-only/README.md).
 
+Execution note (2026-11-05): two fresh final-only pairs extended the same
+Coder IQ1_M retrieval fixture to an 8,192-token prompt under a 16,384-token
+reservation. Both arms in both pairs returned the exact six-token answer and
+matched all 11 final-state fingerprints; both prompt identity and final state
+reproduced across repeats. Minimum available RAM was 20.88 and 20.94 GiB,
+peak swap was 1.81 and 1.71 GiB, and the existing OOM-kill count stayed at one.
+This is one task/context point with no accepted-prefix trace. Fixed-order
+timings are descriptive only. It does not close broader E5 state/quality
+coverage or E6. See the
+[8K Coder retrieval report](../../bench/results/2026-11-05-e5-coder-natural-prompt/retrieval-8k-final-only/README.md).
+
 1. Test held-out short and long requests, repeated continuation, retrieval and
    scoring, cancellation and recovery. Compare state and numerical results in
    addition to text. Retain original/default-route regression evidence.
