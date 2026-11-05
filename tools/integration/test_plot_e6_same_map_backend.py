@@ -33,6 +33,13 @@ def paired_evidence():
 class SameMapChartTests(unittest.TestCase):
     def test_ledger_capacity_cells_are_ordered_and_svg_is_valid(self):
         paired = paired_evidence()
+        pooled = {
+            "metrics": {
+                key: {"paired_median_effect_percent": 0.0,
+                      "paired_bootstrap_95_interval_effect_percent": [-1.0, 1.0]}
+                for key in ("decode_tps", "prompt_tps", "client_ttft_s", "client_total_s")
+            }
+        }
         rows = collect(
             base_evidence(),
             paired,
@@ -42,17 +49,20 @@ class SameMapChartTests(unittest.TestCase):
             paired,
             paired,
             paired,
+            paired,
+            pooled,
         )
         labels = [row['label'] for row in rows]
-        self.assertEqual(labels[:8], [
-            '2K retrieval', '2K code', 'L@4K', 'L@8K',
-            'L@16K', 'L@32K', 'L@64K', '8K code',
+        self.assertEqual(labels[:9], [
+            '2K retrieval', '2K code', 'L@4K', 'L8K-A', 'L8K-B',
+            'L8K-6', 'L@16K', 'L@32K', 'L@64K',
         ])
         rendered = svg_chart(rows)
         root = ET.fromstring(rendered)
         texts = [node.text for node in root.iter() if node.tag.endswith('text')]
-        self.assertEqual(len(rows), 15)
+        self.assertEqual(len(rows), 17)
         self.assertTrue(any(text == 'L@64K' for text in texts))
+        self.assertTrue(any(text == 'L8K-6' for text in texts))
 
 
 if __name__ == '__main__':

@@ -626,12 +626,30 @@ warmup/measured outputs passed the exact JSON oracle. The three-pair NInfer
 decode effect was +1.71% (95% screening interval +1.09% to +2.94%), below the
 5% useful-effect gate; prompt TPS changed +1.42%, first-visible latency
 −1.33% and client duration −1.26%, with all three intervals spanning zero.
-Both this and the separate 8K-cap ledger screen show small positive decode
-effects, but their separate samples do not establish a context-by-backend
-interaction. Minimum available RAM was 9.30 GiB; swap peaked at 2.38 GiB and
-the pre-existing OOM counter did not increment. No state trace or energy
+The initial 8K-cap screen showed +1.22% decode, but an independent same-day
+three-pair repeat measured −1.15%; descriptively pooling six pairs gives a
+0.00% median decode effect (95% interval −11.71% to +2.14%). The samples do
+not establish a context-by-backend interaction. Minimum available RAM was 9.30 GiB; swap peaked at 2.38 GiB
+and the pre-existing OOM counter did not increment. No state trace or energy
 qualification was collected. E6/E7 remain open. See the [4K-capacity
 ledger screen](../../bench/results/2026-11-04-e6-q2-ledger-capacity-4096/README.md).
+
+**Execution note (2026-11-04):** added the same exact 2,048-token ledger task
+at an 8,192-token context cap, with the Q2_0 weights, fixed 5K map and
+randomized strict-NInfer/Strata pair held constant. All 12 warmup/measured
+answers passed the independent exact JSON oracle and all six measured outputs
+matched; cache hits were 28.5%. This independent repeat measured a −1.15%
+paired median decode change (three-pair screening interval −22.27% to −0.32%),
+with one retained slow candidate arm. The initial 8K-cap screen measured
++1.22%; pooling both same-day screens descriptively gives a 0.00% median
+decode effect (six-pair interval −11.71% to +2.14%). Prompt throughput in
+the repeat changed −1.90%, first-visible latency +1.95% and client duration
++1.64%. No useful decode gain was shown. Minimum available
+memory was 9.19 GiB, sampled swap peaked at 2.06 GiB, and the pre-existing
+OOM-kill counter did not increment. Clocks were uncontrolled, EMC readback was
+denied and energy was not measured. This is an independent repeat at the existing 8K cap, not evidence of a
+context-cap interaction. E6/E7 remain open. See the
+[8K-capacity ledger screen](../../bench/results/2026-11-04-e6-q2-ledger-capacity-8192/README.md).
 
 **Execution note (2026-11-04):** extended the same 2K signed-ledger task to a
 16,384-token configured context cap, retaining the same Q2_0 model, fixed map,
@@ -2075,7 +2093,7 @@ suggests a possible prompt-boundary order interaction but does not establish
 it. Do not attribute the divergence to an engine or modify arithmetic yet.
 Next run a small preregistered process-history control matrix with matched
 single-backend repeats, then return to localization only if trajectories are
-repeatable. See the [order-balanced report](../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-order-balanced/README.md).
+repeatable. See the [order-balanced report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-order-balanced/README.md).
 
 **E6 same-backend NInfer repeat (2026-10-28):** two fresh strict-NInfer engine
 processes ran the identical 160K workload and capture positions. They matched
@@ -2088,7 +2106,7 @@ the paired harness and confirms that cross-backend attribution remains
 confounded. The run took 3,230.7 s; minimum available memory was 6.96 GiB and
 sampled OOM kills were zero. Next repeat Strata/Strata under the same settings
 to test whether the drift is specific to NInfer or shared. See the
-[NInfer repeat report](../bench/results/2026-10-28-e6-q2-active-compute-quality-160k/same-backend-ninfer-repeat/README.md).
+[NInfer repeat report](../../bench/results/2026-10-28-e6-q2-active-compute-quality-160k/same-backend-ninfer-repeat/README.md).
 
 **E6 same-backend Strata repeat (2026-10-28):** two fresh Strata engine
 processes ran the same 160K workload and captures. They matched answer, 47
@@ -2102,7 +2120,7 @@ shows within-backend state drift on both paths; the measured early-prefix drift
 is larger in the NInfer sample, but one pair per backend is insufficient to
 establish distinct backend profiles or a cause. Next repeat these controls if
 causal attribution is needed, or proceed to the task-quality gate without
-changing arithmetic. See the [Strata repeat report](../bench/results/2026-10-28-e6-q2-active-compute-quality-160k/same-backend-strata-repeat/README.md).
+changing arithmetic. See the [Strata repeat report](../../bench/results/2026-10-28-e6-q2-active-compute-quality-160k/same-backend-strata-repeat/README.md).
 
 **E6 same-backend context repeatability screen (2026-10-28):** at both 2K and
 16K, fresh-process NInfer/NInfer and Strata/Strata pairs matched answer, 47

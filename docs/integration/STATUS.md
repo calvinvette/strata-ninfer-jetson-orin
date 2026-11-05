@@ -1,3 +1,18 @@
+**E6 2K ledger screen at 8K context (2026-11-04):** three randomized
+same-map pairs passed all twelve exact JSON checks and returned matching
+184-token answers. The independent repeat measured a −1.15% paired median
+decode change (95% three-pair screening interval −22.27% to −0.32%); the
+initial same-day 8K screen measured +1.22%. Pooling the six matched pairs
+descriptively gives
+0.00% median decode change (95% interval −11.71% to +2.14%). Prompt
+throughput in the repeat changed −1.90%, first-visible latency +1.95%, and
+client duration +1.64%. One slow NInfer arm is retained. No 5% useful decode
+gain was demonstrated. Minimum available memory was 9.19 GiB, swap
+peaked at 2.06 GiB and the pre-existing OOM-kill counter did not increment.
+This is a replication at the existing 8K cap, not another cap value. The 4K,
+16K, 32K and 64K cap cells remain separate screens; no interaction is inferred.
+E6/E7 remain open. [Report and evidence](../../bench/results/2026-11-04-e6-q2-ledger-capacity-8192/README.md).
+
 **E6 update (2026-11-04):** a corrected strict-NInfer/Strata state diagnostic
 on the held-out 65,536-token Q2_0 retrieval prompt matched the first token,
 all nine final-state fingerprints and the 5K resident map after a one-token
@@ -7146,7 +7161,7 @@ generated-prefix first-difference layers varied between repeats, with overlappin
 relative-L2 ranges across arm orders. Same-backend run-to-run drift remains a
 confounder, so backend causation is unresolved and arithmetic is unchanged. Next
 is a preregistered process-history control matrix with matched single-backend
-repeats. See the [balanced-order report](../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-order-balanced/README.md).
+repeats. See the [balanced-order report](../../bench/results/2026-10-27-e6-q2-active-compute-quality-160k/generated-gdn-trace/gdn-commit-all-3pos-order-balanced/README.md).
 
 **E6 same-backend control (2026-10-28):** a fresh-process NInfer/NInfer pair
 matched exact output, 47 token IDs, and residency but failed GDN/tail/pooled/
@@ -7154,7 +7169,7 @@ pooled-full/KV state parity. Relative-L2 GDN drift crossed `1e-6` at layers
 12, 4, and 2 for positions 163840, 163862, and 163885. This directly confirms
 within-backend run-to-run variation, so prior cross-backend onset attribution
 is confounded. Minimum available memory was 6.96 GiB; sampled OOM kills were
-zero. Next run the matched Strata/Strata control. [Report](../bench/results/2026-10-28-e6-q2-active-compute-quality-160k/same-backend-ninfer-repeat/README.md).
+zero. Next run the matched Strata/Strata control. [Report](../../bench/results/2026-10-28-e6-q2-active-compute-quality-160k/same-backend-ninfer-repeat/README.md).
 
 **E6 same-backend Strata control (2026-10-28):** Strata/Strata matched answer,
 47 token IDs, and residency, but final persistent state differed. GDN state
@@ -7162,7 +7177,7 @@ was bitwise equal at position 163840, stayed below `1.65e-9` through all layers
 at 163862, then first crossed `1e-6` at layer 13 (`5.49e-4`) at 163885. This,
 with the NInfer repeat, confirms run-to-run drift on both paths; one pair per
 backend cannot identify a cause or a stable backend-specific profile. Minimum
-available memory was 6.47 GiB and OOM kills were zero. [Report](../bench/results/2026-10-28-e6-q2-active-compute-quality-160k/same-backend-strata-repeat/README.md).
+available memory was 6.47 GiB and OOM kills were zero. [Report](../../bench/results/2026-10-28-e6-q2-active-compute-quality-160k/same-backend-strata-repeat/README.md).
 
 **E6 repeatability by context (2026-10-28):** fresh-process same-backend pairs
 for NInfer and Strata were bitwise identical in final state and all captured
@@ -7183,7 +7198,7 @@ cells before causal claims. All supervised runs remained above the six-GiB
 memory floor with zero OOM kills. Next repeat the paired capacity cells with
 identical capture settings, then inspect capacity-sensitive allocations,
 dispatch and state initialization if the pattern holds. No arithmetic change
-is justified. [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+is justified. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
 
 **E6 repeated 32K/262K controls (2026-10-29):** a second NInfer/NInfer pair
 and a second Strata/Strata pair reproduced exact-state failures at 262,144
@@ -7193,7 +7208,7 @@ available memory was 7.21 and 7.14 GiB respectively; OOM kills were zero.
 This strengthens the capacity-associated repeatability finding across both
 backends, without establishing the mechanism. Next repeat the 16K capacity
 cells with matching capture settings and add another pair at both 32K
-capacities. [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+capacities. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
 
 **E6 repeated 16K/262K controls (2026-10-29):** second pairs for both backends
 again matched output, tokens and residency but failed exact final-state
@@ -7203,7 +7218,7 @@ parity. Both reproduced sampled GDN onset at layers 14, 2 and 2 for positions
 (NInfer) and 7.13 GiB (Strata), with no OOM kills. Together with the exact
 16K/32K-capacity repeats, this strengthens the capacity association, but the
 matching cross-backend signature does not reveal the mechanism. Next repeat
-the 16K lower-capacity pairs with these capture settings. [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+the 16K lower-capacity pairs with these capture settings. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
 
 **E6 matched 16K capacity repeats (2026-10-29):** second pairs at 32,768
 capacity were exact in final state and sampled GDN across all layers for both
@@ -7214,7 +7229,7 @@ capacity the leading condition in the current experiment, while mechanism is
 unknown. Next repeat 32K at 65,536 capacity and inspect capacity-driven QSA
 allocation/layout, selection and attention dispatch that can propagate into
 later GDN state before proposing code changes.
-[Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+[Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
 
 **E6 staged-path localization at 32K/262K (2026-10-29):** at model layer 1,
 position 32,768, changing only `--pcie-frac` from 1.0 to 0.0 preserved route
@@ -7234,7 +7249,7 @@ did not reach the selected position. The execution arithmetic is independently
 confirmed. One initial parity invocation lacked its output directory; the
 rerun passed. No performance claim is made. Next test whether disabling the
 staged path also removes the 16K/262K state failure, then proceed to
-minimally-instrumented performance controls. [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+minimally-instrumented performance controls. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
 
 **E6 staged-path replication at 16K/262K (2026-10-29):** the 16K Q2_0
 MTP-off/MTP-4 pair with PCIe staging disabled also passed exact answer, token,
@@ -7247,7 +7262,7 @@ high-capacity state mismatch is conditional on the staging configuration at
 both tested prompt lengths. No energy or performance qualification was done.
 Next run minimally-instrumented paired performance controls only after
 preserving the exact-state condition, and keep the staged path experimental.
-[Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+[Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
 
 **E6 routed-expert owner capture (2026-10-29):** at the 16K prompt boundary,
 model layer 2 routed the same ten experts at both 32,768 and 262,144 configured
@@ -7313,8 +7328,8 @@ required six-GiB floor. This implicates staging/owner-path configuration in
 the prior differences, but does not isolate CPU/GPU arithmetic from transfer
 or other staged-path interactions. No performance claim is made; energy was
 not measured. Next localize the staged-path effect using same-capacity
-MoE/state controls. [Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
-[Report](../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+MoE/state controls. [Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
+[Report](../../bench/results/2026-10-29-e6-q2-state-repeatability-length-screen/README.md).
 
 **E6 pp2048+tg128 no-staging pilot (2026-10-29):** at 4,096 configured
 capacity, one paired synthetic long-form Q2_0 request with PCIe staging disabled

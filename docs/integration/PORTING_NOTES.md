@@ -1,3 +1,19 @@
+## 2026-11-04 — Treat context reservation as its own experiment factor
+
+A fixed 2,048-token structured-ledger request was repeated at separate 4K,
+8K, 16K, 32K and 64K configured context caps while holding the same Q2_0
+weights, 5K resident map, task and Strata/NInfer backend pair. The 8K-cap
+screen returned identical exact answers, but the NInfer decode effect was
+−1.15% with a wide three-pair interval (−22.27% to −0.32%). The first 8K
+screen measured +1.22%; pooling both same-day screens descriptively gives
+0.00% median decode change (six-pair interval −11.71% to +2.14%). The other
+caps also produced small or noisy backend effects. Keep each cap as a separate
+paired cell; do not attribute differences between cells to a backend-by-cap
+interaction without a jointly designed interaction analysis. This is portable
+to a future Strata/Splash comparison because context reservation can change
+memory pressure, cache behavior and runtime scheduling independently of the
+compute backend. [8K-cap evidence](../../bench/results/2026-11-04-e6-q2-ledger-capacity-8192/README.md).
+
 # Integration notebook and future Strata + Splash work
 
 ## 2026-11-04 — Pair long-prompt answer and terminal state checks

@@ -81,9 +81,12 @@ below the useful-effect threshold. A separate accepted-prefix check matched
 all 107 token IDs and recorded state fingerprints across both backends. These
 results broaden correctness coverage but show no useful NInfer kernel gain.
 An additional 2K ledger aggregation task passed an exact JSON oracle in all
-twelve warmup/measured responses. At an 8K context cap, same-map decode
-changed +1.22% (95% three-pair screen interval +0.33% to +3.05%); at a 4K
-cap, it changed +1.71% (+1.09% to +2.94%); at a 16K cap, it changed +0.82%
+twelve warmup/measured responses. At the 8K context cap, the initial screen
+measured +1.22% median decode change (+0.33% to +3.05%), while an independent
+same-day three-pair replication measured −1.15% (−22.27% to −0.32%). Pooling
+both screens descriptively gives +0.00% across six pairs (95% interval
+−11.71% to +2.14%), with the slow NInfer arm retained. At a 4K cap, decode
+changed +1.71% (+1.09% to +2.94%); at a 16K cap, it changed +0.82%
 (−4.79% to +1.00%); at a 32K cap, it changed −15.12% (−37.35% to +1.52%).
 All medians are below the 5% useful-effect gate. One slow pair at 16K and one
 slow NInfer arm at 32K widen those cells' intervals; neither is attributed to
@@ -108,11 +111,12 @@ A separate 64K-capacity ledger screen passed all twelve exact JSON checks and ma
 The chart keeps each workload separate and shows the paired effects and
 uncertainty:
 
-<p align="center"><img src="bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/same-map-backend-screens.svg" width="100%" alt="Same-map Strata versus strict NInfer paired effects for retrieval tasks from 2K to 240K, code tasks, and 2K ledger tasks at 4K, 8K, 16K, 32K, and 64K context caps"></p>
+<p align="center"><img src="bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/same-map-backend-screens.svg" width="100%" alt="Same-map Strata versus strict NInfer paired effects for retrieval tasks from 2K to 240K, code tasks, and 2K ledger tasks; 8K cap includes two three-pair screens and their six-pair pooled estimate"></p>
 
 See the [code-generation report](bench/results/2026-11-04-e6-q2-code-generation-screen/README.md)
 and [8K code-generation report](bench/results/2026-11-04-e6-q2-code-generation-8k-screen/README.md)
 and [ledger aggregation report](bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/README.md)
+and [8K-capacity ledger replication and pooled summary](bench/results/2026-11-04-e6-q2-ledger-capacity-8192/README.md)
 and [4K-capacity ledger report](bench/results/2026-11-04-e6-q2-ledger-capacity-4096/README.md)
 and [16K-capacity ledger report](bench/results/2026-11-04-e6-q2-ledger-capacity-16384/README.md)
 and [32K-capacity ledger report](bench/results/2026-11-04-e6-q2-ledger-capacity-32768/README.md)

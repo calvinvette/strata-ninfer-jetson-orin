@@ -1,0 +1,228 @@
+{
+  "scope": "descriptive pooling of same-day independent screens with identical model, task, map, runtime and context cap",
+  "source_summaries": [
+    "bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/summary.json",
+    "bench/results/2026-11-04-e6-q2-ledger-capacity-8192/summary.json"
+  ],
+  "paired_blocks": 6,
+  "method": "Compute candidate/baseline ratios within each pair; report their median. Paired bootstrap resamples ratios with replacement 5,000 times, takes each sample median, uses the supplied deterministic seed, and returns sorted elements at floor(0.025*n) and floor(0.975*n). Intervals are reported as percent change from ratio 1.",
+  "qualification": "Exploratory pooling, not a preregistered confirmation; retain every pair, including outliers.",
+  "answer_sha256": "bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168",
+  "completion_tokens": 184,
+  "bootstrap_seed": 202611048192,
+  "bootstrap_resamples": 5000,
+  "metrics": {
+    "prompt_tps": {
+      "paired_median_effect_percent": -1.1655988801700268,
+      "paired_bootstrap_95_interval_effect_percent": [
+        -11.16145693741688,
+        1.4480703561300157
+      ],
+      "baseline_median": 45.299262761786785,
+      "candidate_median": 45.439525811014974,
+      "pairs": [
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/summary.json",
+          "source_block": 0,
+          "baseline": 45.30662720034688,
+          "candidate": 45.1109270647941,
+          "candidate_over_baseline": 0.9956805406262665
+        },
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/summary.json",
+          "source_block": 1,
+          "baseline": 47.99962500292966,
+          "candidate": 45.76812455723585,
+          "candidate_over_baseline": 0.9535100441814366
+        },
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/summary.json",
+          "source_block": 2,
+          "baseline": 48.15367794876618,
+          "candidate": 48.98501986428662,
+          "candidate_over_baseline": 1.0172643492861533
+        },
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-capacity-8192/summary.json",
+          "source_block": 0,
+          "baseline": 42.008015982737334,
+          "candidate": 34.583553561447445,
+          "candidate_over_baseline": 0.8232608170702259
+        },
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-capacity-8192/summary.json",
+          "source_block": 1,
+          "baseline": 45.05138673799803,
+          "candidate": 44.195747454104826,
+          "candidate_over_baseline": 0.981007481770333
+        },
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-capacity-8192/summary.json",
+          "source_block": 2,
+          "baseline": 45.29189832322669,
+          "candidate": 45.82168027743595,
+          "candidate_over_baseline": 1.011697057836447
+        }
+      ]
+    },
+    "decode_tps": {
+      "paired_median_effect_percent": 0.00039639466580254634,
+      "paired_bootstrap_95_interval_effect_percent": [
+        -11.708614435467569,
+        2.135879371951921
+      ],
+      "baseline_median": 6.5480502679598365,
+      "candidate_median": 6.549235811579299,
+      "pairs": [
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/summary.json",
+          "source_block": 0,
+          "baseline": 6.557353680136564,
+          "candidate": 6.57871214558976,
+          "candidate_over_baseline": 1.003257177589474
+        },
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/summary.json",
+          "source_block": 1,
+          "baseline": 6.603597525086493,
+          "candidate": 6.684006335275569,
+          "candidate_over_baseline": 1.0121765158890452
+        },
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/summary.json",
+          "source_block": 2,
+          "baseline": 6.389754168099152,
+          "candidate": 6.584904107333937,
+          "candidate_over_baseline": 1.0305410715499934
+        },
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-capacity-8192/summary.json",
+          "source_block": 0,
+          "baseline": 6.3155799178288134,
+          "candidate": 4.909350444909884,
+          "candidate_over_baseline": 0.7773396123214024
+        },
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-capacity-8192/summary.json",
+          "source_block": 1,
+          "baseline": 6.555087674297644,
+          "candidate": 6.479626153743216,
+          "candidate_over_baseline": 0.9884880989692463
+        },
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-capacity-8192/summary.json",
+          "source_block": 2,
+          "baseline": 6.541012861622029,
+          "candidate": 6.519759477568838,
+          "candidate_over_baseline": 0.9967507503038421
+        }
+      ]
+    },
+    "client_ttft_s": {
+      "paired_median_effect_percent": 1.2154900198188878,
+      "paired_bootstrap_95_interval_effect_percent": [
+        -1.4220280036524757,
+        13.078669031046687
+      ],
+      "baseline_median": 45.43591188080609,
+      "candidate_median": 45.315198675962165,
+      "pairs": [
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/summary.json",
+          "source_block": 0,
+          "baseline": 45.42582402937114,
+          "candidate": 45.64411369711161,
+          "candidate_over_baseline": 1.004805409090638
+        },
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/summary.json",
+          "source_block": 1,
+          "baseline": 42.959953509736806,
+          "candidate": 44.98628365481272,
+          "candidate_over_baseline": 1.0471678849609707
+        },
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/summary.json",
+          "source_block": 2,
+          "baseline": 42.84741590870544,
+          "candidate": 42.13981038564816,
+          "candidate_over_baseline": 0.9834854562859761
+        },
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-capacity-8192/summary.json",
+          "source_block": 0,
+          "baseline": 48.98224614420906,
+          "candidate": 59.48430890729651,
+          "candidate_over_baseline": 1.214405495659963
+        },
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-capacity-8192/summary.json",
+          "source_block": 1,
+          "baseline": 45.67350912978873,
+          "candidate": 46.564343124162406,
+          "candidate_over_baseline": 1.0195043913057398
+        },
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-capacity-8192/summary.json",
+          "source_block": 2,
+          "baseline": 45.445999732241035,
+          "candidate": 44.90400999598205,
+          "candidate_over_baseline": 0.9880739836409743
+        }
+      ]
+    },
+    "client_total_s": {
+      "paired_median_effect_percent": 0.8945441616395655,
+      "paired_bootstrap_95_interval_effect_percent": [
+        -1.3940695232389277,
+        13.301623461188594
+      ],
+      "baseline_median": 73.35084464750253,
+      "candidate_median": 73.19213995547034,
+      "pairs": [
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/summary.json",
+          "source_block": 0,
+          "baseline": 73.32110512722284,
+          "candidate": 73.42830133717507,
+          "candidate_over_baseline": 1.0014620102870277
+        },
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/summary.json",
+          "source_block": 1,
+          "baseline": 70.59015376213938,
+          "candidate": 72.33745662076399,
+          "candidate_over_baseline": 1.0247527844253226
+        },
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-aggregation-screen/summary.json",
+          "source_block": 2,
+          "baseline": 71.38683292688802,
+          "candidate": 69.8095378195867,
+          "candidate_over_baseline": 0.9779049575022226
+        },
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-capacity-8192/summary.json",
+          "source_block": 0,
+          "baseline": 77.93294816184789,
+          "candidate": 96.73658532975242,
+          "candidate_over_baseline": 1.241279684798449
+        },
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-capacity-8192/summary.json",
+          "source_block": 1,
+          "baseline": 73.56350396294147,
+          "candidate": 74.77206942299381,
+          "candidate_over_baseline": 1.0164288729457636
+        },
+        {
+          "source_summary": "bench/results/2026-11-04-e6-q2-ledger-capacity-8192/summary.json",
+          "source_block": 2,
+          "baseline": 73.38058416778222,
+          "candidate": 72.9559785737656,
+          "candidate_over_baseline": 0.9942136520329987
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,328 @@
+{
+  "date": "2026-11-04",
+  "hardware": "Jetson AGX Orin",
+  "system": {
+    "kernel": "Linux orin1 5.15.148-tegra aarch64",
+    "jetpack_release": "R36 REVISION 4.4",
+    "cuda_compiler": "12.6.68",
+    "driver": "540.4.0",
+    "gpu": "Orin (nvgpu)"
+  },
+  "tested_checkout_revision": "6c669cb1cd716be50e203e52c365ce23b3ab410c",
+  "runtime_binary_sha256": "fd67288c399d895be036dab344e30caab3d081540bfc552f22dac6a5fc33644a",
+  "runtime_binary_mtime": "2026-10-31 11:10:03.604465309 -0400; unchanged pre-existing executable",
+  "binary_build_source_revision": "not embedded; binary SHA-256 matches the earlier same-map screen",
+  "model": "Qwen3.8-Flash-Next Q2_0",
+  "model_source": {
+    "repo": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
+    "revision": "8f752f8ae475984833f74edf84d9e43c5d1eaf98"
+  },
+  "model_files": [
+    {
+      "name": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+      "size_bytes": 37623740192,
+      "sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720"
+    },
+    {
+      "name": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+      "size_bytes": 28800138432,
+      "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+    }
+  ],
+  "task": {
+    "name": "heldout-ledger-aggregation-2048",
+    "family": "structured data extraction and aggregation",
+    "prompt_tokens": 2048,
+    "generation_limit": 256,
+    "allow_natural_stop": true,
+    "observed_completion_tokens": 184,
+    "fixture_sha256": "9d58563e9a512a0007243414ce13e9c468485549b26901fd2015f11a1133f8d7",
+    "quality_oracle": "evaluate_e6_ledger_task.py; exact JSON groups/counts/signed sums/maximum IDs and overall totals",
+    "quality_outcomes": "All 12 warmup/measured outputs passed the exact JSON oracle; all six measured outputs shared answer SHA-256 bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168",
+    "cell": "heldout-ledger-aggregation-2048-cap8192",
+    "configured_context_tokens": 8192
+  },
+  "controls": {
+    "fixed_map_sha256": "76a1644f56d985fdd54a5816aadd39ce9356190dbaa828a293fab8462f507087",
+    "gpu_expert_slots": 5000,
+    "ram_expert_budget_gib": 6,
+    "max_context": 8192,
+    "prefill_chunk": 128,
+    "speculation_configured": 2,
+    "accepted_drafts": 0,
+    "workers": 8,
+    "prompt_cache": false,
+    "adaptation": false,
+    "pcie_staging_fraction": 0,
+    "randomized_seed": 202611048192,
+    "paired_blocks": 3,
+    "config_sha256": {
+      "strata": "be262d0902f4041c79c0e03ee44782a9c1239685defd1fbab6d60066ad175bbb",
+      "ninfer": "57f7044a8873b99f33939077b9fda231f32888c0d9812c0e178c69fe721cd753"
+    }
+  },
+  "configuration_note": "Within each pair, only the expert backend selector differs materially: default Strata versus --expert-backend ninfer --expert-backend-strict. The 8,192-token context cap is identical in every arm. API model_name, log path and loopback port differ only as labels/ownership; the summary tool checked normalized configs.",
+  "paired_summary": {
+    "prompt_tps": {
+      "baseline_median": 45.05138673799803,
+      "candidate_median": 44.195747454104826,
+      "median_within_block_candidate_over_baseline": 0.981007481770333,
+      "paired_bootstrap_95_interval": [
+        0.8232608170702259,
+        1.011697057836447
+      ]
+    },
+    "decode_tps": {
+      "baseline_median": 6.541012861622029,
+      "candidate_median": 6.479626153743216,
+      "median_within_block_candidate_over_baseline": 0.9884880989692463,
+      "paired_bootstrap_95_interval": [
+        0.7773396123214024,
+        0.9967507503038421
+      ]
+    },
+    "client_ttft_s": {
+      "baseline_median": 45.67350912978873,
+      "candidate_median": 46.564343124162406,
+      "median_within_block_candidate_over_baseline": 1.0195043913057398,
+      "paired_bootstrap_95_interval": [
+        0.9880739836409743,
+        1.214405495659963
+      ]
+    },
+    "client_total_s": {
+      "baseline_median": 73.56350396294147,
+      "candidate_median": 74.77206942299381,
+      "median_within_block_candidate_over_baseline": 1.0164288729457636,
+      "paired_bootstrap_95_interval": [
+        0.9942136520329987,
+        1.241279684798449
+      ]
+    }
+  },
+  "paired_blocks": [
+    {
+      "block": 0,
+      "api_responses_identical": true,
+      "arms": {
+        "baseline": {
+          "metrics": {
+            "prompt_tps": 42.008015982737334,
+            "decode_tps": 6.3155799178288134,
+            "client_ttft_s": 48.98224614420906,
+            "client_total_s": 77.93294816184789
+          },
+          "completion_tokens": 184,
+          "expert_cache_hit_rate": 0.285,
+          "answer_sha256": "bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168",
+          "resources": {
+            "minimum_available_gib": 9.188098907470703,
+            "minimum_admission_available_gib": 9.188098907470703,
+            "maximum_swap_used_gib": 1.1124610900878906,
+            "maximum_oom_kill_counter": 1,
+            "clocks": {
+              "cpu": {
+                "minimum_mhz": 729.6,
+                "maximum_mhz": 2201.6
+              },
+              "gpu": {
+                "minimum_mhz": 306.0,
+                "maximum_mhz": 1300.5
+              },
+              "emc": {
+                "status": "unavailable"
+              }
+            }
+          }
+        },
+        "candidate": {
+          "metrics": {
+            "prompt_tps": 34.583553561447445,
+            "decode_tps": 4.909350444909884,
+            "client_ttft_s": 59.48430890729651,
+            "client_total_s": 96.73658532975242
+          },
+          "completion_tokens": 184,
+          "expert_cache_hit_rate": 0.285,
+          "answer_sha256": "bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168",
+          "resources": {
+            "minimum_available_gib": 9.195838928222656,
+            "minimum_admission_available_gib": 9.195838928222656,
+            "maximum_swap_used_gib": 1.1019630432128906,
+            "maximum_oom_kill_counter": 1,
+            "clocks": {
+              "cpu": {
+                "minimum_mhz": 729.6,
+                "maximum_mhz": 2201.6
+              },
+              "gpu": {
+                "minimum_mhz": 306.0,
+                "maximum_mhz": 1300.5
+              },
+              "emc": {
+                "status": "unavailable"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "block": 1,
+      "api_responses_identical": true,
+      "arms": {
+        "baseline": {
+          "metrics": {
+            "prompt_tps": 45.05138673799803,
+            "decode_tps": 6.555087674297644,
+            "client_ttft_s": 45.67350912978873,
+            "client_total_s": 73.56350396294147
+          },
+          "completion_tokens": 184,
+          "expert_cache_hit_rate": 0.285,
+          "answer_sha256": "bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168",
+          "resources": {
+            "minimum_available_gib": 9.306156158447266,
+            "minimum_admission_available_gib": 9.306156158447266,
+            "maximum_swap_used_gib": 2.057842254638672,
+            "maximum_oom_kill_counter": 1,
+            "clocks": {
+              "cpu": {
+                "minimum_mhz": 729.6,
+                "maximum_mhz": 2201.6
+              },
+              "gpu": {
+                "minimum_mhz": 306.0,
+                "maximum_mhz": 1300.5
+              },
+              "emc": {
+                "status": "unavailable"
+              }
+            }
+          }
+        },
+        "candidate": {
+          "metrics": {
+            "prompt_tps": 44.195747454104826,
+            "decode_tps": 6.479626153743216,
+            "client_ttft_s": 46.564343124162406,
+            "client_total_s": 74.77206942299381
+          },
+          "completion_tokens": 184,
+          "expert_cache_hit_rate": 0.285,
+          "answer_sha256": "bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168",
+          "resources": {
+            "minimum_available_gib": 9.274635314941406,
+            "minimum_admission_available_gib": 9.274635314941406,
+            "maximum_swap_used_gib": 1.4565696716308594,
+            "maximum_oom_kill_counter": 1,
+            "clocks": {
+              "cpu": {
+                "minimum_mhz": 729.6,
+                "maximum_mhz": 2201.6
+              },
+              "gpu": {
+                "minimum_mhz": 306.0,
+                "maximum_mhz": 1300.5
+              },
+              "emc": {
+                "status": "unavailable"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "block": 2,
+      "api_responses_identical": true,
+      "arms": {
+        "baseline": {
+          "metrics": {
+            "prompt_tps": 45.29189832322669,
+            "decode_tps": 6.541012861622029,
+            "client_ttft_s": 45.445999732241035,
+            "client_total_s": 73.38058416778222
+          },
+          "completion_tokens": 184,
+          "expert_cache_hit_rate": 0.285,
+          "answer_sha256": "bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168",
+          "resources": {
+            "minimum_available_gib": 9.315074920654297,
+            "minimum_admission_available_gib": 9.315074920654297,
+            "maximum_swap_used_gib": 2.0560073852539062,
+            "maximum_oom_kill_counter": 1,
+            "clocks": {
+              "cpu": {
+                "minimum_mhz": 729.6,
+                "maximum_mhz": 2201.6
+              },
+              "gpu": {
+                "minimum_mhz": 306.0,
+                "maximum_mhz": 1300.5
+              },
+              "emc": {
+                "status": "unavailable"
+              }
+            }
+          }
+        },
+        "candidate": {
+          "metrics": {
+            "prompt_tps": 45.82168027743595,
+            "decode_tps": 6.519759477568838,
+            "client_ttft_s": 44.90400999598205,
+            "client_total_s": 72.9559785737656
+          },
+          "completion_tokens": 184,
+          "expert_cache_hit_rate": 0.285,
+          "answer_sha256": "bf5ee0d2a7118160bed5b6654d479ad69b25271c8b18a036459fcc8758a79168",
+          "resources": {
+            "minimum_available_gib": 9.312206268310547,
+            "minimum_admission_available_gib": 9.312206268310547,
+            "maximum_swap_used_gib": 2.0614166259765625,
+            "maximum_oom_kill_counter": 1,
+            "clocks": {
+              "cpu": {
+                "minimum_mhz": 729.6,
+                "maximum_mhz": 2201.6
+              },
+              "gpu": {
+                "minimum_mhz": 306.0,
+                "maximum_mhz": 1300.5
+              },
+              "emc": {
+                "status": "unavailable"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "resource_summary": {
+    "minimum_available_gib": 9.188098907470703,
+    "minimum_admission_available_gib": 9.188098907470703,
+    "maximum_swap_used_gib": 2.0614166259765625,
+    "maximum_oom_kill_counter": 1,
+    "cpu_clock_mhz_range": {
+      "minimum_mhz": 729.6,
+      "maximum_mhz": 2201.6
+    },
+    "gpu_clock_mhz_range": {
+      "minimum_mhz": 306.0,
+      "maximum_mhz": 1300.5
+    },
+    "emc_clock": "not available: permission denied",
+    "energy": "instantaneous tegrastats rail samples were captured; energy was not analyzed or used for qualification"
+  },
+  "raw_campaign": "/tmp/e6-q2-ledger-capacity-8192/campaign/",
+  "state_capture": "No state trace was collected in this timing campaign; timings are no-trace.",
+  "decision": "The 5% useful decode-gain gate was not met. Median paired decode changed -1.15%; the three-pair screening interval is -22.27% to -0.32%, driven by a retained slow NInfer arm in block 0. Do not promote a profile or infer a context-cap interaction from this single cell. E6/E7 remain open.",
+  "same_day_pooled_screen": {
+    "summary": "same-day-pooled-summary.json",
+    "independent_initial_screen": "../2026-11-04-e6-q2-ledger-aggregation-screen/summary.json",
+    "paired_blocks_total": 6,
+    "qualification": "exploratory descriptive pooling; not a preregistered seven-pair confirmation"
+  }
+}
