@@ -123,6 +123,53 @@ state update. An opt-in prefill-state hook did not produce a capture in this
 service path and is not used as evidence. The numerical tolerance and user-
 visible impact remain open.
 
+### Prompt-position 41 layer boundary capture
+
+A follow-up captured every prompt row through GDN layer 1 and MoE bundles at
+layers 0, 1, 2, 12, 17, 21 and 47 for the same 44-token `is_even` prompt. The
+binary was built from source `910b3e1b` (SHA-256
+`42fbb0afd69eb11979884352584a5f14f141b3e3ed5a6e87eef4a780aa721b2c`); the
+temporary 256-slot profile SHA-256 was
+`c1e66c2e60ae8e7880befa303fb6bb79da1ccdd59895053eb95d433c648ef047`.
+The run used greedy sampling, the same IQ1_M two-shard artifact, profile and
+cache, 4 workers, prefill chunk 64 and 512-token context. At position 41
+(token ID 271), layer 0 had identical route IDs, route weights and inputs.
+Its ten expert parts differed by relative L2 `6.31e-8`, and the combined
+output by `3.50e-8`. At layer 1, route IDs still matched, while route
+weights and inputs differed by `2.36e-7` and `3.80e-7`; expert parts differed
+by `1.18e-3`, shared output by `1.57e-4`, and combined output by `1.334e-3`.
+The GDN raw output at layer 1 remained close (`7.55e-8` relative L2) at that
+position. Later sampled MoE boundaries show the difference growing through
+the remaining network; layer 21 and layer 47 also had changed route IDs.
+
+The pair used the same 256-slot static profile. Its top 256 entries cover
+layer 0, so all ten layer-1 experts at position 41 were CPU misses; the
+service's layer-1 NInfer dispatch line does not mean those expert rows ran on
+the NInfer GPU kernels. A separate actual-weight oracle for layer 1/expert
+198, run on each backend's captured layer-1 input, dispatched the NInfer CUDA
+operator and matched the Strata grouped reference bitwise for both inputs,
+including all hidden Q8_1 bytes. That oracle checks the operator on fixed
+inputs, not the service's CPU-miss path. The evidence therefore places a
+small difference at the resident layer-0 output and a much larger change at a
+subsequent CPU-owned MoE boundary, but does not yet prove the mechanism. Input
+quantization sensitivity is a candidate explanation, not a demonstrated
+cause; do not attribute this amplification to an NInfer kernel defect.
+
+The supervised boundary pair passed with minimum available RAM 21.36 GiB;
+the pre-existing cgroup OOM-kill count remained one. The GPU clock was observed
+at 306 MHz, CPU clocks varied, EMC readback was denied, and energy was not
+measured. These are functional diagnostics; their timings are excluded. The
+structured data are in [`moe-comparison.json`](moe-boundaries-pos41/moe-comparison.json),
+[`diag-comparison.json`](gdn-layer1-diag/diag-comparison.json) and
+[`layer1-expert198-service-input-oracle/results.json`](layer1-expert198-service-input-oracle/results.json).
+Supervisor memory/clock evidence is in
+[`supervisor-moe-boundaries-pos41/result.json`](supervisor-moe-boundaries-pos41/result.json)
+and [`supervisor-layer1-expert198-service-input-oracle/result.json`](supervisor-layer1-expert198-service-input-oracle/result.json).
+Reproduction helpers are [`run_gdn_layer_diag_pair.py`](run_gdn_layer_diag_pair.py),
+[`run_layer1_expert_input_oracle.py`](run_layer1_expert_input_oracle.py), and
+[`compare_gdn_layer_diag.py`](../../../tools/integration/compare_gdn_layer_diag.py).
+Raw GDN, MoE and activation captures remain local and are excluded from Git.
+
 ### Independent oracle for a resident mixed-codec service row
 
 To distinguish resident NInfer arithmetic from CPU fallback, the recorded
