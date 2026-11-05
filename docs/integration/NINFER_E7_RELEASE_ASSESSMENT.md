@@ -98,7 +98,7 @@ paired response bodies. Decode changed −0.27% (95% three-pair interval
 −4.24% to +0.66%), below the useful-effect gate. Minimum available memory
 was 7.82 GiB and peak sampled swap 2.68 GiB. This separate capacity point
 adds no release evidence and does not establish a context interaction. The
-no-release decision is unchanged. See the [64K-capacity ledger report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-65536/README.md).
+no-release decision is unchanged. See the [64K-capacity ledger report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-65536/README.md). A subsequent trace-enabled pair at that cap matched all 184 accepted token IDs and persistent-state fingerprints; both answers passed the oracle. Trace timings are excluded, and the 2K prompt does not qualify 64K ingestion. The additional state check does not change the no-release decision.
 
 A follow-up three-pair screen used the same executable code task with an exact
 8,192-token formatted prompt at 16K configured context. All twelve warmup and

@@ -3499,3 +3499,19 @@ NInfer decode changed −0.27% (95% three-pair interval −4.24% to +0.66%).
 Minimum available memory was 7.82 GiB and peak sampled swap 2.68 GiB. This
 adds a separate capacity observation only; it does not estimate an interaction.
 See the [64K-capacity ledger report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-65536/README.md).
+
+The 64K-cap ledger follow-up also has a separate accepted-prefix state pair:
+both backends matched all 184 token IDs and every recorded state fingerprint
+for the measured answer, with both warmup and measured JSON passing the oracle.
+This uses a 2K prompt at 64K configured context, not a near-limit prompt. Trace
+overhead is excluded from performance. See the [state diagnostic](../../bench/results/2026-11-04-e6-q2-ledger-capacity-65536/README.md#accepted-prefix-state-diagnostic).
+
+
+## 2026-11-04 — State checks at a 64K context reservation
+
+The 64K-cap ledger follow-up also has a separate accepted-prefix Strata/NInfer
+pair. Both backends passed the exact JSON oracle for warmup and measured
+requests, and matched all 184 measured token IDs and recorded persistent-state
+fingerprints. This uses a 2K prompt at 64K configured context, not near-limit
+ingestion. The trace reduced decode to about 1 token/s, so its timing is excluded.
+See the [state diagnostic](../../bench/results/2026-11-04-e6-q2-ledger-capacity-65536/README.md#accepted-prefix-state-diagnostic).

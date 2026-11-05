@@ -20,7 +20,7 @@ screens. Decode paired medians were +1.71%, +1.22%, +0.82%, −15.12% and
 +0.66%. Minimum available memory at 64K was 7.82 GiB, with 2.68 GiB peak
 sampled swap. These independently randomized cells do not estimate a capacity
 interaction. See the [32K-cap report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-32768/README.md)
-and [64K-cap report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-65536/README.md).
+and [64K-cap report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-65536/README.md). A separate trace-enabled pair at 64K cap matched all 184 accepted token IDs and recorded state fingerprints, with exact JSON answers; trace timings are excluded. This covers the short 2K task at that reservation only.
 
 The `neroued/Qwen3.8-Flash-Next-NInfer` package is now downloaded under
 `~/models/Qwen3.8-Flash-Next-NInfer/`. Its manifest identifies a mixed-format

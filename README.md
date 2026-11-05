@@ -97,7 +97,7 @@ available RAM remained 8.97 GiB. A separate instrumented pair matched all 107
 accepted token IDs and persistent-state fingerprints for this same task;
 trace timings are excluded. This adds longer-input task evidence, not a
 useful backend effect or state parity for natural long-context tasks.
-A separate 64K-capacity ledger screen passed all twelve exact JSON checks and matched all paired responses. Decode changed −0.27% (95% three-pair interval −4.24% to +0.66%), with minimum available RAM 7.82 GiB and peak sampled swap 2.68 GiB. This adds no useful performance gain and does not establish a capacity interaction.
+A separate 64K-capacity ledger screen passed all twelve exact JSON checks and matched all paired responses. Decode changed −0.27% (95% three-pair interval −4.24% to +0.66%), with minimum available RAM 7.82 GiB and peak sampled swap 2.68 GiB. This adds no useful performance gain and does not establish a capacity interaction. A distinct accepted-prefix diagnostic at the same configured cap also passed both exact-answer checks and matched all 184 measured token IDs and persistent-state fingerprints. Its trace timings are excluded, and it covers a 2K prompt under the 64K reservation, not 64K ingestion.
 
 The chart keeps each workload separate and shows the paired effects and
 uncertainty:

@@ -664,6 +664,17 @@ increase. This separate cell does not estimate a capacity interaction or
 qualify a release profile. E6/E7 remain open. See the [64K-capacity ledger
 screen](../../bench/results/2026-11-04-e6-q2-ledger-capacity-65536/README.md).
 
+**E6 64K-cap ledger accepted-prefix state check (2026-11-04):** a separate
+trace-enabled Strata/strict-NInfer pair repeated the exact 2K ledger task with
+65,536 configured context, matching map and runtime. Both warmup and measured
+outputs passed the exact JSON oracle. The measured 184-token traces matched all
+token IDs and persistent-state fingerprints at every accepted prefix; both
+arms accepted zero speculative drafts. Minimum available memory was 7.83 GiB
+for Strata and 7.88 GiB for NInfer; peak swap was 2.98 and 1.60 GiB. Trace
+hashing reduced decode to about 1 token/s, so timing is excluded. This is
+short-prompt state parity under a 64K reservation, not near-limit ingestion or
+broad state qualification. See the [64K-cap ledger state diagnostic](../../bench/results/2026-11-04-e6-q2-ledger-capacity-65536/README.md#accepted-prefix-state-diagnostic).
+
 **Execution note (2026-11-04):** extended the executable code task to an exact
 8,192-token formatted prompt at 16K configured context. Three randomized
 same-map pairs retained the same controls and passed the independent five-case

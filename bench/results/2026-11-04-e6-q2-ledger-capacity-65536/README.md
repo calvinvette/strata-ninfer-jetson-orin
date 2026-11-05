@@ -29,7 +29,7 @@ floor. Sampled swap peaked at 2.68 GiB. The pre-existing cgroup OOM-kill
 counter stayed at 1, with no increment. CPU and GPU clocks were dynamic and
 uncontrolled (729.6–2,201.6 and 306–1,300.5 MHz); EMC readback was denied.
 Rail samples were captured but energy was not integrated or used for
-qualification. No persistent-state capture was run for this cell.
+qualification. A separate accepted-prefix state diagnostic at the same configured context cap is reported below; its trace timings are excluded from this screen.
 
 Separate 4K-, 8K-, 16K-, 32K- and 64K-cap screens are not jointly randomized
 capacity/backend experiments. Their point estimates do not establish a
@@ -73,3 +73,40 @@ The API `model_name` label in the saved configs still says `cap16384`; the
 health response and actual `--max-context 65536` argument confirm the context
 used. This is one task, model and context-cap screen. It does not qualify
 another model format or a native `.ninfer` artifact. E6 and E7 remain open.
+
+
+## Accepted-prefix state diagnostic
+
+A separate trace-enabled pair used the same model, 5,000-slot map, 2,048-token
+fixture and 65,536-token context cap. Both arms passed the exact JSON oracle
+for warmup and measured requests and returned the same 184-token answer. The
+measured accepted-prefix traces matched all 184 token IDs and all recorded
+persistent-state fingerprints exactly; no first difference was found. Health
+responses confirmed `max_context=65536` in both arms, and both accepted zero
+speculative drafts. Minimum available/admission memory was 7.83 GiB for Strata
+and 7.88 GiB for NInfer. Sampled swap peaked at 2.98 GiB and 1.60 GiB,
+respectively; the pre-existing cgroup OOM-kill count remained at 1.
+
+The tracing run took 497 seconds for Strata and 509 seconds for NInfer, with
+state hashing reducing decode to about 1 token/s. These timings are diagnostic
+overhead and are excluded from performance results. This establishes exact
+accepted-prefix parity for this short ledger request under a 64K configured
+capacity; the prompt itself was 2K and this does not establish near-limit
+64K ingestion, broader state parity, or semantic quality beyond the oracle.
+Compact [statecheck evidence](statecheck-evidence.json) is committed. Full logs
+and memory traces remain outside Git under
+`/tmp/e6-q2-ledger-capacity-65536-statecheck/`.
+
+The paired diagnostic can be repeated by running `run_control.py` with the
+the saved [Strata state config](statecheck-strata-config.json) or [NInfer state config](statecheck-ninfer-config.json), fixture and output path, and adding
+`--no-trace --accepted-prefix-trace --state-hash` to
+`api_control_block.py`. Compare captures with:
+
+```sh
+python3 tools/integration/compare_e6_ledger_state.py \
+  --strata-log /tmp/e6-q2-ledger-capacity-65536-statecheck/strata/engine.log \
+  --ninfer-log /tmp/e6-q2-ledger-capacity-65536-statecheck/ninfer/engine.log \
+  --strata-requests /tmp/e6-q2-ledger-capacity-65536-statecheck/strata/requests.json \
+  --ninfer-requests /tmp/e6-q2-ledger-capacity-65536-statecheck/ninfer/requests.json \
+  --output /tmp/e6-q2-ledger-capacity-65536-statecheck/state-comparison.json
+```
