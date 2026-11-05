@@ -41,17 +41,18 @@ class SameMapChartTests(unittest.TestCase):
             paired,
             paired,
             paired,
+            paired,
         )
         labels = [row['label'] for row in rows]
-        self.assertEqual(labels[:7], [
+        self.assertEqual(labels[:8], [
             '2K retrieval', '2K code', 'L@4K', 'L@8K',
-            'L@16K', 'L@32K', '8K code',
+            'L@16K', 'L@32K', 'L@64K', '8K code',
         ])
         rendered = svg_chart(rows)
         root = ET.fromstring(rendered)
         texts = [node.text for node in root.iter() if node.tag.endswith('text')]
-        self.assertEqual(len(rows), 14)
-        self.assertTrue(any(text == 'L@32K' for text in texts))
+        self.assertEqual(len(rows), 15)
+        self.assertTrue(any(text == 'L@64K' for text in texts))
 
 
 if __name__ == '__main__':

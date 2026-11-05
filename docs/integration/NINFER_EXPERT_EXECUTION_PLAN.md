@@ -653,6 +653,17 @@ response and actual launch argument confirmed a 32,768-token cap. This adds a
 separate capacity cell and no confirmation or profile promotion. E6/E7 remain
 open. See the [32K-capacity ledger screen](../../bench/results/2026-11-04-e6-q2-ledger-capacity-32768/README.md).
 
+**E6 2K ledger screen at 64K context (2026-11-04):** the third randomized
+capacity extension passed all twelve exact JSON oracles and all three paired
+response comparisons. Decode changed −0.27% (95% three-pair interval −4.24%
+to +0.66%), below the 5% useful-effect gate. Prompt throughput changed
+−0.42%, first-visible latency +0.41%, and client duration +0.27%; the latter
+latency changes are regressions, with wide intervals. Minimum available RAM
+was 7.82 GiB and sampled swap peaked at 2.68 GiB; OOM-kill count did not
+increase. This separate cell does not estimate a capacity interaction or
+qualify a release profile. E6/E7 remain open. See the [64K-capacity ledger
+screen](../../bench/results/2026-11-04-e6-q2-ledger-capacity-65536/README.md).
+
 **Execution note (2026-11-04):** extended the executable code task to an exact
 8,192-token formatted prompt at 16K configured context. Three randomized
 same-map pairs retained the same controls and passed the independent five-case

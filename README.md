@@ -97,10 +97,12 @@ available RAM remained 8.97 GiB. A separate instrumented pair matched all 107
 accepted token IDs and persistent-state fingerprints for this same task;
 trace timings are excluded. This adds longer-input task evidence, not a
 useful backend effect or state parity for natural long-context tasks.
+A separate 64K-capacity ledger screen passed all twelve exact JSON checks and matched all paired responses. Decode changed −0.27% (95% three-pair interval −4.24% to +0.66%), with minimum available RAM 7.82 GiB and peak sampled swap 2.68 GiB. This adds no useful performance gain and does not establish a capacity interaction.
+
 The chart keeps each workload separate and shows the paired effects and
 uncertainty:
 
-<p align="center"><img src="bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/same-map-backend-screens.svg" width="100%" alt="Same-map Strata versus strict NInfer paired effects for retrieval tasks from 2K to 240K, code tasks, and 2K ledger tasks at 4K, 8K, 16K, and 32K context caps"></p>
+<p align="center"><img src="bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/same-map-backend-screens.svg" width="100%" alt="Same-map Strata versus strict NInfer paired effects for retrieval tasks from 2K to 240K, code tasks, and 2K ledger tasks at 4K, 8K, 16K, 32K, and 64K context caps"></p>
 
 See the [code-generation report](bench/results/2026-11-04-e6-q2-code-generation-screen/README.md)
 and [8K code-generation report](bench/results/2026-11-04-e6-q2-code-generation-8k-screen/README.md)
@@ -108,6 +110,7 @@ and [ledger aggregation report](bench/results/2026-11-04-e6-q2-ledger-aggregatio
 and [4K-capacity ledger report](bench/results/2026-11-04-e6-q2-ledger-capacity-4096/README.md)
 and [16K-capacity ledger report](bench/results/2026-11-04-e6-q2-ledger-capacity-16384/README.md)
 and [32K-capacity ledger report](bench/results/2026-11-04-e6-q2-ledger-capacity-32768/README.md)
+and [64K-capacity ledger report](bench/results/2026-11-04-e6-q2-ledger-capacity-65536/README.md)
 and [combined fixed-map screen report](bench/results/2026-10-31-e6-q2-fixed-map-ORBIT-screen/README.md)
 for workload, memory, clock and measurement limits.
 No general performance-qualified profile is available,

@@ -3492,3 +3492,10 @@ capacity/backend interaction estimate. For Splash experiments, record the
 actual context argument and health response separately from API model labels;
 the saved label for this run still said `cap16384` while runtime context was
 32,768. See the [32K-capacity ledger report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-32768/README.md).
+
+
+The same ledger screen at a 64K cap again passed all exact-oracle responses;
+NInfer decode changed −0.27% (95% three-pair interval −4.24% to +0.66%).
+Minimum available memory was 7.82 GiB and peak sampled swap 2.68 GiB. This
+adds a separate capacity observation only; it does not estimate an interaction.
+See the [64K-capacity ledger report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-65536/README.md).

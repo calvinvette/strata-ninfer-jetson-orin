@@ -93,6 +93,13 @@ not evidence of equivalence or a useful backend effect. The separate capacity
 cells do not estimate an interaction and do not change the no-release decision.
 See the [32K-capacity ledger report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-32768/README.md).
 
+A 64K-cap follow-up passed all twelve exact JSON checks and matched all three
+paired response bodies. Decode changed −0.27% (95% three-pair interval
+−4.24% to +0.66%), below the useful-effect gate. Minimum available memory
+was 7.82 GiB and peak sampled swap 2.68 GiB. This separate capacity point
+adds no release evidence and does not establish a context interaction. The
+no-release decision is unchanged. See the [64K-capacity ledger report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-65536/README.md).
+
 A follow-up three-pair screen used the same executable code task with an exact
 8,192-token formatted prompt at 16K configured context. All twelve warmup and
 measured outputs passed the five-case oracle and matched across arms. Decode

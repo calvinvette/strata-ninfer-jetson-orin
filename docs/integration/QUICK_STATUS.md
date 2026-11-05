@@ -13,13 +13,14 @@ GiB sampled swap. E6/E7 remain open, the NInfer path remains opt-in, and no
 release profile is qualified. [8K code report](../../bench/results/2026-11-04-e6-q2-code-generation-8k-screen/README.md)
 · [release assessment](NINFER_E7_RELEASE_ASSESSMENT.md).
 
-The same 2K signed-ledger task now has separate 4K/8K/16K/32K context-cap
-screens. Decode paired medians were +1.71%, +1.22%, +0.82% and −15.12%, all
-below the 5% useful-effect threshold; the 32K interval was wide
-(−37.35% to +1.52%) after one slow NInfer arm. These cells were not jointly
-randomized and do not estimate a capacity interaction. The new
-[32K-cap report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-32768/README.md)
-records the task and memory limits.
+The same 2K signed-ledger task now has separate 4K/8K/16K/32K/64K context-cap
+screens. Decode paired medians were +1.71%, +1.22%, +0.82%, −15.12% and
+−0.27%, all below the 5% useful-effect threshold. The 32K interval was wide
+(−37.35% to +1.52%) after one slow NInfer arm; the 64K interval was −4.24% to
++0.66%. Minimum available memory at 64K was 7.82 GiB, with 2.68 GiB peak
+sampled swap. These independently randomized cells do not estimate a capacity
+interaction. See the [32K-cap report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-32768/README.md)
+and [64K-cap report](../../bench/results/2026-11-04-e6-q2-ledger-capacity-65536/README.md).
 
 The `neroued/Qwen3.8-Flash-Next-NInfer` package is now downloaded under
 `~/models/Qwen3.8-Flash-Next-NInfer/`. Its manifest identifies a mixed-format
