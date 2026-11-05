@@ -62,6 +62,13 @@ identity manifest is [here](../../2026-10-21-phase6-coder-current-source-cache-c
 The [all-layer input comparison](../state-moe-inputs/comparison.json) and
 [layer-0 route/output comparison](../state-moe-layer0/comparison.json) include
 the diagnostic summaries and their raw captures.
+The [ten-expert replay](../state-moe-layer0/ten-routed-expert-operator-parity.json)
+used the exact service activation and all ten experts selected at layer 0,
+position 2. Candidate-versus-Strata operator relative L2 ranged from
+`7.64e-8` to `9.24e-8`, with zero invalid values for all ten outputs. This
+confirms the small operator delta across the routed set; an independent
+mathematical oracle for these exact service rows and a task-quality test remain
+open.
 State instrumentation changes execution cost, so no timing comparison is
 reported. These short synthetic token-ID requests do not measure answer quality,
 held-out tasks, long-context behavior, or memory minima.
